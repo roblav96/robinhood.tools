@@ -6,6 +6,7 @@ declare let NODE_ENV: 'development' | 'production'
 declare let DEVELOPMENT: boolean
 declare let PRODUCTION: boolean
 declare let DOMAIN: string
+declare let VERSION: string
 
 declare namespace NodeJS {
 	interface Global {
@@ -13,7 +14,17 @@ declare namespace NodeJS {
 		DEVELOPMENT: typeof DEVELOPMENT
 		PRODUCTION: typeof PRODUCTION
 		DOMAIN: typeof DOMAIN
+		VERSION: typeof VERSION
 	}
 }
+
+
+
+interface Dict<T = any> {
+	[key: string]: T
+	[key: number]: T
+}
+
+
 
 

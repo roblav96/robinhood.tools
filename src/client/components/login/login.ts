@@ -2,6 +2,7 @@
 
 import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
+import * as http from '@/client/services/http'
 
 
 
@@ -10,8 +11,8 @@ import Vue from 'vue'
 })
 export default class Login extends Vue {
 
-	username = ''
-	password = ''
+	username = '' || process.env.VUE_APP_ROBINHOOD_USERNAME
+	password = '' || process.env.VUE_APP_ROBINHOOD_PASSWORD
 	busy = false
 	mfa = ''
 	ismfa = false
@@ -20,11 +21,14 @@ export default class Login extends Vue {
 
 	mounted() {
 		(this.$refs.username as HTMLElement).focus()
-		console.log('process.env', process.env)
 	}
 
 	submit() {
-
+		http.post('/robinhood/login').then(function(response) {
+			console.log('response', response)
+		}).catch(function(error) {
+			console.error('submit > error', error)
+		})
 	}
 
 }

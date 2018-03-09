@@ -20,10 +20,10 @@ form.robinhood-form .input:not(.is-danger):focus {
 				<img src="@/assets/robinhood-banner.png" class="h-5">
 			</header>
 			<section class="modal-card-body">
-				<b-field label="Email or Username" type="">
+				<b-field label="Email or Username">
 					<b-input ref="username" v-model="username" />
 				</b-field>
-				<b-field label="Password" type="">
+				<b-field label="Password">
 					<b-input type="password" v-model="password" required />
 				</b-field>
 			</section>
