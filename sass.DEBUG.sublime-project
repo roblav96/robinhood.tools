@@ -1,0 +1,9 @@
+{
+	"folders": [{
+		"name": "bulma",
+		"path": "node_modules/bulma/sass"
+	}, {
+		"name": "buefy",
+		"path": "node_modules/buefy/src/scss"
+	}]
+}

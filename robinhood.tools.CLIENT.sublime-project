@@ -1,0 +1,19 @@
+{
+	"folders": [{
+		"path": ".",
+		"folder_exclude_patterns": [
+			"assets",
+			"server",
+			"dist",
+			"node_modules"
+		],
+		"file_exclude_patterns": [
+			"*.svg",
+			"*.ico",
+			"*.png",
+			"*.server.*",
+			"license*",
+			"readme*"
+		]
+	}]
+}

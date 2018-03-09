@@ -1,0 +1,63 @@
+// 
+@import '~ibm-design-colors';
+@import '~bulma/sass/utilities/initial-variables';
+// 
+// /*████  COLORS  ████*/
+// 
+$_TINT: 'cool';
+// 
+$black: rgb(14, 14, 14);
+$black-bis: rgb(26, 26, 26);
+$black-ter: rgb(39, 39, 39);
+// 
+$grey-darker: color($_TINT + '-gray', 90);
+$grey-dark: color($_TINT + '-gray', 70);
+$grey: color($_TINT + '-gray', 50);
+$grey-light: color($_TINT + '-gray', 30);
+$grey-lighter: color($_TINT + '-gray', 20);
+// 
+$white-ter: color($_TINT + '-white', 4);
+$white-bis: color($_TINT + '-white', 2);
+$white: color('white', 0);
+// 
+$orange: color('orange', 30);
+$yellow: color('gold', 20);
+$green: color('green', 30);
+$turquoise: color('teal', 30);
+$cyan: color('aqua', 30);
+$blue: color('blue', 50);
+$purple: color('indigo', 60);
+$red: color('red', 50);
+// 
+$primary: #9855D4;
+$primary-light: #AF6EE8;
+$secondary: #FDD600;
+$secondary-light: #FDE876;
+$accent: #562F72;
+// 
+$info: $cyan;
+$success: $green;
+$warning: $orange;
+$danger: $red;
+// 
+// /*████  VARIABLES  ████*/
+// 
+$light: $white-ter;
+$dark: $grey-darker;
+// 
+$background: $white-ter;
+$body-background-color: $white-bis;
+// 
+$text: $grey-dark;
+$text-light: $grey;
+$text-strong: $grey-darker;
+// 
+$link: $primary;
+// 
+// $desktop: 769px;
+// 
+// $black: red;
+// $title-color: red;
+// 
+// 
+//

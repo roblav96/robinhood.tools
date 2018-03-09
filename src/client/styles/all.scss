@@ -1,0 +1,88 @@
+// 
+@charset 'utf-8';
+// 
+// /*████  FUNCTIONS  ████*/
+// 
+@import '~bulma/sass/utilities/functions';
+@import '~sassy-lists/stylesheets/functions/is-empty';
+@import '~sassy-lists/stylesheets/functions/is-single';
+@import '~sassy-lists/stylesheets/functions/has-multiple-values';
+@import '~sassy-lists/stylesheets/functions/debug';
+// 
+@function debug($var) {
+	@return sl-debug($var, true, 1);
+}
+
+@function inverted($color) {
+	@if (colorLuminance($color) > 0.55) {
+		@return $dark;
+	}
+	@return $light;
+}
+
+// 
+// /*████  THEME  ████*/
+// 
+@import './theme';
+// 
+// /*████  INVERTS  ████*/
+// 
+$light-invert: $dark;
+$dark-invert: $light;
+// 
+$orange-invert: inverted($orange);
+$yellow-invert: inverted($yellow);
+$green-invert: inverted($green);
+$turquoise-invert: inverted($turquoise);
+$cyan-invert: inverted($cyan);
+$blue-invert: inverted($blue);
+$purple-invert: inverted($purple);
+$red-invert: inverted($red);
+// 
+$info-invert: inverted($info);
+$success-invert: inverted($success);
+$warning-invert: inverted($warning);
+$danger-invert: inverted($danger);
+// 
+$primary-invert: inverted($primary);
+$primary-light-invert: inverted($primary-light);
+$secondary-invert: inverted($secondary);
+$secondary-light-invert: inverted($secondary-light);
+$accent-invert: inverted($accent);
+// 
+$text-invert: inverted($text);
+$link-invert: inverted($link);
+// 
+// /*████  FONTS  ████*/
+// 
+$family-sans-serif: ('IBM Plex Sans', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif);
+$family-primary: $family-sans-serif;
+$family-monospace: ('IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace);
+$family-code: $family-monospace;
+// 
+// /*████  UTILS  ████*/
+// 
+@import '~bulma/sass/utilities/all';
+@import '~buefy/src/scss/utils/all';
+// 
+// /*████  MERGES  ████*/
+// 
+$colors: map-merge($colors, ('primary':($primary, $primary-invert)));
+$colors: map-merge($colors, ('primary-light':($primary-light, $primary-light-invert)));
+$colors: map-merge($colors, ('secondary':($secondary, $secondary-invert)));
+$colors: map-merge($colors, ('secondary-light':($secondary-light, $secondary-light-invert)));
+$colors: map-merge($colors, ('accent':($accent, $accent-invert)));
+// 
+// /*████  EXTERNALS  ████*/
+// 
+@import './lolo';
+@import '~bulma';
+@import '~buefy/src/scss/buefy';
+// 
+// /*████  DEBUG  ████*/
+// 
+// @debug debug($title-color);
+// @debug debug($shades);
+// 
+// 
+//
