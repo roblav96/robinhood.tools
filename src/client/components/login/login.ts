@@ -24,7 +24,10 @@ export default class Login extends Vue {
 	}
 
 	submit() {
-		http.post('/robinhood/login').then(function(response) {
+		http.post('/robinhood/login', {
+			username: this.username,
+			password: this.password,
+		}).then(function(response) {
 			console.log('response', response)
 		}).catch(function(error) {
 			console.error('submit > error', error)

@@ -15,8 +15,8 @@ form.robinhood-form .input:not(.is-danger):focus {
 
 <template>
 	<form class="robinhood-form" v-on:submit.prevent="submit()">
-		<div class="modal-card" style="width: 240px;">
-			<header class="modal-card-head bg-white b-0 pb-0">
+		<div class="modal-card" style="width: 300px;">
+			<header class="modal-card-head bg-white">
 				<img src="@/assets/robinhood-banner.png" class="h-5">
 			</header>
 			<section class="modal-card-body">

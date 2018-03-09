@@ -22,11 +22,42 @@ import redis from './adapters/redis'
 
 const fastify = ffastify()
 
+fastify.use(require('cors')())
 
 
-fastify.get('/api/robinhood/login', function(request, reply) {
-	reply.send({ hello: 'world' })
+
+fastify.route({
+	method: 'POST',
+	url: '/api/robinhood/login',
+	schema: {
+		body: {
+			type: 'object',
+			properties: {
+				username: { type: 'string' },
+				password: { type: 'string' },
+			},
+		},
+		response: {
+			200: {
+				type: 'object',
+				properties: {
+					hello: { type: 'string' },
+				},
+			},
+		},
+	},
+	handler: function(request, reply) {
+		console.log('request >')
+		eyes.inspect(request)
+		reply.send({ hello: 'world' })
+	},
 })
+
+// fastify.post('/api/robinhood/login', (request, reply) => {
+// 	console.log('request >')
+// 	eyes.inspect(request)
+// 	reply.send({ hello: 'world' })
+// })
 
 
 
@@ -70,7 +101,7 @@ if (MASTER) {
 	let port = Number.parseInt(process.env.PORT) + INSTANCE
 	fastify.listen(port, process.env.HOST, function(error) {
 		if (error) console.error('fastify.listen > error', error);
-		else console.log('fastify ready >', port);
+		// else console.log('fastify ready >', port);
 	})
 
 }

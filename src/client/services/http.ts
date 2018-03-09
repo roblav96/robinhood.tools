@@ -3,12 +3,14 @@
 import * as _ from 'rambda'
 import * as got from 'got'
 import * as common from '@/common'
+import * as router from '@/client/router'
 
 
 
 function request(config: HttpRequestConfig): Promise<any> {
 	return Promise.resolve().then(function() {
 
+		config.json = true
 		let pconfig = config.isproxy ? common.object.clone(config) : undefined
 		// console.log('pconfig', JSON.stringify(pconfig, null, 4))
 
@@ -46,12 +48,20 @@ function request(config: HttpRequestConfig): Promise<any> {
 		})
 
 	}).catch(function(error: got.GotError) {
-		// console.log('http got > error', error)
-		let message = error.message
-		if (_.has('response.body.message', error)) message = error.response.body.message;
-		let premessage = '[' + config.method + '] ' + config.url
-		console.log('%c◀ ' + premessage + ' ◀', 'color: red; font-weight: bolder;', message)
-		// Snackbar.push({ message: premessage + ' > ' + message, color: 'error' })
+		let message = (error as any).statusMessage || error.message
+
+		let ishttp = _.is(got.HTTPError, error)
+		let route = '[' + (ishttp ? error.method : config.method) + '] ' + (ishttp ? error.url : config.url).replace(DOMAIN, '').trim()
+
+		if (common.json.is(_.path('response.body.message', error))) {
+			let response = JSON.parse(error.response.body.message)
+			if (Array.isArray(response)) response = response[0];
+			message = message + ': ' + common.string.id(response.dataPath) + ' ' + response.message
+		}
+
+		console.log('%c◀ ' + route, 'color: red; font-weight: bolder;', message)
+		{ (router.app as any).$toast.open({ message: route + ' ▶ ' + message, type: 'is-danger' }) }
+
 		return Promise.reject(error)
 	})
 
