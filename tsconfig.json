@@ -23,7 +23,6 @@
 		"src/**/*.vue"
 	],
 	"exclude": [
-		".git",
 		"dist",
 		"node_modules"
 	]

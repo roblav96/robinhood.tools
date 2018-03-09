@@ -1,19 +1,11 @@
 {
-	"extends": "../tsconfig",
+	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"target": "es5",
-		"module": "commonjs",
-		"lib": ["es2015"],
-		"outDir": "dist"
+		"module": "commonjs"
 	},
-	"include": [
-		"../types/**/*.d.ts",
-		"../shared/**/*.ts",
-		"**/*.ts"
-	],
 	"exclude": [
-		".git",
-		"dist",
-		"node_modules"
+		"../../src/client/**/*",
+		"../../dist",
+		"../../node_modules"
 	]
 }

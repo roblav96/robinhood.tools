@@ -1,7 +1,7 @@
 {
 	"scripts": {
 		"postinstall": "rm -rf node_modules/vuex/types/vue.d.ts",
-		"serve": "vue-cli-service serve",
+		"serve": "cross-env NODE_ENV=development vue-cli-service serve",
 		"serve-legacy": "rm -rf dist/client && cross-env NODE_ENV=development webpack --config node_modules/@vue/cli-service/webpack.config.js",
 		"build": "cross-env NODE_ENV=production vue-cli-service build"
 	},

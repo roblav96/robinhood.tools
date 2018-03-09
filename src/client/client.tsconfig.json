@@ -1,14 +1,8 @@
 {
-	"extends": "../../tsconfig",
-	"include": [
-		"src/main.ts",
-		"src/client/**/*.ts",
-		"src/client/**/*.vue"
-	],
+	"extends": "../../tsconfig.json",
 	"exclude": [
-		"server",
-		".git",
-		"dist",
-		"node_modules"
+		"../../src/server/**/*",
+		"../../dist",
+		"../../node_modules"
 	]
 }

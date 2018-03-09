@@ -3,7 +3,6 @@
 const eyes = require('eyes')
 eyes.defaults.maxLength = 131072
 const webpack = require('webpack')
-const LiveReloadPlugin = require('webpack-livereload-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 
@@ -27,26 +26,33 @@ module.exports = {
 		hotReload: false,
 	},
 
+	// devServer: {
+	// 	quiet: false,
+	// 	stats: {
+	// 		warnings: false, performance: false, modules: false,
+	// 		excludeAssets: [/img\//, /media\//, /fonts\//, /hot-update/],
+	// 	},
+	// },
+
 	configureWebpack: function(config) {
-		// config.watch = true
-		// config.stats = {
-		// 	warnings: false, performance: false, modules: false,
-		// 	excludeAssets: [/img\//, /media\//, /fonts\//],
-		// }
 		config.devtool = 'source-map'
 		delete config.node.process
 
-		config.output.filename = DEVELOPMENT ? '[name].bundle.js' : '[name].bundle.[hash].js'
-		config.output.chunkFilename = DEVELOPMENT ? 'chunk.[name].js' : '[chunkhash].chunk.[hash].js'
+		config.output.filename = '[name].bundle.[hash].js'
+		config.output.chunkFilename = '[chunkhash].chunk.[hash].js'
 
-		config.module.rules.forEach(function(rule) {
-			if (!Array.isArray(rule.use)) return;
-			rule.use.forEach(function(use) {
-				if (use.loader != 'url-loader') return;
-				use.loader = 'file-loader'
-				delete use.options.limit
+		if (DEVELOPMENT) {
+			config.output.filename = '[name].bundle.js'
+			config.output.chunkFilename = 'chunk.[name].js'
+			config.module.rules.forEach(function(rule) {
+				if (!Array.isArray(rule.use)) return;
+				rule.use.forEach(function(use) {
+					if (use.loader != 'url-loader') return;
+					use.loader = 'file-loader'
+					delete use.options.limit
+				})
 			})
-		})
+		}
 
 		config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
 			name: 'vendors', minChunks: module => module.context && module.context.includes('node_modules'),
@@ -55,27 +61,23 @@ module.exports = {
 			name: 'manifest', minChunks: Infinity,
 		}))
 
-		config.plugins.push(new webpack.IgnorePlugin(/dist/))
-		config.plugins.push(new webpack.IgnorePlugin(/server/))
-		config.plugins.push(new webpack.IgnorePlugin(/typescript/))
+		// config.plugins.push(new webpack.IgnorePlugin(/dist/))
+		// config.plugins.push(new webpack.IgnorePlugin(/server/))
+		// config.plugins.push(new webpack.IgnorePlugin(/typescript/))
 		config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/]))
-		// config.plugins.push(new LiveReloadPlugin({ appendScriptTag: true }))
 		// config.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 9999, openAnalyzer: false }))
 
 	},
 
 	chainWebpack: function(config) {
-		// config.plugins.delete('hmr')
+		config.plugin('fork-ts-checker').tap(function(args) {
+			args[0].tsconfig = 'src/client/client.tsconfig.json'
+			// args[0].async = false
+			return args
+		})
 		config.plugins.delete('no-emit-on-errors')
 		config.plugin('friendly-errors').tap(function(args) {
 			args[0].clearConsole = false
-			return args
-		})
-		config.plugin('fork-ts-checker').tap(function(args) {
-			// args[0].reportFiles = ['src/client/**/*', 'src/common/**/*']
-			args[0].tsconfig = 'src/client/client.tsconfig.json'
-			console.log('args[0] >')
-			eyes.inspect(args[0])
 			return args
 		})
 	},
@@ -90,7 +92,7 @@ module.exports = {
 
 // // const styles = new ExtractTextPlugin('style.css')
 // const ExtractTextPlugin = require('extract-text-webpack-plugin')
-
+// const LiveReloadPlugin = require('webpack-livereload-plugin')
 // const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin')
 
 // module.exports = {
