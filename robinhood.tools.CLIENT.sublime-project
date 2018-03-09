@@ -8,10 +8,7 @@
 			"node_modules"
 		],
 		"file_exclude_patterns": [
-			"*.ico",
-			"*.png",
-			"*.svg",
-			"*.server.*",
+			"*.server*",
 			"license*",
 			"readme*"
 		]

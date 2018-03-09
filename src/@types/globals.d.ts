@@ -7,6 +7,12 @@ declare let DEVELOPMENT: boolean
 declare let PRODUCTION: boolean
 declare let DOMAIN: string
 declare let VERSION: string
+declare let INSTANCE: number
+declare let INSTANCES: number
+declare let MASTER: boolean
+declare let WORKER: boolean
+declare let PRIMARY: boolean
+declare let EE3: EventEmitter
 
 declare namespace NodeJS {
 	interface Global {
@@ -15,6 +21,12 @@ declare namespace NodeJS {
 		PRODUCTION: typeof PRODUCTION
 		DOMAIN: typeof DOMAIN
 		VERSION: typeof VERSION
+		INSTANCE: typeof INSTANCE
+		INSTANCES: typeof INSTANCES
+		MASTER: typeof MASTER
+		WORKER: typeof WORKER
+		PRIMARY: typeof PRIMARY
+		EE3: typeof EE3
 	}
 }
 

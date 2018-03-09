@@ -1,9 +1,11 @@
 {
 	"scripts": {
 		"postinstall": "rm -rf node_modules/vuex/types/vue.d.ts",
-		"serve": "cross-env NODE_ENV=development vue-cli-service serve",
-		"serve-legacy": "rm -rf dist/client && cross-env NODE_ENV=development webpack --config node_modules/@vue/cli-service/webpack.config.js",
-		"build": "cross-env NODE_ENV=production vue-cli-service build"
+		"client:dev": "cross-env NODE_ENV=development vue-cli-service serve",
+		"client:dev-legacy": "rm -rf dist/client && cross-env NODE_ENV=development webpack --config node_modules/@vue/cli-service/webpack.config.js",
+		"client:build": "cross-env NODE_ENV=production vue-cli-service build",
+		"server:dev": "rm -rf dist && tsc-watch -p src/server/server.tsconfig.json --onSuccess 'npm run server:forever:dev'",
+		"server:forever:dev": "cross-env NODE_ENV=development forever --killTree --minUptime 1000 --spinSleepTime 10000 dist/server/server.js"
 	},
 	"dependencies": {
 		"@ibm/plex": "latest",
@@ -13,7 +15,6 @@
 		"bulma": "latest",
 		"correcting-interval": "latest",
 		"debug-trace": "latest",
-		"dotenv": "latest",
 		"eventemitter3": "latest",
 		"eyes": "latest",
 		"fastify": "latest",
@@ -48,13 +49,16 @@
 		"@vue/cli-service": "latest",
 		"cli-color": "latest",
 		"cross-env": "latest",
+		"dotenv": "latest",
 		"dts-gen": "latest",
 		"eyes": "latest",
+		"forever-fixed": "latest",
 		"node-sass": "latest",
 		"sass-loader": "latest",
 		"sassy-lists": "latest",
+		"source-map-support": "latest",
+		"tsc-watch": "latest",
 		"vue-template-compiler": "latest",
-		"webpack-bundle-analyzer": "latest",
-		"webpack-livereload-plugin": "latest"
+		"webpack-bundle-analyzer": "latest"
 	}
 }

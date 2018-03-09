@@ -1,7 +1,6 @@
 // 
 
 require('source-map-support').install()
-global.Promise = require('bluebird')
 import './process'
 // import './radio'
 
@@ -16,19 +15,19 @@ import * as cluster from 'cluster'
 import * as url from 'url'
 import * as moment from 'moment'
 import * as ffastify from 'fastify'
-import r from './adapters/rethinkdb'
-import redis from './adapters/redis'
+// import r from './adapters/rethinkdb'
+// import redis from './adapters/redis'
 
 
 
-if (process.MASTER) {
+if (MASTER) {
 
-	let host = url.parse(process.DOMAIN).host
-	if (process.DEVELOPMENT) host = process.HOST + ':' + process.PORT;
+	let host = url.parse(DOMAIN).host
+	// if (DEVELOPMENT) host = HOST + ':' + PORT;
 	console.log('\n \n' +
 		clc.bold.underline.magenta('𝛂CoinTrader') + '\n' +
-		'v' + process.VERSION + ' ' +
-		clc.bold(process.ENV) + '\n' +
+		'v' + VERSION + ' ' +
+		clc.bold(NODE_ENV) + '\n' +
 		host + '\n' +
 		'/*===============================================\n' +
 		'=========           ' + clc.bold(moment().format('hh:mm:ss')) + '           ==========\n' +
@@ -39,7 +38,7 @@ if (process.MASTER) {
 		console.warn('RESTART')
 		process.nextTick(() => process.exit(1))
 	})
-	process.EE3.once('RESTART', restart)
+	EE3.once('RESTART', restart)
 	// process.RADIO.once('RESTART', restart)
 
 	// console.log(clc.bold('Forking x' + clc.bold.redBright(process.INSTANCES) + ' nodes in cluster...'))
@@ -58,15 +57,15 @@ if (process.MASTER) {
 
 
 
-const fastify = ffastify()
+// const fastify = ffastify()
 
-fastify.listen(process.PORT, process.HOST, function(error) {
-	if (error) {
-		console.error('fastify.listen > error', error)
-		throw error
-	}
-	console.log('fastify ready')
-})
+// fastify.listen(process.PORT, process.HOST, function(error) {
+// 	if (error) {
+// 		console.error('fastify.listen > error', error)
+// 		throw error
+// 	}
+// 	console.log('fastify ready')
+// })
 
 
 

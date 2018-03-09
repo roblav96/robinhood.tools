@@ -12,7 +12,7 @@
 			"src/main.ts",
 			"vue.*",
 			"sass.*",
-			"*.env.*",
+			"*.local*",
 			"*.client.*",
 			"license*",
 			"readme*"

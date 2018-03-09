@@ -6,6 +6,9 @@ global.PRODUCTION = NODE_ENV == 'production'
 global.DOMAIN = process.env.VUE_APP_DOMAIN
 global.VERSION = '0.0.1'
 
+import ee3 from 'eventemitter3'
+global.EE3 = new ee3.EventEmitter()
+
 // 
 
 import '@ibm/plex/css/ibm-plex.css'
