@@ -36,6 +36,10 @@ function request(config: HttpRequestConfig): Promise<any> {
 			config.method = 'POST'
 		}
 
+		if (Object.keys(config.query).length == 0) {
+			config = _.omit('query', config)
+		}
+
 		console.log('config', JSON.stringify(config, null, 4))
 		return got(config.url, config).then(function(response) {
 			return Promise.resolve(response.body)

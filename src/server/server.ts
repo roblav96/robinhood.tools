@@ -24,7 +24,7 @@ const fastify = ffastify()
 
 
 
-fastify.get('/', function(request, reply) {
+fastify.get('/api/robinhood/login', function(request, reply) {
 	reply.send({ hello: 'world' })
 })
 
@@ -69,11 +69,8 @@ if (MASTER) {
 
 	let port = Number.parseInt(process.env.PORT) + INSTANCE
 	fastify.listen(port, process.env.HOST, function(error) {
-		if (error) {
-			console.error('fastify.listen > error', error)
-			throw error
-		}
-		console.log('fastify ready >', port)
+		if (error) console.error('fastify.listen > error', error);
+		else console.log('fastify ready >', port);
 	})
 
 }
