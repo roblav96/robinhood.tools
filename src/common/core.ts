@@ -35,6 +35,10 @@ export const valid = {
 
 export const string = {
 	is(value): value is string { return typeof value == 'string' },
+	id(id: string, tolower = false): string {
+		id = id.replace(/\W+/g, '').trim()
+		return tolower == true ? id.toLowerCase() : id
+	},
 	fuzzy(needle: string, haystack: string) {
 		if (!string.is(needle) || !string.is(haystack)) return false;
 		let hlen = haystack.length
@@ -64,6 +68,10 @@ export const number = {
 	parseFloat(value: string) {
 		return Number.parseFloat(value.replace(/[^0-9\.]/g, ''))
 	},
+	round(value: number, precision = 0) {
+		value = +(Math.round(value + 'e+' + precision as any) + 'e-' + precision)
+		return Number.isFinite(value) ? value : 0
+	},
 }
 
 
@@ -79,7 +87,7 @@ export const object = {
 	clone<T>(target: T): T { return JSON.parse(JSON.stringify(target)) },
 	compact<T>(target: T) {
 		Object.keys(target).forEach(function(key) {
-			if (isBad(target[key])) _.omit(key, target); // _.unset(target, key);
+			if (isBad(target[key])) target = _.omit(key, target); // _.unset(target, key);
 		})
 	},
 	merge<T>(target: T, source: T) {

@@ -1,8 +1,8 @@
 // 
 
 require('source-map-support').install()
-import './process'
-// import './radio'
+require('./process')
+// require('./radio')
 
 // 
 
@@ -15,17 +15,29 @@ import * as cluster from 'cluster'
 import * as url from 'url'
 import * as moment from 'moment'
 import * as ffastify from 'fastify'
-// import r from './adapters/rethinkdb'
-// import redis from './adapters/redis'
+import r from './adapters/rethinkdb'
+import redis from './adapters/redis'
+
+
+
+const fastify = ffastify()
+
+
+
+fastify.get('/', function(request, reply) {
+	reply.send({ hello: 'world' })
+})
+
+
 
 
 
 if (MASTER) {
 
 	let host = url.parse(DOMAIN).host
-	// if (DEVELOPMENT) host = HOST + ':' + PORT;
+	if (DEVELOPMENT) host = process.env.HOST + ':' + process.env.PORT;
 	console.log('\n \n' +
-		clc.bold.underline.magenta('𝛂CoinTrader') + '\n' +
+		clc.bold.underline.magenta(process.env.DNAME) + '\n' +
 		'v' + VERSION + ' ' +
 		clc.bold(NODE_ENV) + '\n' +
 		host + '\n' +
@@ -41,31 +53,30 @@ if (MASTER) {
 	EE3.once('RESTART', restart)
 	// process.RADIO.once('RESTART', restart)
 
-	// console.log(clc.bold('Forking x' + clc.bold.redBright(process.INSTANCES) + ' nodes in cluster...'))
-	// let i: number, len = process.INSTANCES
-	// for (i = 0; i < len; i++) { cluster.fork() }
-	// cluster.on('disconnect', function(worker) {
-	// 	console.warn('cluster disconnect >', worker.id)
-	// 	process.RADIO.emit('RESTART')
-	// })
-	// cluster.on('exit', function(worker, code, signal) {
-	// 	console.error('cluster exit >', worker.id, code, signal)
-	// 	process.RADIO.emit('RESTART')
-	// })
+	console.log(clc.bold('Forking x' + clc.bold.redBright(INSTANCES) + ' nodes in cluster...'))
+	let i: number, len = INSTANCES
+	for (i = 0; i < len; i++) { cluster.fork() }
+	cluster.on('disconnect', function(worker) {
+		console.warn('cluster disconnect >', worker.id)
+		// process.RADIO.emit('RESTART')
+	})
+	cluster.on('exit', function(worker, code, signal) {
+		console.error('cluster exit >', worker.id, code, signal)
+		// process.RADIO.emit('RESTART')
+	})
+
+} else {
+
+	let port = Number.parseInt(process.env.PORT) + INSTANCE
+	fastify.listen(port, process.env.HOST, function(error) {
+		if (error) {
+			console.error('fastify.listen > error', error)
+			throw error
+		}
+		console.log('fastify ready >', port)
+	})
 
 }
-
-
-
-// const fastify = ffastify()
-
-// fastify.listen(process.PORT, process.HOST, function(error) {
-// 	if (error) {
-// 		console.error('fastify.listen > error', error)
-// 		throw error
-// 	}
-// 	console.log('fastify ready')
-// })
 
 
 

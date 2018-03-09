@@ -6,9 +6,11 @@ import * as _ from 'rambda'
 
 import * as os from 'os'
 import * as cluster from 'cluster'
+import * as path from 'path'
 import * as url from 'url'
 import * as ee3 from 'eventemitter3'
 import * as moment from 'moment'
+import * as dotenv from 'dotenv'
 
 
 
@@ -17,14 +19,15 @@ Object.assign((eyes as any).defaults, { maxLength: 65536, showHidden: true } as 
 global.NODE_ENV = process.env.NODE_ENV as any
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
+dotenv.config({ path: path.resolve(process.cwd(), '.env.' + NODE_ENV + '.server') })
+global.DOMAIN = process.env.DOMAIN
+global.VERSION = '0.0.1'
 
 global.INSTANCES = os.cpus().length
 global.INSTANCE = cluster.isWorker ? Number.parseInt(cluster.worker.id as any) - 1 : -1
 global.PRIMARY = INSTANCE == 0
 global.MASTER = cluster.isMaster
 global.WORKER = cluster.isWorker
-
-global.VERSION = '0.0.1'
 
 global.EE3 = new ee3.EventEmitter()
 
