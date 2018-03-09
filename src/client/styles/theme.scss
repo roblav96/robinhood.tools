@@ -35,6 +35,10 @@ $secondary: #FDD600;
 $secondary-light: #FDE876;
 $accent: #562F72;
 // 
+$robinhood-primary: #21CE99;
+$robinhood-secondary: #F45531;
+$robinhood-accent: #303030; // #424242;
+// 
 $info: $cyan;
 $success: $green;
 $warning: $orange;
@@ -55,9 +59,41 @@ $text-strong: $grey-darker;
 $link: $primary;
 // 
 // $desktop: 769px;
+$modal-content-width: 480px;
 // 
 // $black: red;
 // $title-color: red;
+// 
+// /*████  INVERTS  ████*/
+// 
+$light-invert: $dark;
+$dark-invert: $light;
+// 
+$orange-invert: inverted($orange);
+$yellow-invert: inverted($yellow);
+$green-invert: inverted($green);
+$turquoise-invert: inverted($turquoise);
+$cyan-invert: inverted($cyan);
+$blue-invert: inverted($blue);
+$purple-invert: inverted($purple);
+$red-invert: inverted($red);
+// 
+$info-invert: inverted($info);
+$success-invert: inverted($success);
+$warning-invert: inverted($warning);
+$danger-invert: inverted($danger);
+// 
+$primary-invert: inverted($primary);
+$primary-light-invert: inverted($primary-light);
+$secondary-invert: inverted($secondary);
+$secondary-light-invert: inverted($secondary-light);
+$accent-invert: inverted($accent);
+$robinhood-primary-invert: inverted($robinhood-primary);
+$robinhood-secondary-invert: inverted($robinhood-secondary);
+$robinhood-accent-invert: inverted($robinhood-accent);
+// 
+$text-invert: inverted($text);
+$link-invert: inverted($link);
 // 
 // 
 //

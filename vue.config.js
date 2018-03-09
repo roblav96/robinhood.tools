@@ -28,11 +28,11 @@ module.exports = {
 	},
 
 	configureWebpack: function(config) {
-		config.watch = true
-		config.stats = {
-			warnings: false, performance: false, modules: false,
-			excludeAssets: [/img\//, /media\//, /fonts\//],
-		}
+		// config.watch = true
+		// config.stats = {
+		// 	warnings: false, performance: false, modules: false,
+		// 	excludeAssets: [/img\//, /media\//, /fonts\//],
+		// }
 		config.devtool = 'source-map'
 		delete config.node.process
 
@@ -56,13 +56,13 @@ module.exports = {
 		}))
 
 		config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/]))
-		config.plugins.push(new LiveReloadPlugin({ appendScriptTag: true }))
+		// config.plugins.push(new LiveReloadPlugin({ appendScriptTag: true }))
 		// config.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 9999, openAnalyzer: false }))
 
 	},
 
 	chainWebpack: function(config) {
-		config.plugins.delete('hmr')
+		// config.plugins.delete('hmr')
 		config.plugins.delete('no-emit-on-errors')
 		config.plugin('friendly-errors').tap(function(args) {
 			args[0].clearConsole = false

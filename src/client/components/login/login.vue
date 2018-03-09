@@ -1,0 +1,37 @@
+<!--  -->
+<script lang="ts" src="./login.ts"></script>
+
+<style>
+/*  */
+
+form.robinhood-form .input:not(.is-danger):focus {
+	border-color: #21CE99;
+	box-shadow: 0 0 0 0.125em rgba(33, 206, 153, 0.25);
+}
+
+/*  */
+
+</style>
+
+<template>
+	<form class="robinhood-form" v-on:submit.prevent="submit()">
+		<div class="modal-card" style="width: 240px;">
+			<header class="modal-card-head bg-white b-0 pb-0">
+				<img src="@/assets/robinhood-banner.png" class="h-5">
+			</header>
+			<section class="modal-card-body">
+				<b-field label="Email or Username" type="">
+					<b-input ref="username" v-model="username" />
+				</b-field>
+				<b-field label="Password" type="">
+					<b-input type="password" v-model="password" required />
+				</b-field>
+			</section>
+			<footer class="modal-card-foot">
+				<button class="button is-robinhood-primary w-100 t-bold" type="submit" :disabled="disabled" :loading="busy">
+					Sign In
+				</button>
+			</footer>
+		</div>
+	</form>
+</template>

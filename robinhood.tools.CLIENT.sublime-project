@@ -8,9 +8,9 @@
 			"node_modules"
 		],
 		"file_exclude_patterns": [
-			"*.svg",
 			"*.ico",
 			"*.png",
+			"*.svg",
 			"*.server.*",
 			"license*",
 			"readme*"

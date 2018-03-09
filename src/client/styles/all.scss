@@ -25,34 +25,6 @@
 // 
 @import './theme';
 // 
-// /*████  INVERTS  ████*/
-// 
-$light-invert: $dark;
-$dark-invert: $light;
-// 
-$orange-invert: inverted($orange);
-$yellow-invert: inverted($yellow);
-$green-invert: inverted($green);
-$turquoise-invert: inverted($turquoise);
-$cyan-invert: inverted($cyan);
-$blue-invert: inverted($blue);
-$purple-invert: inverted($purple);
-$red-invert: inverted($red);
-// 
-$info-invert: inverted($info);
-$success-invert: inverted($success);
-$warning-invert: inverted($warning);
-$danger-invert: inverted($danger);
-// 
-$primary-invert: inverted($primary);
-$primary-light-invert: inverted($primary-light);
-$secondary-invert: inverted($secondary);
-$secondary-light-invert: inverted($secondary-light);
-$accent-invert: inverted($accent);
-// 
-$text-invert: inverted($text);
-$link-invert: inverted($link);
-// 
 // /*████  FONTS  ████*/
 // 
 $family-sans-serif: ('IBM Plex Sans', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif);
@@ -72,6 +44,9 @@ $colors: map-merge($colors, ('primary-light':($primary-light, $primary-light-inv
 $colors: map-merge($colors, ('secondary':($secondary, $secondary-invert)));
 $colors: map-merge($colors, ('secondary-light':($secondary-light, $secondary-light-invert)));
 $colors: map-merge($colors, ('accent':($accent, $accent-invert)));
+$colors: map-merge($colors, ('robinhood-primary':($robinhood-primary, $robinhood-primary-invert)));
+$colors: map-merge($colors, ('robinhood-secondary':($robinhood-secondary, $robinhood-secondary-invert)));
+$colors: map-merge($colors, ('robinhood-accent':($robinhood-accent, $robinhood-accent-invert)));
 // 
 // /*████  EXTERNALS  ████*/
 // 
