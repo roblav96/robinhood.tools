@@ -20,11 +20,14 @@ declare namespace NodeJS {
 
 
 
+interface Console {
+	format(c: any): any
+}
+
 interface Dict<T = any> {
 	[key: string]: T
 	[key: number]: T
 }
-
 
 
 

@@ -55,6 +55,9 @@ module.exports = {
 			name: 'manifest', minChunks: Infinity,
 		}))
 
+		config.plugins.push(new webpack.IgnorePlugin(/dist/))
+		config.plugins.push(new webpack.IgnorePlugin(/server/))
+		config.plugins.push(new webpack.IgnorePlugin(/typescript/))
 		config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/]))
 		// config.plugins.push(new LiveReloadPlugin({ appendScriptTag: true }))
 		// config.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 9999, openAnalyzer: false }))
@@ -66,6 +69,13 @@ module.exports = {
 		config.plugins.delete('no-emit-on-errors')
 		config.plugin('friendly-errors').tap(function(args) {
 			args[0].clearConsole = false
+			return args
+		})
+		config.plugin('fork-ts-checker').tap(function(args) {
+			// args[0].reportFiles = ['src/client/**/*', 'src/common/**/*']
+			args[0].tsconfig = 'src/client/client.tsconfig.json'
+			console.log('args[0] >')
+			eyes.inspect(args[0])
 			return args
 		})
 	},
