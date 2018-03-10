@@ -1,6 +1,7 @@
 // 
 // /*████  VARIABLES  ████*/
 // 
+// $_breakpoints: ('mobile', 'tablet', 'tablet-only', 'touch', 'desktop', 'desktop-only', 'widescreen', 'widescreen-only', 'fullhd');
 $_breakpoints: ('mobile', 'tablet', 'touch', 'desktop', 'widescreen', 'fullhd');
 // 
 // /*████  COLORS  ████*/
@@ -71,6 +72,14 @@ $pair in $colors {
 	font-style: italic !important;
 }
 
+// 
+// $_weights: ('light', 'normal', 'medium', 'semibold', 'bold');
+// @each $_weight in $_weights {
+// 	.t-#{$_weight} {
+// 		font-weight: $weight-#{$_weight} !important;
+// 	}
+// }
+// 
 .t-light {
 	font-weight: $weight-light !important;
 }

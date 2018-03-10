@@ -17,7 +17,7 @@ import Login from '@/client/components/login/login'
 export default class App extends Vue {
 
 	mounted() {
-		setTimeout(() => this.showLogin(), 1)
+		setTimeout(() => this.showLogin(), 300)
 	}
 
 

@@ -2,9 +2,9 @@
 <script lang="ts" src="./navbar.ts"></script>
 
 <style>
-/*  */
+/**/
 
-/*  */
+/**/
 
 </style>
 
@@ -15,6 +15,11 @@
 				<a class="navbar-item is-hidden-desktop" v-on:click="showMenu = !showMenu">
 					<b-icon icon="menu" />
 				</a>
+				<!-- <div class="navbar-item ml-auto">
+					<b-field>
+						<b-input type="search" placeholder="Search anything..." icon="magnify" />
+					</b-field>
+				</div> -->
 			</div>
 			<div class="navbar-menu" :class="{ 'is-active': showMenu }">
 				<div class="navbar-start">
@@ -43,7 +48,6 @@
 					</div>
 				</div>
 			</div>
-
 		</div>
 	</nav>
 </template>

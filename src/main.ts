@@ -11,6 +11,14 @@ global.EE3 = new ee3.EventEmitter()
 
 // 
 
+// if (PRODUCTION) {
+// let script = document.createElement('script')
+// script.setAttribute('src', 'https://www.google.com/recaptcha/api.js?render=explicit')
+// script.async = true
+// script.defer = true
+// document.body.appendChild(script)
+// }
+
 import '@ibm/plex/css/ibm-plex.css'
 import 'mdi/css/materialdesignicons.css'
 
@@ -29,8 +37,8 @@ Vue.config.performance = false
 Vue.use(VueRouter)
 Vue.use(Vuex)
 Vue.use(Buefy, {
-	defaultSnackbarDuration: 3000,
-	defaultToastDuration: 3000,
+	defaultSnackbarDuration: 5000,
+	defaultToastDuration: 5000,
 	defaultInputAutocomplete: 'off',
 	defaultNoticeQueue: false,
 })

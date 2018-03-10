@@ -40,6 +40,7 @@
 	"devDependencies": {
 		"@types/boom": "latest",
 		"@types/cli-color": "latest",
+		"@types/cors": "latest",
 		"@types/eyes": "latest",
 		"@types/got": "latest",
 		"@types/ioredis": "0.0.27",

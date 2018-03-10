@@ -14,7 +14,9 @@ import * as os from 'os'
 import * as cluster from 'cluster'
 import * as url from 'url'
 import * as moment from 'moment'
+import * as got from 'got'
 import * as ffastify from 'fastify'
+import * as cors from 'cors'
 import r from './adapters/rethinkdb'
 import redis from './adapters/redis'
 
@@ -22,7 +24,7 @@ import redis from './adapters/redis'
 
 const fastify = ffastify()
 
-fastify.use(require('cors')())
+fastify.use(cors())
 
 
 
@@ -46,20 +48,50 @@ fastify.route({
 			},
 		},
 	},
-	handler: function(request, reply) {
+	handler: async function(request, reply) {
 		console.log('request >')
 		eyes.inspect(request)
-		reply.send({ hello: 'world' })
+		return reply.send({ hello: 'world' })
 	},
 })
 
-// fastify.post('/api/robinhood/login', (request, reply) => {
-// 	console.log('request >')
-// 	eyes.inspect(request)
-// 	reply.send({ hello: 'world' })
-// })
 
 
+fastify.route({
+	method: 'POST',
+	url: '/api/recaptcha/verify',
+	schema: {
+		body: {
+			type: 'object',
+			properties: {
+				response: { type: 'string' },
+			},
+		},
+		response: {
+			200: {
+				type: 'object',
+				properties: {
+					success: { type: 'boolean' },
+				},
+			},
+		},
+	},
+	handler: async function(request, reply) {
+		request.body.secret = process.env.RECAPTCHA_SECRET
+		console.log('request.body >')
+		eyes.inspect(request.body)
+		return got.post('https://www.google.com/recaptcha/api/siteverify', {
+			query: request.body, json: true,
+		}).then(function({ body }) {
+			console.log('body >')
+			eyes.inspect(body)
+			// if (body['error-codes'].length > 0) {
+			// 	throw JSON.stringify(body['error-codes'])
+			// }
+			return reply.send({ success: body.success })
+		})
+	},
+})
 
 
 

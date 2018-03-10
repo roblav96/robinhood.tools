@@ -15,8 +15,8 @@ function request(config: HttpRequestConfig): Promise<any> {
 		// console.log('pconfig', JSON.stringify(pconfig, null, 4))
 
 		if (!Number.isFinite(config.timeout)) config.timeout = 10000;
-		if (!Number.isFinite(config.retries as any)) config.retries = 3;
-		config.silent = config.silent == true || PRODUCTION
+		if (!Number.isFinite(config.retries as any)) config.retries = 5;
+		config.silent = config.silent || PRODUCTION
 		if (!config.silent) console.log('%c▶ ' + config.method + ' ' + config.url + ' ▶', 'font-weight: 300;', (JSON.stringify(config.query || config.body || {})).substring(0, 64));
 
 		if (config.url[0] == '/') config.url = DOMAIN + '/api' + config.url;
