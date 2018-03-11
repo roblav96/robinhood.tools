@@ -3,11 +3,6 @@
 global.NODE_ENV = process.env.NODE_ENV as any
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
-global.DOMAIN = process.env.VUE_APP_DOMAIN
-global.VERSION = '0.0.1'
-
-import ee3 from 'eventemitter3'
-global.EE3 = new ee3.EventEmitter()
 
 // 
 

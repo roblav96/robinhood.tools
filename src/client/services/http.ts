@@ -19,21 +19,21 @@ function request(config: HttpRequestConfig): Promise<any> {
 		config.silent = config.silent || PRODUCTION
 		if (!config.silent) console.log('%c▶ ' + config.method + ' ' + config.url + ' ▶', 'font-weight: 300;', (JSON.stringify(config.query || config.body || {})).substring(0, 64));
 
-		if (config.url[0] == '/') config.url = DOMAIN + '/api' + config.url;
+		if (config.url[0] == '/') config.url = process.env.DOMAIN + '/api' + config.url;
 
 		if (!config.query) config.query = {};
 		if (config.silent) config.query.silent = true;
 
 		if (!config.headers) config.headers = {};
 		Object.assign(config.headers, {
-			'x-version': VERSION,
+			'x-version': process.env.VERSION,
 			'x-platform': 'web',
 		})
 		// Object.assign(config.headers, security.getHeaders())
 		common.object.compact(config.headers)
 
 		if (config.isproxy) {
-			config.url = DOMAIN + '/api/proxy'
+			config.url = process.env.DOMAIN + '/api/proxy'
 			config.body = pconfig
 			config.method = 'POST'
 		}
@@ -51,7 +51,7 @@ function request(config: HttpRequestConfig): Promise<any> {
 		let message = (error as any).statusMessage || error.message
 
 		let ishttp = _.is(got.HTTPError, error)
-		let route = '[' + (ishttp ? error.method : config.method) + '] ' + (ishttp ? error.url : config.url).replace(DOMAIN, '').trim()
+		let route = '[' + (ishttp ? error.method : config.method) + '] ' + (ishttp ? error.url : config.url).replace(process.env.DOMAIN, '').trim()
 
 		if (common.json.is(_.path('response.body.message', error))) {
 			let response = JSON.parse(error.response.body.message)

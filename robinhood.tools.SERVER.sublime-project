@@ -12,7 +12,6 @@
 			"src/main.ts",
 			"vue.*",
 			"sass.*",
-			"*.local*",
 			"*.client.*",
 			"license*",
 			"readme*"

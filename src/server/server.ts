@@ -10,25 +10,26 @@ import * as eyes from 'eyes'
 import * as clc from 'cli-color'
 import * as _ from 'lodash'
 
+import { Server, IncomingMessage, ServerResponse } from 'http'
 import * as os from 'os'
 import * as cluster from 'cluster'
 import * as url from 'url'
 import * as moment from 'moment'
 import * as got from 'got'
-import * as ffastify from 'fastify'
+import * as fastify from 'fastify'
 import * as cors from 'cors'
 import r from './adapters/rethinkdb'
 import redis from './adapters/redis'
 
 
 
-const fastify = ffastify()
+const server = fastify()
 
-fastify.use(cors())
+server.use(cors())
 
 
 
-fastify.route({
+server.route({
 	method: 'POST',
 	url: '/api/robinhood/login',
 	schema: {
@@ -50,14 +51,14 @@ fastify.route({
 	},
 	handler: async function(request, reply) {
 		console.log('request >')
-		eyes.inspect(request)
+		eyes.inspect(request.req)
 		return reply.send({ hello: 'world' })
 	},
 })
 
 
 
-fastify.route({
+server.route({
 	method: 'POST',
 	url: '/api/recaptcha/verify',
 	schema: {
@@ -77,6 +78,8 @@ fastify.route({
 		},
 	},
 	handler: async function(request, reply) {
+		console.log('request >')
+		eyes.inspect(request)
 		request.body.secret = process.env.RECAPTCHA_SECRET
 		console.log('request.body >')
 		eyes.inspect(request.body)
@@ -95,13 +98,13 @@ fastify.route({
 
 
 
-if (MASTER) {
+if (process.MASTER) {
 
-	let host = url.parse(DOMAIN).host
+	let host = url.parse(process.env.DOMAIN).host
 	if (DEVELOPMENT) host = process.env.HOST + ':' + process.env.PORT;
 	console.log('\n \n' +
 		clc.bold.underline.magenta(process.env.DNAME) + '\n' +
-		'v' + VERSION + ' ' +
+		'v' + process.env.VERSION + ' ' +
 		clc.bold(NODE_ENV) + '\n' +
 		host + '\n' +
 		'/*===============================================\n' +
@@ -113,11 +116,11 @@ if (MASTER) {
 		console.warn('RESTART')
 		process.nextTick(() => process.exit(1))
 	})
-	EE3.once('RESTART', restart)
+	process.EE3.once('RESTART', restart)
 	// process.RADIO.once('RESTART', restart)
 
-	console.log(clc.bold('Forking x' + clc.bold.redBright(INSTANCES) + ' nodes in cluster...'))
-	let i: number, len = INSTANCES
+	console.log(clc.bold('Forking x' + clc.bold.redBright(process.INSTANCES) + ' nodes in cluster...'))
+	let i: number, len = process.INSTANCES
 	for (i = 0; i < len; i++) { cluster.fork() }
 	cluster.on('disconnect', function(worker) {
 		console.warn('cluster disconnect >', worker.id)
@@ -130,10 +133,10 @@ if (MASTER) {
 
 } else {
 
-	let port = Number.parseInt(process.env.PORT) + INSTANCE
-	fastify.listen(port, process.env.HOST, function(error) {
+	let port = Number.parseInt(process.env.PORT) + process.INSTANCE + 1
+	server.listen(port, process.env.HOST, function(error) {
 		if (error) console.error('fastify.listen > error', error);
-		// else console.log('fastify ready >', port);
+		else console.log('fastify ready >', port);
 	})
 
 }

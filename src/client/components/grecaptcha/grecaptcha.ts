@@ -12,7 +12,7 @@ import * as http from '@/client/services/http'
 })
 export default class Grecaptcha extends Vue {
 
-	static emitter = new ee3.EventEmitter()
+	static emitter = new ee3.EventEmitter<'onload'>()
 
 	@Vts.Prop() gresponse: (success: boolean) => void
 
@@ -46,7 +46,7 @@ export default class Grecaptcha extends Vue {
 		if (loaded) {
 			console.warn('g > RENDER')
 			window.grecaptcha.render(this.$el, {
-				sitekey: '6LdzxksUAAAAAOVrhQz7iLCfzDPqgdwWsc36-3oX',
+				sitekey: process.env.RECAPTCHA_SITE,
 				theme: 'light',
 				size: 'normal',
 				'callback': this.gcallback,

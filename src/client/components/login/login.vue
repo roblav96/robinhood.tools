@@ -25,7 +25,7 @@ form.robinhood-form .input:not(.is-danger):focus {
                 <b-field label="Email or Username">
                     <b-input id="username_input" type="text" v-model="username" required />
                 </b-field>
-                <b-field label="Password" class="mb-3">
+                <b-field label="Password" class="mb-4">
                     <b-input type="password" v-model="password" required />
                 </b-field>
                 <v-grecaptcha :gresponse="gresponse" />

@@ -19,24 +19,22 @@ Object.assign((eyes as any).defaults, { maxLength: 65536, showHidden: true } as 
 global.NODE_ENV = process.env.NODE_ENV as any
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
-dotenv.config({ path: path.resolve(process.cwd(), '.env.' + NODE_ENV + '.server') })
-global.DOMAIN = process.env.DOMAIN
-global.VERSION = '0.0.1'
 
-global.INSTANCES = os.cpus().length
-global.INSTANCE = cluster.isWorker ? Number.parseInt(cluster.worker.id as any) - 1 : -1
-global.PRIMARY = INSTANCE == 0
-global.MASTER = cluster.isMaster
-global.WORKER = cluster.isWorker
+dotenv.config({ path: path.resolve(process.cwd(), '.server.' + NODE_ENV + '.local') })
 
-global.EE3 = new ee3.EventEmitter()
+process.EE3 = new ee3.EventEmitter()
+process.INSTANCES = os.cpus().length
+process.INSTANCE = cluster.isWorker ? Number.parseInt(cluster.worker.id as any) - 1 : -1
+process.PRIMARY = process.INSTANCE == 0
+process.MASTER = cluster.isMaster
+process.WORKER = cluster.isWorker
 
 
 
 require('debug-trace')()
 console.format = function(args) {
 	let time = moment().format('hh:mm:ss:SSS')
-	let instance = '[' + INSTANCE + ']'
+	let instance = '[' + process.INSTANCE + ']'
 	let stack = new Error().stack.toString()
 	// eyes.inspect(stack, 'stack')
 	stack = stack.replace(/^ {4}at /gm, '').split('\n')[4].trim()
@@ -74,7 +72,7 @@ process.on('unhandledRejection', function(error) {
 
 
 if (DEVELOPMENT) {
-	if (MASTER) setInterval(process.stdout.write, 1000, (clc as any).erase.lineRight);
+	if (process.MASTER) setInterval(process.stdout.write, 1000, (clc as any).erase.lineRight);
 	// const dtsgen = require('dts-gen')
 	// const clipboardy = require('clipboardy')
 	// process.dtsgen = function(name, value) {

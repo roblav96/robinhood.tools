@@ -3,6 +3,9 @@
 const eyes = require('eyes')
 eyes.defaults.maxLength = 131072
 const webpack = require('webpack')
+const fs = require('fs')
+const path = require('path')
+const dotenv = require('dotenv')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 
@@ -70,9 +73,14 @@ module.exports = {
 	},
 
 	chainWebpack: function(config) {
+		// console.log('config.plugins', config.plugins)
+		config.plugin('define').tap(function(args) {
+			let parsed = dotenv.parse(fs.readFileSync(path.resolve(process.cwd(), '.client.' + NODE_ENV + '.local')))
+			Object.keys(parsed).forEach(k => args[0]['process.env'][k] = '"' + parsed[k] + '"')
+			return args
+		})
 		config.plugin('fork-ts-checker').tap(function(args) {
 			args[0].tsconfig = 'src/client/client.tsconfig.json'
-			// args[0].async = false
 			return args
 		})
 		config.plugins.delete('no-emit-on-errors')
