@@ -1,6 +1,6 @@
 // 
 
-import * as _ from 'rambda'
+import * as _ from 'lodash'
 
 
 
@@ -19,15 +19,22 @@ export function noop() { }
 
 
 export const valid = {
-	symbol(symbol: string) {
+	symbol(symbol: string): boolean {
 		if (!string.is(symbol)) return false;
 		return symbol.match(/[^a-zA-Z0-9]/) == null
 	},
-	email(email: string) {
+	email(email: string): boolean {
 		if (!string.is(email)) return false;
 		/** ████ maybe prevents future Regex vulnerabilities? */
 		if (email.indexOf('@') == -1 || email.indexOf('.') == -1) return false;
 		return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)
+	},
+	headers(headers: Dict<string>, keys: string[]): string {
+		let i: number, len = keys.length
+		for (i = 0; i < len; i++) {
+			let key = keys[i]
+			if (headers[key] == null) return key;
+		}
 	},
 }
 
@@ -39,7 +46,7 @@ export const string = {
 		id = id.replace(/\W+/g, '').trim()
 		return tolower == true ? id.toLowerCase() : id
 	},
-	fuzzy(needle: string, haystack: string) {
+	fuzzy(needle: string, haystack: string): boolean {
 		if (!string.is(needle) || !string.is(haystack)) return false;
 		let hlen = haystack.length
 		let nlen = needle.length
@@ -83,11 +90,11 @@ export const boolean = {
 
 
 export const object = {
-	is<T>(target: T): target is T { return _.is(Object, target) },
+	is<T>(target: T): target is T { return _.isPlainObject(target) },
 	clone<T>(target: T): T { return JSON.parse(JSON.stringify(target)) },
 	compact<T>(target: T) {
 		Object.keys(target).forEach(function(key) {
-			if (isBad(target[key])) target = _.omit(key, target); // _.unset(target, key);
+			if (isBad(target[key])) _.unset(target, key);
 		})
 	},
 	merge<T>(target: T, source: T) {
@@ -142,7 +149,6 @@ export const array = {
 	// 	return array.chunks(items, process.INSTANCES)[process.INSTANCE]
 	// },
 	merge<T>(target: T[], source: T[], key: string) {
-		// if (!array.is(source)) return;
 		source.forEach(function(item, i) {
 			let found = target.find(v => v && v[key] == item[key])
 			if (found) object.merge(found, item);

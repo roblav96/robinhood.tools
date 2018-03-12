@@ -2,7 +2,7 @@
 
 import * as eyes from 'eyes'
 import * as clc from 'cli-color'
-import * as _ from 'rambda'
+import * as _ from 'lodash'
 import * as common from '../../common'
 
 import * as ioredis from 'ioredis'
@@ -23,7 +23,8 @@ class Redis extends ioredis {
 
 		if (PRODUCTION) {
 			opts.path = '/var/run/redis_' + opts.port + '.sock'
-			opts = _.omit(['host', 'port'], opts)
+			_.unset(opts, 'host')
+			_.unset(opts, 'port')
 		}
 
 		return opts
@@ -33,22 +34,17 @@ class Redis extends ioredis {
 		super(Redis.getOpts())
 	}
 
-	pipelinecoms(coms: Redis.Coms, fix = true): Promise<any[]> {
-		return super.pipeline(coms).exec().then(function(resolved) {
-			if (fix == true && Array.isArray(resolved)) {
-				let i: number, len = resolved.length
-				for (i = 0; i < len; i++) {
-					let result = resolved[i]
-					let error = result[0]
-					if (error != null) {
-						console.error(clc.red.bold('>>>> REDIS PIPELINE ERROR <<<<'))
-						throw new Error(error)
-					}
-					resolved[i] = result[1]
-				}
+	fixpipeline(resolved: any[]) {
+		if (Array.isArray(resolved)) {
+			let i: number, len = resolved.length
+			for (i = 0; i < len; i++) {
+				let result = resolved[i]
+				let error = result[0]
+				if (error) throw new Error(error);
+				resolved[i] = result[1]
 			}
-			return Promise.resolve(resolved)
-		})
+		}
+		return Promise.resolve(resolved)
 	}
 
 	tohset(item: any): any {
@@ -91,7 +87,6 @@ export default new Redis()
 declare global {
 	namespace Redis {
 		type Coms = string[][]
-		type Resolved = string[][]
 		interface PublishEvent<T = any> {
 			name: string
 			data: T

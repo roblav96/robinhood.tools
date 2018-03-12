@@ -2,7 +2,7 @@
 
 import * as eyes from 'eyes'
 import * as clc from 'cli-color'
-import * as _ from 'rambda'
+import * as _ from 'lodash'
 
 import * as os from 'os'
 import * as cluster from 'cluster'
@@ -22,17 +22,20 @@ global.PRODUCTION = NODE_ENV == 'production'
 
 dotenv.config({ path: path.resolve(process.cwd(), '.server.' + NODE_ENV + '.local') })
 
-process.EE3 = new ee3.EventEmitter()
 process.INSTANCES = os.cpus().length
 process.INSTANCE = cluster.isWorker ? Number.parseInt(cluster.worker.id as any) - 1 : -1
 process.PRIMARY = process.INSTANCE == 0
 process.MASTER = cluster.isMaster
 process.WORKER = cluster.isWorker
 
+declare global { namespace NodeJS { interface Process { EE3: ee3.EventEmitter } } }
+process.EE3 = new ee3.EventEmitter()
+
 
 
 require('debug-trace')()
 console.format = function(args) {
+	// eyes.inspect(args, 'args')
 	let time = moment().format('hh:mm:ss:SSS')
 	let instance = '[' + process.INSTANCE + ']'
 	let stack = new Error().stack.toString()
@@ -62,10 +65,10 @@ console.format = function(args) {
 
 
 process.on('uncaughtException', function(error) {
-	console.error('uncaughtExceptions > error', error)
+	console.error('uncaughtException >', error)
 })
 process.on('unhandledRejection', function(error) {
-	console.error('unhandledRejection > error', error)
+	console.error('unhandledRejection >', error)
 	process.exit(1)
 })
 
@@ -73,24 +76,24 @@ process.on('unhandledRejection', function(error) {
 
 if (DEVELOPMENT) {
 	if (process.MASTER) setInterval(process.stdout.write, 1000, (clc as any).erase.lineRight);
-	// const dtsgen = require('dts-gen')
-	// const clipboardy = require('clipboardy')
-	// process.dtsgen = function(name, value) {
-	// 	name = name.replace(/\W+/g, '').trim()
-	// 	let results = dtsgen.generateIdentifierDeclarationFile(name, value)
-	// 	clipboardy.write(results).then(function() {
-	// 		console.warn('/*████  DTS COPPIED > "' + clc.bold(name) + '"  ████*/')
-	// 	}).catch(function(error) {
-	// 		console.error('clipboardy.write > error', error)
-	// 	})
-	// }
-	// process.clipboard = function(name, input) {
-	// 	clipboardy.write(input).then(function() {
-	// 		console.warn('/*████  "' + clc.bold(name) + '" > APPENDED TO CLIPBOARD  ████*/')
-	// 	}).catch(function(error) {
-	// 		console.error('clipboardy.write > error', error)
-	// 	})
-	// }
+	const dtsgen = require('dts-gen')
+	const clipboardy = require('clipboardy')
+	process.dtsgen = function(name, value) {
+		name = name.replace(/\W+/g, '').trim()
+		let results = dtsgen.generateIdentifierDeclarationFile(name, value)
+		clipboardy.write(results).then(function() {
+			console.warn('/*████  DTS COPPIED > "' + clc.bold(name) + '"  ████*/')
+		}).catch(function(error) {
+			console.error('clipboardy.write > error', error)
+		})
+	}
+	process.clipboard = function(name, input) {
+		clipboardy.write(input).then(function() {
+			console.warn('/*████  "' + clc.bold(name) + '" > APPENDED TO CLIPBOARD  ████*/')
+		}).catch(function(error) {
+			console.error('clipboardy.write > error', error)
+		})
+	}
 }
 
 

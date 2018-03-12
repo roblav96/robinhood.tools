@@ -6,14 +6,6 @@ global.PRODUCTION = NODE_ENV == 'production'
 
 // 
 
-// if (PRODUCTION) {
-// let script = document.createElement('script')
-// script.setAttribute('src', 'https://www.google.com/recaptcha/api.js?render=explicit')
-// script.async = true
-// script.defer = true
-// document.body.appendChild(script)
-// }
-
 import '@ibm/plex/css/ibm-plex.css'
 import 'mdi/css/materialdesignicons.css'
 

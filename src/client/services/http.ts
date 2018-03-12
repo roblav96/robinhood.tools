@@ -1,13 +1,14 @@
 // 
 
-import * as _ from 'rambda'
+import * as _ from 'lodash'
 import * as got from 'got'
 import * as common from '@/common'
 import * as router from '@/client/router'
+import * as security from './security'
 
 
 
-function request(config: HttpRequestConfig): Promise<any> {
+function request(config: Partial<HttpRequestConfig>): Promise<any> {
 	return Promise.resolve().then(function() {
 
 		config.json = true
@@ -16,20 +17,19 @@ function request(config: HttpRequestConfig): Promise<any> {
 
 		if (!Number.isFinite(config.timeout)) config.timeout = 10000;
 		if (!Number.isFinite(config.retries as any)) config.retries = 5;
+
 		config.silent = config.silent || PRODUCTION
 		if (!config.silent) console.log('%c▶ ' + config.method + ' ' + config.url + ' ▶', 'font-weight: 300;', (JSON.stringify(config.query || config.body || {})).substring(0, 64));
 
 		if (config.url[0] == '/') config.url = process.env.DOMAIN + '/api' + config.url;
 
-		if (!config.query) config.query = {};
-		if (config.silent) config.query.silent = true;
-
 		if (!config.headers) config.headers = {};
 		Object.assign(config.headers, {
 			'x-version': process.env.VERSION,
 			'x-platform': 'web',
+			'x-silent': config.silent,
 		})
-		// Object.assign(config.headers, security.getHeaders())
+		Object.assign(config.headers, security.getHeaders())
 		common.object.compact(config.headers)
 
 		if (config.isproxy) {
@@ -38,43 +38,44 @@ function request(config: HttpRequestConfig): Promise<any> {
 			config.method = 'POST'
 		}
 
-		if (Object.keys(config.query).length == 0) {
-			config = _.omit('query', config)
-		}
-
 		console.log('config', JSON.stringify(config, null, 4))
-		return got(config.url, config).then(function(response) {
+		return got(config.url, config as any).then(function(response) {
+			// console.log('response.headers', JSON.stringify(response.headers, null, 4))
 			return Promise.resolve(response.body)
 		})
 
 	}).catch(function(error: got.GotError) {
-		let message = (error as any).statusMessage || error.message
+		// console.warn('http > error'); console.dir(error);
+		let message = _.get(error, 'statusMessage', error.message)
 
-		let ishttp = _.is(got.HTTPError, error)
-		let route = '[' + (ishttp ? error.method : config.method) + '] ' + (ishttp ? error.url : config.url).replace(process.env.DOMAIN, '').trim()
-
-		if (common.json.is(_.path('response.body.message', error))) {
-			let response = JSON.parse(error.response.body.message)
-			if (Array.isArray(response)) response = response[0];
-			message = message + ': ' + common.string.id(response.dataPath) + ' ' + response.message
+		if (_.has(error, 'response.body.message') && error.response.body.message != message) {
+			message += ': "' + error.response.body.message + '"'
+			// let response = common.json.parse(error.response.body.message)
+			// if (common.json.is(response)) response = common.json.parse(response);
+			// console.log('response', response)
+			// if (Array.isArray(response)) response = response[0];
+			// message = message + ': ' + common.string.id(response.dataPath) + ' ' + response.message
+			// message += ': "' + response + '"'
 		}
 
+		let route = '[' + _.get(error, 'method', config.method) + '] ' + _.get(error, 'url', config.url).replace(process.env.DOMAIN, '').trim()
 		console.log('%c◀ ' + route, 'color: red; font-weight: bolder;', message)
 		{ (router.app as any).$toast.open({ message: route + ' ▶ ' + message, type: 'is-danger' }) }
 
+		error.message = message
 		return Promise.reject(error)
 	})
 
 }
 
-export function get<T = any, Q = any>(url: string, query?: Q, config = {} as HttpRequestConfig): Promise<T> {
+export function get<T = any, Q = any>(url: string, query?: Q, config = {} as Partial<HttpRequestConfig>): Promise<T> {
 	config.url = url
 	config.method = 'GET'
 	if (query) config.query = query;
 	return request(config)
 }
 
-export function post<T = any, B = any>(url: string, body?: B, config = {} as HttpRequestConfig): Promise<T> {
+export function post<T = any, B = any>(url: string, body?: B, config = {} as Partial<HttpRequestConfig>): Promise<T> {
 	config.url = url
 	config.method = 'POST'
 	if (body) config.body = body as any;
@@ -87,10 +88,13 @@ export function post<T = any, B = any>(url: string, body?: B, config = {} as Htt
 
 // declare global {
 interface HttpRequestConfig extends got.GotJSONOptions {
-	url?: string
-	query?: any
-	silent?: boolean
-	isproxy?: boolean
+	url: string
+	query: any
+	silent: boolean
+	isproxy: boolean
 }
+// interface HttpHeaders {
+// 	[header: string]: string
+// }
 // }
 

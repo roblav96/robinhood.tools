@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import store from '@/client/services/store'
+import * as security from '@/client/services/security'
 import App from '@/client/app/app'
 
 
@@ -24,5 +25,9 @@ export const router = new VueRouter({
 })
 
 export const app = new App({ router, store }).$mount('#app')
+
+security.init().finally(function() {
+	// app.$mount('#app')
+})
 
 

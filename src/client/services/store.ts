@@ -2,12 +2,13 @@
 
 import Vue, { ComponentOptions } from 'vue'
 import Vuex, { Store } from 'vuex'
+import * as security from './security'
 
 
 
 export class State {
 
-
+	security = security.state
 
 }
 

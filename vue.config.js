@@ -10,7 +10,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 
 
-global.NODE_ENV = process.env.NODE_ENV
+global.NODE_ENV = process.env.NODE_ENV || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
@@ -30,14 +30,22 @@ module.exports = {
 	},
 
 	// devServer: {
-	// 	quiet: false,
-	// 	stats: {
-	// 		warnings: false, performance: false, modules: false,
-	// 		excludeAssets: [/img\//, /media\//, /fonts\//, /hot-update/],
-	// 	},
+	// 	// contentBase: path.join(__dirname, 'dist'),
+	// 	// host: '127.0.0.1',
+	// 	// host: 'dev.robinhood.tools',
+	// 	// port: 81,
+	// 	// https: true,
+	// 	// quiet: false,
+	// 	// stats: {
+	// 	// 	warnings: false, performance: false, modules: false,
+	// 	// 	excludeAssets: [/img\//, /media\//, /fonts\//, /hot-update/],
+	// 	// },
 	// },
 
 	configureWebpack: function(config) {
+		// config.watch = true
+		// config.stats = { warnings: false, modules: false, performance: false, excludeAssets: [/fonts\//, /img\//], }
+
 		config.devtool = 'source-map'
 		delete config.node.process
 
@@ -83,6 +91,7 @@ module.exports = {
 			args[0].tsconfig = 'src/client/client.tsconfig.json'
 			return args
 		})
+		// config.plugins.delete('hmr')
 		config.plugins.delete('no-emit-on-errors')
 		config.plugin('friendly-errors').tap(function(args) {
 			args[0].clearConsole = false

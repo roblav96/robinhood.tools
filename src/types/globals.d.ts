@@ -12,9 +12,6 @@ declare namespace NodeJS {
 		DEVELOPMENT: typeof DEVELOPMENT
 		PRODUCTION: typeof PRODUCTION
 	}
-	interface Process {
-		EE3: ee3.EventEmitter
-	}
 	// interface ProcessEnv {
 	// 	NODE_ENV: 'development' | 'production'
 	// }
