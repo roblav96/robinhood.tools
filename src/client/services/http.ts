@@ -1,9 +1,9 @@
 // 
 
 import * as _ from 'lodash'
-import * as got from 'got'
 import * as common from '@/common'
-import * as router from '@/client/router'
+import * as got from 'got'
+import * as router from '../router'
 import * as security from './security'
 
 

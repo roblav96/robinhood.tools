@@ -14,7 +14,7 @@ import * as os from 'os'
 import * as cluster from 'cluster'
 import * as url from 'url'
 import * as moment from 'moment'
-// import * as gun from './adapters/gun'
+import gun from './adapters/gun'
 
 
 
@@ -50,12 +50,11 @@ if (process.MASTER) {
 		// process.RADIO.emit('RESTART')
 	})
 
-	require('./adapters/gun')
+	// import('./adapters/gun')
 
 } else {
-	require('./server')
+	import('./server')
+	import('./adapters/gun')
 }
-
-// require('./adapters/gun')
 
 

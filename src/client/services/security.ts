@@ -5,8 +5,9 @@ import * as common from '@/common'
 import * as storage from './storage'
 import * as store from './store'
 import * as http from './http'
+import gun from '../adapters/gun'
 
-
+gun
 
 export const state = {
 	ready: false,
@@ -69,5 +70,8 @@ export function getHeaders() {
 	}
 	return headers
 }
+
+
+
 
 

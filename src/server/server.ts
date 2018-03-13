@@ -13,6 +13,7 @@ import * as boom from 'boom'
 import * as cookie from 'cookie'
 import * as security from './services/security'
 import r from './adapters/rethinkdb'
+import gun from './adapters/gun'
 import redis from './adapters/redis'
 
 
@@ -43,6 +44,8 @@ server.setErrorHandler(async function(error: boom & { validation: any }, request
 	reply.type('application/json')
 	return error.output.payload
 })
+
+
 
 server.use(cors({ origin: process.env.DOMAIN }))
 
@@ -85,8 +88,8 @@ server.addHook('preHandler', async function(request, reply) {
 		request.doc.bytes = request.cookies['x-bytes']
 	}
 
-	console.log('request.doc >')
-	eyes.inspect(request.doc)
+	// console.log('request.doc >')
+	// eyes.inspect(request.doc)
 
 	if (request.doc.bytes && request.doc.token) {
 		let prime = await redis.hget('security:doc:' + request.doc.uuid, 'prime') as string

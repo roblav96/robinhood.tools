@@ -14,7 +14,7 @@ import * as dotenv from 'dotenv'
 
 
 
-Object.assign((eyes as any).defaults, { maxLength: 65536, showHidden: true } as eyes.EyesOptions)
+Object.assign((eyes as any).defaults, { maxLength: 131072, showHidden: true } as eyes.EyesOptions)
 
 global.NODE_ENV = process.env.NODE_ENV as any
 global.DEVELOPMENT = NODE_ENV == 'development'

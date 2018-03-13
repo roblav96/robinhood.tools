@@ -18,7 +18,7 @@ import * as Login from '@/client/components/login/login'
 export default class App extends Mixins(Login.Mixin) {
 
 	mounted() {
-		setTimeout(() => this.showLogin(), 300)
+		// setTimeout(() => this.showLogin(), 300)
 	}
 
 
