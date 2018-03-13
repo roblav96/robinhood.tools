@@ -1,2 +1,3 @@
-# robinhood.tools
-Advanced trading tools for Robinhood
+# [https://robinhood.tools](https://robinhood.tools)
+Advanced Trading Tools & Resources for Robinhood Web
+
