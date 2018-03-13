@@ -1,33 +1,24 @@
 // 
 
+// import { VueClass } from 'vue-class-component/lib/declarations'
 import * as Vts from 'vue-property-decorator'
+import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import Navbar from '@/client/components/navbar/navbar'
-import Login from '@/client/components/login/login'
+import * as Login from '@/client/components/login/login'
 
 
 
 @Vts.Component({
 	name: 'App',
 	components: {
-		'v-login': Login,
 		'v-navbar': Navbar,
 	},
 })
-export default class App extends Vue {
+export default class App extends Mixins(Login.Mixin) {
 
 	mounted() {
 		setTimeout(() => this.showLogin(), 300)
-	}
-
-
-
-	showLogin() {
-		(this as any).$modal.open({
-			parent: this,
-			component: Login,
-			hasModalCard: true
-		})
 	}
 
 

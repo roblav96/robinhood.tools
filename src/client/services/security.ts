@@ -10,6 +10,7 @@ import * as http from './http'
 
 export const state = {
 	ready: false,
+	human: false,
 }
 
 

@@ -23,6 +23,8 @@
 		"fastify-cookie": "latest",
 		"fingerprintjs2": "latest",
 		"got": "latest",
+		"gun": "latest",
+		"gun-flint": "0.0.28",
 		"ibm-design-colors": "latest",
 		"ioredis": "latest",
 		"lodash": "latest",

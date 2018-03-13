@@ -1,6 +1,7 @@
 // 
 
 import * as Vts from 'vue-property-decorator'
+import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import Grecaptcha from '@/client/components/grecaptcha/grecaptcha'
 import * as http from '@/client/services/http'
@@ -50,8 +51,21 @@ export default class Login extends Vue {
 		})
 	}
 
+}
 
 
+
+@Vts.Component
+export class Mixin extends Vue {
+	showLogin() { show(this) }
+}
+
+export function show(vm: Vue) {
+	vm.$root.$modal.open({
+		parent: vm.$root,
+		component: Login,
+		hasModalCard: true
+	})
 }
 
 

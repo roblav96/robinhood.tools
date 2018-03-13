@@ -2,5 +2,5 @@
 <script lang="ts" src="./grecaptcha.ts"></script>
 
 <template>
-	<div :id="_uid" class="g-recaptcha"></div>
+	<div :id="g_id" class="g-recaptcha"></div>
 </template>

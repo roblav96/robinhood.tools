@@ -30,11 +30,12 @@ module.exports = {
 	},
 
 	// devServer: {
+	// 	before: function(app) {
+	// 		app.use(function(req, res, next) {
+	// 			req.header('Keep-Alive', 'close'); res.header('Keep-Alive', 'close'); next();
+	// 		})
+	// 	},
 	// 	// contentBase: path.join(__dirname, 'dist'),
-	// 	// host: '127.0.0.1',
-	// 	// host: 'dev.robinhood.tools',
-	// 	// port: 81,
-	// 	// https: true,
 	// 	// quiet: false,
 	// 	// stats: {
 	// 	// 	warnings: false, performance: false, modules: false,
@@ -63,6 +64,7 @@ module.exports = {
 					delete use.options.limit
 				})
 			})
+			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/]))
 		}
 
 		config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
@@ -75,7 +77,6 @@ module.exports = {
 		// config.plugins.push(new webpack.IgnorePlugin(/dist/))
 		// config.plugins.push(new webpack.IgnorePlugin(/server/))
 		// config.plugins.push(new webpack.IgnorePlugin(/typescript/))
-		config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/]))
 		// config.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 9999, openAnalyzer: false }))
 
 	},

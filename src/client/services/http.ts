@@ -38,7 +38,7 @@ function request(config: Partial<HttpRequestConfig>): Promise<any> {
 			config.method = 'POST'
 		}
 
-		console.log('config', JSON.stringify(config, null, 4))
+		// console.log('config', JSON.stringify(config, null, 4))
 		return got(config.url, config as any).then(function(response) {
 			// console.log('response.headers', JSON.stringify(response.headers, null, 4))
 			return Promise.resolve(response.body)
@@ -68,6 +68,13 @@ function request(config: Partial<HttpRequestConfig>): Promise<any> {
 
 }
 
+interface HttpRequestConfig extends got.GotJSONOptions {
+	url: string
+	query: any
+	silent: boolean
+	isproxy: boolean
+}
+
 export function get<T = any, Q = any>(url: string, query?: Q, config = {} as Partial<HttpRequestConfig>): Promise<T> {
 	config.url = url
 	config.method = 'GET'
@@ -82,19 +89,4 @@ export function post<T = any, B = any>(url: string, body?: B, config = {} as Par
 	return request(config)
 }
 
-
-
-
-
-// declare global {
-interface HttpRequestConfig extends got.GotJSONOptions {
-	url: string
-	query: any
-	silent: boolean
-	isproxy: boolean
-}
-// interface HttpHeaders {
-// 	[header: string]: string
-// }
-// }
 

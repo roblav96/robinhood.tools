@@ -9,13 +9,10 @@ global.PRODUCTION = NODE_ENV == 'production'
 import '@ibm/plex/css/ibm-plex.css'
 import 'mdi/css/materialdesignicons.css'
 
-import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Vuex from 'vuex'
-import Buefy from 'buefy'
-
-
+import Buefy, { BuefyConfig } from 'buefy'
 
 Vue.config.devtools = false
 Vue.config.productionTip = false
@@ -28,8 +25,9 @@ Vue.use(Buefy, {
 	defaultToastDuration: 5000,
 	defaultInputAutocomplete: 'off',
 	defaultNoticeQueue: false,
-})
+} as BuefyConfig)
 
+// import * as Vts from 'vue-property-decorator'
 // Vts.Component.registerHooks(['beforeRouteEnter', 'beforeRouteLeave', 'beforeRouteUpdate'])
 
 require('@/client/router')
