@@ -36,6 +36,7 @@ server.route({
 			query: {
 				response: request.body.response,
 				secret: process.env.RECAPTCHA_SECRET,
+				remoteip: request.ip,
 			}, json: true,
 		})
 		if (!_.isEmpty(body['error-codes'])) {

@@ -21,6 +21,11 @@ global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
 dotenv.config({ path: path.resolve(process.cwd(), '.server.' + NODE_ENV + '.local') })
+process.DNAME = process.env.DNAME
+process.VERSION = process.env.VERSION
+process.DOMAIN = process.env.DOMAIN
+process.HOST = process.env.HOST
+process.PORT = Number.parseInt(process.env.PORT)
 
 process.INSTANCES = os.cpus().length
 process.INSTANCE = cluster.isWorker ? Number.parseInt(cluster.worker.id as any) - 1 : -1

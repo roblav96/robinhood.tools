@@ -4,6 +4,10 @@ global.NODE_ENV = process.env.NODE_ENV as any
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
+process.DNAME = process.env.DNAME
+process.VERSION = process.env.VERSION
+process.DOMAIN = process.env.DOMAIN
+
 // 
 
 import '@ibm/plex/css/ibm-plex.css'

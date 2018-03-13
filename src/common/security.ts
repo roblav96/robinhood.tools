@@ -87,6 +87,7 @@ declare global {
 			bytes: string
 			prime: string
 			token: string
+			drift: number
 		}
 		interface PemKeyPair {
 			publicPem: string

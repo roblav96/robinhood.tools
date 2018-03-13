@@ -90,6 +90,8 @@ module.exports = {
 		})
 		config.plugin('fork-ts-checker').tap(function(args) {
 			args[0].tsconfig = 'src/client/client.tsconfig.json'
+			// args[0].memoryLimit = 1024
+			// args[0].workers = 4
 			return args
 		})
 		// config.plugins.delete('hmr')

@@ -13,7 +13,6 @@ import * as boom from 'boom'
 import * as cookie from 'cookie'
 import * as security from './services/security'
 import r from './adapters/rethinkdb'
-import gun from './adapters/gun'
 import redis from './adapters/redis'
 
 

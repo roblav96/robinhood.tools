@@ -5,9 +5,8 @@ import * as common from '@/common'
 import * as storage from './storage'
 import * as store from './store'
 import * as http from './http'
-import gun from '../adapters/gun'
 
-gun
+
 
 export const state = {
 	ready: false,
@@ -39,7 +38,9 @@ function initFinger() {
 }
 
 function initToken() {
-	return http.get('/security/token', null, { retries: 999 }).then(function(response) {
+	return http.get('/security/token', {
+		now: Date.now(),
+	}, { retries: 999 }).then(function(response) {
 		console.log('response', response)
 		// doc.id = response.id
 		doc.token = response.token
@@ -61,10 +62,10 @@ export function init() {
 
 export function getHeaders() {
 	let headers = {
+		'x-id': doc.id,
 		'x-uuid': doc.uuid,
 		'x-finger': doc.finger,
 	} as Dict<string>
-	if (doc.id) headers['x-id'] = doc.id;
 	if (doc.token) {
 		headers['x-token'] = doc.token + '.' + Date.now()
 	}

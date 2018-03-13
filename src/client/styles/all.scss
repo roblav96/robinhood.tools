@@ -50,7 +50,7 @@ $colors: map-merge($colors, ('robinhood-accent':($robinhood-accent, $robinhood-a
 // 
 // /*████  EXTERNALS  ████*/
 // 
-@import './lolo';
+@import './utils';
 @import '~bulma';
 @import '~buefy/src/scss/buefy';
 // 

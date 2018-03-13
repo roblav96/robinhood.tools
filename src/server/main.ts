@@ -1,9 +1,7 @@
 // 
 
 require('source-map-support').install()
-// global.Promise = require('bluebird')
 require('./process')
-// require('./radio')
 
 // 
 
@@ -14,7 +12,6 @@ import * as os from 'os'
 import * as cluster from 'cluster'
 import * as url from 'url'
 import * as moment from 'moment'
-import gun from './adapters/gun'
 
 
 
@@ -38,6 +35,8 @@ if (process.MASTER) {
 	})
 	// process.RADIO.once('RESTART', restart)
 
+	if (DEVELOPMENT) process.INSTANCES = 0;
+
 	console.log(clc.bold('Forking x' + clc.bold.redBright(process.INSTANCES) + ' nodes in cluster...'))
 	let i: number, len = process.INSTANCES
 	for (i = 0; i < len; i++) { cluster.fork() }
@@ -50,11 +49,8 @@ if (process.MASTER) {
 		// process.RADIO.emit('RESTART')
 	})
 
-	// import('./adapters/gun')
-
 } else {
-	import('./server')
-	import('./adapters/gun')
+	require('./server')
 }
 
 
