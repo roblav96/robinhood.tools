@@ -35,7 +35,7 @@ if (process.MASTER) {
 	})
 	// process.RADIO.once('RESTART', restart)
 
-	if (DEVELOPMENT) process.INSTANCES = 2;
+	if (DEVELOPMENT) process.INSTANCES = 1;
 
 	console.log(chalk.bold('Forking x' + chalk.bold.redBright(process.INSTANCES.toString()) + ' nodes in cluster...'))
 	let i: number, len = process.INSTANCES

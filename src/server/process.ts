@@ -54,7 +54,7 @@ console.format = function(args) {
 	let color = cdict[args.method] || 'magenta'
 	let output = chalk[color + 'Bright']('▉') + time + instance
 	if (args.method == 'warn') {
-		output = chalk.yellowBright('=============================== WARN ================================\n') + output
+		// output = chalk.yellowBright('=============================== WARN ================================\n') + output
 		// file = chalk.yellow(file)
 	} else if (args.method == 'error') {
 		output = chalk.redBright('=============================== ERROR ================================\n') + output
