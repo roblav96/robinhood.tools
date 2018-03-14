@@ -18,8 +18,8 @@ if (process.MASTER) {
 
 	const nats = Nats.connect(process.PORT)
 	nats.on('error', function(error) { console.error('nats Error >', error) })
-	nats.subscribe('message', function(data) {
-		nats.publish('message', data)
+	nats.subscribe('master', function(data) {
+		nats.publish('worker', data)
 	})
 
 }
@@ -36,14 +36,14 @@ if (process.WORKER) {
 	nats.on('error', function(error) { console.error('nats Error >', error) })
 
 	const natsEE3 = new ee3.EventEmitter()
-	nats.subscribe('message', function(data) {
+	nats.subscribe('worker', function(data) {
 		natsEE3.emit('message', data)
 	})
 
 	suite.add('NATS', {
 		defer: true,
 		fn: function(next) {
-			nats.publish('message', Date.now().toString())
+			nats.publish('master', Date.now().toString())
 			natsEE3.once('message', function(data) {
 				next.resolve(data)
 			})
