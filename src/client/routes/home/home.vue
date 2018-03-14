@@ -16,7 +16,7 @@
 					<img class="mb-4" src="@/assets/robinhood-logo-white.svg" width="128" alt="Robinhood Tools">
 					<p class="title">Advanced trading tools &amp; resources for Robinhood.</p>
 					<!-- <p class="subtitle">Are you ready to step up your game?</p> -->
-					<button class="button is-medium is-secondary">
+					<button class="button is-large is-secondary t-500">
 						<span>Level Up</span>
 						<b-icon icon="trending-up" class="t-bold" size="" />
 					</button>

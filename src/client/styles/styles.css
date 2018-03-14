@@ -1,0 +1,12 @@
+/**/
+
+span.icon.t-bold > i.mdi::before {
+	font-weight: bold;
+}
+
+img.is-png {
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+}
+
+/**/

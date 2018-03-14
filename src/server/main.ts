@@ -5,8 +5,8 @@ require('./process')
 
 // 
 
+import chalk from 'chalk'
 import * as eyes from 'eyes'
-import * as clc from 'cli-color'
 
 import * as os from 'os'
 import * as cluster from 'cluster'
@@ -20,12 +20,12 @@ if (process.MASTER) {
 	let host = url.parse(process.env.DOMAIN).host
 	if (DEVELOPMENT) host = process.env.HOST + ':' + process.env.PORT;
 	console.log('\n \n' +
-		clc.bold.underline.magenta(process.env.DNAME) + '\n' +
+		chalk.bold.underline.magenta(process.env.DNAME) + '\n' +
 		'v' + process.env.VERSION + ' ' +
-		clc.bold(NODE_ENV) + '\n' +
+		chalk.bold(NODE_ENV) + '\n' +
 		host + '\n' +
 		'/*===============================================\n' +
-		'=========           ' + clc.bold(moment().format('hh:mm:ss')) + '           ==========\n' +
+		'=========           ' + chalk.bold(moment().format('hh:mm:ss')) + '           ==========\n' +
 		'===============================================*/'
 	)
 
@@ -35,9 +35,9 @@ if (process.MASTER) {
 	})
 	// process.RADIO.once('RESTART', restart)
 
-	if (DEVELOPMENT) process.INSTANCES = 0;
+	if (DEVELOPMENT) process.INSTANCES = 2;
 
-	console.log(clc.bold('Forking x' + clc.bold.redBright(process.INSTANCES) + ' nodes in cluster...'))
+	console.log(chalk.bold('Forking x' + chalk.bold.redBright(process.INSTANCES.toString()) + ' nodes in cluster...'))
 	let i: number, len = process.INSTANCES
 	for (i = 0; i < len; i++) { cluster.fork() }
 	cluster.on('disconnect', function(worker) {
@@ -50,7 +50,10 @@ if (process.MASTER) {
 	})
 
 } else {
-	require('./server')
+	// require('./server')
+	// require('./services/benchmarks')
 }
+
+require('./services/benchmarks')
 
 

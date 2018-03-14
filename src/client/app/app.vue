@@ -1,15 +1,11 @@
 <!--  -->
-
 <script lang="ts" src="./app.ts"></script>
 
 <style lang="scss" src="@/client/styles/all.scss"></style>
+<style src="@/client/styles/styles.css"></style>
 
 <style>
 /**/
-
-span.icon.t-bold > i.mdi::before {
-	font-weight: bold;
-}
 
 /**/
 

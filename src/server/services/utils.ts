@@ -1,7 +1,7 @@
 // 
 
+import chalk from 'chalk'
 import * as eyes from 'eyes'
-import * as clc from 'cli-color'
 import * as _ from 'lodash'
 import * as common from '../../common'
 
@@ -10,7 +10,7 @@ import * as dtsgen from 'dts-gen'
 
 
 export function expose(name: string, input: any, skips = [] as string[]) {
-	process.stdout.write('\n\n')
+	process.stdout.write('\n \n')
 
 	let keys = _.uniq(_.keys(input).concat(_.keysIn(input)))
 	eyes.inspect(keys, '"' + name + '"' + ' properties')

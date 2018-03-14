@@ -4,12 +4,7 @@
 <style>
 /**/
 
-img.robinhood-banner {
-	-webkit-backface-visibility: hidden;
-	backface-visibility: hidden;
-}
-
-form.robinhood-form .input:not(.is-danger):focus {
+form.robinhood-form input.input:not(.is-danger):focus {
 	border-color: #21CE99;
 	box-shadow: 0 0 0 0.125em rgba(33, 206, 153, 0.25);
 }
@@ -19,11 +14,11 @@ form.robinhood-form .input:not(.is-danger):focus {
 </style>
 
 <template>
-	<form class="robinhood-login-modal robinhood-form" v-on:submit.prevent="submit()">
+	<form class="robinhood-form" v-on:submit.prevent="submit()">
 		<div class="modal-card" style="width: 342px;">
 
 			<header class="modal-card-head bg-white">
-				<img src="@/assets/robinhood-banner.png" class="robinhood-banner h-5">
+				<img src="@/assets/robinhood-banner.png" class="is-png h-5">
 			</header>
 
 			<section class="modal-card-body">

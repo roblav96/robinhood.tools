@@ -1,6 +1,5 @@
 // 
 
-// import { VueClass } from 'vue-class-component/lib/declarations'
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
@@ -18,6 +17,7 @@ import * as Login from '@/client/components/login/login'
 export default class App extends Mixins(Login.Mixin) {
 
 	mounted() {
+		// console.log('mounted')
 		// setTimeout(() => this.showLogin(), 300)
 	}
 
