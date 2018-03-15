@@ -17,16 +17,10 @@ import * as moment from 'moment'
 
 if (process.MASTER) {
 
-	let host = url.parse(process.env.DOMAIN).host
-	if (DEVELOPMENT) host = process.env.HOST + ':' + process.env.PORT;
-	console.log('\n \n' +
-		chalk.bold.underline.magenta(process.env.DNAME) + '\n' +
-		'v' + process.env.VERSION + ' ' +
-		chalk.bold(NODE_ENV) + '\n' +
-		host + '\n' +
-		'/*===============================================\n' +
-		'=========           ' + chalk.bold(moment().format('hh:mm:ss')) + '           ==========\n' +
-		'===============================================*/'
+	console.log('\n' +
+		'█ ' + chalk.underline.magenta(process.DNAME) + '\n' +
+		'█ ' + NODE_ENV + '\n' +
+		'█ ' + process.HOST + ':' + process.PORT
 	)
 
 	process.EE3.once('RESTART', function() {
@@ -37,7 +31,7 @@ if (process.MASTER) {
 
 	// if (DEVELOPMENT) process.INSTANCES = 1;
 
-	console.log(chalk.bold('Forking x' + chalk.bold.redBright(process.INSTANCES.toString()) + ' nodes in cluster...'))
+	console.log('Forking ' + chalk.bold('x' + chalk.redBright(process.INSTANCES.toString())) + ' nodes in cluster...')
 	let i: number, len = process.INSTANCES
 	for (i = 0; i < len; i++) { cluster.fork() }
 	cluster.on('disconnect', function(worker) {
@@ -51,6 +45,7 @@ if (process.MASTER) {
 
 } else {
 	require('./server')
+	require('./adapters/gun')
 }
 
 

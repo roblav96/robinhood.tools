@@ -18,7 +18,7 @@ class Redis extends ioredis {
 			password: process.env.REDIS_PASSWORD,
 			db: 0,
 			dropBufferSupport: true,
-			connectionName: '[' + process.INSTANCE + '][' + common.string.id(process.env.DNAME) + '][' + NODE_ENV + ']',
+			connectionName: '[' + process.INSTANCE + '][' + common.string.id(process.DNAME) + '][' + NODE_ENV + ']',
 		} as ioredis.RedisOptions
 
 		if (PRODUCTION) {

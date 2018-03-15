@@ -32,7 +32,6 @@ process.PRIMARY = process.INSTANCE == 0
 process.MASTER = cluster.isMaster
 process.WORKER = cluster.isWorker
 
-declare global { namespace NodeJS { interface Process { EE3: ee3.EventEmitter } } }
 process.EE3 = new ee3.EventEmitter()
 
 
@@ -50,7 +49,7 @@ console.format = function(args) {
 	let file = fullpath.split('.ts:')[0]
 	let i = (fullpath.indexOf('.ts:') == -1) ? 0 : 1
 	let line = fullpath.split('.ts:')[i].split(':')[0]
-	let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red', debug: 'red' } as Dict<string>
+	let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' } as Dict<string>
 	let color = cdict[args.method] || 'magenta'
 	let output = chalk[color + 'Bright']('▉') + time + instance
 	if (args.method == 'warn') {
@@ -79,8 +78,7 @@ process.on('unhandledRejection', function(error) {
 
 
 if (DEVELOPMENT) {
-	if (process.MASTER) require('ora')({ spinner: 'runner', hideCursor: true, stream: process.stdout }).start();
-
+	if (process.MASTER) require('ora')({ spinner: 'runner', interval: 1000, hideCursor: true, stream: process.stdout }).start();
 	const dtsgen = require('dts-gen')
 	const clipboardy = require('clipboardy')
 	process.dtsgen = function(name, value) {
@@ -92,7 +90,6 @@ if (DEVELOPMENT) {
 			console.error('clipboardy.write > error', error)
 		})
 	}
-
 	process.clipboard = function(name, input) {
 		clipboardy.write(input).then(function() {
 			console.warn('/*████  "' + chalk.bold(name) + '" > APPENDED TO CLIPBOARD  ████*/')
@@ -100,7 +97,6 @@ if (DEVELOPMENT) {
 			console.error('clipboardy.write > error', error)
 		})
 	}
-
 }
 
 

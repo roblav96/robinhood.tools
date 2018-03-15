@@ -26,6 +26,7 @@ declare namespace NodeJS {
 		MASTER: boolean
 		WORKER: boolean
 		PRIMARY: boolean
+		EE3: ee3.EventEmitter
 	}
 	// interface ProcessEnv {
 	// 	NODE_ENV: 'development' | 'production'

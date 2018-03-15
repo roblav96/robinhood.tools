@@ -9,7 +9,6 @@ import server from '../server'
 import * as security from '../services/security'
 import * as got from 'got'
 import * as forge from 'node-forge'
-import r from '../adapters/rethinkdb'
 import redis from '../adapters/redis'
 
 

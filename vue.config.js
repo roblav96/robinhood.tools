@@ -1,11 +1,10 @@
 // 
 
 const eyes = require('eyes')
-eyes.defaults.maxLength = 131072
+Object.assign(eyes.defaults, { maxLength: 131072, showHidden: true })
 const webpack = require('webpack')
 const fs = require('fs')
 const path = require('path')
-const ora = require('ora')
 const dotenv = require('dotenv')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
@@ -17,7 +16,7 @@ global.PRODUCTION = NODE_ENV == 'production'
 
 
 
-ora({ spinner: 'runner', hideCursor: true }).start()
+if (DEVELOPMENT) require('ora')({ spinner: 'runner', interval: 1000, hideCursor: true, stream: process.stdout }).start();
 
 module.exports = {
 
@@ -25,31 +24,14 @@ module.exports = {
 	outputDir: 'dist/client',
 
 	css: {
-		sourceMap: true,
+		sourceMap: false,
 	},
 
 	vueLoader: {
 		hotReload: false,
 	},
 
-	// devServer: {
-	// 	before: function(app) {
-	// 		app.use(function(req, res, next) {
-	// 			req.header('Keep-Alive', 'close'); res.header('Keep-Alive', 'close'); next();
-	// 		})
-	// 	},
-	// 	// contentBase: path.join(__dirname, 'dist'),
-	// 	// quiet: false,
-	// 	// stats: {
-	// 	// 	warnings: false, performance: false, modules: false,
-	// 	// 	excludeAssets: [/img\//, /media\//, /fonts\//, /hot-update/],
-	// 	// },
-	// },
-
 	configureWebpack: function(config) {
-		// config.watch = true
-		// config.stats = { warnings: false, modules: false, performance: false, excludeAssets: [/fonts\//, /img\//], }
-
 		config.devtool = 'source-map'
 		delete config.node.process
 
@@ -77,8 +59,6 @@ module.exports = {
 			name: 'manifest', minChunks: Infinity,
 		}))
 
-		// config.plugins.push(new webpack.IgnorePlugin(/dist/))
-		// config.plugins.push(new webpack.IgnorePlugin(/server/))
 		// config.plugins.push(new webpack.IgnorePlugin(/typescript/))
 		// config.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 9999, openAnalyzer: false }))
 
@@ -93,11 +73,10 @@ module.exports = {
 		})
 		config.plugin('fork-ts-checker').tap(function(args) {
 			args[0].tsconfig = 'src/client/client.tsconfig.json'
-			// args[0].memoryLimit = 1024
+			// args[0].memoryLimit = 2048
 			// args[0].workers = 4
 			return args
 		})
-		// config.plugins.delete('hmr')
 		config.plugins.delete('no-emit-on-errors')
 		config.plugin('friendly-errors').tap(function(args) {
 			args[0].clearConsole = false

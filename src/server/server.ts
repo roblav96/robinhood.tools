@@ -12,7 +12,6 @@ import * as cors from 'cors'
 import * as boom from 'boom'
 import * as cookie from 'cookie'
 import * as security from './services/security'
-import r from './adapters/rethinkdb'
 import redis from './adapters/redis'
 
 
@@ -46,7 +45,7 @@ server.setErrorHandler(async function(error: boom & { validation: any }, request
 
 
 
-server.use(cors({ origin: process.env.DOMAIN }))
+server.use(cors({ origin: process.DOMAIN }))
 
 
 
@@ -95,8 +94,8 @@ server.addHook('preHandler', async function(request, reply) {
 		if (!prime) return;
 		let hmac = security.docHmac(request.doc.uuid, request.doc.bytes, request.hostname, prime)
 		request.authed = request.doc.token == hmac
-		console.log('request.authed >')
-		eyes.inspect(request.authed)
+		// console.log('request.authed >')
+		// eyes.inspect(request.authed)
 	}
 
 })
@@ -109,8 +108,8 @@ import './api/robinhood.api'
 
 
 
-let port = Number.parseInt(process.env.PORT) + process.INSTANCE + 1
-server.listen(port, process.env.HOST, function(error) {
+let port = process.PORT + process.INSTANCE + 1
+server.listen(port, process.HOST, function(error) {
 	if (error) return console.error('fastify.listen > error', error);
 	// console.log('fastify ready >', port)
 })

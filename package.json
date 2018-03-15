@@ -1,6 +1,8 @@
 {
 	"scripts": {
-		"postinstall": "rm -rf node_modules/vuex/types/vue.d.ts",
+		"postinstall": "run-p fix:types fix:gun",
+		"fix:types": "rm -rf node_modules/vuex/types/vue.d.ts",
+		"fix:gun": "open node_modules/gun/gun.js && open node_modules/gun/lib/uws.js",
 		"clean": "rm -rf dist && rm -rf node_modules",
 		"client:dev": "cross-env NODE_ENV=development vue-cli-service serve",
 		"client:dev-legacy": "rm -rf dist/client && cross-env NODE_ENV=development webpack --config node_modules/@vue/cli-service/webpack.config.js",
@@ -24,6 +26,8 @@
 		"fastify-cookie": "latest",
 		"fingerprintjs2": "latest",
 		"got": "latest",
+		"gun": "latest",
+		"gun-flint": "latest",
 		"ibm-design-colors": "latest",
 		"ioredis": "latest",
 		"lodash": "latest",
@@ -62,6 +66,7 @@
 		"eyes": "latest",
 		"forever-fixed": "latest",
 		"node-sass": "latest",
+		"npm-run-all": "latest",
 		"ora": "latest",
 		"sass-loader": "latest",
 		"sassy-lists": "latest",
