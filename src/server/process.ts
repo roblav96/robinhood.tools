@@ -67,7 +67,7 @@ console.format = function(args) {
 	// if (args.method == 'error') output = chalk.redBright('=============================== ERROR ================================\n') + output;
 	// output = output + '[' + chalk.bold(file) + ':' + line + ']'
 
-	return '\n \n' + chalk.underline(output) + '\n'
+	return '\n \n' + chalk.reset.underline(output) + '\n'
 }
 
 
@@ -83,7 +83,7 @@ process.on('unhandledRejection', function(error) {
 
 
 if (DEVELOPMENT) {
-	if (process.MASTER) require('ora')({ spinner: 'runner', interval: 1000, hideCursor: true, stream: process.stdout }).start();
+	if (process.MASTER) require('ora')({ spinner: 'runner', interval: 1000, hideCursor: false, stream: process.stdout }).start();
 	const dtsgen = require('dts-gen')
 	const clipboardy = require('clipboardy')
 	process.dtsgen = function(name, value) {

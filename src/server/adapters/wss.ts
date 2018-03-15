@@ -14,7 +14,7 @@ import fastify from '../fastify'
 const wss = new WebSocket.Server({
 	host: 'localhost',
 	port: process.PORT + process.INSTANCE,
-	path: 'websocket',
+	path: 'ws',
 })
 
 export default wss
