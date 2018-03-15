@@ -56,28 +56,24 @@ console.format = function(args) {
 	let line = fullpath.split('.ts:')[i].split(':')[0]
 	let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' } as Dict<string>
 	let color = cdict[args.method] || 'magenta'
-
 	let osquare = chalk[color + 'Bright']('▉')
 	let ofile = '[' + chalk.bold(chalk[color](file) + ':' + line) + ']'
 	let otime = moment().format('hh:mm:ss:SSS')
 	let oinstance = '[' + process.INSTANCE + ']'
 	let output = osquare + ofile + '' + oinstance + 'T-' + otime
-
-	// let output = chalk[color + 'Bright']('▉') + time + instance
-	// if (args.method == 'error') output = chalk.redBright('=============================== ERROR ================================\n') + output;
-	// output = output + '[' + chalk.bold(file) + ':' + line + ']'
-
+	if (args.method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
 	return '\n \n' + chalk.reset.underline(output) + '\n'
 }
 
 
 
 process.on('uncaughtException', function(error) {
-	console.error('uncaughtException >', error)
+	console.error(chalk.bold.underline.redBright('UNCAUGHT EXCEPTION') + ' Error >', error)
 })
 process.on('unhandledRejection', function(error) {
-	console.error('unhandledRejection >', error)
-	process.exit(1)
+	console.error(chalk.bold.underline.redBright('UNHANDLED REJECTION') + ' Error >', error)
+	// https://github.com/mcollina/make-promises-safe
+	// process.exit(1)
 })
 
 
@@ -90,17 +86,13 @@ if (DEVELOPMENT) {
 		name = name.replace(/\W+/g, '').trim()
 		let results = dtsgen.generateIdentifierDeclarationFile(name, value)
 		clipboardy.write(results).then(function() {
-			console.warn('/*████  DTS COPPIED > "' + chalk.bold(name) + '"  ████*/')
-		}).catch(function(error) {
-			console.error('clipboardy.write > error', error)
-		})
+			console.info('dtsgen > "' + chalk.bold(name) + '"')
+		}).catch(error => console.error('dtsgen Error', error))
 	}
 	process.clipboard = function(name, input) {
 		clipboardy.write(input).then(function() {
-			console.warn('/*████  "' + chalk.bold(name) + '" > APPENDED TO CLIPBOARD  ████*/')
-		}).catch(function(error) {
-			console.error('clipboardy.write > error', error)
-		})
+			console.info('clipboard > "' + chalk.bold(name) + '"')
+		}).catch(error => console.error('clipboard Error', error))
 	}
 }
 
