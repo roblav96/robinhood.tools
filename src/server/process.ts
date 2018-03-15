@@ -36,16 +36,16 @@ process.EE3 = new ee3.EventEmitter()
 
 
 
-// if (DEVELOPMENT) process.INSTANCES = 1;
+if (DEVELOPMENT) process.INSTANCES = 1;
+
 // if (process.MASTER) process.env.GUN_ENV = 'debug';
+// process.env.GUN_ENV = 'debug'
 
 
 
 require('debug-trace')()
 console.format = function(args) {
 	// eyes.inspect(args, 'args')
-	let time = moment().format('hh:mm:ss:SSS')
-	let instance = '[' + process.INSTANCE + ']'
 	let stack = new Error().stack.toString()
 	// eyes.inspect(stack, 'stack')
 	stack = stack.replace(/^ {4}at /gm, '').split('\n')[4].trim()
@@ -56,17 +56,17 @@ console.format = function(args) {
 	let line = fullpath.split('.ts:')[i].split(':')[0]
 	let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' } as Dict<string>
 	let color = cdict[args.method] || 'magenta'
-	let output = chalk[color + 'Bright']('▉') + time + instance
-	if (args.method == 'warn') {
-		// output = chalk.yellowBright('=============================== WARN ================================\n') + output
-		// file = chalk.yellow(file)
-	} else if (args.method == 'error') {
-		output = chalk.redBright('=============================== ERROR ================================\n') + output
-		// file = chalk.redBright(file)
-	} else {
-		// file = chalk[color](file)
-	}
-	output += '[' + chalk.bold(file) + ':' + line + ']'
+
+	let osquare = chalk[color + 'Bright']('▉')
+	let ofile = '[' + chalk.bold(chalk[color](file) + ':' + line) + ']'
+	let otime = moment().format('hh:mm:ss:SSS')
+	let oinstance = '[' + process.INSTANCE + ']'
+	let output = osquare + ofile + '' + oinstance + 'T-' + otime
+
+	// let output = chalk[color + 'Bright']('▉') + time + instance
+	// if (args.method == 'error') output = chalk.redBright('=============================== ERROR ================================\n') + output;
+	// output = output + '[' + chalk.bold(file) + ':' + line + ']'
+
 	return '\n \n' + chalk.underline(output) + '\n'
 }
 

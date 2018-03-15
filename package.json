@@ -32,6 +32,7 @@
 		"lodash": "latest",
 		"mdi": "latest",
 		"moment": "latest",
+		"mqtt": "^2.16.0",
 		"node-forge": "latest",
 		"secure-ls": "latest",
 		"uws": "latest",

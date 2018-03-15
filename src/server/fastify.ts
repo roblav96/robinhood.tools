@@ -11,7 +11,7 @@ import * as cors from 'cors'
 import * as boom from 'boom'
 import * as cookie from 'cookie'
 import * as security from './services/security'
-import redis from './adapters/redis'
+import * as redis from './adapters/redis'
 
 
 
@@ -98,7 +98,7 @@ fastify.addHook('preHandler', async function(request, reply) {
 	// eyes.inspect(request.doc)
 
 	if (request.doc.bytes && request.doc.token) {
-		let prime = await redis.hget('security:doc:' + request.doc.uuid, 'prime') as string
+		let prime = await redis.main.hget('security:doc:' + request.doc.uuid, 'prime') as string
 		if (!prime) return;
 		let hmac = security.docHmac(request.doc.uuid, request.doc.bytes, request.hostname, prime)
 		request.authed = request.doc.token == hmac

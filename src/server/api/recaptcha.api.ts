@@ -8,7 +8,7 @@ import * as common from '../../common'
 import fastify from '../fastify'
 import * as boom from 'boom'
 import * as got from 'got'
-import redis from '../adapters/redis'
+import * as redis from '../adapters/redis'
 
 
 
@@ -43,7 +43,7 @@ fastify.route({
 			throw boom.badRequest('Recaptcha errors, ' + JSON.stringify(body['error-codes']))
 		}
 		if (!body.success) throw boom.badRequest('Recaptcha unsuccessful');
-		await redis.setex('security:human:' + request.doc.uuid, 300, true)
+		await redis.main.setex('security:human:' + request.doc.uuid, 300, true)
 		return { success: body.success }
 	},
 })

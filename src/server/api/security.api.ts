@@ -9,7 +9,7 @@ import fastify from '../fastify'
 import * as security from '../services/security'
 import * as got from 'got'
 import * as forge from 'node-forge'
-import redis from '../adapters/redis'
+import * as redis from '../adapters/redis'
 
 
 
@@ -28,7 +28,7 @@ fastify.route({
 	},
 	handler: async function(request, reply) {
 		let prime = common.security.random(32)
-		await redis.hset('security:doc:' + request.doc.uuid, 'prime', prime)
+		await redis.main.hset('security:doc:' + request.doc.uuid, 'prime', prime)
 		// await redis.pipeline()
 		// 	.hset('security:doc:' + request.doc.uuid, 'prime', prime)
 		// 	.exec().then(redis.fixpipeline)

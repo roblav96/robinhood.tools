@@ -11,27 +11,26 @@ import * as ioredis from 'ioredis'
 
 class Redis extends ioredis {
 
-	static getOpts() {
+	static getOpts(name: string, offset: number) {
 		let opts = {
 			host: process.env.REDIS_HOST,
-			port: Number.parseInt(process.env.REDIS_PORT),
+			port: Number.parseInt(process.env.REDIS_PORT) + offset,
 			password: process.env.REDIS_PASSWORD,
 			db: 0,
 			dropBufferSupport: true,
-			connectionName: '[' + process.INSTANCE + '][' + common.string.id(process.DNAME) + '][' + NODE_ENV + ']',
+			connectionName: '[' + process.INSTANCE + '][' + common.string.id(process.DNAME) + '][' + name.toUpperCase() + '][' + NODE_ENV + ']',
 		} as ioredis.RedisOptions
 
 		if (PRODUCTION) {
 			opts.path = '/var/run/redis_' + opts.port + '.sock'
-			_.unset(opts, 'host')
-			_.unset(opts, 'port')
+			_.unset(opts, 'host'); _.unset(opts, 'port');
 		}
 
 		return opts
 	}
 
-	constructor() {
-		super(Redis.getOpts())
+	constructor(name: string, offset: number) {
+		super(Redis.getOpts(name, offset))
 	}
 
 	fixpipeline(resolved: any[]) {
@@ -78,7 +77,9 @@ class Redis extends ioredis {
 
 
 
-export default new Redis()
+export const main = new Redis('main', 0)
+export const pub = new Redis('pub', 0)
+export const sub = new Redis('sub', 0)
 
 
 

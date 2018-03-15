@@ -8,7 +8,7 @@ import * as common from '../../common'
 import fastify from '../fastify'
 import * as boom from 'boom'
 import * as got from 'got'
-import redis from '../adapters/redis'
+import * as redis from '../adapters/redis'
 
 
 
@@ -34,7 +34,7 @@ fastify.route({
 	},
 	handler: async function(request, reply) {
 		if (!request.authed) throw boom.unauthorized();
-		let human = await redis.get('security:human:' + request.doc.uuid)
+		let human = await redis.main.get('security:human:' + request.doc.uuid)
 		console.log('human >')
 		eyes.inspect(human)
 		if (!human) throw boom.preconditionRequired('Recaptcha must be complete');

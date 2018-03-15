@@ -5,6 +5,7 @@ import * as common from '@/common'
 
 import * as Gun from 'gun/gun'
 import 'gun/nts'
+import 'gun/lib/ws'
 // import 'gun/lib/wire'
 
 
@@ -26,12 +27,29 @@ console.log('gun._.opt >', gun._.opt)
 
 
 
-const greetings = gun.get('greetings')
-greetings.put({ client: common.security.random(8) })
-// greetings.put({ [common.security.random(4)]: common.security.random(8) })
-greetings.on(function(data) {
-	console.log('greetings.on update >', JSON.stringify(data, null, 4))
+common.DEV_SYMBOLS.forEach(function(fsymbol) {
+	gun.get('quotes/' + fsymbol.symbol).on(function(data, key) {
+		console.log(key, 'on >', JSON.stringify(_.omit(data, ['_']), null, 4))
+	}, { change: true })
 })
+
+// const quotes = gun.get('quotes/SPY')
+// quotes.on(function(data, key) {
+// 	console.log('gun on >', key, JSON.stringify(data, null, 4))
+// }, { change: true })
+
+// gun.on(function(data, key) {
+// 	console.log('gun on >', key, JSON.stringify(data, null, 4))
+// })
+
+
+
+// const greetings = gun.get('greetings')
+// greetings.put({ client: common.security.random(8) })
+// // greetings.put({ [common.security.random(4)]: common.security.random(8) })
+// greetings.on(function(data) {
+// 	console.log('greetings.on update >', JSON.stringify(data, null, 4))
+// })
 
 
 

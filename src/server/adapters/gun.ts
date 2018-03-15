@@ -8,9 +8,9 @@ import * as utils from '../services/utils'
 
 import * as Gun from 'gun/gun'
 import 'gun/nts'
+// import 'gun/lib/store'
 import 'gun/lib/wire'
 // import 'gun/lib/ws'
-// import 'gun/lib/store'
 import fastify from '../fastify'
 
 
@@ -21,21 +21,21 @@ const gun = new Gun({
 	web: fastify.server,
 	ws: { path: '/websocket/' + process.INSTANCE },
 	uuid: 'uuid_' + process.INSTANCE,
-	peers: common.array.create(process.INSTANCES).filter(function(i) {
-		return i != process.INSTANCE
-	}).map(i => 'ws://localhost:' + (process.PORT + i) + '/websocket/' + i),
+	// peers: common.array.create(process.INSTANCES).filter(function(i) {
+	// 	return i != process.INSTANCE
+	// }).map(i => 'ws://localhost:' + (process.PORT + i) + '/websocket/' + i),
 	// }).map(i => 'ws://localhost:' + (process.PORT + i) + '/gun'),
 	// }).map(i => 'ws://dev.robinhood.tools/websocket/' + i),
 })
 
 if (process.PRIMARY) {
 	setTimeout(function() {
-		console.log('gun._.opt.peers >', gun._.opt.peers)
+		// console.log('gun._.opt.peers >', gun._.opt.peers)
 		// Object.keys(gun._.opt.peers).forEach(function (key) {
 		// 	let peer = gun._.opt.peers[key]
 		// 	console.log(key + ' peer.wire >', !!peer.wire)
 		// })
-	}, 3000)
+	}, 1000)
 }
 
 
