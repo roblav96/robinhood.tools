@@ -21,11 +21,11 @@ function request(config: Partial<HttpRequestConfig>): Promise<any> {
 		config.silent = config.silent || PRODUCTION
 		if (!config.silent) console.log('%c▶ ' + config.method + ' ' + config.url + ' ▶', 'font-weight: 300;', (JSON.stringify(config.query || config.body || {})).substring(0, 64));
 
-		if (config.url[0] == '/') config.url = process.env.DOMAIN + '/api' + config.url;
+		if (config.url[0] == '/') config.url = process.DOMAIN + '/api' + config.url;
 
 		if (!config.headers) config.headers = {};
 		Object.assign(config.headers, {
-			'x-version': process.env.VERSION,
+			'x-version': process.VERSION,
 			'x-platform': 'web',
 			'x-silent': config.silent,
 		})
@@ -33,7 +33,7 @@ function request(config: Partial<HttpRequestConfig>): Promise<any> {
 		common.object.compact(config.headers)
 
 		if (config.isproxy) {
-			config.url = process.env.DOMAIN + '/api/proxy'
+			config.url = process.DOMAIN + '/api/proxy'
 			config.body = pconfig
 			config.method = 'POST'
 		}
@@ -58,7 +58,7 @@ function request(config: Partial<HttpRequestConfig>): Promise<any> {
 			// message += ': "' + response + '"'
 		}
 
-		let route = '[' + _.get(error, 'method', config.method) + '] ' + _.get(error, 'url', config.url).replace(process.env.DOMAIN, '').trim()
+		let route = '[' + _.get(error, 'method', config.method) + '] ' + _.get(error, 'url', config.url).replace(process.DOMAIN, '').trim()
 		console.log('%c◀ ' + route, 'color: red; font-weight: bolder;', message)
 		{ (router.app as any).$toast.open({ message: route + ' ▶ ' + message, type: 'is-danger' }) }
 

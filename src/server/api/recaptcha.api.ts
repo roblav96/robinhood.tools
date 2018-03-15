@@ -5,14 +5,14 @@ import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as common from '../../common'
 
-import server from '../server'
+import fastify from '../fastify'
 import * as boom from 'boom'
 import * as got from 'got'
 import redis from '../adapters/redis'
 
 
 
-server.route({
+fastify.route({
 	method: 'POST',
 	url: '/api/recaptcha/verify',
 	schema: {

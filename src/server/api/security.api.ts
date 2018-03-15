@@ -5,7 +5,7 @@ import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as common from '../../common'
 
-import server from '../server'
+import fastify from '../fastify'
 import * as security from '../services/security'
 import * as got from 'got'
 import * as forge from 'node-forge'
@@ -13,7 +13,7 @@ import redis from '../adapters/redis'
 
 
 
-server.route({
+fastify.route({
 	method: 'GET',
 	url: '/api/security/token',
 	schema: {

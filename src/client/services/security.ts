@@ -41,7 +41,7 @@ function initToken() {
 	return http.get('/security/token', {
 		now: Date.now(),
 	}, { retries: 999 }).then(function(response) {
-		console.log('response', response)
+		// console.log('response', response)
 		// doc.id = response.id
 		doc.token = response.token
 	}).catch(function(error) {

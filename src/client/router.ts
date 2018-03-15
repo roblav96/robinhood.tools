@@ -30,4 +30,6 @@ security.init().finally(function() {
 	// app.$mount('#app')
 })
 
+require('./services/gun')
+
 

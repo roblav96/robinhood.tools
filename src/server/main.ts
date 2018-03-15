@@ -29,8 +29,6 @@ if (process.MASTER) {
 	})
 	// process.RADIO.once('RESTART', restart)
 
-	// if (DEVELOPMENT) process.INSTANCES = 1;
-
 	console.log('Forking ' + chalk.bold('x' + chalk.redBright(process.INSTANCES.toString())) + ' nodes in cluster...')
 	let i: number, len = process.INSTANCES
 	for (i = 0; i < len; i++) { cluster.fork() }
@@ -44,7 +42,7 @@ if (process.MASTER) {
 	})
 
 } else {
-	require('./server')
+	require('./fastify')
 	require('./adapters/gun')
 }
 

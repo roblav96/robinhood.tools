@@ -36,6 +36,11 @@ process.EE3 = new ee3.EventEmitter()
 
 
 
+// if (DEVELOPMENT) process.INSTANCES = 1;
+// if (process.MASTER) process.env.GUN_ENV = 'debug';
+
+
+
 require('debug-trace')()
 console.format = function(args) {
 	// eyes.inspect(args, 'args')

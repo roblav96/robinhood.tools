@@ -13,6 +13,11 @@ declare module 'fastify' {
 		hasHeader: (key: string) => boolean
 	}
 
+	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
+		register<T extends RegisterOptions<HttpServer, HttpRequest, HttpResponse>>(plugin: Plugin<HttpServer, HttpRequest, HttpResponse, T>, error?: (error: Error) => void): FastifyInstance<HttpServer, HttpRequest, HttpResponse>
+		register<T extends RegisterOptions<HttpServer, HttpRequest, HttpResponse>>(plugin: Plugin<HttpServer, HttpRequest, HttpResponse, T>, opts?: T, error?: (error: Error) => void): FastifyInstance<HttpServer, HttpRequest, HttpResponse>
+	}
+
 }
 
 

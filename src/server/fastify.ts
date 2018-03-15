@@ -5,9 +5,8 @@ import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as common from '../common'
 
-import * as moment from 'moment'
 import * as http from 'http'
-import * as fastify from 'fastify'
+import * as Fastify from 'fastify'
 import * as cors from 'cors'
 import * as boom from 'boom'
 import * as cookie from 'cookie'
@@ -16,20 +15,21 @@ import redis from './adapters/redis'
 
 
 
-const server = fastify<http.Server, http.IncomingMessage, http.ServerResponse>({
-	// logger: { level: 'error', prettyPrint: { forceColor: true, levelFirst: true, }, },
+const fastify = Fastify<http.Server, http.IncomingMessage, http.ServerResponse>({
+	logger: { level: 'error', prettyPrint: { forceColor: true, levelFirst: true, }, },
 })
-export default server
+export default fastify
+
+fastify.register(require('fastify-cookie'), error => { if (error) console.error('fastify-cookie Error >', error); })
 
 
 
-server.register(require('fastify-cookie'))
-
-server.setNotFoundHandler(async function(request, reply) {
+fastify.setNotFoundHandler(async function(request, reply) {
 	return boom.notFound()
 })
 
-server.setErrorHandler(async function(error: boom & { validation: any }, request, reply) {
+fastify.setErrorHandler(async function(error: boom & { validation: any }, request, reply) {
+	// console.error('fastify Error >', error)
 	if (Array.isArray(error.validation)) {
 		let validation = error.validation[0]
 		error = boom.preconditionFailed('Parameter `' + validation.dataPath.substr(1) + '` ' + validation.message) as any
@@ -45,28 +45,36 @@ server.setErrorHandler(async function(error: boom & { validation: any }, request
 
 
 
-server.use(cors({ origin: process.DOMAIN }))
+fastify.use(cors({ origin: process.DOMAIN }))
 
 
 
-server.addHook('preHandler', async function(request, reply) {
+fastify.get('/api/debug', function(request, reply) {
+	console.info('request.query >')
+	eyes.inspect(request.query)
+	reply.send('OK')
+})
+
+
+
+fastify.addHook('preHandler', async function(request, reply) {
 	request.authed = false
-
+	
 	// console.log('request.headers >')
 	// eyes.inspect(request.headers)
+
 	let invalid = common.valid.headers(request.headers, ['x-uuid', 'x-finger', 'user-agent', 'hostname'])
-	if (invalid) throw boom.preconditionFailed('Invalid ' + invalid + ' header');
+	if (invalid) throw boom.preconditionFailed('Invalid ' + invalid + ' header, common.valid.headers');
 
 	request.ip = security.reqip(request)
 	request.hostname = request.headers['hostname']
-
 	request.doc = {
 		uuid: request.headers['x-uuid'],
 		finger: request.headers['x-finger'],
 		ua: request.headers['user-agent'],
 	}
 
-	// if (request.headers['x-id']) request.doc.id = request.headers['x-id'];
+	if (request.headers['x-id']) request.doc.id = request.headers['x-id'];
 	if (request.headers['x-token']) {
 		let split = request.headers['x-token'].split('.')
 		if (split.length != 2) {
@@ -108,10 +116,9 @@ import './api/robinhood.api'
 
 
 
-let port = process.PORT + process.INSTANCE + 1
-server.listen(port, process.HOST, function(error) {
+fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 	if (error) return console.error('fastify.listen > error', error);
-	// console.log('fastify ready >', port)
+	// console.info('fastify.listen >', fastify.server.address().address + ':' + fastify.server.address().port)
 })
 
 
