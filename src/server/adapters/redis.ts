@@ -18,12 +18,13 @@ class Redis extends ioredis {
 			password: process.env.REDIS_PASSWORD,
 			db: 0,
 			dropBufferSupport: true,
-			connectionName: '[' + process.INSTANCE + '][' + common.string.id(process.DNAME) + '][' + name.toUpperCase() + '][' + NODE_ENV + ']',
+			connectionName: '[' + process.INSTANCE + '][' + common.string.id(process.NAME) + '][' + name.toUpperCase() + '][' + NODE_ENV + ']',
 		} as ioredis.RedisOptions
 
 		if (PRODUCTION) {
 			opts.path = '/var/run/redis_' + opts.port + '.sock'
-			_.unset(opts, 'host'); _.unset(opts, 'port');
+			_.unset(opts, 'host')
+			_.unset(opts, 'port')
 		}
 
 		return opts

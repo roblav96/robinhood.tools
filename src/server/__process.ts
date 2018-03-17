@@ -1,9 +1,13 @@
 // 
 
-import chalk from 'chalk'
+import 'source-map-support/register'
 import * as eyes from 'eyes'
-import * as _ from 'lodash'
+eyes.defaults.maxLength = 65536
+eyes.defaults.showHidden = true
 
+// 
+
+import chalk from 'chalk'
 import * as os from 'os'
 import * as cluster from 'cluster'
 import * as path from 'path'
@@ -13,16 +17,14 @@ import * as dotenv from 'dotenv'
 
 
 
-global.NODE_ENV = process.env.NODE_ENV as any
+global.NODE_ENV = process.env.NODE_ENV || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
-Object.assign((eyes as any).defaults, { maxLength: 131072, showHidden: true } as eyes.EyesOptions)
-dotenv.config({ path: path.resolve(process.cwd(), '.server.' + NODE_ENV + '.local') })
-
-process.DNAME = process.env.DNAME
-process.VERSION = process.env.VERSION
-process.DOMAIN = process.env.DOMAIN
+dotenv.config({ path: path.resolve(process.cwd(), 'config/server.' + NODE_ENV + '.env') })
+process.NAME = process.env.npm_package_name
+process.VERSION = process.env.npm_package_version
+process.DOMAIN = (DEVELOPMENT ? 'http://dev.' : 'https://') + process.env.npm_package_domain
 process.HOST = process.env.HOST
 process.PORT = Number.parseInt(process.env.PORT)
 
@@ -36,18 +38,9 @@ process.EE3 = new ee3.EventEmitter()
 
 
 
-if (DEVELOPMENT) process.INSTANCES = 1;
-
-// if (process.MASTER) process.env.GUN_ENV = 'debug';
-// process.env.GUN_ENV = 'debug'
-
-
-
 require('debug-trace')()
 console.format = function(args) {
-	// eyes.inspect(args, 'args')
 	let stack = new Error().stack.toString()
-	// eyes.inspect(stack, 'stack')
 	stack = stack.replace(/^ {4}at /gm, '').split('\n')[4].trim()
 	let fullpath = stack.split('/').pop()
 	if (!fullpath) fullpath = args.filename + ':' + args.getLineNumber();
@@ -56,13 +49,13 @@ console.format = function(args) {
 	let line = fullpath.split('.ts:')[i].split(':')[0]
 	let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' } as Dict<string>
 	let color = cdict[args.method] || 'magenta'
-	let osquare = chalk[color + 'Bright']('▉')
+	let osquare = chalk[color + 'Bright']('█')
 	let ofile = '[' + chalk.bold(chalk[color](file) + ':' + line) + ']'
+	let oinstance = '[' + chalk.gray(process.INSTANCE) + ']'
 	let otime = moment().format('hh:mm:ss:SSS')
-	let oinstance = '[' + process.INSTANCE + ']'
-	let output = osquare + ofile + '' + oinstance + 'T-' + otime
+	let output = osquare + ofile + oinstance + chalk.gray('T-') + otime
 	if (args.method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
-	return '\n \n' + chalk.reset.underline(output) + '\n'
+	return '\n\n' + chalk.reset.underline(output) + '\n'
 }
 
 
@@ -72,14 +65,12 @@ process.on('uncaughtException', function(error) {
 })
 process.on('unhandledRejection', function(error) {
 	console.error(chalk.bold.underline.redBright('UNHANDLED REJECTION') + ' Error >', error)
-	// https://github.com/mcollina/make-promises-safe
-	// process.exit(1)
+	// process.exit(1) // https://github.com/mcollina/make-promises-safe
 })
 
 
 
 if (DEVELOPMENT) {
-	if (process.MASTER) require('ora')({ spinner: 'runner', interval: 1000, hideCursor: false, stream: process.stdout }).start();
 	const dtsgen = require('dts-gen')
 	const clipboardy = require('clipboardy')
 	process.dtsgen = function(name, value) {
@@ -87,13 +78,23 @@ if (DEVELOPMENT) {
 		let results = dtsgen.generateIdentifierDeclarationFile(name, value)
 		clipboardy.write(results).then(function() {
 			console.info('dtsgen > "' + chalk.bold(name) + '"')
-		}).catch(error => console.error('dtsgen Error', error))
+		}).catch(error => console.error('dtsgen Error >', error))
 	}
 	process.clipboard = function(name, input) {
 		clipboardy.write(input).then(function() {
 			console.info('clipboard > "' + chalk.bold(name) + '"')
-		}).catch(error => console.error('clipboard Error', error))
+		}).catch(error => console.error('clipboard Error >', error))
 	}
+}
+
+
+
+if (process.MASTER) {
+	process.stdout.write('\n\n' +
+		'█ ' + chalk.underline.magenta(process.NAME) + '\n' +
+		'█ ' + NODE_ENV + '\n' +
+		'█ ' + process.HOST + ':' + process.PORT + '\n'
+	)
 }
 
 

@@ -24,12 +24,10 @@ export const router = new VueRouter({
 	mode: 'history', routes,
 })
 
-export const app = new App({ router, store }).$mount('#app')
+export const vm = new App({ router, store }).$mount('#app')
 
 security.init().finally(function() {
-	// app.$mount('#app')
+	// vm.$mount('#app')
 })
-
-require('./services/gun')
 
 

@@ -1,8 +1,8 @@
 // 
 
+import lockr from 'lockr'
 import Fingerprint2 from 'fingerprintjs2'
 import * as common from '@/common'
-import * as storage from './storage'
 import * as store from './store'
 import * as http from './http'
 
@@ -18,20 +18,20 @@ export const state = {
 const doc = {} as Security.Doc
 
 function initUuid() {
-	let uuid = storage.get('security.uuid') as string
+	let uuid = lockr.get('security.uuid', '')
 	if (uuid) return Promise.resolve(uuid);
 	return common.security.generatePrime(32).then(function(uuid) {
-		storage.set('security.uuid', uuid)
+		lockr.set('security.uuid', uuid)
 		return Promise.resolve(uuid)
 	})
 }
 
 function initFinger() {
-	let finger = storage.get('security.finger') as string
+	let finger = lockr.get('security.finger', '')
 	if (finger) return Promise.resolve(finger);
 	return new Promise<string>(function(resolve) {
 		new Fingerprint2().get(function(finger) {
-			storage.set('security.finger', finger) // common.security.sha256(finger))
+			lockr.set('security.finger', finger) // common.security.sha256(finger))
 			resolve(finger)
 		})
 	})

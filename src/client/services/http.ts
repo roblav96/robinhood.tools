@@ -15,7 +15,7 @@ function request(config: Partial<HttpRequestConfig>): Promise<any> {
 		let pconfig = config.isproxy ? common.object.clone(config) : undefined
 		// console.log('pconfig', JSON.stringify(pconfig, null, 4))
 
-		if (!Number.isFinite(config.timeout)) config.timeout = 10000;
+		if (!Number.isFinite(config.timeout as any)) config.timeout = 10000;
 		if (!Number.isFinite(config.retries as any)) config.retries = 5;
 
 		config.silent = config.silent || PRODUCTION
@@ -60,7 +60,7 @@ function request(config: Partial<HttpRequestConfig>): Promise<any> {
 
 		let route = '[' + _.get(error, 'method', config.method) + '] ' + _.get(error, 'url', config.url).replace(process.DOMAIN, '').trim()
 		console.log('%c◀ ' + route, 'color: red; font-weight: bolder;', message)
-		{ (router.app as any).$toast.open({ message: route + ' ▶ ' + message, type: 'is-danger' }) }
+		router.vm.$toast.open({ message: route + ' ▶ ' + message, type: 'is-danger' })
 
 		error.message = message
 		return Promise.reject(error)

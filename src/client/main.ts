@@ -1,18 +1,19 @@
 // 
 
-global.NODE_ENV = process.env.NODE_ENV as any
+global.NODE_ENV = process.env.NODE_ENV || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
-process.DNAME = process.env.DNAME
+process.NAME = process.env.NAME
 process.VERSION = process.env.VERSION
 process.DOMAIN = process.env.DOMAIN
 
 // 
 
-import '@ibm/plex/css/ibm-plex.css'
-import 'mdi/css/materialdesignicons.css'
+import '@ibm/plex/css/ibm-plex.css' // typography
+import 'mdi/css/materialdesignicons.css' // icons library
 
+import '@/client/service-worker'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Vuex from 'vuex'
@@ -29,11 +30,9 @@ Vue.use(Buefy, {
 	defaultToastDuration: 5000,
 	defaultInputAutocomplete: 'off',
 	defaultNoticeQueue: false,
+	defaultTooltipType: 'is-dark',
 } as BuefyConfig)
 
-// import * as Vts from 'vue-property-decorator'
-// Vts.Component.registerHooks(['beforeRouteEnter', 'beforeRouteLeave', 'beforeRouteUpdate'])
-
-require('@/client/router')
+import('@/client/router')
 
 

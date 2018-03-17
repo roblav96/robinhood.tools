@@ -12,12 +12,15 @@ declare namespace NodeJS {
 		DEVELOPMENT: typeof DEVELOPMENT
 		PRODUCTION: typeof PRODUCTION
 	}
-	// interface Process extends ProcessEnv {
+	interface ProcessEnv {
+		NODE_ENV: typeof NODE_ENV
+	}
 	interface Process {
-		DNAME: string
+		NAME: string
 		VERSION: string
 		DOMAIN: string
-		dtsgen: (name: string, value: any) => void
+		EE3: ee3.EventEmitter
+		dtsgen: (name: string, input: any) => void
 		clipboard: (name: string, input: string) => void
 		HOST: string
 		PORT: number
@@ -26,11 +29,7 @@ declare namespace NodeJS {
 		MASTER: boolean
 		WORKER: boolean
 		PRIMARY: boolean
-		EE3: ee3.EventEmitter
 	}
-	// interface ProcessEnv {
-	// 	NODE_ENV: 'development' | 'production'
-	// }
 }
 
 

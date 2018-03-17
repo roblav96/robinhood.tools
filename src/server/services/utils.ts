@@ -10,7 +10,7 @@ import * as dtsgen from 'dts-gen'
 
 
 export function expose(name: string, input: any, skips = [] as string[]) {
-	process.stdout.write('\n \n')
+	process.stdout.write('\n\n')
 
 	let keys = _.uniq(_.keys(input).concat(_.keysIn(input)))
 	eyes.inspect(keys, '"' + name + '"' + ' properties')

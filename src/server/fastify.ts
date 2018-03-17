@@ -4,9 +4,11 @@ import chalk from 'chalk'
 import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as common from '../common'
+import * as utils from './services/utils'
 
 import * as http from 'http'
 import * as Fastify from 'fastify'
+import * as pino from 'pino'
 import * as cors from 'cors'
 import * as boom from 'boom'
 import * as cookie from 'cookie'
@@ -16,7 +18,15 @@ import * as redis from './adapters/redis'
 
 
 const fastify = Fastify<http.Server, http.IncomingMessage, http.ServerResponse>({
-	logger: { level: 'error', prettyPrint: { forceColor: true, levelFirst: true, }, },
+	logger: {
+		level: 'info',
+		prettyPrint: {
+			forceColor: true, levelFirst: true,
+			formatter: function(desc, pieces) {
+				// return '12345'
+			} as pino.PrettyFormatter,
+		},
+	},
 })
 export default fastify
 
@@ -29,7 +39,7 @@ fastify.setNotFoundHandler(async function(request, reply) {
 })
 
 fastify.setErrorHandler(async function(error: boom & { validation: any }, request, reply) {
-	// console.error('fastify Error >', error)
+	console.error('fastify.setErrorHandler Error >', error)
 	if (Array.isArray(error.validation)) {
 		let validation = error.validation[0]
 		error = boom.preconditionFailed('Parameter `' + validation.dataPath.substr(1) + '` ' + validation.message) as any
@@ -49,22 +59,14 @@ fastify.use(cors({ origin: process.DOMAIN }))
 
 
 
-fastify.get('/api/debug', function(request, reply) {
-	console.info('request.query >')
-	eyes.inspect(request.query)
-	reply.send('OK')
-})
-
-
-
 fastify.addHook('preHandler', async function(request, reply) {
 	request.authed = false
-	
+
 	// console.log('request.headers >')
 	// eyes.inspect(request.headers)
 
 	let invalid = common.valid.headers(request.headers, ['x-uuid', 'x-finger', 'user-agent', 'hostname'])
-	if (invalid) throw boom.preconditionFailed('Invalid ' + invalid + ' header, common.valid.headers');
+	if (invalid) throw boom.preconditionFailed('Invalid ' + invalid + ' header, pre-handler hook');
 
 	request.ip = security.reqip(request)
 	request.hostname = request.headers['hostname']
@@ -99,11 +101,10 @@ fastify.addHook('preHandler', async function(request, reply) {
 
 	if (request.doc.bytes && request.doc.token) {
 		let prime = await redis.main.hget('security:doc:' + request.doc.uuid, 'prime') as string
-		if (!prime) return;
-		let hmac = security.docHmac(request.doc.uuid, request.doc.bytes, request.hostname, prime)
-		request.authed = request.doc.token == hmac
-		// console.log('request.authed >')
-		// eyes.inspect(request.authed)
+		if (prime) {
+			let hmac = security.docHmac(request.doc.uuid, request.doc.bytes, request.hostname, prime)
+			request.authed = request.doc.token == hmac
+		}
 	}
 
 })
@@ -117,7 +118,7 @@ import './api/robinhood.api'
 
 
 fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
-	if (error) return console.error('fastify.listen > error', error);
+	if (error) return console.error('fastify.listen Error >', error);
 	// console.info('fastify.listen >', fastify.server.address().address + ':' + fastify.server.address().port)
 })
 

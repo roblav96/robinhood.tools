@@ -9,10 +9,8 @@
 			"node_modules"
 		],
 		"file_exclude_patterns": [
-			"src/main.ts",
-			"vue.*",
-			"sass.*",
-			"*.client.*",
+			"*vue*",
+			"*client*",
 			"license*",
 			"readme*"
 		]

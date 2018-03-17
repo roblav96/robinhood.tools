@@ -46,6 +46,9 @@ export const string = {
 		id = id.replace(/\W+/g, '').trim()
 		return tolower == true ? id.toLowerCase() : id
 	},
+	capitalizeWords(input: string) {
+		return input.toLowerCase().split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ')
+	},
 	fuzzy(needle: string, haystack: string): boolean {
 		if (!string.is(needle) || !string.is(haystack)) return false;
 		let hlen = haystack.length

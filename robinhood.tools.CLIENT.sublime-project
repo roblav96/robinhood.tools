@@ -8,7 +8,7 @@
 			"node_modules"
 		],
 		"file_exclude_patterns": [
-			"*.server*",
+			"*server*",
 			"license*",
 			"readme*"
 		]
