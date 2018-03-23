@@ -8,6 +8,7 @@ const eyes = require('eyes')
 const webpack = require('webpack')
 const path = require('path')
 const dotenv = require('dotenv')
+const package = require('./package.json')
 
 
 

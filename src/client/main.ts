@@ -3,6 +3,9 @@ global.NODE_ENV = process.env.NODE_ENV
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 global.Promise = require('bluebird')
+process.NAME = process.env.NAME
+process.VERSION = process.env.VERSION
+process.DOMAIN = process.env.DOMAIN
 // 
 
 import Vue from 'vue'
