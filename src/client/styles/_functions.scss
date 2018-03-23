@@ -1,0 +1,17 @@
+// 
+@import '~bulma/sass/utilities/functions';
+// 
+// 
+// 
+// ████  FUNCTIONS  ████
+// 
+@function inverted($color) {
+	@if (colorLuminance($color) > 0.55) {
+		@return $dark;
+	}
+	@return $light;
+}
+
+// 
+// 
+//

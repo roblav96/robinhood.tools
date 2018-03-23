@@ -7,15 +7,15 @@ declare const DEVELOPMENT: boolean
 declare const PRODUCTION: boolean
 
 declare namespace NodeJS {
-	interface Global {
+	export interface Global {
 		NODE_ENV: typeof NODE_ENV
 		DEVELOPMENT: typeof DEVELOPMENT
 		PRODUCTION: typeof PRODUCTION
 	}
-	interface ProcessEnv {
+	export interface ProcessEnv {
 		NODE_ENV: typeof NODE_ENV
 	}
-	interface Process {
+	export interface Process {
 		NAME: string
 		VERSION: string
 		DOMAIN: string
@@ -35,12 +35,23 @@ declare namespace NodeJS {
 
 
 interface Console {
-	format(args: any): any
+	format(args: any): void
 }
 
 interface Dict<T = any> {
 	[key: string]: T
 	[key: number]: T
+}
+
+interface WebpackRequireContext {
+	(file: string): void
+	id: string
+	name: string
+	resolve: RequireResolve
+	keys: () => string[]
+}
+interface NodeRequire {
+	context: (path: string, descending: boolean, regex: RegExp) => WebpackRequireContext
 }
 
 

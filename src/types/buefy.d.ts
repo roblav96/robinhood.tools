@@ -1,5 +1,7 @@
 // 
 
+
+
 declare module 'buefy' {
 
 	import _Vue from 'vue'

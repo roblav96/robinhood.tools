@@ -1,9 +1,8 @@
 // 
 
-import chalk from 'chalk'
 import * as eyes from 'eyes'
 import * as _ from 'lodash'
-import * as common from '../../common'
+import * as core from '../../common/core'
 
 import * as dtsgen from 'dts-gen'
 

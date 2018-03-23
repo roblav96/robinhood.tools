@@ -1,0 +1,28 @@
+// 
+@import '~bulma/sass/utilities/mixins';
+// 
+// 
+// 
+// ████  MIXINS  ████
+// 
+$breakpoints: ('mobile', 'tablet', 'touch', 'desktop', 'widescreen', 'fullhd');
+// 
+@mixin with-breakpoints($class) {
+	.#{$class} {
+		@content;
+	}
+	@include touch {
+		.#{$class}-touch {
+			@content;
+		}
+	}
+	@include desktop {
+		.#{$class}-desktop {
+			@content;
+		}
+	}
+}
+
+// 
+// 
+//

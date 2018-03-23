@@ -1,0 +1,11 @@
+{
+	"extends": "./tsconfig.json",
+	"exclude": [
+		"./src/server",
+		"./src/assets",
+		"./config",
+		"./public",
+		"./dist",
+		"./node_modules"
+	]
+}

@@ -3,25 +3,23 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
-import Navbar from '@/client/components/navbar/navbar'
-import * as Login from '@/client/components/login/login'
+import _ from 'lodash'
+import NavBar from '@/client/components/navbar/navbar'
 
 
 
 @Vts.Component({
-	name: 'App',
 	components: {
-		'v-navbar': Navbar,
+		'v-navbar': NavBar,
 	},
 })
-export default class App extends Mixins(Login.Mixin) {
+export default class extends Vue {
 
+	initing = true
 	mounted() {
-		// console.log('mounted')
-		// setTimeout(() => this.showLogin(), 300)
+		_.delay(() => this.initing = false, 1)
+		_.delay(() => delete this.initing, 300)
 	}
-
-
 
 }
 

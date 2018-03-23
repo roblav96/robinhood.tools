@@ -1,11 +1,13 @@
 // 
 
-import * as uws from 'uws'
+import * as _uws from 'uws'
+
+
 
 declare module 'uws' {
 	export interface Server {
-		broadcast(message: any, options: { binary: boolean }): void
-		startAutoPing(interval: number, message: any): void
+		broadcast(message: string, options?: { binary: boolean }): void
+		startAutoPing(interval: number, message: string): void
 	}
 }
 

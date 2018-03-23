@@ -1,106 +1,34 @@
 // 
-@import '~ibm-design-colors';
-@import '~bulma/sass/utilities/initial-variables';
 // 
-// /*████  COLORS  ████*/
 // 
-$_TINT: 'cool';
+// ████  COLORS  ████
 // 
-$black: rgb(14, 14, 14);
-$black-bis: rgb(26, 26, 26);
-$black-ter: rgb(39, 39, 39);
+$light: #F6F6F6;
+$dark: #2B2B2B;
+// $dark: #1F2524;
 // 
-$grey-darker: color($_TINT + '-gray', 90);
-$grey-dark: color($_TINT + '-gray', 70);
-$grey: color($_TINT + '-gray', 50);
-$grey-light: color($_TINT + '-gray', 30);
-$grey-lighter: color($_TINT + '-gray', 20);
+$cyan: #4CC5E6;
+$green: #00C283;
+$yellow: #F8D03E;
+$red: #E2595B;
 // 
-$white-ter: color($_TINT + '-white', 4);
-$white-bis: color($_TINT + '-white', 2);
-$white: color('white', 0);
+$primary: #8861A7;
+$primary-dark: #4D3E71;
+$secondary: $green;
+$accent: $cyan;
 // 
-$orange: color('orange', 30);
-$yellow: color('gold', 20);
-$green: color('green', 30);
-$turquoise: color('teal', 30);
-$cyan: color('aqua', 30);
-$blue: color('blue', 50);
-$purple: color('indigo', 60);
-$red: color('red', 50);
+// #42BCE8;
+// #00B080;
+// #4D3E71;
+// #42BCE8;
+// #8365AA;
 // 
-$primary: #9855D4;
-$primary-light: #AF6EE8;
-$secondary: #FDD600;
-$secondary-light: #FDE876;
-$accent: #562F72;
-// 
-$robinhood-primary: #21CE99;
-$robinhood-secondary: #F45531;
-$robinhood-accent: #303030; // #424242;
-// 
-$info: $cyan;
-$success: $green;
-$warning: $orange;
-$danger: $red;
-// 
-// /*████  VARIABLES  ████*/
-// 
-$light: $white-ter;
-$dark: $grey-darker;
-// 
-$background: $white-ter;
-$body-background-color: $white-bis;
-// 
-$text: $grey-dark;
-$text-light: $grey;
-$text-strong: $grey-darker;
-// 
-$link: $primary;
-// 
-// $gap: 32px;
-// $tablet: 577px;
-// $desktop: 769px + (2 * $gap);
-// $widescreen: 960px + (2 * $gap);
-// $fullhd: 1152px + (2 * $gap);
-// 
-$modal-content-width: 480px;
-$modal-background-background-color: rgba($black, 0.66);
-$button-disabled-opacity: 0.33;
-// 
-// $black: red;
-// $title-color: red;
-// 
-// /*████  INVERTS  ████*/
-// 
-$light-invert: $dark;
-$dark-invert: $light;
-// 
-$orange-invert: inverted($orange);
-$yellow-invert: inverted($yellow);
-$green-invert: inverted($green);
-$turquoise-invert: inverted($turquoise);
-$cyan-invert: inverted($cyan);
-$blue-invert: inverted($blue);
-$purple-invert: inverted($purple);
-$red-invert: inverted($red);
-// 
-$info-invert: inverted($info);
-$success-invert: inverted($success);
-$warning-invert: inverted($warning);
-$danger-invert: inverted($danger);
+// ████  INVERTS  ████
 // 
 $primary-invert: inverted($primary);
-$primary-light-invert: inverted($primary-light);
+$primary-dark-invert: inverted($primary-dark);
 $secondary-invert: inverted($secondary);
-$secondary-light-invert: inverted($secondary-light);
 $accent-invert: inverted($accent);
-$robinhood-primary-invert: inverted($robinhood-primary);
-$robinhood-secondary-invert: inverted($robinhood-secondary);
-$robinhood-accent-invert: inverted($robinhood-accent);
-// 
-$text-invert: inverted($text);
-$link-invert: inverted($link);
 // 
 // 
 //

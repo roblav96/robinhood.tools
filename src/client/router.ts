@@ -2,32 +2,50 @@
 
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import store from '@/client/services/store'
-import * as security from '@/client/services/security'
-import App from '@/client/app/app'
+import _ from 'lodash'
 
 
 
 export const routes = [
 
 	{
-		name: 'home', path: '/', component: () => import('@/client/routes/home/home'),
+		name: 'home', path: '/',
+		component: () => import('@/client/routes/home/home'),
 	},
 
 	{
-		path: '*', redirect: { name: 'home' },
+		name: 'storybook', path: '/storybook',
+		component: () => import('@/client/routes/storybook/storybook'),
 	},
+
+	{ path: '*', redirect: { name: 'home' } },
 
 ] as Array<RouteConfig>
 
-export const router = new VueRouter({
-	mode: 'history', routes,
+
+
+const router = new VueRouter({
+	routes, mode: 'history',
+	linkExactActiveClass: 'is-active',
+	// linkActiveClass: 'is-active',
 })
 
-export const vm = new App({ router, store }).$mount('#app')
-
-security.init().finally(function() {
-	// vm.$mount('#app')
+router.afterEach(function(to, from) {
+	_.delay(window.scrollTo, !from.name ? 100 : 1, { top: 0, behavior: 'instant' })
 })
+
+export default router
+
+
+
+
+
+declare module 'vue-router/types/router' {
+	export interface RouteConfig {
+		dname?: string
+		icon?: string
+		bold?: boolean
+	}
+}
 
 

@@ -1,0 +1,128 @@
+// 
+// 
+// 
+// ████  MERGERS  ████
+// 
+$colors: map-merge($colors, ('primary':($primary, $primary-invert)));
+$colors: map-merge($colors, ('primary-dark':($primary-dark, $primary-dark-invert)));
+$colors: map-merge($colors, ('secondary':($secondary, $secondary-invert)));
+$colors: map-merge($colors, ('accent':($accent, $accent-invert)));
+// 
+// 
+// 
+// ████  COLORS  ████
+// 
+:root {
+	@each $name,
+	$pair in $colors {
+		--c-#{$name}: nth($pair, 1);
+		--c-#{$name}-inverse: nth($pair, 2);
+	}
+	@each $name,
+	$shade in $shades {
+		--c-#{$name}: $shade;
+	}
+}
+
+@each $name,
+$pair in $colors {
+	.is-bg-#{$name} {
+		background-color: nth($pair, 1) !important; // color: nth($pair, 2) !important;
+	}
+}
+
+.is-bg-transparent {
+	background-color: transparent !important;
+}
+
+@each $name,
+$pair in $colors {
+	.is-text-#{$name} {
+		color: nth($pair, 1) !important;
+	}
+}
+
+// 
+// 
+// 
+// ████  TEXT  ████
+// 
+@each $name,
+$white-space in (('wrap', normal), ('nowrap', nowrap)) {
+	@include with-breakpoints('is-text-#{$name}') {
+		white-space: $white-space !important;
+	}
+}
+
+@each $text-align in (left, right, center, justify, justify-all) {
+	.is-text-#{$text-align} {
+		text-align: $text-align !important;
+	}
+}
+
+@each $text-transform in (lowercase, uppercase, capitalize) {
+	.is-text-#{$text-transform} {
+		text-transform: $text-transform !important;
+	}
+}
+
+.is-text-noraml {
+	text-transform: none !important;
+	text-decoration: none !important;
+}
+
+.is-text-underline {
+	text-decoration: underline !important;
+}
+
+// 
+// 
+// 
+// ████  FONT  ████
+// 
+@each $name,
+$font in (('thin', 200), ('light', $weight-light), ('normal', $weight-normal), ('medium', $weight-medium), ('semibold', $weight-semibold), ('bold', $weight-bold), ('heavy', 800)) {
+	.is-font-#{$name} {
+		font-weight: $font !important;
+	}
+}
+
+@each $name,
+$weight in (('2', 200), ('3', 300), ('4', 400), ('5', 500), ('6', 600), ('7', 700), ('8', 800)) {
+	.is-weight-#{$name} {
+		font-weight: $weight !important;
+	}
+}
+
+.is-font-italic {
+	font-style: italic !important;
+}
+
+.is-font-noraml {
+	font-style: normal !important;
+	font-weight: normal !important;
+}
+
+// 
+// 
+// 
+// ████  ANIMATIONS  ████
+// 
+.is-animation-loading {
+	opacity: 0 !important;
+}
+
+@each $name,
+$speed in (('', $speed), ('-slow', $speed-slow), ('-slower', $speed-slower), ('-slowest', 500ms)) {
+	.is-animation#{$name} {
+		animation-duration: $speed !important;
+	}
+}
+
+.is-animation-infinite {
+	animation-iteration-count: infinite !important;
+}
+
+// 
+// 
+//

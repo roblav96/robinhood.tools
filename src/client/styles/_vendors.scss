@@ -1,0 +1,20 @@
+// 
+@charset 'utf-8';
+// 
+// ████  REPAINTLESS ANIMATIONS  ████
+// 
+@import '~repaintless/repaintless-scss/repaintless';
+// 
+// ████  IBM PLEX FONT FAMILY  ████
+// 
+$font-prefix: '~@ibm/plex';
+@import '~@ibm/plex/scss/sans/index';
+@import '~@ibm/plex/scss/mono/index';
+// 
+// ████  MATERIAL DESIGN ICONS  ████
+// 
+$mdi-font-path: '~mdi/fonts';
+@import '~mdi/scss/materialdesignicons';
+// 
+// 
+//

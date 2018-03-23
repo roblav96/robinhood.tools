@@ -1,5 +1,6 @@
 {
 	"folders": [{
+		"name": "robinhood.tools.SERVER",
 		"path": ".",
 		"folder_exclude_patterns": [
 			"public",
@@ -9,10 +10,14 @@
 			"node_modules"
 		],
 		"file_exclude_patterns": [
+			"*.sublime*",
+			"*.gitignore*",
+			"*.tsconfig.*",
 			"*vue*",
 			"*client*",
-			"license*",
-			"readme*"
+			"*debug*",
+			"*license*",
+			"*readme*"
 		]
 	}]
 }

@@ -1,5 +1,7 @@
 // 
 
+
+
 declare namespace ee3 {
 	export class EventEmitter<E = string, D = any> {
 		static prefixed: string | boolean
