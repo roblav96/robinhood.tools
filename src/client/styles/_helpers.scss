@@ -1,12 +1,244 @@
 // 
 // 
 // 
-// ████  MERGERS  ████
+// ████  SIZING  ████
 // 
-$colors: map-merge($colors, ('primary':($primary, $primary-invert)));
-$colors: map-merge($colors, ('primary-dark':($primary-dark, $primary-dark-invert)));
-$colors: map-merge($colors, ('secondary':($secondary, $secondary-invert)));
-$colors: map-merge($colors, ('accent':($accent, $accent-invert)));
+@each $size in (0, 25, 50, 75, 100) {
+	.is-min-w-#{$size} {
+		min-width: percentage($size/100) !important;
+	}
+	.is-max-w-#{$size} {
+		max-width: percentage($size/100) !important;
+	}
+	.is-w-#{$size} {
+		width: percentage($size/100) !important;
+	}
+	.is-min-h-#{$size} {
+		min-height: percentage($size/100) !important;
+	}
+	.is-max-h-#{$size} {
+		max-height: percentage($size/100) !important;
+	}
+	.is-h-#{$size} {
+		height: percentage($size/100) !important;
+	}
+}
+
+.is-min-w-initial {
+	min-width: initial !important;
+}
+
+.is-max-w-initial {
+	max-width: initial !important;
+}
+
+.is-w-initial {
+	width: initial !important;
+}
+
+.is-min-h-initial {
+	min-height: initial !important;
+}
+
+.is-max-h-initial {
+	max-height: initial !important;
+}
+
+.is-h-initial {
+	height: initial !important;
+}
+
+// 
+// 
+// 
+// ████  POSITION  ████
+// 
+@each $position in (static, relative, absolute, fixed, sticky) {
+	.is-p-#{$position} {
+		position: $position !important;
+	}
+}
+
+// 
+// 
+// 
+// ████  DISPLAY  ████
+// 
+@each $display in (none, block, inline, inline-block, table, table-row, table-cell, flex, inline-flex) {
+	.is-d-#{$display} {
+		display: $display !important;
+	}
+}
+
+// 
+// 
+// 
+// ████  FLEXBOX  ████
+// 
+@each $flex-direction in (row, column, row-reverse, column-reverse) {
+	.is-fx-#{$flex-direction} {
+		flex-direction: $flex-direction !important;
+	}
+}
+
+@each $flex-wrap in (wrap, nowrap, wrap-reverse) {
+	.is-fx-#{$flex-wrap} {
+		flex-wrap: $flex-wrap !important;
+	}
+}
+
+.is-fx-initial {
+	flex: initial !important;
+}
+
+.is-fx-none {
+	display: block !important;
+	flex: none !important;
+}
+
+.is-fx-shrink {
+	flex: 0 0 auto !important;
+}
+
+.is-fx-fill {
+	flex: 1 1 auto !important;
+}
+
+@each $fill in (0, 1, 2, 3) {
+	.is-fx-#{$fill} {
+		flex: $fill $fill auto !important;
+	}
+}
+
+@each $name,
+$justify in (('start', flex-start), ('end', flex-end), ('center', center), ('between', space-between), ('around', space-around)) {
+	.is-fx-justify-#{$name} {
+		justify-content: $justify !important;
+	}
+}
+
+@each $name,
+$align-items in (('start', flex-start), ('end', flex-end), ('center', center), ('baseline', baseline), ('stretch', stretch)) {
+	.is-fx-align-items-#{$name} {
+		align-items: $align-items !important;
+	}
+}
+
+@each $name,
+$align-content in (('start', flex-start), ('end', flex-end), ('center', center), ('between', space-between), ('around', space-around), ('stretch', stretch)) {
+	.is-fx-align-content-#{$name} {
+		align-content: $align-content !important;
+	}
+}
+
+@each $name,
+$align-self in (('auto', auto), ('start', flex-start), ('end', flex-end), ('center', center), ('baseline', baseline), ('stretch', stretch)) {
+	.is-fx-align-self-#{$name} {
+		align-self: $align-self !important;
+	}
+}
+
+// 
+// 
+// 
+// ████  VERTICAL ALIGN  ████
+// 
+@each $vertical-align in (baseline, top, middle, bottom, text-top, text-bottom) {
+	.is-va-#{$vertical-align} {
+		vertical-align: $vertical-align !important;
+	}
+}
+
+// 
+// 
+// 
+// ████  SPACING  ████
+// 
+$space: 16;
+$spaces: (0, 1, 2, 3, 4, 5);
+@function calcSpace($step) {
+	@if $step==1 {
+		@return $space * 0.25;
+	}
+	@else if $step==2 {
+		@return $space * 0.5;
+	}
+	@else if $step==3 {
+		@return $space;
+	}
+	@else if $step==4 {
+		@return $space * 1.5;
+	}
+	@else if $step==5 {
+		@return $space * 3;
+	}
+	@return 0;
+}
+
+@each $property,
+$letter in (margin: 'm', padding: 'p') {
+	@each $space in $spaces {
+		.is-#{$letter}a-#{$space} {
+			#{$property}: calcSpace($space) + px !important;
+		}
+		.is-#{$letter}t-#{$space},
+		.is-#{$letter}y-#{$space} {
+			#{$property}-top: calcSpace($space) + px !important;
+		}
+		.is-#{$letter}r-#{$space},
+		.is-#{$letter}x-#{$space} {
+			#{$property}-right: calcSpace($space) + px !important;
+		}
+		.is-#{$letter}b-#{$space},
+		.is-#{$letter}y-#{$space} {
+			#{$property}-bottom: calcSpace($space) + px !important;
+		}
+		.is-#{$letter}l-#{$space},
+		.is-#{$letter}x-#{$space} {
+			#{$property}-left: calcSpace($space) + px !important;
+		}
+	}
+}
+
+.is-ma-auto {
+	margin: auto !important;
+}
+
+.is-mt-auto,
+.is-my-auto {
+	margin-top: auto !important;
+}
+
+.is-mr-auto,
+.is-mx-auto {
+	margin-right: auto !important;
+}
+
+.is-mb-auto,
+.is-my-auto {
+	margin-bottom: auto !important;
+}
+
+.is-ml-auto,
+.is-mx-auto {
+	margin-left: auto !important;
+}
+
+@each $property,
+$letter in (width: 'w', height: 'h') {
+	@each $space in $spaces {
+		.is-#{$letter}-#{$space} {
+			#{$property}: calcSpace($space) + px !important;
+		}
+	}
+}
+
+@each $space in $spaces {
+	.is-lh-#{$space} {
+		line-height: 1 + ($space/10) !important;
+	}
+}
+
 // 
 // 
 // 
@@ -81,9 +313,9 @@ $white-space in (('wrap', normal), ('nowrap', nowrap)) {
 // ████  FONT  ████
 // 
 @each $name,
-$font in (('thin', 200), ('light', $weight-light), ('normal', $weight-normal), ('medium', $weight-medium), ('semibold', $weight-semibold), ('bold', $weight-bold), ('heavy', 800)) {
-	.is-font-#{$name} {
-		font-weight: $font !important;
+$weight in (('thin', 200), ('light', $weight-light), ('normal', $weight-normal), ('medium', $weight-medium), ('semibold', $weight-semibold), ('bold', $weight-bold), ('heavy', 800)) {
+	.is-weight-#{$name} {
+		font-weight: $weight !important;
 	}
 }
 

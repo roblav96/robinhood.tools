@@ -1,7 +1,7 @@
 // 
 
 import router from '@/client/router'
-import store from '@/client/stores/store'
+import store from '@/client/store'
 import App from '@/client/app/app'
 
 

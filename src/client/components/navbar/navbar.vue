@@ -15,9 +15,10 @@ html.has-navbar-fixed-top .hero.is-fullheight {
 		<div class="container">
 
 			<div class="navbar-brand">
-				<router-link class="navbar-item" :to="{ name: 'home' }" active-class exact-active-class>
-					Circle Invest
-				</router-link>
+				<a class="navbar-item">
+					<img src="@/assets/robinhood-logo.svg" class="h-4 mr-2 va-top">
+					<span>Login</span>
+				</a>
 				<div class="fx-fill is-hidden-desktop"></div>
 				<a class="navbar-item is-hidden-desktop" v-on:click="showMobileMenu = !showMobileMenu">
 					<b-icon icon="menu" />

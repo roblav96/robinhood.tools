@@ -6,7 +6,7 @@
 // ████  FUNCTIONS  ████
 // 
 @function inverted($color) {
-	@if (colorLuminance($color) > 0.55) {
+	@if (colorLuminance($color) > 0.66) {
 		@return $dark;
 	}
 	@return $light;

@@ -5,8 +5,6 @@
 // 
 // ████  MIXINS  ████
 // 
-$breakpoints: ('mobile', 'tablet', 'touch', 'desktop', 'widescreen', 'fullhd');
-// 
 @mixin with-breakpoints($class) {
 	.#{$class} {
 		@content;

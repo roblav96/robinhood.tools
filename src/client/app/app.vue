@@ -11,19 +11,19 @@
 </style>
 
 <template>
-	<div id="app" :class="{ 'is-animated-loading': initing === true, 'is-animated fade-in': initing === false }">
+	<div id="app" :class="{ 'is-animation-loading': initing === true, 'is-animation fade-in': initing === false }">
 
 		<v-navbar></v-navbar>
 
 		<router-view></router-view>
 
-		<footer class="footer bg-accent py-4">
+		<footer class="footer is-bg-dark py-4">
 			<div class="container">
 				<div class="content has-text-centered mb-2">
 					footer
 				</div>
 				<div class="content has-text-centered">
-					<a class="button mt-1" href="https://github.com/roblav96/circle.invest.web" target="_blank">
+					<a class="button mt-1" href="https://github.com/roblav96/robinhood.tools" target="_blank">
 						<b-icon icon="github-circle" class="" />
 						<span>Open Source</span>
 					</a>

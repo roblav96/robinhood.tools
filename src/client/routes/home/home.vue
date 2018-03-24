@@ -1,5 +1,4 @@
 <!--  -->
-<!-- <script lang="ts" src="./home.ts"></script> -->
 <script lang="ts" :src="module.id"></script>
 
 <style>
