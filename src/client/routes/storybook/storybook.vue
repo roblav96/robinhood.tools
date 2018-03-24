@@ -1,5 +1,5 @@
 <!--  -->
-<script lang="ts" :src="module.id"></script>
+<script lang="ts" src="./storybook.ts"></script>
 
 <style>
 /**/
@@ -7,8 +7,38 @@
 </style>
 
 <template>
-	<section class="hero is-light is-fullheight">
-		<div class="hero-body">
+	<section>
+
+		<section class="hero is-bold is-primary is-small">
+			<div class="hero-body">
+				<div class="container">
+					<h1 class="title">Stylesheets</h1>
+				</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="container">
+				<b-collapse class="card" v-for="stylesheet in stylesheets" :open="false">
+					<div class="card-header" slot="trigger" slot-scope="props">
+						<p class="card-header-title">{{ stylesheet.title }}</p>
+					</div>
+					<hr class="my-0">
+					<div class="content is-small">
+						<pre>{{ stylesheet.styles }}</pre>
+					</div>
+				</b-collapse>
+			</div>
+		</section>
+
+		<section class="hero is-bold is-primary is-small">
+			<div class="hero-body">
+				<div class="container">
+					<h1 class="title">Theme</h1>
+				</div>
+			</div>
+		</section>
+		<section class="section">
 			<div class="container">
 				<div class="box buttons is-block has-text-centered">
 					<button class="button is-large is-primary">primary</button>
@@ -28,6 +58,7 @@
 					<button class="button is-large is-dark">dark</button>
 				</div>
 			</div>
-		</div>
+		</section>
+
 	</section>
 </template>

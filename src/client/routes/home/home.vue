@@ -1,5 +1,5 @@
 <!--  -->
-<script lang="ts" :src="module.id"></script>
+<script lang="ts" src="./home.ts"></script>
 
 <style>
 /**/

@@ -30,9 +30,10 @@ const router = new VueRouter({
 	// linkActiveClass: 'is-active',
 })
 
-router.afterEach(function(to, from) {
-	_.delay(window.scrollTo, !from.name ? 100 : 1, { top: 0, behavior: 'instant' })
-})
+// router.afterEach(function(to, from) {
+// 	if (!from.name) return;
+// 	_.delay(window.scrollTo, 1, { top: 0, behavior: 'instant' })
+// })
 
 export default router
 

@@ -16,9 +16,8 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 			return got.post(process.DOMAIN + '/api/proxy', config as any).then(({ body }) => body)
 		}
 
-		if (!Number.isFinite(config.timeout as any)) config.timeout = 10000;
-		if (!Number.isFinite(config.retries as any)) config.retries = 9;
-
+		config.timeout = config.timeout || 10000
+		config.retries = config.retries || 9
 		config.silent = config.silent || PRODUCTION
 		if (!config.silent) console.log('%c▶ ' + config.method + ' ' + config.url + ' ▶', 'font-weight: 300;', (JSON.stringify(config.query || config.body || '')).substring(0, 64));
 
