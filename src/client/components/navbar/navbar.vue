@@ -4,21 +4,21 @@
 <style>
 /**/
 
-html.has-navbar-fixed-top .hero.is-fullheight {
-	min-height: calc(100vh - 3.25rem);
-}
-
 </style>
 
 <template>
-	<nav class="navbar is-fixed-top has-shadow">
+	<nav class="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
 		<div class="container">
 
 			<div class="navbar-brand">
-				<a class="navbar-item">
-					<img src="@/assets/robinhood-logo.svg" class="h-4 mr-2 va-top">
-					<span>Login</span>
-				</a>
+				<router-link class="navbar-item" :to="{ name: 'home' }" active-class exact-active-class>
+					<img src="@/assets/logo-primary.svg">
+				</router-link>
+
+				<div class="navbar-item">
+					<v-searchbar></v-searchbar>
+				</div>
+
 				<div class="fx-fill is-hidden-desktop"></div>
 				<a class="navbar-item is-hidden-desktop" v-on:click="showMobileMenu = !showMobileMenu">
 					<b-icon icon="menu" />
@@ -27,9 +27,10 @@ html.has-navbar-fixed-top .hero.is-fullheight {
 
 			<div class="navbar-menu" :class="{ 'is-active': showMobileMenu }">
 				<div class="navbar-end">
-					<a class="navbar-item">
-						<b-icon class="mr-2" icon="security-account" /> Account
-					</a>
+					<router-link class="navbar-item" v-for="route in v_routes" :key="route.name" :to="{ name: route.name }">
+						<b-icon class="mr-2 va-middle" :icon="route.icon" />
+						<span class="va-middle">{{ route.title }}</span>
+					</router-link>
 				</div>
 			</div>
 

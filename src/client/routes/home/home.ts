@@ -9,17 +9,7 @@ import Vue from 'vue'
 @Vts.Component
 export default class extends Vue {
 
-	created() {
-
-	}
-
-	mounted() {
-
-	}
-
-	beforeDestroy() {
-
-	}
+	
 
 }
 

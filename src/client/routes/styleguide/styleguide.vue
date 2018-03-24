@@ -1,5 +1,5 @@
 <!--  -->
-<script lang="ts" src="./storybook.ts"></script>
+<script lang="ts" src="./styleguide.ts"></script>
 
 <style>
 /**/
@@ -12,20 +12,20 @@
 		<section class="hero is-bold is-primary is-small">
 			<div class="hero-body">
 				<div class="container">
-					<h1 class="title">Stylesheets</h1>
+					<h1 class="title">CSS Helpers</h1>
 				</div>
 			</div>
 		</section>
 
 		<section class="section">
 			<div class="container">
-				<b-collapse class="card" v-for="stylesheet in stylesheets" :open="false">
-					<div class="card-header" slot="trigger" slot-scope="props">
-						<p class="card-header-title">{{ stylesheet.title }}</p>
+				<b-collapse class="card" v-for="helper in helpers" :key="helper.title" :open="false">
+					<div class="card-header is-unselectable" slot="trigger" slot-scope="props">
+						<p class="card-header-title">{{ helper.title }}</p>
 					</div>
 					<hr class="my-0">
 					<div class="content is-small">
-						<pre>{{ stylesheet.styles }}</pre>
+						<pre>{{ helper.styles }}</pre>
 					</div>
 				</b-collapse>
 			</div>
@@ -43,6 +43,7 @@
 				<div class="box buttons is-block has-text-centered">
 					<button class="button is-large is-primary">primary</button>
 					<button class="button is-large is-secondary">secondary</button>
+					<button class="button is-large is-accent">accent</button>
 					<button class="button is-large is-robinhood-green">robinhood-green</button>
 					<button class="button is-large is-robinhood-red">robinhood-red</button>
 					<hr>

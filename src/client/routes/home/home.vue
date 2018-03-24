@@ -4,35 +4,39 @@
 <style>
 /**/
 
+div.home-boxes span.icon {
+	width: initial;
+	height: initial;
+}
+
+div.home-boxes span.icon > i.mdi,
+div.home-boxes span.icon > i.mdi:before {
+	font-size: 200%;
+	line-height: 1;
+}
+
 </style>
 
 <template>
-	<section class="hero is-primary is-fullheight">
-		<div class="hero-body fx-align-items-start">
-			<div class="container">
-				<div class="columns">
-					<div class="column is-10 is-offset-1 has-text-centered">
-						<h1 class="title t-300 t-lh-2">
-							Circle Invest for Web
-						</h1>
-						<div class="buttons is-block">
-							<button class="button is-large has-text-weight-semibold is-white">white</button>
-							<button class="button is-large has-text-weight-semibold is-black">black</button>
-							<button class="button is-large has-text-weight-semibold is-light">light</button>
-							<button class="button is-large has-text-weight-semibold is-dark">dark</button>
-							<button class="button is-large has-text-weight-semibold is-primary">primary</button>
-							<button class="button is-large has-text-weight-semibold is-secondary">secondary</button>
-							<button class="button is-large has-text-weight-semibold is-tertiary">tertiary</button>
-							<button class="button is-large has-text-weight-semibold is-accent">accent</button>
-							<button class="button is-large has-text-weight-semibold is-link">link</button>
-							<button class="button is-large has-text-weight-semibold is-info">info</button>
-							<button class="button is-large has-text-weight-semibold is-success">success</button>
-							<button class="button is-large has-text-weight-semibold is-warning">warning</button>
-							<button class="button is-large has-text-weight-semibold is-danger">danger</button>
+	<section>
+
+		<section class="hero is-bold is-primary">
+			<div class="hero-body">
+				<div class="container">
+					<div class="columns level is-mobile">
+						<div class="column is-narrow is-hidden-mobile">
+							<figure class="image is-64x64">
+								<img src="@/assets/logo-white.svg" alt="Robinhood Tools">
+							</figure>
+						</div>
+						<div class="column">
+							<h1 class="title">Robinhood Tools</h1>
+							<h2 class="subtitle">Advanced trading tools and resources for Robinhood Web and Crypto.</h2>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</section>
+
 	</section>
 </template>

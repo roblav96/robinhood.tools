@@ -5,8 +5,6 @@ $prefix: '';
 // 
 // 
 // 
-/*_block_*/
-
 /* ████  SIZING  ████ */
 
 @each $size in (0, 25, 50, 75, 100) {
@@ -57,11 +55,9 @@ $prefix: '';
 // 
 // 
 // 
-/*_block_*/
-
 /* ████  POSITION  ████ */
 
-@each $position in ('static', 'relative', 'absolute', 'fixed', 'sticky') {
+@each $position in (static, relative, absolute, fixed, sticky) {
 	.#{$prefix}p-#{$position} {
 		position: $position !important;
 	}
@@ -70,11 +66,9 @@ $prefix: '';
 // 
 // 
 // 
-/*_block_*/
-
 /* ████  DISPLAY  ████ */
 
-@each $display in ('none', 'block', 'inline', 'inline-block', 'table', 'table-row', 'table-cell', 'flex', 'inline-flex') {
+@each $display in (none, block, inline, inline-block, table, table-row, table-cell, flex, inline-flex) {
 	.#{$prefix}d-#{$display} {
 		display: $display !important;
 	}
@@ -83,17 +77,15 @@ $prefix: '';
 // 
 // 
 // 
-/*_block_*/
-
 /* ████  FLEXBOX  ████ */
 
-@each $flex-direction in ('row', 'column', 'row-reverse', 'column-reverse') {
+@each $flex-direction in (row, column, row-reverse, column-reverse) {
 	.#{$prefix}fx-#{$flex-direction} {
 		flex-direction: $flex-direction !important;
 	}
 }
 
-@each $flex-wrap in ('wrap', 'nowrap', 'wrap-reverse') {
+@each $flex-wrap in (wrap, nowrap, wrap-reverse) {
 	.#{$prefix}fx-#{$flex-wrap} {
 		flex-wrap: $flex-wrap !important;
 	}
@@ -153,11 +145,9 @@ $align-self in (('auto', auto), ('start', flex-start), ('end', flex-end), ('cent
 // 
 // 
 // 
-/*_block_*/
-
 /* ████  VERTICAL ALIGN  ████ */
 
-@each $vertical-align in ('baseline', 'top', 'middle', 'bottom', 'text-top', 'text-bottom') {
+@each $vertical-align in (baseline, top, middle, bottom, text-top, text-bottom) {
 	.#{$prefix}va-#{$vertical-align} {
 		vertical-align: $vertical-align !important;
 	}
@@ -166,32 +156,11 @@ $align-self in (('auto', auto), ('start', flex-start), ('end', flex-end), ('cent
 // 
 // 
 // 
-/*_block_*/
-
 /* ████  SPACING  ████ */
 
 $space: 16;
 $spaces: (0, 1, 2, 3, 4, 5);
 // 
-@function calcSpace($step) {
-	@if $step==1 {
-		@return $space * 0.25;
-	}
-	@else if $step==2 {
-		@return $space * 0.5;
-	}
-	@else if $step==3 {
-		@return $space;
-	}
-	@else if $step==4 {
-		@return $space * 1.5;
-	}
-	@else if $step==5 {
-		@return $space * 3;
-	}
-	@return 0;
-}
-
 @each $property,
 $letter in ('margin': m, 'padding': p) {
 	@each $space in $spaces {
@@ -217,28 +186,26 @@ $letter in ('margin': m, 'padding': p) {
 	}
 }
 
-.#{$prefix}ma-auto {
-	margin: auto !important;
-}
-
-.#{$prefix}mt-auto,
-.#{$prefix}my-auto {
-	margin-top: auto !important;
-}
-
-.#{$prefix}mr-auto,
-.#{$prefix}mx-auto {
-	margin-right: auto !important;
-}
-
-.#{$prefix}mb-auto,
-.#{$prefix}my-auto {
-	margin-bottom: auto !important;
-}
-
-.#{$prefix}ml-auto,
-.#{$prefix}mx-auto {
-	margin-left: auto !important;
+@each $other in (auto, initial) {
+	.#{$prefix}ma-#{$other} {
+		margin: $other !important;
+	}
+	.#{$prefix}mt-#{$other},
+	.#{$prefix}my-#{$other} {
+		margin-top: $other !important;
+	}
+	.#{$prefix}mr-#{$other},
+	.#{$prefix}mx-#{$other} {
+		margin-right: $other !important;
+	}
+	.#{$prefix}mb-#{$other},
+	.#{$prefix}my-#{$other} {
+		margin-bottom: $other !important;
+	}
+	.#{$prefix}ml-#{$other},
+	.#{$prefix}mx-#{$other} {
+		margin-left: $other !important;
+	}
 }
 
 @each $property,
@@ -250,17 +217,20 @@ $letter in ('width': w, 'height': h) {
 	}
 }
 
-@each $space in $spaces {
-	.#{$prefix}lh-#{$space} {
-		line-height: 1 + ($space/10) !important;
+// 
+// 
+// 
+/* ████  LINE HEIGHT  ████ */
+
+@each $line-height in (0, 1, 2, 3, 4, 5, 10) {
+	.#{$prefix}lh-#{$line-height} {
+		line-height: 1 + ($line-height/10) !important;
 	}
 }
 
 // 
 // 
 // 
-/*_block_*/
-
 /* ████  COLORS  ████ */
 
 :root {
@@ -289,8 +259,6 @@ $pair in $colors {
 // 
 // 
 // 
-/*_block_*/
-
 /* ████  TEXT  ████ */
 
 @each $name,
@@ -331,8 +299,6 @@ $white-space in (('wrap', normal), ('nowrap', nowrap)) {
 // 
 // 
 // 
-/*_block_*/
-
 /* ████  FONT  ████ */
 
 @each $name,
@@ -342,9 +308,8 @@ $weight in (('thin', 200), ('light', $weight-light), ('normal', $weight-normal),
 	}
 }
 
-@each $name,
-$weight in (('2', 200), ('3', 300), ('4', 400), ('5', 500), ('6', 600), ('7', 700), ('8', 800)) {
-	.#{$prefix}font-#{$name} {
+@each $weight in (200, 300, 400, 500, 600, 700, 800) {
+	.#{$prefix}font-#{$weight} {
 		font-weight: $weight !important;
 	}
 }
@@ -361,8 +326,6 @@ $weight in (('2', 200), ('3', 300), ('4', 400), ('5', 500), ('6', 600), ('7', 70
 // 
 // 
 // 
-/*_block_*/
-
 /* ████  ANIMATIONS  ████ */
 
 @each $name,

@@ -4,6 +4,7 @@ import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import _ from 'lodash'
+import VUtilsMixin from '@/client/mixins/v-utils.mixin'
 import NavBar from '@/client/components/navbar/navbar'
 
 
@@ -13,12 +14,16 @@ import NavBar from '@/client/components/navbar/navbar'
 		'v-navbar': NavBar,
 	},
 })
-export default class extends Vue {
+export default class extends Mixins(VUtilsMixin) {
 
 	initing = true
 	mounted() {
-		_.delay(() => this.initing = false, 1)
-		_.delay(() => delete this.initing, 300)
+		_.delay(() => this.initing = false, 100)
+		_.delay(() => this.initing = null, 10000)
+	}
+
+	get routes() {
+		return this.$router.options.routes.filter(v => !!v.name)
 	}
 
 }

@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import _ from 'lodash'
+import store from '@/client/store'
 
 
 
@@ -14,8 +15,32 @@ export const routes = [
 	},
 
 	{
-		name: 'storybook', path: '/storybook',
-		component: () => import('@/client/routes/storybook/storybook'),
+		name: 'about', path: '/about',
+		component: () => import('@/client/routes/about/about'),
+	},
+
+	{
+		title: 'Watchlist', icon: 'wunderlist',
+		name: 'watchlist', path: '/watchlist',
+		// component: () => import('@/client/routes/watchlist/watchlist'),
+	},
+
+	{
+		title: 'Markets', icon: 'web',
+		name: 'markets', path: '/markets',
+		// component: () => import('@/client/routes/markets/markets'),
+	},
+
+	{
+		title: 'Crypto', icon: 'bitcoin',
+		name: 'crypto', path: '/crypto',
+		// component: () => import('@/client/routes/crypto/crypto'),
+	},
+
+	{
+		title: 'Style Guide', icon: 'palette', dev: true,
+		name: 'styleguide', path: '/styleguide',
+		component: () => import('@/client/routes/styleguide/styleguide'),
 	},
 
 	{ path: '*', redirect: { name: 'home' } },
@@ -27,25 +52,46 @@ export const routes = [
 const router = new VueRouter({
 	routes, mode: 'history',
 	linkExactActiveClass: 'is-active',
-	// linkActiveClass: 'is-active',
+	scrollBehavior: function(to, from, saved) {
+		if (!from.name || saved) return;
+		return { x: 0, y: 0 }
+	},
 })
 
-// router.afterEach(function(to, from) {
-// 	if (!from.name) return;
-// 	_.delay(window.scrollTo, 1, { top: 0, behavior: 'instant' })
-// })
+
 
 export default router
+
+
+
+// store.registerModule('routes', {
+// 	state: routes.filter(function(route) {
+// 		if (route.dev && PRODUCTION) return false;
+// 		return !!route.title
+// 	}).map(v => _.omit(v, ['component']))
+// })
+
+// declare global {
+// 	namespace Store {
+// 		interface State {
+// 			routes: typeof routes
+// 		}
+// 	}
+// }
 
 
 
 
 
 declare module 'vue-router/types/router' {
+	export interface VueRouter {
+		options: RouterOptions
+	}
 	export interface RouteConfig {
-		dname?: string
-		icon?: string
-		bold?: boolean
+		dev: boolean
+		title: string
+		icon: string
+		bold: boolean
 	}
 }
 

@@ -3,11 +3,18 @@
 // 
 // ████  VARIABLES  ████
 // 
+// $tablet: 576px;
+// $desktop: 768px;
+// $widescreen: 992px;
+// $fullhd: 1200px;
+// 
 $body-background-color: $light;
 // 
 $link: $primary;
 $link-invert: $primary-invert;
 $link-focus-border: $primary;
+// 
+$navbar-item-active-color: $primary;
 // 
 $modal-content-width: 480px;
 $modal-background-background-color: rgba($black, 0.66);

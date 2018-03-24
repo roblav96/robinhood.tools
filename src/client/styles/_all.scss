@@ -24,6 +24,7 @@
 // 
 $colors: map-merge($colors, ('primary':($primary, $primary-invert)));
 $colors: map-merge($colors, ('secondary':($secondary, $secondary-invert)));
+$colors: map-merge($colors, ('accent':($accent, $accent-invert)));
 $colors: map-merge($colors, ('robinhood-green':($robinhood-green, $robinhood-green-invert)));
 $colors: map-merge($colors, ('robinhood-red':($robinhood-red, $robinhood-red-invert)));
 // 
@@ -32,6 +33,10 @@ $colors: map-merge($colors, ('robinhood-red':($robinhood-red, $robinhood-red-inv
 @import './helpers';
 @import '~bulma';
 @import '~buefy/src/scss/buefy';
+// 
+// ████  STYLES  ████
+// 
+@import './styles';
 // 
 // 
 //
