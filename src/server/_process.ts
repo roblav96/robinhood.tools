@@ -3,6 +3,8 @@
 import 'source-map-support/register'
 import chalk from 'chalk'
 import * as eyes from 'eyes'
+eyes.defaults.maxLength = 65536
+eyes.defaults.showHidden = true
 import * as os from 'os'
 import * as cluster from 'cluster'
 import * as path from 'path'
@@ -25,7 +27,7 @@ process.NAME = process.env.npm_package_name
 process.VERSION = process.env.npm_package_version
 process.DOMAIN = (DEVELOPMENT ? 'http://dev.' : 'https://') + process.env.npm_package_domain
 process.HOST = process.env.HOST || 'localhost'
-process.PORT = (Number.parseInt(process.env.PORT) || 12100) + process.INSTANCE
+process.PORT = (Number.parseInt(process.env.PORT) || 12300) + process.INSTANCE
 
 process.EE3 = new ee3.EventEmitter()
 
@@ -48,16 +50,16 @@ console.format = function(args) {
 	let otime = moment().format('hh:mm:ss:SSS')
 	let output = osquare + ofile + oinstance + chalk.gray('T-') + otime
 	if (args.method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
-	return '\n\n' + chalk.reset.underline(output) + '\n'
+	return '\n\n' + chalk.underline(output) + '\n'
 }
 
 
 
 process.on('uncaughtException', function(error) {
-	console.error(chalk.bold.underline.redBright('UNCAUGHT EXCEPTION') + ' Error >', error)
+	console.error(chalk.bold.underline.redBright('UNCAUGHT EXCEPTION') + ' Error ->', error)
 })
 process.on('unhandledRejection', function(error) {
-	console.error(chalk.bold.underline.redBright('UNHANDLED REJECTION') + ' Error >', error)
+	console.error(chalk.bold.underline.redBright('UNHANDLED REJECTION') + ' Error ->', error)
 	// process.exit(1) // https://github.com/mcollina/make-promises-safe
 })
 
@@ -85,7 +87,7 @@ if (DEVELOPMENT) {
 if (process.MASTER) {
 	process.stdout.write('\n\n' +
 		chalk.magentaBright('█') + ' ' + chalk.underline.bold(process.NAME) + '\n' +
-		chalk.magentaBright('█') + ' ' + NODE_ENV + '\n' +
+		chalk.magentaBright('█') + ' ' + process.VERSION + ' ' + NODE_ENV + '\n' +
 		chalk.magentaBright('█') + ' ' + process.HOST + ':' + (process.PORT + 1) + '\n'
 	)
 }

@@ -19,7 +19,7 @@ export default class extends Vue {
 			let blocks = el.innerHTML.split('/* █').map(v => v.trim())
 			blocks.filter(v => v.includes('█')).forEach(block => {
 				let split = block.split('\n')
-				let title = core.string.capitalizeWords(core.string.clean(split.shift()))
+				let title = core.string.capitalize(core.string.clean(split.shift()))
 				let styles = split.join('\n').split('\n/*! bulma.io').shift()
 				styles = styles.replace(/ !important;/g, ';')
 				styles = styles.replace(/  /g, '    ')
@@ -27,7 +27,7 @@ export default class extends Vue {
 				this.helpers.push({ title, styles })
 			})
 		})
-		this.helpers.sort((a, b) => core.array.sortAlphabetically(a.title, b.title))
+		this.helpers.sort((a, b) => core.sort.alphabetically(a.title, b.title))
 	}
 
 }

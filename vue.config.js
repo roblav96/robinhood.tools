@@ -17,7 +17,6 @@ const package = require('./package.json')
 
 module.exports = {
 
-	parallel: true,
 	outputDir: 'dist/client',
 	dll: DEVELOPMENT, // faster incremental recompilation, slower initial build
 	css: { sourceMap: false }, // only enable when needed
@@ -25,16 +24,16 @@ module.exports = {
 
 	configureWebpack: function(config) {
 		config.entry.app = './src/client/main.ts'
-		delete config.node.process // required for `got` http client
+		_.unset(config.node, 'process') // required for `got` http client
 
 		if (DEVELOPMENT) {
 			config.devtool = 'source-map'
 			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/]))
-			// config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
-			// 	rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
-			// 		use.loader = 'file-loader'; delete use.options.limit;
-			// 	})
-			// })
+			config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
+				rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
+					use.loader = 'file-loader'; _.unset(use.options, 'limit');
+				})
+			})
 		}
 
 		// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
@@ -56,7 +55,6 @@ module.exports = {
 		})
 		config.plugin('fork-ts-checker').tap(function(args) {
 			args[0].tsconfig = '.client.tsconfig.json'
-			// args[0].workers = 4
 			return args
 		})
 		config.plugins.delete('no-emit-on-errors')

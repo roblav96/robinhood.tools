@@ -23,6 +23,7 @@
 		"fastify": "latest",
 		"fastify-cookie": "latest",
 		"fingerprintjs2": "latest",
+		"fuzzy": "latest",
 		"got": "latest",
 		"ioredis": "latest",
 		"lockr": "latest",
