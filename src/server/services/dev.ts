@@ -4,34 +4,38 @@ import chalk from 'chalk'
 import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
+import * as pretty from '../../common/pretty'
 
 import * as dts from 'dts-gen'
 import * as clipboardy from 'clipboardy'
-import * as boxen from 'boxen'
-import * as stdupdate from 'log-update'
-import * as ticks from './ticks'
+import ticks from './ticks'
 
 
+
+process.DEV_MEMORY = process.memoryUsage()
+declare global { namespace NodeJS { interface Process { BONE_MEMORY: MemoryUsage, PROC_MEMORY: MemoryUsage, DEV_MEMORY: MemoryUsage } } }
 
 if (DEVELOPMENT && process.MASTER) {
-	// ticks.EE3.addListener(ticks.TICKS.T1, i => console.log('i ->', i))
-	// let box = boxen('58.5 MB', { float: 'right', padding: 1, margin: 1, borderStyle: 'double' })
-	// const log = stdupdate.create(process.stdout, {
-	// 	showCursor: true
-	// })
-	// setInterval(function() {
-	// 	let heap = _.random(50, 100) + 'MB'
-	// 	let box = boxen(heap, { float: 'right', borderStyle: 'round' })
-	// 	stdupdate(box)
-	// 	// process.stdout.write(box)
-	// }, 100)
-	
-	let heap = process.memoryUsage()
-	console.info('heap ->')
-	eyes.inspect(heap)
+	ticks.EE3.addListener(ticks.T30, outputMemory)
+	// outputMemory()
+}
 
+function outputMemory() {
+	let to = process.memoryUsage()
+	console.warn('MEMORY FOOTPRINT ->')
+	inspectMemory(to, 'BONE_MEMORY')
+	inspectMemory(to, 'PROC_MEMORY')
+	inspectMemory(to, 'DEV_MEMORY')
+}
 
-
+function inspectMemory(to: NodeJS.MemoryUsage, key: string) {
+	to = core.json.clone(to)
+	let from = process[key]
+	Object.keys(to).forEach(function(key) {
+		to[key] = pretty.bytes(to[key] - from[key])
+	})
+	let name = key.split('_').shift().toLowerCase()
+	eyes.inspect({ total: to.heapTotal, used: to.heapUsed }, name)
 }
 
 

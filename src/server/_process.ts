@@ -17,19 +17,15 @@ import * as dotenv from 'dotenv'
 
 
 
-global.NODE_ENV = process.env.NODE_ENV
+global.NODE_ENV = process.env.NODE_ENV // || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
-process.INSTANCES = os.cpus().length
+process.INSTANCES = (Number.isFinite(process.INSTANCES) && DEVELOPMENT) ? process.INSTANCES : os.cpus().length
 process.INSTANCE = cluster.isWorker ? Number.parseInt(process.env.WORKER_INSTANCE) : -1
 process.PRIMARY = process.INSTANCE == 0
 process.MASTER = cluster.isMaster
 process.WORKER = cluster.isWorker
-
-// ████████████████████████████████████████
-if (DEVELOPMENT) process.INSTANCES = 0;
-// ████████████████████████████████████████
 
 dotenv.config({ path: path.resolve(process.cwd(), 'config/server.' + NODE_ENV + '.env') })
 dotenv.config({ path: path.resolve(process.cwd(), 'config/server.env') })
@@ -45,6 +41,7 @@ process.EE3 = new ee3.EventEmitter()
 
 require('debug-trace')()
 console.format = function(args) {
+	let method = args.method as keyof Console
 	let stack = new Error().stack.toString()
 	stack = stack.replace(/^ {4}at /gm, '').split('\n')[4].trim()
 	let fullpath = stack.split('/').pop()
@@ -53,13 +50,14 @@ console.format = function(args) {
 	let i = (fullpath.indexOf('.ts:') == -1) ? 0 : 1
 	let line = fullpath.split('.ts:')[i].split(':')[0]
 	let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' } as Dict<string>
-	let color = cdict[args.method] || 'magenta'
+	let color = cdict[method] || 'magenta'
 	let osquare = chalk[color + 'Bright']('█')
+	if (method == 'error') color = color + 'Bright';
 	let ofile = '[' + chalk.bold(chalk[color](file) + ':' + line) + ']'
 	let oinstance = '[' + chalk.gray(process.INSTANCE) + ']'
 	let otime = moment().format('hh:mm:ss:SSS')
 	let output = osquare + ofile + oinstance + chalk.gray('T-') + otime
-	if (args.method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
+	if (method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
 	return '\n\n' + chalk.underline(output) + '\n'
 }
 
@@ -103,5 +101,7 @@ if (process.MASTER) {
 	})
 
 }
+
+
 
 

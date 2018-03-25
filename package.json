@@ -9,6 +9,7 @@
 		"client:dev": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
 		"client:build": "rimraf dist/client && cross-env NODE_ENV=production vue-cli-service build --mode production",
 		"server:dev": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'cross-env NODE_ENV=development forever dist/server/main.js --colors'",
+		"server:clinic": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'cross-env NODE_ENV=development clinic doctor -- node dist/server/main.js'",
 		"server:build": "rimraf dist/server && tsc -p .server.tsconfig.json"
 	},
 	"dependencies": {
@@ -33,6 +34,8 @@
 		"moment": "latest",
 		"mqtt": "latest",
 		"node-forge": "latest",
+		"pretty-bytes": "latest",
+		"pretty-ms": "latest",
 		"repaintless": "latest",
 		"rxjs": "alpha",
 		"sockette": "latest",
@@ -57,6 +60,8 @@
 		"@types/lodash": "latest",
 		"@types/node": "latest",
 		"@types/node-forge": "latest",
+		"@types/pretty-bytes": "latest",
+		"@types/pretty-ms": "latest",
 		"@types/source-map-support": "latest",
 		"@types/uws": "latest",
 		"@types/webpack": "latest",
