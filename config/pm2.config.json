@@ -1,0 +1,20 @@
+{
+	"apps": [{
+		"name": "robinhood.tools",
+		"script": "dist/server/main.js",
+		"exec_mode": "cluster",
+		"instances": 8,
+		"watch": false,
+		"ignore_watch": "**/*",
+		"autorestart": true,
+		"max_memory_restart": "512M",
+		"vizion": false,
+		"pmx": false,
+		"automation": false,
+		"max_restarts": 3,
+		"min_uptime": "3s",
+		"env": {
+			"NODE_ENV": "development"
+		}
+	}]
+}
