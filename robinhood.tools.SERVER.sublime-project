@@ -10,12 +10,12 @@
 			"node_modules"
 		],
 		"file_exclude_patterns": [
+			"*.tsconfig.*",
 			"*.sublime*",
 			"*.gitignore*",
-			"*.tsconfig.*",
+			"*.debug*",
 			"*vue*",
 			"*client*",
-			"*debug*",
 			"*license*",
 			"*readme*"
 		]

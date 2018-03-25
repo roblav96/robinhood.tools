@@ -12,30 +12,18 @@ import ticks from './ticks'
 
 
 
-process.DEV_MEMORY = process.memoryUsage()
-declare global { namespace NodeJS { interface Process { BONE_MEMORY: MemoryUsage, PROC_MEMORY: MemoryUsage, DEV_MEMORY: MemoryUsage } } }
-
-if (DEVELOPMENT && process.MASTER) {
-	ticks.EE3.addListener(ticks.T30, outputMemory)
-	// outputMemory()
-}
-
-function outputMemory() {
-	let to = process.memoryUsage()
-	console.warn('MEMORY FOOTPRINT ->')
-	inspectMemory(to, 'BONE_MEMORY')
-	inspectMemory(to, 'PROC_MEMORY')
-	inspectMemory(to, 'DEV_MEMORY')
-}
-
-function inspectMemory(to: NodeJS.MemoryUsage, key: string) {
-	to = core.json.clone(to)
-	let from = process[key]
-	Object.keys(to).forEach(function(key) {
-		to[key] = pretty.bytes(to[key] - from[key])
+const initheap = process.memoryUsage()
+function inspectHeap() {
+	let nowheap = process.memoryUsage()
+	Object.keys(nowheap).forEach(function(key) {
+		nowheap[key] = pretty.bytes(nowheap[key] - initheap[key])
 	})
-	let name = key.split('_').shift().toLowerCase()
-	eyes.inspect({ total: to.heapTotal, used: to.heapUsed }, name)
+	console.warn('memory heap ->', chalk.bold(nowheap.heapUsed), 'used ->', chalk.bold(nowheap.heapTotal), 'total')
+}
+
+if (process.MASTER || process.INSTANCE == process.INSTANCES) {
+	ticks.EE3.addListener(ticks.T30, inspectHeap)
+	// inspectHeap()
 }
 
 
@@ -77,4 +65,5 @@ export function expose(name: string, input: any, skips = [] as string[]) {
 	})
 
 }
+
 

@@ -21,7 +21,7 @@ global.NODE_ENV = process.env.NODE_ENV // || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
-process.INSTANCES = (Number.isFinite(process.INSTANCES) && DEVELOPMENT) ? process.INSTANCES : os.cpus().length
+process.INSTANCES = os.cpus().length
 process.INSTANCE = cluster.isWorker ? Number.parseInt(process.env.WORKER_INSTANCE) : -1
 process.PRIMARY = process.INSTANCE == 0
 process.MASTER = cluster.isMaster
@@ -76,32 +76,11 @@ process.once('unhandledRejection', function(error) {
 
 
 if (process.MASTER) {
-
 	process.stdout.write('\n\n\n\n' +
 		chalk.magentaBright('█') + ' ' + chalk.underline.bold(process.NAME) + '\n' +
 		chalk.magentaBright('█') + ' ' + NODE_ENV + ' v' + process.VERSION + '\n' +
 		chalk.magentaBright('█') + ' ' + process.HOST + ':' + (process.PORT + 1) + '\n'
 	)
-
-	const workers = {} as Dict<number>
-	console.log('Forking ' + chalk.bold('x' + chalk.red(process.INSTANCES)) + ' workers in cluster...')
-	let i: number, len = process.INSTANCES
-	for (i = 0; i < len; i++) {
-		let worker = cluster.fork({ WORKER_INSTANCE: i })
-		workers[worker.process.pid] = i
-	}
-	cluster.on('online', function(worker) { console.info('worker', workers[worker.process.pid], 'online') })
-	cluster.on('exit', function(worker, code, signal) {
-		let i = workers[worker.process.pid]
-		console.error('worker', i, 'exit ->', 'id:', worker.id, '| pid:', worker.process.pid, '| code:', code, '| signal:', signal)
-		_.delay(function(i: number) {
-			let worker = cluster.fork({ WORKER_INSTANCE: i })
-			workers[worker.process.pid] = i
-		}, 1000, i)
-	})
-
 }
-
-
 
 
