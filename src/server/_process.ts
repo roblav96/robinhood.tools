@@ -1,11 +1,13 @@
 // 
-
 import '../common/polyfills'
 import 'source-map-support/register'
+// 
+
 import chalk from 'chalk'
 import * as eyes from 'eyes'
 eyes.defaults.maxLength = 65536
 eyes.defaults.showHidden = true
+import * as _ from 'lodash'
 import * as os from 'os'
 import * as cluster from 'cluster'
 import * as path from 'path'
@@ -20,10 +22,14 @@ global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
 process.INSTANCES = os.cpus().length
-process.INSTANCE = cluster.isWorker ? cluster.worker.id - 1 : -1
+process.INSTANCE = cluster.isWorker ? Number.parseInt(process.env.WORKER_INSTANCE) : -1
 process.PRIMARY = process.INSTANCE == 0
 process.MASTER = cluster.isMaster
 process.WORKER = cluster.isWorker
+
+// ████████████████████████████████████████
+if (DEVELOPMENT) process.INSTANCES = 0;
+// ████████████████████████████████████████
 
 dotenv.config({ path: path.resolve(process.cwd(), 'config/server.' + NODE_ENV + '.env') })
 dotenv.config({ path: path.resolve(process.cwd(), 'config/server.env') })
@@ -59,41 +65,43 @@ console.format = function(args) {
 
 
 
-process.on('uncaughtException', function(error) {
+// ████  https://github.com/mcollina/make-promises-safe  ████
+process.once('uncaughtException', function(error) {
 	console.error(chalk.bold.underline.redBright('UNCAUGHT EXCEPTION') + ' Error ->', error)
+	process.exit(1)
 })
-process.on('unhandledRejection', function(error) {
+process.once('unhandledRejection', function(error) {
 	console.error(chalk.bold.underline.redBright('UNHANDLED REJECTION') + ' Error ->', error)
-	// process.exit(1) // https://github.com/mcollina/make-promises-safe
+	process.exit(1)
 })
-
-
-
-if (DEVELOPMENT) {
-	const dtsgen = require('dts-gen')
-	const clipboardy = require('clipboardy')
-	process.dtsgen = function(name, value) {
-		name = name.replace(/\W+/g, '').trim()
-		let results = dtsgen.generateIdentifierDeclarationFile(name, value)
-		clipboardy.write(results).then(function() {
-			console.info(`dtsgen -> "${chalk.bold(name)}"`)
-		}).catch(error => console.error('dtsgen Error ->', error))
-	}
-	process.clipboard = function(name, input) {
-		clipboardy.write(input).then(function() {
-			console.info(`clipboard -> "${chalk.bold(name)}"`)
-		}).catch(error => console.error('clipboard Error ->', error))
-	}
-}
 
 
 
 if (process.MASTER) {
-	process.stdout.write('\n\n' +
+
+	process.stdout.write('\n\n\n\n' +
 		chalk.magentaBright('█') + ' ' + chalk.underline.bold(process.NAME) + '\n' +
-		chalk.magentaBright('█') + ' ' + process.VERSION + ' ' + NODE_ENV + '\n' +
+		chalk.magentaBright('█') + ' ' + NODE_ENV + ' v' + process.VERSION + '\n' +
 		chalk.magentaBright('█') + ' ' + process.HOST + ':' + (process.PORT + 1) + '\n'
 	)
+
+	const workers = {} as Dict<number>
+	console.log('Forking ' + chalk.bold('x' + chalk.red(process.INSTANCES)) + ' workers in cluster...')
+	let i: number, len = process.INSTANCES
+	for (i = 0; i < len; i++) {
+		let worker = cluster.fork({ WORKER_INSTANCE: i })
+		workers[worker.process.pid] = i
+	}
+	cluster.on('online', function(worker) { console.info('worker', workers[worker.process.pid], 'online') })
+	cluster.on('exit', function(worker, code, signal) {
+		let i = workers[worker.process.pid]
+		console.error('worker', i, 'exit ->', 'id:', worker.id, '| pid:', worker.process.pid, '| code:', code, '| signal:', signal)
+		_.delay(function(i: number) {
+			let worker = cluster.fork({ WORKER_INSTANCE: i })
+			workers[worker.process.pid] = i
+		}, 1000, i)
+	})
+
 }
 
 

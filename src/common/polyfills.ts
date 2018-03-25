@@ -1,5 +1,9 @@
 // 
 
+// ████████████████████████████
+//       HIGH PERFORMANCE
+// ████████████████████████████
+
 
 
 Array.prototype.forEach = function(fn, arg) {

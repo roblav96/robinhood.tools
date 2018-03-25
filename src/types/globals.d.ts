@@ -16,12 +16,10 @@ declare namespace NodeJS {
 		NODE_ENV: typeof NODE_ENV
 	}
 	export interface Process {
+		EE3: ee3.EventEmitter
 		NAME: string
 		VERSION: string
 		DOMAIN: string
-		EE3: ee3.EventEmitter
-		dtsgen: (name: string, input: any) => void
-		clipboard: (name: string, input: string) => void
 		HOST: string
 		PORT: number
 		INSTANCE: number
