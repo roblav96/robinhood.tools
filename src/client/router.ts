@@ -43,6 +43,11 @@ export const routes = [
 		component: () => import('@/client/routes/styleguide/styleguide'),
 	},
 
+	{
+		name: 'symbol', path: '/symbol',
+		// component: () => import('@/client/routes/symbol/symbol'),
+	},
+
 	{ path: '*', redirect: { name: 'home' } },
 
 ] as Array<RouteConfig>

@@ -48,7 +48,7 @@ fastify.addHook('preHandler', async function preHandler(request, reply) {
 	if (request.doc.bytes && request.doc.token) {
 		let prime = await redis.main.hget('security:doc:' + request.doc.uuid, 'prime')
 		if (prime) {
-			let hmac = security.docHmac(request.doc.uuid, request.doc.bytes, request.hostname, prime)
+			let hmac = security.hmac256(request.doc.uuid + request.doc.bytes + request.hostname, prime)
 			request.authed = request.doc.token == hmac
 		}
 	}

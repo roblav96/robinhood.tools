@@ -33,7 +33,7 @@ export const string = {
 	capitalize(value: string) {
 		return value.toLowerCase().split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ').trim()
 	},
-	fuzzy(needle: string, haystack: string) {
+	fuzzysearch(needle: string, haystack: string) {
 		let hlen = haystack.length
 		let nlen = needle.length
 		if (nlen > hlen) return false;

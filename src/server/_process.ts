@@ -1,5 +1,6 @@
 // 
 
+import '../common/polyfills'
 import 'source-map-support/register'
 import chalk from 'chalk'
 import * as eyes from 'eyes'
@@ -10,6 +11,7 @@ import * as cluster from 'cluster'
 import * as path from 'path'
 import * as ee3 from 'eventemitter3'
 import * as moment from 'moment'
+import * as dotenv from 'dotenv'
 
 
 
@@ -23,6 +25,8 @@ process.PRIMARY = process.INSTANCE == 0
 process.MASTER = cluster.isMaster
 process.WORKER = cluster.isWorker
 
+dotenv.config({ path: path.resolve(process.cwd(), 'config/server.' + NODE_ENV + '.env') })
+dotenv.config({ path: path.resolve(process.cwd(), 'config/server.env') })
 process.NAME = process.env.npm_package_name
 process.VERSION = process.env.npm_package_version
 process.DOMAIN = (DEVELOPMENT ? 'http://dev.' : 'https://') + process.env.npm_package_domain
@@ -72,13 +76,13 @@ if (DEVELOPMENT) {
 		name = name.replace(/\W+/g, '').trim()
 		let results = dtsgen.generateIdentifierDeclarationFile(name, value)
 		clipboardy.write(results).then(function() {
-			console.info('dtsgen > "' + chalk.bold(name) + '"')
-		}).catch(error => console.error('dtsgen Error >', error))
+			console.info(`dtsgen -> "${chalk.bold(name)}"`)
+		}).catch(error => console.error('dtsgen Error ->', error))
 	}
 	process.clipboard = function(name, input) {
 		clipboardy.write(input).then(function() {
-			console.info('clipboard > "' + chalk.bold(name) + '"')
-		}).catch(error => console.error('clipboard Error >', error))
+			console.info(`clipboard -> "${chalk.bold(name)}"`)
+		}).catch(error => console.error('clipboard Error ->', error))
 	}
 }
 

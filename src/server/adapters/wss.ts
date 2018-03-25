@@ -3,14 +3,13 @@
 import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
-import * as utils from '../services/utils'
 
-import * as WebSocket from 'uws'
+import * as uws from 'uws'
 import fastify from '../fastify'
 
 
 
-const wss = new WebSocket.Server({
+const wss = new uws.Server({
 	host: 'localhost',
 	port: process.PORT,
 	path: 'websocket',

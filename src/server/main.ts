@@ -16,10 +16,10 @@ if (process.MASTER) {
 	let i: number, len = process.INSTANCES
 	for (i = 0; i < len; i++) { cluster.fork() }
 	cluster.on('disconnect', function(worker) {
-		console.warn('cluster disconnect >', worker.id)
+		console.warn('cluster disconnect ->', worker.id)
 	})
 	cluster.on('exit', function(worker, code, signal) {
-		console.error('cluster exit Error >', worker.id, code, signal)
+		console.error('cluster exit Error ->', worker.id, code, signal)
 	})
 
 } else {

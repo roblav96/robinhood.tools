@@ -24,16 +24,16 @@ fastify.route({
 		},
 	},
 	handler: async function(request, reply) {
-		let prime = security.random(32)
+		let prime = security.randomBytes(32)
 		await redis.main.hset('users:doc:' + request.doc.uuid, 'prime', prime)
 
-		let bytes = security.random(32)
+		let bytes = security.randomBytes(32)
 		reply.setCookie('x-bytes', bytes, {
 			domain: process.DOMAIN, path: '/',
 			sameSite: true, httpOnly: true, secure: PRODUCTION,
 		})
 
-		let hmac = security.docHmac(request.doc.uuid, bytes, request.hostname, prime)
+		let hmac = security.hmac256(request.doc.uuid + bytes + request.hostname, prime)
 		return { token: hmac }
 
 	},

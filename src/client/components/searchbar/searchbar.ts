@@ -13,7 +13,7 @@ import * as http from '@/client/adapters/http'
 export default class extends Vue {
 
 	mounted() {
-		// if (DEVELOPMENT) setTimeout(() => this.query = 'nvda', 300);
+		if (DEVELOPMENT) setTimeout(() => this.query = 'nvda', 300);
 	}
 
 	busy = false
@@ -26,7 +26,7 @@ export default class extends Vue {
 		this.busy = true
 		http.post('/search', { query }).then(response => {
 			console.log('response ->', core.json.clone(response))
-			this.results = response
+			this.results = response.list
 
 		}).catch(error => {
 			console.error('sync Error ->', error)

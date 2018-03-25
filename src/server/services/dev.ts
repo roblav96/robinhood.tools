@@ -21,7 +21,7 @@ export function expose(name: string, input: any, skips = [] as string[]) {
 	eyes.inspect(all, '"' + name + '"' + ' all')
 	all.forEach(function(key) {
 		let result = dtsgen.generateIdentifierDeclarationFile(key, input[key])
-		console.log(key, '>', result)
+		console.log(key, '->', result)
 	})
 
 }

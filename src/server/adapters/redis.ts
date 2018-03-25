@@ -42,34 +42,33 @@ class Redis extends ioredis {
 				resolved[i] = result[1]
 			}
 		}
-		return Promise.resolve(resolved)
+		return resolved
 	}
 
-	tohset(item: any): any {
-		if (!core.object.is(item)) return {};
-		let toitem = {}
-		Object.keys(item).forEach(function(key) {
-			let value = item[key]
+	tohset(from: any): any {
+		let to = {}
+		Object.keys(from).forEach(function(key) {
+			let value = from[key]
 			if (value == null) value = null;
 			if (Number.isFinite(value)) value = core.number.round(value, 8);
-			toitem[key] = JSON.stringify(value)
+			to[key] = JSON.stringify(value)
 		})
-		return toitem
+		return to
 	}
 
-	fromhget(item: any): any {
-		if (!core.object.is(item)) return {};
-		Object.keys(item).forEach(function(k) {
-			item[k] = JSON.parse(item[k])
+	fromhget(to: any): any {
+		// if (!core.object.is(item)) return {};
+		Object.keys(to).forEach(function(key) {
+			to[key] = JSON.parse(to[key])
 		})
-		return item
+		return to
 	}
 
 	fromhmget(values: any[], keys: string[]): any {
-		if (!Array.isArray(values) || !Array.isArray(keys)) return {};
-		let item = {}
-		values.forEach((v, i) => item[keys[i]] = v)
-		return this.fromhget(item)
+		// if (!Array.isArray(values) || !Array.isArray(keys)) return {};
+		let to = {}
+		values.forEach((v, i) => to[keys[i]] = v)
+		return this.fromhget(to)
 	}
 
 }

@@ -33,9 +33,8 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 
 		let method = _.get(error, 'method', config.method)
 		let url = _.get(error, 'url', config.url).replace(process.DOMAIN, '')
-		let route = '[' + method + '] ' + url
-		console.log('%c◀ ' + route, 'color: red; font-weight: bolder;', message)
-		vm.$toast.open({ message: route + ' ▶ ' + message, type: 'is-danger' })
+		console.log('%c◀ ' + '[' + method + '] ' + url, 'color: red; font-weight: bolder;', message)
+		vm.$toast.open({ message: url + ' ➤ ' + message, type: 'is-danger' })
 
 		error.message = message
 		return Promise.reject(error)
