@@ -9,9 +9,7 @@ import * as cluster from 'cluster'
 
 
 
-// ████████████████████████████████████████
 if (DEVELOPMENT) process.INSTANCES = 0;
-// ████████████████████████████████████████
 
 if (process.MASTER) {
 
@@ -37,10 +35,10 @@ if (process.MASTER) {
 
 
 import './services/ticks'
-import './services/debug'
+import './services/devtools'
 import './services/radio'
 
-
+// import './adapters/redis'
 
 if (process.WORKER) {
 	import('./fastify')

@@ -7,6 +7,7 @@ import chalk from 'chalk'
 import * as eyes from 'eyes'
 eyes.defaults.maxLength = 65536
 eyes.defaults.showHidden = true
+global.inspect = eyes.inspector({ stream: null })
 import * as _ from 'lodash'
 import * as os from 'os'
 import * as cluster from 'cluster'
@@ -63,13 +64,15 @@ console.format = function(args) {
 
 
 
-// ████  https://github.com/mcollina/make-promises-safe  ████
+const reason = chalk.bold('https://github.com/mcollina/make-promises-safe')
 process.once('uncaughtException', function(error) {
-	console.error(chalk.bold.underline.redBright('UNCAUGHT EXCEPTION') + ' Error ->', error)
+	console.error(chalk.bold.underline.redBright('UNCAUGHT EXCEPTION'), '\n', error)
+	process.stdout.write(`\n${reason}\n\n`)
 	process.exit(1)
 })
 process.once('unhandledRejection', function(error) {
-	console.error(chalk.bold.underline.redBright('UNHANDLED REJECTION') + ' Error ->', error)
+	console.error(chalk.bold.underline.redBright('UNHANDLED REJECTION'), '\n', error)
+	process.stdout.write(`\n${reason}\n\n`)
 	process.exit(1)
 })
 

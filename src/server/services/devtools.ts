@@ -18,11 +18,11 @@ function inspectHeap() {
 	Object.keys(nowheap).forEach(function(key) {
 		nowheap[key] = pretty.bytes(nowheap[key] - initheap[key])
 	})
-	console.warn('memory heap ->', chalk.bold(nowheap.heapUsed), 'used ->', chalk.bold(nowheap.heapTotal), 'total')
+	console.log('memory heap ->', chalk.bold(nowheap.heapUsed), 'used', chalk.bold(nowheap.heapTotal), 'total')
 }
 
 if (process.MASTER || process.INSTANCE == process.INSTANCES) {
-	ticks.EE3.addListener(ticks.T30, inspectHeap)
+	// ticks.EE3.addListener(ticks.T60, inspectHeap)
 	// inspectHeap()
 }
 
@@ -43,8 +43,6 @@ export function clipboard(name: string, value: any) {
 		console.info('clipboard ->', chalk.bold(name))
 	}).catch(error => console.error('clipboard Error ->', error))
 }
-
-
 
 export function expose(name: string, input: any, skips = [] as string[]) {
 	if (PRODUCTION || process.INSTANCE > 0) return;

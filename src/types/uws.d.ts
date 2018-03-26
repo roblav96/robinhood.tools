@@ -1,6 +1,6 @@
 // 
 
-import * as _uws from 'uws'
+import * as uws from 'uws'
 
 
 
@@ -10,5 +10,14 @@ declare module 'uws' {
 		startAutoPing(interval: number, message: string): void
 	}
 }
+
+// declare global {
+// 	export interface WebSocket extends uws { }
+// 	export namespace NodeJS {
+// 		export interface Global {
+// 			WebSocket: uws
+// 		}
+// 	}
+// }
 
 

@@ -110,15 +110,27 @@ export const sort = {
 
 export const object = {
 	is<T = any>(value: T): value is T { return _.isPlainObject(value) },
+	assign<T = any>(target: T, source: T, deep = false) {
+		Object.keys(source).forEach(function(key) {
+			let tvalue = target[key]
+			let svalue = source[key]
+			if (deep && object.is(tvalue) && object.is(svalue)) {
+				return object.assign(tvalue, svalue, true)
+			}
+			target[key] = svalue;
+		})
+	},
 	compact<T = any>(target: T) {
 		Object.keys(target).forEach(function(key) {
-			if (target[key] == null) _.unset(target, key);
+			let tvalue = target[key]
+			if (tvalue === null || tvalue === undefined) _.unset(target, key);
 		})
 	},
 	merge<T = any>(target: T, source: T) {
 		Object.keys(source).forEach(function(key) {
-			let value = source[key]
-			if (value != null) target[key] = value;
+			let svalue = source[key]
+			if (svalue == null) return;
+			target[key] = svalue
 		})
 	},
 	repair<T = any>(target: T, source: T) {
@@ -135,7 +147,7 @@ export const object = {
 	fix<T = any>(target: T, deep = false) {
 		Object.keys(target).forEach(function(key) {
 			let value = target[key]
-			if (deep == true && object.is(value)) {
+			if (deep && object.is(value)) {
 				return object.fix(value, true)
 			}
 			if (value === '') return _.unset(target, key);
