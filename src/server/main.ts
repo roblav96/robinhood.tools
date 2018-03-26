@@ -36,12 +36,13 @@ if (process.MASTER) {
 
 import './services/ticks'
 import './services/devtools'
+// import './services/clws'
 import './services/radio'
 
 // import './adapters/redis'
 
-if (process.WORKER) {
-	import('./fastify')
-}
+// if (process.WORKER) {
+// 	import('./fastify')
+// }
 
 

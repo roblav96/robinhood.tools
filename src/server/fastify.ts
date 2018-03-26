@@ -57,10 +57,12 @@ import './apis/search.api'
 
 
 
-fastify.listen(process.PORT, process.HOST, function(error) {
+fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 	if (error) return console.error('fastify listen Error ->', error);
 	if (process.PRIMARY) console.info(fastify.server.address().address + ':' + fastify.server.address().port, '\n', fastify.printRoutes());
 })
+
+
 
 
 

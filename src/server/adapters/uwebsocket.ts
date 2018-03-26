@@ -4,13 +4,10 @@ import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
 
-// global.WebSocket = require('uws')
-// import * as Sockette from 'sockette'
 import * as WebSocket from 'uws'
 import * as ee3 from 'eventemitter3'
-import * as utils from './utils'
-import ticks from './ticks'
-// import EWebSocket from '../adapters/ewebsocket'
+import * as utils from '../services/utils'
+import ticks from '../services/ticks'
 
 
 
@@ -82,7 +79,15 @@ class uWebSocket extends WebSocket {
 
 }
 
-export default new uWebSocket(ADDRESS)
+export default uWebSocket
+
+
+
+
+
+
+
+
 
 
 

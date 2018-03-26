@@ -34,7 +34,7 @@ process.NAME = process.env.npm_package_name
 process.VERSION = process.env.npm_package_version
 process.DOMAIN = (DEVELOPMENT ? 'http://dev.' : 'https://') + process.env.npm_package_domain
 process.HOST = process.env.HOST || 'localhost'
-process.PORT = (Number.parseInt(process.env.PORT) || 12300) + process.INSTANCE
+process.PORT = Number.parseInt(process.env.PORT) || 12300
 
 process.EE3 = new ee3.EventEmitter()
 
@@ -67,12 +67,12 @@ console.format = function(args) {
 const reason = chalk.bold('https://github.com/mcollina/make-promises-safe')
 process.once('uncaughtException', function(error) {
 	console.error(chalk.bold.underline.redBright('UNCAUGHT EXCEPTION'), '\n', error)
-	process.stdout.write(`\n${reason}\n\n`)
+	process.stdout.write(`\n${reason}\n`)
 	process.exit(1)
 })
 process.once('unhandledRejection', function(error) {
 	console.error(chalk.bold.underline.redBright('UNHANDLED REJECTION'), '\n', error)
-	process.stdout.write(`\n${reason}\n\n`)
+	process.stdout.write(`\n${reason}\n`)
 	process.exit(1)
 })
 
@@ -82,7 +82,7 @@ if (process.MASTER) {
 	process.stdout.write('\n\n\n\n' +
 		chalk.magentaBright('█') + ' ' + chalk.underline.bold(process.NAME) + '\n' +
 		chalk.magentaBright('█') + ' ' + NODE_ENV + ' v' + process.VERSION + '\n' +
-		chalk.magentaBright('█') + ' ' + process.HOST + ':' + (process.PORT + 1) + '\n'
+		chalk.magentaBright('█') + ' ' + process.HOST + ':' + process.PORT + '\n'
 	)
 }
 
