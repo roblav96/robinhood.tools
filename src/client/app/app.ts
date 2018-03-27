@@ -15,6 +15,10 @@ import NavBar from '@/client/components/navbar/navbar'
 	},
 })
 export default class extends Mixins(VUtilsMixin) {
+	
+	created() {
+		
+	}
 
 	initing = true
 	mounted() {

@@ -5,6 +5,9 @@ import * as fastify from 'fastify'
 
 
 declare module 'fastify' {
+	// interface RouteOptions<HttpServer, HttpRequest, HttpResponse> {
+	// 	handlers: RequestHandler<HttpRequest, HttpResponse>
+	// }
 	interface FastifyRequest<HttpRequest> {
 		headers?: Dict<string>
 	}

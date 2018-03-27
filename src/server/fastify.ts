@@ -14,7 +14,7 @@ import * as cookie from 'cookie'
 
 
 const fastify = Fastify<http.Server, http.IncomingMessage, http.ServerResponse>({
-	// logger: { level: 'error', prettyPrint: { forceColor: true, levelFirst: true } },
+	// logger: { level: 'debug', prettyPrint: { forceColor: true, levelFirst: true } },
 })
 export default fastify
 
@@ -28,7 +28,7 @@ fastify.register(function(instance, opts, next) {
 	radio.once('_onready_', next)
 })
 
-import wss from './adapters/wsserver'
+import wss from './adapters/ws.server'
 fastify.register(function(instance, opts, next) {
 	fastify.decorate('wss', wss)
 	fastify.addHook('onClose', function(fastify, done) {
@@ -65,6 +65,7 @@ fastify.use(cors({ origin: process.DOMAIN }))
 
 import './hooks/security.hook'
 
+import './apis/socket.api'
 import './apis/security.api'
 import './apis/recaptcha.api'
 import './apis/search.api'
@@ -81,6 +82,7 @@ fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 
 
 declare global {
+	type FastifyInstance = Fastify.FastifyInstance<http.Server, http.IncomingMessage, http.ServerResponse>
 	type FastifyMiddleware = Fastify.FastifyMiddleware<http.Server, http.IncomingMessage, http.ServerResponse>
 	type FastifyRequest = Fastify.FastifyRequest<http.IncomingMessage>
 	type FastifyReply = Fastify.FastifyReply<http.ServerResponse>

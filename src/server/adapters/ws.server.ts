@@ -10,13 +10,22 @@ import fastify from '../fastify'
 
 
 const wss = new uws.Server({
+	host: '127.0.0.1',
+	// host: process.DOMAIN,
+	port: process.PORT + process.INSTANCES + process.INSTANCE,
+	path: 'websocket/' + process.INSTANCE,
 	// noServer: true,
-	server: fastify.server,
+	// server: fastify.server,
 	verifyClient(incoming, next) {
 		console.info('incoming.req.headers ->')
 		eyes.inspect(incoming.req.headers)
 		next(true)
 	},
+})
+
+wss.on('listening', function(this: uws.Server) {
+	console.info('listening ->', this.httpServer.address())
+	this.startAutoPing(3000, 'ping')
 })
 
 const onmessage = function(this: uws, message: string) {

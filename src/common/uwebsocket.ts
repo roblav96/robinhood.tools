@@ -14,7 +14,8 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	private static get defaults() {
 		return _.clone({
 			autoreconnect: true,
-			retrytimeout: 3000,
+			retrytimeout: DEVELOPMENT ? 5000 : 1000,
+			startdelay: -1,
 			heartrate: ticks.T10,
 			verbose: false,
 		})
@@ -23,17 +24,16 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	get name() { return 'ws:/' + url.parse(this.address).path }
 
 	constructor(
-		private adapter: typeof uws | WebSocket,
 		public address: string,
 		public options = {} as Partial<typeof uWebSocket.defaults>,
 	) {
 		super()
 		_.defaults(this.options, uWebSocket.defaults)
-		this.reconnect = _.throttle(this.connect, Math.max(this.options.retrytimeout, 1000), { leading: false, trailing: true })
-		this.connect()
+		this.reconnect = _.throttle(this.connect, this.options.retrytimeout, { leading: false, trailing: true })
+		this.options.startdelay == -1 ? this.connect() : _.delay(() => this.connect(), this.options.startdelay)
 	}
 
-	private _socket: uws & WebSocket
+	private _socket: WebSocket & uws
 	get OPEN() { return this._socket.OPEN }
 	get CLOSED() { return this._socket.CLOSED }
 
@@ -71,19 +71,35 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	reconnect: (() => void) & _.Cancelable
 	connect() {
 		this.terminate()
-		this._socket = new (this.adapter as any)(this.address)
-		this._socket.on('open', this._onopen)
-		this._socket.on('close', this._onclose)
-		this._socket.on('error', this._onerror)
-		this._socket.on('message', this._onmessage)
-		this._socket.on('ping', this._onping)
-		this._socket.on('pong', this._onpong)
+		this._socket = new WebSocket(this.address) as any
+		if (process.SERVER) {
+			this._socket.on('open', this._onopen)
+			this._socket.on('close', this._onclose)
+			this._socket.on('error', this._onerror)
+			this._socket.on('message', this._onmessage)
+			this._socket.on('ping', this._onping)
+			this._socket.on('pong', this._onpong)
+		}
+		if (process.CLIENT) {
+			this._socket.addEventListener('open', this._onopen)
+			this._socket.addEventListener('close', this._onclose)
+			this._socket.addEventListener('error', this._onerror)
+			this._socket.addEventListener('message', this._onmessage)
+			this._socket.addEventListener('ping', this._onping)
+			this._socket.addEventListener('pong', this._onpong)
+		}
+		// this._socket.onopen = this._onopen
+		// this._socket.onclose = this._onclose
+		// this._socket.onerror = this._onerror
+		// this._socket.onmessage = this._onmessage
+		// this._socket.onping = this._onping
+		// this._socket.onpong = this._onpong
 		this.reconnect()
 	}
 
-	private _onopen = () => {
-		if (this.options.verbose) console.info(this.name, 'onopen');
-		ticks.EE4.on(this.options.heartrate, this._heartbeat)
+	private _onopen = (event) => {
+		if (this.options.verbose) console.info(this.name, 'onopen ->', event);
+		ticks.EE4.addListener(this.options.heartrate, this._heartbeat)
 		this.reconnect.cancel()
 		this.emit('open')
 	}
@@ -108,11 +124,11 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	}
 
 	private _onping = (message: string) => {
-		// if (this.options.verbose) console.log(this.name, 'onping ->', message);
+		if (this.options.verbose) console.log(this.name, 'onping ->', message);
 		this.emit('ping', message)
 	}
 	private _onpong = (message: string) => {
-		// if (this.options.verbose) console.log(this.name, 'onpong ->', message);
+		if (this.options.verbose) console.log(this.name, 'onpong ->', message);
 		this.emit('pong', message)
 	}
 

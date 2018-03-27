@@ -16,6 +16,7 @@ function ee4start(topic: string, ms: number) {
 	if (core.isNodejs) ee4ts[topic].unref();
 	clearTimeout(ee4ts[topic]); ee4ts[topic] = null; _.unset(ee4ts, topic);
 	ee4is[topic] = 0
+	EE4.emit(topic, ee4is[topic])
 	ci.setCorrectingInterval(function() {
 		ee4is[topic]++
 		EE4.emit(topic, ee4is[topic])

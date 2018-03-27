@@ -13,7 +13,7 @@ import * as http from '@/client/adapters/http'
 export default class extends Vue {
 
 	mounted() {
-		if (DEVELOPMENT) setTimeout(() => this.query = 'nvda', 300);
+		// if (DEVELOPMENT) setTimeout(() => this.query = 'nvda', 300);
 	}
 
 	busy = false

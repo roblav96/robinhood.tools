@@ -24,6 +24,8 @@ declare namespace NodeJS {
 		DOMAIN: string
 		HOST: string
 		PORT: number
+		CLIENT: boolean
+		SERVER: boolean
 		INSTANCE: number
 		INSTANCES: number
 		MASTER: boolean

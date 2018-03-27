@@ -35,6 +35,7 @@ process.VERSION = process.env.npm_package_version
 process.DOMAIN = (DEVELOPMENT ? 'http://dev.' : 'https://') + process.env.npm_package_domain
 process.HOST = process.env.HOST || 'localhost'
 process.PORT = Number.parseInt(process.env.PORT) || 12300
+process.SERVER = true
 
 process.EE4 = new ee4.EventEmitter()
 

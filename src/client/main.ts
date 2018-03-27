@@ -6,6 +6,7 @@ global.PRODUCTION = NODE_ENV == 'production'
 process.NAME = process.env.NAME
 process.VERSION = process.env.VERSION
 process.DOMAIN = process.env.DOMAIN
+process.CLIENT = true
 // 
 
 import Vue from 'vue'

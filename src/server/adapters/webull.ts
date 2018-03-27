@@ -7,7 +7,6 @@ import * as core from '../../common/core'
 import * as got from 'got'
 import * as qs from 'querystring'
 import * as redis from './redis'
-import wss from './wss'
 
 
 
