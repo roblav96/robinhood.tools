@@ -11,6 +11,15 @@ import ticks from './ticks'
 
 export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'error' | 'message'> {
 
+	private static readonly codes = {
+		1000: 'CLOSE_NORMAL',
+		1001: 'CLOSE_GOING_AWAY',
+		1002: 'CLOSE_PROTOCOL_ERROR',
+		1003: 'CLOSE_UNSUPPORTED',
+		1005: 'CLOSED_NO_STATUS',
+		1006: 'CLOSE_ABNORMAL',
+	}
+
 	private static get defaults() {
 		return _.clone({
 			autoreconnect: true,
@@ -21,7 +30,11 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 		})
 	}
 
-	get name() { return 'ws:/' + url.parse(this.address).path }
+	get name() {
+		let parsed = url.parse(this.address)
+		if (parsed.path) return 'ws:/' + parsed.path;
+		return 'ws:' + parsed.host
+	}
 
 	constructor(
 		public address: string,
@@ -85,20 +98,20 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	}
 
 	private _onopen = (event: Event) => {
-		if (this.options.verbose) console.info(this.name, 'onopen ->', process.CLIENT ? event : '');
+		if (this.options.verbose) console.info(this.name, 'onopen ->', process.CLIENT ? (event.target as WebSocket).url : '');
 		ticks.EE4.addListener(this.options.heartrate, this._heartbeat)
 		this.reconnect.cancel()
 		this.emit('open')
 	}
 
 	private _onclose = (event: CloseEvent) => {
-		if (this.options.verbose) console.warn(this.name, 'onclose ->', event.code, event.reason);
+		console.warn(this.name, 'onclose ->', uWebSocket.codes[event.code] || event.code, '->', event.reason)
 		this.emit('close', event.code, event.reason)
 		this._reboot()
 	}
 
 	private _onerror = (error: Error) => {
-		if (this.options.verbose) console.error(this.name, 'onerror Error ->', error.message || error);
+		console.error(this.name, 'onerror Error ->', error.message || error)
 		this.emit('error', error)
 		// this._reboot()
 	}

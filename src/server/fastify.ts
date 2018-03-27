@@ -14,7 +14,7 @@ import * as cookie from 'cookie'
 
 
 const fastify = Fastify<http.Server, http.IncomingMessage, http.ServerResponse>({
-	// logger: { level: 'debug', prettyPrint: { forceColor: true, levelFirst: true } },
+	logger: { level: 'error', prettyPrint: { forceColor: true, levelFirst: true } },
 })
 export default fastify
 
@@ -44,10 +44,13 @@ fastify.setNotFoundHandler(async function(request, reply) {
 })
 
 fastify.setErrorHandler(async function(error: boom & { validation: any }, request, reply) {
-	console.error('setErrorHandler Error ->\n', _.omit(error, 'stack'))
+	// console.error('setErrorHandler Error ->', (error as any).type, error.message, error.stack) // , _.omit(error, 'stack'))
+	// eyes.inspect(_.omit(error, 'stack'))
 	if (Array.isArray(error.validation)) {
 		let validation = error.validation[0]
-		error = boom.preconditionFailed('Parameter `' + validation.dataPath.substr(1) + '` ' + validation.message) as any
+		let param = validation.dataPath.substr(1)
+		param = param ? `"${param}"` : 'is missing,'
+		error = boom.preconditionFailed('Parameter ' + param + ' ' + validation.message) as any
 	} else if (!error.isBoom) {
 		error = boom.internal(error.message) as any
 	}
@@ -98,7 +101,8 @@ declare module 'fastify' {
 		authed: boolean
 		ip: string
 		hostname: string
-		doc: Partial<any>
+		ua: string
+		doc: Partial<Security.Doc>
 	}
 	interface FastifyReply<HttpResponse> {
 		setCookie: (name: string, value: string, opts: cookie.CookieSerializeOptions) => FastifyReply<HttpResponse>

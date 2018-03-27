@@ -25,7 +25,7 @@ div.about-boxes span.icon > i.mdi:before {
 				<div class="container has-text-centered">
 					<img class="mb-4" style="max-width: 128px;" src="@/assets/logo-white.svg" width="25%" alt="Robinhood Tools">
 					<h1 class="title">Robinhood Tools</h1>
-					<h2 class="subtitle">Advanced trading tools and resources for Robinhood Web and Crypto.</h2>
+					<h2 class="subtitle">Advanced trading tools and resources for Robinhood Web.</h2>
 				</div>
 			</div>
 		</section>

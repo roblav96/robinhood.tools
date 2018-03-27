@@ -55,21 +55,17 @@ class Radio extends ee4.EventEmitter {
 		// verbose: true, // process.MASTER,
 	})
 
-	private _onopen = () => {
-		this._socket.send('_onopen_')
-		super.emit('_onopen_')
-	}
-
-	private _onmessage = (message: Radio.Message) => {
-		if ((message as any) == '_onready_') return super.emit('_onready_');
-		message = JSON.parse(message as any)
-		super.emit(message.event, message.data)
-	}
-
 	constructor() {
 		super()
-		this._socket.on('open', this._onopen)
-		this._socket.on('message', this._onmessage)
+		this._socket.on('open', () => {
+			this._socket.send('_onopen_')
+			super.emit('_onopen_')
+		})
+		this._socket.on('message', (message: Radio.Message) => {
+			if ((message as any) == '_onready_') return super.emit('_onready_');
+			message = JSON.parse(message as any)
+			super.emit(message.event, message.data)
+		})
 	}
 
 	emit(event: string, data?: any) {

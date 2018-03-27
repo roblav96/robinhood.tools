@@ -4,6 +4,7 @@ import * as _ from 'lodash'
 import * as core from '@/common/core'
 import got from 'got'
 import vm from '@/client/vm'
+import * as security from '@/client/services/security'
 
 
 
@@ -19,9 +20,16 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 		config.timeout = config.timeout || 10000
 		config.retries = config.retries || 9
 		config.silent = config.silent || PRODUCTION
-		if (!config.silent) console.log('%c▶ ' + config.method + ' ' + config.url + ' ▶', 'font-weight: 300;', (JSON.stringify(config.query || config.body || '')).substring(0, 64));
+		if (!config.silent) {
+			let ending = (config.query || config.body) ? ' ➤ ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
+			console.log('➤ ' + config.method + ' ' + config.url + ending);
+		}
 
-		if (config.url[0] == '/') config.url = process.DOMAIN + '/api' + config.url;
+		if (config.url[0] == '/') {
+			config.headers = config.headers || {}
+			_.defaults(config.headers, security.headers())
+			config.url = process.DOMAIN + '/api' + config.url
+		}
 
 		return got(config.url, config as any).then(({ body }) => body)
 
@@ -36,8 +44,7 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 		console.log('%c◀ ' + '[' + method + '] ' + url, 'color: red; font-weight: bolder;', message)
 		vm.$toast.open({ message: url + ' ➤ ' + message, type: 'is-danger' })
 
-		error.message = message
-		return Promise.reject(error)
+		return Promise.reject(message)
 	})
 
 }

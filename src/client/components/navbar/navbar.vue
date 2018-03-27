@@ -26,7 +26,7 @@
 			</div>
 
 			<div class="navbar-menu" :class="{ 'is-active': showMobileMenu }">
-				<div class="navbar-end">
+				<div class="navbar-start">
 					<router-link class="navbar-item" v-for="route in v_routes" :key="route.name" :to="{ name: route.name }">
 						<b-icon class="mr-2 va-middle" :icon="route.icon" />
 						<span class="va-middle">{{ route.title }}</span>

@@ -27,7 +27,7 @@ div.searchbar .autocomplete .dropdown-content {
 
 <template>
 	<b-field class="searchbar">
-		<b-autocomplete class="" type="search" placeholder="Search..." icon="magnify" open-on-focus v-model="query"
+		<b-autocomplete class="is-danger" custom-class="is-danger" type="search" placeholder="Search..." icon="magnify" open-on-focus v-model="query"
 		    :data="results" :loading="busy" v-on:input="oninput" v-on:select="onselect">
 			<template slot-scope="props">
 				<router-link tag="div" :to="{ name: 'symbol' }" class="columns is-mobile is-gapless">

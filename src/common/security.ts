@@ -67,12 +67,23 @@ export function decryptObjectValues<T = any>(encrypted: T, privatePem: string): 
 	return decrypted
 }
 
+export function generateToken(doc: Partial<Security.Doc>, hostname: string, prime: string) {
+	return hmac256(doc.uuid + doc.finger + doc.bytes + hostname, prime)
+}
+
 
 
 
 
 declare global {
 	namespace Security {
+		interface Doc {
+			id: string
+			uuid: string
+			finger: string
+			bytes: string
+			token: string
+		}
 		interface PemKeyPair {
 			publicPem: string
 			privatePem: string

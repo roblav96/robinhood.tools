@@ -31,7 +31,7 @@ div.home-boxes span.icon > i.mdi:before {
 						</div>
 						<div class="column">
 							<h1 class="title">Robinhood Tools</h1>
-							<h2 class="subtitle">Advanced trading tools and resources for Robinhood Web and Crypto.</h2>
+							<h2 class="subtitle">Advanced trading tools and resources for Robinhood Web.</h2>
 						</div>
 					</div>
 				</div>

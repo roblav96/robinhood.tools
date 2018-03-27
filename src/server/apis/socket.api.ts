@@ -14,12 +14,22 @@ fastify.route({
 	url: '/api/socket/addresses',
 	handler: async function(this: FastifyInstance, request, reply) {
 		let domain = process.DOMAIN.replace('http', 'ws')
-		let addresses = [] as string[]
-		let i: number, len = process.INSTANCES
-		for (i = 0; i < len; i++) {
-			addresses.push(domain + '/websocket/' + i)
-		}
-		return addresses
+		return core.array.create(process.INSTANCES).map(function(i) {
+			return domain + '/websocket/' + i
+		})
+	},
+})
+
+
+
+fastify.route({
+	method: 'POST',
+	url: '/api/socket/subscribe',
+	handler: async function(this: FastifyInstance, request, reply) {
+		let domain = process.DOMAIN.replace('http', 'ws')
+		return core.array.create(process.INSTANCES).map(function(i) {
+			return domain + '/websocket/' + i
+		})
 	},
 })
 

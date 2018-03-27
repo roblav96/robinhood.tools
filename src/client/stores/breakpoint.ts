@@ -11,7 +11,7 @@ import store from '@/client/store'
 
 
 
-const breakpoint = {
+const state = {
 	name: '', width: 0, height: 0,
 	mobile: false, tablet: false, desktop: false, widescreen: false, fullhd: false,
 	tabletOnly: false, tabletAndDown: false, tabletAndUp: false,
@@ -50,7 +50,7 @@ function update() {
 	let widescreenAndUp = !(mobile || tablet || desktop) && (widescreen || fullhd)
 	let fullhdOnly = fullhd
 
-	Object.assign(breakpoint, {
+	Object.assign(state, {
 		name, width, height,
 		mobile, tablet, desktop, widescreen, fullhd,
 		tabletOnly, tabletAndDown, tabletAndUp,
@@ -58,23 +58,14 @@ function update() {
 		widescreenOnly, widescreenAndDown, widescreenAndUp,
 		mobileOnly, fullhdOnly,
 	})
-	// console.log('breakpoint >', breakpoint)
+	// console.log('state >', state)
 
 }
 
 const onresize = _.throttle(update, 300, { leading: false })
 window.addEventListener('resize', onresize, { passive: true })
 
-store.registerModule('breakpoint', { state: breakpoint })
-
-
-
-declare global {
-	namespace Store {
-		interface State {
-			breakpoint: typeof breakpoint
-		}
-	}
-}
+store.registerModule('breakpoint', { state })
+declare global { namespace Store { interface State { breakpoint: typeof state } } }
 
 
