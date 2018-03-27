@@ -15,18 +15,16 @@ export default class extends Vue {
 
 	mounted() {
 		// if (DEVELOPMENT) setTimeout(() => this.query = 'nvda', 300);
-
-		security.EE4.once('ready', function() {
-			http.get('https://infoapi.webull.com/api/search/tickers2', {
-				query: { keys: 'nvda' },
-				iscors: true,
-			}).then(function(response) {
-				console.log('response ->', response)
-			}).catch(function(error) {
-				console.error('mounted Error ->', error)
-			})
-		})
-
+		// security.EE4.once('ready', function() {
+		// 	http.get('https://infoapi.webull.com/api/search/tickers2', {
+		// 		query: { keys: 'nvda' },
+		// 		iscors: true,
+		// 	}).then(function(response) {
+		// 		console.log('response ->', response)
+		// 	}).catch(function(error) {
+		// 		console.error('mounted Error ->', error)
+		// 	})
+		// })
 	}
 
 	busy = false
@@ -43,9 +41,7 @@ export default class extends Vue {
 
 		}).catch(error => {
 			console.error('sync Error ->', error)
-		}).finally(() => {
-			this.busy = false
-		})
+		}).finally(() => this.busy = false)
 	}
 
 	onselect(result) {

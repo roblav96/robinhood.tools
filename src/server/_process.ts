@@ -5,9 +5,8 @@ import 'source-map-support/register'
 
 import chalk from 'chalk'
 import * as eyes from 'eyes'
-eyes.defaults.maxLength = 65536
-eyes.defaults.showHidden = true
-global.inspect = eyes.inspector({ stream: null })
+Object.assign(eyes.defaults, { maxLength: 65536, showHidden: true, pretty: true } as eyes.EyesOptions)
+global.inspect = eyes.inspector(Object.assign({ stream: null } as eyes.EyesOptions, eyes.defaults))
 import * as _ from 'lodash'
 import * as os from 'os'
 import * as cluster from 'cluster'

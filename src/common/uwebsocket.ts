@@ -24,7 +24,7 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 		return _.clone({
 			query: undefined as () => string,
 			autoreconnect: true,
-			retrytimeout: DEVELOPMENT ? 3000 : 1000,
+			retrytimeout: 3000,
 			startdelay: -1,
 			heartrate: ticks.T10,
 			verbose: false,
@@ -72,7 +72,7 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 
 	terminate() {
 		this.reconnect.cancel()
-		ticks.EE4.removeListenerFunction(this._heartbeat)
+		ticks.removeListenerFunction(this._heartbeat)
 		if (!this._socket) return;
 		this._socket.close()
 		if (process.SERVER) {
@@ -93,15 +93,10 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 		this._socket.onmessage = this._onmessage as any
 		this.reconnect()
 	}
-	private _reboot() {
-		ticks.EE4.removeListenerFunction(this._heartbeat)
-		if (this.options.autoreconnect) this.reconnect();
-		else this.destroy();
-	}
 
 	private _onopen = (event: Event) => {
 		if (this.options.verbose) console.info(this.name, 'onopen ->', process.CLIENT ? (event.target as WebSocket).url : '');
-		ticks.EE4.addListener(this.options.heartrate, this._heartbeat)
+		ticks.addListener(this.options.heartrate, this._heartbeat)
 		this.reconnect.cancel()
 		this.emit('open')
 	}
@@ -109,13 +104,14 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	private _onclose = (event: CloseEvent) => {
 		console.warn(this.name, 'onclose ->', uWebSocket.codes[event.code] || event.code, '->', event.reason)
 		this.emit('close', event.code, event.reason)
-		this._reboot()
+		ticks.removeListenerFunction(this._heartbeat)
+		if (this.options.autoreconnect) this.reconnect();
+		else this.destroy();
 	}
 
 	private _onerror = (error: Error) => {
 		console.error(this.name, 'onerror Error ->', error.message || error)
 		this.emit('error', error)
-		// this._reboot()
 	}
 
 	private _onmessage = (event: MessageEvent) => {
@@ -128,7 +124,7 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 
 	private _heartbeat = () => {
 		if (this.isopen) this.send('ping');
-		else ticks.EE4.removeListenerFunction(this._heartbeat);
+		else ticks.removeListenerFunction(this._heartbeat);
 	}
 
 }

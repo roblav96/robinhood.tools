@@ -30,4 +30,6 @@ Vue.use(Buefy, {
 
 require('@/client/vm')
 
+if (DEVELOPMENT) Object.assign(window, require('@/common/core'));
+
 

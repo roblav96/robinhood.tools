@@ -14,8 +14,8 @@ import * as http from './http'
 class Client {
 
 	private _socket = new uWebSocket(this.address, {
-		query() { return qs.stringify(security.headers()) },
-		verbose: true,
+		query() { return qs.stringify(_.defaults(security.headers())) },
+		// verbose: true,
 	})
 
 	constructor(
@@ -43,10 +43,6 @@ class Socket {
 			this._clients = addresses.map((v, i) => new Client(v, i))
 		})
 	})
-
-	off(event: string, fn: (...args: any[]) => void, context?: any) {
-		return this
-	}
 
 }
 

@@ -33,10 +33,11 @@ const doc = {
 
 export function headers() {
 	let headers = {
+		'x-id': doc.id,
 		'x-uuid': doc.uuid,
 		'x-finger': doc.finger + '.' + Date.now(),
 	} as Dict<string>
-	if (doc.id) headers['x-id'] = doc.id;
+	// if (doc.id) headers['x-id'] = doc.id;
 	return headers
 }
 
@@ -65,7 +66,7 @@ function finger() {
 function token() {
 	return http.get('/security/token').catch(function(error) {
 		console.error('token Error ->', error)
-		return pdelay(DEVELOPMENT ? 5000 : 3000).then(token)
+		return pdelay(3000).then(token)
 	})
 }
 

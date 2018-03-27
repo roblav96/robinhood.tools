@@ -12,8 +12,8 @@ import * as security from '../services/security'
 
 
 
-fastify.addHook('preHandler', async function preHandler(request, reply) {
-
+fastify.addHook('preHandler', async function preHandler(this: FastifyInstance, request, reply) {
+	
 	request.ip = security.getip(request.req)
 
 	request.doc = {

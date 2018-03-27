@@ -52,7 +52,9 @@ wss.on('connection', function(socket) {
 	socket.on('message', function(message: string) {
 		if (message == 'pong') return;
 		if (message == 'ping') return socket.send('pong');
-		this.close(1003, 'Sending messages via the client not allowed!')
+		socket.close(1003, 'Sending messages via the client not allowed!')
+		socket.terminate()
+		socket.removeAllListeners()
 	})
 })
 

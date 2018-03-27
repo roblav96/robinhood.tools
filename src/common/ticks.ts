@@ -13,7 +13,7 @@ const EE4 = new ee4.EventEmitter<string, number>()
 const ee4ts = {} as Dict<number & NodeJS.Timer>
 const ee4is = {} as Dict<number>
 function ee4start(topic: string, ms: number) {
-	if (core.isNodejs) ee4ts[topic].unref();
+	if (process.SERVER) ee4ts[topic].unref();
 	clearTimeout(ee4ts[topic]); ee4ts[topic] = null; _.unset(ee4ts, topic);
 	ee4is[topic] = 0
 	EE4.emit(topic, ee4is[topic])
@@ -35,13 +35,13 @@ setImmediate(function() {
 		let now = Date.now()
 		let start = now - (now % ms)
 		let end = start + ms
-		let ims = core.time.instanceMs(ms)
+		let ims = process.CLIENT ? 0 : core.math.dispersed(ms, process.INSTANCE, process.INSTANCES)
 		let delayms = (start + ims) - now
 		if (delayms <= 0) delayms = (end + ims) - now;
 		ee4ts[topic] = _.delay(ee4start, delayms, topic, ms) as any
 	})
 })
 
-export default Object.assign({}, { EE4 }, enums.TICKS)
+export default Object.assign(EE4, enums.TICKS)
 
 

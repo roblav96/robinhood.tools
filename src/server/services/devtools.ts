@@ -22,7 +22,7 @@ function inspectHeap() {
 }
 
 if (process.MASTER || process.INSTANCE == process.INSTANCES) {
-	// ticks.EE4.addListener(ticks.T60, inspectHeap)
+	// ticks.addListener(ticks.T60, inspectHeap)
 	// inspectHeap()
 }
 

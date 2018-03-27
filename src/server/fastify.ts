@@ -4,14 +4,16 @@ import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../common/core'
 
+import { CookieSerializeOptions } from 'cookie'
 import * as http from 'http'
 import * as Fastify from 'fastify'
 import * as uws from 'uws'
 import * as cors from 'cors'
 import * as boom from 'boom'
-import * as cookie from 'cookie'
 
 
+
+if (process.MASTER) console.error('process.MASTER Error ->', process.MASTER);
 
 const fastify = Fastify<http.Server, http.IncomingMessage, http.ServerResponse>({
 	logger: { level: 'error', prettyPrint: { forceColor: true, levelFirst: true } },
@@ -21,25 +23,35 @@ export default fastify
 
 
 fastify.register(require('fastify-cookie'), error => { if (error) console.error('fastify-cookie Error ->', error); })
+declare module 'fastify' {
+	interface FastifyRequest<HttpRequest> { cookies: Dict<string> }
+	interface FastifyReply<HttpResponse> { setCookie: (name: string, value: string, opts: CookieSerializeOptions) => FastifyReply<HttpResponse> }
+}
 
-// fastify.register(function(instance, opts, next) {
-// 	fastify.decorate('boom', boom)
-// 	next()
-// })
+
 
 import radio from './services/radio'
 fastify.register(function(instance, opts, next) {
-	fastify.decorate('radio', radio)
 	radio.once('_onready_', next)
 })
 
-import wss from './adapters/ws.server'
+
+
+import wss from './services/socket'
 fastify.register(function(instance, opts, next) {
 	fastify.decorate('wss', wss)
-	fastify.addHook('onClose', function(fastify, done) {
-		fastify.wss.close(done)
+	fastify.addHook('onClose', function(instance, done) {
+		instance.wss.close(done)
 	})
 	next()
+})
+declare module 'fastify' { interface FastifyInstance { wss: typeof wss } }
+
+
+
+import * as products from './watchers/products'
+fastify.register(function(instance, opts, next) {
+	products.register(next)
 })
 
 
@@ -99,18 +111,15 @@ declare global {
 
 declare module 'fastify' {
 	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
-		boom: typeof boom,
-		radio: Radio.radio
-		wss: uws.Server
+
 	}
 	interface FastifyRequest<HttpRequest> {
-		cookies: Dict<string>
 		authed: boolean
 		ip: string
 		doc: Security.Doc
 	}
 	interface FastifyReply<HttpResponse> {
-		setCookie: (name: string, value: string, opts: cookie.CookieSerializeOptions) => FastifyReply<HttpResponse>
+
 	}
 }
 

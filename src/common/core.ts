@@ -12,7 +12,6 @@ export function isJunk(value: any) {
 }
 
 export function noop() { }
-export const isNodejs = new Function('try { return this === global; } catch(e) { return false }')() as boolean
 
 
 
@@ -180,15 +179,23 @@ export const json = {
 
 
 
-export const time = {
-	instanceMs(ms: number) {
-		if (!isNodejs) return 0;
-		return Math.round(Math.max(process.INSTANCE, 0) * (ms / Math.max(process.INSTANCES, 1)))
-	},
-	dispersedMs(ms: number, i: number, length: number) {
-		return Math.round(i * (ms / length))
-	},
+export const math = {
+	dispersed(value: number, index: number, max: number) {
+		return Math.round(index * (value / max))
+	}
 }
+
+
+
+// export const time = {
+// 	instanceMs(ms: number) {
+// 		if (process.CLIENT) return 0;
+// 		return Math.round(Math.max(process.INSTANCE, 0) * (ms / Math.max(process.INSTANCES, 1)))
+// 	},
+// 	dispersedMs(ms: number, i: number, length: number) {
+// 		return Math.round(i * (ms / length))
+// 	},
+// }
 
 
 
