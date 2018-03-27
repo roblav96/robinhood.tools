@@ -77,7 +77,7 @@ import './apis/search.api'
 
 fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 	if (error) return console.error('listen Error ->', error);
-	if (process.PRIMARY) console.info(fastify.server.address().address + ':' + fastify.server.address().port, '\n', fastify.printRoutes());
+	if (process.PRIMARY) console.info('listen ->', fastify.server.address().address + ':' + fastify.server.address().port) // , '\n', fastify.printRoutes());
 })
 
 
@@ -100,9 +100,7 @@ declare module 'fastify' {
 		cookies: Dict<string>
 		authed: boolean
 		ip: string
-		hostname: string
-		ua: string
-		doc: Partial<Security.Doc>
+		doc: Security.Doc
 	}
 	interface FastifyReply<HttpResponse> {
 		setCookie: (name: string, value: string, opts: cookie.CookieSerializeOptions) => FastifyReply<HttpResponse>

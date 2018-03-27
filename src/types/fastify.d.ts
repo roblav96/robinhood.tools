@@ -9,7 +9,7 @@ declare module 'fastify' {
 	// 	handlers: RequestHandler<HttpRequest, HttpResponse>
 	// }
 	interface FastifyRequest<HttpRequest> {
-		headers?: Dict<string>
+		headers: Dict<string>
 	}
 	interface FastifyReply<HttpResponse> {
 		getHeader: (key: string) => string

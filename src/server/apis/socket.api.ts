@@ -14,9 +14,10 @@ fastify.route({
 	url: '/api/socket/addresses',
 	handler: async function(this: FastifyInstance, request, reply) {
 		let domain = process.DOMAIN.replace('http', 'ws')
-		return core.array.create(process.INSTANCES).map(function(i) {
+		let addresses = core.array.create(process.INSTANCES).map(function(i) {
 			return domain + '/websocket/' + i
 		})
+		return addresses
 	},
 })
 
@@ -26,10 +27,7 @@ fastify.route({
 	method: 'POST',
 	url: '/api/socket/subscribe',
 	handler: async function(this: FastifyInstance, request, reply) {
-		let domain = process.DOMAIN.replace('http', 'ws')
-		return core.array.create(process.INSTANCES).map(function(i) {
-			return domain + '/websocket/' + i
-		})
+
 	},
 })
 

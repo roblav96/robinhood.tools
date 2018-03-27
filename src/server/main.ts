@@ -9,7 +9,7 @@ import * as cluster from 'cluster'
 
 
 
-// if (DEVELOPMENT) process.INSTANCES = 2;
+if (DEVELOPMENT) process.INSTANCES = 2;
 
 if (process.MASTER) {
 

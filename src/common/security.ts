@@ -4,6 +4,12 @@ import * as forge from 'node-forge'
 
 
 
+export function sha1(value: string): string {
+	let md = forge.md.sha1.create()
+	md.update(value)
+	return md.digest().toHex()
+}
+
 export function hash256(value: string): string {
 	let md = forge.md.sha512.sha256.create()
 	md.update(value)
@@ -67,10 +73,6 @@ export function decryptObjectValues<T = any>(encrypted: T, privatePem: string): 
 	return decrypted
 }
 
-export function generateToken(doc: Partial<Security.Doc>, hostname: string, prime: string) {
-	return hmac256(doc.uuid + doc.finger + doc.bytes + hostname, prime)
-}
-
 
 
 
@@ -83,6 +85,8 @@ declare global {
 			finger: string
 			bytes: string
 			token: string
+			hostname: string
+			useragent: string
 		}
 		interface PemKeyPair {
 			publicPem: string

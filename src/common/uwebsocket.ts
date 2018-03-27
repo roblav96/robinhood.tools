@@ -22,6 +22,7 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 
 	private static get defaults() {
 		return _.clone({
+			query: undefined as () => string,
 			autoreconnect: true,
 			retrytimeout: DEVELOPMENT ? 3000 : 1000,
 			startdelay: -1,
@@ -32,7 +33,7 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 
 	get name() {
 		let parsed = url.parse(this.address)
-		if (parsed.path) return 'ws:/' + parsed.path;
+		if (parsed.pathname) return 'ws:/' + parsed.pathname;
 		return 'ws:' + parsed.host
 	}
 
@@ -84,7 +85,8 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	reconnect: (() => void) & _.Cancelable
 	connect() {
 		this.terminate()
-		this._socket = new WebSocket(this.address) as any
+		let address = this.options.query ? this.address + '?' + this.options.query() : this.address
+		this._socket = new WebSocket(address) as any
 		this._socket.onopen = this._onopen as any
 		this._socket.onclose = this._onclose as any
 		this._socket.onerror = this._onerror as any

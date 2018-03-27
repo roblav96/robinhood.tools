@@ -120,11 +120,12 @@ export const object = {
 			target[key] = svalue;
 		})
 	},
-	compact<T = any>(target: T) {
+	compact<T = any>(target: T, returns = false) {
 		Object.keys(target).forEach(function(key) {
 			let tvalue = target[key]
 			if (tvalue === null || tvalue === undefined) _.unset(target, key);
 		})
+		if (returns) return target;
 	},
 	merge<T = any>(target: T, source: T) {
 		Object.keys(source).forEach(function(key) {

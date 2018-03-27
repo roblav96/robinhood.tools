@@ -30,11 +30,10 @@ const doc = {
 
 export function headers() {
 	let headers = {
-		'x-id': doc.id,
 		'x-uuid': doc.uuid,
-		'x-finger': doc.finger,
+		'x-finger': doc.finger + '.' + Date.now(),
 	} as Dict<string>
-	if (doc.token) headers['x-token'] = doc.token + '.' + Date.now();
+	if (doc.id) headers['x-id'] = doc.id;
 	return headers
 }
 
@@ -52,7 +51,7 @@ function finger() {
 	if (doc.finger) return;
 	return new Promise(function(resolve) {
 		new Fingerprint2().get(function(finger) {
-			// finger = security.hash256(finger)
+			finger = security.sha1(finger)
 			lockr.set('security.finger', finger)
 			doc.finger = finger
 			resolve()
@@ -61,12 +60,7 @@ function finger() {
 }
 
 function token() {
-	return http.post<Security.TokenRequest, Security.TokenReply>('/security/token', {
-		now: Date.now(),
-	}).then(function(response) {
-		console.log('response ->', response)
-		doc.token = response.token
-	}).catch(function(error) {
+	return http.get('/security/token').catch(function(error) {
 		console.error('token Error ->', error)
 		return pdelay(DEVELOPMENT ? 5000 : 3000).then(token)
 	})
