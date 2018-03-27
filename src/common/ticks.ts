@@ -2,23 +2,23 @@
 
 import * as _ from 'lodash'
 import * as core from './core'
-import * as ee3 from './ee3'
+import * as ee4 from './ee4'
 import * as enums from './enums'
 import * as ci from 'correcting-interval'
 
 
 
-const EE3 = new ee3.EventEmitter<string, number>()
+const EE4 = new ee4.EventEmitter<string, number>()
 
-const ee3ts = {} as Dict<NodeJS.Timer>
-const ee3is = {} as Dict<number>
-function ee3start(topic: string, ms: number) {
-	if (core.isNodejs) ee3ts[topic].unref();
-	clearTimeout(ee3ts[topic]); ee3ts[topic] = null; _.unset(ee3ts, topic);
-	ee3is[topic] = 0
+const ee4ts = {} as Dict<number & NodeJS.Timer>
+const ee4is = {} as Dict<number>
+function ee4start(topic: string, ms: number) {
+	if (core.isNodejs) ee4ts[topic].unref();
+	clearTimeout(ee4ts[topic]); ee4ts[topic] = null; _.unset(ee4ts, topic);
+	ee4is[topic] = 0
 	ci.setCorrectingInterval(function() {
-		ee3is[topic]++
-		EE3.emit(topic, ee3is[topic])
+		ee4is[topic]++
+		EE4.emit(topic, ee4is[topic])
 	}, ms)
 }
 
@@ -34,13 +34,13 @@ setImmediate(function() {
 		let now = Date.now()
 		let start = now - (now % ms)
 		let end = start + ms
-		let ims = core.isNodejs ? Math.round(Math.max(process.INSTANCE, 0) * (ms / Math.max(process.INSTANCES, 1))) : ms
+		let ims = core.time.instanceMs(ms)
 		let delayms = (start + ims) - now
 		if (delayms <= 0) delayms = (end + ims) - now;
-		ee3ts[topic] = _.delay(ee3start, delayms, topic, ms) as any
+		ee4ts[topic] = _.delay(ee4start, delayms, topic, ms) as any
 	})
 })
 
-export default Object.assign({}, { EE3 }, enums.TICKS)
+export default Object.assign({}, { EE4 }, enums.TICKS)
 
 

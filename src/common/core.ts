@@ -179,4 +179,16 @@ export const json = {
 
 
 
+export const time = {
+	instanceMs(ms: number) {
+		if (!isNodejs) return 0;
+		return Math.round(Math.max(process.INSTANCE, 0) * (ms / Math.max(process.INSTANCES, 1)))
+	},
+	dispersedMs(ms: number, i: number, length: number) {
+		return Math.round(i * (ms / length))
+	},
+}
+
+
+
 

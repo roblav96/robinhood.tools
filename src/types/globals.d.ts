@@ -18,7 +18,7 @@ declare namespace NodeJS {
 		NODE_ENV: typeof NODE_ENV
 	}
 	export interface Process {
-		EE3: ee3.EventEmitter
+		EE4: ee4.EventEmitter
 		NAME: string
 		VERSION: string
 		DOMAIN: string

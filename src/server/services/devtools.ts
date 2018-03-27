@@ -22,11 +22,18 @@ function inspectHeap() {
 }
 
 if (process.MASTER || process.INSTANCE == process.INSTANCES) {
-	// ticks.EE3.addListener(ticks.T60, inspectHeap)
+	ticks.EE4.addListener(ticks.T60, inspectHeap)
 	// inspectHeap()
 }
 
 
+
+export function keys(name: string, value: any, skips = [] as string[]) {
+	let keys = _.uniq(_.keys(value).concat(_.keysIn(value)))
+	let functions = _.uniq(_.functions(value).concat(_.functionsIn(value)))
+	let all = _.uniq(keys.concat(functions)).filter(v => skips.indexOf(v) == -1)
+	console.info('\n' + chalk.bold(name), '\n\nKEYS ->', inspect(keys), '\n\nMETHODS ->', inspect(functions), '\n\nALL ->', inspect(all))
+}
 
 export function dtsgen(name: string, value: any) {
 	if (PRODUCTION || process.INSTANCE > 0) return;

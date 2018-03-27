@@ -1,7 +1,7 @@
 // 
 
 import * as _ from 'lodash'
-import * as ee3 from './ee3'
+import * as ee4 from './ee4'
 
 import * as uws from 'uws'
 import * as url from 'url'
@@ -9,7 +9,7 @@ import ticks from './ticks'
 
 
 
-export default class uWebSocket extends ee3.EventEmitter<'open' | 'close' | 'error' | 'message' | 'ping' | 'pong'> {
+export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'error' | 'message' | 'ping' | 'pong'> {
 
 	private static get defaults() {
 		return _.clone({
@@ -60,7 +60,7 @@ export default class uWebSocket extends ee3.EventEmitter<'open' | 'close' | 'err
 
 	terminate() {
 		this.reconnect.cancel()
-		ticks.EE3.removeListenerFunction(this._heartbeat)
+		ticks.EE4.removeListenerFunction(this._heartbeat)
 		if (!this._socket) return;
 		this._socket.close()
 		this._socket.terminate()
@@ -83,7 +83,7 @@ export default class uWebSocket extends ee3.EventEmitter<'open' | 'close' | 'err
 
 	private _onopen = () => {
 		if (this.options.verbose) console.info(this.name, 'onopen');
-		ticks.EE3.on(this.options.heartrate, this._heartbeat)
+		ticks.EE4.on(this.options.heartrate, this._heartbeat)
 		this.reconnect.cancel()
 		this.emit('open')
 	}
@@ -118,7 +118,7 @@ export default class uWebSocket extends ee3.EventEmitter<'open' | 'close' | 'err
 
 	private _heartbeat = () => {
 		if (this._socket) this._socket.ping();
-		else ticks.EE3.removeListenerFunction(this._heartbeat);
+		else ticks.EE4.removeListenerFunction(this._heartbeat);
 	}
 
 }

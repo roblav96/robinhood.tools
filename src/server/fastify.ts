@@ -28,12 +28,11 @@ fastify.register(function(instance, opts, next) {
 	radio.once('_onready_', next)
 })
 
-import wss from './adapters/wss'
+import wss from './adapters/wsserver'
 fastify.register(function(instance, opts, next) {
-	instance.radio.removeListenerFunction
 	fastify.decorate('wss', wss)
 	fastify.addHook('onClose', function(fastify, done) {
-		wss.close(done)
+		fastify.wss.close(done)
 	})
 	next()
 })
@@ -89,7 +88,7 @@ declare global {
 
 declare module 'fastify' {
 	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
-		radio: ee3.EventEmitter
+		radio: Radio.radio
 		wss: uws.Server
 	}
 	interface FastifyRequest<HttpRequest> {

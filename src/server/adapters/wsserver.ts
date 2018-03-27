@@ -10,8 +10,13 @@ import fastify from '../fastify'
 
 
 const wss = new uws.Server({
-	noServer: true,
+	// noServer: true,
 	server: fastify.server,
+	verifyClient(incoming, next) {
+		console.info('incoming.req.headers ->')
+		eyes.inspect(incoming.req.headers)
+		next(true)
+	},
 })
 
 const onmessage = function(this: uws, message: string) {
@@ -29,18 +34,6 @@ wss.on('error', function(error) {
 })
 
 export default wss
-
-
-
-
-
-// declare module 'fastify' {
-// 	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
-// 		wss: uws.Server
-// 	}
-// }
-
-
 
 
 

@@ -9,7 +9,7 @@ import * as cluster from 'cluster'
 
 
 
-if (DEVELOPMENT) process.INSTANCES = 1;
+// if (DEVELOPMENT) process.INSTANCES = 1;
 
 if (process.MASTER) {
 
@@ -27,7 +27,7 @@ if (process.MASTER) {
 		_.delay(function(i: number) {
 			let worker = cluster.fork({ WORKER_INSTANCE: i })
 			workers[worker.process.pid] = i
-		}, DEVELOPMENT ? 5000 : 1000, i)
+		}, DEVELOPMENT ? 5000 : 3000, i)
 	})
 
 }
@@ -35,6 +35,7 @@ if (process.MASTER) {
 
 
 import '../common/ticks'
+import './services/devtools'
 import './services/radio'
 
 if (process.WORKER) {

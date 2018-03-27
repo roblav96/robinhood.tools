@@ -20,13 +20,9 @@ export class EventEmitter<E = string, D = any> extends ee3.EventEmitter<E, D> {
 	}
 }
 
-declare global {
-	export namespace ee3 {
-		export interface EventEmitter<E = string, D = any> {
-			removeListenerFunction(fn: (...args: D[]) => void, context?: any, once?: boolean): this
-			offFunction(fn: (...args: D[]) => void, context?: any, once?: boolean): this
-		}
-	}
-}
+
+
+type _EventEmitter = EventEmitter
+declare global { namespace ee4 { type EventEmitter = _EventEmitter } }
 
 

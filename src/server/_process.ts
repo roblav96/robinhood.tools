@@ -14,7 +14,7 @@ import * as cluster from 'cluster'
 import * as path from 'path'
 import * as moment from 'moment'
 import * as dotenv from 'dotenv'
-import * as ee3 from '../common/ee3'
+import * as ee4 from '../common/ee4'
 
 
 
@@ -36,7 +36,7 @@ process.DOMAIN = (DEVELOPMENT ? 'http://dev.' : 'https://') + process.env.npm_pa
 process.HOST = process.env.HOST || 'localhost'
 process.PORT = Number.parseInt(process.env.PORT) || 12300
 
-process.EE3 = new ee3.EventEmitter()
+process.EE4 = new ee4.EventEmitter()
 
 
 
