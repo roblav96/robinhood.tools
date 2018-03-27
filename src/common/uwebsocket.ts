@@ -1,13 +1,11 @@
 // 
 
-import * as eyes from 'eyes'
 import * as _ from 'lodash'
-import * as core from '../../common/core'
-import * as ee3 from '../../common/ee3'
+import * as ee3 from './ee3'
 
-import * as WebSocket from 'uws'
+import * as uws from 'uws'
 import * as url from 'url'
-import ticks from '../services/ticks'
+import ticks from './ticks'
 
 
 
@@ -22,13 +20,10 @@ export default class uWebSocket extends ee3.EventEmitter<'open' | 'close' | 'err
 		})
 	}
 
-	get name() {
-		let parsed = url.parse(this.address)
-		// return parsed.hostname + parsed.path
-		return 'ws:/' + parsed.path
-	}
+	get name() { return 'ws:/' + url.parse(this.address).path }
 
 	constructor(
+		private adapter: typeof uws | WebSocket,
 		public address: string,
 		public options = {} as Partial<typeof uWebSocket.defaults>,
 	) {
@@ -38,7 +33,7 @@ export default class uWebSocket extends ee3.EventEmitter<'open' | 'close' | 'err
 		this.connect()
 	}
 
-	private _socket: WebSocket
+	private _socket: uws & WebSocket
 	get OPEN() { return this._socket.OPEN }
 	get CLOSED() { return this._socket.CLOSED }
 
@@ -76,7 +71,7 @@ export default class uWebSocket extends ee3.EventEmitter<'open' | 'close' | 'err
 	reconnect: (() => void) & _.Cancelable
 	connect() {
 		this.terminate()
-		this._socket = new WebSocket(this.address)
+		this._socket = new (this.adapter as any)(this.address)
 		this._socket.on('open', this._onopen)
 		this._socket.on('close', this._onclose)
 		this._socket.on('error', this._onerror)

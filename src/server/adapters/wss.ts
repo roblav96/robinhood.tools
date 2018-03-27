@@ -10,14 +10,35 @@ import fastify from '../fastify'
 
 
 const wss = new uws.Server({
-	host: 'localhost',
-	port: process.PORT + process.INSTANCE,
-	path: 'websocket',
+	noServer: true,
+	server: fastify.server,
+})
+
+const onmessage = function(this: uws, message: string) {
+
+}
+
+wss.on('connection', function(socket) {
+	console.info('socket ->')
+	eyes.inspect(socket)
+	socket.on('message', onmessage)
+})
+
+wss.on('error', function(error) {
+	console.error('onerror Error ->', error)
 })
 
 export default wss
 
 
+
+
+
+// declare module 'fastify' {
+// 	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
+// 		wss: uws.Server
+// 	}
+// }
 
 
 

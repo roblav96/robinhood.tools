@@ -27,14 +27,14 @@ if (process.MASTER) {
 		_.delay(function(i: number) {
 			let worker = cluster.fork({ WORKER_INSTANCE: i })
 			workers[worker.process.pid] = i
-		}, 1000, i)
+		}, DEVELOPMENT ? 5000 : 1000, i)
 	})
 
 }
 
 
 
-import './services/ticks'
+import '../common/ticks'
 import './services/radio'
 
 if (process.WORKER) {

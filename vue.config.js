@@ -25,7 +25,6 @@ module.exports = {
 	configureWebpack: function(config) {
 		config.entry.app = './src/client/main.ts'
 		_.unset(config.node, 'process') // required for `got` http client
-
 		if (DEVELOPMENT) {
 			config.devtool = 'source-map'
 			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/]))
@@ -35,10 +34,6 @@ module.exports = {
 				})
 			})
 		}
-
-		// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-		// config.plugins.push(new BundleAnalyzerPlugin())
-
 	},
 
 	chainWebpack: function(config) {

@@ -5,24 +5,25 @@ import * as _ from 'lodash'
 import * as core from '../../common/core'
 import * as ee3 from '../../common/ee3'
 
-import * as WebSocket from 'uws'
-import uWebSocket from '../adapters/uwebsocket'
+import * as uws from 'uws'
+import uWebSocket from '../../common/uwebsocket'
 
 
 
 const PATH = 'radio'
 const PORT = process.PORT - 1
+const ADDRESS = 'ws://localhost:' + PORT + '/' + PATH
 
 if (process.MASTER) {
 
-	const wss = new WebSocket.Server({
+	const wss = new uws.Server({
 		path: PATH, port: PORT,
 		verifyClient(incoming, next) {
 			next(incoming.req.headers['host'] == 'localhost')
 		},
 	})
 
-	const onmessage = function(this: WebSocket, message: string) {
+	const onmessage = function(this: uws, message: string) {
 		if (message == '_onopen_') {
 			if (wss.clients.length > process.INSTANCES) {
 				wss.broadcast(JSON.stringify({ event: '_onready_', clients: wss.clients.length }))
@@ -32,25 +33,21 @@ if (process.MASTER) {
 		wss.broadcast(message)
 	}
 
-	wss.on('connection', function(client) {
-		client.on('message', onmessage)
-		// _.delay(function() { client.close() }, 3000)
+	wss.on('connection', function(socket) {
+		socket.on('message', onmessage)
 	})
 
 	wss.on('error', function(error) {
-		console.error('uws Server Error ->', error)
+		console.error('onerror Error ->', error)
 	})
 
 }
 
 
 
-const ADDRESS = 'ws://localhost:' + PORT + '/' + PATH
-
-// export default new class Radio extends ee3.EventEmitter<'_onopen_' | '_onready_'> {
 export default new class Radio extends ee3.EventEmitter {
 
-	private _socket = new uWebSocket(ADDRESS, { verbose: true, retrytimeout: 1000 })
+	private _socket = new uWebSocket(uws, ADDRESS, { verbose: true, retrytimeout: 1000 })
 
 	constructor() {
 		super()
@@ -66,10 +63,6 @@ export default new class Radio extends ee3.EventEmitter {
 				}
 				return
 			}
-			// if ((message as any) == '_onready_') {
-			// 	super.emit('_onready_')
-			// 	return
-			// }
 			super.emit(message.event, message.data)
 		})
 	}

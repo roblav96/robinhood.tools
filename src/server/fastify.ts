@@ -3,26 +3,40 @@
 import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../common/core'
-import * as security from '../common/security'
 
 import * as http from 'http'
 import * as Fastify from 'fastify'
-import * as pino from 'pino'
+import * as uws from 'uws'
 import * as cors from 'cors'
 import * as boom from 'boom'
 import * as cookie from 'cookie'
-import * as got from 'got'
-import * as redis from './adapters/redis'
-import radio from './services/radio'
 
 
 
 const fastify = Fastify<http.Server, http.IncomingMessage, http.ServerResponse>({
-	// logger: { level: 'info', prettyPrint: { forceColor: true, levelFirst: true, }, },
+	// logger: { level: 'error', prettyPrint: { forceColor: true, levelFirst: true } },
 })
 export default fastify
 
+
+
 fastify.register(require('fastify-cookie'), error => { if (error) console.error('fastify-cookie Error ->', error); })
+
+import radio from './services/radio'
+fastify.register(function(instance, opts, next) {
+	fastify.decorate('radio', radio)
+	radio.once('_onready_', next)
+})
+
+import wss from './adapters/wss'
+fastify.register(function(instance, opts, next) {
+	instance.radio.removeListenerFunction
+	fastify.decorate('wss', wss)
+	fastify.addHook('onClose', function(fastify, done) {
+		wss.close(done)
+	})
+	next()
+})
 
 
 
@@ -31,7 +45,7 @@ fastify.setNotFoundHandler(async function(request, reply) {
 })
 
 fastify.setErrorHandler(async function(error: boom & { validation: any }, request, reply) {
-	console.error('fastify setErrorHandler Error ->', error)
+	console.error('setErrorHandler Error ->\n', _.omit(error, 'stack'))
 	if (Array.isArray(error.validation)) {
 		let validation = error.validation[0]
 		error = boom.preconditionFailed('Parameter `' + validation.dataPath.substr(1) + '` ' + validation.message) as any
@@ -59,20 +73,9 @@ import './apis/search.api'
 
 
 fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
-	if (error) return console.error('fastify listen Error ->', error);
+	if (error) return console.error('listen Error ->', error);
 	if (process.PRIMARY) console.info(fastify.server.address().address + ':' + fastify.server.address().port, '\n', fastify.printRoutes());
 })
-
-
-
-radio.once('_onopen_', function () {
-	console.warn('onopen')
-})
-radio.once('_onready_', function () {
-	console.warn('onready')
-})
-
-
 
 
 
@@ -85,6 +88,10 @@ declare global {
 }
 
 declare module 'fastify' {
+	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
+		radio: ee3.EventEmitter
+		wss: uws.Server
+	}
 	interface FastifyRequest<HttpRequest> {
 		cookies: Dict<string>
 		authed: boolean

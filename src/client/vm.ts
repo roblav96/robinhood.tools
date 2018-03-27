@@ -9,3 +9,8 @@ import App from '@/client/app/app'
 export default new App({ router, store }).$mount('#app')
 
 
+
+import ticks from '@/common/ticks'
+console.log('ticks ->', ticks)
+
+

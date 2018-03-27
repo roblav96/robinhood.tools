@@ -1,22 +1,20 @@
 // 
 
-import * as eyes from 'eyes'
 import * as _ from 'lodash'
-import * as core from '../../common/core'
-import * as ee3 from '../../common/ee3'
+import * as core from './core'
+import * as ee3 from './ee3'
+import * as enums from './enums'
 import * as ci from 'correcting-interval'
-import * as utils from './utils'
-import * as enums from '../../common/enums'
 
 
 
-// ████  evenly distributed ticks based on number of workers in cluster  ████
 const EE3 = new ee3.EventEmitter<string, number>()
 
 const ee3ts = {} as Dict<NodeJS.Timer>
 const ee3is = {} as Dict<number>
 function ee3start(topic: string, ms: number) {
-	ee3ts[topic].unref(); clearTimeout(ee3ts[topic]); ee3ts[topic] = null; _.unset(ee3ts, topic);
+	if (core.isNodejs) ee3ts[topic].unref();
+	clearTimeout(ee3ts[topic]); ee3ts[topic] = null; _.unset(ee3ts, topic);
 	ee3is[topic] = 0
 	ci.setCorrectingInterval(function() {
 		ee3is[topic]++
@@ -36,7 +34,7 @@ setImmediate(function() {
 		let now = Date.now()
 		let start = now - (now % ms)
 		let end = start + ms
-		let ims = utils.instanceMs(ms)
+		let ims = core.isNodejs ? Math.round(Math.max(process.INSTANCE, 0) * (ms / Math.max(process.INSTANCES, 1))) : ms
 		let delayms = (start + ims) - now
 		if (delayms <= 0) delayms = (end + ims) - now;
 		ee3ts[topic] = _.delay(ee3start, delayms, topic, ms) as any

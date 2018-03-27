@@ -5,10 +5,10 @@ import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
 import * as pretty from '../../common/pretty'
+import ticks from '../../common/ticks'
 
 import * as dts from 'dts-gen'
 import * as clipboardy from 'clipboardy'
-import ticks from './ticks'
 
 
 
