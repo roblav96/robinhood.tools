@@ -17,25 +17,21 @@ const wss = new uws.Server({
 	// noServer: true,
 	// server: fastify.server,
 	verifyClient(incoming, next) {
-		console.info('incoming.req.headers ->')
-		eyes.inspect(incoming.req.headers)
+		// console.info('incoming.req.headers ->')
+		// eyes.inspect(incoming.req.headers)
 		next(true)
 	},
 })
 
 wss.on('listening', function(this: uws.Server) {
-	console.info('listening ->', this.httpServer.address())
+	// console.info('listening ->', this.httpServer.address())
 	this.startAutoPing(3000, 'ping')
 })
 
-const onmessage = function(this: uws, message: string) {
-
-}
-
 wss.on('connection', function(socket) {
-	console.info('socket ->')
-	eyes.inspect(socket)
-	socket.on('message', onmessage)
+	socket.on('message', function (message: string) {
+		console.log('message ->', message)
+	})
 })
 
 wss.on('error', function(error) {

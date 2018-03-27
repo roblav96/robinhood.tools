@@ -17,7 +17,7 @@ declare module 'uws' {
 }
 
 declare global {
-	interface WebSocket extends uws { }
+	// interface WebSocket extends uws { }
 	namespace NodeJS { interface Global { WebSocket: uws & WebSocket } }
 }
 

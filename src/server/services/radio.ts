@@ -11,8 +11,8 @@ import uWebSocket from '../../common/uwebsocket'
 
 
 const HOST = '127.0.0.1'
-const PATH = 'radio'
 const PORT = process.PORT - 1
+const PATH = 'radio'
 const ADDRESS = 'ws://' + HOST + ':' + PORT + '/' + PATH
 
 if (process.MASTER) {
@@ -29,24 +29,20 @@ if (process.MASTER) {
 		console.error('wss.on Error ->', error)
 	})
 
-	wss.on('connection', function(this: uws.Server, socket) {
-		socket.on('message', onmessage)
-		socket.on('error', onerror)
-	})
-
-	const onmessage = function(this: uws, message: string) {
-		if (message == '_onopen_') {
-			if (wss.clients.length > process.INSTANCES) {
-				wss.broadcast('_onready_')
+	wss.on('connection', function(socket) {
+		socket.on('message', function(message: string) {
+			if (message == '_onopen_') {
+				if (wss.clients.length > process.INSTANCES) {
+					wss.broadcast('_onready_')
+				}
+				return
 			}
-			return
-		}
-		wss.broadcast(message)
-	}
-
-	const onerror = function(this: uws, error: Error) {
-		console.error('socket.on Error ->', error)
-	}
+			wss.broadcast(message)
+		})
+		socket.on('error', function(error) {
+			console.error('socket.on Error ->', error)
+		})
+	})
 
 }
 
@@ -56,7 +52,7 @@ class Radio extends ee4.EventEmitter {
 
 	private _socket = new uWebSocket(ADDRESS, {
 		startdelay: process.MASTER ? 1 : -1,
-		// verbose: process.MASTER,
+		// verbose: true, // process.MASTER,
 	})
 
 	private _onopen = () => {

@@ -16,8 +16,11 @@ class Client {
 		verbose: true,
 	})
 
-	constructor(private address: string) {
-
+	constructor(
+		private address: string,
+		private index: number,
+	) {
+		
 	}
 
 }
@@ -33,7 +36,7 @@ class Socket extends ee4.EventEmitter {
 		super()
 		http.get<any, string[]>('/socket/addresses').then(addresses => {
 			this._addresses = addresses
-			this._clients = addresses.map(v => new Client(v))
+			this._clients = addresses.map((v, i) => new Client(v, i))
 		})
 	}
 

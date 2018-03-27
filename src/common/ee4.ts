@@ -6,6 +6,7 @@ import * as ee3 from 'eventemitter3'
 
 export class EventEmitter<E = string, D = any> extends ee3.EventEmitter<E, D> {
 	removeListenerFunction(fn: (...args: D[]) => void, context?: any, once?: boolean) {
+		console.log('before this._events ->', this._events)
 		this.eventNames().forEach(event => {
 			this.listeners(event).forEach(listener => {
 				if (fn == listener) {
@@ -13,6 +14,7 @@ export class EventEmitter<E = string, D = any> extends ee3.EventEmitter<E, D> {
 				}
 			})
 		})
+		console.log('after this._events ->', this._events)
 		return this
 	}
 	offFunction(fn: (...args: D[]) => void, context?: any, once?: boolean) {

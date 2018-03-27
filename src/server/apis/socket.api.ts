@@ -19,8 +19,6 @@ fastify.route({
 		for (i = 0; i < len; i++) {
 			addresses.push(domain + '/websocket/' + i)
 		}
-		console.info('addresses ->')
-		eyes.inspect(addresses)
 		return addresses
 	},
 })

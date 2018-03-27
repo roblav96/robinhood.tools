@@ -9,12 +9,12 @@ import ticks from './ticks'
 
 
 
-export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'error' | 'message' | 'ping' | 'pong'> {
+export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'error' | 'message'> {
 
 	private static get defaults() {
 		return _.clone({
 			autoreconnect: true,
-			retrytimeout: DEVELOPMENT ? 5000 : 1000,
+			retrytimeout: DEVELOPMENT ? 3000 : 1000,
 			startdelay: -1,
 			heartrate: ticks.T10,
 			verbose: false,
@@ -34,20 +34,18 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	}
 
 	private _socket: WebSocket & uws
-	get OPEN() { return this._socket.OPEN }
-	get CLOSED() { return this._socket.CLOSED }
+	get isopen() { return this._socket && this._socket.readyState == this._socket.OPEN }
 
 	json(data: object) { this.send(JSON.stringify(data)) }
-	send(message: string) { this._socket.send(message, this._sent) }
+	send(message: string) {
+		if (process.CLIENT) this._socket.send(message);
+		if (process.SERVER) this._socket.send(message, this._sent);
+	}
 	private _sent = (error?: Error) => {
-		if (error) console.error(this.name, 'onerror Error ->', error.message || error);
+		if (error) console.error(this.name, '_sent Error ->', error);
 	}
 
-	ping(message?: string) {
-		this._socket.ping(message)
-	}
-
-	close(code?: number, reason?: string) {
+	close(code = 1000, reason?: string) {
 		this._socket.close(code, reason)
 	}
 
@@ -63,8 +61,10 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 		ticks.EE4.removeListenerFunction(this._heartbeat)
 		if (!this._socket) return;
 		this._socket.close()
-		this._socket.terminate()
-		this._socket.removeAllListeners()
+		if (process.SERVER) {
+			this._socket.terminate()
+			this._socket.removeAllListeners()
+		}
 		this._socket = null
 	}
 
@@ -72,68 +72,47 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	connect() {
 		this.terminate()
 		this._socket = new WebSocket(this.address) as any
-		if (process.SERVER) {
-			this._socket.on('open', this._onopen)
-			this._socket.on('close', this._onclose)
-			this._socket.on('error', this._onerror)
-			this._socket.on('message', this._onmessage)
-			this._socket.on('ping', this._onping)
-			this._socket.on('pong', this._onpong)
-		}
-		if (process.CLIENT) {
-			this._socket.addEventListener('open', this._onopen)
-			this._socket.addEventListener('close', this._onclose)
-			this._socket.addEventListener('error', this._onerror)
-			this._socket.addEventListener('message', this._onmessage)
-			this._socket.addEventListener('ping', this._onping)
-			this._socket.addEventListener('pong', this._onpong)
-		}
-		// this._socket.onopen = this._onopen
-		// this._socket.onclose = this._onclose
-		// this._socket.onerror = this._onerror
-		// this._socket.onmessage = this._onmessage
-		// this._socket.onping = this._onping
-		// this._socket.onpong = this._onpong
+		this._socket.onopen = this._onopen as any
+		this._socket.onclose = this._onclose as any
+		this._socket.onerror = this._onerror as any
+		this._socket.onmessage = this._onmessage as any
 		this.reconnect()
 	}
+	private _reboot() {
+		ticks.EE4.removeListenerFunction(this._heartbeat)
+		if (this.options.autoreconnect) this.reconnect();
+		else this.destroy();
+	}
 
-	private _onopen = (event) => {
-		if (this.options.verbose) console.info(this.name, 'onopen ->', event);
+	private _onopen = (event: Event) => {
+		if (this.options.verbose) console.info(this.name, 'onopen ->', process.CLIENT ? event : '');
 		ticks.EE4.addListener(this.options.heartrate, this._heartbeat)
 		this.reconnect.cancel()
 		this.emit('open')
 	}
 
-	private _onclose = (code?: number, reason?: string) => {
-		if (this.options.verbose) console.warn(this.name, 'onclose ->', code, reason);
-		this.emit('close', code, reason)
-		if (!this.options.autoreconnect) {
-			return this.destroy()
-		}
-		this.reconnect()
+	private _onclose = (event: CloseEvent) => {
+		if (this.options.verbose) console.warn(this.name, 'onclose ->', event.code, event.reason);
+		this.emit('close', event.code, event.reason)
+		this._reboot()
 	}
 
 	private _onerror = (error: Error) => {
 		if (this.options.verbose) console.error(this.name, 'onerror Error ->', error.message || error);
 		this.emit('error', error)
+		// this._reboot()
 	}
 
-	private _onmessage = (message: string) => {
+	private _onmessage = (event: MessageEvent) => {
+		let message = event.data as string
+		if (message == 'pong') return;
+		if (message == 'ping') return this.send('pong');
 		if (this.options.verbose) console.log(this.name, 'onmessage ->', message);
 		this.emit('message', message)
 	}
 
-	private _onping = (message: string) => {
-		if (this.options.verbose) console.log(this.name, 'onping ->', message);
-		this.emit('ping', message)
-	}
-	private _onpong = (message: string) => {
-		if (this.options.verbose) console.log(this.name, 'onpong ->', message);
-		this.emit('pong', message)
-	}
-
 	private _heartbeat = () => {
-		if (this._socket) this._socket.ping();
+		if (this.isopen) this.send('ping');
 		else ticks.EE4.removeListenerFunction(this._heartbeat);
 	}
 
@@ -141,10 +120,12 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 
 
 
+
+
+
+
 // type uWebSocketOptions = typeof uWebSocket.options
 // interface uWebSocket extends uWebSocketOptions { }
 // class uWebSocket extends WebSocket {
-
-
 
 
