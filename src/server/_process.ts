@@ -12,9 +12,9 @@ import * as _ from 'lodash'
 import * as os from 'os'
 import * as cluster from 'cluster'
 import * as path from 'path'
-import * as ee3 from 'eventemitter3'
 import * as moment from 'moment'
 import * as dotenv from 'dotenv'
+import * as ee3 from '../common/ee3'
 
 
 
@@ -64,15 +64,12 @@ console.format = function(args) {
 
 
 
-const reason = chalk.bold('https://github.com/mcollina/make-promises-safe')
 process.once('uncaughtException', function(error) {
 	console.error(chalk.bold.underline.redBright('UNCAUGHT EXCEPTION'), '\n', error)
-	process.stdout.write(`\n${reason}\n`)
-	process.exit(1)
 })
 process.once('unhandledRejection', function(error) {
 	console.error(chalk.bold.underline.redBright('UNHANDLED REJECTION'), '\n', error)
-	process.stdout.write(`\n${reason}\n`)
+	process.stdout.write(`\n${chalk.bold('https://github.com/mcollina/make-promises-safe')}\n\n`)
 	process.exit(1)
 })
 

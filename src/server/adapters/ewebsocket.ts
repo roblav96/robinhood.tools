@@ -3,8 +3,8 @@
 import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
+import * as ee3 from '../../common/ee3'
 
-import * as ee3 from 'eventemitter3'
 import * as uws from 'uws'
 import * as url from 'url'
 import ticks from '../services/ticks'

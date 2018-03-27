@@ -3,34 +3,38 @@
 import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
+import * as ee3 from '../../common/ee3'
 
-// global.WebSocket = require('uws')
-// import * as Sockette from 'sockette'
 import * as WebSocket from 'uws'
-import * as ee3 from 'eventemitter3'
-import * as utils from './utils'
-import ticks from './ticks'
-// import EWebSocket from '../adapters/ewebsocket'
+import uWebSocket from '../adapters/uwebsocket'
 
 
 
 const PATH = 'radio'
 const PORT = process.PORT - 1
-const ADDRESS = 'ws://localhost:' + PORT + '/' + PATH
 
 if (process.MASTER) {
 
 	const wss = new WebSocket.Server({
 		path: PATH, port: PORT,
-		verifyClient(incoming) {
-			return incoming.req.headers['host'] == 'localhost'
+		verifyClient(incoming, next) {
+			next(incoming.req.headers['host'] == 'localhost')
 		},
 	})
 
+	const onmessage = function(this: WebSocket, message: string) {
+		if (message == '_onopen_') {
+			if (wss.clients.length > process.INSTANCES) {
+				wss.broadcast(JSON.stringify({ event: '_onready_', clients: wss.clients.length }))
+			}
+			return
+		}
+		wss.broadcast(message)
+	}
+
 	wss.on('connection', function(client) {
-		client.on('message', function(message: string) {
-			wss.clients.forEach(function(v) { v.send(message) })
-		})
+		client.on('message', onmessage)
+		// _.delay(function() { client.close() }, 3000)
 	})
 
 	wss.on('error', function(error) {
@@ -41,48 +45,56 @@ if (process.MASTER) {
 
 
 
-// class uWebSocket extends ee3.EventEmitter<keyof typeof uWebSocket.events> {
-type uWebSocketOptions = typeof uWebSocket.options
-interface uWebSocket extends uWebSocketOptions { }
-class uWebSocket extends WebSocket {
+const ADDRESS = 'ws://localhost:' + PORT + '/' + PATH
 
-	static readonly events = {
-		open: 'open',
-		close: 'close',
-		error: 'error',
-		message: 'message',
-		ping: 'ping',
-		pong: 'pong',
-	}
+// export default new class Radio extends ee3.EventEmitter<'_onopen_' | '_onready_'> {
+export default new class Radio extends ee3.EventEmitter {
 
-	static get options() {
-		return _.clone({
-			autoreconnect: true,
-			autotimeout: 3000,
-			heartrate: ticks.T5,
-			verbose: false,
+	private _socket = new uWebSocket(ADDRESS, { verbose: true, retrytimeout: 1000 })
+
+	constructor() {
+		super()
+		this._socket.once('open', () => {
+			super.emit('_onopen_')
+			this._socket.send('_onopen_')
+		})
+		this._socket.on('message', (message: Radio.Message) => {
+			message = JSON.parse(message as any)
+			if (message.event == '_onready_') {
+				if (message.clients > process.INSTANCES) {
+					super.emit('_onready_')
+				}
+				return
+			}
+			// if ((message as any) == '_onready_') {
+			// 	super.emit('_onready_')
+			// 	return
+			// }
+			super.emit(message.event, message.data)
 		})
 	}
 
-	constructor(
-		public address: string,
-		public options = {} as Partial<typeof uWebSocket.options>,
-	) {
-		super(address)
-		_.defaults(this.options, uWebSocket.options)
-		console.info('this.options ->')
-		eyes.inspect(this.options)
-		// super(address, _.merge(options, _.merge(uWebSocket.defaults, options)))
-		// console.info('this.options ->')
-		// eyes.inspect(this.options)
-		// ticks.EE3.addListener(this.options.heartrate, i => this.ping(i))
-		// let socket = new WebSocket(address, { headers: { xid: 'randomxid' } })
-
+	emit(event: string, data?: any) {
+		return !!this._socket.json({ event, data } as Radio.Message)
 	}
 
 }
 
-export default new uWebSocket(ADDRESS)
+
+
+
+
+declare global {
+	namespace Radio {
+		interface Message<T = any> {
+			event: string
+			data?: T
+			clients?: number
+		}
+	}
+}
+
+
 
 
 

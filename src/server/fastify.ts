@@ -13,6 +13,7 @@ import * as boom from 'boom'
 import * as cookie from 'cookie'
 import * as got from 'got'
 import * as redis from './adapters/redis'
+import radio from './services/radio'
 
 
 
@@ -60,6 +61,15 @@ import './apis/search.api'
 fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 	if (error) return console.error('fastify listen Error ->', error);
 	if (process.PRIMARY) console.info(fastify.server.address().address + ':' + fastify.server.address().port, '\n', fastify.printRoutes());
+})
+
+
+
+radio.once('_onopen_', function () {
+	console.warn('onopen')
+})
+radio.once('_onready_', function () {
+	console.warn('onready')
 })
 
 

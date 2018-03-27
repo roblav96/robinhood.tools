@@ -3,21 +3,21 @@
 import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
+import * as ee3 from '../../common/ee3'
 import * as ci from 'correcting-interval'
-import * as ee3 from 'eventemitter3'
 import * as utils from './utils'
 import * as enums from '../../common/enums'
 
 
 
-// ████  evenly distributed ticks for an interval based on number of workers in cluster  ████
+// ████  evenly distributed ticks based on number of workers in cluster  ████
 const EE3 = new ee3.EventEmitter<string, number>()
 
 const ee3ts = {} as Dict<NodeJS.Timer>
 const ee3is = {} as Dict<number>
 function ee3start(topic: string, ms: number) {
 	ee3ts[topic].unref(); clearTimeout(ee3ts[topic]); ee3ts[topic] = null; _.unset(ee3ts, topic);
-	ee3is[topic] = -1
+	ee3is[topic] = 0
 	ci.setCorrectingInterval(function() {
 		ee3is[topic]++
 		EE3.emit(topic, ee3is[topic])
