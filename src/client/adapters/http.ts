@@ -12,22 +12,27 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 	return Promise.resolve().then(function() {
 		config.json = true
 
-		if (config.corsproxy) {
+		if (config.iscors) {
 			config.body = core.json.clone(config)
-			return got.post(process.DOMAIN + '/api/proxy', config as any).then(({ body }) => body)
+			config.method = 'POST'
+			config.url = '/cors'
 		}
 
-		config.timeout = config.timeout || 10000
-		config.retries = config.retries || 9
-		config.silent = config.silent || PRODUCTION
+		_.defaults(config, {
+			timeout: 10000,
+			retries: 9,
+			silent: PRODUCTION,
+			headers: {},
+		} as Http.RequestConfig)
+
 		if (!config.silent) {
 			let ending = (config.query || config.body) ? ' ➤ ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
 			console.log('➤ ' + config.method + ' ' + config.url + ending);
 		}
 
+		_.defaults(config.headers, security.headers())
+
 		if (config.url[0] == '/') {
-			config.headers = config.headers || {}
-			_.defaults(config.headers, security.headers())
 			config.url = process.DOMAIN + '/api' + config.url
 		}
 
@@ -45,14 +50,14 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 		vm.$toast.open({ message: url + ' ➤ ' + message, type: 'is-danger' })
 
 		return Promise.reject(message)
+
 	})
 
 }
 
-export function get<Q = any, T = any>(url: string, query?: Q, config = {} as Partial<Http.RequestConfig>): Promise<T> {
+export function get<T = any>(url: string, config = {} as Partial<Http.RequestConfig>): Promise<T> {
 	config.url = url
 	config.method = 'GET'
-	if (query) config.query = query;
 	return request(config)
 }
 
@@ -73,7 +78,7 @@ declare global {
 			url: string
 			query: any
 			silent: boolean
-			corsproxy: boolean
+			iscors: boolean
 		}
 	}
 }

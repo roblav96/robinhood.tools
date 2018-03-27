@@ -6,6 +6,7 @@ import Vue from 'vue'
 import _ from 'lodash'
 import * as core from '@/common/core'
 import * as http from '@/client/adapters/http'
+import * as security from '@/client/services/security'
 
 
 
@@ -14,6 +15,18 @@ export default class extends Vue {
 
 	mounted() {
 		// if (DEVELOPMENT) setTimeout(() => this.query = 'nvda', 300);
+
+		security.EE4.once('ready', function() {
+			http.get('https://infoapi.webull.com/api/search/tickers2', {
+				query: { keys: 'nvda' },
+				iscors: true,
+			}).then(function(response) {
+				console.log('response ->', response)
+			}).catch(function(error) {
+				console.error('mounted Error ->', error)
+			})
+		})
+
 	}
 
 	busy = false

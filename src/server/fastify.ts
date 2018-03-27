@@ -22,6 +22,11 @@ export default fastify
 
 fastify.register(require('fastify-cookie'), error => { if (error) console.error('fastify-cookie Error ->', error); })
 
+// fastify.register(function(instance, opts, next) {
+// 	fastify.decorate('boom', boom)
+// 	next()
+// })
+
 import radio from './services/radio'
 fastify.register(function(instance, opts, next) {
 	fastify.decorate('radio', radio)
@@ -44,7 +49,7 @@ fastify.setNotFoundHandler(async function(request, reply) {
 })
 
 fastify.setErrorHandler(async function(error: boom & { validation: any }, request, reply) {
-	// console.error('setErrorHandler Error ->', (error as any).type, error.message, error.stack) // , _.omit(error, 'stack'))
+	// console.error('setErrorHandler Error ->') // , (error as any).type, error.message, error.stack) // , _.omit(error, 'stack'))
 	// eyes.inspect(_.omit(error, 'stack'))
 	if (Array.isArray(error.validation)) {
 		let validation = error.validation[0]
@@ -70,6 +75,7 @@ import './hooks/security.hook'
 
 import './apis/socket.api'
 import './apis/security.api'
+import './apis/cors.api'
 import './apis/recaptcha.api'
 import './apis/search.api'
 
@@ -93,6 +99,7 @@ declare global {
 
 declare module 'fastify' {
 	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
+		boom: typeof boom,
 		radio: Radio.radio
 		wss: uws.Server
 	}

@@ -8,10 +8,13 @@ import Fingerprint2 from 'fingerprintjs2'
 import pdelay from 'delay'
 import store from '@/client/store'
 import socket from '@/client/adapters/socket'
+import * as ee4 from '@/common/ee4'
 import * as security from '@/common/security'
 import * as http from '@/client/adapters/http'
 
 
+
+export const EE4 = new ee4.EventEmitter()
 
 const state = {
 	ready: false,
@@ -71,8 +74,10 @@ Promise.all([
 ]).then(function() {
 	return token()
 }).then(function() {
+	return socket.init()
+}).then(function() {
 	state.ready = true
-	socket.init()
+	EE4.emit('ready')
 })
 
 
