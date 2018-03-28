@@ -11,13 +11,16 @@ import ticks from './ticks'
 
 export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'error' | 'message'> {
 
-	private static readonly codes = {
-		1000: 'CLOSE_NORMAL',
-		1001: 'CLOSE_GOING_AWAY',
-		1002: 'CLOSE_PROTOCOL_ERROR',
-		1003: 'CLOSE_UNSUPPORTED',
-		1005: 'CLOSED_NO_STATUS',
-		1006: 'CLOSE_ABNORMAL',
+	private static readonly ecodes = {
+		1000: 'Normal',
+		1001: 'Going Away',
+		1002: 'Protocol Error',
+		1003: 'Unsupported',
+		1005: 'No Status',
+		1006: 'Abnormal',
+		1007: 'Unsupported Data',
+		1008: 'Policy Violation',
+		1009: 'Too Large',
 	}
 
 	private static get defaults() {
@@ -102,7 +105,7 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	}
 
 	private _onclose = (event: CloseEvent) => {
-		console.warn(this.name, 'onclose ->', uWebSocket.codes[event.code] || event.code, '->', event.reason)
+		console.warn(this.name, 'onclose ->', uWebSocket.ecodes[event.code] || event.code, '->', event.reason)
 		this.emit('close', event.code, event.reason)
 		ticks.removeListenerFunction(this._heartbeat)
 		if (this.options.autoreconnect) this.reconnect();
