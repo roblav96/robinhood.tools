@@ -13,7 +13,10 @@ import * as got from 'got'
 fastify.route({
 	method: 'POST',
 	url: '/api/cors',
-	handler: async function(this: FastifyInstance, request, reply) {
+	handler: async function(request, reply) {
+		console.info('this ->')
+		eyes.inspect(this)
+		this
 		if (!request.authed) throw boom.unauthorized();
 
 		let config = request.body

@@ -13,7 +13,7 @@ import * as http from './http'
 
 class Client {
 
-	private _socket = new uWebSocket(this.address, {
+	socket = new uWebSocket(this.address, {
 		query() { return qs.stringify(_.defaults(security.headers())) },
 		// verbose: true,
 	})
@@ -38,9 +38,21 @@ class Socket {
 
 	}
 
+	private _cons: number
+	private _onopen = () => {
+		this._cons--
+		if (this._cons > 0) return;
+		console.log('socket clients ->', 'ready')
+	}
+
 	init = _.once(() => {
 		return http.get('/socket/addresses').then((addresses: string[]) => {
-			this._clients = addresses.map((v, i) => new Client(v, i))
+			this._cons = addresses.length
+			this._clients = addresses.map((v, i) => {
+				let client = new Client(v, i)
+				client.socket.once('open', this._onopen)
+				return client
+			})
 		})
 	})
 

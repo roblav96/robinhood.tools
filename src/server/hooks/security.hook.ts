@@ -5,15 +5,14 @@ import * as _ from 'lodash'
 import * as core from '../../common/core'
 
 import fastify from '../fastify'
-import * as boom from 'boom'
 import * as url from 'url'
 import * as redis from '../adapters/redis'
 import * as security from '../services/security'
 
 
 
-fastify.addHook('preHandler', async function preHandler(this: FastifyInstance, request, reply) {
-	
+fastify.addHook('preHandler', async function(request, reply) {
+
 	request.ip = security.getip(request.req)
 
 	request.doc = {

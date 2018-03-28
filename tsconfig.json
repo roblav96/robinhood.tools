@@ -5,6 +5,7 @@
 		"lib": ["dom", "esnext"],
 		"moduleResolution": "node",
 		"jsx": "preserve",
+		"noImplicitThis": true,
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
