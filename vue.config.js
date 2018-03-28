@@ -30,7 +30,8 @@ module.exports = {
 			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/]))
 			config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
 				rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
-					use.loader = 'file-loader'; _.unset(use.options, 'limit');
+					use.loader = 'file-loader'
+					_.unset(use.options, 'limit')
 				})
 			})
 		}
