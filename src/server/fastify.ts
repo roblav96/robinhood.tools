@@ -1,10 +1,12 @@
 // 
 
-if (process.MASTER) console.error('process.MASTER Error ->', process.MASTER);
-
 import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../common/core'
+
+if (process.MASTER) console.error('process.MASTER Error ->', process.MASTER); process.exit(1);
+
+
 
 
 
