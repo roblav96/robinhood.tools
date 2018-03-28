@@ -5,6 +5,7 @@ import './_process'
 import chalk from 'chalk'
 import * as eyes from 'eyes'
 import * as _ from 'lodash'
+import * as core from '../common/core'
 import * as cluster from 'cluster'
 
 
@@ -27,7 +28,7 @@ if (process.MASTER) {
 		_.delay(function(i: number) {
 			let worker = cluster.fork({ WORKER_INSTANCE: i })
 			workers[worker.process.pid] = i
-		}, DEVELOPMENT ? 5000 : 3000, i)
+		}, 3000, i)
 	})
 
 }

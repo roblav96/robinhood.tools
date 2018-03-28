@@ -182,7 +182,10 @@ export const json = {
 export const math = {
 	dispersed(value: number, index: number, max: number) {
 		return Math.round(index * (value / max))
-	}
+	},
+	random(min: number, max: number) {
+		return Math.floor(Math.random() * (max - min + 1)) + min
+	},
 }
 
 
