@@ -5,6 +5,8 @@ import * as _ from 'lodash'
 
 
 
+export function noop() { }
+
 export function isFalsey(value: any) {
 	if (value == null) return true;
 	if (string.is(value) && value === '') return true;
@@ -13,7 +15,8 @@ export function isFalsey(value: any) {
 }
 export function isTruthy(value: any) { return !isFalsey(value) }
 
-export function noop() { }
+export const isBrowser = !new Function('try { return this === global; } catch(e) { return false }')()
+export const isNodejs = !isBrowser
 
 
 

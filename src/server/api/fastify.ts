@@ -8,20 +8,11 @@ import * as core from '../../common/core'
 import logger from '../../common/logger'
 
 import * as Fastify from 'fastify'
-import * as Pino from 'pino'
 
 
 
-const fastify = Fastify({
-	logger,
-})
+const fastify = Fastify({ logger })
 export default fastify
-
-fastify.log.info('wtf info')
-
-
-
-// console.error('fastify Error ->', new Error('awesome error'))
 
 
 

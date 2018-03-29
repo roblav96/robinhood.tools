@@ -38,7 +38,8 @@ export function keys(name: string, value: any, skips = [] as string[]) {
 export function dtsgen(name: string, value: any) {
 	if (PRODUCTION || process.INSTANCE > 0) return;
 	name = _.startCase(name)
-	return clipboardy.write(dts.generateIdentifierDeclarationFile(name, value)).then(function() {
+	let defs = dts.generateIdentifierDeclarationFile(name, value)
+	return clipboardy.write(defs).then(function() {
 		console.info('dtsgen ->', chalk.bold(name))
 	}).catch(error => console.error('dtsgen Error ->', error))
 }
