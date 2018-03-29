@@ -28,17 +28,15 @@ const logger = Pino({
 			log.sourceUrl = log.sourceUrl.replace(process.cwd() + '/', '')
 			log.method = logger.levels.labels[log.level]
 
-			// console.log(`${chalk.bold.blueBright('████  formatter -> log  ████')}\n`, log)
-
 			if (log.msg) {
-				process.stdout.write(`\n\n${chalk.bold.red(`process.stdout.write log.msg ->`)}\n\n${log.msg}\n\n`)
 				log.msg = strip(log.msg)
+				process.stdout.write(`\n\n${chalk.bold.red(`process.stdout.write log.msg ->`)}\n\n${log.msg}\n\n`)
 			} else {
 				let i: number, len = 11
 				for (i = 0; i < len; i++) {
 					if (log[i]) {
-						process.stdout.write(`\n\n${chalk.bold.red(`process.stdout.write ${i} ->`)}\n\n${log[i]}\n\n`)
 						log[i] = strip(log[i])
+						process.stdout.write(`\n\n${chalk.bold.red(`process.stdout.write ${i} ->`)}\n\n${log[i]}\n\n`)
 					}
 				}
 			}
@@ -68,8 +66,8 @@ for (i = 0; i < len; i++) {
 	Object.assign(global._console, { [proxy]: global.console[proxy] })
 	Object.assign(global.console, {
 		[proxy](...args: string[]) {
-			logger[proxy].call(logger, [...args.map(eyes.stringify)])
-			// logger[proxy].call(logger, [...args.map(util.inspect as any)])
+			logger[proxy].call(logger, [...args.map(util.inspect as any)])
+			// logger[proxy].call(logger, [...args.map(eyes.stringify)])
 			// logger[proxy].call(logger, [...args])
 			if (process.env.INSPECTING) global._console[proxy](...args);
 			// // console.log('args ->', args)
