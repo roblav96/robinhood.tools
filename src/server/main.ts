@@ -1,8 +1,9 @@
 // 
 import '../common/polyfills'
 import 'source-map-support/register'
-import './_process'
+import './process'
 import '../common/logger'
+import './adapters/redis'
 // 
 
 import chalk from 'chalk'
@@ -29,6 +30,7 @@ if (process.MASTER && process.INSTANCES > 0) {
 		let worker = cluster.fork({ WORKER_INSTANCE: i })
 		workers[worker.process.pid] = i
 	}
+
 	// cluster.on('online', function(worker) { console.info('worker', workers[worker.process.pid], 'online') })
 	cluster.on('exit', function(worker, code, signal) {
 		let i = workers[worker.process.pid]

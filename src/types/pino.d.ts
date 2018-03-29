@@ -15,9 +15,10 @@ declare module 'pino' {
 	}
 	export type PrettyFormatter = (log: LogDescriptor, config: PrettyConfig) => string
 
-	export interface LogDescriptor {
+	export interface LogDescriptor extends Pretty.StackFrame {
+		method: string
+		release: string
 		instance: number
-		frame: Pretty.StackFrame
 	}
 
 	export interface PrettyConfig {

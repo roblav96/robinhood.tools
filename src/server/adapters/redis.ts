@@ -1,23 +1,23 @@
 //
 
-import * as util from 'util'
+import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
 
-import * as ioredis from 'ioredis'
+import * as IORedis from 'ioredis'
 
 
 
-class Redis extends ioredis {
+class Redis extends IORedis {
 
-	static getOpts(name: string, offset: number) {
+	private static options(name: string, offset: number) {
 		let opts = {
 			db: 0, dropBufferSupport: true,
 			host: process.env.REDIS_HOST || 'localhost',
 			port: (Number.parseInt(process.env.REDIS_PORT) || 6379) + offset,
 			password: process.env.REDIS_PASSWORD,
 			connectionName: '[' + process.INSTANCE + '][' + core.string.alphanumeric(process.NAME) + '][' + name + '][' + NODE_ENV + ']',
-		} as ioredis.RedisOptions
+		} as IORedis.RedisOptions
 
 		if (PRODUCTION) {
 			opts.path = '/var/run/redis_' + opts.port + '.sock'
@@ -28,7 +28,7 @@ class Redis extends ioredis {
 	}
 
 	constructor(name: string, offset: number) {
-		super(Redis.getOpts(name, offset))
+		super(Redis.options(name, offset))
 	}
 
 	fixpipeline(resolved: any[]) {
@@ -77,18 +77,24 @@ class Redis extends ioredis {
 export const main = new Redis('main', 0)
 export const pub = new Redis('pub', 0)
 export const sub = new Redis('sub', 0)
+export const logs = new Redis('logs', 0)
+
+
+
+process.emitLog = function emitLog(log) {
+	console.info('log ->', eyes.stringify(log))
+}
 
 
 
 
 
+import * as Pino from 'pino'
 declare global {
+	namespace NodeJS { export interface Process { emitLog: (log: Pino.LogDescriptor) => void } }
 	namespace Redis {
 		type Coms = string[][]
-		interface PublishEvent<T = any> {
-			name: string
-			data: T
-		}
+		interface Event<T = any> { name: string, data: T }
 	}
 }
 
