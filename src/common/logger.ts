@@ -18,11 +18,17 @@ const logger = Pino({
 			// console.log('log ->', log)
 			console.time('formatter')
 
-			// console.info('log[1] ->', eyes.stringify(log[1]))
-			// console.log('log[1] ->', util.inspect(log[1]))
-			console.info('log ->', eyes.stringify(log))
-
+			let frames = stacktrace.get()
+			let index = frames.findIndex(function(frame) {
+				let src = frame.getFileName() || frame.getScriptNameOrSourceURL() || frame.getEvalOrigin()
+				return src.includes('/dist/') && frame.getTypeName() == 'Console'
+			})
+			Object.assign(log, pretty.frame(frames[index + 1]))
+			log.sourceUrl = log.sourceUrl.replace(process.cwd() + '/', '')
 			log.method = logger.levels.labels[log.level]
+
+			// console.info(`${chalk.bold.redBright('████  formatter -> log  ████')}\n`, eyes.stringify(log))
+			console.log(`${chalk.bold.blueBright('████  formatter -> log  ████')}\n`, log)
 
 			if (log.msg) {
 				process.stdout.write(`\n\n${chalk.bold.red(`process.stdout.write log.msg ->`)}\n\n${log.msg}\n\n`)
@@ -35,32 +41,6 @@ const logger = Pino({
 				}
 			}
 
-			let frames = stacktrace.get()
-			let index = frames.findIndex(function(frame) {
-				let src = frame.getFileName() || frame.getScriptNameOrSourceURL() || frame.getEvalOrigin()
-				return src.includes('/dist/') && frame.getTypeName() == 'Console'
-			})
-			log.frame = pretty.frame(frames[index + 1])
-			log.functionName
-			// console.info('log.frame ->', eyes.stringify(log.frame))
-
-			// console.info('log ->', eyes.stringify(log))
-
-			// let frames = stacktrace.get().map(pretty.frame)
-			// console.info('frames ->', eyes.stringify(frames))
-
-			// let index = frames.findIndex(v => v.sourceUrl.includes('/dist/') && v.typeName == 'Console')
-			// log.frame = frames[index + 1]
-			// console.log('log.frame ->', log.frame)
-
-			// let fmap = { 'pinoWrite': -1, 'LOG': -1, 'EventEmitter': -1 }
-			// frames.forEach(function(v, i) {
-			// 	if (v.functionName == 'pinoWrite') fmap['pinoWrite'] = i;
-			// 	if (v.functionName == 'LOG') fmap['LOG'] = i;
-			// 	if (v.typeName == 'EventEmitter') fmap['EventEmitter'] = i;
-			// })
-			// log.frame = frames[(_.max(Object.values(fmap)) + 2)]
-
 			console.timeEnd('formatter')
 			return '\nformatter -> return string'
 
@@ -71,40 +51,45 @@ const logger = Pino({
 
 
 
-global._console = {} as typeof global.console
-declare global {
-	var _console: Console
-	interface WindowConsole { readonly _console: Console }
-	namespace NodeJS { export interface Global { _console: typeof console } }
+
+
+global._console = {} as typeof console
+declare global { var _console: Console; interface WindowConsole { readonly _console: Console } namespace NodeJS { export interface Global { _console: typeof console } } }
+
+// const proxies = ['log', 'info', 'warn', 'error']
+const proxies = ['error']
+let i: number, len = proxies.length
+for (i = 0; i < len; i++) {
+	let proxy = proxies[i]
+	Object.assign(global._console, { [proxy]: global.console[proxy] })
+	Object.assign(global.console, {
+		[proxy](...args) {
+			// console.log('args ->', args)
+			logger[proxy].call(logger, [...args.map(util.inspect as any)])
+			// logger[proxy].apply(logger, _.map(args, _.unary(wtf)))
+			// logger[proxy].apply(logger, ...args.map(wtf))
+			// logger[proxy].apply(logger, [eyes.stringify.apply(eyes.stringify, args)])
+			// logger[proxy].apply(logger, [util.format.call(util.format, Array.prototype.slice.call(args))])
+			// logger[proxy].apply(logger, [args])
+			// logger[proxy].apply(logger, [Array.prototype.slice.call(args).map(wtf)])
+			// logger[proxy].apply(logger, [util.inspect.call(util.inspect, args)])
+			// logger[proxy].apply(logger, [[...args].map(util.format)])
+			// logger[proxy].call(logger, [util.format.call(util.format, Array.prototype.slice.call(args))])
+			// logger[proxy].call(logger, [...args])
+			// logger[proxy].apply(logger, ...args.map(util.format))
+			if (process.env.INSPECTING) global._console[proxy](...args);
+			// logger[proxy].call(logger, [...args.map(util.inspect as any)])
+			// logger[proxy].apply(logger, [util.format.apply(util.format, Array.prototype.slice.call(args))])
+		},
+	})
 }
 
 
-
-{
-	// const proxies = ['log', 'info', 'warn', 'error']
-	const proxies = ['error']
-	let i: number, len = proxies.length
-	for (i = 0; i < len; i++) {
-		let proxy = proxies[i]
-		Object.assign(global._console, { [proxy]: global.console[proxy] })
-		Object.assign(global.console, {
-			[proxy](...args) {
-				// logger[proxy].call(logger, [util.format.call(util.format, ...args)])
-				// logger[proxy].apply(logger, [...args].map(util.inspect))
-				// logger[proxy].call(logger, [util.format.call(util.format, Array.prototype.slice.call(args))])
-				// logger[proxy].call(logger, [...args])
-				logger[proxy].call(logger, ...args.map(util.format))
-				if (process.env.INSPECTING) global._console[proxy](...args);
-				// logger[proxy].apply(logger, [util.format.apply(util.format, Array.prototype.slice.call(args))])
-			},
-		})
-	}
-}
 
 
 
 import * as boom from 'boom'
-let error = boom.internal(`An horrible internal error has occured! :(`)
+let error = boom.internal(`A horrible internal error has occured!!!`)
 
 function testLoggerError() {
 	console.time('console.error')
