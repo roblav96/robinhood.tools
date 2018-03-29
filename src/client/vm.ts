@@ -1,6 +1,7 @@
 // 
 
 import '@/common/ticks'
+// import '@/client/services/logger'
 import '@/client/services/security'
 import router from '@/client/router'
 import store from '@/client/store'

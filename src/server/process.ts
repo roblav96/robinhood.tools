@@ -63,14 +63,14 @@ _.merge(util.inspect, {
 
 
 process.once('uncaughtException', function(error) {
-	// console.error(chalk.bold.redBright('UNCAUGHT EXCEPTION'), '->\n', error)
-	process.stderr.write(`\n\n${chalk.bold.redBright('=============================== ERROR ================================')}`)
-	process.stderr.write(`\n${chalk.underline.bold.redBright('█ UNCAUGHT EXCEPTION')} ->\n${util.inspect(error)}`)
+	console.error(chalk.bold.redBright('UNCAUGHT EXCEPTION'), '->\n', error)
+	// process.stderr.write(`\n\n${chalk.bold.redBright('=============================== ERROR ================================')}`)
+	// process.stderr.write(`\n${chalk.underline.bold.redBright('█ UNCAUGHT EXCEPTION')} ->\n${util.inspect(error)}`)
 })
 process.once('unhandledRejection', function(error) {
-	// console.error(chalk.bold.redBright('UNHANDLED REJECTION'), '->\n', error)
-	process.stderr.write(`\n\n${chalk.bold.redBright('=============================== ERROR ================================')}`)
-	process.stderr.write(`\n${chalk.underline.bold.redBright('█ UNHANDLED REJECTION')} ->\n${util.inspect(error)}`)
+	console.error(chalk.bold.redBright('UNHANDLED REJECTION'), '->\n', error)
+	// process.stderr.write(`\n\n${chalk.bold.redBright('=============================== ERROR ================================')}`)
+	// process.stderr.write(`\n${chalk.underline.bold.redBright('█ UNHANDLED REJECTION')} ->\n${util.inspect(error)}`)
 	process.stdout.write(`\n${chalk.bold('https://github.com/mcollina/make-promises-safe')}\n\n`)
 	process.exit(1)
 })

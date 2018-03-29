@@ -12,9 +12,7 @@ import * as boom from 'boom'
 
 
 
-const fastify = Fastify({
-	logger
-})
+const fastify = Fastify({ logger })
 export default fastify
 
 

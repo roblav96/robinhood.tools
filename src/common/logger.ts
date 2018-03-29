@@ -1,14 +1,12 @@
 // 
 
 import chalk from 'chalk'
-import * as eyes from 'eyes'
 import * as util from 'util'
-import * as _ from 'lodash'
+import * as core from './core'
 import * as Pino from 'pino'
 import * as moment from 'moment'
-import * as stream from 'stream'
+import * as sourcemaps from 'source-map-support'
 import * as stacktrace from 'stack-trace'
-import * as pretty from './pretty'
 
 
 
@@ -18,17 +16,9 @@ const logger = Pino({
 	prettyPrint: {
 		// errorLikeObjectKeys: [],
 		formatter: (function(log, config) {
-			process.stdout.write('\n\nBEFORE log ->\n' + eyes.stringify(log))
+			// process.stdout.write(`\n\n${'formatter log'} ->\n${util.inspect(log)}`)
 			// console.time('formatter')
-
-			// let PRETTY_FRAMES = stacktrace.get().map(pretty.frame)
-			let offset = log.pconsole ? 3 : 2
-			let frames = stacktrace.get()
-			let index = frames.findIndex(v => v.getTypeName() == 'EventEmitter' && (v.getFileName() == 'pino' || v.getFunctionName() == 'pinoWrite')) || -offset
-			let PRETTY_FRAMES = frames.map(pretty.frame).splice(index + 1)
-			// console.info('PRETTY_FRAMES ->', PRETTY_FRAMES)
-			log.frame = pretty.frame(frames[index + offset])
-
+			
 			log.label = logger.levels.labels[log.level]
 			if (log.pconsole) log.label = log.pconsole.method;
 
@@ -38,9 +28,10 @@ const logger = Pino({
 			let square = chalk[color + 'Bright']('█')
 			if (log.label == 'error') color = color + 'Bright';
 
-			let srcpath = log.frame.sourceUrl.replace('src/server/', '')
-			let srcfile = log.frame.fileName + '.' + log.frame.fileExt
-			let meta = '[' + chalk.grey(srcpath.replace(srcfile, '') + chalk.bold[color](srcfile)) + ':' + chalk.bold(log.frame.line) + '' + chalk.grey('➤' + (log.frame.functionName || '') + '()') + ']'
+			log.stackframe = getStackFrame()
+			let srcpath = log.stackframe.sourceUrl.replace('src/server/', '')
+			let srcfile = log.stackframe.fileName + '.' + log.stackframe.fileExt
+			let meta = '[' + chalk.grey(srcpath.replace(srcfile, '') + chalk.bold[color](srcfile)) + ':' + chalk.bold(log.stackframe.line) + '' + chalk.grey('➤' + (log.stackframe.functionName || '') + '()') + ']'
 			let instance = '[' + chalk.gray(process.INSTANCE) + ']'
 			let stamp = moment(log.time).format('hh:mm:ss:SSS')
 			let header = square + meta + instance + chalk.gray('T-') + stamp
@@ -58,17 +49,13 @@ const logger = Pino({
 	},
 
 	serializers: {
-		'pconsole': function pconsole(pconsole: Pino.ConsoleLog) {
+		'pconsole': function pconsole(pconsole: Logger.ConsoleLog) {
 			// console.log('pconsole ->', pconsole)
 			return pconsole
 		},
 	},
 
 })
-
-// logger.addLevel('log', 25)
-
-
 
 
 
@@ -83,40 +70,86 @@ for (i = 0; i < len; i++) {
 	Object.assign(global._console, { [method]: global.console[method] })
 	Object.assign(global.console, {
 		[method](...args) {
-			global._console[method].apply(global._console, args)
+			// global._console[method].apply(global._console, args)
 			logger[(method == 'log' ? 'info' : method)].apply(logger, [{ pconsole: { method, args } }])
-			// try {
-			// 	logger[(method == 'log' ? 'info' : method)].apply(logger, [{ pconsole: { method, args } }])
-			// } catch (error) {
-			// 	console.error('console catch Error ->', error)
-			// 	global._console[method].apply(global._console, args)
-			// }
 		},
 	})
 }
-
-
-
-
 
 export default logger
 
 
 
-declare module 'pino' {
-	export interface ConsoleLog {
-		method: string
-		args: any[]
+function getStackFrame() {
+	let frames = stacktrace.get()
+	let index = frames.findIndex(function(frame) {
+		let isemitter = frame.getTypeName() == 'EventEmitter'
+		let ispino = frame.getFileName() == 'pino' || frame.getFunctionName() == 'pinoWrite'
+		return isemitter && ispino
+	})
+	let frame = parseStackFrame(frames[index + 2])
+	return frame
+}
+
+function parseStackFrame(frame: stacktrace.StackFrame) {
+	frame = sourcemaps.wrapCallSite(frame)
+	let parsed = {
+		sourceUrl: frame.getFileName() || frame.getScriptNameOrSourceURL() || frame.getEvalOrigin(),
+		fileName: null, fileExt: null,
+		line: frame.getLineNumber(),
+		column: frame.getColumnNumber(),
+		position: frame.getPosition(),
+		functionName: frame.getFunctionName(),
+		typeName: frame.getTypeName(),
+	} as Logger.StackFrame
+	if (parsed.sourceUrl) {
+		let fileSplit = parsed.sourceUrl.split('/').pop().split('.')
+		parsed.fileExt = fileSplit.pop()
+		parsed.fileName = fileSplit.join('.')
+		if (core.isNodejs) parsed.sourceUrl = parsed.sourceUrl.replace(process.cwd() + '/', '');
 	}
+	return parsed
+}
+
+
+
+
+
+declare global {
+	namespace Logger {
+		interface StackFrame { sourceUrl: string, fileName: string, fileExt: string, line: number, column: number, position: number, functionName: string, typeName: string }
+		interface ConsoleLog {
+			method: string
+			args: any[]
+		}
+	}
+}
+
+declare module 'pino' {
 	export interface LogDescriptor {
 		label: string
 		release: string
 		instance: number
-		frame: Pretty.StackFrame
-		pconsole: ConsoleLog
+		stackframe: Logger.StackFrame
+		pconsole: Logger.ConsoleLog
 		// error: typeof boom
 		[index: number]: any
 	}
 }
+
+
+
+
+
+// export function stackframes(frames: strace.StackFrame[]) {
+// 	return frames.map(function(frame) {
+// 		frame = sourcemaps.wrapCallSite(frame)
+// 		let dumped = {}
+// 		FRAME_PROTOS.forEach(function(proto) {
+// 			dumped[proto] = frame[proto]()
+// 		})
+// 		return dumped as Dict<keyof strace.StackFrame>
+// 	})
+// }
 
 
