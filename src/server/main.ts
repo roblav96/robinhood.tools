@@ -15,7 +15,7 @@ import * as cluster from 'cluster'
 
 
 
-// if (DEVELOPMENT) process.INSTANCES = 1;
+if (DEVELOPMENT) process.INSTANCES = 1;
 
 if (process.MASTER && process.INSTANCES > 0) {
 
@@ -33,7 +33,7 @@ if (process.MASTER && process.INSTANCES > 0) {
 		_.delay(function(i: number) {
 			let worker = cluster.fork({ WORKER_INSTANCE: i })
 			workers[worker.process.pid] = i
-		}, 5000, i)
+		}, 3000, i)
 	})
 
 }

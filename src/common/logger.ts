@@ -18,8 +18,7 @@ const logger = Pino({
 	prettyPrint: {
 		// errorLikeObjectKeys: [],
 		formatter: (function(log, config) {
-			// eyes.inspect(log, '\n\nBEFORE log ->')
-			// process.stdout.write('\n\nBEFORE log ->\n' + eyes.stringify(log))
+			process.stdout.write('\n\nBEFORE log ->\n' + eyes.stringify(log))
 			// console.time('formatter')
 
 			// let PRETTY_FRAMES = stacktrace.get().map(pretty.frame)
@@ -59,7 +58,7 @@ const logger = Pino({
 	},
 
 	serializers: {
-		'pconsole': function pconsoleSerializer(pconsole: Pino.ConsoleLog) {
+		'pconsole': function pconsole(pconsole: Pino.ConsoleLog) {
 			// console.log('pconsole ->', pconsole)
 			return pconsole
 		},
@@ -68,8 +67,6 @@ const logger = Pino({
 })
 
 // logger.addLevel('log', 25)
-
-logger.trace
 
 
 
@@ -86,8 +83,14 @@ for (i = 0; i < len; i++) {
 	Object.assign(global._console, { [method]: global.console[method] })
 	Object.assign(global.console, {
 		[method](...args) {
+			global._console[method].apply(global._console, args)
 			logger[(method == 'log' ? 'info' : method)].apply(logger, [{ pconsole: { method, args } }])
-			// global._console[method].apply(global._console, args)
+			// try {
+			// 	logger[(method == 'log' ? 'info' : method)].apply(logger, [{ pconsole: { method, args } }])
+			// } catch (error) {
+			// 	console.error('console catch Error ->', error)
+			// 	global._console[method].apply(global._console, args)
+			// }
 		},
 	})
 }
