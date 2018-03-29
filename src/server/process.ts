@@ -99,16 +99,21 @@ if (!process.env.INSPECTING) {
 
 
 
+
+
 if (process.MASTER) {
 	let blocks = '█████████████████' + '█████████████████████████████████████████████████████'
 	process.stdout.write(
-		'\n' +
+		'\n\n' +
 		chalk.magenta(blocks) + '\n' +
 		chalk.magentaBright('█') + ' ' + chalk.underline.bold(process.NAME) + '\n' +
 		chalk.magentaBright('█') + ' ' + NODE_ENV + '\n' +
 		chalk.magentaBright('█') + ' ' + process.HOST + ':' + process.PORT +
 		'\n'
 	)
+
 }
+
+
 
 

@@ -15,7 +15,7 @@ class Client {
 
 	socket = new uWebSocket(this.address, {
 		query() { return qs.stringify(_.defaults(security.headers())) },
-		// verbose: true,
+		verbose: true,
 	})
 
 	constructor(

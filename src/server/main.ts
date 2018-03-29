@@ -15,7 +15,7 @@ import * as cluster from 'cluster'
 
 
 
-if (DEVELOPMENT) process.INSTANCES = 0;
+if (DEVELOPMENT) process.INSTANCES = 1;
 
 if (process.MASTER && process.INSTANCES > 0) {
 

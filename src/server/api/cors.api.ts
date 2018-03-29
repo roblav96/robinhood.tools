@@ -14,7 +14,7 @@ fastify.route({
 	method: 'POST',
 	url: '/api/cors',
 	handler: async function(request, reply) {
-		console.info('this ->', util.inspect(this))
+		// console.info('this ->', util.inspect(this))
 		
 		if (!request.authed) throw boom.unauthorized();
 

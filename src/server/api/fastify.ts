@@ -8,11 +8,12 @@ import * as core from '../../common/core'
 import logger from '../../common/logger'
 
 import * as Fastify from 'fastify'
+import * as boom from 'boom'
 
 
 
 const fastify = Fastify({
-	// logger
+	logger
 })
 export default fastify
 
@@ -20,7 +21,13 @@ export default fastify
 
 
 
-
+let error = boom.internal(`A server crashing internal error has occured!!!`)
+function testLoggerError() {
+	// console.time('console.error')
+	console.warn('boom.internal Error ->', error, 'error.message ->', `"${error.message}"`, 'error.stack ->', error.stack)
+	// console.timeEnd('console.error')
+}
+testLoggerError()
 
 
 
@@ -35,7 +42,7 @@ declare module 'fastify' {
 
 
 
-import * as boom from 'boom'
+// import * as boom from 'boom'
 fastify.register(function(fastify, opts, next) {
 	fastify.decorate('boom', boom)
 	next()

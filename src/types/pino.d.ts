@@ -10,8 +10,6 @@ declare module 'pino' {
 		errorProps?: string[]
 		errorLikeObjectKeys?: string[]
 		localTime?: boolean
-		// formatter?(log: LogDescriptor, config?: any): string
-		// formatter(this: PrettyOptions, log: LogDescriptor, config: PrettyConfig): string
 	}
 	export type PrettyFormatter = (log: LogDescriptor, config: PrettyConfig) => string
 
@@ -19,6 +17,7 @@ declare module 'pino' {
 		method: string
 		release: string
 		instance: number
+		[index: number]: any
 	}
 
 	export interface PrettyConfig {
