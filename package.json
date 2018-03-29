@@ -9,6 +9,7 @@
 		"client:dev": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
 		"client:build": "rimraf dist/client && cross-env NODE_ENV=production vue-cli-service build --mode production",
 		"server:dev": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'cross-env NODE_ENV=development forever dist/server/main.js --colors'",
+		"server:inspect": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'cross-env NODE_ENV=development INSPECTING=true node --inspect dist/server/main.js'",
 		"server:build": "rimraf dist/server && tsc -p .server.tsconfig.json"
 	},
 	"dependencies": {
@@ -39,7 +40,6 @@
 		"p-forever": "latest",
 		"p-queue": "latest",
 		"pino": "latest",
-		"pino-caller": "latest",
 		"pretty-bytes": "latest",
 		"pretty-ms": "latest",
 		"repaintless": "latest",

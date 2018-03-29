@@ -1,38 +1,42 @@
 // 
 
-// import * as pcaller from 'pino-caller'
-// import * as devtools from '../server/services/devtools'
+import chalk from 'chalk'
 import * as eyes from 'eyes'
 import * as util from 'util'
+import * as _ from 'lodash'
 import * as Pino from 'pino'
 import * as moment from 'moment'
 import * as strace from 'stack-trace'
+import * as pretty from './pretty'
 
 
-
-function dumpstack(frames: strace.StackFrame[]) {
-	
-}
 
 const logger = Pino({
-	name: process.NAME,
+	// name: process.NAME,
 	prettyPrint: {
-		formatter: function(log, config) {
+		formatter: (function(log, config) {
 			console.log('log ->', log)
+			console.time('formatter')
+			let level = logger.levels.labels[log.level]
 
-			let method = logger.levels.labels[log.level]
-			// console.log('method ->', method)
-			// let stack = new Error('ohno')//.stack.toString().split('\n')
-			// console.log('stack ->', stack)
-			// stack = stack.replace(/^ {1}at /gm, '').split('\n')[1].trim()
-			// console.log('stack ->', stack)
-			let stackframes = strace.get()
-			let dumped = dumpstack(stackframes)
-			console.log('dumped ->', dumped)
+			// process.stdout.write(log[1])
 
-			return `\nreturn logger.prettyPrint.formatter -> string`
+			let fmap = { 'pinoWrite': -1, 'LOG': -1, 'EventEmitter': -1 }
+			let frames = strace.get().map(pretty.frame)
+			frames.forEach(function(v, i) {
+				if (v.functionName == 'pinoWrite') fmap['pinoWrite'] = i;
+				if (v.functionName == 'LOG') fmap['LOG'] = i;
+				if (v.typeName == 'EventEmitter') fmap['EventEmitter'] = i;
+			})
+			log.frame = frames[(_.max(Object.values(fmap)) + 2)]
+			// console.info('log.frame ->', eyes.stringify(log.frame))
+			console.info('log.frame ->', eyes.stringify(log.frame))
+			console.log('log.frame ->', log.frame)
 
-		} as Pino.PrettyFormatter,
+			console.timeEnd('formatter')
+			return '\nformatter -> return string'
+
+		} as Pino.PrettyFormatter) as any,
 		forceColor: true, levelFirst: true,
 	},
 })
@@ -40,24 +44,30 @@ const logger = Pino({
 
 
 
-// const proxied = new Proxy(logger, {
-// 	get(obj, key, receiver) {
-// 		console.log('obj ->', obj)
-// 		console.log('key ->', key)
-// 		console.log('receiver ->', receiver)
-// 		return obj[key]
-// 	},
-// })
-// proxied.info('proxied?')
-
-
-
-console.warn = function(...args) {
-	logger.warn.apply(logger, [util.format.apply(util.format, Array.prototype.slice.call(args))])
+{
+	// ['log', 'info', 'warn', 'error'].forEach(function(key) {
+	['error'].forEach(function(key) {
+		console[key] = function PROXY(...args: string[]) {
+			// logger[key].apply(logger, [util.format.apply(util.format, Array.prototype.slice.call(args))])
+			logger[key].apply(logger, [[...args].map(eyes.stringify)])
+			// logger[key].call(logger, [...args].map(eyes.stringify))
+		}
+	})
 }
 import * as boom from 'boom'
-let error = boom.internal(`Oh no, an awesome boom.internal error has occured!`)
-console.warn('boom.internal Error ->', error)
+function testerror() {
+	let error = boom.internal(`Oh no, an awesome boom.internal error has occured!`)
+	console.time('console.error')
+	console.error('boom.internal Error ->', error, 'boom.internal ->', boom.internal)
+	console.timeEnd('console.error')
+}
+testerror()
+
+
+
+// console.error = function(...args) {
+// 	logger.error.apply(logger, [util.format.apply(util.format, Array.prototype.slice.call(args))])
+// }
 
 
 
@@ -80,18 +90,6 @@ console.warn('boom.internal Error ->', error)
 // }
 // console.error('boom.internal Error ->', error)
 // testlog('boom.internal Error ->', error)
-
-
-
-
-
-// {
-// 	['log', 'info', 'warn', 'error'].forEach(function(key) {
-// 		console[key] = function(...args) {
-// 			logger[key].apply(logger, [util.format.apply(util.format, Array.prototype.slice.call(args))])
-// 		}
-// 	})
-// }
 
 
 

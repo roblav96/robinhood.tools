@@ -1,6 +1,7 @@
 // 
 
 import * as _ from 'lodash'
+import * as strace from 'stack-trace'
 
 
 

@@ -1,4 +1,6 @@
 // 
+import '../common/polyfills'
+import 'source-map-support/register'
 import './_process'
 import '../common/logger'
 // 
@@ -9,7 +11,6 @@ import * as _ from 'lodash'
 import * as core from '../common/core'
 import * as pretty from '../common/pretty'
 import * as cluster from 'cluster'
-import * as Humanize from 'humanize-plus'
 
 
 
