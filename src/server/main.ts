@@ -1,5 +1,6 @@
 // 
 import './_process'
+import '../common/logger'
 // 
 
 import chalk from 'chalk'
@@ -43,7 +44,6 @@ import './services/radio'
 
 if (process.WORKER) {
 	require('./api/fastify')
-	// import('./api/fastify').catch(error => console.error('import(./api/fastify) Error ->', error))
 }
 
 

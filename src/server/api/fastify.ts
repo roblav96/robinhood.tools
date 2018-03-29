@@ -5,45 +5,21 @@ if (process.MASTER) { console.error('process.MASTER Error ->', process.MASTER); 
 import * as util from 'util'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
+import logger from '../../common/logger'
 
 import * as Fastify from 'fastify'
 import * as Pino from 'pino'
 
 
 
-
-
 const fastify = Fastify({
-	logger: {
-		level: 'debug',
-		prettyPrint: {
-			forceColor: true,
-			levelFirst: true,
-		},
-	},
+	logger,
 })
 export default fastify
 
 
 
-
-
-console.info('{wut: new Date()} ->')
-// eyes.inspect({ wut: new Date() })
-
-console.log('util.inspect ->', util.inspect(util.inspect, {
-	compact: false,
-	depth: 1,
-	showProxy: true,
-	showHidden: true,
-	colors: true,
-}))
-
-// console.info('eyes.defaults ->')
-// eyes.inspect(eyes.defaults)
-
-// ████  wut are proxies?  ████
-// let wtf = new Proxy()
+console.error('fastify Error ->', new Error('awesome error'))
 
 
 
