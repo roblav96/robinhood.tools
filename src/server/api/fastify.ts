@@ -21,13 +21,13 @@ export default fastify
 
 
 
-let error = boom.internal(`A server crashing internal error has occured!!!`)
-function testLoggerError() {
-	// console.time('console.error')
-	console.warn('boom.internal Error ->', error, 'error.message ->', `"${error.message}"`, 'error.stack ->', error.stack)
-	// console.timeEnd('console.error')
-}
-testLoggerError()
+// let error = boom.internal(`A server crashing internal error has occured!!!`)
+// function testLoggerError() {
+// 	// console.time('console.error')
+// 	console.warn('boom.internal Error ->', error, 'error.message ->', `"${error.message}"`, 'error.stack ->', error.stack)
+// 	// console.timeEnd('console.error')
+// }
+// testLoggerError()
 
 
 
