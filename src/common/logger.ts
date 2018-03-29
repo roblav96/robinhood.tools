@@ -13,35 +13,25 @@ import * as pretty from './pretty'
 
 
 const logger = Pino({
-	name: process.NAME,
-	level: 'warn',
-
-	serializers: {
-		'console': function consoleSerializer(value: any) {
-			console.log('value ->', value)
-			return value
-		}
-	},
-
+	// name: process.NAME,
+	// level: 'warn',
 	prettyPrint: {
 		// errorLikeObjectKeys: [],
 		formatter: (function(log, config) {
-			console.log('log ->', log)
+			console.log('BEFORE log ->', log)
 			// console.time('formatter')
+			log.label = logger.levels.labels[log.level]
 
-			{ let PRETTY_FRAMES = stacktrace.get().map(pretty.frame); console.log('PRETTY_FRAMES ->', PRETTY_FRAMES); }
+			// let PRETTY_FRAMES = stacktrace.get().map(pretty.frame)
+			// console.log('PRETTY_FRAMES ->', PRETTY_FRAMES)
+			let offset = log.pconsole ? 3 : 2
 			let frames = stacktrace.get()
-			let index = frames.findIndex(function(frame) {
-				return frame.getTypeName() == 'EventEmitter' && (frame.getFileName() == 'pino' || frame.getFunctionName() == 'pinoWrite')
-			})
-			let frame = pretty.frame(frames[index + 3])
-			frame.sourceUrl = frame.sourceUrl.replace(process.cwd() + '/', '')
-			console.log('frame ->', frame)
-			Object.assign(log, frame)
-			log.sourceUrl = log.sourceUrl.replace(process.cwd() + '/', '')
-			log.method = logger.levels.labels[log.level]
+			let index = frames.findIndex(v => v.getTypeName() == 'EventEmitter' && (v.getFileName() == 'pino' || v.getFunctionName() == 'pinoWrite')) || -offset
+			let PRETTY_FRAMES = frames.map(pretty.frame).splice(index + 1)
+			console.info('PRETTY_FRAMES ->', PRETTY_FRAMES)
+			log.frame = pretty.frame(frames[index + offset])
 
-			console.log('log ->', log)
+			console.log('AFTER log ->', log)
 
 
 
@@ -83,6 +73,13 @@ const logger = Pino({
 		} as Pino.PrettyFormatter) as any,
 	},
 
+	serializers: {
+		'pconsole': function pconsoleSerializer(pconsole: Pino.ConsoleLog) {
+			// console.log('pconsole ->', pconsole)
+			return pconsole
+		},
+	},
+
 })
 
 // logger.addLevel('log', 25)
@@ -94,18 +91,20 @@ const logger = Pino({
 global._console = {} as typeof console
 declare global { var _console: Console; interface WindowConsole { readonly _console: Console } namespace NodeJS { export interface Global { _console: typeof console } } }
 
-// const proxies = ['log', 'info', 'warn', 'error']
-const proxies = ['warn']
-let i: number, len = proxies.length
+const methods = ['warn', 'log', 'info', 'error']
+methods.splice(1)
+console.log('methods ->', methods)
+let i: number, len = methods.length
 for (i = 0; i < len; i++) {
-	let proxy = proxies[i]
-	Object.assign(global._console, { [proxy]: global.console[proxy] })
+	let method = methods[i]
+	Object.assign(global._console, { [method]: global.console[method] })
 	Object.assign(global.console, {
-		[proxy](...args) {
-			// global._console[proxy].apply(global._console, args)
-			logger.child({ console: true })[proxy].call(logger, [...args])
-			// logger[proxy].call(logger, [...args])
-			// logger[proxy].call(logger, [...args.map(util.inspect as any)])
+		[method](...args) {
+			logger[(method == 'log' ? 'info' : method)]({ pconsole: { method, args } })
+			// logger.child({ pconsole: { method, args } })[method].call(logger, [...args])
+			// global._console[method].apply(global._console, args)
+			// logger[method].call(logger, [...args])
+			// logger[method].call(logger, [...args.map(util.inspect as any)])
 		},
 	})
 }
@@ -118,12 +117,20 @@ export default logger
 
 
 
-// {
-// 	(function proxyConsole(keys) {
-// 		keys.forEach
-// 	})(['error'])
-// }
-
-
+declare module 'pino' {
+	export interface ConsoleLog {
+		method: string
+		args: any[]
+	}
+	export interface LogDescriptor {
+		label: string
+		release: string
+		instance: number
+		frame: Pretty.StackFrame
+		pconsole: ConsoleLog
+		// error: typeof boom
+		[index: number]: any
+	}
+}
 
 

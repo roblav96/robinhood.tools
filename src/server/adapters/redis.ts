@@ -3,6 +3,7 @@
 import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
+import * as utils from '../services/utils'
 
 import * as IORedis from 'ioredis'
 
@@ -16,7 +17,7 @@ class Redis extends IORedis {
 			host: process.env.REDIS_HOST || 'localhost',
 			port: (Number.parseInt(process.env.REDIS_PORT) || 6379) + offset,
 			password: process.env.REDIS_PASSWORD,
-			connectionName: '[' + process.INSTANCE + '][' + core.string.alphanumeric(process.NAME) + '][' + name + '][' + NODE_ENV + ']',
+			connectionName: utils.named(name),
 		} as IORedis.RedisOptions
 
 		if (PRODUCTION) {

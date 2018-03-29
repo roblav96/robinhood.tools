@@ -1,5 +1,7 @@
 // 
 
+import * as core from './core'
+
 
 
 import * as pms from 'pretty-ms'
@@ -38,6 +40,7 @@ export function frame(frame: stacktrace.StackFrame) {
 		pretty.fileExt = fileSplit.pop()
 		pretty.fileName = fileSplit.join('.')
 	}
+	if (core.isNodejs) pretty.sourceUrl = pretty.sourceUrl.replace(process.cwd() + '/', '');
 	return pretty
 }
 declare global { namespace Pretty { interface StackFrame { sourceUrl: string, fileName: string, fileExt: string, line: number, column: number, position: number, functionName: string, typeName: string } } }

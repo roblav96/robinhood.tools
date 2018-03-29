@@ -46,7 +46,7 @@ _.merge(util.inspect, {
 	defaultOptions: {
 		showHidden: true,
 		showProxy: true,
-		depth: 4,
+		depth: 8,
 		colors: true,
 		compact: false,
 		breakLength: Infinity,

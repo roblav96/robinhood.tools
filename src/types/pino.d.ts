@@ -1,6 +1,7 @@
 // 
 
 import * as chalk from 'chalk'
+import * as boom from 'boom'
 import * as pino from 'pino'
 
 declare module 'pino' {
@@ -12,13 +13,6 @@ declare module 'pino' {
 		localTime?: boolean
 	}
 	export type PrettyFormatter = (log: LogDescriptor, config: PrettyConfig) => string
-
-	export interface LogDescriptor extends Pretty.StackFrame {
-		method: string
-		release: string
-		instance: number
-		[index: number]: any
-	}
 
 	export interface PrettyConfig {
 		prefix: string
