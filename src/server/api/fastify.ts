@@ -11,8 +11,16 @@ import * as Fastify from 'fastify'
 
 
 
-const fastify = Fastify({ logger })
+const fastify = Fastify({
+	// logger
+})
 export default fastify
+
+
+
+
+
+
 
 
 

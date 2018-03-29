@@ -39,27 +39,29 @@ process.EE4 = new ee4.EventEmitter()
 
 
 
-require('debug-trace')()
-console.format = function(args) {
-	let method = args.method as keyof Console
-	let stack = new Error().stack.toString()
-	stack = stack.replace(/^ {4}at /gm, '').split('\n')[4].trim()
-	let fullpath = stack.split('/').pop()
-	if (!fullpath) fullpath = args.filename + ':' + args.getLineNumber();
-	let file = fullpath.split('.ts:')[0]
-	let i = (fullpath.indexOf('.ts:') == -1) ? 0 : 1
-	let line = fullpath.split('.ts:')[i].split(':')[0]
-	let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' } as Dict<string>
-	let color = cdict[method] || 'magenta'
-	let osquare = chalk[color + 'Bright']('█')
-	if (method == 'error') color = color + 'Bright';
-	let ofile = '[' + chalk.bold(chalk[color](file) + ':' + line) + ']'
-	let oinstance = '[' + chalk.gray(process.INSTANCE) + ']'
-	let otime = moment().format('hh:mm:ss:SSS')
-	let output = osquare + ofile + oinstance + chalk.gray('T-') + otime
-	if (method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
-	return '\n\n' + chalk.underline(output) + '\n'
-}
+// require('debug-trace')()
+// console.format = function(args) {
+// 	let method = args.method as keyof Console
+// 	let stack = new Error().stack.toString()
+// 	stack = stack.replace(/^ {4}at /gm, '').split('\n')[4].trim()
+// 	let fullpath = stack.split('/').pop()
+// 	if (!fullpath) fullpath = args.filename + ':' + args.getLineNumber();
+// 	let file = fullpath.split('.ts:')[0]
+// 	let i = (fullpath.indexOf('.ts:') == -1) ? 0 : 1
+// 	let line = fullpath.split('.ts:')[i].split(':')[0]
+// 	let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' } as Dict<string>
+// 	let color = cdict[method] || 'magenta'
+// 	let osquare = chalk[color + 'Bright']('█')
+// 	if (method == 'error') color = color + 'Bright';
+// 	let ofile = '[' + chalk.bold(chalk[color](file) + ':' + line) + ']'
+// 	let oinstance = '[' + chalk.gray(process.INSTANCE) + ']'
+// 	let otime = moment().format('hh:mm:ss:SSS')
+// 	let output = osquare + ofile + oinstance + chalk.gray('T-') + otime
+// 	if (method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
+// 	return '\n\n' + chalk.underline(output) + '\n'
+// }
+
+
 
 Object.assign(eyes.defaults, { maxLength: 65536, showHidden: true, pretty: true } as eyes.EyesOptions)
 Object.assign(eyes, { stringify: eyes.inspector(_.defaults({ stream: null } as eyes.EyesOptions, eyes.defaults)) })
@@ -67,7 +69,7 @@ Object.assign(eyes, { stringify: eyes.inspector(_.defaults({ stream: null } as e
 Object.assign(util.inspect.defaultOptions, {
 	showHidden: true,
 	showProxy: true,
-	depth: 1,
+	depth: 8,
 	colors: true,
 	compact: false,
 	breakLength: Infinity,
@@ -93,13 +95,14 @@ process.once('unhandledRejection', function(error) {
 
 
 if (process.MASTER) {
+	let blocks = '█████████████████' + '█████████████████████████████████████████████████████'
 	process.stdout.write(
 		'\n\n\n\n' +
-		chalk.magentaBright('██████████████████████████████████████████████████████████████████████') + '\n' +
+		chalk.magenta(blocks) + '\n' +
 		chalk.magentaBright('█') + ' ' + chalk.underline.bold(process.NAME) + '\n' +
-		chalk.magentaBright('█') + ' ' + NODE_ENV + ' v' + process.VERSION + '\n' +
+		chalk.magentaBright('█') + ' ' + NODE_ENV + '\n' +
 		chalk.magentaBright('█') + ' ' + process.HOST + ':' + process.PORT + '\n' +
-		'\n\n\n'
+		'\n\n'
 	)
 }
 
