@@ -1,9 +1,5 @@
 // 
 
-// ████████████████████████████
-//       HIGH PERFORMANCE
-// ████████████████████████████
-
 
 
 Array.prototype.forEach = function(fn, arg) {
@@ -81,6 +77,25 @@ Array.prototype.find = function(fn, arg) {
 		}
 	}
 	return undefined
+}
+
+
+
+const isBrowser = !new Function('try { return this === global; } catch(e) { return false }')()
+if (isBrowser) {
+
+	Error.captureStackTrace = Error.captureStackTrace || function(error) {
+		let container = new Error()
+		Object.defineProperty(error, 'stack', {
+			configurable: true,
+			get: function getStack() {
+				let stack = container.stack
+				Object.defineProperty(this, 'stack', { value: stack })
+				return stack
+			}
+		})
+	}
+
 }
 
 
