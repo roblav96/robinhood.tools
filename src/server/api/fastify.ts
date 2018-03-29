@@ -17,9 +17,11 @@ const fastify = Fastify({
 })
 export default fastify
 
+fastify.log.info('wtf info')
 
 
-console.error('fastify Error ->', new Error('awesome error'))
+
+// console.error('fastify Error ->', new Error('awesome error'))
 
 
 
