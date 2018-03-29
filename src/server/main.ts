@@ -13,7 +13,7 @@ import * as cluster from 'cluster'
 
 if (DEVELOPMENT) process.INSTANCES = 0;
 
-if (process.MASTER) {
+if (process.MASTER && process.INSTANCES > 0) {
 
 	console.log('Forking ' + chalk.bold('x' + chalk.red(process.INSTANCES)) + ' workers in cluster...')
 	const workers = {} as Dict<number>
