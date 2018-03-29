@@ -13,7 +13,7 @@ import * as Humanize from 'humanize-plus'
 
 
 
-// if (DEVELOPMENT) process.INSTANCES = 1;
+if (DEVELOPMENT) process.INSTANCES = 0;
 
 if (process.MASTER && process.INSTANCES > 0) {
 

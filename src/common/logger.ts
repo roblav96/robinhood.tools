@@ -1,12 +1,18 @@
 // 
 
-import * as util from 'util'
+// import * as pcaller from 'pino-caller'
+// import * as devtools from '../server/services/devtools'
 import * as eyes from 'eyes'
+import * as util from 'util'
 import * as Pino from 'pino'
 import * as moment from 'moment'
-import * as devtools from '../server/services/devtools'
+import * as strace from 'stack-trace'
 
 
+
+function dumpstack(frames: strace.StackFrame[]) {
+	
+}
 
 const logger = Pino({
 	name: process.NAME,
@@ -16,10 +22,13 @@ const logger = Pino({
 
 			let method = logger.levels.labels[log.level]
 			// console.log('method ->', method)
-			let stack = new Error('ohno')//.stack.toString().split('\n')
-			console.log('stacsk ->', stack)
+			// let stack = new Error('ohno')//.stack.toString().split('\n')
+			// console.log('stack ->', stack)
 			// stack = stack.replace(/^ {1}at /gm, '').split('\n')[1].trim()
 			// console.log('stack ->', stack)
+			let stackframes = strace.get()
+			let dumped = dumpstack(stackframes)
+			console.log('dumped ->', dumped)
 
 			return `\nreturn logger.prettyPrint.formatter -> string`
 
@@ -28,6 +37,31 @@ const logger = Pino({
 	},
 })
 // logger.addLevel('log', 25)
+
+
+
+// const proxied = new Proxy(logger, {
+// 	get(obj, key, receiver) {
+// 		console.log('obj ->', obj)
+// 		console.log('key ->', key)
+// 		console.log('receiver ->', receiver)
+// 		return obj[key]
+// 	},
+// })
+// proxied.info('proxied?')
+
+
+
+console.warn = function(...args) {
+	logger.warn.apply(logger, [util.format.apply(util.format, Array.prototype.slice.call(args))])
+}
+import * as boom from 'boom'
+let error = boom.internal(`Oh no, an awesome boom.internal error has occured!`)
+console.warn('boom.internal Error ->', error)
+
+
+
+
 
 // console.log('logger ->', logger)
 // console.log('logger.pinosssdw ->', logger.pino)
@@ -40,15 +74,12 @@ const logger = Pino({
 
 
 
-const elogger = function(...args) {
-	logger.error.apply(logger, [util.format.apply(util.format, Array.prototype.slice.call(args))])
-	// logger.error.call(logger, ...args)
-}
-
-import * as boom from 'boom'
-// let error = boom.internal(`Oh no, an awesome boom.internal error has occured!`)
+// const testlog = function(...args) {
+// 	logger.error.apply(logger, [util.format.apply(util.format, Array.prototype.slice.call(args))])
+// 	// logger.error.call(logger, ...args)
+// }
 // console.error('boom.internal Error ->', error)
-// elogger('boom.internal Error ->', error)
+// testlog('boom.internal Error ->', error)
 
 
 
