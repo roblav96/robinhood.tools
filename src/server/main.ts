@@ -9,15 +9,19 @@ import * as _ from 'lodash'
 import * as core from '../common/core'
 import * as pretty from '../common/pretty'
 import * as cluster from 'cluster'
+import * as Humanize from 'humanize-plus'
 
 
 
-// if (DEVELOPMENT) process.INSTANCES = 2;
+// if (DEVELOPMENT) process.INSTANCES = 1;
 
-if (process.MASTER) {
+if (process.MASTER && process.INSTANCES > 0) {
 
-	// let bars = core.array.create(process.INSTANCES, '❚').join('')
-	console.log('Forking ' + chalk.bold('x' + chalk.red(process.INSTANCES)) + ' (' + chalk.bold.red(pretty.toWords(process.INSTANCES).toUpperCase()) + ') workers in cluster...')
+	let xis = 'x' + chalk.red(process.INSTANCES)
+	let word = chalk.red(core.number.word(process.INSTANCES).toUpperCase())
+	let plural = pretty.plural('worker', process.INSTANCES)
+	console.log(`Forking ${chalk.bold(xis + ' (' + word + ')')} ${plural} in cluster...`)
+
 	const workers = {} as Dict<number>
 	let i: number, len = process.INSTANCES
 	for (i = 0; i < len; i++) {
