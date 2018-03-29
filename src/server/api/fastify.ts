@@ -5,20 +5,21 @@ if (process.MASTER) { console.error('process.MASTER Error ->', process.MASTER); 
 import * as util from 'util'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
-import logger from '../../common/logger'
+// import logger from '../../common/logger'
 
 import * as Fastify from 'fastify'
-import * as boom from 'boom'
 
 
 
-const fastify = Fastify({ logger })
+// const fastify = Fastify({ logger })
+const fastify = Fastify({ logger: { level: 'error' } })
 export default fastify
 
 
 
 
 
+// import * as boom from 'boom'
 // let error = boom.internal(`A server crashing internal error has occured!!!`)
 // function testLoggerError() {
 // 	// console.time('console.error')
@@ -40,7 +41,7 @@ declare module 'fastify' {
 
 
 
-// import * as boom from 'boom'
+import * as boom from 'boom'
 fastify.register(function(fastify, opts, next) {
 	fastify.decorate('boom', boom)
 	next()

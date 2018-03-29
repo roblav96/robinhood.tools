@@ -2,7 +2,7 @@
 import '../common/polyfills'
 import 'source-map-support/register'
 import './process'
-import '../common/logger'
+// import '../common/logger'
 import './adapters/redis'
 // 
 
