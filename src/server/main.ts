@@ -4,18 +4,20 @@ import '../common/logger'
 // 
 
 import chalk from 'chalk'
-import * as util from 'util'
+import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../common/core'
+import * as pretty from '../common/pretty'
 import * as cluster from 'cluster'
 
 
 
-if (DEVELOPMENT) process.INSTANCES = 1;
+// if (DEVELOPMENT) process.INSTANCES = 2;
 
-if (process.MASTER && process.INSTANCES > 0) {
+if (process.MASTER) {
 
-	console.log('Forking ' + chalk.bold('x' + chalk.red(process.INSTANCES)) + ' workers in cluster...')
+	// let bars = core.array.create(process.INSTANCES, '❚').join('')
+	console.log('Forking ' + chalk.bold('x' + chalk.red(process.INSTANCES)) + ' (' + chalk.bold.red(pretty.toWords(process.INSTANCES).toUpperCase()) + ') workers in cluster...')
 	const workers = {} as Dict<number>
 	let i: number, len = process.INSTANCES
 	for (i = 0; i < len; i++) {
@@ -34,7 +36,7 @@ if (process.MASTER && process.INSTANCES > 0) {
 
 }
 
-console.log('oh')
+
 
 global.WebSocket = require('uws')
 

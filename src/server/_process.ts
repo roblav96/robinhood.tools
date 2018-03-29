@@ -16,7 +16,7 @@ import * as ee4 from '../common/ee4'
 
 
 
-global.NODE_ENV = process.env.NODE_ENV // || 'development'
+global.NODE_ENV = process.env.NODE_ENV || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
@@ -39,49 +39,28 @@ process.EE4 = new ee4.EventEmitter()
 
 
 
-// require('debug-trace')()
-// console.format = function(args) {
-// 	let method = args.method as keyof Console
-// 	let stack = new Error().stack.toString()
-// 	stack = stack.replace(/^ {4}at /gm, '').split('\n')[4].trim()
-// 	let fullpath = stack.split('/').pop()
-// 	if (!fullpath) fullpath = args.filename + ':' + args.getLineNumber();
-// 	let file = fullpath.split('.ts:')[0]
-// 	let i = (fullpath.indexOf('.ts:') == -1) ? 0 : 1
-// 	let line = fullpath.split('.ts:')[i].split(':')[0]
-// 	let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' } as Dict<string>
-// 	let color = cdict[method] || 'magenta'
-// 	let osquare = chalk[color + 'Bright']('█')
-// 	if (method == 'error') color = color + 'Bright';
-// 	let ofile = '[' + chalk.bold(chalk[color](file) + ':' + line) + ']'
-// 	let oinstance = '[' + chalk.gray(process.INSTANCE) + ']'
-// 	let otime = moment().format('hh:mm:ss:SSS')
-// 	let output = osquare + ofile + oinstance + chalk.gray('T-') + otime
-// 	if (method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
-// 	return '\n\n' + chalk.underline(output) + '\n'
-// }
-
-
-
-Object.assign(eyes.defaults, { maxLength: 65536, showHidden: true, pretty: true } as eyes.EyesOptions)
+_.merge(eyes.defaults, { styles: { all: 'grey' }, maxLength: 65536, showHidden: true, pretty: true } as eyes.EyesOptions)
 Object.assign(eyes, { stringify: eyes.inspector(_.defaults({ stream: null } as eyes.EyesOptions, eyes.defaults)) })
 
-Object.assign(util.inspect.defaultOptions, {
-	showHidden: true,
-	showProxy: true,
-	depth: 8,
-	colors: true,
-	compact: false,
-	breakLength: Infinity,
-	maxArrayLength: Infinity,
-} as util.InspectOptions)
+_.merge(util.inspect, {
+	defaultOptions: {
+		showHidden: true,
+		showProxy: true,
+		depth: 2,
+		colors: true,
+		compact: false,
+		breakLength: Infinity,
+		maxArrayLength: Infinity,
+	},
+	styles: {
+		string: 'green', regexp: 'green', date: 'green',
+		number: 'magenta', boolean: 'blue',
+		undefined: 'grey', null: 'grey',
+		symbol: 'yellow', special: 'cyan',
+	},
+} as Partial<typeof util.inspect>)
 
-Object.assign(util.inspect.styles, {
-	string: 'green', regexp: 'green', date: 'green',
-	number: 'magenta', boolean: 'blue',
-	undefined: 'grey', null: 'grey',
-	symbol: 'yellow', special: 'cyan',
-})
+
 
 process.once('uncaughtException', function(error) {
 	console.error(chalk.bold.redBright('UNCAUGHT EXCEPTION'), '->\n', error)
@@ -94,6 +73,30 @@ process.once('unhandledRejection', function(error) {
 
 
 
+require('debug-trace')()
+console.format = function(args) {
+	let method = args.method as keyof Console
+	let stack = new Error().stack.toString()
+	stack = stack.replace(/^ {4}at /gm, '').split('\n')[4].trim()
+	let fullpath = stack.split('/').pop()
+	if (!fullpath) fullpath = args.filename + ':' + args.getLineNumber();
+	let file = fullpath.split('.ts:')[0]
+	let i = (fullpath.indexOf('.ts:') == -1) ? 0 : 1
+	let line = fullpath.split('.ts:')[i].split(':')[0]
+	let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' } as Dict<string>
+	let color = cdict[method] || 'magenta'
+	let osquare = chalk[color + 'Bright']('█')
+	if (method == 'error') color = color + 'Bright';
+	let ofile = '[' + chalk.bold(chalk[color](file) + ':' + line) + ']'
+	let oinstance = '[' + chalk.gray(process.INSTANCE) + ']'
+	let otime = moment().format('hh:mm:ss:SSS')
+	let output = osquare + ofile + oinstance + chalk.gray('T-') + otime
+	if (method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
+	return '\n\n' + chalk.underline(output) + '\n'
+}
+
+
+
 if (process.MASTER) {
 	let blocks = '█████████████████' + '█████████████████████████████████████████████████████'
 	process.stdout.write(
@@ -102,7 +105,7 @@ if (process.MASTER) {
 		chalk.magentaBright('█') + ' ' + chalk.underline.bold(process.NAME) + '\n' +
 		chalk.magentaBright('█') + ' ' + NODE_ENV + '\n' +
 		chalk.magentaBright('█') + ' ' + process.HOST + ':' + process.PORT + '\n' +
-		'\n\n'
+		'\n\n\n\n'
 	)
 }
 
