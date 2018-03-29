@@ -2,11 +2,14 @@
 if (process.MASTER) { console.error('process.MASTER Error ->', process.MASTER); process.exit(1); }
 // 
 
-import * as eyes from 'eyes'
+import * as util from 'util'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
+
 import * as Fastify from 'fastify'
 import * as Pino from 'pino'
+
+
 
 
 
@@ -21,11 +24,30 @@ const fastify = Fastify({
 })
 export default fastify
 
-console.info('fastify.log ->')
-eyes.inspect(fastify.log)
+
+
+
+
+console.info('{wut: new Date()} ->')
+// eyes.inspect({ wut: new Date() })
+
+console.log('util.inspect ->', util.inspect(util.inspect, {
+	compact: false,
+	depth: 1,
+	showProxy: true,
+	showHidden: true,
+	colors: true,
+}))
+
+// console.info('eyes.defaults ->')
+// eyes.inspect(eyes.defaults)
 
 // ████  wut are proxies?  ████
 // let wtf = new Proxy()
+
+
+
+
 
 import { CookieSerializeOptions } from 'cookie'
 fastify.register(require('fastify-cookie'), error => { if (error) console.error('fastify-cookie Error ->', error); })

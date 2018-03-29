@@ -3,7 +3,7 @@ import './_process'
 // 
 
 import chalk from 'chalk'
-import * as eyes from 'eyes'
+import * as util from 'util'
 import * as _ from 'lodash'
 import * as core from '../common/core'
 import * as cluster from 'cluster'

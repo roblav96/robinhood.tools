@@ -1,6 +1,6 @@
 // 
 
-import * as eyes from 'eyes'
+import * as util from 'util'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
 
@@ -14,9 +14,8 @@ fastify.route({
 	method: 'POST',
 	url: '/api/cors',
 	handler: async function(request, reply) {
-		console.info('this ->')
-		eyes.inspect(this)
-		this
+		console.info('this ->', util.inspect(this))
+		
 		if (!request.authed) throw boom.unauthorized();
 
 		let config = request.body

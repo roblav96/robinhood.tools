@@ -4,9 +4,7 @@ import 'source-map-support/register'
 // 
 
 import chalk from 'chalk'
-import * as eyes from 'eyes'
-Object.assign(eyes.defaults, { maxLength: 65536, showHidden: true, pretty: true } as eyes.EyesOptions)
-global.inspect = eyes.inspector(Object.assign({}, eyes.defaults, { stream: null } as eyes.EyesOptions))
+import * as util from 'util'
 import * as _ from 'lodash'
 import * as os from 'os'
 import * as cluster from 'cluster'
@@ -60,6 +58,17 @@ console.format = function(args) {
 	let output = osquare + ofile + oinstance + chalk.gray('T-') + otime
 	if (method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
 	return '\n\n' + chalk.underline(output) + '\n'
+}
+
+Object.assign(util.inspect.defaultOptions, {
+	compact: false, depth: 1, colors: true,
+	showProxy: true, showHidden: true,
+} as util.InspectOptions)
+util.inspect.styles = {
+	string: 'green', regexp: 'green', date: 'green',
+	number: 'magenta', boolean: 'blue',
+	undefined: 'grey', null: 'grey',
+	symbol: 'yellow', special: 'cyan',
 }
 
 

@@ -1,15 +1,17 @@
 // 
 
+// import * as util from 'util'
 import * as _ from 'lodash'
 
 
 
-export function isJunk(value: any) {
+export function isFalsey(value: any) {
 	if (value == null) return true;
 	if (string.is(value) && value === '') return true;
 	if (number.is(value) && !Number.isFinite(value)) return true;
 	return false
 }
+export function isTruthy(value: any) { return !isFalsey(value) }
 
 export function noop() { }
 
@@ -161,6 +163,8 @@ export const object = {
 	},
 }
 
+
+
 export const json = {
 	is<T = any>(value: T): value is T {
 		if (string.is(value)) {
@@ -187,18 +191,6 @@ export const math = {
 		return Math.floor(Math.random() * (max - min + 1)) + min
 	},
 }
-
-
-
-// export const time = {
-// 	instanceMs(ms: number) {
-// 		if (process.CLIENT) return 0;
-// 		return Math.round(Math.max(process.INSTANCE, 0) * (ms / Math.max(process.INSTANCES, 1)))
-// 	},
-// 	dispersedMs(ms: number, i: number, length: number) {
-// 		return Math.round(i * (ms / length))
-// 	},
-// }
 
 
 
