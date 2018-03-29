@@ -9,7 +9,7 @@ import * as cookie from 'cookie'
 import * as url from 'url'
 import * as qs from 'querystring'
 import * as security from '../services/security'
-import fastify from '../fastify'
+import fastify from '../api/fastify'
 
 
 

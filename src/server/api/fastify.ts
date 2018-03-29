@@ -4,21 +4,28 @@ if (process.MASTER) { console.error('process.MASTER Error ->', process.MASTER); 
 
 import * as eyes from 'eyes'
 import * as _ from 'lodash'
-import * as core from '../common/core'
-
-
-
-
-
+import * as core from '../../common/core'
 import * as Fastify from 'fastify'
+import * as Pino from 'pino'
+
+
+
 const fastify = Fastify({
-	// logger: { level: 'error', prettyPrint: { forceColor: true, levelFirst: true } },
+	logger: {
+		level: 'debug',
+		prettyPrint: {
+			forceColor: true,
+			levelFirst: true,
+		},
+	},
 })
 export default fastify
 
+console.info('fastify.log ->')
+eyes.inspect(fastify.log)
 
-
-
+// ████  wut are proxies?  ████
+// let wtf = new Proxy()
 
 import { CookieSerializeOptions } from 'cookie'
 fastify.register(require('fastify-cookie'), error => { if (error) console.error('fastify-cookie Error ->', error); })
@@ -30,22 +37,22 @@ declare module 'fastify' {
 
 
 import * as boom from 'boom'
-// fastify.register(function(fastify, opts, next) {
-// 	fastify.decorate('boom', boom)
-// 	next()
-// })
-// declare module 'fastify' { interface FastifyInstance { boom: typeof boom } }
+fastify.register(function(fastify, opts, next) {
+	fastify.decorate('boom', boom)
+	next()
+})
+declare module 'fastify' { interface FastifyInstance { boom: typeof boom } }
 
 
 
-import radio from './services/radio'
+import radio from '../services/radio'
 fastify.register(function(fastify, opts, next) {
 	radio.once('_onready_', next)
 })
 
 
 
-import wss from './adapters/wsserver'
+import wss from '../adapters/wsserver'
 fastify.register(function(fastify, opts, next) {
 	fastify.decorate('wss', wss)
 	fastify.addHook('onClose', function(fastify, done) {
@@ -57,7 +64,7 @@ declare module 'fastify' { interface FastifyInstance { wss: typeof wss } }
 
 
 
-import * as products from './watchers/products'
+import * as products from '../watchers/products'
 fastify.register(function(fastify, opts, next) {
 	products.register(next)
 })
@@ -100,18 +107,17 @@ fastify.setErrorHandler(async function(error, request, reply) {
 
 
 
+import * as url from 'url'
 import * as cors from 'cors'
-fastify.use(cors({ origin: process.DOMAIN }))
+fastify.use(cors({ origin: url.parse(process.DOMAIN).hostname }))
 
+import './security.hook'
 
-
-import './hooks/security.hook'
-
-import './apis/socket.api'
-import './apis/security.api'
-import './apis/cors.api'
-import './apis/recaptcha.api'
-import './apis/search.api'
+import './socket.api'
+import './security.api'
+import './cors.api'
+import './recaptcha.api'
+import './search.api'
 
 
 

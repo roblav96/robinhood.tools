@@ -5,7 +5,7 @@ import * as _ from 'lodash'
 import * as core from '../../common/core'
 
 import { CookieSerializeOptions } from 'cookie'
-import fastify from '../fastify'
+import fastify from './fastify'
 import * as boom from 'boom'
 import * as url from 'url'
 import * as redis from '../adapters/redis'
