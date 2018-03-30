@@ -48,6 +48,8 @@ const wss = new uws.Server({
 	},
 })
 
+
+
 wss.on('connection', function(socket) {
 	socket.on('message', function(message: string) {
 		if (message == 'pong') return;

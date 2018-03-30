@@ -6,6 +6,8 @@ import * as _ from 'lodash'
 import * as core from '../../common/core'
 import * as ee4 from '../../common/ee4'
 
+import * as http from 'http'
+import * as net from 'net'
 import * as uws from 'uws'
 import uWebSocket from '../../common/uwebsocket'
 
@@ -18,11 +20,32 @@ const ADDRESS = 'ws://' + HOST + ':' + PORT + '/' + PATH
 
 if (process.MASTER) {
 
-	const wss = new uws.Server({
+	class uWebSocketServer extends uws.Server {
+		// handleUpgrade(req: http.IncomingMessage, socket: net.Socket, upgrade: ArrayBuffer, next: (client: uws) => void) {
+		// 	// console.log('req ->', eyes.stringify(req))
+		// 	// console.log('socket ->', eyes.stringify(socket))
+		// 	// console.log('upgrade ->', eyes.stringify(upgrade))
+		// 	// console.log('next ->', eyes.stringify(next))
+		// 	// socket.subs = ['AWESOME SOCKET!']
+		// 	next((client => {
+		// 		console.log('client ->', client)
+		// 		next.apply(this, [client])
+		// 	}) as any)
+		// 	super.handleUpgrade(req, socket, upgrade, next)
+		// }
+	}
+
+	const wss = new uWebSocketServer({
 		host: HOST, port: PORT, path: PATH,
 		verifyClient(incoming, next) {
-			console.log('incoming.req.headers ->', incoming.req.headers)
-			next(incoming.req.headers['host'].includes(HOST))
+			let host = incoming.req.headers['host']
+			if (host != HOST) {
+				// console.log('wss.httpServer ->', wss.httpServer)
+				// console.log('incoming.req.headers ->', incoming.req.headers)
+				// console.log('incoming.req.client ->', incoming.req.client)
+				// console.log('incoming.req.socket ->', incoming.req.socket)
+			}
+			next(host.includes(HOST))
 		},
 	})
 
@@ -31,8 +54,15 @@ if (process.MASTER) {
 		console.error('wss.on Error ->', error)
 	})
 
+	wss.on('headers', function(this: uws.Server, headers) {
+		console.log('headers ->', headers)
+	})
+
 	wss.on('connection', function(socket) {
+		if (!Array.isArray(socket.subs)) socket.subs = ['nope :('];
+
 		socket.on('message', function(message: string) {
+			// console.log('SOCKET.SUBS ->', eyes.stringify(socket.subs))
 			if (message == 'pong') return;
 			if (message == 'ping') return socket.send('pong');
 			if (message == '_onopen_') {
@@ -42,17 +72,16 @@ if (process.MASTER) {
 				return
 			}
 			if (message.indexOf(`{"e":"log"`) == 0) {
-				console.warn(`{"e":"log"`, 'wss.clients ->')
-				wss.clients.forEach(function(client, i) {
-					// console.log('client ->', util.inspect(client))
-					// console.log('client.events ->', client.events)
+				// console.log('wss.clients ->', wss.clients)
+				wss.clients.forEach(function(client) {
+					// console.log('client.subs ->', eyes.stringify(client.subs))
 				})
 			}
 			wss.broadcast(message)
 		})
-		socket.on('error', function(error) {
-			console.error('socket.on Error ->', error)
-		})
+
+		socket.on('error', error => console.error('socket.on Error ->', error))
+
 	})
 
 }
@@ -62,8 +91,8 @@ if (process.MASTER) {
 class Radio extends ee4.EventEmitter {
 
 	private _socket = new uWebSocket(ADDRESS, {
-		startdelay: process.MASTER ? 1 : -1,
-		verbose: process.MASTER,
+		startdelay: 1,
+		verbose: false, // process.MASTER,
 	})
 
 	constructor() {
@@ -102,6 +131,11 @@ declare global {
 	}
 }
 
+declare module 'uws' {
+	export interface WebSocket extends uws {
+		subs: string[]
+	}
+}
 
 
 

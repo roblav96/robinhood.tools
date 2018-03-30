@@ -16,13 +16,13 @@ const logger = Pino({
 	prettyPrint: {
 		errorLikeObjectKeys: [],
 		formatter: (function(log, config) {
-			console.log('log ->', log)
-
-
+			// console.log('log ->', log)
 
 			let output = log.msg
 
 			radio.emit('log', output)
+			// return log.msg
+			
 			return ''
 
 		} as Pino.PrettyFormatter) as any,
