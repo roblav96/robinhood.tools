@@ -17,7 +17,6 @@ declare namespace NodeJS {
 		INSPECTING: string
 	}
 	export interface Process {
-		EE4: ee4.EventEmitter
 		NAME: string
 		VERSION: string
 		DOMAIN: string

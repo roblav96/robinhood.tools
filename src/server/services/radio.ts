@@ -58,7 +58,7 @@ if (process.MASTER) {
 		console.log('headers ->', headers)
 	})
 
-	wss.on('connection', function(socket) {
+	wss.on('connection', function(socket, upgrade) {
 		if (!Array.isArray(socket.subs)) socket.subs = ['nope :('];
 
 		socket.on('message', function(message: string) {
@@ -132,7 +132,7 @@ declare global {
 }
 
 declare module 'uws' {
-	export interface WebSocket extends uws {
+	interface WebSocket extends uws {
 		subs: string[]
 	}
 }

@@ -11,8 +11,10 @@ declare module 'uws' {
 		httpServer: http.Server
 		broadcast(message: string, options?: { binary: boolean }): void
 		startAutoPing(interval: number, message: string): void
-		on(event: 'listening', cb: () => void): this
-		addListener(event: 'listening', cb: () => void): this
+		on(event: 'listening', fn: () => void): this
+		addListener(event: 'listening', fn: () => void): this
+		on(event: 'connection', fn: (this: WebSocket, client: WebSocket, req: http.IncomingMessage) => void): this
+		addListener(event: 'connection', fn: (this: WebSocket, client: WebSocket, req: http.IncomingMessage) => void): this
 	}
 }
 

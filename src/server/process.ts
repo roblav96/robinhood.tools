@@ -1,4 +1,8 @@
 // 
+import '../common/polyfills'
+import 'source-map-support/register'
+global.WebSocket = require('uws')
+// 
 
 import chalk from 'chalk'
 import * as eyes from 'eyes'
@@ -8,7 +12,6 @@ import * as os from 'os'
 import * as cluster from 'cluster'
 import * as path from 'path'
 import * as dotenv from 'dotenv'
-import * as ee4 from '../common/ee4'
 
 
 
@@ -22,6 +25,8 @@ process.PRIMARY = process.INSTANCE == 0
 process.MASTER = cluster.isMaster
 process.WORKER = cluster.isWorker
 
+if (DEVELOPMENT) process.INSTANCES = 1;
+
 dotenv.config({ path: path.resolve(process.cwd(), 'config/server.' + NODE_ENV + '.env') })
 dotenv.config({ path: path.resolve(process.cwd(), 'config/server.env') })
 process.NAME = process.env.npm_package_name
@@ -30,8 +35,6 @@ process.DOMAIN = (DEVELOPMENT ? 'http://dev.' : 'https://') + process.env.npm_pa
 process.HOST = process.env.HOST || 'localhost'
 process.PORT = Number.parseInt(process.env.PORT) || 12300
 process.SERVER = true
-
-process.EE4 = new ee4.EventEmitter()
 
 
 
@@ -73,9 +76,28 @@ process.once('unhandledRejection', function(error) {
 
 
 if (process.MASTER) {
+
 	console.log(process.NAME)
 	console.log(NODE_ENV)
 	console.log(process.HOST + ':' + process.PORT)
+
+	const workers = {} as Dict<number>
+	const fork = function fork(i: number) {
+		let worker = cluster.fork({ WORKER_INSTANCE: i })
+		workers[worker.process.pid] = i
+	}
+
+	console.log('Forking', process.INSTANCES, 'workers in cluster...')
+	let i: number, len = process.INSTANCES
+	for (i = 0; i < len; i++) { fork(i) }
+
+	// cluster.on('online', function(worker) { console.info('worker', workers[worker.process.pid], 'online') })
+	cluster.on('exit', function(worker, code, signal) {
+		let i = workers[worker.process.pid]
+		console.error('worker', i, 'exit ->', 'id:', worker.id, '| pid:', worker.process.pid, '| code:', code, '| signal:', signal)
+		_.delay(fork, 3000, i)
+	})
+
 }
 
 

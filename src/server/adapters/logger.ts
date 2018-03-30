@@ -15,17 +15,18 @@ const logger = Pino({
 	level: 'debug',
 	prettyPrint: {
 		errorLikeObjectKeys: [],
-		formatter: (function(log, config) {
-			// console.log('log ->', log)
+		levelFirst: true, forceColor: true,
+		// formatter: (function(log, config) {
+		// 	// console.log('log ->', log)
 
-			let output = log.msg
+		// 	let output = log.msg
 
-			radio.emit('log', output)
-			// return log.msg
-			
-			return ''
+		// 	radio.emit('log', output)
+		// 	// return log.msg
 
-		} as Pino.PrettyFormatter) as any,
+		// 	return ''
+
+		// } as Pino.PrettyFormatter) as any,
 	},
 })
 
@@ -65,19 +66,19 @@ function getStackFrame() {
 function parseStackFrame(frame: stacktrace.StackFrame) {
 	frame = sourcemaps.wrapCallSite(frame)
 	let parsed = {
-		sourceUrl: frame.getFileName() || frame.getScriptNameOrSourceURL() || frame.getEvalOrigin(),
+		filePath: frame.getFileName() || frame.getScriptNameOrSourceURL() || frame.getEvalOrigin(),
 		fileName: null, fileExt: null,
 		line: frame.getLineNumber(),
 		column: frame.getColumnNumber(),
 		position: frame.getPosition(),
 		functionName: frame.getFunctionName(),
 		typeName: frame.getTypeName(),
-	} // as Logger.StackFrame
-	if (parsed.sourceUrl) {
-		let fileSplit = parsed.sourceUrl.split('/').pop().split('.')
+	} as Logger.StackFrame
+	if (parsed.filePath) {
+		let fileSplit = parsed.filePath.split('/').pop().split('.')
 		parsed.fileExt = fileSplit.pop()
 		parsed.fileName = fileSplit.join('.')
-		if (core.isNodejs) parsed.sourceUrl = parsed.sourceUrl.replace(process.cwd() + '/', '');
+		if (core.isNodejs) parsed.filePath = parsed.filePath.replace(process.cwd() + '/', '');
 	}
 	return parsed
 }
@@ -88,20 +89,11 @@ function parseStackFrame(frame: stacktrace.StackFrame) {
 
 declare global {
 	namespace Logger {
-		interface StackFrame { sourceUrl: string, fileName: string, fileExt: string, line: number, column: number, position: number, functionName: string, typeName: string }
+		interface StackFrame { filePath: string, fileName: string, fileExt: string, functionName: string, typeName: string, line: number, column: number, position: number }
 	}
 }
 
 declare module 'pino' {
-	interface BaseLogger {
-		emit(event: 'log', ...args: any[]): boolean
-		on(event: 'log', listener: (...args: any[]) => void): this
-		addListener(event: 'log', listener: (...args: any[]) => void): this
-		once(event: 'log', listener: (...args: any[]) => void): this
-		prependListener(event: 'log', listener: (...args: any[]) => void): this
-		prependOnceListener(event: 'log', listener: (...args: any[]) => void): this
-		removeListener(event: 'log', listener: (...args: any[]) => void): this
-	}
 	interface LogDescriptor {
 
 	}
