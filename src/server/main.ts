@@ -2,12 +2,9 @@
 import '../common/polyfills'
 import 'source-map-support/register'
 import './process'
-// import '../common/logger'
-import './adapters/redis'
+import './adapters/logger'
 // 
 
-import chalk from 'chalk'
-import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../common/core'
 import * as pretty from '../common/pretty'
@@ -19,7 +16,7 @@ if (DEVELOPMENT) process.INSTANCES = 1;
 
 if (process.MASTER && process.INSTANCES > 0) {
 
-	console.log(`Forking ${chalk.bold.red(core.number.word(process.INSTANCES).toUpperCase())} ${pretty.plural('worker', process.INSTANCES)} in cluster...`)
+	console.log(`Forking ${core.number.word(process.INSTANCES).toUpperCase()} ${pretty.plural('worker', process.INSTANCES)} in cluster...`)
 	const workers = {} as Dict<number>
 	let i: number, len = process.INSTANCES
 	for (i = 0; i < len; i++) {

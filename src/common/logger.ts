@@ -28,7 +28,7 @@ const logger = Pino({
 			let square = chalk[color + 'Bright']('█')
 			if (log.label == 'error') color = color + 'Bright';
 
-			log.stackframe = getStackFrame()
+			// log.stackframe = getStackFrame()
 			let srcpath = log.stackframe.sourceUrl.replace('src/server/', '')
 			let srcfile = log.stackframe.fileName + '.' + log.stackframe.fileExt
 			let meta = '[' + chalk.grey(srcpath.replace(srcfile, '') + chalk.bold[color](srcfile)) + ':' + chalk.bold(log.stackframe.line) + '' + chalk.grey('➤' + (log.stackframe.functionName || '') + '()') + ']'
@@ -48,94 +48,35 @@ const logger = Pino({
 		} as Pino.PrettyFormatter) as any,
 	},
 
-	serializers: {
-		'pconsole': function pconsole(pconsole: Logger.ConsoleLog) {
-			// console.log('pconsole ->', pconsole)
-			return pconsole
-		},
-	},
+	// serializers: {
+	// 	'pconsole': function pconsole(pconsole: Logger.ConsoleLog) {
+	// 		// console.log('pconsole ->', pconsole)
+	// 		return pconsole
+	// 	},
+	// },
 
 })
 
 
 
-global._console = {} as typeof console
-declare global { var _console: Console; interface WindowConsole { readonly _console: Console } namespace NodeJS { export interface Global { _console: typeof console } } }
+// global._console = {} as typeof console
+// declare global { var _console: Console; interface WindowConsole { readonly _console: Console } namespace NodeJS { export interface Global { _console: typeof console } } }
 
-const methods = ['warn', 'log', 'info', 'error']
-// if (DEVELOPMENT) methods.splice(1);
-let i: number, len = methods.length
-for (i = 0; i < len; i++) {
-	let method = methods[i]
-	Object.assign(global._console, { [method]: global.console[method] })
-	Object.assign(global.console, {
-		[method](...args) {
-			// global._console[method].apply(global._console, args)
-			logger[(method == 'log' ? 'info' : method)].apply(logger, [{ pconsole: { method, args } }])
-		},
-	})
-}
+// const methods = ['warn', 'log', 'info', 'error']
+// // if (DEVELOPMENT) methods.splice(1);
+// let i: number, len = methods.length
+// for (i = 0; i < len; i++) {
+// 	let method = methods[i]
+// 	Object.assign(global._console, { [method]: global.console[method] })
+// 	Object.assign(global.console, {
+// 		[method](...args) {
+// 			// global._console[method].apply(global._console, args)
+// 			logger[(method == 'log' ? 'info' : method)].apply(logger, [{ pconsole: { method, args } }])
+// 		},
+// 	})
+// }
 
-export default logger
-
-
-
-function getStackFrame() {
-	let frames = stacktrace.get()
-	let index = frames.findIndex(function(frame) {
-		let isemitter = frame.getTypeName() == 'EventEmitter'
-		let ispino = frame.getFileName() == 'pino' || frame.getFunctionName() == 'pinoWrite'
-		return isemitter && ispino
-	})
-	let frame = parseStackFrame(frames[index + 2])
-	return frame
-}
-
-function parseStackFrame(frame: stacktrace.StackFrame) {
-	frame = sourcemaps.wrapCallSite(frame)
-	let parsed = {
-		sourceUrl: frame.getFileName() || frame.getScriptNameOrSourceURL() || frame.getEvalOrigin(),
-		fileName: null, fileExt: null,
-		line: frame.getLineNumber(),
-		column: frame.getColumnNumber(),
-		position: frame.getPosition(),
-		functionName: frame.getFunctionName(),
-		typeName: frame.getTypeName(),
-	} as Logger.StackFrame
-	if (parsed.sourceUrl) {
-		let fileSplit = parsed.sourceUrl.split('/').pop().split('.')
-		parsed.fileExt = fileSplit.pop()
-		parsed.fileName = fileSplit.join('.')
-		if (core.isNodejs) parsed.sourceUrl = parsed.sourceUrl.replace(process.cwd() + '/', '');
-	}
-	return parsed
-}
-
-
-
-
-
-declare global {
-	namespace Logger {
-		interface StackFrame { sourceUrl: string, fileName: string, fileExt: string, line: number, column: number, position: number, functionName: string, typeName: string }
-		interface ConsoleLog {
-			method: string
-			args: any[]
-		}
-	}
-}
-
-declare module 'pino' {
-	export interface LogDescriptor {
-		label: string
-		release: string
-		instance: number
-		stackframe: Logger.StackFrame
-		pconsole: Logger.ConsoleLog
-		// error: typeof boom
-		[index: number]: any
-	}
-}
+// export default logger
 
 
 

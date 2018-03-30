@@ -2,40 +2,34 @@
 if (process.MASTER) { console.error('process.MASTER Error ->', process.MASTER); process.exit(1); }
 // 
 
-import * as eyes from 'eyes'
-import * as util from 'util'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
-// import logger from '../../common/logger'
 
 import * as Fastify from 'fastify'
+import logger from '../adapters/logger'
 
 
 
-// const fastify = Fastify({ logger })
-const fastify = Fastify({ logger: { level: 'debug', prettyPrint: { levelFirst: true, forceColor: true } } })
+// const fastify = Fastify({ logger: { level: 'debug' } })
+const fastify = Fastify({ logger })
 export default fastify
 
 
 
 
 
-// global._console = {} as typeof console
-// declare global { var _console: Console; interface WindowConsole { readonly _console: Console } namespace NodeJS { export interface Global { _console: typeof console } } }
-
-// const methods = ['warn', 'log', 'info', 'error']
-// let i: number, len = methods.length
-// for (i = 0; i < len; i++) {
-// 	let method = methods[i]
-// 	Object.assign(global._console, { [method]: global.console[method] })
-// 	Object.assign(global.console, {
-// 		[method](...args) {
-// 			fastify.log[(method == 'log' ? 'info' : method)].apply(fastify.log, args)
-// 		},
-// 	})
-// }
-
-
+import * as path from 'path'
+import * as fstatic from 'fastify-static'
+fastify.register<FastifyRegisterOptions>(fstatic, {
+	root: path.join(process.cwd(), 'public'),
+	prefix: '/public/',
+}, error => { if (error) console.error('fastify-static Error ->', error); })
+declare module 'fastify' {
+	interface RegisterOptions<HttpServer, HttpRequest, HttpResponse> {
+		root: string
+	}
+	interface FastifyReply<HttpResponse> { sendFile: (file: string) => void }
+}
 
 
 
@@ -90,7 +84,7 @@ fastify.setNotFoundHandler(async function(request, reply) {
 })
 
 fastify.setErrorHandler(async function(error, request, reply) {
-	console.error('BEFORE error handler Error ->', error)
+	// console.error('BEFORE error handler Error ->', error)
 	if (!error) {
 		error = boom.internal('!error')
 
@@ -102,11 +96,10 @@ fastify.setErrorHandler(async function(error, request, reply) {
 		error = boom.preconditionFailed(message, error.validation)
 
 	} else if (!boom.isBoom(error)) {
-		console.warn('!boom.isBoom(error)')
 		error = boom.boomify(error, { override: false })
 
 	}
-	console.error('AFTER error handler Error ->', error)
+	// console.error('AFTER error handler Error ->', error)
 
 	reply.code(error.output.statusCode)
 	reply.headers(error.output.headers)
@@ -125,6 +118,7 @@ fastify.use(cors({ origin: url.parse(process.DOMAIN).hostname }))
 
 import './security.hook'
 
+import './logger.api'
 import './socket.api'
 import './security.api'
 import './cors.api'
@@ -154,6 +148,7 @@ declare global {
 	type Fastify = typeof fastify
 	type FastifyError = boom & { validation?: ajv.ErrorObject[] }
 	type FastifyInstance = Fastify.FastifyInstance
+	type FastifyRegisterOptions = Fastify.RegisterOptions<http.Server, http.IncomingMessage, http.ServerResponse>
 	type FastifyMiddleware = Fastify.FastifyMiddleware<http.Server, http.IncomingMessage, http.ServerResponse>
 	type FastifyRequest = Fastify.FastifyRequest<http.IncomingMessage>
 	type FastifyReply = Fastify.FastifyReply<http.ServerResponse>

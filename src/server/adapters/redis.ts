@@ -1,9 +1,7 @@
 //
 
-import * as eyes from 'eyes'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
-import * as utils from '../services/utils'
 
 import * as IORedis from 'ioredis'
 
@@ -17,7 +15,7 @@ class Redis extends IORedis {
 			host: process.env.REDIS_HOST || 'localhost',
 			port: (Number.parseInt(process.env.REDIS_PORT) || 6379) + offset,
 			password: process.env.REDIS_PASSWORD,
-			connectionName: utils.named(name),
+			connectionName: '[' + process.INSTANCE + '][' + core.string.alphanumeric(process.NAME) + '][' + name + '][' + NODE_ENV + ']',
 		} as IORedis.RedisOptions
 
 		if (PRODUCTION) {
@@ -82,17 +80,9 @@ export const logs = new Redis('logs', 0)
 
 
 
-process.emitLog = function emitLog(log) {
-	console.info('log ->', eyes.stringify(log))
-}
 
 
-
-
-
-import * as Pino from 'pino'
 declare global {
-	namespace NodeJS { export interface Process { emitLog: (log: Pino.LogDescriptor) => void } }
 	namespace Redis {
 		type Coms = string[][]
 		interface Event<T = any> { name: string, data: T }
