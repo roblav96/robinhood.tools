@@ -17,12 +17,8 @@ fastify.route({
 		if (!request.authed) throw boom.unauthorized();
 
 		let config = request.body
-		return got(config.url, config).then(function({ body }) {
-			return body
-
-		}).catch(function(error) {
-			throw boom.badRequest(error.message, DEVELOPMENT ? error : undefined)
-		})
+		let response = await got(config.url, config)
+		return response.body
 
 	},
 })

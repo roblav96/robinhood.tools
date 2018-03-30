@@ -1,6 +1,7 @@
 // 
 
 import chalk from 'chalk'
+import * as strip from 'cli-color/strip'
 import * as eyes from 'eyes'
 import * as util from 'util'
 import * as _ from 'lodash'
@@ -36,27 +37,29 @@ process.EE4 = new ee4.EventEmitter()
 
 
 
-require('debug-trace')()
-console.format = function(args) {
-	let method = args.method as keyof Console
-	let stack = new Error().stack.toString()
-	stack = stack.replace(/^ {4}at /gm, '').split('\n')[4].trim()
-	let fullpath = stack.split('/').pop()
-	if (!fullpath) fullpath = args.filename + ':' + args.getLineNumber();
-	let file = fullpath.split('.ts:')[0]
-	let i = (fullpath.indexOf('.ts:') == -1) ? 0 : 1
-	let line = fullpath.split('.ts:')[i].split(':')[0]
-	let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' } as Dict<string>
-	let color = cdict[method] || 'magenta'
-	let osquare = chalk[color + 'Bright']('█')
-	if (method == 'error') color = color + 'Bright';
-	let ofile = '[' + chalk.bold(chalk[color](file) + ':' + line) + ']'
-	let oinstance = '[' + chalk.gray(process.INSTANCE) + ']'
-	let otime = moment().format('hh:mm:ss:SSS')
-	let output = osquare + ofile + oinstance + chalk.gray('T-') + otime
-	if (method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
-	return '\n\n' + chalk.underline(output) + '\n'
-}
+// if (!process.env.INSPECTING) {
+// 	require('debug-trace')()
+// 	console.format = function(args) {
+// 		let method = args.method as keyof Console
+// 		let stack = new Error().stack.toString()
+// 		stack = stack.replace(/^ {4}at /gm, '').split('\n')[4].trim()
+// 		let fullpath = stack.split('/').pop()
+// 		if (!fullpath) fullpath = args.filename + ':' + args.getLineNumber();
+// 		let file = fullpath.split('.ts:')[0]
+// 		let i = (fullpath.indexOf('.ts:') == -1) ? 0 : 1
+// 		let line = fullpath.split('.ts:')[i].split(':')[0]
+// 		let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' } as Dict<string>
+// 		let color = cdict[method] || 'magenta'
+// 		let osquare = chalk[color + 'Bright']('█')
+// 		if (method == 'error') color = color + 'Bright';
+// 		let ofile = '[' + chalk.bold(chalk[color](file) + ':' + line) + ']'
+// 		let oinstance = '[' + chalk.gray(process.INSTANCE) + ']'
+// 		let otime = moment().format('hh:mm:ss:SSS')
+// 		let output = osquare + ofile + oinstance + chalk.gray('T-') + otime
+// 		if (method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
+// 		return '\n\n' + chalk.underline(output) + '\n'
+// 	}
+// }
 
 
 
@@ -70,11 +73,12 @@ _.merge(util.inspect, {
 	defaultOptions: {
 		showHidden: true,
 		showProxy: true,
-		depth: 8,
+		depth: 32,
 		colors: true,
 		compact: false,
 		breakLength: Infinity,
 		maxArrayLength: Infinity,
+		customInspect: true,
 	},
 	styles: {
 		string: 'green', regexp: 'green', date: 'green',
@@ -88,13 +92,9 @@ _.merge(util.inspect, {
 
 process.once('uncaughtException', function(error) {
 	console.error(chalk.bold.redBright('UNCAUGHT EXCEPTION'), '->\n', error)
-	// process.stderr.write(`\n\n${chalk.bold.redBright('=============================== ERROR ================================')}`)
-	// process.stderr.write(`\n${chalk.underline.bold.redBright('█ UNCAUGHT EXCEPTION')} ->\n${util.inspect(error)}`)
 })
 process.once('unhandledRejection', function(error) {
 	console.error(chalk.bold.redBright('UNHANDLED REJECTION'), '->\n', error)
-	// process.stderr.write(`\n\n${chalk.bold.redBright('=============================== ERROR ================================')}`)
-	// process.stderr.write(`\n${chalk.underline.bold.redBright('█ UNHANDLED REJECTION')} ->\n${util.inspect(error)}`)
 	process.stdout.write(`\n${chalk.bold('https://github.com/mcollina/make-promises-safe')}\n\n`)
 	process.exit(1)
 })
@@ -103,7 +103,7 @@ process.once('unhandledRejection', function(error) {
 
 if (process.MASTER) {
 	let blocks = '█████████████████' + '█████████████████████████████████████████████████████'
-	process.stdout.write(
+	let write = (
 		'\n\n' +
 		chalk.magenta(blocks) + '\n' +
 		chalk.magentaBright('█') + ' ' + chalk.underline.bold(process.NAME) + '\n' +
@@ -111,6 +111,9 @@ if (process.MASTER) {
 		chalk.magentaBright('█') + ' ' + process.HOST + ':' + process.PORT +
 		'\n'
 	)
+	console.info(write)
+	// if (process.env.INSPECTING) write = strip(write);
+	// process.stdout.write(write)
 }
 
 

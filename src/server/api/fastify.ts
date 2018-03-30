@@ -2,6 +2,7 @@
 if (process.MASTER) { console.error('process.MASTER Error ->', process.MASTER); process.exit(1); }
 // 
 
+import * as eyes from 'eyes'
 import * as util from 'util'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
@@ -12,21 +13,27 @@ import * as Fastify from 'fastify'
 
 
 // const fastify = Fastify({ logger })
-const fastify = Fastify({ logger: { level: 'error' } })
+const fastify = Fastify({ logger: { level: 'debug', prettyPrint: { levelFirst: true, forceColor: true } } })
 export default fastify
 
 
 
 
 
-// import * as boom from 'boom'
-// let error = boom.internal(`A server crashing internal error has occured!!!`)
-// function testLoggerError() {
-// 	// console.time('console.error')
-// 	console.warn('boom.internal Error ->', error, 'error.message ->', `"${error.message}"`, 'error.stack ->', error.stack)
-// 	// console.timeEnd('console.error')
+// global._console = {} as typeof console
+// declare global { var _console: Console; interface WindowConsole { readonly _console: Console } namespace NodeJS { export interface Global { _console: typeof console } } }
+
+// const methods = ['warn', 'log', 'info', 'error']
+// let i: number, len = methods.length
+// for (i = 0; i < len; i++) {
+// 	let method = methods[i]
+// 	Object.assign(global._console, { [method]: global.console[method] })
+// 	Object.assign(global.console, {
+// 		[method](...args) {
+// 			fastify.log[(method == 'log' ? 'info' : method)].apply(fastify.log, args)
+// 		},
+// 	})
 // }
-// testLoggerError()
 
 
 
@@ -83,9 +90,9 @@ fastify.setNotFoundHandler(async function(request, reply) {
 })
 
 fastify.setErrorHandler(async function(error, request, reply) {
-	// console.error('before setErrorHandler Error ->', error) // , (error as any).type, error.message, error.stack) // , _.omit(error, 'stack'))
+	console.error('BEFORE error handler Error ->', error)
 	if (!error) {
-		error = boom.internal('undefined error')
+		error = boom.internal('!error')
 
 	} else if (Array.isArray(error.validation)) {
 		let validation = error.validation[0]
@@ -95,11 +102,11 @@ fastify.setErrorHandler(async function(error, request, reply) {
 		error = boom.preconditionFailed(message, error.validation)
 
 	} else if (!boom.isBoom(error)) {
+		console.warn('!boom.isBoom(error)')
 		error = boom.boomify(error, { override: false })
 
 	}
-	// console.error('after setErrorHandler Error ->', error) // , (error as any).type, error.message, error.stack) // , _.omit(error, 'stack'))
-	// eyes.inspect(_.omit(error, 'stack'))
+	console.error('AFTER error handler Error ->', error)
 
 	reply.code(error.output.statusCode)
 	reply.headers(error.output.headers)
