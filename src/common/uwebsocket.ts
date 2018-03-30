@@ -23,12 +23,12 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 		1009: 'Too Large',
 	}
 
-	private static get defaults() {
+	private static get options() {
 		return _.clone({
 			query: undefined as () => string,
 			autoreconnect: true,
 			retrytimeout: 3000,
-			startdelay: -1,
+			startdelay: 1,
 			heartrate: ticks.T10,
 			verbose: false,
 		})
@@ -42,12 +42,12 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 
 	constructor(
 		public address: string,
-		public options = {} as Partial<typeof uWebSocket.defaults>,
+		public options = {} as Partial<typeof uWebSocket.options>,
 	) {
 		super()
-		_.defaults(this.options, uWebSocket.defaults)
+		_.defaults(this.options, uWebSocket.options)
 		this.reconnect = _.throttle(this.connect, this.options.retrytimeout, { leading: false, trailing: true })
-		this.options.startdelay == -1 ? this.connect() : _.delay(() => this.connect(), this.options.startdelay)
+		_.delay(() => this.connect(), this.options.startdelay)
 	}
 
 	private _socket: WebSocket & uws

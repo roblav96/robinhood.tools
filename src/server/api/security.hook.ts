@@ -1,20 +1,11 @@
 // 
 
-import * as eyes from 'eyes'
-import * as util from 'util'
-import * as _ from 'lodash'
-import * as core from '../../common/core'
-
 import fastify from './fastify'
-import * as url from 'url'
-import * as redis from '../adapters/redis'
 import * as security from '../services/security'
 
 
 
 fastify.addHook('preHandler', async function(request, reply) {
-
-	if (request.raw.url.indexOf('/api/') != 0) return;
 
 	request.ip = security.getip(request.req)
 

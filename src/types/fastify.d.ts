@@ -6,10 +6,10 @@ import * as fastify from 'fastify'
 
 
 declare module 'fastify' {
-	interface FastifyRequest<HttpRequest> { // = http.IncomingMessage> {
+	interface FastifyRequest<HttpRequest> {
 		headers: Dict<string>
 	}
-	interface FastifyReply<HttpResponse> { // = http.ServerResponse> {
+	interface FastifyReply<HttpResponse> {
 		getHeader: (key: string) => string
 		hasHeader: (key: string) => boolean
 	}

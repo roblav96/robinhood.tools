@@ -1,13 +1,13 @@
 // 
-
 export * from '../../common/security'
-import * as util from 'util'
+// 
+
 import * as _ from 'lodash'
 import * as core from '../../common/core'
 import * as security from '../../common/security'
+import * as http from 'http'
 import * as boom from 'boom'
 import * as redis from '../adapters/redis'
-import { IncomingMessage } from 'http'
 
 
 
@@ -57,9 +57,8 @@ export function generateToken(doc: Security.Doc, prime: string) {
 	return security.hmac256(doc.uuid + doc.finger + doc.bytes + doc.useragent + doc.hostname, prime)
 }
 
-export function getip(raw: IncomingMessage) {
-	let headers = raw.headers as Dict<string>
-	return headers['x-forwarded-for'] || headers['x-real-ip'] || raw.connection.remoteAddress || raw.socket.remoteAddress
+export function getip(req: http.IncomingMessage) {
+	return (req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.connection.remoteAddress || req.socket.remoteAddress) as string
 }
 
 

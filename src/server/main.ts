@@ -7,9 +7,6 @@ import './adapters/redis'
 import './adapters/logger'
 import './services/devtools'
 import './services/radio'
-
-if (process.WORKER) {
-	require('./api/fastify')
-}
+import './api/fastify'
 
 
