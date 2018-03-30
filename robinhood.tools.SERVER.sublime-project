@@ -3,6 +3,7 @@
 		"name": "robinhood.tools.SERVER",
 		"path": ".",
 		"folder_exclude_patterns": [
+			"public",
 			"assets",
 			"client",
 			"dist",
