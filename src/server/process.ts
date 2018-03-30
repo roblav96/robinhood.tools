@@ -1,6 +1,7 @@
 // 
 
 import chalk from 'chalk'
+import * as eyes from 'eyes'
 import * as util from 'util'
 import * as _ from 'lodash'
 import * as os from 'os'
@@ -38,7 +39,7 @@ _.merge(util.inspect, {
 	defaultOptions: {
 		showHidden: true,
 		showProxy: true,
-		depth: 1,
+		depth: 16,
 		colors: true,
 		compact: false,
 		breakLength: Infinity,
@@ -51,6 +52,12 @@ _.merge(util.inspect, {
 		symbol: 'yellow', special: 'cyan',
 	},
 } as Partial<typeof util.inspect>)
+
+
+
+_.merge(eyes.defaults, { styles: { all: 'grey' }, maxLength: 65536, showHidden: true, pretty: true } as eyes.EyesOptions)
+const inspector = eyes.inspector(_.defaults({ stream: null } as eyes.EyesOptions, eyes.defaults))
+Object.assign(eyes, { stringify(value: any) { return chalk.reset[eyes.defaults.styles.all](inspector(value)) } })
 
 
 

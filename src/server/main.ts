@@ -1,6 +1,7 @@
 // 
 import '../common/polyfills'
 import 'source-map-support/register'
+global.WebSocket = require('uws')
 import './process'
 import './adapters/logger'
 // 
@@ -12,7 +13,7 @@ import * as cluster from 'cluster'
 
 
 
-if (DEVELOPMENT) process.INSTANCES = 1;
+// if (DEVELOPMENT) process.INSTANCES = 1;
 
 if (process.MASTER && process.INSTANCES > 0) {
 
@@ -36,8 +37,6 @@ if (process.MASTER && process.INSTANCES > 0) {
 }
 
 
-
-global.WebSocket = require('uws')
 
 import '../common/ticks'
 import './services/devtools'

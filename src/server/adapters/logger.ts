@@ -2,10 +2,12 @@
 
 import * as core from '../../common/core'
 import * as Pino from 'pino'
+import * as uws from 'uws'
 import * as moment from 'moment'
 import * as sourcemaps from 'source-map-support'
 import * as stacktrace from 'stack-trace'
 import * as redis from './redis'
+import radio from '../services/radio'
 
 
 
@@ -20,7 +22,7 @@ const logger = Pino({
 
 			let output = log.msg
 
-			logger.emit('log', output)
+			radio.emit('log', output)
 			return ''
 
 		} as Pino.PrettyFormatter) as any,

@@ -1,5 +1,6 @@
 // 
 
+import * as eyes from 'eyes'
 import * as util from 'util'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
@@ -20,7 +21,8 @@ if (process.MASTER) {
 	const wss = new uws.Server({
 		host: HOST, port: PORT, path: PATH,
 		verifyClient(incoming, next) {
-			next(incoming.req.headers['host'] == HOST)
+			console.log('incoming.req.headers ->', incoming.req.headers)
+			next(incoming.req.headers['host'].includes(HOST))
 		},
 	})
 
@@ -31,11 +33,20 @@ if (process.MASTER) {
 
 	wss.on('connection', function(socket) {
 		socket.on('message', function(message: string) {
+			if (message == 'pong') return;
+			if (message == 'ping') return socket.send('pong');
 			if (message == '_onopen_') {
 				if (wss.clients.length > process.INSTANCES) {
 					wss.broadcast('_onready_')
 				}
 				return
+			}
+			if (message.indexOf(`{"e":"log"`) == 0) {
+				console.warn(`{"e":"log"`, 'wss.clients ->')
+				wss.clients.forEach(function(client, i) {
+					// console.log('client ->', util.inspect(client))
+					// console.log('client.events ->', client.events)
+				})
 			}
 			wss.broadcast(message)
 		})
@@ -52,7 +63,7 @@ class Radio extends ee4.EventEmitter {
 
 	private _socket = new uWebSocket(ADDRESS, {
 		startdelay: process.MASTER ? 1 : -1,
-		// verbose: true, // process.MASTER,
+		verbose: process.MASTER,
 	})
 
 	constructor() {
@@ -64,12 +75,12 @@ class Radio extends ee4.EventEmitter {
 		this._socket.on('message', (message: Radio.Message) => {
 			if ((message as any) == '_onready_') return super.emit('_onready_');
 			message = JSON.parse(message as any)
-			super.emit(message.event, message.data)
+			super.emit(message.e, message.d)
 		})
 	}
 
 	emit(event: string, data?: any) {
-		return !!this._socket.json({ event, data } as Radio.Message)
+		return !!this._socket.json({ e: event, d: data } as Radio.Message)
 	}
 
 }
@@ -84,8 +95,9 @@ declare global {
 	namespace Radio {
 		type radio = Radio
 		interface Message<T = any> {
-			event: string
-			data?: T
+			e: string
+			i: number
+			d?: T
 		}
 	}
 }
