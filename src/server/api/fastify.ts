@@ -41,6 +41,18 @@ fastify.setErrorHandler(async function(error, request, reply) {
 
 
 
+fastify.after(function(error) {
+	if (error) console.error('after Error ->', error);
+})
+
+const PORT = process.PORT + process.INSTANCE
+fastify.listen(PORT, process.HOST, function(error) {
+	if (error) return console.error('listen Error ->', error);
+	if (process.PRIMARY) console.info('listen ->', fastify.server.address().address + ':' + fastify.server.address().port, '\n', fastify.printRoutes());
+})
+
+
+
 import './fastify.plugins'
 
 import './security.hook'
@@ -51,17 +63,6 @@ import './security.api'
 import './cors.api'
 import './recaptcha.api'
 import './search.api'
-
-
-
-fastify.after(function(error) {
-	if (error) console.error('after Error ->', error);
-})
-
-fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
-	if (error) return console.error('listen Error ->', error);
-	if (process.PRIMARY) console.info('listen ->', fastify.server.address().address + ':' + fastify.server.address().port, '\n', fastify.printRoutes());
-})
 
 
 
