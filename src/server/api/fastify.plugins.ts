@@ -9,11 +9,11 @@ fastify.use(cors({ origin: process.DOMAIN }))
 
 
 
-import * as cookie from 'cookie'
 fastify.register(require('fastify-cookie'), error => { if (error) console.error('fastify-cookie Error ->', error); })
+import { CookieSerializeOptions } from 'cookie'
 declare module 'fastify' {
 	interface FastifyRequest<HttpRequest> { cookies: Dict<string> }
-	interface FastifyReply<HttpResponse> { setCookie: (name: string, value: string, opts: cookie.CookieSerializeOptions) => FastifyReply<HttpResponse> }
+	interface FastifyReply<HttpResponse> { setCookie: (name: string, value: string, opts: CookieSerializeOptions) => FastifyReply<HttpResponse> }
 }
 
 

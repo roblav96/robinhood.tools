@@ -2,16 +2,32 @@
 if (process.MASTER) { console.error('fastify -> process.MASTER should not import fastify', '\n'); process.exit(1) }
 // 
 
-import * as http from 'http'
-import * as Pino from 'pino'
+import * as fs from 'fs'
 import * as Fastify from 'fastify'
+import * as Pino from 'pino'
+import * as core from '../../common/core'
 
 
 
 const LOG_LEVEL = 'debug' as Pino.Level
 
 const fastify = Fastify({
-	logger: { level: LOG_LEVEL, prettyPrint: { levelFirst: true, forceColor: true } },
+	logger: {
+		level: LOG_LEVEL, extreme: PRODUCTION,
+		stream: Object.assign(fs.createWriteStream('/dev/null'), {
+			write(log: Pino.LogDescriptor) {
+				if (!core.json.is(log)) {
+					return console.error('log not parsable ->', log)
+				}
+				log = JSON.parse(log as any)
+				log.label = fastify.log.levels.labels[log.level]
+
+				let method = console[log.label] ? log.label : 'error'
+				console[method]('logger ->', log)
+
+			},
+		}),
+	},
 })
 
 export default fastify
@@ -56,6 +72,13 @@ declare module 'fastify' {
 	}
 	interface FastifyReply<HttpResponse> {
 
+	}
+}
+
+import * as stream from 'stream'
+declare module 'pino' {
+	interface LoggerOptions {
+		stream?: stream.Writable | stream.Duplex | stream.Transform
 	}
 }
 

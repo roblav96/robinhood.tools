@@ -182,8 +182,8 @@ export const object = {
 export const json = {
 	is<T = any>(value: T): value is T {
 		if (string.is(value)) {
-			if (value.charAt(0) == '{' && value.charAt(value.length - 1) == '}') return true;
-			if (value.charAt(0) == '[' && value.charAt(value.length - 1) == ']') return true;
+			if (value.charAt(0) == '{') return true; // && value.charAt(value.length - 1) == '}') return true;
+			if (value.charAt(0) == '[') return true; // && value.charAt(value.length - 1) == ']') return true;
 		}
 		return false
 	},

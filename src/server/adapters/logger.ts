@@ -1,31 +1,70 @@
 // // 
 
-// import * as core from '../../common/core'
-// import * as Pino from 'pino'
-// import * as uws from 'uws'
+// import * as fs from 'fs'
 // import * as moment from 'moment'
 // import * as sourcemaps from 'source-map-support'
 // import * as stacktrace from 'stack-trace'
+// import * as Fastify from 'fastify'
+// import * as Pino from 'pino'
+// import * as core from '../../common/core'
 
 
+
+// const LOG_LEVEL = 'debug' as Pino.Level
 
 // const logger = Pino({
-// 	level: 'debug',
-// 	prettyPrint: {
-// 		levelFirst: true, forceColor: true,
-// 		// errorLikeObjectKeys: [],
-// 		// formatter: (function(log, config) {
-// 		// 	let method = logger.levels.labels[log.level]
-// 		// 	if (!global.console[method]) method = 'error';
-// 		// 	global.console[method]('logger ->', log.msg)
-// 		// 	return ''
-// 		// } as Pino.PrettyFormatter) as any,
-// 	},
-// })
+// 	level: LOG_LEVEL,
+// 	extreme: PRODUCTION,
+// }, Object.assign(fs.createWriteStream('/dev/null'), {
+// 	write(log: Pino.LogDescriptor) {
+// 		if (!core.json.is(log)) {
+// 			return console.error('log not parsable ->', log)
+// 		}
+// 		log = JSON.parse(log as any)
+// 		log.label = logger.levels.labels[log.level]
 
-// // import logger from '../adapters/logger'
-// // const fastify = Fastify({ logger })
+// 		let method = console[log.label] ? log.label : 'error'
+// 		console[method]('logger ->', log)
+
+// 	},
+// }))
+
 // export default logger
+
+
+
+
+
+// declare module 'pino' {
+// 	interface LogDescriptor {
+// 		label: string
+// 		req: any
+// 		res: any
+// 		err: Fastify.FastifyError
+// 		error: Error
+// 	}
+// }
+
+
+
+
+
+
+
+// // prettyPrint: {
+// // 	// errorLikeObjectKeys: [],
+// // 	formatter: (function(log, config) {
+// // 		let method = logger.levels.labels[log.level]
+// // 		if (!global.console[method]) method = 'error';
+// // 		global.console[method]('logger ->', log.msg)
+// // 		return ''
+// // 	} as Pino.PrettyFormatter) as any,
+// // },
+// // }, {
+// // 	write(chunk) {
+// // 		console.log('chunk ->', chunk)
+// // 	},
+// // } as stream.Writable)
 
 
 
