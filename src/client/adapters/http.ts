@@ -1,4 +1,6 @@
 // 
+export * from '@/common/http'
+// 
 
 import * as _ from 'lodash'
 import * as core from '@/common/core'
@@ -6,6 +8,7 @@ import got from 'got'
 import boom from 'boom'
 import vm from '@/client/vm'
 import * as security from '@/client/services/security'
+import * as http from '@/common/http'
 
 
 
@@ -78,18 +81,5 @@ export function post<B = any, T = any>(url: string, body?: B, config = {} as Par
 }
 
 
-
-
-
-declare global {
-	namespace Http {
-		interface RequestConfig extends got.GotJSONOptions {
-			url: string
-			query: any
-			silent: boolean
-			isProxy: boolean
-		}
-	}
-}
 
 

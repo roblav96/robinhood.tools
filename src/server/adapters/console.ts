@@ -24,7 +24,12 @@ console.format = function(args) {
 	let oinstance = '[' + chalk.gray(process.INSTANCE) + ']'
 	let otime = moment().format('hh:mm:ss:SSS')
 	let output = osquare + ofile + oinstance + chalk.gray('T-') + otime
-	if (method == 'error') output = chalk.bold.redBright('=============================== ERROR ================================\n') + output;
+	// if (method == 'warn') {
+	// 	output = chalk.bold.yellowBright('████  WARN  ████\n') + output
+	// }
+	// if (method == 'error') {
+	// 	output = chalk.bold.redBright('████  ERROR  ████\n') + output
+	// }
 	return '\n\n' + chalk.underline(output) + '\n'
 }
 
@@ -33,9 +38,9 @@ console.format = function(args) {
 import * as util from 'util'
 _.merge(util.inspect, {
 	defaultOptions: {
-		showHidden: true,
-		showProxy: true,
-		depth: 3,
+		showHidden: false,
+		showProxy: false,
+		depth: 0,
 		colors: true,
 		compact: false,
 		breakLength: Infinity,
@@ -44,14 +49,27 @@ _.merge(util.inspect, {
 	styles: {
 		string: 'green', regexp: 'green', date: 'green',
 		number: 'magenta', boolean: 'blue',
-		undefined: 'grey', null: 'grey',
+		undefined: 'red', null: 'red',
 		symbol: 'yellow', special: 'cyan',
 	},
 } as Partial<typeof util.inspect>)
 
+Object.assign(console, {
+	dump(value: any, opts = {}) {
+		_.defaults(opts, {
+			depth: 1, showHidden: true, showProxy: true,
+		} as NodeJS.InspectOptions)
+		return util.inspect(value, opts)
+	}
+})
+declare global { interface Console { dump(value: any, opts?: NodeJS.InspectOptions): string } }
+
 
 
 import * as eyes from 'eyes'
-_.merge(eyes.defaults, { maxLength: 65536, styles: { all: null, key: 'grey', special: 'red' }, stream: null, showHidden: true, pretty: true } as eyes.EyesOptions)
+_.merge(eyes.defaults, {
+	maxLength: 65536, stream: null, showHidden: true, pretty: true,
+	styles: { all: null, key: 'grey', special: 'red' },
+} as eyes.EyesOptions)
 
 

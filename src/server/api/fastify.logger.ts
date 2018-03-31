@@ -3,6 +3,7 @@
 import * as eyes from 'eyes'
 import * as fs from 'fs'
 import * as _ from 'lodash'
+import * as Fastify from 'fastify'
 import * as Pino from 'pino'
 import * as core from '../../common/core'
 import fastify from './fastify'
@@ -34,10 +35,30 @@ export default Object.assign(fs.createWriteStream('/dev/null'), {
 		let message = _.omit(log, ['level', 'time', 'pid', 'hostname', 'v', 'label', 'reqId', 'responseTime'])
 		if (message.req) message.req = _.omit(message.req, ['id', 'remoteAddress', 'remotePort']) as any;
 
-		let fn = console[log.label] ? log.label : 'error'
-		if (fastify.log.level == 'debug') console[fn](log.label.toUpperCase(), '->', message);
-		else console[fn](eyes.inspect(message));
+		if (log.err && log.err.stack) {
+			if (log.err.isGot) {
+				return console.error('ERROR ->', eyes.inspect(_.omit(message, ['err.stack'])))
+			}
+			return console.error(
+				'ERROR ->', message.err.stack, '\n',
+				eyes.inspect(_.omit(message, ['err.stack']))
+			)
+		}
 
+		let fn = console[log.label] ? log.label : 'error'
+		console[fn](
+			log.label.toUpperCase(), '->',
+			fastify.log.level == 'debug' ? message : eyes.inspect(message)
+		)
+		// if (fastify.log.level == 'debug') {
+		// 	return console[fn](log.label.toUpperCase(), '->', message)
+		// }
+		// console[fn](eyes.inspect(message))
+
+
+
+		// if (Object.keys(message).length == 1) message = message.msg as any;
+		// console[fn](eyes.inspect(message))
 
 		// let message = log as any
 		// let msg = log.msg
@@ -78,7 +99,7 @@ declare module 'pino' {
 	interface LogResponse {
 		statusCode: number
 	}
-	interface LogError extends Error {
+	interface LogError extends Fastify.FastifyError {
 
 	}
 	interface LogDescriptor {

@@ -10,7 +10,11 @@ fastify.route({
 	method: 'POST',
 	url: '/api/proxy',
 	handler: async function(request, reply) {
-		if (!request.authed) throw boom.unauthorized('no way');
+		if (!request.authed) throw boom.unauthorized();
+		
+		// throw boom.unauthorized('boom.UNAUTHORIZED was thrown')
+		// throw boom.internal('boom.INTERNAL was thrown')
+		// request.body.about.gone
 
 		let config = request.body as Http.RequestConfig
 		let response = await http.request({

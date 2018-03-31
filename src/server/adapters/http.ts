@@ -1,9 +1,12 @@
 // 
+export * from '../../common/http'
+// 
 
 import * as _ from 'lodash'
 import * as url from 'url'
 import * as boom from 'boom'
 import * as got from 'got'
+import * as http from '../../common/http'
 
 
 
@@ -14,7 +17,7 @@ export function request(config: Partial<Http.RequestConfig>): Promise<any> {
 		_.defaults(config, {
 			json: true,
 			timeout: 10000,
-			retries: 9,
+			retries: 3,
 			headers: {
 				'Accept-Encoding': 'deflate, gzip',
 				'Host': parsed.host,
@@ -48,13 +51,12 @@ export function request(config: Partial<Http.RequestConfig>): Promise<any> {
 	}).then(function(config: Http.RequestConfig) {
 		return got(config.url, config).then(({ body }) => body)
 
-	}).catch(function(error: got.GotError) {
-		// console.log('error ->', error)
-		return Promise.reject(new boom(error.message, {
-			ctor: null, // ctor: got[error.name],
-			statusCode: (error as any).statusCode,
-			data: error.response.body,
-		}))
+		// }).catch(function(error: got.GotError) {
+		// 	return Promise.reject(new boom(error.message, {
+		// 		// ctor: null, // ctor: got[error.name],
+		// 		statusCode: (error as any).statusCode,
+		// 		data: error.response.body,
+		// 	}))
 	})
 
 }
@@ -73,19 +75,5 @@ export function post<B = any, T = any>(url: string, body?: B, config = {} as Par
 }
 
 
-
-
-
-declare global {
-	namespace Http {
-		interface RequestConfig extends got.GotJSONOptions {
-			url: string
-			query: any
-			isProxy: boolean
-			rhAuthToken: string
-			wbAuthToken: boolean
-		}
-	}
-}
 
 
