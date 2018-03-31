@@ -13,7 +13,7 @@ fastify.after(function(error) {
 
 
 fastify.setErrorHandler(async function(error, request, reply) {
-	console.error('BEFORE error handler Error ->', error)
+	// console.error('BEFORE error handler Error ->', error)
 	if (error == null) error = boom.internal();
 
 	if (Array.isArray(error.validation)) {
@@ -25,9 +25,9 @@ fastify.setErrorHandler(async function(error, request, reply) {
 	}
 
 	if (!boom.isBoom(error)) {
-		error = boom.boomify(error, { override: false })
+		error = boom.boomify(error, {})
 	}
-	console.error('AFTER error handler Error ->', error)
+	// console.error('AFTER error handler Error ->', error)
 
 	reply.code(error.output.statusCode)
 	reply.headers(error.output.headers)

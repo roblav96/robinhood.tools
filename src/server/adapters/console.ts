@@ -13,9 +13,9 @@ console.format = function(args) {
 	stack = stack.replace(/^ {4}at /gm, '').split('\n')[4].trim()
 	let fullpath = stack.split('/').pop()
 	if (!fullpath) fullpath = args.filename + ':' + args.getLineNumber();
-	let file = fullpath.split(':')[0]
-	let i = (fullpath.indexOf(':') == -1) ? 0 : 1
-	let line = fullpath.split(':')[i].split(':')[0]
+	let file = fullpath.split('.ts:')[0]
+	let i = (fullpath.indexOf('.ts:') == -1) ? 0 : 1
+	let line = fullpath.split('.ts:')[i].split(':')[0]
 	let cdict = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' } as Dict<string>
 	let color = cdict[method] || 'magenta'
 	let osquare = chalk[color + 'Bright']('█')

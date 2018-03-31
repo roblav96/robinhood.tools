@@ -19,9 +19,9 @@ fastify.route({
 			url: config.url,
 			retries: 3,
 			isProxy: true,
-		}).catch(function(error: got.GotError) {
-			console.error('got Error ->', error)
-			throw error
+			// }).catch(function(error: got.GotError) {
+			// 	console.error('got Error ->', error)
+			// 	throw error
 		})
 		console.log('response.body ->', response.body)
 		return response.body

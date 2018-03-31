@@ -35,10 +35,15 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 		if (config.url[0] == '/') {
 			config.url = process.DOMAIN + '/api' + config.url
 		}
+		
+		console.log('config ->', JSON.stringify(config, null, 4))
 
 		return got(config.url, config as any).then(({ body }) => body)
 
 	}).catch(function(error: got.GotError) {
+		
+		console.log('got error ->', error)
+		
 		let message = _.get(error, 'statusMessage', error.message)
 		if (_.has(error, 'response.body.message') && error.response.body.message != message) {
 			message += `: "${error.response.body.message}"`
