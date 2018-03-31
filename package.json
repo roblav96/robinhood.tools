@@ -46,7 +46,6 @@
 		"pretty-ms": "latest",
 		"repaintless": "latest",
 		"rxjs": "rc",
-		"stack-trace": "latest",
 		"uws": "latest",
 		"vue": "latest",
 		"vue-class-component": "latest",
@@ -96,6 +95,7 @@
 		"rimraf": "latest",
 		"sass-loader": "latest",
 		"source-map-support": "latest",
+		"stack-trace": "latest",
 		"tsc-watch": "latest",
 		"vue-template-compiler": "latest"
 	}

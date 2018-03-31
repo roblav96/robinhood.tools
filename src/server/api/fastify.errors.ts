@@ -1,8 +1,7 @@
 // 
 
-import * as ajv from 'ajv'
-import * as boom from 'boom'
 import fastify from './fastify'
+import * as boom from 'boom'
 
 
 
@@ -13,27 +12,20 @@ fastify.after(function(error) {
 
 
 
-fastify.register(function(fastify, opts, next) {
-	fastify.decorate('boom', boom)
-	next()
-}, error => { if (error) console.error('fastify-boom Error ->', error); })
-
-
-
 fastify.setErrorHandler(async function(error, request, reply) {
 	// console.error('BEFORE error handler Error ->', error)
-	if (!error) error = this.boom.internal();
+	if (error == null) error = boom.internal();
 
 	if (Array.isArray(error.validation)) {
 		let validation = error.validation[0]
 		let param = validation.dataPath.substr(1)
 		param = param ? `'${param}'` : 'is missing,'
 		let message = 'Parameter ' + param + ' ' + validation.message
-		error = this.boom.preconditionFailed(message, error.validation)
+		error = boom.preconditionFailed(message, error.validation)
 	}
 
-	if (!this.boom.isBoom(error)) {
-		error = this.boom.boomify(error, { override: false })
+	if (!boom.isBoom(error)) {
+		error = boom.boomify(error, { override: false })
 	}
 	// console.error('AFTER error handler Error ->', error)
 
@@ -47,23 +39,21 @@ fastify.setErrorHandler(async function(error, request, reply) {
 
 
 fastify.setNotFoundHandler(async function(request, reply) {
-	return this.boom.notFound(`API resource '${request.raw.url}' does not exist`)
+	return boom.notFound(`API resource '${request.raw.url}' does not exist`)
 })
 
 
 
 
 
+import * as ajv from 'ajv'
 declare module 'fastify' {
-	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
-		boom: typeof boom
-		setNotFoundHandler(fn: (this: FastifyInstance, request: FastifyRequest<HttpRequest>, reply: FastifyReply<HttpResponse>) => void): void
-		setErrorHandler(fn: (this: FastifyInstance, error: FastifyError, request: FastifyRequest<HttpRequest>, reply: FastifyReply<HttpResponse>) => void): void
+	interface FastifyError extends boom {
+		validation?: ajv.ErrorObject[]
 	}
-}
-
-declare global {
-	type FastifyError = boom & { validation?: ajv.ErrorObject[] }
+	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
+		setErrorHandler(fn: (error: FastifyError, request: FastifyRequest<HttpRequest>, reply: FastifyReply<HttpResponse>) => void): Promise<any>
+	}
 }
 
 

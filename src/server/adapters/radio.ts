@@ -1,7 +1,7 @@
 // 
 
 import { IncomingMessage } from 'http'
-import * as core from '../../common/core'
+import * as _ from 'lodash'
 import * as uws from 'uws'
 import * as ee4 from '../../common/ee4'
 import uWebSocket from '../../common/uwebsocket'
@@ -51,18 +51,24 @@ if (process.MASTER) {
 class Radio extends ee4.EventEmitter {
 
 	socket = new uWebSocket(`ws://${HOST}:${PORT}/${PATH}`, {
-		autoconnect: !process.MASTER,
+		autoconnect: false,
 		// verbose: process.MASTER,
 		// verbose: true,
 	})
 
+	private _connect = _.once(() => this.socket.connect())
+
 	constructor() {
 		super()
-		if (process.MASTER) wss.once('listening', () => this.socket.connect());
+
+		if (process.MASTER) wss.once('listening', this._connect);
+		else setImmediate(this._connect);
+
 		this.socket.on('open', () => {
 			this.socket.send('_onopen_')
 			super.emit('_onopen_')
 		})
+
 		this.socket.on('message', (message: string) => {
 			if (message == '_onready_') {
 				super.emit('_onready_')
@@ -71,6 +77,7 @@ class Radio extends ee4.EventEmitter {
 			let event = JSON.parse(message) as Radio.Event
 			super.emit(event.e, event.d)
 		})
+
 	}
 
 	emit(event: string, data?: any) {

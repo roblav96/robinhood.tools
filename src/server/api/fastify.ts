@@ -3,12 +3,15 @@ if (process.MASTER) { console.error('fastify -> process.MASTER should not import
 // 
 
 import * as http from 'http'
+import * as Pino from 'pino'
 import * as Fastify from 'fastify'
 
 
 
+const LOG_LEVEL = 'error' as Pino.Level
+
 const fastify = Fastify({
-	logger: { level: 'debug', prettyPrint: { levelFirst: true, forceColor: true } },
+	logger: { level: LOG_LEVEL, prettyPrint: { levelFirst: true, forceColor: true } },
 })
 
 export default fastify
@@ -26,10 +29,10 @@ fastify.register(function(fastify, opts, next) {
 
 
 import './security.hook'
+import './security.api'
 
 import './logger.api'
 import './socket.api'
-import './security.api'
 import './cors.api'
 import './recaptcha.api'
 import './search.api'
@@ -54,20 +57,6 @@ declare module 'fastify' {
 	interface FastifyReply<HttpResponse> {
 
 	}
-	interface FastifyInstance<HttpServer = http.Server, HttpRequest = http.IncomingMessage, HttpResponse = http.ServerResponse> {
-		setNotFoundHandler(fn: (this: FastifyInstance, request: FastifyRequest<HttpRequest>, reply: FastifyReply<HttpResponse>) => void): void
-		setErrorHandler(fn: (this: FastifyInstance, error: FastifyError, request: FastifyRequest<HttpRequest>, reply: FastifyReply<HttpResponse>) => void): void
-	}
-}
-
-declare global {
-	type Fastify = typeof fastify
-	type FastifyInstance = Fastify.FastifyInstance
-	type FastifyRegisterOptions = Fastify.RegisterOptions<http.Server, http.IncomingMessage, http.ServerResponse>
-	type FastifyMiddleware = Fastify.FastifyMiddleware<http.Server, http.IncomingMessage, http.ServerResponse>
-	type FastifyRequest = Fastify.FastifyRequest<http.IncomingMessage>
-	type FastifyReply = Fastify.FastifyReply<http.ServerResponse>
-	type FastifyHandler = (this: Fastify.FastifyInstance, request: Fastify.FastifyRequest<http.IncomingMessage>, reply: Fastify.FastifyReply<http.ServerResponse>) => Promise<any>
 }
 
 

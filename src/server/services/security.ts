@@ -2,11 +2,12 @@
 export * from '../../common/security'
 // 
 
+import * as http from 'http'
+import * as url from 'url'
+import * as boom from 'boom'
 import * as _ from 'lodash'
 import * as core from '../../common/core'
 import * as security from '../../common/security'
-import * as http from 'http'
-import * as boom from 'boom'
 import * as redis from '../adapters/redis'
 
 
@@ -28,7 +29,8 @@ export async function authorize(
 		throw boom.preconditionFailed('Missing security headers' + (DEVELOPMENT ? `: '${missing}'` : ''))
 	}
 
-	if ((referer || origin).indexOf(process.DOMAIN) != 0) {
+	let host = url.parse(referer || origin).host
+	if (!host || host.indexOf(process.DOMAIN) != 0) {
 		let which = Object.keys(core.object.compact({ referer, origin }, true))[0]
 		throw boom.preconditionFailed('Invalid security header' + (DEVELOPMENT ? `: '${which}'` : ''))
 	}

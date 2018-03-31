@@ -1,13 +1,7 @@
 // 
 
-import * as util from 'util'
-import * as _ from 'lodash'
-import * as core from '../../common/core'
-
 import { CookieSerializeOptions } from 'cookie'
 import fastify from './fastify'
-import * as boom from 'boom'
-import * as url from 'url'
 import * as redis from '../adapters/redis'
 import * as security from '../services/security'
 
@@ -16,7 +10,7 @@ import * as security from '../services/security'
 fastify.route({
 	method: 'GET',
 	url: '/api/security/token',
-	handler: async function(this: FastifyInstance, request, reply) {
+	handler: async function(request, reply) {
 		let prime = security.randomBytes(32)
 		await redis.main.hset('security:doc:' + request.doc.uuid, 'prime', prime)
 
