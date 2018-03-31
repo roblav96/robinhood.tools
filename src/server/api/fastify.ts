@@ -42,8 +42,6 @@ fastify.setErrorHandler(async function(error, request, reply) {
 
 })
 
-
-
 fastify.after(function(error) {
 	if (error) console.error('after Error ->', error);
 })
@@ -71,7 +69,6 @@ import './search.api'
 
 
 import * as http from 'http'
-import * as ajv from 'ajv'
 declare module 'fastify' {
 	interface FastifyRequest<HttpRequest> {
 		authed: boolean
@@ -86,6 +83,8 @@ declare module 'fastify' {
 		setErrorHandler(fn: (this: FastifyInstance, error: FastifyError, request: FastifyRequest<HttpRequest>, reply: FastifyReply<HttpResponse>) => void): void
 	}
 }
+
+import * as ajv from 'ajv'
 declare global {
 	type Fastify = typeof fastify
 	type FastifyInstance = Fastify.FastifyInstance
