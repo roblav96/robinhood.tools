@@ -33,9 +33,9 @@ class Redis extends IORedis {
 }
 
 export const main = new Redis('main', 0)
-export const pub = new Redis('pub', 0)
-export const sub = new Redis('sub', 0)
-export const logs = new Redis('logs', 0)
+// export const pub = new Redis('pub', 0)
+// export const sub = new Redis('sub', 0)
+// export const logs = new Redis('logs', 0)
 
 
 

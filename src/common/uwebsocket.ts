@@ -28,7 +28,8 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 			query: undefined as () => string,
 			autoreconnect: true,
 			retrytimeout: 3000,
-			startdelay: 1,
+			autostart: true,
+			startdelay: -1,
 			heartrate: ticks.T10,
 			verbose: false,
 		})
@@ -47,7 +48,7 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 		super()
 		_.defaults(this.options, uWebSocket.options)
 		this.reconnect = _.throttle(this.connect, this.options.retrytimeout, { leading: false, trailing: true })
-		_.delay(() => this.connect(), this.options.startdelay)
+		if (this.options.autostart) this.options.startdelay == -1 ? this.connect() : _.delay(() => this.connect(), this.options.startdelay);
 	}
 
 	private _socket: WebSocket & uws

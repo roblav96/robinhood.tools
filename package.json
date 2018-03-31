@@ -86,6 +86,7 @@
 		"chalk": "latest",
 		"clipboardy": "latest",
 		"cross-env": "latest",
+		"debug-trace": "latest",
 		"dotenv": "latest",
 		"dts-gen": "latest",
 		"eyes": "latest",

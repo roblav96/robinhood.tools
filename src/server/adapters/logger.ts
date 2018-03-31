@@ -6,8 +6,6 @@ import * as uws from 'uws'
 import * as moment from 'moment'
 import * as sourcemaps from 'source-map-support'
 import * as stacktrace from 'stack-trace'
-import * as redis from './redis'
-import radio from '../services/radio'
 
 
 
@@ -15,20 +13,17 @@ const logger = Pino({
 	level: 'debug',
 	prettyPrint: {
 		errorLikeObjectKeys: [],
-		levelFirst: true, forceColor: true,
-		// formatter: (function(log, config) {
-		// 	// console.log('log ->', log)
-
-		// 	let output = log.msg
-
-		// 	radio.emit('log', output)
-		// 	// return log.msg
-
-		// 	return ''
-
-		// } as Pino.PrettyFormatter) as any,
+		// levelFirst: true, forceColor: true,
+		formatter: (function(log, config) {
+			let method = logger.levels.labels[log.level]
+			if (!global.console[method]) method = 'error';
+			global.console[method]('logger ->', log.msg)
+			return ''
+		} as Pino.PrettyFormatter) as any,
 	},
 })
+
+export default logger
 
 
 
@@ -46,58 +41,54 @@ const logger = Pino({
 // 	})
 // }
 
-export default logger
+
+
+// function getStackFrame() {
+// 	let frames = stacktrace.get()
+// 	let index = frames.findIndex(function(frame) {
+// 		let isemitter = frame.getTypeName() == 'EventEmitter'
+// 		let ispino = frame.getFileName() == 'pino' || frame.getFunctionName() == 'pinoWrite'
+// 		return isemitter && ispino
+// 	})
+// 	let frame = parseStackFrame(frames[index + 2])
+// 	return frame
+// }
+
+// function parseStackFrame(frame: stacktrace.StackFrame) {
+// 	frame = sourcemaps.wrapCallSite(frame)
+// 	let parsed = {
+// 		filePath: frame.getFileName() || frame.getScriptNameOrSourceURL() || frame.getEvalOrigin(),
+// 		fileName: null, fileExt: null,
+// 		line: frame.getLineNumber(),
+// 		column: frame.getColumnNumber(),
+// 		position: frame.getPosition(),
+// 		functionName: frame.getFunctionName(),
+// 		typeName: frame.getTypeName(),
+// 	} as Logger.StackFrame
+// 	if (parsed.filePath) {
+// 		let fileSplit = parsed.filePath.split('/').pop().split('.')
+// 		parsed.fileExt = fileSplit.pop()
+// 		parsed.fileName = fileSplit.join('.')
+// 		if (core.isNodejs) parsed.filePath = parsed.filePath.replace(process.cwd() + '/', '');
+// 	}
+// 	return parsed
+// }
 
 
 
 
 
-function getStackFrame() {
-	let frames = stacktrace.get()
-	let index = frames.findIndex(function(frame) {
-		let isemitter = frame.getTypeName() == 'EventEmitter'
-		let ispino = frame.getFileName() == 'pino' || frame.getFunctionName() == 'pinoWrite'
-		return isemitter && ispino
-	})
-	let frame = parseStackFrame(frames[index + 2])
-	return frame
-}
+// declare global {
+// 	namespace Logger {
+// 		interface StackFrame { filePath: string, fileName: string, fileExt: string, functionName: string, typeName: string, line: number, column: number, position: number }
+// 	}
+// }
 
-function parseStackFrame(frame: stacktrace.StackFrame) {
-	frame = sourcemaps.wrapCallSite(frame)
-	let parsed = {
-		filePath: frame.getFileName() || frame.getScriptNameOrSourceURL() || frame.getEvalOrigin(),
-		fileName: null, fileExt: null,
-		line: frame.getLineNumber(),
-		column: frame.getColumnNumber(),
-		position: frame.getPosition(),
-		functionName: frame.getFunctionName(),
-		typeName: frame.getTypeName(),
-	} as Logger.StackFrame
-	if (parsed.filePath) {
-		let fileSplit = parsed.filePath.split('/').pop().split('.')
-		parsed.fileExt = fileSplit.pop()
-		parsed.fileName = fileSplit.join('.')
-		if (core.isNodejs) parsed.filePath = parsed.filePath.replace(process.cwd() + '/', '');
-	}
-	return parsed
-}
+// declare module 'pino' {
+// 	interface LogDescriptor {
 
-
-
-
-
-declare global {
-	namespace Logger {
-		interface StackFrame { filePath: string, fileName: string, fileExt: string, functionName: string, typeName: string, line: number, column: number, position: number }
-	}
-}
-
-declare module 'pino' {
-	interface LogDescriptor {
-
-	}
-}
+// 	}
+// }
 
 
 
