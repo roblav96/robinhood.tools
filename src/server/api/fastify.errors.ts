@@ -1,5 +1,6 @@
 // 
 
+import * as _ from 'lodash'
 import fastify from './fastify'
 import * as boom from 'boom'
 
@@ -24,14 +25,15 @@ fastify.setErrorHandler(async function(error, request, reply) {
 		error = boom.preconditionFailed(message, error.validation)
 	}
 
-	if (!boom.isBoom(error)) {
-		error = boom.boomify(error, {})
-	}
+	if (!boom.isBoom(error)) error = boom.boomify(error);
+
+	if (error.data) _.defaults(error.output.payload, { attributes: error.data });
+
 	// console.error('AFTER error handler Error ->', error)
 
+	reply.type('application/json')
 	reply.code(error.output.statusCode)
 	reply.headers(error.output.headers)
-	reply.type('application/json')
 	return error.output.payload
 
 })

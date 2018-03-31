@@ -2,6 +2,7 @@
 
 import * as _ from 'lodash'
 import * as url from 'url'
+import * as boom from 'boom'
 import * as got from 'got'
 
 
@@ -48,8 +49,13 @@ export function request(config: Partial<Http.RequestConfig>): Promise<any> {
 		return got(config.url, config).then(({ body }) => body)
 
 	}).catch(function(error: got.GotError) {
-		throw error
-		// return Promise.reject(error)
+		// console.log('error ->', error)
+		throw new boom(error.message, {
+			ctor: null,
+			// ctor: got[error.name],
+			statusCode: (error as any).statusCode,
+			data: error.response.body,
+		})
 	})
 
 }
