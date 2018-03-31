@@ -26,10 +26,10 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	private static get options() {
 		return _.clone({
 			query: undefined as () => string,
-			autoreconnect: true,
+			autoretry: true,
 			retrytimeout: 3000,
-			autostart: true,
-			startdelay: -1,
+			autoconnect: true,
+			delaystart: -1,
 			heartrate: ticks.T10,
 			verbose: false,
 		})
@@ -48,7 +48,9 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 		super()
 		_.defaults(this.options, uWebSocket.options)
 		this.reconnect = _.throttle(this.connect, this.options.retrytimeout, { leading: false, trailing: true })
-		if (this.options.autostart) this.options.startdelay == -1 ? this.connect() : _.delay(() => this.connect(), this.options.startdelay);
+		if (!this.options.autoconnect) return;
+		if (this.options.delaystart >= 0) _.delay(() => this.connect(), this.options.delaystart);
+		else this.connect();
 	}
 
 	private _socket: WebSocket & uws
@@ -109,7 +111,7 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 		console.warn(this.name, 'onclose ->', uWebSocket.ecodes[event.code] || event.code, '->', event.reason)
 		this.emit('close', event.code, event.reason)
 		ticks.removeListenerFunction(this._heartbeat)
-		if (this.options.autoreconnect) this.reconnect();
+		if (this.options.autoretry) this.reconnect();
 		else this.destroy();
 	}
 

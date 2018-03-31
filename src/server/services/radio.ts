@@ -1,41 +1,34 @@
 // 
 
+import { IncomingMessage } from 'http'
 import * as core from '../../common/core'
-import * as ee4 from '../../common/ee4'
-
-import * as http from 'http'
 import * as uws from 'uws'
+import * as ee4 from '../../common/ee4'
 import uWebSocket from '../../common/uwebsocket'
-import fastify from '../api/fastify'
 
 
+
+let wss: uws.Server
+const HOST = process.HOST
+const PORT = process.PORT - 1
+const PATH = 'radio'
 
 if (process.MASTER) {
 
-	const wss = new uws.Server({
-		path: 'radio',
-		server: fastify.server,
+	wss = new uws.Server({
+		host: HOST, port: PORT, path: PATH,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
-			// next(host.includes(HOST))
-			next(true)
+			next(host == process.HOST)
 		},
 	})
+	wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
+	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
-	wss.on('listening', function() { console.info('listening ->', this.httpServer.address()) })
-	wss.on('error', function(error) {
-		console.error('wss.on Error ->', error)
-	})
-
-	wss.on('headers', function(headers) {
-		console.log('headers ->', headers)
-	})
-
-	wss.on('connection', function(socket: WebSocket, req: http.IncomingMessage) {
+	wss.on('connection', function(socket: uws.WebSocket, req: IncomingMessage) {
 		if (!Array.isArray(socket.subs)) socket.subs = [];
 
 		socket.on('message', function(message: string) {
-			// console.log('SOCKET.SUBS ->', eyes.stringify(socket.subs))
 			if (message == 'pong') return;
 			if (message == 'ping') return socket.send('pong');
 			if (message == '_onopen_') {
@@ -44,16 +37,10 @@ if (process.MASTER) {
 				}
 				return
 			}
-			if (message.indexOf(`{"e":"log"`) == 0) {
-				// console.log('wss.clients ->', wss.clients)
-				wss.clients.forEach(function(client) {
-					// console.log('client.subs ->', eyes.stringify(client.subs))
-				})
-			}
 			wss.broadcast(message)
 		})
 
-		socket.on('error', error => console.error('socket.on Error ->', error))
+		socket.on('error', function(error) { console.error('socket.on Error ->', error) })
 
 	})
 
@@ -63,21 +50,19 @@ if (process.MASTER) {
 
 class Radio extends ee4.EventEmitter {
 
-	private _socket = new uWebSocket(`ws://127.0.0.1:${process.PORT - 1}/radio`, {
-		autostart: false,
+	socket = new uWebSocket(`ws://${HOST}:${PORT}/${PATH}`, {
+		autoconnect: !process.MASTER,
 		verbose: true, // process.MASTER,
 	})
 
 	constructor() {
 		super()
-		fastify.after(function (error) {
-			console.warn('after')
-		})
-		this._socket.on('open', () => {
-			this._socket.send('_onopen_')
+		if (process.MASTER) wss.once('listening', () => this.socket.connect());
+		this.socket.on('open', () => {
+			this.socket.send('_onopen_')
 			super.emit('_onopen_')
 		})
-		this._socket.on('message', (message: Radio.Message) => {
+		this.socket.on('message', (message: Radio.Message) => {
 			if ((message as any) == '_onready_') return super.emit('_onready_');
 			message = JSON.parse(message as any)
 			super.emit(message.e, message.d)
@@ -85,7 +70,7 @@ class Radio extends ee4.EventEmitter {
 	}
 
 	emit(event: string, data?: any) {
-		return !!this._socket.json({ e: event, d: data } as Radio.Message)
+		return !!this.socket.json({ e: event, d: data } as Radio.Message)
 	}
 
 }
@@ -97,9 +82,6 @@ export default new Radio()
 
 
 declare global {
-	interface WebSocket extends uws {
-		subs: string[]
-	}
 	namespace Radio {
 		type radio = Radio
 		interface Message<T = any> {
@@ -107,6 +89,12 @@ declare global {
 			i: number
 			d?: T
 		}
+	}
+}
+
+declare module 'uws' {
+	interface WebSocket extends uws {
+		subs?: string[]
 	}
 }
 

@@ -23,6 +23,8 @@ const logger = Pino({
 	},
 })
 
+// import logger from '../adapters/logger'
+// const fastify = Fastify({ logger })
 export default logger
 
 

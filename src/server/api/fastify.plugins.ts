@@ -19,19 +19,20 @@ declare module 'fastify' {
 
 
 
-import * as boom from 'boom'
+import radio from '../services/radio'
 fastify.register(function(fastify, opts, next) {
-	fastify.decorate('boom', boom)
-	next()
-}, error => { if (error) console.error('fastify-boom Error ->', error); })
-declare module 'fastify' { interface FastifyInstance { boom: typeof boom } }
+	radio.once('_onready_', next)
+})
 
 
 
-// import radio from '../services/radio'
+// import * as boom from 'boom'
 // fastify.register(function(fastify, opts, next) {
-// 	radio.once('_onready_', next)
-// })
+// 	fastify.decorate('boom', boom)
+// 	next()
+// }, error => { if (error) console.error('fastify-boom Error ->', error); })
+// declare module 'fastify' { interface FastifyInstance { boom: typeof boom } }
+// declare global { type FastifyError = boom & { validation?: ajv.ErrorObject[] } }
 
 
 

@@ -20,7 +20,7 @@ global.NODE_ENV = process.env.NODE_ENV || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
-if (PRODUCTION || !Number.isFinite(process.INSTANCES)) process.INSTANCES = os.cpus().length;
+process.INSTANCES = os.cpus().length;
 process.INSTANCE = cluster.isWorker ? Number.parseInt(process.env.WORKER_INSTANCE) : -1
 process.PRIMARY = process.INSTANCE == 0
 process.MASTER = cluster.isMaster
@@ -34,6 +34,13 @@ process.DOMAIN = (DEVELOPMENT ? 'http://dev.' : 'https://') + process.env.npm_pa
 process.HOST = process.env.HOST || 'localhost'
 process.PORT = Number.parseInt(process.env.PORT) || 12300
 process.SERVER = true
+
+process.once('uncaughtException', error => console.error('UNCAUGHT EXCEPTION ->', error))
+process.once('unhandledRejection', function(error) {
+	console.error('UNHANDLED REJECTION ->', error)
+	console.log('https://github.com/mcollina/make-promises-safe')
+	process.exit(1)
+})
 
 
 
@@ -59,8 +66,6 @@ console.format = function(args) {
 	return '\n\n' + chalk.underline(output) + '\n'
 }
 
-
-
 _.merge(util.inspect, {
 	defaultOptions: {
 		showHidden: true,
@@ -79,24 +84,13 @@ _.merge(util.inspect, {
 	},
 } as Partial<typeof util.inspect>)
 
-
-
 _.merge(eyes.defaults, { styles: { all: 'grey' }, maxLength: 65536, showHidden: true, pretty: true } as eyes.EyesOptions)
 const inspector = eyes.inspector(_.defaults({ stream: null } as eyes.EyesOptions, eyes.defaults))
 Object.assign(eyes, { stringify(value: any) { return chalk.reset[eyes.defaults.styles.all](inspector(value)) } })
 
 
 
-process.once('uncaughtException', function(error) {
-	console.error('UNCAUGHT EXCEPTION ->', error)
-})
-process.once('unhandledRejection', function(error) {
-	console.error('UNHANDLED REJECTION ->', error)
-	console.log('https://github.com/mcollina/make-promises-safe')
-	process.exit(1)
-})
-
-
+if (DEVELOPMENT) process.INSTANCES = 1;
 
 if (process.MASTER) {
 
@@ -118,5 +112,7 @@ if (process.MASTER) {
 	})
 
 }
+
+
 
 

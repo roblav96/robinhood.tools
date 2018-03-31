@@ -1,12 +1,15 @@
 // 
+if (process.MASTER) { console.error('fastify -> process.MASTER should not be required!\n'); process.exit(1) }
+// 
 
 import * as Fastify from 'fastify'
 import * as boom from 'boom'
-import logger from '../adapters/logger'
 
 
 
-const fastify = Fastify({ logger })
+const fastify = Fastify({
+	logger: { level: 'debug', prettyPrint: { levelFirst: true, forceColor: true } },
+})
 export default fastify
 
 
@@ -67,6 +70,8 @@ import './search.api'
 
 
 
+import * as http from 'http'
+import * as ajv from 'ajv'
 declare module 'fastify' {
 	interface FastifyRequest<HttpRequest> {
 		authed: boolean
@@ -81,13 +86,10 @@ declare module 'fastify' {
 		setErrorHandler(fn: (this: FastifyInstance, error: FastifyError, request: FastifyRequest<HttpRequest>, reply: FastifyReply<HttpResponse>) => void): void
 	}
 }
-
-import * as http from 'http'
-import * as ajv from 'ajv'
 declare global {
 	type Fastify = typeof fastify
-	type FastifyError = boom & { validation?: ajv.ErrorObject[] }
 	type FastifyInstance = Fastify.FastifyInstance
+	type FastifyError = boom & { validation?: ajv.ErrorObject[] }
 	type FastifyRegisterOptions = Fastify.RegisterOptions<http.Server, http.IncomingMessage, http.ServerResponse>
 	type FastifyMiddleware = Fastify.FastifyMiddleware<http.Server, http.IncomingMessage, http.ServerResponse>
 	type FastifyRequest = Fastify.FastifyRequest<http.IncomingMessage>
