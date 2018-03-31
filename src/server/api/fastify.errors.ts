@@ -13,7 +13,7 @@ fastify.after(function(error) {
 
 
 fastify.setErrorHandler(async function(error, request, reply) {
-	// console.error('BEFORE error handler Error ->', error)
+	// console.error('before error handler Error ->', error)
 	if (error == null) error = boom.internal();
 
 	if (Array.isArray(error.validation)) {
@@ -27,7 +27,7 @@ fastify.setErrorHandler(async function(error, request, reply) {
 	if (!boom.isBoom(error)) {
 		error = boom.boomify(error, { override: false })
 	}
-	// console.error('AFTER error handler Error ->', error)
+	// console.error('after error handler Error ->', error)
 
 	reply.code(error.output.statusCode)
 	reply.headers(error.output.headers)
@@ -39,7 +39,7 @@ fastify.setErrorHandler(async function(error, request, reply) {
 
 
 fastify.setNotFoundHandler(async function(request, reply) {
-	return boom.notFound(`API resource '${request.raw.url}' does not exist`)
+	return boom.notFound(`Endpoint '${request.raw.url}' does not exist`)
 })
 
 

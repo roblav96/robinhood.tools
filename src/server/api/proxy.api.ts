@@ -13,7 +13,10 @@ fastify.route({
 		// if (!request.authed) throw boom.unauthorized();
 
 		let config = request.body
-		let response = await got(config.url, config)
+		let response = await got(config.url, config).catch(function (error: got.GotError) {
+			console.error('got Error ->', error)
+			throw error
+		})
 		console.log('response.body ->', response.body)
 		return response.body
 
