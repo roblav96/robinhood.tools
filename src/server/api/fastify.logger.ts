@@ -1,5 +1,6 @@
 // 
 
+import * as eyes from 'eyes'
 import * as fs from 'fs'
 import * as _ from 'lodash'
 import * as Pino from 'pino'
@@ -32,7 +33,7 @@ export default Object.assign(fs.createWriteStream('/dev/null'), {
 
 		let method = console[log.label] ? log.label : 'error'
 		let message = (method == 'info' && !log.req && !log.res && !log.err) ? log.msg : log
-		console[method](log.label.toUpperCase(), '->', message)
+		console[method](log.label.toUpperCase(), '->', message) // eyes.inspect(message))
 
 	}
 })

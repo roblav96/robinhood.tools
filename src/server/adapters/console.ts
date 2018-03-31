@@ -52,8 +52,6 @@ _.merge(util.inspect, {
 
 
 import * as eyes from 'eyes'
-_.merge(eyes.defaults, { styles: { all: 'grey' }, maxLength: 65536, showHidden: true, pretty: true } as eyes.EyesOptions)
-const inspector = eyes.inspector(_.defaults({ stream: null } as eyes.EyesOptions, eyes.defaults))
-Object.assign(eyes, { stringify(value: any) { return chalk.reset[eyes.defaults.styles.all](inspector(value)) } })
+_.merge(eyes.defaults, { maxLength: 65536, styles: { all: null, key: 'black', special: 'grey' }, stream: null, showHidden: true, pretty: true } as eyes.EyesOptions)
 
 

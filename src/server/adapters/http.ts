@@ -51,8 +51,7 @@ export function request(config: Partial<Http.RequestConfig>): Promise<any> {
 	}).catch(function(error: got.GotError) {
 		// console.log('error ->', error)
 		throw new boom(error.message, {
-			ctor: null,
-			// ctor: got[error.name],
+			// ctor: null, // ctor: got[error.name],
 			statusCode: (error as any).statusCode,
 			data: error.response.body,
 		})

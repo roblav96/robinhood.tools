@@ -3,6 +3,7 @@
 import * as _ from 'lodash'
 import * as core from '@/common/core'
 import got from 'got'
+import boom from 'boom'
 import vm from '@/client/vm'
 import * as security from '@/client/services/security'
 
@@ -43,10 +44,13 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 	}).catch(function(error: got.GotError) {
 		
 		console.log('got error ->', error)
+		console.dir(error)
 		
 		let message = _.get(error, 'statusMessage', error.message)
-		if (_.has(error, 'response.body.message') && error.response.body.message != message) {
-			message += `: "${error.response.body.message}"`
+		let payload = _.get(error, 'response.body') as boom.Payload
+		if (payload && payload.message) {
+			let extra = payload.attributes ? JSON.stringify(payload.attributes) : payload.message
+			message += `: "${extra}"`
 		}
 
 		let method = _.get(error, 'method', config.method)

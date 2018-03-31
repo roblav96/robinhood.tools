@@ -26,9 +26,7 @@ fastify.setErrorHandler(async function(error, request, reply) {
 	}
 
 	if (!boom.isBoom(error)) error = boom.boomify(error);
-
 	if (error.data) _.defaults(error.output.payload, { attributes: error.data });
-
 	// console.error('AFTER error handler Error ->', error)
 
 	reply.type('application/json')
