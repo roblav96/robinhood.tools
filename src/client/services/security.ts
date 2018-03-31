@@ -14,8 +14,6 @@ import * as http from '@/client/adapters/http'
 
 
 
-export const EE4 = new ee4.EventEmitter()
-
 const state = {
 	ready: false,
 	human: false,
@@ -78,7 +76,6 @@ Promise.all([
 	return socket.init()
 }).then(function() {
 	state.ready = true
-	EE4.emit('ready')
 })
 
 

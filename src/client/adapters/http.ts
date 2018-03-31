@@ -12,10 +12,10 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 	return Promise.resolve().then(function() {
 		config.json = true
 
-		if (config.iscors) {
+		if (config.isProxy) {
 			config.body = core.json.clone(config)
 			config.method = 'POST'
-			config.url = '/cors'
+			config.url = '/proxy'
 		}
 
 		_.defaults(config, {
@@ -78,7 +78,7 @@ declare global {
 			url: string
 			query: any
 			silent: boolean
-			iscors: boolean
+			isProxy: boolean
 		}
 	}
 }

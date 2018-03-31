@@ -46,14 +46,14 @@ class Socket {
 	}
 
 	init = _.once(() => {
-		return http.get('/socket/addresses').then((addresses: string[]) => {
-			this._cons = addresses.length
-			this._clients = addresses.map((v, i) => {
-				let client = new Client(v, i)
-				client.socket.once('open', this._onopen)
-				return client
-			})
-		})
+		// return http.get('/socket/addresses').then((addresses: string[]) => {
+		// 	this._cons = addresses.length
+		// 	this._clients = addresses.map((v, i) => {
+		// 		let client = new Client(v, i)
+		// 		client.socket.once('open', this._onopen)
+		// 		return client
+		// 	})
+		// })
 	})
 
 }

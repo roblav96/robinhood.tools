@@ -8,7 +8,7 @@ import * as Fastify from 'fastify'
 
 
 
-const LOG_LEVEL = 'error' as Pino.Level
+const LOG_LEVEL = 'debug' as Pino.Level
 
 const fastify = Fastify({
 	logger: { level: LOG_LEVEL, prettyPrint: { levelFirst: true, forceColor: true } },
@@ -33,7 +33,7 @@ import './security.api'
 
 import './logger.api'
 import './socket.api'
-import './cors.api'
+import './proxy.api'
 import './recaptcha.api'
 import './search.api'
 

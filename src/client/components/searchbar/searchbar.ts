@@ -15,17 +15,17 @@ export default class extends Vue {
 
 	mounted() {
 		// if (DEVELOPMENT) setTimeout(() => this.query = 'nvda', 300);
-		security.EE4.once('ready', function() {
-			// http.get('/awesome', {
-			http.get('https://infoapi.webull.com/api/search/tickers2', {
-				iscors: true,
-				// query: { keys: 'nvda' },
-			}).then(function(response) {
-				console.log('response ->', response)
-			}).catch(function(error) {
-				console.error('mounted Error ->', error)
-			})
+		// security.EE4.once('ready', function() {
+		// http.get('/awesome', {
+		http.get('https://infoapi.webull.com/api/search/tickers2', {
+			isProxy: true,
+			// query: { keys: 'nvda' },
+		}).then(function(response) {
+			console.log('response ->', response)
+		}).catch(function(error) {
+			console.error('mounted Error ->', error)
 		})
+		// })
 	}
 
 	busy = false
