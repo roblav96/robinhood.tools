@@ -22,15 +22,15 @@ if (process.MASTER) {
 			next(host == process.HOST)
 		},
 	})
-	wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
+	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
-	wss.on('connection', function(socket: uws.WebSocket, req: IncomingMessage) {
-		if (!Array.isArray(socket.subs)) socket.subs = [];
+	wss.on('connection', function(client: Radio.Client, req: IncomingMessage) {
+		if (!Array.isArray(client.subs)) client.subs = [];
 
-		socket.on('message', function(message: string) {
+		client.on('message', function(message: string) {
 			if (message == 'pong') return;
-			if (message == 'ping') return socket.send('pong');
+			if (message == 'ping') return client.send('pong');
 			if (message == '_onopen_') {
 				if (wss.clients.length > process.INSTANCES) {
 					wss.broadcast('_onready_')
@@ -40,7 +40,7 @@ if (process.MASTER) {
 			wss.broadcast(message)
 		})
 
-		socket.on('error', function(error) { console.error('socket.on Error ->', error) })
+		client.on('error', function(error) { console.error('socket.on Error ->', error) })
 
 	})
 
@@ -52,7 +52,8 @@ class Radio extends ee4.EventEmitter {
 
 	socket = new uWebSocket(`ws://${HOST}:${PORT}/${PATH}`, {
 		autoconnect: !process.MASTER,
-		verbose: true, // process.MASTER,
+		// verbose: process.MASTER,
+		// verbose: true,
 	})
 
 	constructor() {
@@ -62,15 +63,18 @@ class Radio extends ee4.EventEmitter {
 			this.socket.send('_onopen_')
 			super.emit('_onopen_')
 		})
-		this.socket.on('message', (message: Radio.Message) => {
-			if ((message as any) == '_onready_') return super.emit('_onready_');
-			message = JSON.parse(message as any)
-			super.emit(message.e, message.d)
+		this.socket.on('message', (message: string) => {
+			if (message == '_onready_') {
+				super.emit('_onready_')
+				return
+			}
+			let event = JSON.parse(message) as Radio.Event
+			super.emit(event.e, event.d)
 		})
 	}
 
 	emit(event: string, data?: any) {
-		return !!this.socket.json({ e: event, d: data } as Radio.Message)
+		return !!this.socket.json({ e: event, d: data } as Radio.Event)
 	}
 
 }
@@ -83,18 +87,15 @@ export default new Radio()
 
 declare global {
 	namespace Radio {
-		type radio = Radio
-		interface Message<T = any> {
-			e: string
-			i: number
-			d?: T
+		interface Client extends uws {
+			subs: string[]
 		}
-	}
-}
-
-declare module 'uws' {
-	interface WebSocket extends uws {
-		subs?: string[]
+		interface Event<T = any> {
+			/** ▶ event name */
+			e: string
+			/** ▶ data */
+			d: T
+		}
 	}
 }
 

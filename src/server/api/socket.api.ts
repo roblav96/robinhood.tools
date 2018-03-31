@@ -12,10 +12,10 @@ import * as boom from 'boom'
 fastify.route({
 	method: 'GET',
 	url: '/api/socket/addresses',
-	handler: async function(this: FastifyInstance, request, reply) {
-		let domain = process.DOMAIN.replace('http', 'ws')
+	handler: async function(request, reply) {
+		let address = 'ws' + (PRODUCTION ? 's' : '') + '://' + process.DOMAIN
 		let addresses = core.array.create(process.INSTANCES).map(function(i) {
-			return domain + '/websocket/' + i
+			return address + '/websocket/' + i
 		})
 		return addresses
 	},
@@ -26,7 +26,7 @@ fastify.route({
 fastify.route({
 	method: 'POST',
 	url: '/api/socket/subscribe',
-	handler: async function(this: FastifyInstance, request, reply) {
+	handler: async function(request, reply) {
 
 	},
 })

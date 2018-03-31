@@ -1,12 +1,11 @@
 // 
 
-import * as url from 'url'
 import fastify from './fastify'
 
 
 
 import * as cors from 'cors'
-fastify.use(cors({ origin: url.parse(process.DOMAIN).hostname }))
+fastify.use(cors({ origin: process.DOMAIN }))
 
 
 
@@ -16,23 +15,6 @@ declare module 'fastify' {
 	interface FastifyRequest<HttpRequest> { cookies: Dict<string> }
 	interface FastifyReply<HttpResponse> { setCookie: (name: string, value: string, opts: cookie.CookieSerializeOptions) => FastifyReply<HttpResponse> }
 }
-
-
-
-import radio from '../services/radio'
-fastify.register(function(fastify, opts, next) {
-	radio.once('_onready_', next)
-})
-
-
-
-// import * as boom from 'boom'
-// fastify.register(function(fastify, opts, next) {
-// 	fastify.decorate('boom', boom)
-// 	next()
-// }, error => { if (error) console.error('fastify-boom Error ->', error); })
-// declare module 'fastify' { interface FastifyInstance { boom: typeof boom } }
-// declare global { type FastifyError = boom & { validation?: ajv.ErrorObject[] } }
 
 
 
@@ -52,7 +34,5 @@ fastify.register(function(fastify, opts, next) {
 // fastify.register(function(fastify, opts, next) {
 // 	products.register(next)
 // })
-
-
 
 

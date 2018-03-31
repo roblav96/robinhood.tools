@@ -45,7 +45,7 @@
 		"pretty-bytes": "latest",
 		"pretty-ms": "latest",
 		"repaintless": "latest",
-		"rxjs": "alpha",
+		"rxjs": "rc",
 		"stack-trace": "latest",
 		"uws": "latest",
 		"vue": "latest",

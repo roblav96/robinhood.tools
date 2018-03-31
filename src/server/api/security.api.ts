@@ -21,7 +21,7 @@ fastify.route({
 		await redis.main.hset('security:doc:' + request.doc.uuid, 'prime', prime)
 
 		let cookie = {
-			domain: url.parse(process.DOMAIN).hostname,
+			domain: process.DOMAIN,
 			path: '/', sameSite: true, httpOnly: true,
 			secure: PRODUCTION,
 		} as CookieSerializeOptions
