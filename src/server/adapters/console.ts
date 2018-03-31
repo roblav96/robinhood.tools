@@ -52,6 +52,6 @@ _.merge(util.inspect, {
 
 
 import * as eyes from 'eyes'
-_.merge(eyes.defaults, { maxLength: 65536, styles: { all: null, key: 'black', special: 'grey' }, stream: null, showHidden: true, pretty: true } as eyes.EyesOptions)
+_.merge(eyes.defaults, { maxLength: 65536, styles: { all: null, key: 'grey', special: 'red' }, stream: null, showHidden: true, pretty: true } as eyes.EyesOptions)
 
 

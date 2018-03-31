@@ -8,13 +8,14 @@ import stream from './fastify.logger'
 
 
 
-const LOG_LEVEL = 'trace' as Pino.Level
-
+const LOG_LEVEL = 'info' as Pino.Level
 const fastify = Fastify({
 	logger: { level: LOG_LEVEL, extreme: PRODUCTION, stream },
 })
 
 export default fastify
+
+
 
 import './fastify.errors'
 import './fastify.plugins'
@@ -40,7 +41,9 @@ import './search.api'
 
 fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 	if (error) return console.error('listen Error ->', error);
-	if (process.PRIMARY) console.info('listen ->', fastify.server.address().address + ':' + fastify.server.address().port, '\n', fastify.printRoutes());
+	if (process.PRIMARY) {
+		console.info('listen ->', fastify.server.address().address + ':' + fastify.server.address().port, '\n', fastify.printRoutes())
+	}
 })
 
 
@@ -48,8 +51,8 @@ fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 
 
 declare module 'fastify' {
-	interface FastifyInstance {
-
+	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
+		addHook(name: 'onRoute', fn: (opts: RegisterOptions<HttpServer, HttpRequest, HttpResponse>) => void): FastifyInstance
 	}
 	interface FastifyRequest<HttpRequest> {
 		authed: boolean

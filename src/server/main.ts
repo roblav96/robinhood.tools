@@ -6,7 +6,7 @@ import 'source-map-support/register'
 import './process'
 
 import './adapters/console'
-// if (DEVELOPMENT) process.INSTANCES = 1;
+if (DEVELOPMENT) process.INSTANCES = 1;
 import './adapters/cluster'
 
 global.WebSocket = require('uws')
@@ -18,5 +18,8 @@ import './adapters/redis'
 if (process.WORKER) {
 	require('./api/fastify')
 }
+
+
+
 
 

@@ -62,10 +62,10 @@ function finger() {
 }
 
 function token() {
-	return http.get('/security/token').catch(function(error) {
-		console.error('token Error ->', error)
-		return pdelay(3000).then(token)
-	})
+	// return http.get('/security/token').catch(function(error) {
+	// 	console.error('token Error ->', error)
+	// 	return pdelay(3000).then(token)
+	// })
 }
 
 Promise.all([

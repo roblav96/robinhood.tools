@@ -31,9 +31,33 @@ export default Object.assign(fs.createWriteStream('/dev/null'), {
 			}
 		}
 
-		let method = console[log.label] ? log.label : 'error'
-		let message = (method == 'info' && !log.req && !log.res && !log.err) ? log.msg : log
-		console[method](log.label.toUpperCase(), '->', message) // eyes.inspect(message))
+		let message = _.omit(log, ['level', 'time', 'pid', 'hostname', 'v', 'label', 'reqId', 'responseTime'])
+		if (message.req) message.req = _.omit(message.req, ['id', 'remoteAddress', 'remotePort']) as any;
+
+		let fn = console[log.label] ? log.label : 'error'
+		if (fastify.log.level == 'debug') console[fn](log.label.toUpperCase(), '->', message);
+		else console[fn](eyes.inspect(message));
+
+
+		// let message = log as any
+		// let msg = log.msg
+		// let label = log.label.toUpperCase()
+		// if (label == 'INFO') {
+		// 	// if (msg.indexOf('Server listening') == 0) return;
+		// 	if (msg.indexOf('Server listening') == 0) message = msg;
+		// 	// if (msg == 'incoming request') message = `-> [${log.req.method}] ${log.req.url}`;
+		// 	if (msg == 'incoming request') {
+		// 		message = _.pick(log, ['msg', 'req'])
+		// 	}
+		// 	// if (msg == 'request completed') message = `<- [${log.req.method}] ${log.req.url}`;
+		// }
+
+		// let fn = console[log.label] ? log.label : 'error'
+		// if (label == 'INFO' && core.string.is(message)) {
+		// 	console[fn](message)
+		// } else {
+		// 	console[fn](label, '->', eyes.inspect(message))
+		// }
 
 	}
 })
