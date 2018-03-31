@@ -12,14 +12,14 @@ import * as stacktrace from 'stack-trace'
 const logger = Pino({
 	level: 'debug',
 	prettyPrint: {
-		errorLikeObjectKeys: [],
-		// levelFirst: true, forceColor: true,
-		formatter: (function(log, config) {
-			let method = logger.levels.labels[log.level]
-			if (!global.console[method]) method = 'error';
-			global.console[method]('logger ->', log.msg)
-			return ''
-		} as Pino.PrettyFormatter) as any,
+		levelFirst: true, forceColor: true,
+		// errorLikeObjectKeys: [],
+		// formatter: (function(log, config) {
+		// 	let method = logger.levels.labels[log.level]
+		// 	if (!global.console[method]) method = 'error';
+		// 	global.console[method]('logger ->', log.msg)
+		// 	return ''
+		// } as Pino.PrettyFormatter) as any,
 	},
 })
 
@@ -54,6 +54,7 @@ export default logger
 // 	return frame
 // }
 
+// const FRAME_PROTOS = ['getColumnNumber', 'getEvalOrigin', 'getFileName', 'getFunction', 'getFunctionName', 'getLineNumber', 'getMethodName', 'getPosition', 'getScriptNameOrSourceURL', 'getThis', 'getTypeName', 'isConstructor', 'isEval', 'isNative', 'isToplevel']
 // function parseStackFrame(frame: stacktrace.StackFrame) {
 // 	frame = sourcemaps.wrapCallSite(frame)
 // 	let parsed = {
