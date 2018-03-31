@@ -3,6 +3,7 @@
 import fastify from './fastify'
 import * as boom from 'boom'
 import * as got from 'got'
+import * as http from '../adapters/http'
 
 
 
@@ -12,8 +13,13 @@ fastify.route({
 	handler: async function(request, reply) {
 		// if (!request.authed) throw boom.unauthorized();
 
-		let config = request.body
-		let response = await got(config.url, config).catch(function (error: got.GotError) {
+		let config = request.body as Http.RequestConfig
+		let response = await http.request({
+			method: config.method,
+			url: config.url,
+			retries: 3,
+			isProxy: true,
+		}).catch(function(error: got.GotError) {
 			console.error('got Error ->', error)
 			throw error
 		})

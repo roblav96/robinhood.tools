@@ -34,11 +34,10 @@ const fastify = Fastify({
 						_.unset(this.reqs, log.reqId)
 					}
 				}
-				
-				process.dtsgen('log', log)
 
 				let method = console[log.label] ? log.label : 'error'
-				console[method](log.label.toUpperCase(), '->', log)
+				let message = method == 'info' ? log.msg : log
+				console[method](log.label.toUpperCase(), '->', message)
 
 			},
 
