@@ -6,7 +6,7 @@ import * as rx from 'rxjs'
 import * as uws from 'uws'
 import * as ee4 from '../../common/ee4'
 import * as rxu from '../../common/rx.utils'
-import uWebSocket from '../../common/uwebsocket'
+import WebSocketClient from '../../common/websocket.client'
 
 
 
@@ -53,7 +53,7 @@ if (process.MASTER) {
 class Radio extends ee4.EventEmitter {
 
 	rxReady = new rxu.ReadySubject()
-	socket = new uWebSocket(`ws://${HOST}:${PORT}/${PATH}`, {
+	socket = new WebSocketClient(`ws://${HOST}:${PORT}/${PATH}`, {
 		autoconnect: false,
 		// verbose: process.MASTER,
 		// verbose: true,

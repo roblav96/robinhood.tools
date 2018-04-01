@@ -1,17 +1,18 @@
 // 
+export * from '../../common/robinhood'
+// 
 
-import * as util from 'util'
 import * as _ from 'lodash'
-import * as core from '../../common/core'
-
-import * as got from 'got'
-import * as qs from 'querystring'
+import * as robinhood from '../../common/robinhood'
+import * as http from './http'
 import * as redis from './redis'
 
 
 
-export function syncInstruments() {
-	
+export async function getSymbols() {
+	let resolved = await redis.main.get(redis.RH.SYMBOLS + ':' + process.INSTANCE)
+	console.log('resolved ->', resolved)
+	return JSON.parse(resolved) as string[]
 }
 
 

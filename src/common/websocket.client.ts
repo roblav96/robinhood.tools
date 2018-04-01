@@ -9,7 +9,7 @@ import ticks from './ticks'
 
 
 
-export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'error' | 'message'> {
+export default class WebSocketClient extends ee4.EventEmitter<'open' | 'close' | 'error' | 'message'> {
 
 	private static readonly ecodes = {
 		1000: 'Normal',
@@ -43,30 +43,28 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 
 	constructor(
 		public address: string,
-		public options = {} as Partial<typeof uWebSocket.options>,
+		public options = {} as Partial<typeof WebSocketClient.options>,
 	) {
 		super()
-		_.defaults(this.options, uWebSocket.options)
+		_.defaults(this.options, WebSocketClient.options)
 		this.reconnect = _.throttle(this.connect, this.options.retrytimeout, { leading: false, trailing: true })
 		if (!this.options.autoconnect) return;
 		if (this.options.delaystart >= 0) _.delay(() => this.connect(), this.options.delaystart);
 		else this.connect();
 	}
 
-	private _socket: WebSocket & uws
-	get isopen() { return this._socket && this._socket.readyState == this._socket.OPEN }
+	socket: WebSocket & uws
+	get isopen() { return this.socket && this.socket.readyState == this.socket.OPEN }
 
 	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
 	send(message: string) {
-		if (process.CLIENT) this._socket.send(message);
-		if (process.SERVER) this._socket.send(message, this._sent);
+		if (process.CLIENT) this.socket.send(message);
+		if (process.SERVER) this.socket.send(message, this._sent);
 	}
-	private _sent = (error?: Error) => {
-		if (error) console.error(this.name, '_sent Error ->', error);
-	}
+	private _sent = (error?: Error) => { if (error) console.error(this.name, '_sent Error ->', error); }
 
 	close(code = 1000, reason?: string) {
-		this._socket.close(code, reason)
+		this.socket.close(code, reason)
 	}
 
 	destroy() {
@@ -79,24 +77,24 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	terminate() {
 		this.reconnect.cancel()
 		ticks.removeListenerFunction(this._heartbeat)
-		if (!this._socket) return;
-		this._socket.close()
+		if (!this.socket) return;
+		this.socket.close()
 		if (process.SERVER) {
-			this._socket.terminate()
-			this._socket.removeAllListeners()
+			this.socket.terminate()
+			this.socket.removeAllListeners()
 		}
-		this._socket = null
+		this.socket = null
 	}
 
 	reconnect: (() => void) & _.Cancelable
 	connect() {
 		this.terminate()
 		let address = this.options.query ? this.address + '?' + this.options.query() : this.address
-		this._socket = new WebSocket(address) as any
-		this._socket.onopen = this._onopen as any
-		this._socket.onclose = this._onclose as any
-		this._socket.onerror = this._onerror as any
-		this._socket.onmessage = this._onmessage as any
+		this.socket = new WebSocket(address) as any
+		this.socket.onopen = this._onopen as any
+		this.socket.onclose = this._onclose as any
+		this.socket.onerror = this._onerror as any
+		this.socket.onmessage = this._onmessage as any
 		this.reconnect()
 	}
 
@@ -108,7 +106,7 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 	}
 
 	private _onclose = (event: CloseEvent) => {
-		console.warn(this.name, 'onclose ->', uWebSocket.ecodes[event.code] || event.code, '->', event.reason)
+		console.warn(this.name, 'onclose ->', WebSocketClient.ecodes[event.code] || event.code, '->', event.reason)
 		this.emit('close', event.code, event.reason)
 		ticks.removeListenerFunction(this._heartbeat)
 		if (this.options.autoretry) this.reconnect();
@@ -141,8 +139,8 @@ export default class uWebSocket extends ee4.EventEmitter<'open' | 'close' | 'err
 
 
 
-// type uWebSocketOptions = typeof uWebSocket.options
-// interface uWebSocket extends uWebSocketOptions { }
-// class uWebSocket extends WebSocket {
+// type WebSocketClientOptions = typeof WebSocketClient.options
+// interface WebSocketClient extends WebSocketClientOptions { }
+// class WebSocketClient extends WebSocket {
 
 

@@ -14,7 +14,6 @@
 			"*.sublime*",
 			"*.gitignore*",
 			"*.debug*",
-			"*.client*",
 			"*vue*",
 			"*license*",
 			"*readme*"

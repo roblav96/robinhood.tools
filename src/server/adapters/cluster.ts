@@ -4,7 +4,7 @@ import * as cluster from 'cluster'
 
 
 
-if (process.MASTER) process.stdout.write('\n\n\n\n\n\n');
+if (process.MASTER) process.stdout.write('\n\n');
 if (process.MASTER && process.INSTANCES > 0) {
 
 	const workers = {} as Dict<number>
@@ -13,7 +13,7 @@ if (process.MASTER && process.INSTANCES > 0) {
 		workers[worker.process.pid] = i
 	}
 
-	console.log('Forking', process.INSTANCES, 'workers in cluster...')
+	console.warn('Forking', process.INSTANCES, 'workers in cluster...')
 	let i: number, len = process.INSTANCES
 	for (i = 0; i < len; i++) { fork(i) }
 

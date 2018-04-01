@@ -1,6 +1,6 @@
 // 
 
-import ticks from './ticks'
+export { }
 
 
 
