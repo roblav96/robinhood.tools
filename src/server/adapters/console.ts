@@ -49,10 +49,10 @@ _.merge(util.inspect, {
 		showHidden: false,
 		showProxy: false,
 		depth: 1,
-		colors: true,
 		compact: false,
 		breakLength: Infinity,
 		maxArrayLength: Infinity,
+		colors: !!chalk.supportsColor,
 	},
 	styles: {
 		string: 'green', regexp: 'green', date: 'green',
