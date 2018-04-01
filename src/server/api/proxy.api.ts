@@ -16,7 +16,7 @@ fastify.route({
 		// throw boom.internal('boom.INTERNAL was thrown')
 		// request.body.about.gone
 
-		let config = request.body as Http.RequestConfig
+		let config = request.body as Http.Config
 		let response = await http.request({
 			method: config.method,
 			url: config.url,

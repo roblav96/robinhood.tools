@@ -8,7 +8,7 @@ import * as robinhood from '../adapters/robinhood'
 
 
 
-const rxInstrument = new rx.Subject()
+const rxInstruments = new rx.Subject()
 
 async function getInstruments(url: string) {
 	let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>

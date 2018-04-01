@@ -163,14 +163,12 @@ export const object = {
 	fix<T = object>(target: T, deep = false) {
 		Object.keys(target).forEach(function(key) {
 			let value = target[key]
-			if (deep && object.is(value)) {
-				return object.fix(value, true)
-			}
+			if (deep && object.is(value)) return object.fix(value, true);
 			if (value === '') return _.unset(target, key);
 			if (!string.is(value)) return;
-			if (value == 'true' || value == 'false') {
-				target[key] = JSON.parse(value)
-			} else if (!isNaN(value as any) && value.match(/[^0-9.-]/) == null) {
+			if (value == 'true') return target[key] = true;
+			if (value == 'false') return target[key] = false;
+			if (!isNaN(value as any) && value.match(/[^0-9.-]/) == null) {
 				target[key] = Number.parseFloat(value)
 			}
 		})

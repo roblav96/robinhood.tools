@@ -3,13 +3,14 @@
 import '../common/polyfills'
 import 'source-map-support/register'
 
+global.Promise = require('bluebird')
+global.WebSocket = require('uws')
+
 import './process'
 
 import './adapters/console'
 if (DEVELOPMENT) process.INSTANCES = 2;
 import './adapters/cluster'
-
-global.WebSocket = require('uws')
 
 import '../common/ticks'
 import './adapters/radio'

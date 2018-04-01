@@ -31,9 +31,12 @@ process.SERVER = true
 
 
 
-process.once('uncaughtException', error => console.error('UNCAUGHT EXCEPTION ->', error))
-process.once('unhandledRejection', function(error) {
-	console.error('UNHANDLED REJECTION ->', error)
+import chalk from 'chalk'
+process.on('uncaughtException', function(error) {
+	console.error(chalk.bold.redBright('UNCAUGHT EXCEPTION'), '->', error)
+})
+process.on('unhandledRejection', function(error) {
+	console.error(chalk.bold.redBright('UNHANDLED REJECTION'), '->', error)
 	console.error('https://github.com/mcollina/make-promises-safe', '\n')
 	process.exit(1)
 })

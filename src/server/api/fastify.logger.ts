@@ -12,13 +12,14 @@ import fastify from './fastify'
 
 
 
-const inspector = !chalk.supportsColor ? util.inspect : eyes.inspect as (value: any) => string
 const reqs = [] as Pino.LogRequest[]
 const recycle = _.throttle(function(reqId: number) {
 	reqs.splice(0, reqId)
 }, 1000, { leading: false, trailing: true })
 
 export default Object.assign(fs.createWriteStream('/dev/null'), {
+
+	inspector(value: any) { return !chalk.supportsColor ? util.inspect(value) : eyes.inspect(value) },
 
 	write(log: Pino.LogDescriptor) {
 		if (!core.json.is(log)) {
@@ -40,48 +41,19 @@ export default Object.assign(fs.createWriteStream('/dev/null'), {
 
 		if (log.err && log.err.stack) {
 			if (log.err.isGot) {
-				return console.error('ERROR ->', inspector(_.omit(message, ['err.stack'])))
+				return console.error('ERROR ->', this.inspector(_.omit(message, ['err.stack'])))
 			}
 			return console.error(
 				'ERROR ->', message.err.stack, '\n',
-				inspector(_.omit(message, ['err.stack']))
+				this.inspector(_.omit(message, ['err.stack']))
 			)
 		}
 
 		let fn = console[log.label] ? log.label : 'error'
 		console[fn](
 			log.label.toUpperCase(), '->',
-			fastify.log.level == 'debug' ? message : inspector(message)
+			fastify.log.level == 'debug' ? message : this.inspector(message)
 		)
-		// if (fastify.log.level == 'debug') {
-		// 	return console[fn](log.label.toUpperCase(), '->', message)
-		// }
-		// console[fn](inspector(message))
-
-
-
-		// if (Object.keys(message).length == 1) message = message.msg as any;
-		// console[fn](inspector(message))
-
-		// let message = log as any
-		// let msg = log.msg
-		// let label = log.label.toUpperCase()
-		// if (label == 'INFO') {
-		// 	// if (msg.indexOf('Server listening') == 0) return;
-		// 	if (msg.indexOf('Server listening') == 0) message = msg;
-		// 	// if (msg == 'incoming request') message = `-> [${log.req.method}] ${log.req.url}`;
-		// 	if (msg == 'incoming request') {
-		// 		message = _.pick(log, ['msg', 'req'])
-		// 	}
-		// 	// if (msg == 'request completed') message = `<- [${log.req.method}] ${log.req.url}`;
-		// }
-
-		// let fn = console[log.label] ? log.label : 'error'
-		// if (label == 'INFO' && core.string.is(message)) {
-		// 	console[fn](message)
-		// } else {
-		// 	console[fn](label, '->', inspector(message))
-		// }
 
 	}
 })

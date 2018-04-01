@@ -6,24 +6,28 @@ import * as boom from 'boom'
 
 
 
-export const timeout = 10000
+export const config = {
+	json: true,
+	timeout: 10000,
+	retries(i: number) {
+		console.log('http retries i ->', i)
+		return i
+	},
+} as Partial<Http.Config>
 
-export function retries(i: number) {
-	console.log('i ->', i)
-	return i
-}
+
 
 
 
 declare global {
 	namespace Http {
-		interface RequestConfig extends got.GotJSONOptions {
+		interface Config extends got.GotJSONOptions {
 			url: string
 			query: any
 			silent: boolean
 			isProxy: boolean
-			rhAuthToken: string
-			wbAuthToken: boolean
+			robinhoodToken: string
+			webullAuth: boolean
 		}
 		interface Payload extends boom.Payload {
 

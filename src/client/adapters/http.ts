@@ -12,7 +12,7 @@ import * as http from '@/common/http'
 
 
 
-function request(config: Partial<Http.RequestConfig>): Promise<any> {
+function request(config: Partial<Http.Config>): Promise<any> {
 	return Promise.resolve().then(function() {
 		config.json = true
 
@@ -27,7 +27,7 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 			retries: 9,
 			silent: PRODUCTION,
 			headers: {},
-		} as Partial<Http.RequestConfig>)
+		} as Partial<Http.Config>)
 
 		if (!config.silent) {
 			let ending = (config.query || config.body) ? ' ➤ ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
@@ -62,13 +62,13 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 
 }
 
-export function get<T = any>(url: string, config = {} as Partial<Http.RequestConfig>): Promise<T> {
+export function get<T = any>(url: string, config = {} as Partial<Http.Config>): Promise<T> {
 	config.url = url
 	config.method = 'GET'
 	return request(config)
 }
 
-export function post<B = any, T = any>(url: string, body?: B, config = {} as Partial<Http.RequestConfig>): Promise<T> {
+export function post<B = any, T = any>(url: string, body?: B, config = {} as Partial<Http.Config>): Promise<T> {
 	config.url = url
 	config.method = 'POST'
 	if (body) config.body = body as any;
