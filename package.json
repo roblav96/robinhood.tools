@@ -99,6 +99,7 @@
 		"source-map-support": "latest",
 		"stack-trace": "latest",
 		"tsc-watch": "latest",
-		"vue-template-compiler": "latest"
+		"vue-template-compiler": "latest",
+		"webpack-bundle-analyzer": "latest"
 	}
 }

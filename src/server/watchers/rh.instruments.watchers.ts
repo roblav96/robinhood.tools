@@ -1,5 +1,6 @@
 // 
 
+import * as eyes from 'eyes'
 import * as cron from 'cron'
 import * as pdelay from 'delay'
 import * as pevent from 'p-event'
@@ -19,10 +20,16 @@ const rxInstrument = new rx.Subject()
 
 
 
+console.info('rxInstrument dtsgen ->', console.dtsgen(rxInstrument))
+console.info('rxInstrument dtsgen ->', eyes.inspect(console.dtsgen(rxInstrument)))
+
+
+
 async function onUrl(url: string) {
 	let response = await http.get(url)
 	// console.log('response ->', response)
-	// process.dtsgen('response', response)
+	// console.info('rxInstrument ->', process.dtsgen(rxInstrument))
+	// console.info('response ->', eyes.inspect(process.dtsgen(response)))
 }
 
 async function doForever() {

@@ -39,18 +39,3 @@ process.once('unhandledRejection', function(error) {
 })
 
 
-
-declare global { namespace NodeJS { interface Process { dtsgen: (name: string, typings: any) => void } } }
-if (DEVELOPMENT) {
-	const dtsgen = require('dts-gen')
-	const clipboardy = require('clipboardy')
-	process.dtsgen = function(name, typings) {
-		if (typings == null) return;
-		// let results = dtsgen.generateIdentifierDeclarationFile('typings', typings)
-		let results = dtsgen.generateModuleDeclarationFile('typings', typings)
-		console.info('dtsgen', name, '->', results)
-		clipboardy.write(results)
-	}
-}
-
-

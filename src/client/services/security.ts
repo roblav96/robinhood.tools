@@ -67,15 +67,15 @@ function token(): Promise<string[]> {
 	})
 }
 
-Promise.all([
-	uuid(), finger(),
-]).then(function() {
-	return token()
-}).then(function(addresses) {
-	return socket.init(addresses)
-}).then(function() {
-	state.ready = true
-})
+// Promise.all([
+// 	uuid(), finger(),
+// ]).then(function() {
+// 	return token()
+// }).then(function(addresses) {
+// 	return socket.init(addresses)
+// }).then(function() {
+// 	state.ready = true
+// })
 
 
 

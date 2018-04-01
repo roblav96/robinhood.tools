@@ -1,4 +1,9 @@
 // 
+import { noop } from 'lodash'
+let dtsgen = noop
+// /**▶ UNCOMMENT TO ENABLE */ if (DEVELOPMENT) dtsgen = require('@/common/dtsgen').default;
+Object.assign(console, { dtsgen })
+// 
 
 import '@/common/ticks'
 import '@/client/services/security'

@@ -35,6 +35,14 @@ console.format = function(args) {
 
 
 
+import * as eyes from 'eyes'
+_.merge(eyes.defaults, {
+	maxLength: 65536, stream: null, showHidden: true, pretty: true,
+	styles: { all: null, key: 'grey', special: 'red' },
+} as eyes.EyesOptions)
+
+
+
 import * as util from 'util'
 _.merge(util.inspect, {
 	defaultOptions: {
@@ -54,22 +62,33 @@ _.merge(util.inspect, {
 	},
 } as Partial<typeof util.inspect>)
 
+
+
 Object.assign(console, {
 	dump(value: any, opts = {}) {
 		_.defaults(opts, {
 			depth: 2, showHidden: true, showProxy: true,
 		} as NodeJS.InspectOptions)
 		return util.inspect(value, opts)
-	}
+	},
 })
 declare global { interface Console { dump(value: any, opts?: NodeJS.InspectOptions): string } }
 
 
 
-import * as eyes from 'eyes'
-_.merge(eyes.defaults, {
-	maxLength: 65536, stream: null, showHidden: true, pretty: true,
-	styles: { all: null, key: 'grey', special: 'red' },
-} as eyes.EyesOptions)
+Object.assign(console, { dtsgen: _.noop })
+if (DEVELOPMENT) {
+	const dtsgen = require('../../common/dtsgen').default
+	const clipboardy = require('clipboardy')
+	Object.assign(console, {
+		dtsgen(value: any) {
+			let results = dtsgen(value)
+			clipboardy.write(results)
+			return results
+		},
+	})
+}
+
+
 
 

@@ -5,8 +5,6 @@ global.PRODUCTION = NODE_ENV == 'production'
 // 
 
 const eyes = require('eyes')
-eyes.defaults.maxLength = 65536
-eyes.defaults.showHidden = true
 const webpack = require('webpack')
 const path = require('path')
 const _ = require('lodash')
@@ -18,7 +16,7 @@ const package = require('./package.json')
 module.exports = {
 
 	outputDir: 'dist/client',
-	dll: DEVELOPMENT, // faster incremental recompilation, slower initial build
+	// dll: DEVELOPMENT, // faster incremental recompilation, slower initial build
 	css: { sourceMap: false }, // only enable when needed
 	vueLoader: { hotReload: false }, // hot reload can make debugging difficult
 
@@ -35,6 +33,8 @@ module.exports = {
 				})
 			})
 		}
+		// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+		// config.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 12321 }))
 	},
 
 	chainWebpack: function(config) {
