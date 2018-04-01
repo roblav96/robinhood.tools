@@ -124,8 +124,8 @@ export const sort = {
 
 
 export const object = {
-	is<T = any>(value: T): value is T { return _.isPlainObject(value) },
-	assign<T = any>(target: T, source: T, deep = false) {
+	is<T = object>(value: T): value is T { return _.isPlainObject(value) },
+	assign<T = object>(target: T, source: T, deep = false) {
 		Object.keys(source).forEach(function(key) {
 			let tvalue = target[key]
 			let svalue = source[key]
@@ -135,32 +135,32 @@ export const object = {
 			target[key] = svalue;
 		})
 	},
-	compact<T = any>(target: T, returns = false) {
+	compact<T = object>(target: T, returns = false) {
 		Object.keys(target).forEach(function(key) {
 			let tvalue = target[key]
 			if (tvalue === null || tvalue === undefined) _.unset(target, key);
 		})
 		if (returns) return target;
 	},
-	merge<T = any>(target: T, source: T) {
+	merge<T = object>(target: T, source: T) {
 		Object.keys(source).forEach(function(key) {
 			let svalue = source[key]
 			if (svalue == null) return;
 			target[key] = svalue
 		})
 	},
-	repair<T = any>(target: T, source: T) {
+	repair<T = object>(target: T, source: T) {
 		Object.keys(source).forEach(function(key) {
 			let value = source[key]
 			if (target[key] == null && value != null) target[key] = value;
 		})
 	},
-	nullify<T = any>(target: T) {
+	nullify<T = object>(target: T) {
 		Object.keys(target).forEach(function(key) {
 			target[key] = null
 		})
 	},
-	fix<T = any>(target: T, deep = false) {
+	fix<T = object>(target: T, deep = false) {
 		Object.keys(target).forEach(function(key) {
 			let value = target[key]
 			if (deep && object.is(value)) {
@@ -180,17 +180,17 @@ export const object = {
 
 
 export const json = {
-	is<T = any>(value: T): value is T {
+	is<T = object>(value: T): value is T {
 		if (string.is(value)) {
 			if (value.charAt(0) == '{') return true; // && value.charAt(value.length - 1) == '}') return true;
 			if (value.charAt(0) == '[') return true; // && value.charAt(value.length - 1) == ']') return true;
 		}
 		return false
 	},
-	clone<T = any>(value: T): T {
+	clone<T = object>(value: T): T {
 		return JSON.parse(JSON.stringify(value))
 	},
-	parse<T = any>(value: T): T {
+	parse<T = object>(value: T): T {
 		return json.is(value) ? JSON.parse(value as any) : value
 	},
 }

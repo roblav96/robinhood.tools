@@ -6,6 +6,13 @@ import * as boom from 'boom'
 
 
 
+export const timeout = 10000
+
+export function retries(i: number) {
+	console.log('i ->', i)
+	return i
+}
+
 
 
 declare global {
@@ -19,10 +26,10 @@ declare global {
 			wbAuthToken: boolean
 		}
 		interface Payload extends boom.Payload {
-			
+
 		}
 		interface GotResponse<T = any> extends got.Response<T>, stream.PassThrough {
-			
+
 		}
 		interface GotError<T = any> extends Error {
 			name: string

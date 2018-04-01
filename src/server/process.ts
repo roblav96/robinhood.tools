@@ -34,7 +34,7 @@ process.SERVER = true
 process.once('uncaughtException', error => console.error('UNCAUGHT EXCEPTION ->', error))
 process.once('unhandledRejection', function(error) {
 	console.error('UNHANDLED REJECTION ->', error)
-	console.log('https://github.com/mcollina/make-promises-safe')
+	console.error('https://github.com/mcollina/make-promises-safe', '\n')
 	process.exit(1)
 })
 

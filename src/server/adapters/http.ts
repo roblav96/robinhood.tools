@@ -16,8 +16,8 @@ export function request(config: Partial<Http.RequestConfig>): Promise<any> {
 		let parsed = url.parse(config.url)
 		_.defaults(config, {
 			json: true,
-			timeout: 10000,
-			retries: 3,
+			timeout: http.timeout,
+			retries: http.retries,
 			headers: {
 				'Accept-Encoding': 'deflate, gzip',
 				'Host': parsed.host,
@@ -45,6 +45,8 @@ export function request(config: Partial<Http.RequestConfig>): Promise<any> {
 				config.headers['access_token'] = process.env.WEBULL_TOKEN
 			}
 		}
+		
+		console.log('config ->', config)
 
 		return config
 
