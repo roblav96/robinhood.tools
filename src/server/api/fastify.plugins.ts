@@ -20,20 +20,6 @@ declare module 'fastify' {
 
 
 
-
-
-// import wss from '../adapters/wsserver'
-// fastify.register(function(fastify, opts, next) {
-// 	fastify.decorate('wss', wss)
-// 	fastify.addHook('onClose', function(fastify, done) {
-// 		fastify.wss.close(done)
-// 	})
-// 	next()
-// })
-// declare module 'fastify' { interface FastifyInstance { wss: typeof wss } }
-
-
-
 // import * as products from '../watchers/products'
 // fastify.register(function(fastify, opts, next) {
 // 	products.register(next)

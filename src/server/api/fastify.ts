@@ -4,19 +4,19 @@ if (process.MASTER) { console.error('fastify -> process.MASTER should not import
 
 import * as Fastify from 'fastify'
 import * as Pino from 'pino'
-
-
-
-// const LOG_LEVEL = 'debug' as Pino.Level
-const LOG_LEVEL = 'info' as Pino.Level
-// const LOG_LEVEL = 'error' as Pino.Level
-
 import stream from './fastify.logger'
+
+
+
+const LOG_LEVEL = 'info' as Pino.Level
+
 const fastify = Fastify({
 	logger: { level: LOG_LEVEL, extreme: PRODUCTION, stream },
 })
 
 export default fastify
+
+
 
 import './fastify.errors'
 import './fastify.plugins'
@@ -33,7 +33,9 @@ fastify.register(function(fastify, opts, next) {
 import './security.hook'
 import './security.api'
 
+import './socket.server'
 import './socket.api'
+
 import './proxy.api'
 import './recaptcha.api'
 import './search.api'
@@ -42,9 +44,7 @@ import './search.api'
 
 fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 	if (error) return console.error('listen Error ->', error);
-	if (process.PRIMARY) {
-		console.info('listen ->', fastify.server.address().address + ':' + fastify.server.address().port, '\n', fastify.printRoutes())
-	}
+	// if (process.PRIMARY) console.info('listen ->', fastify.server.address().address + ':' + fastify.server.address().port, '\n', fastify.printRoutes());
 })
 
 
@@ -74,6 +74,8 @@ declare module 'fastify' {
 	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
 		addHook(name: 'onRoute', handler: (opts: RegisterOptions<HttpServer, HttpRequest, HttpResponse>) => void): FastifyInstance
 		setErrorHandler(handler: (error: FastifyError, request: FastifyRequest<HttpRequest>, reply: FastifyReply<HttpResponse>) => void): Promise<any>
+		all(url: string, opts: RouteShorthandOptions<HttpServer, HttpRequest, HttpResponse>, handler: RequestHandler<HttpRequest, HttpResponse>): FastifyInstance
+		all(url: string, handler: RequestHandler<HttpRequest, HttpResponse>): FastifyInstance
 	}
 }
 

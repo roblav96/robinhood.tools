@@ -18,6 +18,9 @@ declare global {
 			rhAuthToken: string
 			wbAuthToken: boolean
 		}
+		interface Payload extends boom.Payload {
+			
+		}
 		interface GotResponse<T = any> extends got.Response<T>, stream.PassThrough {
 			
 		}

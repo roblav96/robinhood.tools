@@ -40,7 +40,7 @@ _.merge(util.inspect, {
 	defaultOptions: {
 		showHidden: false,
 		showProxy: false,
-		depth: 0,
+		depth: 1,
 		colors: true,
 		compact: false,
 		breakLength: Infinity,
@@ -50,14 +50,14 @@ _.merge(util.inspect, {
 		string: 'green', regexp: 'green', date: 'green',
 		number: 'magenta', boolean: 'blue',
 		undefined: 'red', null: 'red',
-		symbol: 'yellow', special: 'cyan',
+		symbol: 'cyan', special: 'cyan',
 	},
 } as Partial<typeof util.inspect>)
 
 Object.assign(console, {
 	dump(value: any, opts = {}) {
 		_.defaults(opts, {
-			depth: 1, showHidden: true, showProxy: true,
+			depth: 2, showHidden: true, showProxy: true,
 		} as NodeJS.InspectOptions)
 		return util.inspect(value, opts)
 	}

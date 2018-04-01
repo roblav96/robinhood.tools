@@ -20,7 +20,6 @@ class Client {
 
 	constructor(
 		public address: string,
-		public index: number,
 	) {
 
 	}
@@ -29,32 +28,16 @@ class Client {
 
 
 
-class Socket {
+class Socket extends ee4.EventEmitter {
 
-	private _ee4 = new ee4.EventEmitter()
-	private _clients = [] as Client[]
+	clients: Client[]
+	init = _.once((addresses: string[]) => {
+		this.clients = addresses.map(v => new Client(v))
+	})
 
 	constructor() {
-
+		super()
 	}
-
-	private _cons: number
-	private _onopen = () => {
-		this._cons--
-		if (this._cons > 0) return;
-		console.log('socket clients ->', 'ready')
-	}
-
-	init = _.once(() => {
-		// return http.get('/socket/addresses').then((addresses: string[]) => {
-		// 	this._cons = addresses.length
-		// 	this._clients = addresses.map((v, i) => {
-		// 		let client = new Client(v, i)
-		// 		client.socket.once('open', this._onopen)
-		// 		return client
-		// 	})
-		// })
-	})
 
 }
 

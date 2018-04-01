@@ -1,9 +1,7 @@
 // 
 
-import * as util from 'util'
+import { IncomingMessage } from 'http'
 import * as _ from 'lodash'
-import * as core from '../../common/core'
-
 import * as uws from 'uws'
 import * as cookie from 'cookie'
 import * as url from 'url'
@@ -48,23 +46,32 @@ const wss = new uws.Server({
 	},
 })
 
+// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
+wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
+wss.on('connection', function(client: uws, req: IncomingMessage) {
+	client.on('error', function(error) { console.error('client.on Error ->', error) })
 
-wss.on('connection', function(socket) {
-	socket.on('message', function(message: string) {
+	client.on('message', function(message: string) {
 		if (message == 'pong') return;
-		if (message == 'ping') return socket.send('pong');
-		socket.close(1003, 'Sending messages via the client not allowed!')
-		socket.terminate()
-		socket.removeAllListeners()
+		if (message == 'ping') return client.send('pong');
+		client.close(1003, 'Sending messages via the client not allowed!')
+		client.terminate()
+		client.removeAllListeners()
 	})
-})
 
-wss.on('error', function(error) {
-	console.error('onerror Error ->', error)
 })
 
 export default wss
+
+
+
+fastify.addHook('onClose', function(fastify, done) {
+	wss.close(done)
+})
+
+// fastify.decorate('wss', wss)
+// declare module 'fastify' { interface FastifyInstance { wss: typeof wss } }
 
 
 

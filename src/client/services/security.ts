@@ -9,7 +9,6 @@ import Fingerprint2 from 'fingerprintjs2'
 import pdelay from 'delay'
 import store from '@/client/store'
 import socket from '@/client/adapters/socket'
-import * as ee4 from '@/common/ee4'
 import * as http from '@/client/adapters/http'
 import * as security from '@/common/security'
 
@@ -36,13 +35,12 @@ export function headers() {
 		'x-uuid': doc.uuid,
 		'x-finger': doc.finger + '.' + Date.now(),
 	} as Dict<string>
-	// if (doc.id) headers['x-id'] = doc.id;
 	return headers
 }
 
 
 
-function uuid() {
+function uuid(): Promise<void> {
 	if (doc.uuid) return;
 	return security.generateProbablePrime(32).then(function(uuid) {
 		lockr.set('security.uuid', uuid)
@@ -50,7 +48,7 @@ function uuid() {
 	})
 }
 
-function finger() {
+function finger(): Promise<void> {
 	if (doc.finger) return;
 	return new Promise(function(resolve) {
 		new Fingerprint2().get(function(finger) {
@@ -62,19 +60,19 @@ function finger() {
 	})
 }
 
-function token() {
-	// return http.get('/security/token').catch(function(error) {
-	// 	console.error('token Error ->', error)
-	// 	return pdelay(3000).then(token)
-	// })
+function token(): Promise<string[]> {
+	return http.get('/security/token').catch(function(error) {
+		console.error('token Error ->', error)
+		return pdelay(3000).then(token)
+	})
 }
 
 Promise.all([
 	uuid(), finger(),
 ]).then(function() {
 	return token()
-}).then(function() {
-	return socket.init()
+}).then(function(addresses) {
+	return socket.init(addresses)
 }).then(function() {
 	state.ready = true
 })

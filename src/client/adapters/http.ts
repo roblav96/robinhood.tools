@@ -27,7 +27,7 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 			retries: 9,
 			silent: PRODUCTION,
 			headers: {},
-		} as Http.RequestConfig)
+		} as Partial<Http.RequestConfig>)
 
 		if (!config.silent) {
 			let ending = (config.query || config.body) ? ' ➤ ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
@@ -39,18 +39,13 @@ function request(config: Partial<Http.RequestConfig>): Promise<any> {
 		if (config.url[0] == '/') {
 			config.url = process.DOMAIN + '/api' + config.url
 		}
-		
-		console.log('config ->', JSON.stringify(config, null, 4))
 
+		// console.log('config ->', JSON.stringify(config, null, 4))
 		return got(config.url, config as any).then(({ body }) => body)
 
-	}).catch(function(error: got.GotError) {
-		
-		console.log('got error ->', error)
-		console.dir(error)
-		
+	}).catch(function(error: Http.GotError) {
 		let message = _.get(error, 'statusMessage', error.message)
-		let payload = _.get(error, 'response.body') as boom.Payload
+		let payload = _.get(error, 'response.body') as Http.Payload
 		if (payload && payload.message) {
 			let extra = payload.attributes ? JSON.stringify(payload.attributes) : payload.message
 			message += `: "${extra}"`

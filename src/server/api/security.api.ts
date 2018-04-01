@@ -2,6 +2,7 @@
 
 import { CookieSerializeOptions } from 'cookie'
 import fastify from './fastify'
+import * as core from '../../common/core'
 import * as redis from '../adapters/redis'
 import * as security from '../services/security'
 
@@ -13,7 +14,7 @@ fastify.route({
 	handler: async function(request, reply) {
 		let prime = security.randomBytes(32)
 		await redis.main.hset('security:doc:' + request.doc.uuid, 'prime', prime)
-
+		
 		let cookie = {
 			domain: process.DOMAIN,
 			path: '/', sameSite: true, httpOnly: true,
@@ -25,7 +26,10 @@ fastify.route({
 		let token = security.generateToken(request.doc, prime)
 		reply.setCookie('x-token', token, cookie)
 
-		return true
+		let address = 'ws' + (PRODUCTION ? 's' : '') + '://' + process.DOMAIN
+		return core.array.create(process.INSTANCES).map(function(i) {
+			return address + '/websocket/' + i
+		})
 
 	},
 })

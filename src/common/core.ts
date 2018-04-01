@@ -82,12 +82,12 @@ export const number = {
 
 export const array = {
 	is<T = any[]>(value: any): value is T { return Array.isArray(value) },
-	create(length: number, filled?: any) {
+	create<T = number>(length: number, filled?: T): T[] {
 		let alength = arguments.length
 		return Array.from(Array(length), function(v, i) {
 			if (alength == 1) return i;
 			return filled
-		})
+		}) as any
 	},
 	chunks<T = any[]>(value: T[], nchunks: number) {
 		let chunks = Array.from(Array(nchunks), v => []) as T[][]

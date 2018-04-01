@@ -50,13 +50,6 @@ export function request(config: Partial<Http.RequestConfig>): Promise<any> {
 
 	}).then(function(config: Http.RequestConfig) {
 		return got(config.url, config).then(({ body }) => body)
-
-		// }).catch(function(error: got.GotError) {
-		// 	return Promise.reject(new boom(error.message, {
-		// 		// ctor: null, // ctor: got[error.name],
-		// 		statusCode: (error as any).statusCode,
-		// 		data: error.response.body,
-		// 	}))
 	})
 
 }
