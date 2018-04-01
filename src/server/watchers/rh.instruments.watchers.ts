@@ -14,20 +14,21 @@ import * as robinhood from '../adapters/robinhood'
 
 
 
-import * as rx from 'rxjs'
-import { websocket } from 'rxjs/websocket'
+import * as cctz from 'cctz'
 
-const rxInstrument = new rx.Subject()
-// console.log('rxInstrument1 ->', rxInstrument)
+console.warn('cctz ->', console.dtsgen(cctz))
 
 
 
-console.warn('cron ->', console.dtsgen(cron))
-console.warn('cron ->', eyes.inspect(console.dtsgen(cron).trim()))
+// import * as rx from 'rxjs'
+// import { websocket } from 'rxjs/websocket'
+
+// const rxInstrument = new rx.Subject()
+// // console.log('rxInstrument1 ->', rxInstrument)
 
 
 
-async function onUrl(url: string) {
+async function getInstruments(url: string) {
 	let response = await http.get(url)
 	// console.warn('response ->', console.dtsgen(response))
 	// console.warn('response ->', eyes.inspect(console.dtsgen(response)))
@@ -49,12 +50,22 @@ function syncInstruments() {
 
 
 
+function startFullSync() {
+	
+}
+
+function ensure(args) {
+	
+}
+
+
+
 /**▶ 3:40 AM Weekdays */
 const job = new cron.CronJob({
 	cronTime: '40 03 * * 1-5',
 	timeZone: 'America/New_York',
 	start: true,
-	onTick: syncInstruments,
+	// onTick: syncInstruments,
 	runOnInit: DEVELOPMENT,
 })
 

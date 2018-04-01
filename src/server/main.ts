@@ -14,9 +14,8 @@ global.WebSocket = require('uws')
 import '../common/ticks'
 import './adapters/radio'
 import './adapters/redis'
+import './watchers/watchers'
 
 if (process.WORKER) require('./api/fastify');
-
-import './watchers/watchers'
 
 
