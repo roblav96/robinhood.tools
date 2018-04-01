@@ -12,6 +12,8 @@ import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
 
+
+
 import * as rx from 'rxjs'
 import { websocket } from 'rxjs/websocket'
 
@@ -20,16 +22,15 @@ const rxInstrument = new rx.Subject()
 
 
 
-console.info('rxInstrument dtsgen ->', console.dtsgen(rxInstrument))
-console.info('rxInstrument dtsgen ->', eyes.inspect(console.dtsgen(rxInstrument)))
+console.warn('cron ->', console.dtsgen(cron))
+console.warn('cron ->', eyes.inspect(console.dtsgen(cron).trim()))
 
 
 
 async function onUrl(url: string) {
 	let response = await http.get(url)
-	// console.log('response ->', response)
-	// console.info('rxInstrument ->', process.dtsgen(rxInstrument))
-	// console.info('response ->', eyes.inspect(process.dtsgen(response)))
+	// console.warn('response ->', console.dtsgen(response))
+	// console.warn('response ->', eyes.inspect(console.dtsgen(response)))
 }
 
 async function doForever() {

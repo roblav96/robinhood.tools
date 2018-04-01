@@ -2,7 +2,7 @@
 
 
 
-declare module 'dts-gen' {
+declare module 'dts-gen-wtf' {
 
 	export function generateIdentifierDeclarationFile(name: string, value: any): string
 

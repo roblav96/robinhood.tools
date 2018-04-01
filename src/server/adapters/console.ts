@@ -82,8 +82,9 @@ if (DEVELOPMENT) {
 	const clipboardy = require('clipboardy')
 	Object.assign(console, {
 		dtsgen(value: any) {
-			let results = dtsgen(value)
-			clipboardy.write(results)
+			let results = dtsgen(value) as string
+			let paste = results.trim()
+			clipboardy.write(paste.substring(1, paste.length - 2).trim())
 			return results
 		},
 	})
