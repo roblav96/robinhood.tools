@@ -1,6 +1,8 @@
 // 
 
+import chalk from 'chalk'
 import * as eyes from 'eyes'
+import * as util from 'util'
 import * as fs from 'fs'
 import * as _ from 'lodash'
 import * as Fastify from 'fastify'
@@ -10,6 +12,7 @@ import fastify from './fastify'
 
 
 
+const inspector = !chalk.supportsColor ? util.inspect : eyes.inspect as (value: any) => string
 const reqs = [] as Pino.LogRequest[]
 const recycle = _.throttle(function(reqId: number) {
 	reqs.splice(0, reqId)
@@ -37,28 +40,28 @@ export default Object.assign(fs.createWriteStream('/dev/null'), {
 
 		if (log.err && log.err.stack) {
 			if (log.err.isGot) {
-				return console.error('ERROR ->', eyes.inspect(_.omit(message, ['err.stack'])))
+				return console.error('ERROR ->', inspector(_.omit(message, ['err.stack'])))
 			}
 			return console.error(
 				'ERROR ->', message.err.stack, '\n',
-				eyes.inspect(_.omit(message, ['err.stack']))
+				inspector(_.omit(message, ['err.stack']))
 			)
 		}
 
 		let fn = console[log.label] ? log.label : 'error'
 		console[fn](
 			log.label.toUpperCase(), '->',
-			fastify.log.level == 'debug' ? message : eyes.inspect(message)
+			fastify.log.level == 'debug' ? message : inspector(message)
 		)
 		// if (fastify.log.level == 'debug') {
 		// 	return console[fn](log.label.toUpperCase(), '->', message)
 		// }
-		// console[fn](eyes.inspect(message))
+		// console[fn](inspector(message))
 
 
 
 		// if (Object.keys(message).length == 1) message = message.msg as any;
-		// console[fn](eyes.inspect(message))
+		// console[fn](inspector(message))
 
 		// let message = log as any
 		// let msg = log.msg
@@ -77,7 +80,7 @@ export default Object.assign(fs.createWriteStream('/dev/null'), {
 		// if (label == 'INFO' && core.string.is(message)) {
 		// 	console[fn](message)
 		// } else {
-		// 	console[fn](label, '->', eyes.inspect(message))
+		// 	console[fn](label, '->', inspector(message))
 		// }
 
 	}
