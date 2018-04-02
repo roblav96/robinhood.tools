@@ -53,14 +53,13 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	socket: WebSocket & uws
+
 	get isopen() { return this.socket && this.socket.readyState == this.socket.OPEN }
 
 	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
 	send(message: string) {
-		if (process.CLIENT) this.socket.send(message);
-		if (process.SERVER) this.socket.send(message, this._sent);
+		this.socket.send(message)
 	}
-	private _sent = (error?: Error) => { if (error) console.error(this.name, '_sent Error ->', error); }
 
 	close(code = 1000, reason?: string) {
 		this.socket.close(code, reason)
@@ -70,12 +69,12 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.terminate()
 		this.reconnect.cancel()
 		this.reconnect = null
-		this.offAllListeners()
+		this.offAll()
 	}
 
 	terminate() {
 		this.reconnect.cancel()
-		clock.offListener(this._heartbeat)
+		clock.offFn(this._heartbeat)
 		if (!this.socket) return;
 		this.socket.close()
 		if (process.SERVER) {
@@ -107,7 +106,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private _onclose = (event: CloseEvent) => {
 		console.warn(this.name, 'onclose ->', WebSocketClient.ecodes[event.code] || event.code, '->', event.reason)
 		this.emit('close', event.code, event.reason)
-		clock.offListener(this._heartbeat)
+		clock.offFn(this._heartbeat)
 		if (this.options.autoRetry) this.reconnect();
 		else this.destroy();
 	}
@@ -126,7 +125,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _heartbeat = () => {
-		if (!this.isopen) return clock.offListener(this._heartbeat);
+		if (!this.isopen) return clock.offFn(this._heartbeat);
 		this.send('ping')
 	}
 

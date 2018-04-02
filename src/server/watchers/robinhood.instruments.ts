@@ -23,6 +23,7 @@ if (process.MASTER) {
 	}
 
 
+	console.log('clock ->', console.dump(clock, { depth: 8 }))
 
 	function first(i) { }
 	clock.on('1s', first)
@@ -31,11 +32,15 @@ if (process.MASTER) {
 	function third(i) { }
 	clock.on('1s', third)
 
-	console.log('clock.e ->', clock.e)
-	clock.offListener(third)
-	console.log('clock.e ->', clock.e)
+	clock.eachEvent(function(event, i) {
+		console.log('i ->', i, 'event ->', event)
+	})
 
-	// console.log('clock.e ->', console.dump(clock.e, { depth: 8 }))
+	// console.log('clock.ee ->', clock.ee)
+	// clock.offAll()
+	// console.log('clock.ee ->', clock.ee)
+
+	console.log('clock ->', console.dump(clock, { depth: 8 }))
 
 }
 
