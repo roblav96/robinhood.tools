@@ -4,7 +4,6 @@ import * as _ from 'lodash'
 import * as luxon from 'luxon'
 import * as ci from 'correcting-interval'
 import * as core from './core'
-import * as Rx from './rxjs'
 import Emitter from './emitter'
 
 
@@ -17,33 +16,28 @@ enum TICKS {
 }
 declare global { namespace Clock { type Tick = keyof typeof TICKS } }
 
+const emitter = new Emitter<Clock.Tick, number>()
+export default emitter
+
+
+
 const ticks = Object.keys(TICKS).filter(isNaN as any)
 const tocks = core.array.dict(ticks, 0)
 
-
-
-const clock = new Rx.Subject<Clock.Tick>()
-// // const clock = Rx.of({ message : 'Logged in' })
-// // export default clock
-
-// // clock.pipe(
-// // 	Rx.scan(function (tick) {
-// // 		return tick
-// // 	})
-// // )
-
-// // let clock$ = clock.pipe(
-// // 	Rx.map(tick => state => Object.assign({}, state, { count: state.count + 1 }))
-// // )
-
-
-
 function onTick(tick: Clock.Tick) {
-	console.log('onTick tick ->', tick)
-	clock.next(tick)
+	tocks[tick]++
+	emitter.emit(tick, tocks[tick])
 }
 
-function tickGenesis(tick: string) {
+function startTicking(tick: Clock.Tick, ms: number) {
+	onTick(tick)
+	const tock = tick
+	ci.setCorrectingInterval(function tickingInterval() {
+		onTick(tock)
+	}, ms)
+}
+
+function tickGenesis(tick: Clock.Tick) {
 	let qty = Number.parseInt(tick)
 	let unit = core.time.UNITS[tick.substr(qty.toString().length)]
 	let ms = luxon.Duration.fromObject({ [unit]: qty }).as('milliseconds')
@@ -54,14 +48,21 @@ function tickGenesis(tick: string) {
 	let ims = process.CLIENT ? 0 : core.math.dispersed(ms, process.INSTANCE, process.INSTANCES)
 	let delay = (from + ims) - now
 	if (delay <= 0) delay = (to + ims) - now;
-	Rolex.setTimeout(Rolex.setInterval, delay, onTick, ms, tick)
+	_.delay(startTicking, delay, tick, ms)
 }
 
-setImmediate(function clockGenesis() { ticks.forEach(tickGenesis) })
+setImmediate(function clockGenesis() {
+	ticks.forEach(tickGenesis)
+})
 
 
 
 
+
+// function delayGenesis(tick: Clock.Tick, i: number) {
+// 	_.delay(tickGenesis, 100 * (i + 1), tick)
+// }
+// ticks.forEach(delayGenesis)
 
 // function onTock(tick: Clock.Tick) {
 // 	tocks[tick]++

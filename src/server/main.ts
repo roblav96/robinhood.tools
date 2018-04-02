@@ -9,16 +9,16 @@ global.WebSocket = require('uws')
 import './process'
 
 import './adapters/console'
-if (DEVELOPMENT) process.INSTANCES = 0;
+// if (DEVELOPMENT) process.INSTANCES = 0;
 import './adapters/cluster'
 
 import '../common/clock'
-// import './adapters/radio'
-// import './adapters/redis'
-// import './watchers/watchers'
+import './adapters/radio'
+import './adapters/redis'
+import './watchers/watchers'
 
-// if (process.WORKER) {
-// 	require('./api/fastify')
-// }
+if (process.WORKER) {
+	require('./api/fastify')
+}
 
 
