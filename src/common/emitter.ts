@@ -25,6 +25,7 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 				this.off(name, event.fn)
 			})
 		})
+		delete this.e
 		return this
 	}
 
