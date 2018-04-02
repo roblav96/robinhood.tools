@@ -1,16 +1,25 @@
 // 
 
-import * as rx from 'rxjs'
-import * as ops from 'rxjs/operators'
+import { BehaviorSubject } from 'rxjs'
+import { filter, take, mapTo } from 'rxjs/operators'
 
 
 
 export class ReadySubject {
-	subject = new rx.BehaviorSubject(false)
-	get ready() { return this.subject.value }
-	set ready(ready: boolean) { if (!this.subject.value) this.subject.next(ready); }
-	toPromise() { return this.subject.pipe(ops.filter(v => !!v), ops.take(1)).toPromise() }
-	addListener(fn: (ready: boolean) => void) { this.subject.pipe(ops.filter(v => !!v), ops.take(1)).subscribe(fn) }
+
+	private _subject = new BehaviorSubject(false)
+
+	get ready() { return this._subject.value }
+	set ready(ready: boolean) { if (!this._subject.value) this._subject.next(ready); }
+
+	toPromise() {
+		return this._subject.pipe(filter(v => !!v), take(1)).toPromise()
+	}
+
+	subscribe(next: () => void) {
+		this._subject.pipe(filter(v => !!v), take(1), mapTo(void 0)).subscribe(next)
+	}
+
 }
 
 

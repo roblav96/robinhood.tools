@@ -1,43 +1,31 @@
 // 
 
 import * as _ from 'lodash'
-import * as rx from 'rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
 import radio from '../adapters/radio'
+import { ReadySubject } from '../../common/rx.utils'
 
 
 
-const rxInstruments = new rx.Subject<Robinhood.Instrument>()
-
-if (process.MASTER) {
-	radio.rxReady.addListener(readyInstruments)
-}
+export const rxReady = new ReadySubject()
 
 
 
 async function readyInstruments() {
 	let symbols = await robinhood.getSymbols()
+	if (symbols.length > 0) return;
+	syncAllInstruments()
+}
+
+if (process.MASTER) {
+	radio.rxready.subscribe(readyInstruments)
 }
 
 
 
-async function getInstruments(url: string) {
-	let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
-	if (_.isEmpty(response)) return;
-
-
-
-	return response.next
-
-}
-
-
-
-
-
-function syncAllInstruments() {
+async function syncAllInstruments() {
 
 }
 

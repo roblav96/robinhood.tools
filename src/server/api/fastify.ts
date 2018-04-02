@@ -25,7 +25,7 @@ import './fastify.plugins'
 
 import radio from '../adapters/radio'
 fastify.register(function(fastify, opts, next) {
-	radio.once('_onready_', next)
+	radio.rxready.subscribe(next)
 })
 
 

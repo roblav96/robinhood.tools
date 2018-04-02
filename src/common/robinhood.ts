@@ -1,6 +1,15 @@
 // 
 
-export { }
+
+
+export const acronyms = {
+	OTCM: 'OTCM',
+	XASE: 'AMEX',
+	ARCX: 'NYSE',
+	XNYS: 'NYSE',
+	XNAS: 'NASDAQ',
+	BATS: 'BATS',
+}
 
 
 

@@ -56,7 +56,7 @@ export default class WebSocketClient extends ee4.EventEmitter<'open' | 'close' |
 	socket: WebSocket & uws
 	get isopen() { return this.socket && this.socket.readyState == this.socket.OPEN }
 
-	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
+	json<T = any>(data: T) { this.send(JSON.stringify(data)) }
 	send(message: string) {
 		if (process.CLIENT) this.socket.send(message);
 		if (process.SERVER) this.socket.send(message, this._sent);

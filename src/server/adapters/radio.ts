@@ -1,12 +1,11 @@
 // 
 
-import { IncomingMessage } from 'http'
+import * as http from 'http'
 import * as _ from 'lodash'
-import * as rx from 'rxjs'
 import * as uws from 'uws'
 import * as ee4 from '../../common/ee4'
-import * as rxu from '../../common/rx.utils'
 import WebSocketClient from '../../common/websocket.client'
+import { ReadySubject } from '../../common/rx.utils'
 
 
 
@@ -27,7 +26,7 @@ if (process.MASTER) {
 	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
-	wss.on('connection', function(client: Radio.Client, req: IncomingMessage) {
+	wss.on('connection', function(client: Radio.Client, req: http.IncomingMessage) {
 		client.on('error', function(error) { console.error('socket.on Error ->', error) })
 
 		if (!Array.isArray(client.subs)) client.subs = [];
@@ -50,9 +49,10 @@ if (process.MASTER) {
 
 
 
-class Radio extends ee4.EventEmitter {
+class Radio {
 
-	rxReady = new rxu.ReadySubject()
+	rxready = new ReadySubject()
+	emitter = new ee4.EventEmitter()
 	socket = new WebSocketClient(`ws://${HOST}:${PORT}/${PATH}`, {
 		autoconnect: false,
 		// verbose: process.MASTER,
@@ -60,25 +60,23 @@ class Radio extends ee4.EventEmitter {
 	})
 
 	constructor() {
-		super()
-
 		const _connect = _.once(() => this.socket.connect())
 		if (process.MASTER) wss.once('listening', _connect);
 		else setImmediate(_connect);
 
 		this.socket.on('open', () => {
 			this.socket.send('_onopen_')
-			super.emit('_onopen_')
+			this.emitter.emit('_onopen_')
 		})
 
 		this.socket.on('message', (message: string) => {
 			if (message == '_onready_') {
-				this.rxReady.ready = true
-				super.emit('_onready_')
+				this.rxready.ready = true
+				this.emitter.emit('_onready_')
 				return
 			}
 			let event = JSON.parse(message) as Radio.Event
-			super.emit(event.e, event.d)
+			this.emitter.emit(event.e, event.d)
 		})
 
 	}
