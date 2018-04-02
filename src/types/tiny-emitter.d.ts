@@ -8,7 +8,7 @@ declare namespace TinyEmitter {
 	type Listener<D> = (...args: D[]) => void
 }
 
-declare class TinyEmitter<E, D> {
+declare class TinyEmitter<E = string, D = any> {
 	e: { [event: string]: TinyEmitter.Event<D>[] }
 	on(event: E, listener: TinyEmitter.Listener<D>, ctx?: any): this
 	once(event: E, listener: TinyEmitter.Listener<D>, ctx?: any): this
@@ -16,8 +16,8 @@ declare class TinyEmitter<E, D> {
 	off(event: E, listener?: TinyEmitter.Listener<D>): this
 }
 
-declare module 'tiny-emitter' {
-	export = TinyEmitter
-}
+// declare module 'tiny-emitter' {
+// 	export = TinyEmitter
+// }
 
 
