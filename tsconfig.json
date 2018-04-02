@@ -9,7 +9,6 @@
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"removeComments": true,
 		"inlineSourceMap": true,
 		"inlineSources": true,
 		"pretty": true,

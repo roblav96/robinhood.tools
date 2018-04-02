@@ -4,7 +4,6 @@ import * as _ from 'lodash'
 import * as ci from 'correcting-interval'
 import * as core from './core'
 import * as Rx from './rxjs'
-import Emitter from './emitter'
 
 
 
