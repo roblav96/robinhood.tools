@@ -1,13 +1,19 @@
 // 
 
-
-
-declare namespace ee3 {
+declare namespace EventEmitter {
+	interface Event<D> {
+		listener: Listener<D>
+		context?: any
+		once?: boolean
+	}
+	interface HandlerEvent<E, D> extends Event<D> {
+		event: E
+	}
+	type Events<D> = { [event: string]: Event<D> }
 	type Listener<D> = (...args: D[]) => void
-	interface Event<D> { listener: Listener<D>, context?: any, once?: boolean, name?: string }
-	class EventEmitter<E = string, D = any> {
+	class EventEmitter<E, D> {
 		static prefixed: string | boolean
-		protected _events: Dict<Event<D>>
+		protected _events: Events<D>
 		eventNames(): E[]
 		listeners(event: E): Listener<D>[]
 		listenerCount(event: E): number
@@ -22,7 +28,7 @@ declare namespace ee3 {
 }
 
 declare module 'eventemitter3' {
-	export = ee3
+	export = EventEmitter
 }
 
 
