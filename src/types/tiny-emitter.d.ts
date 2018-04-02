@@ -1,23 +1,23 @@
 // 
 
 declare namespace TinyEmitter {
-	interface Event<D> {
-		fn: Listener<D>
+	type Listener<Data = any> = (...args: Data[]) => void
+	interface Event<Data = any> {
+		fn: Listener<Data>
 		ctx: any
 	}
-	type Listener<D> = (...args: D[]) => void
 }
 
-declare class TinyEmitter<E = string, D = any> {
-	e: { [event: string]: TinyEmitter.Event<D>[] }
-	on(event: E, listener: TinyEmitter.Listener<D>, ctx?: any): this
-	once(event: E, listener: TinyEmitter.Listener<D>, ctx?: any): this
-	emit(event: E, ...args: D[]): this
-	off(event: E, listener?: TinyEmitter.Listener<D>): this
+declare class TinyEmitter<Names extends string = string, Data = any> {
+	protected e: { [name: string]: TinyEmitter.Event<Data>[] }
+	on<Name extends Names>(name: Name, listener: TinyEmitter.Listener<Data>, ctx?: any): this
+	once<Name extends Names>(name: Name, listener: TinyEmitter.Listener<Data>, ctx?: any): this
+	emit<Name extends Names>(name: Name, ...args: Data[]): this
+	off<Name extends Names>(name: Name, listener?: TinyEmitter.Listener<Data>): this
 }
 
-// declare module 'tiny-emitter' {
-// 	export = TinyEmitter
-// }
+declare module 'tiny-emitter' {
+	export = TinyEmitter
+}
 
 

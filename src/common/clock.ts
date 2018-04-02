@@ -3,6 +3,7 @@
 import * as _ from 'lodash'
 import * as ci from 'correcting-interval'
 import * as core from './core'
+import * as Rx from './rxjs'
 import Emitter from './emitter'
 
 
@@ -12,9 +13,9 @@ const TICKS = {
 	'1s': 1000, '2s': 2000, '3s': 3000, '5s': 5000,
 	'10s': 10000, '15s': 15000, '30s': 30000, '60s': 60000,
 }
-declare global { type Tick = keyof typeof TICKS }
+declare global { namespace Clock { type Tick = keyof typeof TICKS } }
 
-const emitter = new Emitter<Tick, number>()
+const emitter = new Emitter<Clock.Tick, number>()
 export default emitter
 
 
@@ -22,7 +23,7 @@ export default emitter
 const delays = {} as Dict<NodeJS.Timer>
 const ages = {} as Dict<number>
 
-function ready(tick: Tick, ms: number) {
+function ready(tick: Clock.Tick, ms: number) {
 	if (process.SERVER) delays[tick].unref();
 	clearTimeout(delays[tick]); delays[tick] = null; _.unset(delays, tick);
 	ages[tick] = 0

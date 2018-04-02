@@ -12,16 +12,16 @@ declare namespace EventEmitter {
 	class EventEmitter<Names extends string = string, Data = any> {
 		static prefixed: string | boolean
 		protected _events: { [name: string]: Event<Data> | Event<Data>[] }
-		eventNames(): Names[]
-		listeners(event?: Names): Listener<Data>[]
-		listenerCount(event?: Names): number
-		emit(event: Names, ...args: any[]): boolean
-		on(event: Names, listener: Listener<Data>, context?: any): this
-		addListener(event: Names, listener: Listener<Data>, context?: any): this
-		once(event: Names, listener: Listener<Data>, context?: any): this
-		removeListener(event: Names, listener?: Listener<Data>, context?: any, once?: boolean): this
-		off(event: Names, listener?: Listener<Data>, context?: any, once?: boolean): this
-		removeAllListeners(event?: Names): this
+		eventNames<Name extends Names>(): Name[]
+		listeners<Name extends Names>(name?: Name): Listener<Data>[]
+		listenerCount<Name extends Names>(name?: Name): number
+		emit<Name extends Names>(name: Name, ...args: Data[]): boolean
+		on<Name extends Names>(name: Name, listener: Listener<Data>, context?: any): this
+		addListener<Name extends Names>(name: Name, listener: Listener<Data>, context?: any): this
+		once<Name extends Names>(name: Name, listener: Listener<Data>, context?: any): this
+		removeListener<Name extends Names>(name: Name, listener?: Listener<Data>, context?: any, once?: boolean): this
+		off<Name extends Names>(name: Name, listener?: Listener<Data>, context?: any, once?: boolean): this
+		removeAllListeners<Name extends Names>(name?: Name): this
 	}
 
 }

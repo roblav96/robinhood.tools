@@ -1,11 +1,12 @@
 // 
 import { noop } from 'lodash'
 let dtsgen = noop
-// /**▶ UNCOMMENT TO ENABLE */ if (DEVELOPMENT) dtsgen = require('@/common/dtsgen').default;
+// /**▶ UNCOMMENT TO ENABLE */
+// if (DEVELOPMENT) dtsgen = require('@/common/dtsgen').default;
 Object.assign(console, { dtsgen })
 // 
 
-import '@/common/ticks'
+import '@/common/clock'
 import '@/client/services/security'
 import router from '@/client/router'
 import store from '@/client/store'

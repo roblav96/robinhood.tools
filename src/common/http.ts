@@ -8,6 +8,7 @@ import * as boom from 'boom'
 
 export const config = {
 	json: true,
+	silent: PRODUCTION,
 	timeout: 10000,
 	retries(i: number) {
 		console.log('http retries i ->', i)

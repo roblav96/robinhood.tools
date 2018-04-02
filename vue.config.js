@@ -13,10 +13,12 @@ const package = require('./package.json')
 
 
 
+const dlls = ['bluebird', 'node-forge', 'lodash', 'vue', 'buefy']
+
 module.exports = {
 
 	outputDir: 'dist/client',
-	// dll: DEVELOPMENT, // faster incremental recompilation, slower initial build
+	dll: false, // DEVELOPMENT, // faster incremental recompilation, slower initial build
 	css: { sourceMap: false }, // only enable when needed
 	vueLoader: { hotReload: false }, // hot reload can make debugging difficult
 
@@ -33,8 +35,26 @@ module.exports = {
 				})
 			})
 		}
-		// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-		// config.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 12321 }))
+
+		// config.output.filename = '[name].bundle.js'
+		// config.output.chunkFilename = '[name].chunk.js'
+		// dlls.forEach(function(dll) {
+		// 	config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
+		// 		name: dll, minChunks: module => module.context && module.context.includes(dll),
+		// 	}))
+		// })
+		// config.plugins.push(new webpack.optimize.AggressiveSplittingPlugin({
+		// 	minSize: 30000, maxSize: 50000,
+		// }))
+		// config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
+		// 	name: 'node_modules', minChunks: module => module.context && module.context.includes('node_modules'),
+		// }))
+		// config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
+		// 	name: 'manifest', minChunks: Infinity,
+		// }))
+
+		const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+		config.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 12321 }))
 	},
 
 	chainWebpack: function(config) {

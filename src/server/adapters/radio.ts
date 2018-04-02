@@ -3,9 +3,9 @@
 import * as http from 'http'
 import * as _ from 'lodash'
 import * as uws from 'uws'
-import * as rx from '../../common/rxjs'
-import Emitter from '../../common/emitter'
+import * as Rx from '../../common/rxjs'
 import WebSocketClient from '../../common/websocket.client'
+import Emitter from '../../common/emitter'
 
 
 
@@ -51,7 +51,7 @@ if (process.MASTER) {
 
 class Radio {
 
-	ready = new rx.ReadySubject()
+	ready = new Rx.ReadySubject()
 	emitter = new Emitter()
 	socket = new WebSocketClient(`ws://${HOST}:${PORT}/${PATH}`, {
 		autoConnect: false,

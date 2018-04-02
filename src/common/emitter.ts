@@ -6,14 +6,13 @@ import * as ee3 from 'eventemitter3'
 
 export default class Emitter<Names extends string = string, Data = any> extends ee3.EventEmitter<Names, Data> {
 
-	removeFnListeners(listener: ee3.Listener<Data>, context?: any, once?: boolean) {
-		console.warn('removeFnListeners')
+	offListener(listener: ee3.Listener<Data>, context?: any, once?: boolean): this {
 		this.eventNames().forEach(name => {
 			console.log('name ->', name)
 			this.listeners(name).forEach(fn => {
 				console.log('fn ->', fn)
 				if (listener == fn) {
-					console.error('removeListener ->', name, listener)
+					console.warn('removeListener ->', name, listener)
 					this.removeListener(name, listener, context, once)
 				}
 			})
@@ -21,10 +20,43 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 		return this
 	}
 
-	// offListener(listener: ee3.Listener<Data>, context?: any, once?: boolean) { return this.removeFnListeners(listener, context, once) }
-	// offAllListeners(name?: Names) { return this.removeAllListeners(name) }
-
 }
+
+
+
+
+
+
+
+// import * as ti from 'tiny-emitter'
+
+// export class TinyEmitter<Names extends string = string, Data = any> extends ti<Names, Data> {
+// 	// off<Name extends Names>(name: Name, listener?: TinyEmitter.Listener<Data>): this
+// 	eventNames<Name extends Names>() {
+// 		let e = this.e || (this.e = {})
+// 		return Object.keys(e) as Name[]
+// 	}
+// 	removeListener<Name extends Names>(listener: ti.Listener<Data>) {
+// 		let e = this.e || (this.e = {})
+// 		let names = Object.keys(e) as Name[]
+// 		if (names.length == 0) return this;
+// 		names.forEach(name => {
+// 			e[name].forEach(event => {
+// 				if (listener == event.fn) {
+// 					console.warn('off ->', name, listener)
+// 					this.off(name, listener)
+// 				}
+// 			})
+// 		})
+// 		return this
+// 	}
+// 	removeAllListeners(name?: Names) {
+// 		if (!this.e) return this;
+		
+// 	}
+// }
+
+
 
 
 

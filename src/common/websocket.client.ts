@@ -29,7 +29,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 			retryTimeout: 3000,
 			autoConnect: true,
 			delayStart: -1,
-			pingRate: '10s' as Tick,
+			pingRate: '10s' as Clock.Tick,
 			verbose: false,
 		})
 	}
@@ -75,7 +75,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	terminate() {
 		this.reconnect.cancel()
-		clock.removeListeners(this._heartbeat)
+		clock.offListener(this._heartbeat)
 		if (!this.socket) return;
 		this.socket.close()
 		if (process.SERVER) {
@@ -99,7 +99,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	private _onopen = (event: Event) => {
 		if (this.options.verbose) console.info(this.name, 'onopen ->', process.CLIENT ? (event.target as WebSocket).url : '');
-		clock.addListener(this.options.pingRate, this._heartbeat)
+		clock.on(this.options.pingRate, this._heartbeat)
 		this.reconnect.cancel()
 		this.emit('open')
 	}
@@ -107,7 +107,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private _onclose = (event: CloseEvent) => {
 		console.warn(this.name, 'onclose ->', WebSocketClient.ecodes[event.code] || event.code, '->', event.reason)
 		this.emit('close', event.code, event.reason)
-		clock.removeListeners(this._heartbeat)
+		clock.offListener(this._heartbeat)
 		if (this.options.autoRetry) this.reconnect();
 		else this.destroy();
 	}
@@ -126,7 +126,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _heartbeat = () => {
-		if (!this.isopen) return clock.removeListeners(this._heartbeat);
+		if (!this.isopen) return clock.offListener(this._heartbeat);
 		this.send('ping')
 	}
 

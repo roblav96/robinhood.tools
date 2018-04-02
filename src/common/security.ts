@@ -5,22 +5,22 @@ import * as forge from 'node-forge'
 
 
 export function sha1(value: string): string {
-	let md = forge.md.sha1.create()
-	md.update(value)
-	return md.digest().toHex()
+	let hash = forge.md.sha1.create()
+	hash.update(value)
+	return hash.digest().toHex()
 }
 
 export function hash256(value: string): string {
-	let md = forge.md.sha512.sha256.create()
-	md.update(value)
-	return md.digest().toHex()
+	let hash = forge.md.sha512.sha256.create()
+	hash.update(value)
+	return hash.digest().toHex()
 }
 
 export function hmac256(message: string, prime: string): string {
-	let hmac = forge.hmac.create()
-	hmac.start('sha256', prime)
-	hmac.update(message)
-	return hmac.digest().toHex()
+	let hash = forge.hmac.create()
+	hash.start('sha256', prime)
+	hash.update(message)
+	return hash.digest().toHex()
 }
 
 export function randomBytes(size: number): string {

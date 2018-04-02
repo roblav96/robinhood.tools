@@ -5,14 +5,14 @@ export * from '@/common/http'
 import * as _ from 'lodash'
 import * as core from '@/common/core'
 import got from 'got'
-import boom from 'boom'
+import url from 'url'
 import vm from '@/client/vm'
 import * as security from '@/client/services/security'
 import * as http from '@/common/http'
 
 
 
-function request(config: Partial<Http.Config>): Promise<any> {
+export function request(config: Partial<Http.Config>): Promise<any> {
 	return Promise.resolve().then(function() {
 		config.json = true
 
@@ -23,18 +23,15 @@ function request(config: Partial<Http.Config>): Promise<any> {
 		}
 
 		_.defaults(config, {
-			timeout: 10000,
-			retries: 9,
-			silent: PRODUCTION,
 			headers: {},
-		} as Partial<Http.Config>)
+		} as Partial<Http.Config>, http.config)
+		
+		_.defaults(config.headers, security.headers())
 
 		if (!config.silent) {
 			let ending = (config.query || config.body) ? ' ➤ ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
 			console.log('➤ ' + config.method + ' ' + config.url + ending);
 		}
-
-		_.defaults(config.headers, security.headers())
 
 		if (config.url[0] == '/') {
 			config.url = process.DOMAIN + '/api' + config.url

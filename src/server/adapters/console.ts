@@ -72,7 +72,6 @@ Object.assign(console, {
 		return util.inspect(value, opts)
 	},
 })
-declare global { interface Console { dump(value: any, opts?: NodeJS.InspectOptions): string } }
 
 
 
