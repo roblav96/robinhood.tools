@@ -48,7 +48,6 @@
 		"pretty-ms": "latest",
 		"repaintless": "latest",
 		"rxjs": "rc",
-		"rxjs-compat": "rc",
 		"tiny-emitter": "latest",
 		"uws": "latest",
 		"vue": "latest",

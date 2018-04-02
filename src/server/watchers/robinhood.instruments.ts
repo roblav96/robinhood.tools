@@ -20,7 +20,7 @@ async function readyInstruments() {
 }
 
 if (process.MASTER) {
-	radio.rxready.subscribe(readyInstruments)
+	radio.ready.subscribe(readyInstruments)
 }
 
 

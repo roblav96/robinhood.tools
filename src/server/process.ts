@@ -44,11 +44,12 @@ process.on('unhandledRejection', function(error) {
 
 
 if (process.MASTER) {
-	console.log('\n\n' +
-		chalk.magentaBright('█') + ' ' + chalk.underline.bold(process.NAME) + '\n' +
-		chalk.magentaBright('█') + ' ' + NODE_ENV + '\n' +
-		chalk.magentaBright('█') + ' ' + process.HOST + ':' + process.PORT
-	)
+	console.log((
+		`\n\n
+		${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}
+		${chalk.magentaBright('█')} ${NODE_ENV}
+		`
+	).replace(/\t/g, ''))
 }
 
 

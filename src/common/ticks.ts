@@ -12,27 +12,37 @@ const TICKS = {
 	t1s: '1000', t2s: '2000', t3s: '3000', t5s: '5000',
 	t10s: '10000', t15s: '15000', t30s: '30000', t60s: '60000',
 }
-const emitter = new Emitter<keyof typeof TICKS, number>()
+declare global { type Tick = keyof typeof TICKS }
+
+const Ticks = {} as Dict<Tick>
+const emitter = new Emitter<Tick, number>()
+
+if (process.MASTER) {
+	emitter.addListener(TICKS.t100ms as Tick, function(i) {
+
+	})
+	console.log('emitter ->', console.dump(emitter, { depth: 8 }))
+}
 
 
 
 const delays = {} as Dict<number>
-const tprog = {} as Dict<number>
-function ee4start(event: string, ms: number) {
+const progs = {} as Dict<number>
+function ee4start(event: Tick, ms: number) {
 	if (process.SERVER) (delays[event] as any).unref();
 	clearTimeout(delays[event]); delays[event] = null; _.unset(delays, event);
-	tprog[event] = 0
-	emitter.emit(event as any, tprog[event])
+	progs[event] = 0
+	emitter.emit(event, progs[event])
 	ci.setCorrectingInterval(function() {
-		tprog[event]++
-		emitter.emit(event as any, tprog[event])
+		progs[event]++
+		emitter.emit(event, progs[event])
 	}, ms)
 }
 
 setImmediate(function() {
-	Object.keys(TICKS).forEach(function(event, i) {
+	Object.keys(TICKS).forEach(function(event: Tick, i) {
 		let ms = Number.parseInt(TICKS[event])
-		TICKS[event] = event
+		Ticks[event] = event
 		let now = Date.now()
 		let start = now - (now % ms)
 		let end = start + ms
@@ -43,6 +53,8 @@ setImmediate(function() {
 	})
 })
 
-export default Object.assign(emitter, TICKS)
+export default Object.assign(emitter, Ticks)
+
+
 
 

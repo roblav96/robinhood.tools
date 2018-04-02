@@ -1,6 +1,6 @@
 // 
 
-import { IncomingMessage } from 'http'
+import * as http from 'http'
 import * as _ from 'lodash'
 import * as uws from 'uws'
 import * as cookie from 'cookie'
@@ -49,7 +49,7 @@ const wss = new uws.Server({
 // wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
-wss.on('connection', function(client: uws, req: IncomingMessage) {
+wss.on('connection', function(client: uws, req: http.IncomingMessage) {
 	client.on('error', function(error) { console.error('client.on Error ->', error) })
 
 	client.on('message', function(message: string) {

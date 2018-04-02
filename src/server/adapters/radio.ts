@@ -5,7 +5,12 @@ import * as _ from 'lodash'
 import * as uws from 'uws'
 import Emitter from '../../common/emitter'
 import WebSocketClient from '../../common/websocket.client'
-import { ReadySubject } from '../../common/rx.utils'
+
+import { BehaviorSubject } from 'rxjs'
+import { filter, take, mapTo } from 'rxjs/operators'
+import * as rxjs from 'rxjs'
+import * as rxop from 'rxjs/operators'
+import * as rx from '../../common/rxjs'
 
 
 
@@ -51,7 +56,7 @@ if (process.MASTER) {
 
 class Radio {
 
-	rxready = new ReadySubject()
+	ready = new rx.ReadySubject()
 	emitter = new Emitter()
 	socket = new WebSocketClient(`ws://${HOST}:${PORT}/${PATH}`, {
 		autoconnect: false,
@@ -71,7 +76,7 @@ class Radio {
 
 		this.socket.on('message', (message: string) => {
 			if (message == '_onready_') {
-				this.rxready.ready = true
+				this.ready.next(true)
 				this.emitter.emit('_onready_')
 				return
 			}

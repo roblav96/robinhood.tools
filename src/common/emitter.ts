@@ -8,10 +8,11 @@ import * as ee3 from 'eventemitter3'
 export default class Emitter<E = string, D = any> extends ee3.EventEmitter<E, D> {
 
 	handlerEvents(handler: ee3.Listener<D>, context?: any, once?: boolean) {
-		let events = [] as ee3.HandlerEvent<E, D>[]
+		let events = {} as Dict<ee3.Event<D>>
 		this.eventNames().forEach(event => {
 			this.listeners(event).forEach(listener => {
 				if (handler == listener) {
+					events[event]
 					events.push({ event, listener })
 				}
 			})

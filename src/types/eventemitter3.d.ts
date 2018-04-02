@@ -2,18 +2,14 @@
 
 declare namespace EventEmitter {
 	interface Event<D> {
-		listener: Listener<D>
-		context?: any
-		once?: boolean
+		fn: Listener<D>
+		context: any
+		once: boolean
 	}
-	interface HandlerEvent<E, D> extends Event<D> {
-		event: E
-	}
-	type Events<D> = { [event: string]: Event<D> }
 	type Listener<D> = (...args: D[]) => void
 	class EventEmitter<E, D> {
 		static prefixed: string | boolean
-		protected _events: Events<D>
+		protected _events: Dict<Event<D>>
 		eventNames(): E[]
 		listeners(event: E): Listener<D>[]
 		listenerCount(event: E): number

@@ -48,7 +48,7 @@ _.merge(util.inspect, {
 	defaultOptions: {
 		showHidden: false,
 		showProxy: false,
-		depth: 1,
+		depth: 2,
 		compact: false,
 		breakLength: Infinity,
 		maxArrayLength: Infinity,
@@ -67,7 +67,7 @@ _.merge(util.inspect, {
 Object.assign(console, {
 	dump(value: any, opts = {}) {
 		_.defaults(opts, {
-			depth: 2, showHidden: true, showProxy: true,
+			depth: 4, showHidden: true, showProxy: true,
 		} as NodeJS.InspectOptions)
 		return util.inspect(value, opts)
 	},
