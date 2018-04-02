@@ -1,60 +1,100 @@
 // 
 
-import * as TinyEmitter from 'tiny-emitter'
+import * as ee3 from 'eventemitter3'
 
 
 
-interface Dict<T = any> { [name: string]: T }
-interface TinyEvent { fn: (...args: any[]) => void, ctx: any }
+export default class Emitter<Names extends string = string, Data = any> extends ee3.EventEmitter<Names, Data> {
 
-interface Emitter<Names extends string = string, Data extends Dict = Dict> {
-	e: Dict<TinyEvent[]>
-	on<Name extends Names>(name: Name, listener: () => void): this
-	on<Name extends keyof Data>(name: Name, listener: (data: Data[Name]) => void): this
-	once<Name extends Names>(name: Name, listener: () => void): this
-	once<Name extends keyof Data>(name: Name, listener: (data: Data[Name]) => void): this
-	off<Name extends Names>(name: Name, listener: () => void): this
-	off<Name extends keyof Data>(name: Name, listener?: (data?: Data[Name]) => void): this
-	emit<Name extends Names>(name: Name): this
-	emit<Name extends keyof Data>(name: Name, ...data: Data[Name][]): this
+	removeFnListeners(listener: ee3.Listener<Data>, context?: any, once?: boolean) {
+		console.warn('removeFnListeners')
+		this.eventNames().forEach(name => {
+			console.log('name ->', name)
+			this.listeners(name).forEach(fn => {
+				console.log('fn ->', fn)
+				if (listener == fn) {
+					console.error('removeListener ->', name, listener)
+					this.removeListener(name, listener, context, once)
+				}
+			})
+		})
+		return this
+	}
 
-	eventNames<Name extends Names>(): Name[]
-	eventNames<Name extends keyof Data>(): Name[]
-	listeners<Name extends Names>(name?: Name): Name[]
-	listeners<Name extends keyof Data>(name?: Name): Name[]
+	// offListener(listener: ee3.Listener<Data>, context?: any, once?: boolean) { return this.removeFnListeners(listener, context, once) }
+	// offAllListeners(name?: Names) { return this.removeAllListeners(name) }
 
 }
 
-class Emitter<Names extends string = string, Data extends Dict = Dict> extends TinyEmitter {
-
-	eventNames() {
-		return Object.keys(this.e)
-	}
-	listeners<Name extends Names>(name: Name): Name[] {
-		if (event) return this.e[name].map(v => v.fn) as any
-
-		// if (!event) return this.eventNames().map(event => this.e[event].fn)
-	}
-	listenerCount(event?: E): number {
-		return this.e[event as any].length
-	}
-
-	removeAllListeners(event?: E) {
-
-	}
-
-}
-
-export default Emitter
 
 
 
-let emitter = new Emitter<'open' | 'close' | 'error' | 'message', { closing: boolean }>()
-let names = emitter.listeners()
 
-emitter.on('closing', function(value) {
+// import * as _ from 'lodash'
+// import * as TinyEmitter from 'tiny-emitter'
+// type TinyListener<Data = any> = (...args: Data[]) => void
+// interface TinyEvent<Data = any> { listener: TinyListener<Data>, ctx: any }
+// interface Datas<T = any> { [name: string]: T }
 
-})
+// interface Emitter<Names extends string = string, Data extends Datas = Datas> {
+// 	e: { [name: string]: TinyEvent<Data>[] }
+// 	on<Name extends Names>(name: Name, listener: () => void): this
+// 	on<Name extends keyof Data>(name: Name, listener: (data: Data[Name]) => void): this
+// 	once<Name extends Names>(name: Name, listener: () => void): this
+// 	once<Name extends keyof Data>(name: Name, listener: (data: Data[Name]) => void): this
+// 	off<Name extends Names>(name: Name, listener: () => void): this
+// 	off<Name extends keyof Data>(name: Name, listener?: (data?: Data[Name]) => void): this
+// 	emit<Name extends Names>(name: Name): this
+// 	emit<Name extends keyof Data>(name: Name, ...data: Data[Name][]): this
+// 	// 
+// 	eventNames<Name extends Names>(): Name[]
+// 	eventNames<Name extends keyof Data>(): Name[]
+
+// 	listeners<Name extends Names>(name?: Name): (() => void)[]
+// 	listeners<Name extends keyof Data>(name?: Name): ((data?: Data[Name]) => void)[]
+
+// }
+
+// class Emitter<Names extends string = string, Data extends Datas = Datas> extends TinyEmitter {
+
+// 	eventNames() {
+// 		return !this.e ? [] : Object.keys(this.e)
+// 	}
+// 	listeners(name?: string) {
+// 		if (name) {
+// 			return (!this.e || _.isEmpty(this.e[name])) ? [] : this.e[name].map(event => {
+// 				return event.listener
+// 			})
+// 		}
+
+// 		// if (!event) return this.eventNames().map(event => this.e[event].fn)
+// 	}
+// 	listenerCount(event?: E): number {
+// 		return this.e[event as any].length
+// 	}
+
+// 	removeAllListeners(event?: E) {
+
+// 	}
+
+// }
+
+// export default Emitter
+
+
+
+// let emitter = new Emitter<'open' | 'close' | 'error' | 'message', { closing: boolean }>()
+
+// let names = emitter.eventNames()
+// console.log('names ->', names)
+// let listeners = emitter.listeners()
+// console.log('listeners ->', listeners)
+
+// emitter.on('close', function(value) {
+
+// })
+
+// console.log('emitter ->', console.dump(emitter))
 
 
 
