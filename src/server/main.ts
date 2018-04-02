@@ -1,7 +1,6 @@
 // 
 
 import '../common/polyfills'
-require('rolex').noConflict()
 import 'source-map-support/register'
 
 global.Promise = require('bluebird')

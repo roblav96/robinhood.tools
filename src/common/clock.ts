@@ -3,7 +3,6 @@
 import * as _ from 'lodash'
 import * as luxon from 'luxon'
 import * as ci from 'correcting-interval'
-import * as Rolex from 'rolex'
 import * as core from './core'
 import * as Rx from './rxjs'
 import Emitter from './emitter'
@@ -23,7 +22,6 @@ const tocks = core.array.dict(ticks, 0)
 
 
 
-// // const clock = new Rx.Subject<Clock.Tick>()
 const clock = new Rx.Subject<Clock.Tick>()
 // // const clock = Rx.of({ message : 'Logged in' })
 // // export default clock
@@ -40,14 +38,9 @@ const clock = new Rx.Subject<Clock.Tick>()
 
 
 
-function onTock(tick: Clock.Tick) {
-	console.log('onTock tick ->', tick)
+function onTick(tick: Clock.Tick) {
+	console.log('onTick tick ->', tick)
 	clock.next(tick)
-}
-
-function tockGenesis(tick: Clock.Tick, ms: number) {
-	console.warn('tockGenesis tick ->', tick)
-	Rolex.setInterval(onTock, ms, tick)
 }
 
 function tickGenesis(tick: string) {
@@ -61,14 +54,10 @@ function tickGenesis(tick: string) {
 	let ims = process.CLIENT ? 0 : core.math.dispersed(ms, process.INSTANCE, process.INSTANCES)
 	let delay = (from + ims) - now
 	if (delay <= 0) delay = (to + ims) - now;
-	Rolex.setTimeout(tockGenesis, delay, tick, ms)
-	// ████████████████████████████████████████████████████████████████████████
-	//       Rolex.setTimeout(Rolex.setInterval, delay, onTock, ms, tick)
-	// ████████████████████████████████████████████████████████████████████████
+	Rolex.setTimeout(Rolex.setInterval, delay, onTick, ms, tick)
 }
 
-function clockGenesis() { ticks.forEach(tickGenesis) }
-setImmediate(clockGenesis)
+setImmediate(function clockGenesis() { ticks.forEach(tickGenesis) })
 
 
 
