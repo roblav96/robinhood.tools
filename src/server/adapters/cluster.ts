@@ -4,7 +4,6 @@ import * as cluster from 'cluster'
 
 
 
-if (process.MASTER) process.stdout.write('\n\n');
 if (process.MASTER && process.INSTANCES > 0) {
 
 	const workers = {} as Dict<number>
