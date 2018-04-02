@@ -1,10 +1,9 @@
 // 
 
 import * as _ from 'lodash'
-import Emitter from './emitter'
-
 import * as uws from 'uws'
 import * as url from 'url'
+import Emitter from './emitter'
 import ticks from './ticks'
 
 
@@ -30,7 +29,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 			retrytimeout: 3000,
 			autoconnect: true,
 			delaystart: -1,
-			heartrate: ticks.T10,
+			heartrate: ticks.t10s,
 			verbose: false,
 		})
 	}
@@ -56,7 +55,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	socket: WebSocket & uws
 	get isopen() { return this.socket && this.socket.readyState == this.socket.OPEN }
 
-	json<T = any>(data: T) { this.send(JSON.stringify(data)) }
+	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
 	send(message: string) {
 		if (process.CLIENT) this.socket.send(message);
 		if (process.SERVER) this.socket.send(message, this._sent);
@@ -76,7 +75,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	terminate() {
 		this.reconnect.cancel()
-		ticks.removeListener(this._heartbeat)
+		ticks.removeHandler(this._heartbeat)
 		if (!this.socket) return;
 		this.socket.close()
 		if (process.SERVER) {
@@ -108,7 +107,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private _onclose = (event: CloseEvent) => {
 		console.warn(this.name, 'onclose ->', WebSocketClient.ecodes[event.code] || event.code, '->', event.reason)
 		this.emit('close', event.code, event.reason)
-		ticks.removeListener(this._heartbeat)
+		ticks.removeHandler(this._heartbeat)
 		if (this.options.autoretry) this.reconnect();
 		else this.destroy();
 	}
@@ -127,20 +126,10 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _heartbeat = () => {
-		if (this.isopen) this.send('ping');
-		else ticks.removeListener();
+		if (!this.isopen) return ticks.removeHandler(this._heartbeat);
+		this.send('ping')
 	}
 
 }
-
-
-
-
-
-
-
-// type WebSocketClientOptions = typeof WebSocketClient.options
-// interface WebSocketClient extends WebSocketClientOptions { }
-// class WebSocketClient extends WebSocket {
 
 

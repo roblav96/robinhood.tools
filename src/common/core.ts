@@ -23,13 +23,12 @@ export const isNodejs = !isBrowser
 export function fix(target: any, deep = false) {
 	Object.keys(target).forEach(function(key) {
 		let value = target[key]
-		if (deep && object.is(value)) return fix(value, true);
-		if (value === '') return _.unset(target, key);
-		if (value == 'true') return target[key] = true;
-		if (value == 'false') return target[key] = false;
-		if (!isNaN(value) && value.match(/[^0-9.-]/) == null) {
-			target[key] = Number.parseFloat(value)
-		}
+		if (value == null) return;
+		else if (deep && object.is(value)) fix(value, true);
+		else if (value === '') _.unset(target, key);
+		else if (value == 'true') target[key] = true;
+		else if (value == 'false') target[key] = false;
+		else if (!isNaN(value)) target[key] = Number.parseFloat(value);
 	})
 }
 
@@ -182,8 +181,8 @@ export const object = {
 export const json = {
 	is<T = object>(value: T): value is T {
 		if (string.is(value)) {
-			if (value.charAt(0) == '{') return true; // && value.charAt(value.length - 1) == '}') return true;
-			if (value.charAt(0) == '[') return true; // && value.charAt(value.length - 1) == ']') return true;
+			if (value.charAt(0) == '{') return true;
+			if (value.charAt(0) == '[') return true;
 		}
 		return false
 	},
@@ -199,7 +198,7 @@ export const json = {
 
 export const math = {
 	dispersed(value: number, index: number, max: number) {
-		return Math.round(index * (value / max))
+		return Math.round(Math.max(index, 0) * (value / Math.max(max, 1)))
 	},
 	random(min: number, max: number) {
 		return Math.floor(Math.random() * (max - min + 1)) + min

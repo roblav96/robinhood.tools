@@ -5,88 +5,48 @@ import * as ee3 from 'eventemitter3'
 
 
 
-type AnyHandler = any
-type Handler = (...args: any[]) => void
-interface Event { handler: Handler, context?: any, once?: boolean }
-interface Emitter<E = string> {
-	eventNames(): E[]
-	listeners(event: E): Handler[]
-	listenerCount(event: E): number
-	emit(event: E, ...args: any[]): boolean
-	on(event: E, handler: Handler, context?: any): this
-	addListener(event: E, handler: Handler, context?: any): this
-	once(event: E, handler: Handler, context?: any): this
-	removeListener(event: E, handler?: Handler, context?: any, once?: boolean): this
-	off(event: E, handler?: Handler, context?: any, once?: boolean): this
-	removeAllListeners(event?: E): this
-	// 
-	removeListener(handler: Handler, context?: any, once?: boolean): this
-	// off(handler: Handler, context?: any, once?: boolean): this
-	// removeAllListeners(handler: Handler): this
-}
+export default class Emitter<E = string> extends ee3.EventEmitter {
 
-// class Emitter<E = string> extends ((ee3.EventEmitter as any) as _Emitter) {
-// class Emitter<E = string> extends ((ee3 as any).EventEmitter as typeof ee3.EventEmitter) {
-// class Emitter<E = string> extends (ee3.EventEmitter as any) {
-class Emitter<E = string> extends ee3.EventEmitter<E> {
-
-	protected _events: Dict<Event>
-
-	findHandlerEvent(handler: AnyHandler) {
-		let names = this.eventNames()
-		let i: number, len = names.length
-		for (i = 0; i < len; i++) {
-			let name = names[i]
-			let listeners = this.listeners(name)
-			let ii: number, len = listeners.length
-			for (ii = 0; ii < len; ii++) {
-				if (handler === listeners[ii]) {
-					return name
+	handlerEvents(handler: ee3.Listener, context?: any, once?: boolean) {
+		let events = [] as ee3.Event[]
+		this.eventNames().forEach(name => {
+			this.listeners(name).forEach(listener => {
+				if (handler == listener) {
+					events.push({ name, listener })
 				}
-			}
-		}
+			})
+		})
+		return events
 	}
 
-	removeHandler(handler: Handler, context?: any, once?: boolean) {
-		if (_.isFunction(handler)) {
-			console.warn('removeListener handler ->', handler)
-			let name = this.findHandlerEvent(handler)
-			if (name) return super.removeListener(name, handler, context, once);
-		}
-		return super.removeListener.apply(this, arguments)
-		// return super.removeListener(...arguments)
+	removeHandler(handler: ee3.Listener, context?: any, once?: boolean) {
+		this.handlerEvents(handler).forEach(event => {
+			this.removeListener(event.name, event.listener, context, once)
+		})
+		return this
 	}
-	
-	offHandler(handler: Handler, context?: any, once?: boolean) {
-		
+	offHandler(handler: ee3.Listener, context?: any, once?: boolean) {
+		return this.removeHandler(handler, context, once)
 	}
 
-	// if (!_.isFunction(handler)) return super.removeListener.apply(this, arguments);
-	// let names = Object.keys(this._events)
-	// let i: number, len = names.length
-	// for (i = 0; i < len; i++) {
-	// 	let name = names[i]
-	// 	let event = this._events[name]
-	// 	if (handler == event.handler) {
-	// 		return super.removeListener(name as any, handler, context, once)
-	// 	}
-	// }
-	// this.eventNames().forEach(event => {
-	// 	this.listeners(event).forEach(listener => {
-	// 		if (handler === listener) {
-	// 			super.removeListener(event, handler, context, once)
+	// handlerEventName(handler: ee3.Handler, context?: any, once?: boolean) {
+	// 	let names = this.eventNames()
+	// 	let i: number, len = names.length
+	// 	for (i = 0; i < len; i++) {
+	// 		let name = names[i]
+	// 		let listeners = this.listeners(name)
+	// 		let ii: number, len = listeners.length
+	// 		for (ii = 0; ii < len; ii++) {
+	// 			if (handler === listeners[ii]) {
+	// 				return name
+	// 			}
 	// 		}
-	// 	})
-	// })
-	// return this
+	// 	}
+	// let name = this.handlerEvents(handler, context, once)
+	// if (name) return super.removeListener(name, handler, context, once);
+	// return super.removeListener(...arguments)
 	// }
-	// off(handler, context?: any, once?: boolean) {
-	// 	if (typeof handler == 'string') return super.removeListener.apply(this, arguments);
-	// }
-	// offFunction(fn: (...args: D[]) => void, context?: any, once?: boolean) { return this.removeListenerFunction(fn, context, once) }
 
 }
-
-export default Emitter
 
 

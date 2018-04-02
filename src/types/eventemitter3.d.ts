@@ -3,31 +3,21 @@
 
 
 declare namespace ee3 {
-	export type Handler = (...args: any[]) => void
-	export interface Event { handler: Handler, context?: any, once?: boolean }
-	export class EventEmitter<E = string> {
+	type Listener = (...args: any[]) => void
+	interface Event { listener: Listener, context?: any, once?: boolean, name?: string }
+	class EventEmitter<E = string> {
 		static prefixed: string | boolean
 		protected _events: Dict<Event>
 		eventNames(): E[]
-		listeners(event: E): Handler[]
+		listeners(event: E): Listener[]
 		listenerCount(event: E): number
 		emit(event: E, ...args: any[]): boolean
-		on(event: E, handler: Handler, context?: any): this
-		addListener(event: E, handler: Handler, context?: any): this
-		once(event: E, handler: Handler, context?: any): this
-		removeListener(event: E, handler?: Handler, context?: any, once?: boolean): this
-		off(event: E, handler?: Handler, context?: any, once?: boolean): this
+		on(event: E, listener: Listener, context?: any): this
+		addListener(event: E, listener: Listener, context?: any): this
+		once(event: E, listener: Listener, context?: any): this
+		removeListener(event: E, listener?: Listener, context?: any, once?: boolean): this
+		off(event: E, listener?: Listener, context?: any, once?: boolean): this
 		removeAllListeners(event?: E): this
-		// eventNames(): E[]
-		// listeners(event: E): ((...args: any[]) => void)[]
-		// listenerCount(event: E): number
-		// emit(event: E, ...args: any[]): boolean
-		// on(event: E, handler: (...args: any[]) => void, context?: any): this
-		// addListener(event: E, handler: (...args: any[]) => void, context?: any): this
-		// once(event: E, handler: (...args: any[]) => void, context?: any): this
-		// removeListener(event: E, handler?: (...args: any[]) => void, context?: any, once?: boolean): this
-		// off(event: E, handler?: (...args: any[]) => void, context?: any, once?: boolean): this
-		// removeAllListeners(event?: E): this
 	}
 }
 

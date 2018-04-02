@@ -3,7 +3,7 @@
 import * as http from 'http'
 import * as _ from 'lodash'
 import * as uws from 'uws'
-import * as ee4 from '../../common/ee4'
+import Emitter from '../../common/emitter'
 import WebSocketClient from '../../common/websocket.client'
 import { ReadySubject } from '../../common/rx.utils'
 
@@ -52,7 +52,7 @@ if (process.MASTER) {
 class Radio {
 
 	rxready = new ReadySubject()
-	emitter = new ee4.EventEmitter()
+	emitter = new Emitter()
 	socket = new WebSocketClient(`ws://${HOST}:${PORT}/${PATH}`, {
 		autoconnect: false,
 		// verbose: process.MASTER,
