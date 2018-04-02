@@ -54,7 +54,7 @@ class Radio {
 	ready = new rx.ReadySubject()
 	emitter = new Emitter()
 	socket = new WebSocketClient(`ws://${HOST}:${PORT}/${PATH}`, {
-		autoconnect: false,
+		autoConnect: false,
 		// verbose: process.MASTER,
 		// verbose: true,
 	})

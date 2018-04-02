@@ -4,16 +4,12 @@ import * as rx from '../../common/rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
-import emitter from '../../common/emitter'
-import ticks from '../../common/ticks'
+import clock from '../../common/clock'
 import radio from '../adapters/radio'
 
 
 
 // import { ReadySubject } from '../../common/rx.utils'
-
-
-
 // export const rxReady = new ReadySubject()
 
 
@@ -27,16 +23,19 @@ async function readyInstruments() {
 if (process.MASTER) {
 	radio.ready.subscribe(readyInstruments)
 
-	ticks.addListener('1s', function(i) {
+
+	// clock.listeners()
+	clock.on('1s', function(i) {
 
 	})
-	ticks.addListener('2s', function(ii) {
+	clock.on('2s', function(ii) {
 
 	})
-	ticks.addListener('1s', function(iii) {
+	clock.on('1s', function(iii) {
 
 	})
-	console.log('ticks ->', console.dump(ticks, { depth: 8 }))
+	
+	console.log('clock.e ->', console.dump(clock.e, { depth: 8 }))
 
 
 

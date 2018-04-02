@@ -12,7 +12,7 @@ import './adapters/console'
 if (DEVELOPMENT) process.INSTANCES = 0;
 import './adapters/cluster'
 
-import '../common/ticks'
+import '../common/clock'
 import './adapters/radio'
 import './adapters/redis'
 import './watchers/watchers'

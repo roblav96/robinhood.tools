@@ -19,20 +19,21 @@ export default emitter
 
 
 
-const delays = {} as Dict<number>
-const progs = {} as Dict<number>
-function genesis(event: Tick, ms: number) {
-	if (process.SERVER) (delays[event] as any).unref();
-	clearTimeout(delays[event]); delays[event] = null; _.unset(delays, event);
-	progs[event] = 0
-	emitter.emit(event, progs[event])
+const delays = {} as Dict<NodeJS.Timer>
+const ages = {} as Dict<number>
+
+function ready(tick: Tick, ms: number) {
+	if (process.SERVER) delays[tick].unref();
+	clearTimeout(delays[tick]); delays[tick] = null; _.unset(delays, tick);
+	ages[tick] = 0
+	emitter.emit(tick, ages[tick])
 	ci.setCorrectingInterval(function() {
-		progs[event]++
-		emitter.emit(event, progs[event])
+		ages[tick]++
+		emitter.emit(tick, ages[tick])
 	}, ms)
 }
 
-setImmediate(function() {
+function prepare() {
 	Object.keys(TICKS).forEach(function(event, i) {
 		let ms = TICKS[event]
 		let now = Date.now()
@@ -41,9 +42,11 @@ setImmediate(function() {
 		let ims = process.CLIENT ? 0 : core.math.dispersed(ms, process.INSTANCE, process.INSTANCES)
 		let delay = (start + ims) - now
 		if (delay <= 0) delay = (end + ims) - now;
-		delays[event] = _.delay(genesis, delay, event, ms)
+		delays[event] = _.delay(ready, delay, event, ms) as any
 	})
-})
+}
+
+setImmediate(prepare)
 
 
 

@@ -4,7 +4,7 @@ import * as _ from 'lodash'
 import * as uws from 'uws'
 import * as url from 'url'
 import Emitter from './emitter'
-import ticks from './ticks'
+import clock from './clock'
 
 
 
@@ -25,11 +25,11 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private static get options() {
 		return _.clone({
 			query: undefined as () => string,
-			autoretry: true,
-			retrytimeout: 3000,
-			autoconnect: true,
-			delaystart: -1,
-			heartrate: '10s' as Tick,
+			autoRetry: true,
+			retryTimeout: 3000,
+			autoConnect: true,
+			delayStart: -1,
+			pingRate: '10s' as Tick,
 			verbose: false,
 		})
 	}
@@ -46,9 +46,9 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	) {
 		super()
 		_.defaults(this.options, WebSocketClient.options)
-		this.reconnect = _.throttle(this.connect, this.options.retrytimeout, { leading: false, trailing: true })
-		if (!this.options.autoconnect) return;
-		if (this.options.delaystart >= 0) _.delay(() => this.connect(), this.options.delaystart);
+		this.reconnect = _.throttle(this.connect, this.options.retryTimeout, { leading: false, trailing: true })
+		if (!this.options.autoConnect) return;
+		if (this.options.delayStart >= 0) _.delay(() => this.connect(), this.options.delayStart);
 		else this.connect();
 	}
 
@@ -75,7 +75,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	terminate() {
 		this.reconnect.cancel()
-		ticks.removeHandler(this._heartbeat)
+		clock.removeListeners(this._heartbeat)
 		if (!this.socket) return;
 		this.socket.close()
 		if (process.SERVER) {
@@ -99,7 +99,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	private _onopen = (event: Event) => {
 		if (this.options.verbose) console.info(this.name, 'onopen ->', process.CLIENT ? (event.target as WebSocket).url : '');
-		ticks.addListener(this.options.heartrate, this._heartbeat)
+		clock.addListener(this.options.pingRate, this._heartbeat)
 		this.reconnect.cancel()
 		this.emit('open')
 	}
@@ -107,8 +107,8 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private _onclose = (event: CloseEvent) => {
 		console.warn(this.name, 'onclose ->', WebSocketClient.ecodes[event.code] || event.code, '->', event.reason)
 		this.emit('close', event.code, event.reason)
-		ticks.removeHandler(this._heartbeat)
-		if (this.options.autoretry) this.reconnect();
+		clock.removeListeners(this._heartbeat)
+		if (this.options.autoRetry) this.reconnect();
 		else this.destroy();
 	}
 
@@ -126,7 +126,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _heartbeat = () => {
-		if (!this.isopen) return ticks.removeHandler(this._heartbeat);
+		if (!this.isopen) return clock.removeListeners(this._heartbeat);
 		this.send('ping')
 	}
 

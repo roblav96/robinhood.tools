@@ -1,6 +1,7 @@
 // 
 
 declare namespace EventEmitter {
+
 	interface Event<D> {
 		fn: Listener<D>
 		context: any
@@ -8,6 +9,7 @@ declare namespace EventEmitter {
 		event?: string
 	}
 	type Listener<D> = (...args: D[]) => void
+
 	class EventEmitter<E, D> {
 		static prefixed: string | boolean
 		protected _events: Dict<Event<D> | Event<D>[]>
@@ -22,6 +24,7 @@ declare namespace EventEmitter {
 		off(event: E, listener?: Listener<D>, context?: any, once?: boolean): this
 		removeAllListeners(event?: E): this
 	}
+
 }
 
 declare module 'eventemitter3' {

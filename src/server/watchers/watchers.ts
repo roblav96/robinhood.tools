@@ -1,6 +1,6 @@
 // 
 
-// import ticks from '../../common/ticks'
+// import clock from '../../common/clock'
 // import * as pdelay from 'delay'
 // import * as pevent from 'p-event'
 // import * as pall from 'p-all'
