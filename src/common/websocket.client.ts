@@ -29,7 +29,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 			retrytimeout: 3000,
 			autoconnect: true,
 			delaystart: -1,
-			heartrate: ticks.t10s,
+			heartrate: '10s' as Tick,
 			verbose: false,
 		})
 	}

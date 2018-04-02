@@ -5,11 +5,12 @@ declare namespace EventEmitter {
 		fn: Listener<D>
 		context: any
 		once: boolean
+		event?: string
 	}
 	type Listener<D> = (...args: D[]) => void
 	class EventEmitter<E, D> {
 		static prefixed: string | boolean
-		protected _events: Dict<Event<D>>
+		protected _events: Dict<Event<D> | Event<D>[]>
 		eventNames(): E[]
 		listeners(event: E): Listener<D>[]
 		listenerCount(event: E): number

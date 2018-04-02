@@ -1,15 +1,20 @@
 // 
 
-import * as _ from 'lodash'
+import * as rx from '../../common/rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
+import emitter from '../../common/emitter'
+import ticks from '../../common/ticks'
 import radio from '../adapters/radio'
-import { ReadySubject } from '../../common/rx.utils'
 
 
 
-export const rxReady = new ReadySubject()
+// import { ReadySubject } from '../../common/rx.utils'
+
+
+
+// export const rxReady = new ReadySubject()
 
 
 
@@ -21,6 +26,20 @@ async function readyInstruments() {
 
 if (process.MASTER) {
 	radio.ready.subscribe(readyInstruments)
+
+	ticks.addListener('1s', function(i) {
+
+	})
+	ticks.addListener('2s', function(ii) {
+
+	})
+	ticks.addListener('1s', function(iii) {
+
+	})
+	console.log('ticks ->', console.dump(ticks, { depth: 8 }))
+
+
+
 }
 
 
