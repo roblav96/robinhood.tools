@@ -12,7 +12,7 @@ const TICKS = {
 	t1s: '1000', t2s: '2000', t3s: '3000', t5s: '5000',
 	t10s: '10000', t15s: '15000', t30s: '30000', t60s: '60000',
 }
-const emitter = new Emitter<keyof typeof TICKS>()
+const emitter = new Emitter<keyof typeof TICKS, number>()
 
 
 
@@ -22,10 +22,10 @@ function ee4start(event: string, ms: number) {
 	if (process.SERVER) (delays[event] as any).unref();
 	clearTimeout(delays[event]); delays[event] = null; _.unset(delays, event);
 	tprog[event] = 0
-	emitter.emit(event, tprog[event])
+	emitter.emit(event as any, tprog[event])
 	ci.setCorrectingInterval(function() {
 		tprog[event]++
-		emitter.emit(event, tprog[event])
+		emitter.emit(event as any, tprog[event])
 	}, ms)
 }
 

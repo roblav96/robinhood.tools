@@ -2,30 +2,31 @@
 
 import * as _ from 'lodash'
 import * as ee3 from 'eventemitter3'
+import * as TinyEmitter from 'tiny-emitter'
 
 
 
-export default class Emitter<E = string> extends ee3.EventEmitter {
+export default class Emitter<E = string, D = any> extends ee3.EventEmitter<E, D> {
 
-	handlerEvents(handler: ee3.Listener, context?: any, once?: boolean) {
-		let events = [] as ee3.Event[]
+	handlerEvents(handler: ee3.Listener<D>, context?: any, once?: boolean) {
+		let events = [] as ee3.Event<D>[]
 		this.eventNames().forEach(name => {
 			this.listeners(name).forEach(listener => {
 				if (handler == listener) {
-					events.push({ name, listener })
+					events.push({ name: name as any, listener })
 				}
 			})
 		})
 		return events
 	}
 
-	removeHandler(handler: ee3.Listener, context?: any, once?: boolean) {
+	removeHandler(handler: ee3.Listener<D>, context?: any, once?: boolean) {
 		this.handlerEvents(handler).forEach(event => {
-			this.removeListener(event.name, event.listener, context, once)
+			this.removeListener(event.name as any, event.listener, context, once)
 		})
 		return this
 	}
-	offHandler(handler: ee3.Listener, context?: any, once?: boolean) {
+	offHandler(handler: ee3.Listener<D>, context?: any, once?: boolean) {
 		return this.removeHandler(handler, context, once)
 	}
 

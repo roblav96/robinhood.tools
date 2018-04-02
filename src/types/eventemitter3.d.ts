@@ -3,20 +3,20 @@
 
 
 declare namespace ee3 {
-	type Listener = (...args: any[]) => void
-	interface Event { listener: Listener, context?: any, once?: boolean, name?: string }
-	class EventEmitter<E = string> {
+	type Listener<D> = (...args: D[]) => void
+	interface Event<D> { listener: Listener<D>, context?: any, once?: boolean, name?: string }
+	class EventEmitter<E = string, D = any> {
 		static prefixed: string | boolean
-		protected _events: Dict<Event>
+		protected _events: Dict<Event<D>>
 		eventNames(): E[]
-		listeners(event: E): Listener[]
+		listeners(event: E): Listener<D>[]
 		listenerCount(event: E): number
-		emit(event: E, ...args: any[]): boolean
-		on(event: E, listener: Listener, context?: any): this
-		addListener(event: E, listener: Listener, context?: any): this
-		once(event: E, listener: Listener, context?: any): this
-		removeListener(event: E, listener?: Listener, context?: any, once?: boolean): this
-		off(event: E, listener?: Listener, context?: any, once?: boolean): this
+		emit(event: E, ...args: D[]): boolean
+		on(event: E, listener: Listener<D>, context?: any): this
+		addListener(event: E, listener: Listener<D>, context?: any): this
+		once(event: E, listener: Listener<D>, context?: any): this
+		removeListener(event: E, listener?: Listener<D>, context?: any, once?: boolean): this
+		off(event: E, listener?: Listener<D>, context?: any, once?: boolean): this
 		removeAllListeners(event?: E): this
 	}
 }
