@@ -1,6 +1,7 @@
 // 
 
 import '../common/polyfills'
+require('rolex').noConflict()
 import 'source-map-support/register'
 
 global.Promise = require('bluebird')
@@ -17,6 +18,8 @@ import '../common/clock'
 // import './adapters/redis'
 // import './watchers/watchers'
 
-if (process.WORKER) require('./api/fastify');
+// if (process.WORKER) {
+// 	require('./api/fastify')
+// }
 
 

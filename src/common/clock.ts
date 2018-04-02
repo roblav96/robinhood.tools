@@ -3,6 +3,7 @@
 import * as _ from 'lodash'
 import * as luxon from 'luxon'
 import * as ci from 'correcting-interval'
+import * as Rolex from 'rolex'
 import * as core from './core'
 import * as Rx from './rxjs'
 import Emitter from './emitter'
@@ -22,39 +23,31 @@ const tocks = core.array.dict(ticks, 0)
 
 
 
-const emitter = new Emitter()
-export default emitter
-
-
-
-// const clock = new Rx.Subject<Clock.Tick>()
+// // const clock = new Rx.Subject<Clock.Tick>()
 const clock = new Rx.Subject<Clock.Tick>()
-// const clock = Rx.of({ message : 'Logged in' })
-// export default clock
+// // const clock = Rx.of({ message : 'Logged in' })
+// // export default clock
 
-// clock.pipe(
-// 	Rx.scan(function (tick) {
-// 		return tick
-// 	})
-// )
+// // clock.pipe(
+// // 	Rx.scan(function (tick) {
+// // 		return tick
+// // 	})
+// // )
 
-let clock$ = clock.pipe(
-	Rx.map(tick => state => Object.assign({}, state, { count: state.count + 1 }))
-)
+// // let clock$ = clock.pipe(
+// // 	Rx.map(tick => state => Object.assign({}, state, { count: state.count + 1 }))
+// // )
 
 
 
 function onTock(tick: Clock.Tick) {
-	tocks[tick]++
+	console.log('onTock tick ->', tick)
 	clock.next(tick)
 }
 
-function startTicking(tick: Clock.Tick, ms: number) {
-	onTock(tick)
-	const tock = tick
-	ci.setCorrectingInterval(function tickInterval() {
-		onTock(tock)
-	}, ms)
+function tockGenesis(tick: Clock.Tick, ms: number) {
+	console.warn('tockGenesis tick ->', tick)
+	Rolex.setInterval(onTock, ms, tick)
 }
 
 function tickGenesis(tick: string) {
@@ -68,13 +61,31 @@ function tickGenesis(tick: string) {
 	let ims = process.CLIENT ? 0 : core.math.dispersed(ms, process.INSTANCE, process.INSTANCES)
 	let delay = (from + ims) - now
 	if (delay <= 0) delay = (to + ims) - now;
-	_.delay(startTicking, delay, tick, ms) as any
+	Rolex.setTimeout(tockGenesis, delay, tick, ms)
+	// ████████████████████████████████████████████████████████████████████████
+	//       Rolex.setTimeout(Rolex.setInterval, delay, onTock, ms, tick)
+	// ████████████████████████████████████████████████████████████████████████
 }
 
-function clockGenesis() {
-	Object.keys(TICKS).filter(isNaN as any).forEach(tickGenesis)
-} setImmediate(clockGenesis)
+function clockGenesis() { ticks.forEach(tickGenesis) }
+setImmediate(clockGenesis)
 
 
+
+
+
+// function onTock(tick: Clock.Tick) {
+// 	tocks[tick]++
+// 	clock.next(tick)
+// }
+// function startTicking(tick: Clock.Tick, ms: number) {
+// 	onTock(tick)
+// 	const tock = tick
+// 	ci.setCorrectingInterval(function tickInterval() {
+// 		onTock(tock)
+// 	}, ms)
+// }
+// const emitter = new Emitter()
+// export default emitter
 
 
