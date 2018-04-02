@@ -1,7 +1,6 @@
 // 
 
 import * as _ from 'lodash'
-import * as strace from 'stack-trace'
 
 
 
@@ -95,7 +94,7 @@ export const number = {
 
 
 export const array = {
-	is<T = any[]>(value: any): value is T { return Array.isArray(value) },
+	is<T = any>(value: any): value is T[] { return Array.isArray(value) },
 	create<T = number>(length: number, filled?: T): T[] {
 		let alength = arguments.length
 		return Array.from(Array(length), function(v, i) {
@@ -103,24 +102,30 @@ export const array = {
 			return filled
 		}) as any
 	},
-	chunks<T = any[]>(value: T[], nchunks: number) {
+	chunks<T = any>(value: T[], nchunks: number) {
 		let chunks = Array.from(Array(nchunks), v => []) as T[][]
 		value.forEach((v, i) => chunks[i % chunks.length].push(v))
 		return chunks
 	},
-	merge<T = any[]>(value: T[], source: T[], key: string) {
+	merge<T = any>(value: T[], source: T[], key: string) {
 		source.forEach(function(item, i) {
 			let found = value.find(v => v && v[key] == item[key])
 			if (found) object.merge(found, item);
 			else value.push(item);
 		})
 	},
-	dict<T = any[]>(value: T[], key: string): Dict<T> {
+	dict<T = string>(value: any[], filled?: T): Dict<T> {
 		return value.reduce(function(previous, current, i) {
-			previous[current[key]] = current
+			previous[current] = filled == null ? current : filled
 			return previous
 		}, {})
 	},
+	// dict<T = any>(value: T[], key: string): Dict<T> {
+	// 	return value.reduce(function(previous, current, i) {
+	// 		previous[current[key]] = current
+	// 		return previous
+	// 	}, {})
+	// },
 }
 
 export const sort = {
@@ -203,6 +208,13 @@ export const math = {
 	random(min: number, max: number) {
 		return Math.floor(Math.random() * (max - min + 1)) + min
 	},
+}
+
+
+
+import { DurationObjectUnits } from 'luxon'
+export const time = {
+	UNITS: { 'ms': 'milliseconds', 's': 'seconds', 'm': 'minutes', 'h': 'hours' } as Dict<keyof DurationObjectUnits>,
 }
 
 

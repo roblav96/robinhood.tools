@@ -13,9 +13,9 @@ if (DEVELOPMENT) process.INSTANCES = 0;
 import './adapters/cluster'
 
 import '../common/clock'
-import './adapters/radio'
-import './adapters/redis'
-import './watchers/watchers'
+// import './adapters/radio'
+// import './adapters/redis'
+// import './watchers/watchers'
 
 if (process.WORKER) require('./api/fastify');
 

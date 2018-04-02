@@ -1,16 +1,14 @@
 // 
 
-import * as ee3 from 'eventemitter3'
+import * as EventEmitter from 'eventemitter3'
 
 
 
-export default class Emitter<Names extends string = string, Data = any> extends ee3.EventEmitter<Names, Data> {
+export default class Emitter<Names extends string = string, Data = any> extends EventEmitter<Names, Data> {
 
-	offListener(listener: ee3.Listener<Data>, context?: any, once?: boolean): this {
+	offListener(listener: EventEmitter.Listener<Data>, context?: any, once?: boolean): this {
 		this.eventNames().forEach(name => {
-			console.log('name ->', name)
 			this.listeners(name).forEach(fn => {
-				console.log('fn ->', fn)
 				if (listener == fn) {
 					console.warn('removeListener ->', name, listener)
 					this.removeListener(name, listener, context, once)
