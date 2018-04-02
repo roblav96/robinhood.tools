@@ -27,8 +27,6 @@ if (process.MASTER) {
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
 	wss.on('connection', function(client: Radio.Client, req: http.IncomingMessage) {
-		client.on('error', function(error) { console.error('socket.on Error ->', error) })
-
 		if (!Array.isArray(client.subs)) client.subs = [];
 
 		client.on('message', function(message: string) {
@@ -42,6 +40,13 @@ if (process.MASTER) {
 			}
 			wss.broadcast(message)
 		})
+
+		client.on('close', function(code: number, message: string) {
+			client.terminate()
+			client.removeAllListeners()
+		})
+
+		client.on('error', function(error) { console.error('socket.on Error ->', error) })
 
 	})
 

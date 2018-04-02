@@ -70,7 +70,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.terminate()
 		this.reconnect.cancel()
 		this.reconnect = null
-		this.removeAllListeners()
+		this.offAllListeners()
 	}
 
 	terminate() {

@@ -9,47 +9,35 @@ import radio from '../adapters/radio'
 
 
 
-
-
-
-// import { ReadySubject } from '../../common/rx.utils'
-// export const rxReady = new ReadySubject()
-
-
-
-async function readyInstruments() {
-	let symbols = await robinhood.getSymbols()
-	if (symbols.length > 0) return;
-	syncAllInstruments()
-}
-
 if (process.MASTER) {
+
 	radio.ready.subscribe(readyInstruments)
+	async function readyInstruments() {
+		let symbols = await robinhood.getSymbols()
+		if (symbols.length > 0) return;
+		syncAllInstruments()
+	}
+
+	async function syncAllInstruments() {
+
+	}
 
 
-	// clock.listeners()
-	clock.on('1s', function(i) {
 
-	})
-	clock.on('2s', function(ii) {
+	function first(i) { }
+	clock.on('1s', first)
+	function second(i) { }
+	clock.on('2s', second)
+	function third(i) { }
+	clock.on('1s', third)
 
-	})
-	clock.on('1s', function(iii) {
+	console.log('clock.e ->', clock.e)
+	clock.offListener(third)
+	console.log('clock.e ->', clock.e)
 
-	})
-	
-	console.log('clock.e ->', console.dump(clock.e, { depth: 8 }))
-
-
+	// console.log('clock.e ->', console.dump(clock.e, { depth: 8 }))
 
 }
-
-
-
-async function syncAllInstruments() {
-
-}
-
 
 
 
