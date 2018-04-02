@@ -9,7 +9,7 @@ global.WebSocket = require('uws')
 import './process'
 
 import './adapters/console'
-if (DEVELOPMENT) process.INSTANCES = 2;
+if (DEVELOPMENT) process.INSTANCES = 0;
 import './adapters/cluster'
 
 import '../common/ticks'

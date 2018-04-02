@@ -1,7 +1,7 @@
 // 
 
 import * as _ from 'lodash'
-import * as ee4 from './ee4'
+import Emitter from './emitter'
 
 import * as uws from 'uws'
 import * as url from 'url'
@@ -9,7 +9,7 @@ import ticks from './ticks'
 
 
 
-export default class WebSocketClient extends ee4.EventEmitter<'open' | 'close' | 'error' | 'message'> {
+export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' | 'message'> {
 
 	private static readonly ecodes = {
 		1000: 'Normal',
@@ -76,7 +76,7 @@ export default class WebSocketClient extends ee4.EventEmitter<'open' | 'close' |
 
 	terminate() {
 		this.reconnect.cancel()
-		ticks.removeListenerFunction(this._heartbeat)
+		ticks.removeListener(this._heartbeat)
 		if (!this.socket) return;
 		this.socket.close()
 		if (process.SERVER) {
@@ -108,7 +108,7 @@ export default class WebSocketClient extends ee4.EventEmitter<'open' | 'close' |
 	private _onclose = (event: CloseEvent) => {
 		console.warn(this.name, 'onclose ->', WebSocketClient.ecodes[event.code] || event.code, '->', event.reason)
 		this.emit('close', event.code, event.reason)
-		ticks.removeListenerFunction(this._heartbeat)
+		ticks.removeListener(this._heartbeat)
 		if (this.options.autoretry) this.reconnect();
 		else this.destroy();
 	}
@@ -128,7 +128,7 @@ export default class WebSocketClient extends ee4.EventEmitter<'open' | 'close' |
 
 	private _heartbeat = () => {
 		if (this.isopen) this.send('ping');
-		else ticks.removeListenerFunction(this._heartbeat);
+		else ticks.removeListener();
 	}
 
 }

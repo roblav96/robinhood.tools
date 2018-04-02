@@ -1,18 +1,19 @@
 // 
 
 import * as _ from 'lodash'
-import * as core from './core'
-import * as ee4 from './ee4'
 import * as ci from 'correcting-interval'
+import * as core from './core'
+import Emitter from './emitter'
 
 
 
 const TICKS = {
-	T01: 'tick:01', T025: 'tick:025', T05: 'tick:05',
-	T1: 'tick:1', T2: 'tick:2', T3: 'tick:3', T5: 'tick:5',
-	T10: 'tick:10', T15: 'tick:15', T30: 'tick:30', T60: 'tick:60',
+	t01: 'tick:01', t025: 'tick:025', t05: 'tick:05',
+	t1: 'tick:1', t2: 'tick:2', t3: 'tick:3', t5: 'tick:5',
+	t10: 'tick:10', t15: 'tick:15', t30: 'tick:30', t60: 'tick:60',
 }
-const EE4 = new ee4.EventEmitter<string, number>()
+// const emitter = new Emitter<keyof typeof TICKS>()
+const emitter = new Emitter()
 
 
 
@@ -21,11 +22,12 @@ const ee4is = {} as Dict<number>
 function ee4start(topic: string, ms: number) {
 	if (process.SERVER) (ee4ts[topic] as any).unref();
 	clearTimeout(ee4ts[topic]); ee4ts[topic] = null; _.unset(ee4ts, topic);
-	ee4is[topic] = 0
-	EE4.emit(topic, ee4is[topic])
+	const tick = topic as any
+	ee4is[tick] = 0
+	emitter.emit(tick, ee4is[tick])
 	ci.setCorrectingInterval(function() {
-		ee4is[topic]++
-		EE4.emit(topic, ee4is[topic])
+		ee4is[tick]++
+		emitter.emit(tick, ee4is[tick])
 	}, ms)
 }
 
@@ -48,6 +50,6 @@ setImmediate(function() {
 	})
 })
 
-export default Object.assign(EE4, TICKS)
+export default Object.assign(emitter, TICKS)
 
 
