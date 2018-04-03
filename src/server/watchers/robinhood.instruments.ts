@@ -1,47 +1,45 @@
 // 
 
+import * as _ from 'lodash'
+import * as pretry from 'bluebird-retry'
+import * as pforever from 'p-forever'
+import * as boom from 'boom'
 import * as Rx from '../../common/rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
+import * as radio from '../adapters/radio'
+import * as core from '../../common/core'
 import clock from '../../common/clock'
-import radio from '../adapters/radio'
 
 
 
 if (process.MASTER) {
-
-	radio.ready.subscribe(readyInstruments)
-	async function readyInstruments() {
-		let symbols = await robinhood.getSymbols()
-		if (symbols.length > 0) return;
-		syncAllInstruments()
-	}
-
-	async function syncAllInstruments() {
-
-	}
-
-
-	console.log('clock ->', console.dump(clock, { depth: 8 }))
-
-	function first(i) { }
-	clock.on('1s', first)
-	function second(i) { }
-	clock.on('2s', second)
-	function third(i) { }
-	clock.on('1s', third)
-
-	clock.eachEvent(function(event, i) {
-		console.log('i ->', i, 'event ->', event)
+	radio.ready.toPromise().then(function() {
+		return pretry(readyInstruments, {
+			max_tries: Infinity, max_interval: 10000,
+		})
 	})
 
-	// console.log('clock.ee ->', clock.ee)
-	// clock.offAll()
-	// console.log('clock.ee ->', clock.ee)
+	// .then(readyInstruments).catch(function(error) {
+	// 	console.error('readyInstruments Error ->', error)
+	// })
+}
 
-	console.log('clock ->', console.dump(clock, { depth: 8 }))
+async function readyInstruments() {
+	let coms = core.array.create(process.INSTANCES).map(function(i) {
+		return ['exists', `${redis.RH.SYMBOLS}:${process.INSTANCES}:${i}`]
+	})
+	let resolved = await redis.main.pipeline(coms).exec().then(redis.pipe) as number[]
+	console.log('resolved ->', resolved)
+	if (_.sum(resolved) == process.INSTANCES) return true;
+	throw boom.tooManyRequests('now try again')
 
+	// return pforever()
+}
+
+async function syncAllInstruments() {
+	return pforever()
 }
 
 
@@ -51,6 +49,12 @@ if (process.MASTER) {
 
 
 
+
+// async function readyInstruments() {
+// 	let symbols = await robinhood.getAllSymbols()
+// 	if (symbols.length > 0) return;
+// 	syncAllInstruments()
+// }
 
 // async function doForever() {
 // 	await pforever(function(url) {

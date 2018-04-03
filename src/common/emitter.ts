@@ -5,8 +5,16 @@ import * as TinyEmitter from 'tiny-emitter'
 export default class Emitter<Names extends string = string, Data = any> extends TinyEmitter<Names, Data> {
 
 	get ee() { return this.e || (this.e = {}) }
+	get names() { return Object.keys(this.ee) as Names[] }
 
-	offFn<Name extends Names>(listener: TinyEmitter.Listener<Data>) {
+	eachEvent<Name extends Names>(fn: (event: TinyEmitter.Event<Data>, index: number) => void) {
+		let e = this.ee; let i = 0;
+		Object.keys(e).forEach((name: Names) => {
+			e[name].forEach(event => { fn(event, i); i++; })
+		})
+	}
+
+	offListener<Name extends Names>(listener: TinyEmitter.Listener<Data>) {
 		let e = this.ee
 		Object.keys(e).forEach((name: Names) => {
 			e[name].forEach(event => {
@@ -29,15 +37,31 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 		return this
 	}
 
-	// get names() { return Object.keys(this.ee) as Names[] }
-	// eachEvent<Name extends Names>(fn: (event: TinyEmitter.Event<Data>, index: number) => void) {
-	// 	let e = this.ee; let i = 0;
-	// 	Object.keys(e).forEach(name => {
-	// 		e[name].forEach(event => { fn(event, i); i++; })
-	// 	})
-	// }
-
 }
+
+
+
+
+// console.log('clock ->', console.dump(clock, { depth: 8 }))
+
+// function first(i) { }
+// clock.on('1s', first)
+// function second(i) { }
+// clock.on('2s', second)
+// function third(i) { }
+// clock.on('1s', third)
+
+// clock.eachEvent(function(event, i) {
+// 	console.log('i ->', i, 'event ->', event)
+// })
+
+// // console.log('clock.ee ->', clock.ee)
+// // clock.offAll()
+// // console.log('clock.ee ->', clock.ee)
+
+// console.log('clock ->', console.dump(clock, { depth: 8 }))
+
+
 
 
 

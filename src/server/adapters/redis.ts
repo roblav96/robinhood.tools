@@ -40,7 +40,7 @@ export const main = new Redis('main', 0)
 
 
 
-export function fixPipeline(resolved: any[]) {
+export function pipe(resolved: any[]) {
 	if (Array.isArray(resolved)) {
 		let i: number, len = resolved.length
 		for (i = 0; i < len; i++) {

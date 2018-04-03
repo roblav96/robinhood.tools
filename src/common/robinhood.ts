@@ -2,7 +2,7 @@
 
 
 
-export const acronyms = {
+export const ACRONYMS = {
 	OTCM: 'OTCM',
 	XASE: 'AMEX',
 	ARCX: 'NYSE',

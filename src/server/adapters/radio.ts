@@ -54,45 +54,33 @@ if (process.MASTER) {
 
 
 
-class Radio {
+export const ready = new Rx.ReadySubject()
+const emitter = new Emitter()
+const socket = new WebSocketClient(`ws://${HOST}:${PORT}/${PATH}`, {
+	autoStart: false,
+	// verbose: process.MASTER,
+	// verbose: true,
+})
 
-	ready = new Rx.ReadySubject()
-	emitter = new Emitter()
-	socket = new WebSocketClient(`ws://${HOST}:${PORT}/${PATH}`, {
-		autoConnect: false,
-		// verbose: process.MASTER,
-		// verbose: true,
-	})
+const connect = _.once(() => socket.connect())
+if (process.MASTER) wss.once('listening', connect);
+else setImmediate(connect);
 
-	constructor() {
-		const _connect = _.once(() => this.socket.connect())
-		if (process.MASTER) wss.once('listening', _connect);
-		else setImmediate(_connect);
+socket.on('open', function() {
+	socket.send('_onopen_')
+})
 
-		this.socket.on('open', () => {
-			this.socket.send('_onopen_')
-			this.emitter.emit('_onopen_')
-		})
-
-		this.socket.on('message', (message: string) => {
-			if (message == '_onready_') {
-				this.ready.next(true)
-				this.emitter.emit('_onready_')
-				return
-			}
-			let event = JSON.parse(message) as Radio.Event
-			this.emitter.emit(event.e, event.d)
-		})
-
+socket.on('message', function(message: string) {
+	if (message == '_onready_') {
+		return ready.next(true)
 	}
+	let event = JSON.parse(message) as Radio.Event
+	emitter.emit(event.e, event.d)
+})
 
-	emit(event: string, data?: any) {
-		return !!this.socket.json({ e: event, d: data } as Radio.Event)
-	}
-
+export function emit(event: string, data?: any) {
+	socket.json({ e: event, d: data } as Radio.Event)
 }
-
-export default new Radio()
 
 
 
