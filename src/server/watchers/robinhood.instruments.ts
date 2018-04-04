@@ -14,6 +14,21 @@ import clock from '../../common/clock'
 
 
 
+export const ready = new Rx.ReadySubject()
+
+radio.ready.toPromise().then(async function() {
+	if (process.MASTER) {
+		await pretry(readyInstruments, { max_tries: Infinity })
+	}
+	radio
+
+}).catch(function(error) {
+	console.error('robinhood.instruments Error ->', error)
+	ready.next()
+})
+
+
+
 if (process.MASTER) {
 	radio.ready.toPromise().then(function() {
 		return pretry(readyInstruments, {

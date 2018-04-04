@@ -55,7 +55,7 @@ if (process.MASTER) {
 
 
 export const ready = new Rx.ReadySubject()
-const emitter = new Emitter()
+export const emitter = new Emitter()
 const socket = new WebSocketClient(`ws://${HOST}:${PORT}/${PATH}`, {
 	autoStart: false,
 	// verbose: process.MASTER,
@@ -72,7 +72,7 @@ socket.on('open', function() {
 
 socket.on('message', function(message: string) {
 	if (message == '_onready_') {
-		return ready.next(true)
+		return ready.next()
 	}
 	let event = JSON.parse(message) as Radio.Event
 	emitter.emit(event.e, event.d)

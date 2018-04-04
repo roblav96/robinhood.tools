@@ -44,8 +44,8 @@ process.on('unhandledRejection', function(error) {
 
 
 if (process.MASTER) {
-	process.stdout.write(`\n\n${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}\n`)
-	process.stdout.write(`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}\n`)
+	console.log(`\n\n${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`)
+	console.log(`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}`)
 }
 
 
