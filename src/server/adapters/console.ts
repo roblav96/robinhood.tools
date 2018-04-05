@@ -32,6 +32,7 @@ console.format = function(args) {
 	// }
 	return '\n\n' + chalk.underline(output) + '\n'
 }
+declare global { interface Console { format(args: any): void } }
 
 
 
@@ -40,6 +41,11 @@ _.merge(eyes.defaults, {
 	maxLength: 65536, stream: null, showHidden: true, pretty: true,
 	styles: { all: null, key: 'grey', special: 'red' },
 } as eyes.EyesOptions)
+
+Object.assign(console, {
+	inspect(value: any) { return eyes.inspect(value) },
+})
+declare global { interface Console { inspect(value: any): string } }
 
 
 
@@ -65,9 +71,6 @@ _.merge(util.inspect, {
 
 
 Object.assign(console, {
-	inspect(value: any) {
-		return eyes.inspect(value)
-	},
 	dump(value: any, opts = {}) {
 		_.defaults(opts, {
 			depth: 4, showHidden: true, showProxy: true,
@@ -75,6 +78,7 @@ Object.assign(console, {
 		return util.inspect(value, opts)
 	},
 })
+declare global { interface Console { dump(value: any, opts?: NodeJS.InspectOptions): string } }
 
 
 

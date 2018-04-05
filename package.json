@@ -82,7 +82,6 @@
 		"@types/pretty-bytes": "latest",
 		"@types/pretty-ms": "latest",
 		"@types/source-map-support": "latest",
-		"@types/stack-trace": "latest",
 		"@types/uws": "latest",
 		"@types/webpack": "latest",
 		"@vue/cli-plugin-typescript": "latest",
@@ -100,7 +99,6 @@
 		"rimraf": "latest",
 		"sass-loader": "latest",
 		"source-map-support": "latest",
-		"stack-trace": "latest",
 		"tsc-watch": "latest",
 		"vue-template-compiler": "latest",
 		"webpack-bundle-analyzer": "latest"

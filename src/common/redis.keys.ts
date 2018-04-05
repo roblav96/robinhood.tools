@@ -9,6 +9,8 @@ export const RH = {
 	UNTRADABLES: 'rh:untradables',
 }
 
+export const SYMBOLS = 'symbols'
+
 
 
 

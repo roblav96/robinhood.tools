@@ -19,10 +19,13 @@ radio.once('robinhood.instruments.ready', () => ready.next())
 
 if (process.MASTER) {
 	radio.ready.toPromise().then(readyInstruments).catch(function(error) {
-		console.error('ready Error ->', error)
+		console.error('readyInstruments Error ->', error)
 	}).finally(function() {
-		console.info('readyInstruments -> done')
 		radio.emit('robinhood.instruments.ready')
+	})
+} else {
+	ready.toPromise().then(readyWebullTickerIds).catch(function(error) {
+		console.error('readyWebullTickerIds Error ->', error)
 	})
 }
 
@@ -37,20 +40,17 @@ async function readyInstruments() {
 		await syncInstruments()
 	}
 
-	// if (DEVELOPMENT) { await redis.main.purge(redis.RH.TRADABLES); await redis.main.purge(redis.RH.UNTRADABLES); }
-	let tradables = await redis.main.smembers(redis.RH.TRADABLES) as string[]
-	if (_.isEmpty(tradables)) {
-		await syncTradables()
+	// if (DEVELOPMENT) await redis.main.purge(`${redis.RH.TRADABLES}:${process.INSTANCES}`);
+	let coms = core.array.create(process.INSTANCES).map(function(i) {
+		return ['exists', `${redis.RH.TRADABLES}:${process.INSTANCES}:${i}`]
+	})
+	let exists = await redis.main.pipecoms(coms) as number[]
+	if (_.sum(exists) != process.INSTANCES) {
+		await chunkTradables()
 	}
 
-	// // if (DEVELOPMENT) await redis.main.purge(`${redis.RH.SYMBOLS}:${process.INSTANCES}`);
-	// let coms = core.array.create(process.INSTANCES).map(function(i) {
-	// 	return ['exists', `${redis.RH.SYMBOLS}:${process.INSTANCES}:${i}`]
-	// })
-	// let exists = await redis.main.pipecoms(coms) as number[]
-	// if (_.sum(exists) != process.INSTANCES) {
-	// 	await chunkSymbols()
-	// }
+	console.info('readyInstruments -> done')
+	radio.emit('readyInstruments')
 
 }
 
@@ -63,7 +63,23 @@ async function syncInstruments() {
 		_.remove(response.results, v => v.symbol.match(/\W+/))
 		if (DEVELOPMENT) console.log('syncInstruments ->', console.inspect(response.results.length));
 
+		let tradables = new redis.SetsComs(redis.RH.TRADABLES)
+		let untradables = new redis.SetsComs(redis.RH.UNTRADABLES)
+		response.results.forEach(function(v) {
+			let active = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
+			if (active) {
+				tradables.sadd(v.symbol)
+				untradables.srem(v.symbol)
+			} else {
+				tradables.srem(v.symbol)
+				untradables.sadd(v.symbol)
+			}
+		})
+
 		let coms = response.results.map(v => ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
+		tradables.concat(coms)
+		untradables.concat(coms)
+
 		await redis.main.pipecoms(coms)
 		return response.next || pforever.end
 
@@ -76,41 +92,21 @@ async function syncInstruments() {
 
 
 
-async function syncTradables() {
-	let rkeys = await redis.main.keys(redis.RH.INSTRUMENTS + ':*')
-	await pall(rkeys.map(function (rkey) {
-		return () => {}
-	}))
-
-	let tradable = new redis.SetsComs(redis.RH.TRADABLES)
-	let untradable = new redis.SetsComs(redis.RH.UNTRADABLES)
-	response.results.forEach(function(v) {
-		let active = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
-		if (active) {
-			tradable.sadd(v.symbol)
-			untradable.srem(v.symbol)
-		} else {
-			tradable.srem(v.symbol)
-			untradable.sadd(v.symbol)
-		}
-	})
-
-	tradable.concat(coms)
-	untradable.concat(coms)
-}
-
-async function chunkSymbols() {
+async function chunkTradables() {
 	let symbols = (await redis.main.smembers(redis.RH.TRADABLES) as string[]).sort()
 
 	let chunks = core.array.chunks(symbols, process.INSTANCES)
-	let coms = chunks.map((v, i) => ['set', `${redis.RH.SYMBOLS}:${process.INSTANCES}:${i}`, v.toString()])
+	let coms = chunks.map((v, i) => ['set', `${redis.RH.TRADABLES}:${process.INSTANCES}:${i}`, v.toString()])
 	await redis.main.pipecoms(coms)
 
-	console.info('chunkSymbols -> done')
-	radio.emit('chunkSymbols')
+	console.info('chunkTradables -> done')
+	radio.emit('chunkTradables')
 
 }
 
 
 
+async function readyWebullTickerIds() {
+	
+}
 
