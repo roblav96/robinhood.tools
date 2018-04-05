@@ -16,31 +16,21 @@ import radio from '../adapters/radio'
 
 
 export const ready = new Rx.ReadySubject()
+ready.subscribe(function() { console.warn('ready.subscribe') })
 radio.once('webull.tickers.ready', () => ready.next())
 
-ready.subscribe(function() { console.warn('ready.subscribe') })
-
 if (process.MASTER) {
-	let done = 0
-	radio.on('webull.tickers.done', function() {
-		done++
-		if (done < process.INSTANCES) return;
-		radio.off('webull.tickers.done')
-		radio.emit('webull.tickers.ready')
-	})
-}
-if (process.WORKER) {
-	robinhoodinstruments.ready.toPromise().then(readyTickers).catch(function(error) {
+	radio.ready.toPromise().then(readyTickers).catch(function(error) {
 		console.error('readyTickers Error ->', error)
 	}).finally(function() {
-		radio.emit('webull.tickers.done')
+		radio.emit('webull.tickers.ready')
 	})
 }
 
 
 
 async function readyTickers() {
-	if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
+	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
 
 	let synced = await redis.main.keys(`${redis.WB.TICKERS}:*`)
 	console.log('tickers synced ->', console.inspect(synced.length))
@@ -50,6 +40,56 @@ async function readyTickers() {
 
 	console.info('readyTickers -> done')
 
+}
+
+async function syncTickers() {
+	let stocks = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
+		query: { pageIndex: 0, pageSize: 999999, hl: 'en', sourceRegionId: 1 },
+	}) as Webull.Ticker[]
+	await redis.main.coms(stocks.map(function(v) {
+		return ['hmset', `${redis.WB.TICKERS}:${v.disSymbol}`, v as any]
+	}))
+
+	let etfs = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
+		query: { pageIndex: 0, pageSize: 999999, hl: 'en', sourceRegionId: 1 },
+	}) as Webull.Ticker[]
+	await redis.main.coms(etfs.map(function(v) {
+		return ['hmset', `${redis.WB.TICKERS}:${v.disSymbol}`, v as any]
+	}))
+
+	console.info('syncTickers -> done')
+
+}
+
+
+
+
+
+
+
+if (process.MASTER) {
+	let done = 0
+	radio.on('webull.tickers.done', function() {
+		done++
+		if (done < process.INSTANCES) return;
+		radio.off('webull.tickers.done')
+		radio.emit('webull.tickers.ready')
+	})
+	robinhoodinstruments.ready.toPromise().then(readyTickers).catch(function(error) {
+		console.error('readyTickers Error ->', error)
+	}).finally(function() {
+		radio.emit('webull.tickers.start')
+	})
+}
+
+
+
+if (process.WORKER) {
+	robinhoodinstruments.ready.toPromise().then(readyTickers).catch(function(error) {
+		console.error('readyTickers Error ->', error)
+	}).finally(function() {
+		radio.emit('webull.tickers.done')
+	})
 }
 
 
@@ -125,23 +165,6 @@ async function syncTicker(symbol: string) {
 // 	})
 // }
 
-// async function syncTickers() {
-// 	let stocks = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
-// 		query: { pageIndex: 0, pageSize: 999999, hl: 'en', sourceRegionId: 1 },
-// 	}) as Webull.Ticker[]
-// 	await redis.main.coms(stocks.map(function(v) {
-// 		return ['hmset', `${redis.WB.TICKERS}:${v.disSymbol}`, v as any]
-// 	}))
 
-// 	let etfs = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
-// 		query: { pageIndex: 0, pageSize: 999999, hl: 'en', sourceRegionId: 1 },
-// 	}) as Webull.Ticker[]
-// 	await redis.main.coms(etfs.map(function(v) {
-// 		return ['hmset', `${redis.WB.TICKERS}:${v.disSymbol}`, v as any]
-// 	}))
-
-// 	console.info('syncTickers -> done')
-
-// }
 
 
