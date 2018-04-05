@@ -50,7 +50,7 @@ declare global {
 			// 
 			mic: string
 			acronym: string
-			alive: boolean
+			good: boolean
 		}
 
 

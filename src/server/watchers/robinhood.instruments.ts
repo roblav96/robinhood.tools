@@ -29,8 +29,8 @@ if (process.MASTER) {
 async function readyInstruments() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
 
-	let synced = await redis.main.keys(redis.RH.INSTRUMENTS + ':*')
-	console.log('synced ->', console.inspect(synced.length))
+	let synced = await redis.main.keys(`${redis.RH.INSTRUMENTS}:*`)
+	console.log('instruments synced ->', console.inspect(synced.length))
 	if (synced.length < 10000) {
 		await syncInstruments()
 	}
@@ -59,8 +59,8 @@ async function syncInstruments() {
 			symbols.sadd(v.symbol)
 			v.mic = _.compact(v.market.split('/')).pop()
 			v.acronym = robinhood.MICS[v.mic]
-			v.alive = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
-			if (v.alive) {
+			v.good = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
+			if (v.good) {
 				tradables.sadd(v.symbol)
 				untradables.srem(v.symbol)
 			} else {
