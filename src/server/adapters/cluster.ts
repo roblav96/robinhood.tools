@@ -12,7 +12,7 @@ if (process.MASTER && process.INSTANCES > 0) {
 		workers[worker.process.pid] = i
 	}
 
-	console.log('Forking', process.INSTANCES, 'workers in cluster...')
+	console.info('Forking', process.INSTANCES, 'workers in cluster...')
 	let i: number, len = process.INSTANCES
 	for (i = 0; i < len; i++) { fork(i) }
 

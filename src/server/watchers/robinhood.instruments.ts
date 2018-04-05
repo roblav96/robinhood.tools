@@ -35,7 +35,7 @@ async function readyInstruments() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
 
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.INSTRUMENTS);
-	let resolved = await redis.main.pipecoms([
+	let resolved = await redis.main.coms([
 		['keys', redis.RH.INSTRUMENTS + ':*'],
 		['exists', redis.RH.SYMBOLS],
 		['exists', redis.RH.TRADABLES],
@@ -45,15 +45,7 @@ async function readyInstruments() {
 		await syncInstruments()
 	}
 
-	// if (DEVELOPMENT) await redis.main.purge(`${redis.RH.TRADABLES}:${process.INSTANCES}`);
-	// let coms = core.array.create(process.INSTANCES).map(function(i) {
-	// 	return ['exists', `${redis.RH.TRADABLES}:${process.INSTANCES}:${i}`]
-	// })
-	// let exists = await redis.main.pipecoms(coms) as number[]
-	// if (_.sum(exists) != process.INSTANCES) {
-	// 	await chunkSymbols()
-	// }
-	await chunkSymbols()
+	await syncSymbols()
 
 	console.info('readyInstruments -> done')
 	radio.emit('readyInstruments')
@@ -66,7 +58,7 @@ async function syncInstruments() {
 	await pforever(async function(url) {
 
 		let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
-		_.remove(response.results, v => v.symbol.match(/\W+/))
+		_.remove(response.results, v => Array.isArray(v.symbol.match(/\W+/)))
 		if (DEVELOPMENT) console.log('syncInstruments ->', console.inspect(response.results.length));
 
 		let coms = response.results.map(v => ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
@@ -89,7 +81,7 @@ async function syncInstruments() {
 		tradables.concat(coms)
 		untradables.concat(coms)
 
-		await redis.main.pipecoms(coms)
+		await redis.main.coms(coms)
 		return response.next || pforever.end
 
 	}, 'https://api.robinhood.com/instruments/')
@@ -101,22 +93,23 @@ async function syncInstruments() {
 
 
 
-async function chunkSymbols() {
-	let resolved = await redis.main.pipecoms([
-		['smembers', redis.RH.SYMBOLS],
-		['smembers', redis.RH.TRADABLES],
-		['smembers', redis.RH.UNTRADABLES],
-	])
-	
-	console.log('resolved ->', console.inspect(resolved))
+async function syncSymbols() {
+	let rkeys = [redis.RH.SYMBOLS, redis.RH.TRADABLES, redis.RH.UNTRADABLES]
+	let rcoms = rkeys.map(v => ['smembers', v])
+	let resolved = await redis.main.coms(rcoms) as string[][]
 
-	// let symbols = (await redis.main.smembers(redis.RH.TRADABLES) as string[]).sort()
-	// let chunks = core.array.chunks(symbols, process.INSTANCES)
-	// let coms = chunks.map((v, i) => ['set', `${redis.RH.TRADABLES}:${process.INSTANCES}:${i}`, v.toString()])
-	// await redis.main.pipecoms(coms)
+	let coms = [] as Redis.Coms
+	resolved.forEach(function(symbols, i) {
+		let rkey = rkeys[i]
+		let chunks = core.array.chunks(symbols, process.INSTANCES)
+		chunks.forEach(function(chunk, ii) {
+			coms.push(['set', `${rkey}:${process.INSTANCES}:${ii}`, chunk.toString()])
+		})
+	})
+	await redis.main.coms(coms)
 
-	console.info('chunkSymbols -> done')
-	radio.emit('chunkSymbols')
+	console.info('syncSymbols -> done')
+	radio.emit('syncSymbols')
 
 }
 

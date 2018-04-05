@@ -32,14 +32,14 @@ class Redis extends IORedis {
 		super(Redis.options(name, offset))
 	}
 
-	pipecoms(coms: Redis.Coms) {
+	coms(coms: Redis.Coms) {
 		return this.pipeline(coms).exec().then(fixPipeline)
 	}
 
 	async purge(rkey: string, pattern = ':*') {
 		let keys = await this.keys(rkey + pattern)
 		console.warn('PURGING ->', console.inspect(rkey + pattern), '->', console.inspect(keys.length))
-		await this.pipecoms(keys.map(v => ['del', v]))
+		await this.coms(keys.map(v => ['del', v]))
 		return keys
 	}
 

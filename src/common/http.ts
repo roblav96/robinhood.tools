@@ -10,10 +10,11 @@ export const config = {
 	json: true,
 	silent: PRODUCTION,
 	timeout: 10000,
-	retries(i: number) {
-		console.log('http retries i ->', i)
-		return i
-	},
+	retries: 9,
+	// retries(i, error) {
+	// 	console.warn('http retries', 'i ->', i, 'error ->', error)
+	// 	return i
+	// },
 } as Partial<Http.Config>
 
 
