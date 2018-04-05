@@ -1,15 +1,15 @@
 // 
 
 import * as _ from 'lodash'
-import * as pretry from 'bluebird-retry'
 import * as pforever from 'p-forever'
+import * as pevent from 'p-event'
 import * as boom from 'boom'
 import * as Rx from '../../common/rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
-import * as radio from '../adapters/radio'
 import * as core from '../../common/core'
+import radio from '../adapters/radio'
 import clock from '../../common/clock'
 
 
@@ -18,9 +18,11 @@ export const ready = new Rx.ReadySubject()
 
 radio.ready.toPromise().then(async function() {
 	if (process.MASTER) {
-		await pretry(readyInstruments, { max_tries: Infinity })
+		await readyInstruments()
 	}
-	radio
+	let isready = await pevent(radio, 'robinhood.instruments.ready')
+	console.log('isready ->', isready)
+	// radio.once('robinhood.instruments.ready')
 
 }).catch(function(error) {
 	console.error('robinhood.instruments Error ->', error)
@@ -29,33 +31,39 @@ radio.ready.toPromise().then(async function() {
 
 
 
-if (process.MASTER) {
-	radio.ready.toPromise().then(function() {
-		return pretry(readyInstruments, {
-			max_tries: Infinity, max_interval: 10000,
-		})
-	})
-
-	// .then(readyInstruments).catch(function(error) {
-	// 	console.error('readyInstruments Error ->', error)
-	// })
-}
-
 async function readyInstruments() {
 	let coms = core.array.create(process.INSTANCES).map(function(i) {
 		return ['exists', `${redis.RH.SYMBOLS}:${process.INSTANCES}:${i}`]
 	})
 	let resolved = await redis.main.pipeline(coms).exec().then(redis.pipe) as number[]
 	console.log('resolved ->', resolved)
-	if (_.sum(resolved) == process.INSTANCES) return true;
-	throw boom.tooManyRequests('now try again')
+	// if (_.sum(resolved) == process.INSTANCES) return true;
+	// throw boom.tooManyRequests('now try again')
+	
+	radio.emit('robinhood.instruments.ready')
 
 	// return pforever()
 }
 
-async function syncAllInstruments() {
-	return pforever()
-}
+
+
+// async function syncAllInstruments() {
+// 	return pforever()
+// }
+
+
+
+// if (process.MASTER) {
+// 	radio.ready.toPromise().then(function() {
+// 		return pretry(readyInstruments, {
+// 			max_tries: Infinity, max_interval: 10000,
+// 		})
+// 	})
+
+// 	// .then(readyInstruments).catch(function(error) {
+// 	// 	console.error('readyInstruments Error ->', error)
+// 	// })
+// }
 
 
 

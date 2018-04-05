@@ -2,6 +2,12 @@
 
 
 
+export const RH = {
+	SYMBOLS: 'rh:symbols',
+}
+
+
+
 export const ACRONYMS = {
 	OTCM: 'OTCM',
 	XASE: 'AMEX',

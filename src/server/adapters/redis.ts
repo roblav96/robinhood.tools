@@ -1,5 +1,6 @@
 // 
-export * from '../../common/redis.keys' // export { rdkeys as rdkeys }
+// export * from '../../common/redis.keys' // export { rdkeys as rdkeys }
+export { RH } from '../../common/robinhood'
 // 
 
 import * as _ from 'lodash'

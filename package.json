@@ -16,8 +16,6 @@
 	},
 	"dependencies": {
 		"@ibm/plex": "latest",
-		"bluebird": "latest",
-		"bluebird-retry": "^0.11.0",
 		"boom": "latest",
 		"buefy": "latest",
 		"bulma": "latest",
@@ -58,8 +56,6 @@
 		"vuex": "latest"
 	},
 	"devDependencies": {
-		"@types/bluebird": "latest",
-		"@types/bluebird-retry": "^0.11.0",
 		"@types/boom": "latest",
 		"@types/clipboardy": "latest",
 		"@types/cookie": "latest",

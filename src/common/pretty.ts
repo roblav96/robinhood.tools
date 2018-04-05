@@ -13,6 +13,7 @@ export function bytes(bytes: number) {
 }
 
 
+
 import * as Humanize from 'humanize-plus'
 export function plural(input: string, value: number) {
 	return Humanize.pluralize(value, input)

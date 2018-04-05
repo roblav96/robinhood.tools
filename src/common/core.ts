@@ -219,4 +219,12 @@ export const time = {
 
 
 
+// export const promise = {
+// 	retry<T = any>(wrapper: Promise<T>): Promise<T> {
+// 		return wrapper.then( function () {
+				
+// 		} )
+// 	},
+// }
+
 

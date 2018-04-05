@@ -8,7 +8,7 @@ import clock from './clock'
 
 
 
-export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' | 'message'> {
+export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' | 'message', string | number | Error> {
 
 	private static readonly ecodes = {
 		1000: 'Normal',

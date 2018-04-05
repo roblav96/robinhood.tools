@@ -4,22 +4,25 @@ import * as TinyEmitter from 'tiny-emitter'
 
 export default class Emitter<Names extends string = string, Data = any> extends TinyEmitter<Names, Data> {
 
-	get ee() { return this.e || (this.e = {}) }
-	get names() { return Object.keys(this.ee) as Names[] }
+	private get _e() { return this.e || (this.e = {}) }
+	get names() { return Object.keys(this._e) as Names[] }
 
 	eachEvent<Name extends Names>(fn: (event: TinyEmitter.Event<Data>, index: number) => void) {
-		let e = this.ee; let i = 0;
-		Object.keys(e).forEach((name: Names) => {
-			e[name].forEach(event => { fn(event, i); i++; })
+		let e = this._e; let i = 0;
+		Object.keys(e).forEach(function(name: Names) {
+			e[name].forEach(function(event) {
+				fn(event, i); i++;
+			})
 		})
 	}
 
 	offListener<Name extends Names>(listener: TinyEmitter.Listener<Data>) {
-		let e = this.ee
-		Object.keys(e).forEach((name: Names) => {
-			e[name].forEach(event => {
+		let e = this._e
+		let off = this.off
+		Object.keys(e).forEach(function(name: Names) {
+			e[name].forEach(function(event) {
 				if (listener == event.fn) {
-					this.off(name, listener)
+					off(name, listener)
 				}
 			})
 		})
@@ -27,11 +30,10 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 	}
 
 	offAll<Name extends Names>() {
-		let e = this.ee
-		Object.keys(e).forEach((name: Names) => {
-			e[name].forEach(event => {
-				this.off(name, event.fn)
-			})
+		let e = this._e
+		let off = this.off
+		Object.keys(e).forEach(function(name: Names) {
+			off(name)
 		})
 		delete this.e
 		return this

@@ -9,14 +9,16 @@ import Emitter from '../../common/emitter'
 
 
 
-let wss: uws.Server
 const HOST = process.HOST
 const PORT = process.PORT - 1
 const PATH = 'radio'
+const ADDRESS = `ws://${HOST}:${PORT}/${PATH}`
+
+
 
 if (process.MASTER) {
 
-	wss = new uws.Server({
+	const wss = new uws.Server({
 		host: HOST, port: PORT, path: PATH,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
@@ -27,7 +29,6 @@ if (process.MASTER) {
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
 	wss.on('connection', function(client: Radio.Client, req: http.IncomingMessage) {
-		if (!Array.isArray(client.subs)) client.subs = [];
 
 		client.on('message', function(message: string) {
 			if (message == 'pong') return;
@@ -41,12 +42,9 @@ if (process.MASTER) {
 			wss.broadcast(message)
 		})
 
-		client.on('close', function(code: number, message: string) {
-			client.terminate()
-			client.removeAllListeners()
+		client.on('error', function(error) {
+			console.error('client.on Error ->', error)
 		})
-
-		client.on('error', function(error) { console.error('socket.on Error ->', error) })
 
 	})
 
@@ -54,33 +52,44 @@ if (process.MASTER) {
 
 
 
-export const ready = new Rx.ReadySubject()
-export const emitter = new Emitter()
-const socket = new WebSocketClient(`ws://${HOST}:${PORT}/${PATH}`, {
-	autoStart: false,
-	// verbose: process.MASTER,
-	// verbose: true,
-})
+class Radio extends Emitter {
 
-const connect = _.once(() => socket.connect())
-if (process.MASTER) wss.once('listening', connect);
-else setImmediate(connect);
+	ready = new Rx.ReadySubject()
+	socket = new WebSocketClient(ADDRESS, {
+		autoStart: false,
+		// verbose: process.MASTER,
+		// verbose: true,
+	})
 
-socket.on('open', function() {
-	socket.send('_onopen_')
-})
+	constructor() {
+		super()
 
-socket.on('message', function(message: string) {
-	if (message == '_onready_') {
-		return ready.next()
+		const connect = _.once(() => this.socket.connect())
+		setImmediate(connect)
+
+		this.socket.on('open', () => {
+			this.socket.send('_onopen_')
+		})
+
+		this.socket.on('message', (message: string) => {
+			if (message == '_onready_') {
+				return this.ready.next()
+			}
+			let event = JSON.parse(message) as Radio.Event
+			super.emit(event.e, event.d)
+		})
+
 	}
-	let event = JSON.parse(message) as Radio.Event
-	emitter.emit(event.e, event.d)
-})
 
-export function emit(event: string, data?: any) {
-	socket.json({ e: event, d: data } as Radio.Event)
+	emit(event: string, data?: any) {
+		this.socket.json({ e: event, d: data } as Radio.Event)
+		return this
+	}
+
 }
+
+const radio = new Radio()
+export default radio
 
 
 
@@ -89,7 +98,7 @@ export function emit(event: string, data?: any) {
 declare global {
 	namespace Radio {
 		interface Client extends uws {
-			subs: string[]
+			
 		}
 		interface Event<T = any> {
 			/** ▶ event name */

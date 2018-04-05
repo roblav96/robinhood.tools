@@ -3,13 +3,13 @@
 import '../common/polyfills'
 import 'source-map-support/register'
 
-global.Promise = require('bluebird')
+// global.Promise = require('bluebird')
 global.WebSocket = require('uws')
 
 import './process'
 
 import './adapters/console'
-if (DEVELOPMENT) process.INSTANCES = 0;
+if (DEVELOPMENT) process.INSTANCES = 1;
 import './adapters/cluster'
 
 import '../common/clock'

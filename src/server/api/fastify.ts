@@ -8,7 +8,7 @@ import stream from './fastify.logger'
 
 
 
-const LOG_LEVEL = 'error' as Pino.Level
+const LOG_LEVEL = 'info' as Pino.Level
 
 const fastify = Fastify({
 	logger: { level: LOG_LEVEL, extreme: PRODUCTION, stream },
@@ -23,7 +23,7 @@ import './fastify.plugins'
 
 
 
-import * as radio from '../adapters/radio'
+import radio from '../adapters/radio'
 fastify.register(function(fastify, opts, next) {
 	radio.ready.subscribe(next)
 })

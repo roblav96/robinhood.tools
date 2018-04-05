@@ -30,11 +30,11 @@ export class ReadySubject {
 		if (!this._subject.value) this._subject.next(true);
 	}
 
-	toPromise() { return this.pipe().toPromise() }
-	subscribe(next: () => void) { return this.pipe().subscribe(next) }
 	pipe() {
 		return this._subject.pipe(Rx.filter(v => !!v), Rx.take(1), Rx.mapTo(void 0))
 	}
+	toPromise() { return this.pipe().toPromise() }
+	subscribe(next: () => void) { return this.pipe().subscribe(next) }
 
 }
 
