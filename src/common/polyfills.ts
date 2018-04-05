@@ -79,6 +79,25 @@ Array.prototype.find = function(fn, arg) {
 	return undefined
 }
 
+// Array.prototype.remove = function(fn, arg) {
+// 	let array = this
+// 	let len = array.length
+// 	let i: number
+// 	if (!arg) {
+// 		for (i = 0; i < len; i++) {
+// 			let value = array[i]
+// 			if (fn(value, i, array)) array.splice(i, 1);
+// 		}
+// 	} else {
+// 		let ctx = arg
+// 		for (i = 0; i < len; i++) {
+// 			let value = array[i]
+// 			if (fn.call(ctx, value, i, array)) array.splice(i, 1);
+// 		}
+// 	}
+// }
+// interface Array<T> { remove(fn: (value: T, index: number, array: Array<T>) => boolean, thisArg?: any): void }
+
 
 
 // const isBrowser = !new Function('try { return this === global; } catch(e) { return false }')()

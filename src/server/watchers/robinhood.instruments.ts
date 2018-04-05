@@ -34,18 +34,12 @@ if (process.MASTER) {
 async function readyInstruments() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
 
-	// if (DEVELOPMENT) await redis.main.purge(redis.RH.INSTRUMENTS);
-	let resolved = await redis.main.coms([
-		['keys', redis.RH.INSTRUMENTS + ':*'],
-		['exists', redis.RH.SYMBOLS],
-		['exists', redis.RH.TRADABLES],
-		['exists', redis.RH.UNTRADABLES],
-	])
-	if (_.compact(resolved).length != resolved.length) {
+	let synced = await redis.main.keys(redis.RH.INSTRUMENTS + ':*')
+	if (synced.length < 10000) {
 		await syncInstruments()
 	}
 
-	await syncSymbols()
+	await chunkSymbols()
 
 	console.info('readyInstruments -> done')
 	radio.emit('readyInstruments')
@@ -59,7 +53,7 @@ async function syncInstruments() {
 
 		let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
 		_.remove(response.results, v => Array.isArray(v.symbol.match(/\W+/)))
-		if (DEVELOPMENT) console.log('syncInstruments ->', console.inspect(response.results.length));
+		if (DEVELOPMENT) console.log('syncInstruments ->', console.inspect(response.results.length), console.inspect(response.next));
 
 		let coms = response.results.map(v => ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
 
@@ -93,7 +87,7 @@ async function syncInstruments() {
 
 
 
-async function syncSymbols() {
+async function chunkSymbols() {
 	let rkeys = [redis.RH.SYMBOLS, redis.RH.TRADABLES, redis.RH.UNTRADABLES]
 	let rcoms = rkeys.map(v => ['smembers', v])
 	let resolved = await redis.main.coms(rcoms) as string[][]
@@ -108,14 +102,14 @@ async function syncSymbols() {
 	})
 	await redis.main.coms(coms)
 
-	console.info('syncSymbols -> done')
-	radio.emit('syncSymbols')
+	console.info('chunkSymbols -> done')
+	radio.emit('chunkSymbols')
 
 }
 
 
 
 async function readyWebullTickerIds() {
-
+	console.warn('readyWebullTickerIds')
 }
 

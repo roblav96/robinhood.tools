@@ -16,6 +16,45 @@ const ADDRESS = `ws://${HOST}:${PORT}/${PATH}`
 
 
 
+if (process.MASTER) {
+
+	const wss = new uws.Server({
+		host: HOST, port: PORT, path: PATH,
+		verifyClient(incoming, next) {
+			let host = incoming.req.headers['host']
+			next(host == process.HOST)
+		},
+	})
+
+	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
+	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
+
+	wss.on('connection', function(client: Radio.Client, req: http.IncomingMessage) {
+
+		client.on('message', function(message: string) {
+			if (message == 'pong') return;
+			if (message == 'ping') return client.send('pong');
+			if (message == '_onopen_') {
+				if (wss.clients.length > process.INSTANCES) {
+					wss.broadcast('_onready_')
+				}
+				return
+			}
+			wss.broadcast(message)
+		})
+
+		client.on('error', function(error) {
+			console.error('client.on Error ->', error)
+		})
+
+	})
+
+	wss.once('listening', function() { radio.connect() })
+
+}
+
+
+
 class Radio extends Emitter {
 
 	ready = new Rx.ReadySubject()
@@ -56,45 +95,6 @@ class Radio extends Emitter {
 
 const radio = new Radio()
 export default radio
-
-
-
-if (process.MASTER) {
-
-	const wss = new uws.Server({
-		host: HOST, port: PORT, path: PATH,
-		verifyClient(incoming, next) {
-			let host = incoming.req.headers['host']
-			next(host == process.HOST)
-		},
-	})
-
-	wss.once('listening', radio.connect)
-
-	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
-	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
-
-	wss.on('connection', function(client: Radio.Client, req: http.IncomingMessage) {
-
-		client.on('message', function(message: string) {
-			if (message == 'pong') return;
-			if (message == 'ping') return client.send('pong');
-			if (message == '_onopen_') {
-				if (wss.clients.length > process.INSTANCES) {
-					wss.broadcast('_onready_')
-				}
-				return
-			}
-			wss.broadcast(message)
-		})
-
-		client.on('error', function(error) {
-			console.error('client.on Error ->', error)
-		})
-
-	})
-
-}
 
 
 
