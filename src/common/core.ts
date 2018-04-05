@@ -103,6 +103,12 @@ export const array = {
 			return filled
 		}) as any
 	},
+	// remove<T = any>(value: T[], fn: (value: T, index: number) => boolean) {
+	// 	let i: number, len = value.length
+	// 	for (i = 0; i < len; i++) {
+	// 		if (fn(value[i], i)) value.splice(i, 1);
+	// 	}
+	// },
 	chunks<T = any>(value: T[], nchunks: number) {
 		let chunks = Array.from(Array(nchunks), v => []) as T[][]
 		value.forEach((v, i) => chunks[i % chunks.length].push(v))

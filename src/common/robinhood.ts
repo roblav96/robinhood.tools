@@ -47,8 +47,6 @@ declare global {
 			id: string
 			market: string
 			name: string
-			mic: string
-			acronym: string
 		}
 
 

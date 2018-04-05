@@ -43,6 +43,7 @@ async function readyInstruments() {
 
 
 async function syncInstruments() {
+	// if (DEVELOPMENT) await redis.main.purge(redis.RH.INSTRUMENTS);
 	await pforever(function(url) {
 		if (url) return getInstruments(url);
 		return pforever.end
@@ -53,24 +54,45 @@ async function syncInstruments() {
 
 
 async function getInstruments(url: string) {
-	let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
-	if (!response) return;
+	let instruments = await robinhood.getInstruments(url)
 
-	let instruments = response.results.filter(function (instrument) {
-		return !Array.isArray(instrument.symbol.match(/\W+/))
-	}).map(function(instrument) {
-		core.fix(instrument)
-		instrument.mic = _.compact(instrument.market.split('/')).pop()
-		instrument.acronym = robinhood.ACRONYMS[instrument.mic]
-		return instrument
-	})
-	
-	console.log('instruments.length ->', instruments.length)
+	console.log('instruments ->', console.inspect(instruments.results.slice(0, 3)))
 
-	let coms = instruments.map(v => ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
-	await redis.main.pipecoms(coms)
 
-	return response.next
+
+	// let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
+	// if (!response) return;
+
+	// let coms = response.results.filter(function(v) {
+	// 	return v.symbol.match(/\W+/) == null
+	// }).map(function(v) {
+	// 	core.fix(v)
+	// 	return ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any]
+	// })
+	// await redis.main.pipecoms(coms)
+
+	// return response.next
+
+	// if (
+	// 	instrument.state == 'active' &&
+	// 	instrument.tradability == 'tradable' &&
+	// 	instrument.tradeable == true
+	// ) {
+	// 	coms.push(['hmset', redis.RH.INSTRUMENTS + ':' + instrument.symbol, instrument as any])
+	// } else {
+	// 	coms.push(['del', redis.RH.INSTRUMENTS + ':' + instrument.symbol, instrument as any])
+	// }
+
+	// let instruments = response.results.filter(function(instrument) {
+	// 	return !Array.isArray(instrument.symbol.match(/\W+/))
+	// }).map(function(instrument) {
+	// 	core.fix(instrument)
+	// 	return instrument
+	// })
+
+	// // console.log('instruments ->', console.inspect(instruments))
+
+	// // let coms = instruments.map(v => ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
 
 }
 
