@@ -28,7 +28,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 			autoRetry: true,
 			retryTimeout: 3000,
 			autoStart: true,
-			startDelay: -1,
+			delayed: -1,
 			heartbeat: '10s' as Clock.Tick,
 			verbose: false,
 		})
@@ -48,7 +48,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		_.defaults(this.options, WebSocketClient.options)
 		this.reconnect = _.throttle(this.connect, this.options.retryTimeout, { leading: false, trailing: true })
 		if (!this.options.autoStart) return;
-		if (this.options.startDelay >= 0) _.delay(() => this.connect(), this.options.startDelay);
+		if (this.options.delayed >= 0) _.delay(() => this.connect(), this.options.delayed);
 		else this.connect();
 	}
 
