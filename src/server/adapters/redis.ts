@@ -38,7 +38,6 @@ class Redis extends IORedis {
 
 	async purge(rkey: string, pattern = ':*') {
 		let keys = await this.keys(rkey + pattern)
-		if (DEVELOPMENT) console.warn('purging', keys.length, rkey);
 		await this.pipecoms(keys.map(v => ['del', v]))
 		return keys
 	}

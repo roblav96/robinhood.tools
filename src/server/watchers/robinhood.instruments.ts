@@ -36,25 +36,38 @@ async function readyInstruments() {
 	let resolved = await redis.main.pipecoms(coms) as number[]
 	console.log('resolved ->', resolved)
 	if (_.sum(resolved) == process.INSTANCES) return;
-	await syncInstruments()
-	await syncSymbols()
+	// await saveInstruments()
+	await chunkSymbols()
 }
 
 
 
-async function syncInstruments() {
-	// if (DEVELOPMENT) await redis.main.purge(redis.RH.INSTRUMENTS);
+async function saveInstruments() {
+	// await purgeInstruments()
 	await pforever(async function(url) {
 		let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
 		_.remove(response.results, v => v.symbol.match(/\W+/))
+		if (DEVELOPMENT) console.log('saveInstruments ->', console.inspect(response.results.length));
 		let coms = response.results.map(v => ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
 		await redis.main.pipecoms(coms)
-		return !response.next ? pforever.end : response.next
+		return response.next || pforever.end
 	}, 'https://api.robinhood.com/instruments/')
 }
 
-async function syncSymbols() {
-	let keys = await redis.main.keys(redis.RH.INSTRUMENTS + ':*')
+
+
+async function chunkSymbols() {
+	let symbols = (await redis.main.keys(redis.RH.INSTRUMENTS + ':*')).map(function(v) {
+		return v.substring(v.lastIndexOf(':') + 1)
+	})
+	console.log('symbols ->', symbols)
+}
+
+
+
+async function purgeInstruments() {
+	let purged = await redis.main.purge(redis.RH.INSTRUMENTS)
+	console.warn('purgeInstruments ->', purged.length)
 }
 
 
