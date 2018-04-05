@@ -34,7 +34,7 @@ async function readyInstruments() {
 	let coms = core.array.create(process.INSTANCES).map(function(i) {
 		return ['exists', `${redis.RH.SYMBOLS}:${process.INSTANCES}:${i}`]
 	})
-	let resolved = await redis.main.pipeline(coms).exec().then(redis.fix) as number[]
+	let resolved = await redis.main.pipecoms(coms) as number[]
 	console.log('resolved ->', resolved)
 	if (_.sum(resolved) == process.INSTANCES) return;
 	return syncInstruments()
@@ -55,11 +55,22 @@ async function syncInstruments() {
 async function getInstruments(url: string) {
 	let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
 	if (!response) return;
-	response.results.forEach(function(instrument) {
+
+	let instruments = response.results.filter(function (instrument) {
+		return !Array.isArray(instrument.symbol.match(/\W+/))
+	}).map(function(instrument) {
 		core.fix(instrument)
 		instrument.mic = _.compact(instrument.market.split('/')).pop()
 		instrument.acronym = robinhood.ACRONYMS[instrument.mic]
+		return instrument
 	})
+	
+	console.log('instruments.length ->', instruments.length)
+
+	let coms = instruments.map(v => ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
+	await redis.main.pipecoms(coms)
+
+	return response.next
 
 }
 

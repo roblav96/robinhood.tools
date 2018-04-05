@@ -31,6 +31,10 @@ class Redis extends IORedis {
 	constructor(name: string, offset: number) {
 		super(Redis.options(name, offset))
 	}
+	
+	pipecoms(coms: Redis.Coms) {
+		return this.pipeline(coms).exec().then(fixPipeline)
+	}
 
 }
 
@@ -41,7 +45,7 @@ export const main = new Redis('main', 0)
 
 
 
-export function fix(resolved: any[]) {
+export function fixPipeline(resolved: any[]) {
 	if (Array.isArray(resolved)) {
 		let i: number, len = resolved.length
 		for (i = 0; i < len; i++) {
