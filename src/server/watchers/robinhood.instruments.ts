@@ -29,13 +29,13 @@ if (process.MASTER) {
 
 
 async function readyInstruments() {
-	// await redis.main.purge(redis.RH.INSTRUMENTS)
+	await redis.main.purge(redis.RH.INSTRUMENTS)
 	let saved = await redis.main.keys(redis.RH.INSTRUMENTS + ':*')
 	if (_.isEmpty(saved)) {
 		await syncInstruments()
 	}
 
-	// await redis.main.purge(`${redis.RH.SYMBOLS}:${process.INSTANCES}`)
+	await redis.main.purge(`${redis.RH.SYMBOLS}:${process.INSTANCES}`)
 	let coms = core.array.create(process.INSTANCES).map(function(i) {
 		return ['exists', `${redis.RH.SYMBOLS}:${process.INSTANCES}:${i}`]
 	})
@@ -53,13 +53,23 @@ async function syncInstruments() {
 		_.remove(response.results, v => v.symbol.match(/\W+/))
 		if (DEVELOPMENT) console.log('syncInstruments ->', console.inspect(response.results.length));
 
-		let coms = response.results.map(v => ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
-		let scoms = new redis.SetsComs(redis.RH.ACTIVES)
+		let coms = [] as Redis.Coms
+		let actives = new redis.SetsComs(redis.RH.ACTIVES)
+		let inactives = new redis.SetsComs(redis.RH.INACTIVES)
 		response.results.forEach(function(v) {
+			coms.push(['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
 			let active = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
-			active ? scoms.sadd(v.symbol) : scoms.srem(v.symbol)
+			if (active) {
+				actives.sadd(v.symbol)
+				inactives.srem(v.symbol)
+			} else {
+				actives.srem(v.symbol)
+				inactives.sadd(v.symbol)
+			}
 		})
-		scoms.concat(coms)
+		actives.concat(coms)
+		inactives.concat(coms)
+
 		await redis.main.pipecoms(coms)
 		return response.next || pforever.end
 
