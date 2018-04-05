@@ -42,8 +42,17 @@ declare global {
 			exchangeTrade: boolean
 			fundSecType: number[]
 			secType: number[]
+			change: number
+			changeRatio: number
+			close: number
+			name: string
+			price: number
+			regionIsoCode: string
+			symbol: string
+			type: number
+			volume: number
+			status: string
 		}
-
 
 
 

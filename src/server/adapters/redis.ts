@@ -32,8 +32,8 @@ class Redis extends IORedis {
 		super(Redis.options(name, offset))
 	}
 
-	coms(coms: Redis.Coms) {
-		return this.pipeline(coms).exec().then(fixPipeline)
+	coms(coms: Redis.Coms): Promise<any[]> {
+		return this.pipeline(coms).exec().then(fixPipeline) as any
 	}
 
 	async purge(rkey: string, pattern = ':*') {

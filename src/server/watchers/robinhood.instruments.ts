@@ -14,8 +14,6 @@ import radio from '../adapters/radio'
 export const ready = new Rx.ReadySubject()
 radio.once('robinhood.instruments.ready', () => ready.next())
 
-
-
 if (process.MASTER) {
 	radio.ready.toPromise().then(readyInstruments).catch(function(error) {
 		console.error('readyInstruments Error ->', error)
