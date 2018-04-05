@@ -8,6 +8,11 @@ global.PRODUCTION = NODE_ENV == 'production'
 
 
 
+import * as bluebird from 'bluebird'
+bluebird.config({ warnings: { wForgottenReturn: false } })
+
+
+
 import * as os from 'os'
 import * as cluster from 'cluster'
 process.INSTANCES = os.cpus().length;
@@ -43,12 +48,8 @@ process.on('unhandledRejection', function(error) {
 
 
 
-import * as bluebird from 'bluebird'
-bluebird.config({ warnings: { wForgottenReturn: false } })
-
-
-
 if (process.MASTER) {
+	if (DEVELOPMENT) setInterval(function() { process.stdout.write(' ') }, 1000); // keeps terminal focused
 	console.log(`\n\n${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`)
 	console.log(`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}`)
 }

@@ -68,8 +68,6 @@ _.merge(util.inspect, {
 	},
 } as Partial<typeof util.inspect>)
 
-
-
 Object.assign(console, {
 	dump(value: any, opts = {}) {
 		_.defaults(opts, {
