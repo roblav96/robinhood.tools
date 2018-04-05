@@ -3,12 +3,12 @@
 
 
 export const MICS = {
+	ARCX: 'NYSE',
+	BATS: 'BATS',
 	OTCM: 'OTCM',
 	XASE: 'AMEX',
-	ARCX: 'NYSE',
-	XNYS: 'NYSE',
 	XNAS: 'NASDAQ',
-	BATS: 'BATS',
+	XNYS: 'NYSE',
 }
 
 
@@ -20,37 +20,37 @@ declare global {
 
 		namespace API {
 			interface Paginated<T = any> {
+				next: string
 				previous: string
 				results: T[]
-				next: string
 			}
 		}
 
 		interface Instrument {
-			type: 'wrt' | 'pfd' | 'stock' | 'etp' | 'unit' | 'adr' | 'nyrs' | 'right' | 'cef' | 'reit' | 'mlp' | 'tracking' | 'lp' | 'rlt'
-			state: 'unlisted' | 'active' | 'inactive'
-			tradability: 'untradable' | 'tradable' | 'position_closing_only'
-			min_tick_size: number
-			splits: string
-			margin_initial_ratio: number
-			simple_name: string
-			url: string
-			quote: string
-			symbol: string
 			bloomberg_unique: string
-			list_date: string
-			fundamentals: string
 			country: string
 			day_trade_ratio: number
-			tradeable: boolean
-			maintenance_ratio: number
+			fundamentals: string
 			id: string
+			list_date: string
+			maintenance_ratio: number
+			margin_initial_ratio: number
 			market: string
+			min_tick_size: number
 			name: string
+			quote: string
+			simple_name: string
+			splits: string
+			state: 'unlisted' | 'active' | 'inactive'
+			symbol: string
+			tradability: 'untradable' | 'tradable' | 'position_closing_only'
+			tradeable: boolean
+			type: 'wrt' | 'pfd' | 'stock' | 'etp' | 'unit' | 'adr' | 'nyrs' | 'right' | 'cef' | 'reit' | 'mlp' | 'tracking' | 'lp' | 'rlt'
+			url: string
 			// 
-			mic: string
 			acronym: string
 			good: boolean
+			mic: string
 		}
 
 
