@@ -52,24 +52,21 @@ async function syncTickers() {
 
 
 async function syncAll() {
-	let all = _.flatten(await Promise.all([
+	let all = await Promise.all([
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
 			query: { pageSize: 999999 },
 		}),
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
 			query: { pageSize: 999999 },
 		})
-	])) as Webull.Ticker[]
+	])// as Webull.Ticker[]
+
 	_.remove(all, v => Array.isArray(v.disSymbol.match(/\W+/)))
 	console.log('all.length ->', console.inspect(all.length))
 
 	let grouped = _.groupBy(all, 'disSymbol' as keyof Webull.Ticker)
 	let coms = Object.keys(grouped).map(function(symbol) {
-		let group = grouped[symbol]
-		if (group.length > 1) {
-			console.log(symbol, 'group ->', console.inspect(group))
-		}
-		return ['set', `${redis.WB.ALL}:${symbol}`, JSON.stringify(group)]
+		return ['set', `${redis.WB.ALL}:${symbol}`, JSON.stringify(grouped[symbol])]
 	})
 	await redis.main.coms(coms)
 
