@@ -2,6 +2,12 @@
 
 
 
+export const ITEMS = 'items'
+export const PRODUCTS = 'products'
+export const QUOTES = 'quotes'
+
+
+
 export const RH = {
 	RH: 'rh',
 	INSTRUMENTS: 'rh:instruments',
@@ -10,7 +16,12 @@ export const RH = {
 	UNTRADABLES: 'rh:untradables',
 }
 
-export const SYMBOLS = 'symbols'
+
+
+export const WB = {
+	WB: 'wb',
+	TICKER_IDS: 'wb:tickerids',
+}
 
 
 

@@ -2,7 +2,7 @@
 
 
 
-export const ACRONYMS = {
+export const MICS = {
 	OTCM: 'OTCM',
 	XASE: 'AMEX',
 	ARCX: 'NYSE',

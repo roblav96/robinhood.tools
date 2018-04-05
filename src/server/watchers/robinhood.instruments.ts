@@ -1,8 +1,7 @@
 // 
 
 import * as _ from 'lodash'
-import * as pforever from 'p-forever'
-import * as pall from 'p-all'
+import * as pForever from 'p-forever'
 import * as Rx from '../../common/rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
@@ -23,10 +22,6 @@ if (process.MASTER) {
 	}).finally(function() {
 		radio.emit('robinhood.instruments.ready')
 	})
-} else {
-	ready.toPromise().then(readyWebullTickerIds).catch(function(error) {
-		console.error('readyWebullTickerIds Error ->', error)
-	})
 }
 
 
@@ -35,6 +30,7 @@ async function readyInstruments() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
 
 	let synced = await redis.main.keys(redis.RH.INSTRUMENTS + ':*')
+	console.log('synced ->', console.inspect(synced.length))
 	if (synced.length < 10000) {
 		await syncInstruments()
 	}
@@ -42,14 +38,13 @@ async function readyInstruments() {
 	await chunkSymbols()
 
 	console.info('readyInstruments -> done')
-	radio.emit('readyInstruments')
 
 }
 
 
 
 async function syncInstruments() {
-	await pforever(async function(url) {
+	await pForever(async function(url) {
 
 		let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
 		_.remove(response.results, v => Array.isArray(v.symbol.match(/\W+/)))
@@ -76,12 +71,11 @@ async function syncInstruments() {
 		untradables.concat(coms)
 
 		await redis.main.coms(coms)
-		return response.next || pforever.end
+		return response.next || pForever.end
 
 	}, 'https://api.robinhood.com/instruments/')
 
 	console.info('syncInstruments -> done')
-	radio.emit('syncInstruments')
 
 }
 
@@ -94,6 +88,7 @@ async function chunkSymbols() {
 
 	let coms = [] as Redis.Coms
 	resolved.forEach(function(symbols, i) {
+		symbols.sort()
 		let rkey = rkeys[i]
 		let chunks = core.array.chunks(symbols, process.INSTANCES)
 		chunks.forEach(function(chunk, ii) {
@@ -103,13 +98,7 @@ async function chunkSymbols() {
 	await redis.main.coms(coms)
 
 	console.info('chunkSymbols -> done')
-	radio.emit('chunkSymbols')
 
 }
 
-
-
-async function readyWebullTickerIds() {
-	// console.warn('readyWebullTickerIds')
-}
 

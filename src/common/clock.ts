@@ -16,13 +16,13 @@ enum TICKS {
 }
 declare global { namespace Clock { type Tick = keyof typeof TICKS } }
 
+const ticks = Object.keys(TICKS).filter(isNaN as any)
+const tocks = core.array.dict(ticks, 0)
+
 const emitter = new Emitter<Clock.Tick, number>()
 export default emitter
 
 
-
-const ticks = Object.keys(TICKS).filter(isNaN as any)
-const tocks = core.array.dict(ticks, 0)
 
 function onTick(tick: Clock.Tick) {
 	tocks[tick]++

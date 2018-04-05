@@ -1,6 +1,9 @@
 // 
 
 import * as TinyEmitter from 'tiny-emitter'
+import * as pEvent from 'p-event'
+
+
 
 export default class Emitter<Names extends string = string, Data = any> extends TinyEmitter<Names, Data> {
 
@@ -37,6 +40,10 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 		})
 		delete this.e
 		return this
+	}
+	
+	pEvent<Name extends Names>(name: Names) {
+		return pEvent(this, name)
 	}
 
 }
