@@ -9,7 +9,7 @@ import Emitter from './emitter'
 
 
 enum TICKS {
-	// '100ms', '250ms', '500ms',
+	'100ms', '250ms', '500ms',
 	'1s', '2s', '3s', '5s', '10s', '15s', '30s',
 	'1m', '5m', '10m', '15m', '30m',
 	'1h', '2h', '3h', '6h', '12h',

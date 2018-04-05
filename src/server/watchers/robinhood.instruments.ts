@@ -50,15 +50,17 @@ async function syncInstruments() {
 		_.remove(response.results, v => Array.isArray(v.symbol.match(/\W+/)))
 		if (DEVELOPMENT) console.log('syncInstruments ->', console.inspect(response.results.length), console.inspect(response.next));
 
-		let coms = response.results.map(v => ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
+		let coms = response.results.map(v => ['hmset', `${redis.RH.INSTRUMENTS}:${v.symbol}`, v as any])
 
 		let symbols = new redis.SetsComs(redis.RH.SYMBOLS)
 		let tradables = new redis.SetsComs(redis.RH.TRADABLES)
 		let untradables = new redis.SetsComs(redis.RH.UNTRADABLES)
 		response.results.forEach(function(v) {
 			symbols.sadd(v.symbol)
-			let active = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
-			if (active) {
+			v.mic = _.compact(v.market.split('/')).pop()
+			v.acronym = robinhood.MICS[v.mic]
+			v.alive = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
+			if (v.alive) {
 				tradables.sadd(v.symbol)
 				untradables.srem(v.symbol)
 			} else {

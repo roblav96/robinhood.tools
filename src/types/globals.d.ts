@@ -34,6 +34,8 @@ declare namespace NodeJS {
 
 
 
+type KeysOf<T> = (keyof T)[]
+
 interface Dict<T = any> {
 	[key: string]: T
 }

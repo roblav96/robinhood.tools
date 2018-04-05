@@ -27,9 +27,9 @@ console.format = function(args) {
 	// if (method == 'warn') {
 	// 	output = chalk.bold.yellowBright('████  WARN  ████\n') + output
 	// }
-	// if (method == 'error') {
-	// 	output = chalk.bold.redBright('████  ERROR  ████\n') + output
-	// }
+	if (method == 'error') {
+		output = chalk.bold.redBright('████  ERROR  ████\n') + output
+	}
 	return '\n\n' + chalk.underline(output) + '\n'
 }
 declare global { interface Console { format(args: any): void } }
