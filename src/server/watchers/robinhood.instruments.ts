@@ -22,6 +22,7 @@ if (process.MASTER) {
 	radio.ready.toPromise().then(readyInstruments).catch(function(error) {
 		console.error('ready Error ->', error)
 	}).finally(function() {
+		console.info('readyInstruments -> done')
 		radio.emit('robinhood.instruments.ready')
 	})
 }
@@ -29,62 +30,74 @@ if (process.MASTER) {
 
 
 async function readyInstruments() {
-	await redis.main.purge(redis.RH.INSTRUMENTS)
+	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
+
+	// if (DEVELOPMENT) await redis.main.purge(redis.RH.INSTRUMENTS);
 	let saved = await redis.main.keys(redis.RH.INSTRUMENTS + ':*')
-	if (_.isEmpty(saved)) {
-		await syncInstruments()
+	let tradable = await redis.main.smembers(redis.RH.TRADABLE)
+	if (_.isEmpty(saved) || _.isEmpty(tradable)) {
+		await saveInstruments()
 	}
 
-	await redis.main.purge(`${redis.RH.SYMBOLS}:${process.INSTANCES}`)
+	// if (DEVELOPMENT) await redis.main.purge(`${redis.RH.SYMBOLS}:${process.INSTANCES}`);
 	let coms = core.array.create(process.INSTANCES).map(function(i) {
 		return ['exists', `${redis.RH.SYMBOLS}:${process.INSTANCES}:${i}`]
 	})
 	let exists = await redis.main.pipecoms(coms) as number[]
 	if (_.sum(exists) != process.INSTANCES) {
-		await syncSymbols()
+		await chunkSymbols()
 	}
+
 }
 
 
 
-async function syncInstruments() {
+async function saveInstruments() {
 	await pforever(async function(url) {
+
 		let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
 		_.remove(response.results, v => v.symbol.match(/\W+/))
-		if (DEVELOPMENT) console.log('syncInstruments ->', console.inspect(response.results.length));
+		if (DEVELOPMENT) console.log('saveInstruments ->', console.inspect(response.results.length));
 
-		let coms = [] as Redis.Coms
-		let actives = new redis.SetsComs(redis.RH.ACTIVES)
-		let inactives = new redis.SetsComs(redis.RH.INACTIVES)
+		let tradable = new redis.SetsComs(redis.RH.TRADABLE)
+		let untradable = new redis.SetsComs(redis.RH.UNTRADABLE)
 		response.results.forEach(function(v) {
-			coms.push(['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
 			let active = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
 			if (active) {
-				actives.sadd(v.symbol)
-				inactives.srem(v.symbol)
+				tradable.sadd(v.symbol)
+				untradable.srem(v.symbol)
 			} else {
-				actives.srem(v.symbol)
-				inactives.sadd(v.symbol)
+				tradable.srem(v.symbol)
+				untradable.sadd(v.symbol)
 			}
 		})
-		actives.concat(coms)
-		inactives.concat(coms)
+
+		let coms = response.results.map(v => ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
+		tradable.concat(coms)
+		untradable.concat(coms)
 
 		await redis.main.pipecoms(coms)
 		return response.next || pforever.end
 
 	}, 'https://api.robinhood.com/instruments/')
-	radio.emit('syncInstruments')
+
+	console.info('saveInstruments -> done')
+	radio.emit('saveInstruments')
+
 }
 
 
 
-async function syncSymbols() {
-	let symbols = (await redis.main.smembers(redis.RH.ACTIVES) as string[]).sort()
+async function chunkSymbols() {
+	let symbols = (await redis.main.smembers(redis.RH.TRADABLE) as string[]).sort()
+
 	let chunks = core.array.chunks(symbols, process.INSTANCES)
 	let coms = chunks.map((v, i) => ['set', `${redis.RH.SYMBOLS}:${process.INSTANCES}:${i}`, v.toString()])
 	await redis.main.pipecoms(coms)
-	radio.emit('syncSymbols')
+
+	console.info('chunkSymbols -> done')
+	radio.emit('chunkSymbols')
+
 }
 
 

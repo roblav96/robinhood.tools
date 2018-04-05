@@ -3,10 +3,11 @@
 
 
 export const RH = {
+	RH: 'rh',
 	SYMBOLS: 'rh:symbols',
 	INSTRUMENTS: 'rh:instruments',
-	ACTIVES: 'rh:actives',
-	INACTIVES: 'rh:inactives',
+	TRADABLE: 'rh:tradable',
+	UNTRADABLE: 'rh:untradable',
 }
 
 
