@@ -22,14 +22,4 @@ export async function getSymbols(i = process.INSTANCE) {
 
 
 
-export async function getInstruments(url: string) {
-	let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
-	// if (!response) return;
-	_.remove(response.results, v => v.symbol.match(/\W+/))
-	response.results.forEach(v => core.fix(v))
-	return response
-}
-
-
-
 
