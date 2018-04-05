@@ -41,13 +41,13 @@ class Radio extends Emitter {
 				return this.ready.next()
 			}
 			let event = JSON.parse(message) as Radio.Event
-			super.emit(event.e, event.d)
+			super.emit(event.n, event.d)
 		})
 
 	}
 
-	emit(event: string, data?: any) {
-		this.socket.json({ e: event, d: data } as Radio.Event)
+	emit(name: string, data?: any) {
+		this.socket.json({ n: name, d: data } as Radio.Event)
 		return this
 	}
 
@@ -105,8 +105,8 @@ declare global {
 
 		}
 		interface Event<T = any> {
-			/** ▶ event name */
-			e: string
+			/** ▶ name */
+			n: string
 			/** ▶ data */
 			d: T
 		}
