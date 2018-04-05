@@ -29,14 +29,17 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 			}
 		}
 
-		if (parsed.host.includes('webull') || parsed.host.includes('stocks666')) {
+		if (parsed.host.includes('webull')) {
 			Object.assign(config.headers, {
+				origin: 'https://app.webull.com',
+				referer: 'https://app.webull.com',
 				ver: '1.8.4',
 				app: 'desktop',
 				os: 'web',
 				osv: 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)',
 				dnt: '1', hl: 'en', locale: 'eng', tz: 'America/New_York',
 			})
+			config.headers['User-Agent'] = config.headers['osv']
 			if (config.webullAuth) {
 				config.headers['did'] = process.env.WEBULL_DID
 				config.headers['access_token'] = process.env.WEBULL_TOKEN
