@@ -21,14 +21,4 @@ export async function getSymbols(i = process.INSTANCE) {
 
 
 
-async function getInstruments(url: string) {
-	let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
-	// if (_.isEmpty(response)) return;
-	// response.results.forEach(v => core.fix(v))
-	console.log('response.results ->', response.results)
-	return response
-}
-
-
-
 

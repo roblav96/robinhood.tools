@@ -3,7 +3,7 @@
 import '../common/polyfills'
 import 'source-map-support/register'
 
-// global.Promise = require('bluebird')
+global.Promise = require('bluebird')
 global.WebSocket = require('uws')
 
 import './process'

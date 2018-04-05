@@ -65,6 +65,9 @@ _.merge(util.inspect, {
 
 
 Object.assign(console, {
+	inspect(value: any) {
+		return eyes.inspect(value)
+	},
 	dump(value: any, opts = {}) {
 		_.defaults(opts, {
 			depth: 4, showHidden: true, showProxy: true,

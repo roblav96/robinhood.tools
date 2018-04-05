@@ -42,8 +42,6 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 				config.headers['access_token'] = process.env.WEBULL_TOKEN
 			}
 		}
-		
-		console.log('config ->', JSON.stringify(config, null, 4))
 
 		return config
 

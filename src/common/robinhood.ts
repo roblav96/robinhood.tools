@@ -2,12 +2,6 @@
 
 
 
-export const RH = {
-	SYMBOLS: 'rh:symbols',
-}
-
-
-
 export const ACRONYMS = {
 	OTCM: 'OTCM',
 	XASE: 'AMEX',
@@ -32,15 +26,10 @@ declare global {
 			}
 		}
 
-		namespace Instrument {
-			type Types = 'wrt' | 'pfd' | 'stock' | 'etp' | 'unit' | 'adr' | 'nyrs' | 'right' | 'cef' | 'reit' | 'mlp' | 'tracking' | 'lp' | 'rlt'
-			type States = 'unlisted' | 'active' | 'inactive'
-			type Tradabilities = 'untradable' | 'tradable' | 'position_closing_only'
-		}
 		interface Instrument {
-			type: Instrument.Types
-			state: Instrument.States
-			tradability: Instrument.Tradabilities
+			type: 'wrt' | 'pfd' | 'stock' | 'etp' | 'unit' | 'adr' | 'nyrs' | 'right' | 'cef' | 'reit' | 'mlp' | 'tracking' | 'lp' | 'rlt'
+			state: 'unlisted' | 'active' | 'inactive'
+			tradability: 'untradable' | 'tradable' | 'position_closing_only'
 			min_tick_size: number
 			splits: string
 			margin_initial_ratio: number
@@ -58,8 +47,6 @@ declare global {
 			id: string
 			market: string
 			name: string
-			ticker_name: string
-			tiny_name: string
 			mic: string
 			acronym: string
 		}

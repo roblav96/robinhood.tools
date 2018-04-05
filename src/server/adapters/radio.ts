@@ -98,7 +98,7 @@ export default radio
 declare global {
 	namespace Radio {
 		interface Client extends uws {
-			
+
 		}
 		interface Event<T = any> {
 			/** ▶ event name */

@@ -3,7 +3,6 @@
 import * as _ from 'lodash'
 import * as pforever from 'p-forever'
 import * as pevent from 'p-event'
-import * as boom from 'boom'
 import * as Rx from '../../common/rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
@@ -15,19 +14,19 @@ import clock from '../../common/clock'
 
 
 export const ready = new Rx.ReadySubject()
+radio.once('robinhood.instruments.ready', () => ready.next())
 
-radio.ready.toPromise().then(async function() {
-	if (process.MASTER) {
-		await readyInstruments()
-	}
-	let isready = await pevent(radio, 'robinhood.instruments.ready')
-	console.log('isready ->', isready)
-	// radio.once('robinhood.instruments.ready')
 
-}).catch(function(error) {
-	console.error('robinhood.instruments Error ->', error)
-	ready.next()
-})
+
+if (process.MASTER) {
+	radio.ready.toPromise().then(function() {
+		return readyInstruments()
+	}).catch(function(error) {
+		console.error('robinhood.instruments.ready Error ->', error)
+	}).finally(function() {
+		radio.emit('robinhood.instruments.ready')
+	})
+}
 
 
 
@@ -35,21 +34,36 @@ async function readyInstruments() {
 	let coms = core.array.create(process.INSTANCES).map(function(i) {
 		return ['exists', `${redis.RH.SYMBOLS}:${process.INSTANCES}:${i}`]
 	})
-	let resolved = await redis.main.pipeline(coms).exec().then(redis.pipe) as number[]
+	let resolved = await redis.main.pipeline(coms).exec().then(redis.fix) as number[]
 	console.log('resolved ->', resolved)
-	// if (_.sum(resolved) == process.INSTANCES) return true;
-	// throw boom.tooManyRequests('now try again')
-	
-	radio.emit('robinhood.instruments.ready')
-
-	// return pforever()
+	if (_.sum(resolved) == process.INSTANCES) return;
+	return syncInstruments()
 }
 
 
 
-// async function syncAllInstruments() {
-// 	return pforever()
-// }
+async function syncInstruments() {
+	await pforever(function(url) {
+		if (url) return getInstruments(url);
+		return pforever.end
+	}, 'https://api.robinhood.com/instruments/')
+	console.warn('syncInstruments -> DONE')
+}
+
+
+
+async function getInstruments(url: string) {
+	let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
+	if (!response) return;
+	response.results.forEach(function(instrument) {
+		core.fix(instrument)
+		instrument.mic = _.compact(instrument.market.split('/')).pop()
+		instrument.acronym = robinhood.ACRONYMS[instrument.mic]
+	})
+
+}
+
+
 
 
 

@@ -1,6 +1,6 @@
 // 
-// export * from '../../common/redis.keys' // export { rdkeys as rdkeys }
-export { RH } from '../../common/robinhood'
+export * from '../../common/redis.keys' // export { rdkeys as rdkeys }
+// export { RH } from '../../common/robinhood'
 // 
 
 import * as _ from 'lodash'
@@ -41,7 +41,7 @@ export const main = new Redis('main', 0)
 
 
 
-export function pipe(resolved: any[]) {
+export function fix(resolved: any[]) {
 	if (Array.isArray(resolved)) {
 		let i: number, len = resolved.length
 		for (i = 0; i < len; i++) {

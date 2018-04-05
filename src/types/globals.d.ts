@@ -36,6 +36,7 @@ declare namespace NodeJS {
 
 interface Console {
 	format(args: any): void
+	inspect(value: any): string
 	dump(value: any, opts?: NodeJS.InspectOptions): string
 }
 

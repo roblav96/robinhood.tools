@@ -6,13 +6,13 @@ import * as _ from 'lodash'
 
 export function noop() { }
 
-export function isFalsey(value: any) {
+export function isJunk(value: any) {
 	if (value == null) return true;
 	if (string.is(value) && value === '') return true;
 	if (number.is(value) && !Number.isFinite(value)) return true;
 	return false
 }
-export function isTruthy(value: any) { return !isFalsey(value) }
+// export function isTruthy(value: any) { return !isFalsey(value) }
 
 export const isBrowser = !new Function('try { return this === global; } catch(e) { return false }')()
 export const isNodejs = !isBrowser
@@ -24,10 +24,11 @@ export function fix(target: any, deep = false) {
 		let value = target[key]
 		if (value == null) return;
 		else if (deep && object.is(value)) fix(value, true);
+		else if (!string.is(value)) return;
 		else if (value === '') _.unset(target, key);
-		else if (value == 'true') target[key] = true;
-		else if (value == 'false') target[key] = false;
-		else if (!isNaN(value)) target[key] = Number.parseFloat(value);
+		else if (value === 'true') target[key] = true;
+		else if (value === 'false') target[key] = false;
+		else if (!isNaN(value as any)) target[key] = Number.parseFloat(value);
 	})
 }
 
@@ -222,7 +223,7 @@ export const time = {
 // export const promise = {
 // 	retry<T = any>(wrapper: Promise<T>): Promise<T> {
 // 		return wrapper.then( function () {
-				
+
 // 		} )
 // 	},
 // }
