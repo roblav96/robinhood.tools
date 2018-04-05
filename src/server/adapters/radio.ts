@@ -20,7 +20,8 @@ class Radio extends Emitter {
 
 	ready = new Rx.ReadySubject()
 	socket = new WebSocketClient(ADDRESS, {
-		autoStart: false,
+		timeout: 1000,
+		connect: false,
 		// verbose: process.MASTER,
 		// verbose: true,
 	})

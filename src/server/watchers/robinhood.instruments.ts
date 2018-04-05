@@ -35,19 +35,25 @@ async function readyInstruments() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
 
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.INSTRUMENTS);
-	let saved = await redis.main.keys(redis.RH.INSTRUMENTS + ':*')
-	if (_.isEmpty(saved)) {
+	let resolved = await redis.main.pipecoms([
+		['keys', redis.RH.INSTRUMENTS + ':*'],
+		['exists', redis.RH.SYMBOLS],
+		['exists', redis.RH.TRADABLES],
+		['exists', redis.RH.UNTRADABLES],
+	])
+	if (_.compact(resolved).length != resolved.length) {
 		await syncInstruments()
 	}
 
 	// if (DEVELOPMENT) await redis.main.purge(`${redis.RH.TRADABLES}:${process.INSTANCES}`);
-	let coms = core.array.create(process.INSTANCES).map(function(i) {
-		return ['exists', `${redis.RH.TRADABLES}:${process.INSTANCES}:${i}`]
-	})
-	let exists = await redis.main.pipecoms(coms) as number[]
-	if (_.sum(exists) != process.INSTANCES) {
-		await chunkTradables()
-	}
+	// let coms = core.array.create(process.INSTANCES).map(function(i) {
+	// 	return ['exists', `${redis.RH.TRADABLES}:${process.INSTANCES}:${i}`]
+	// })
+	// let exists = await redis.main.pipecoms(coms) as number[]
+	// if (_.sum(exists) != process.INSTANCES) {
+	// 	await chunkSymbols()
+	// }
+	await chunkSymbols()
 
 	console.info('readyInstruments -> done')
 	radio.emit('readyInstruments')
@@ -63,9 +69,13 @@ async function syncInstruments() {
 		_.remove(response.results, v => v.symbol.match(/\W+/))
 		if (DEVELOPMENT) console.log('syncInstruments ->', console.inspect(response.results.length));
 
+		let coms = response.results.map(v => ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
+
+		let symbols = new redis.SetsComs(redis.RH.SYMBOLS)
 		let tradables = new redis.SetsComs(redis.RH.TRADABLES)
 		let untradables = new redis.SetsComs(redis.RH.UNTRADABLES)
 		response.results.forEach(function(v) {
+			symbols.sadd(v.symbol)
 			let active = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
 			if (active) {
 				tradables.sadd(v.symbol)
@@ -75,8 +85,7 @@ async function syncInstruments() {
 				untradables.sadd(v.symbol)
 			}
 		})
-
-		let coms = response.results.map(v => ['hmset', redis.RH.INSTRUMENTS + ':' + v.symbol, v as any])
+		symbols.concat(coms)
 		tradables.concat(coms)
 		untradables.concat(coms)
 
@@ -92,21 +101,28 @@ async function syncInstruments() {
 
 
 
-async function chunkTradables() {
-	let symbols = (await redis.main.smembers(redis.RH.TRADABLES) as string[]).sort()
+async function chunkSymbols() {
+	let resolved = await redis.main.pipecoms([
+		['smembers', redis.RH.SYMBOLS],
+		['smembers', redis.RH.TRADABLES],
+		['smembers', redis.RH.UNTRADABLES],
+	])
+	
+	console.log('resolved ->', console.inspect(resolved))
 
-	let chunks = core.array.chunks(symbols, process.INSTANCES)
-	let coms = chunks.map((v, i) => ['set', `${redis.RH.TRADABLES}:${process.INSTANCES}:${i}`, v.toString()])
-	await redis.main.pipecoms(coms)
+	// let symbols = (await redis.main.smembers(redis.RH.TRADABLES) as string[]).sort()
+	// let chunks = core.array.chunks(symbols, process.INSTANCES)
+	// let coms = chunks.map((v, i) => ['set', `${redis.RH.TRADABLES}:${process.INSTANCES}:${i}`, v.toString()])
+	// await redis.main.pipecoms(coms)
 
-	console.info('chunkTradables -> done')
-	radio.emit('chunkTradables')
+	console.info('chunkSymbols -> done')
+	radio.emit('chunkSymbols')
 
 }
 
 
 
 async function readyWebullTickerIds() {
-	
+
 }
 

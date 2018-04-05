@@ -25,9 +25,9 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private static get options() {
 		return _.clone({
 			query: null as () => string,
-			autoRetry: true,
-			retryTimeout: 3000,
-			autoStart: true,
+			retry: true,
+			timeout: 3000,
+			connect: true,
 			delayed: -1,
 			heartbeat: '10s' as Clock.Tick,
 			verbose: false,
@@ -46,8 +46,8 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	) {
 		super()
 		_.defaults(this.options, WebSocketClient.options)
-		this.reconnect = _.throttle(this.connect, this.options.retryTimeout, { leading: false, trailing: true })
-		if (!this.options.autoStart) return;
+		this.reconnect = _.throttle(this.connect, this.options.timeout, { leading: false, trailing: true })
+		if (!this.options.connect) return;
 		if (this.options.delayed >= 0) _.delay(() => this.connect(), this.options.delayed);
 		else this.connect();
 	}
@@ -107,7 +107,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		console.warn(this.name, 'onclose ->', WebSocketClient.ecodes[event.code] || event.code, '->', event.reason)
 		this.emit('close', event.code, event.reason)
 		clock.offListener(this._heartbeat)
-		if (this.options.autoRetry) this.reconnect();
+		if (this.options.retry) this.reconnect();
 		else this.destroy();
 	}
 
