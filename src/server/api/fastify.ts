@@ -28,6 +28,11 @@ fastify.register(function(fastify, opts, next) {
 	radio.ready.subscribe(next)
 })
 
+// import rhinstruments from '../watchers/robinhood.instruments'
+// fastify.register(function(fastify, opts, next) {
+// 	radio.ready.subscribe(next)
+// })
+
 
 
 import './security.hook'

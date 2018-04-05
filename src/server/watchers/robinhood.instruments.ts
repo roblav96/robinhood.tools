@@ -110,6 +110,6 @@ async function chunkSymbols() {
 
 
 async function readyWebullTickerIds() {
-	console.warn('readyWebullTickerIds')
+	// console.warn('readyWebullTickerIds')
 }
 
