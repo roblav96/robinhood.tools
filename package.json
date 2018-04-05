@@ -33,6 +33,7 @@
 		"got": "latest",
 		"humanize-plus": "latest",
 		"ioredis": "latest",
+		"leven": "latest",
 		"lockr": "latest",
 		"lodash": "latest",
 		"luxon": "latest",

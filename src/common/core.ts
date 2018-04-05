@@ -19,11 +19,11 @@ export const isNodejs = !isBrowser
 
 
 
-export function fix(target: any, deep = false) {
+export function fix(target: any) {
 	Object.keys(target).forEach(function(key) {
 		let value = target[key]
 		if (value == null) return;
-		else if (deep && object.is(value)) fix(value, true);
+		// else if (object.is(value)) fix(value);
 		else if (!string.is(value)) return;
 		else if (value === '') _.unset(target, key);
 		else if (value === 'true') target[key] = true;

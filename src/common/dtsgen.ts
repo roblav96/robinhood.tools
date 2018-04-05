@@ -12,7 +12,7 @@ export default function generate(value: any) {
 	results = results.replace(`declare const value:`, '').trim()
 	results = results.replace(/;/g, '').replace(/\015\n\015\n+/g, '\n').trim()
 	
-	return '\n\n\n' + results + '\n\n\n'
+	return '\n\n' + results + '\n'
 	
 }
 
