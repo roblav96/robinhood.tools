@@ -38,6 +38,7 @@ class Redis extends IORedis {
 
 	async purge(rkey: string, pattern = ':*') {
 		let keys = await this.keys(rkey + pattern)
+		console.warn('purge ->', rkey, keys.length)
 		await this.pipecoms(keys.map(v => ['del', v]))
 		return keys
 	}
@@ -86,6 +87,24 @@ export function fromHmget(values: any[], keys: string[]): any {
 	let to = {}
 	values.forEach((v, i) => to[keys[i]] = v)
 	return fromHget(to)
+}
+
+
+
+export class SetsComs {
+	private _sadds = ['sadd', this.rkey]
+	private _srems = ['srem', this.rkey]
+	constructor(public rkey: string) { }
+	sadd(value: any) {
+		this._sadds.push(value)
+	}
+	srem(value: any) {
+		this._srems.push(value)
+	}
+	merge(coms: Redis.Coms) {
+		if (this._sadds.length > 2) coms.push(this._sadds);
+		if (this._srems.length > 2) coms.push(this._srems);
+	}
 }
 
 
