@@ -17,18 +17,21 @@ enum TICKS {
 }
 declare global { namespace Clock { type Tick = keyof typeof TICKS } }
 
-const ticks = Object.keys(TICKS).filter(isNaN as any) as Clock.Tick[]
-const tocks = core.array.dict(ticks, 0)
 
-const emitter = new Emitter<Clock.Tick, number>()
-Object.assign(emitter, { ticks, tocks })
-export default emitter
+
+class Clock extends Emitter<Clock.Tick, number> {
+	ticks = Object.keys(TICKS).filter(isNaN as any) as Clock.Tick[]
+	tocks = core.array.dict(this.ticks, 0)
+}
+
+const clock = new Clock()
+export default clock
 
 
 
 function onTick(tick: Clock.Tick) {
-	tocks[tick]++
-	emitter.emit(tick, tocks[tick])
+	clock.tocks[tick]++
+	clock.emit(tick, clock.tocks[tick])
 }
 
 function startTicking(tick: Clock.Tick, ms: number) {
@@ -54,30 +57,7 @@ function tickGenesis(tick: Clock.Tick) {
 }
 
 setImmediate(function clockGenesis() {
-	ticks.forEach(tickGenesis)
+	clock.ticks.forEach(tickGenesis)
 })
-
-
-
-
-
-// function delayGenesis(tick: Clock.Tick, i: number) {
-// 	_.delay(tickGenesis, 100 * (i + 1), tick)
-// }
-// ticks.forEach(delayGenesis)
-
-// function onTock(tick: Clock.Tick) {
-// 	tocks[tick]++
-// 	clock.next(tick)
-// }
-// function startTicking(tick: Clock.Tick, ms: number) {
-// 	onTock(tick)
-// 	const tock = tick
-// 	ci.setCorrectingInterval(function tickInterval() {
-// 		onTock(tock)
-// 	}, ms)
-// }
-// const emitter = new Emitter()
-// export default emitter
 
 

@@ -62,7 +62,7 @@ export default Object.assign(fs.createWriteStream('/dev/null'), {
 
 
 
-import * as stream from 'stream'
+import { Writable, Duplex, Transform } from 'stream'
 declare module 'pino' {
 	interface LogRequest {
 		id: number,
@@ -86,7 +86,7 @@ declare module 'pino' {
 		err?: LogError
 	}
 	interface LoggerOptions {
-		stream?: stream.Writable | stream.Duplex | stream.Transform
+		stream?: Writable | Duplex | Transform
 	}
 }
 

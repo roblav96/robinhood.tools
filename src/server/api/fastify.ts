@@ -18,32 +18,25 @@ export default fastify
 
 
 
-import './fastify.errors'
-import './fastify.plugins'
+if (process.WORKER) {
+	import('./fastify.errors')
+	import('./fastify.plugins')
 
+	import('./security.hook')
+	import('./security.api')
 
+	import('./socket.server')
+	import('./socket.api')
 
-// import radio from '../adapters/radio'
-// fastify.register(function(fastify, opts, next) {
-// 	radio.ready.subscribe(next)
-// })
+	import('./proxy.api')
+	import('./recaptcha.api')
+	import('./search.api')
+}
 
-// import rhinstruments from '../watchers/robinhood.instruments'
-// fastify.register(function(fastify, opts, next) {
-// 	radio.ready.subscribe(next)
-// })
-
-
-
-import './security.hook'
-import './security.api'
-
-import './socket.server'
-import './socket.api'
-
-import './proxy.api'
-import './recaptcha.api'
-import './search.api'
+import radio from '../adapters/radio'
+fastify.register(function(fastify, opts, next) {
+	radio.ready.subscribe(next)
+})
 
 
 

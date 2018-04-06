@@ -7,6 +7,7 @@ import * as core from '../../common/core'
 import * as Rx from '../../common/rxjs'
 import WebSocketClient from '../../common/websocket.client'
 import Emitter from '../../common/emitter'
+import fastify from '../api/fastify'
 
 
 
@@ -20,7 +21,8 @@ const ADDRESS = `ws://${HOST}:${PORT}/${PATH}`
 if (process.MASTER) {
 
 	const wss = new uws.Server({
-		host: HOST, port: PORT, path: PATH,
+		// host: HOST, port: PORT, path: PATH,
+		server: fastify.server,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
 			next(host == process.HOST)
@@ -61,7 +63,7 @@ class Radio extends Emitter {
 	open = new Rx.ReadySubject()
 	ready = new Rx.ReadySubject()
 	socket = new WebSocketClient(ADDRESS, {
-		timeout: 1000,
+		timeout: '1s',
 		connect: false,
 		// verbose: process.MASTER,
 		// verbose: true,

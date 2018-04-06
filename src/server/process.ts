@@ -36,7 +36,7 @@ process.on('uncaughtException', function(error) {
 })
 process.on('unhandledRejection', function(error) {
 	console.error(chalk.bold.redBright('UNHANDLED REJECTION'), '->', error)
-	console.error('https://github.com/mcollina/make-promises-safe', '\n')
+	console.error('https://github.com/mcollina/make-promises-safe')
 	process.exit(1)
 })
 

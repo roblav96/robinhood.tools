@@ -26,7 +26,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		return _.clone({
 			query: null as () => string,
 			retry: true,
-			timeout: 3000,
+			timeout: '3s' as Clock.Tick,
 			connect: true,
 			delayed: -1,
 			heartbeat: '10s' as Clock.Tick,
@@ -46,9 +46,8 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	) {
 		super()
 		_.defaults(this.options, WebSocketClient.options)
-		this.reconnect = _.throttle(this.connect, this.options.timeout, { leading: false, trailing: true })
 		if (!this.options.connect) return;
-		if (this.options.delayed >= 0) _.delay(() => this.connect(), this.options.delayed);
+		if (this.options.delayed >= 0) _.delay(this._connect, this.options.delayed);
 		else this.connect();
 	}
 
@@ -67,13 +66,12 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	destroy() {
 		this.terminate()
-		this.reconnect.cancel()
-		this.reconnect = null
+		clock.offListener(this._connect)
 		this.offAll()
 	}
 
 	terminate() {
-		this.reconnect.cancel()
+		clock.offListener(this._connect)
 		clock.offListener(this._heartbeat)
 		if (!this.socket) return;
 		this.socket.close()
@@ -84,7 +82,12 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.socket = null
 	}
 
-	reconnect: (() => void) & _.Cancelable
+	reconnect() {
+		clock.offListener(this._connect)
+		clock.once(this.options.timeout, this._connect)
+	}
+
+	private _connect = () => this.connect()
 	connect() {
 		this.terminate()
 		let address = this.options.query ? this.address + '?' + this.options.query() : this.address
@@ -99,7 +102,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private _onopen = (event: Event) => {
 		if (this.options.verbose) console.info(this.name, 'onopen ->', process.CLIENT ? (event.target as WebSocket).url : '');
 		clock.on(this.options.heartbeat, this._heartbeat)
-		this.reconnect.cancel()
+		clock.offListener(this._connect)
 		this.emit('open')
 	}
 

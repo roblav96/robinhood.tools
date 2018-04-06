@@ -18,6 +18,18 @@ declare module 'fastify' {
 
 
 
+// import radio from '../adapters/radio'
+// fastify.register(function(fastify, opts, next) {
+// 	radio.ready.subscribe(next)
+// })
+
+// import rhinstruments from '../watchers/robinhood.instruments'
+// fastify.register(function(fastify, opts, next) {
+// 	radio.ready.subscribe(next)
+// })
+
+
+
 
 
 // import * as products from '../watchers/products'
