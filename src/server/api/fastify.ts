@@ -14,29 +14,25 @@ const fastify = Fastify({
 	logger: { level: LOG_LEVEL, extreme: PRODUCTION, stream },
 })
 
+fastify.server.timeout = 10000
+fastify.server.keepAliveTimeout = 1000
+
 export default fastify
 
 
 
-if (process.WORKER) {
-	import('./fastify.errors')
-	import('./fastify.plugins')
+import './fastify.errors'
+import './fastify.plugins'
 
-	import('./security.hook')
-	import('./security.api')
+import './security.hook'
+import './security.api'
 
-	import('./socket.server')
-	import('./socket.api')
+import './socket.server'
+import './socket.api'
 
-	import('./proxy.api')
-	import('./recaptcha.api')
-	import('./search.api')
-}
-
-import radio from '../adapters/radio'
-fastify.register(function(fastify, opts, next) {
-	radio.ready.subscribe(next)
-})
+import './proxy.api'
+import './recaptcha.api'
+import './search.api'
 
 
 
@@ -49,9 +45,9 @@ fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 
 
 
-import * as http from 'http'
-import * as boom from 'boom'
-import * as ajv from 'ajv'
+import { IncomingMessage, ServerResponse, Server } from 'http'
+import { ErrorObject } from 'ajv'
+import { default as Boom } from 'boom'
 declare module 'fastify' {
 	interface FastifyRequest<HttpRequest> {
 		authed: boolean
@@ -62,12 +58,12 @@ declare module 'fastify' {
 
 	}
 	interface FastifyHandler {
-		(request: FastifyRequest<http.IncomingMessage>, reply: FastifyReply<http.ServerResponse>): Promise<any>
+		(request: FastifyRequest<IncomingMessage>, reply: FastifyReply<ServerResponse>): Promise<any>
 	}
-	interface FastifyError extends boom {
+	interface FastifyError extends Boom {
 		isCaught?: boolean
 		isGot?: boolean
-		validation?: ajv.ErrorObject[]
+		validation?: ErrorObject[]
 	}
 	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
 		addHook(name: 'onRoute', handler: (opts: RegisterOptions<HttpServer, HttpRequest, HttpResponse>) => void): FastifyInstance
@@ -79,10 +75,10 @@ declare module 'fastify' {
 
 declare global {
 	type Fastify = typeof fastify
-	interface FastifyMiddleware extends Fastify.FastifyMiddleware<http.Server, http.IncomingMessage, http.ServerResponse> { }
-	interface FastifyRegisterOptions extends Fastify.RegisterOptions<http.Server, http.IncomingMessage, http.ServerResponse> { }
-	interface FastifyRequest extends Fastify.FastifyRequest<http.IncomingMessage> { }
-	interface FastifyReply extends Fastify.FastifyReply<http.ServerResponse> { }
+	interface FastifyMiddleware extends Fastify.FastifyMiddleware<Server, IncomingMessage, ServerResponse> { }
+	interface FastifyRegisterOptions extends Fastify.RegisterOptions<Server, IncomingMessage, ServerResponse> { }
+	interface FastifyRequest extends Fastify.FastifyRequest<IncomingMessage> { }
+	interface FastifyReply extends Fastify.FastifyReply<ServerResponse> { }
 	interface FastifyHandler extends Fastify.FastifyHandler { }
 	interface FastifyError extends Fastify.FastifyError { }
 	interface FastifyInstance extends Fastify.FastifyInstance { }

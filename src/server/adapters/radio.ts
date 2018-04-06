@@ -22,12 +22,15 @@ if (process.MASTER) {
 
 	const wss = new uws.Server({
 		// host: HOST, port: PORT, path: PATH,
+		path: PATH,
 		server: fastify.server,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
 			next(host == process.HOST)
 		},
 	})
+	
+	console.log('wss ->', console.inspect(wss))
 
 	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
@@ -63,10 +66,10 @@ class Radio extends Emitter {
 	open = new Rx.ReadySubject()
 	ready = new Rx.ReadySubject()
 	socket = new WebSocketClient(ADDRESS, {
-		timeout: '1s',
+		timeout: '5s',
 		connect: false,
 		// verbose: process.MASTER,
-		// verbose: true,
+		verbose: true,
 	})
 
 	connect = _.once(() => this.socket.connect())

@@ -17,7 +17,7 @@ import '../common/clock'
 import './adapters/redis'
 import './api/fastify'
 import './adapters/radio'
-import './adapters/cluster'
+// import './adapters/cluster'
 
 import './watchers/watchers'
 
