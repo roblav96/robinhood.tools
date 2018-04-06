@@ -8,7 +8,6 @@ import * as Rx from '../../common/rxjs'
 import clock from '../../common/clock'
 import WebSocketClient from '../../common/websocket.client'
 import Emitter from '../../common/emitter'
-import fastify from '../api/fastify'
 
 
 
@@ -17,21 +16,19 @@ const PORT = process.PORT - 1
 const PATH = 'radio'
 const ADDRESS = `ws://${HOST}:${PORT}/${PATH}`
 
-
-
 if (process.MASTER) {
 
 	const wss = new uws.Server({
-		// host: HOST, port: PORT, path: PATH,
-		path: PATH,
-		server: fastify.server,
+		host: HOST, port: PORT, path: PATH,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
 			next(host == process.HOST)
 		},
 	})
 
-	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
+	wss.httpServer.timeout = 10000; wss.httpServer.keepAliveTimeout = 1000;
+
+	wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
 	wss.on('connection', function(client: Radio.Client, req: IncomingMessage) {
@@ -54,8 +51,7 @@ if (process.MASTER) {
 
 	})
 
-	// wss.once('listening', function() { radio.connect() })
-	fastify.server.once('listening', function() { radio.connect() })
+	wss.once('listening', function() { radio.connect() })
 
 }
 
@@ -67,9 +63,9 @@ class Radio extends Emitter {
 	ready = new Rx.ReadySubject()
 	socket = new WebSocketClient(ADDRESS, {
 		connect: false,
-		// timeout: '1s',
+		timeout: '1s',
+		// verbose: true,
 		// verbose: process.MASTER,
-		verbose: true,
 	})
 
 	connect = _.once(() => this.socket.connect())

@@ -15,17 +15,15 @@ import './adapters/console'
 
 import '../common/clock'
 import './adapters/redis'
-import './api/fastify'
 import './adapters/radio'
-// import './adapters/cluster'
+import './adapters/cluster'
 
-import './watchers/watchers'
+// import './watchers/watchers'
+import './watchers/robinhood.instruments'
+import './watchers/webull.tickers'
 
-// import './watchers/robinhood.instruments'
-// import './watchers/webull.tickers'
-
-// if (process.WORKER) {
-// 	require('./api/fastify')
-// }
+if (process.WORKER) {
+	require('./api/fastify')
+}
 
 

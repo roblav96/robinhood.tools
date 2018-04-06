@@ -24,11 +24,11 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	private static get options() {
 		return _.clone({
-			query: null as () => string,
-			timeout: '3s' as Clock.Tick,
-			heartbeat: '10s' as Clock.Tick,
-			retry: true,
 			connect: true,
+			heartbeat: '10s' as Clock.Tick,
+			query: null as () => string,
+			retry: true,
+			timeout: '3s' as Clock.Tick,
 			verbose: false,
 		})
 	}
