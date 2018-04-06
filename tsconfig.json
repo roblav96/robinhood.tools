@@ -10,6 +10,7 @@
 		"emitDecoratorMetadata": true,
 		"inlineSourceMap": true,
 		"inlineSources": true,
+		"removeComments": true,
 		"pretty": true,
 		"outDir": "dist",
 		"baseUrl": ".",

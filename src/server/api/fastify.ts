@@ -1,5 +1,5 @@
 // 
-if (process.MASTER) { console.error('fastify -> process.MASTER should not import fastify', '\n'); process.exit(1) }
+// if (process.MASTER) { console.error('fastify -> process.MASTER should not import fastify', '\n'); process.exit(1) }
 // 
 
 import * as Fastify from 'fastify'
@@ -8,7 +8,7 @@ import stream from './fastify.logger'
 
 
 
-const LOG_LEVEL = 'error' as Pino.Level
+const LOG_LEVEL = 'info' as Pino.Level
 
 const fastify = Fastify({
 	logger: { level: LOG_LEVEL, extreme: PRODUCTION, stream },
@@ -23,10 +23,10 @@ import './fastify.plugins'
 
 
 
-import radio from '../adapters/radio'
-fastify.register(function(fastify, opts, next) {
-	radio.ready.subscribe(next)
-})
+// import radio from '../adapters/radio'
+// fastify.register(function(fastify, opts, next) {
+// 	radio.ready.subscribe(next)
+// })
 
 // import rhinstruments from '../watchers/robinhood.instruments'
 // fastify.register(function(fastify, opts, next) {

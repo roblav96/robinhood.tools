@@ -101,7 +101,7 @@ export class SetsComs {
 	srem(value: any) {
 		this._srems.push(value)
 	}
-	concat(coms: Redis.Coms) {
+	merge(coms: Redis.Coms) {
 		if (this._sadds.length > 2) coms.push(this._sadds);
 		if (this._srems.length > 2) coms.push(this._srems);
 	}

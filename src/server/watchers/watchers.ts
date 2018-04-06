@@ -7,7 +7,7 @@
 // // import * as pforever from 'p-forever'
 // // import * as pqueue from 'p-queue'
 
-// import * as utils from '../services/utils'
+import * as utils from '../services/utils'
 
 
 
@@ -19,7 +19,7 @@
 
 
 
-// utils.requireDir(__dirname, __filename)
+utils.requireDir(__dirname, __filename)
 
 
 

@@ -26,15 +26,23 @@ export class ReadySubject {
 	private _subject = new Rx.BehaviorSubject(false)
 
 	get value() { return this._subject.value }
-	next() {
-		if (!this._subject.value) this._subject.next(true);
+	next(value?: boolean) {
+		if (typeof value == 'boolean') {
+			if (value != this.value) this._subject.next(value);
+		} else {
+			if (!this._subject.value) this._subject.next(true);
+		}
 	}
 
-	pipe() {
-		return this._subject.pipe(Rx.filter(v => !!v), Rx.take(1), Rx.mapTo(void 0))
+	toPromise() {
+		return this._subject.pipe(Rx.filter(v => !!v), Rx.take(1)).toPromise()
 	}
-	toPromise() { return this.pipe().toPromise() }
-	subscribe(next: () => void) { return this.pipe().subscribe(next) }
+
+	// private _pipe() {
+	// 	return this._subject.pipe(Rx.filter(v => !!v), Rx.take(1), Rx.mapTo(void 0))
+	// }
+	// toPromise() { return this._pipe().toPromise() }
+	// subscribe(next: () => void) { return this._pipe().subscribe(next) }
 
 }
 

@@ -1,6 +1,6 @@
 // 
 
-import * as http from 'http'
+import { IncomingMessage } from 'http'
 import * as _ from 'lodash'
 import * as uws from 'uws'
 import * as core from '../../common/core'
@@ -30,7 +30,7 @@ if (process.MASTER) {
 	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
-	wss.on('connection', function(client: Radio.Client, req: http.IncomingMessage) {
+	wss.on('connection', function(client: Radio.Client, req: IncomingMessage) {
 
 		client.on('message', function(message: string) {
 			if (message == 'pong') return;
@@ -58,6 +58,7 @@ if (process.MASTER) {
 
 class Radio extends Emitter {
 
+	open = new Rx.ReadySubject()
 	ready = new Rx.ReadySubject()
 	socket = new WebSocketClient(ADDRESS, {
 		timeout: 1000,
@@ -74,6 +75,7 @@ class Radio extends Emitter {
 		if (process.WORKER) setImmediate(this.connect);
 
 		this.socket.on('open', () => {
+			this.open.next()
 			this.socket.send('_onopen_')
 		})
 

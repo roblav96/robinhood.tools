@@ -1,7 +1,7 @@
 // 
 
+import { Duration } from 'luxon'
 import * as _ from 'lodash'
-import * as luxon from 'luxon'
 import * as ci from 'correcting-interval'
 import * as core from './core'
 import Emitter from './emitter'
@@ -17,10 +17,11 @@ enum TICKS {
 }
 declare global { namespace Clock { type Tick = keyof typeof TICKS } }
 
-const ticks = Object.keys(TICKS).filter(isNaN as any)
+const ticks = Object.keys(TICKS).filter(isNaN as any) as Clock.Tick[]
 const tocks = core.array.dict(ticks, 0)
 
 const emitter = new Emitter<Clock.Tick, number>()
+Object.assign(emitter, { ticks, tocks })
 export default emitter
 
 
@@ -41,7 +42,7 @@ function startTicking(tick: Clock.Tick, ms: number) {
 function tickGenesis(tick: Clock.Tick) {
 	let qty = Number.parseInt(tick)
 	let unit = core.time.UNITS[tick.substr(qty.toString().length)]
-	let ms = luxon.Duration.fromObject({ [unit]: qty }).as('milliseconds')
+	let ms = Duration.fromObject({ [unit]: qty }).as('milliseconds')
 	// console.warn('tick ->', console.dump(tick), '\n', 'qty ->', console.dump(qty), '\n', 'unit ->', console.dump(unit), '\n', 'ms ->', console.dump(ms))
 	let now = Date.now()
 	let from = now - (now % ms)

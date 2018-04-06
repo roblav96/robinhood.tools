@@ -14,13 +14,13 @@ import radio from '../adapters/radio'
 export const ready = new Rx.ReadySubject()
 radio.once('robinhood.instruments.ready', () => ready.next())
 
-if (process.MASTER) {
-	radio.ready.toPromise().then(readyInstruments).catch(function(error) {
-		console.error('readyInstruments Error ->', error)
-	}).finally(function() {
-		radio.emit('robinhood.instruments.ready')
-	})
-}
+// if (process.MASTER) {
+// 	radio.ready.toPromise().then(readyInstruments).catch(function(error) {
+// 		console.error('readyInstruments Error ->', error)
+// 	}).finally(function() {
+// 		radio.emit('robinhood.instruments.ready')
+// 	})
+// }
 
 
 
@@ -66,9 +66,9 @@ async function syncInstruments() {
 				untradables.sadd(v.symbol)
 			}
 		})
-		symbols.concat(coms)
-		tradables.concat(coms)
-		untradables.concat(coms)
+		symbols.merge(coms)
+		tradables.merge(coms)
+		untradables.merge(coms)
 
 		await redis.main.coms(coms)
 		return response.next || pForever.end

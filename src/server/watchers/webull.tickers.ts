@@ -19,14 +19,14 @@ import radio from '../adapters/radio'
 export const ready = new Rx.ReadySubject()
 radio.once('webull.tickers.ready', () => ready.next())
 
-if (process.MASTER) {
-	radio.ready.toPromise().then(readyTickers).catch(function(error) {
-		console.error('readyTickers Error ->', error)
-	}).finally(function() {
-		console.warn('emit -> webull.tickers.ready')
-		radio.emit('webull.tickers.ready')
-	})
-}
+// if (process.MASTER) {
+// 	radio.ready.toPromise().then(readyTickers).catch(function(error) {
+// 		console.error('readyTickers Error ->', error)
+// 	}).finally(function() {
+// 		console.warn('emit -> webull.tickers.ready')
+// 		radio.emit('webull.tickers.ready')
+// 	})
+// }
 
 
 
