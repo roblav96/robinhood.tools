@@ -11,17 +11,18 @@ import Emitter from '../../common/emitter'
 
 
 
-const host = process.HOST
-const port = process.PORT - 1
-const path = 'radio'
-const address = `ws://${host}:${port}/${path}`
+const HOST = process.HOST
+const PORT = process.PORT - 1
+const PATH = 'radio'
+const ADDRESS = `ws://${HOST}:${PORT}/${PATH}`
 
 if (process.MASTER) {
 
 	const wss = new uws.Server({
-		host, port, path,
+		host: HOST, port: PORT, path: PATH,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
+			console.log('incoming.req.headers ->', console.inspect(incoming.req.headers))
 			next(host == process.HOST)
 		},
 	})
@@ -63,7 +64,7 @@ class Radio extends Emitter {
 	open = new Rx.ReadySubject()
 	ready = new Rx.ReadySubject()
 
-	socket = new WebSocketClient(address, {
+	socket = new WebSocketClient(ADDRESS, {
 		connect: process.WORKER,
 		timeout: '1s',
 		// verbose: true,
