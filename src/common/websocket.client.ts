@@ -25,11 +25,10 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private static get options() {
 		return _.clone({
 			query: null as () => string,
-			retry: true,
 			timeout: '3s' as Clock.Tick,
-			connect: true,
-			delayed: -1,
 			heartbeat: '10s' as Clock.Tick,
+			retry: true,
+			connect: true,
 			verbose: false,
 		})
 	}
@@ -46,27 +45,18 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	) {
 		super()
 		_.defaults(this.options, WebSocketClient.options)
-		if (!this.options.connect) return;
-		if (this.options.delayed >= 0) _.delay(this._connect, this.options.delayed);
-		else this.connect();
+		if (this.options.connect) this.connect();
 	}
 
 	socket: WebSocket & uws
-
 	get isopen() { return this.socket && this.socket.readyState == this.socket.OPEN }
 
 	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
-	send(message: string) {
-		this.socket.send(message)
-	}
-
-	close(code = 1000, reason?: string) {
-		this.socket.close(code, reason)
-	}
+	send(message: string) { this.socket.send(message) }
+	close(code = 1000, reason?: string) { this.socket.close(code, reason) }
 
 	destroy() {
 		this.terminate()
-		clock.offListener(this._connect)
 		this.offAll()
 	}
 
@@ -82,7 +72,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.socket = null
 	}
 
-	reconnect() {
+	private _reconnect() {
 		clock.offListener(this._connect)
 		clock.once(this.options.timeout, this._connect)
 	}
@@ -90,13 +80,13 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private _connect = () => this.connect()
 	connect() {
 		this.terminate()
-		let address = this.options.query ? this.address + '?' + this.options.query() : this.address
+		let address = this.options.query ? `${this.address}?${this.options.query()}` : this.address
 		this.socket = new WebSocket(address) as any
 		this.socket.onopen = this._onopen as any
 		this.socket.onclose = this._onclose as any
 		this.socket.onerror = this._onerror as any
 		this.socket.onmessage = this._onmessage as any
-		this.reconnect()
+		this._reconnect()
 	}
 
 	private _onopen = (event: Event) => {
@@ -108,9 +98,9 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	private _onclose = (event: CloseEvent) => {
 		console.warn(this.name, 'onclose ->', WebSocketClient.ecodes[event.code] || event.code, '->', event.reason)
-		this.emit('close', event.code, event.reason)
+		this.emit('close') //, _.pick(event, ['code','reason']) as any)
 		clock.offListener(this._heartbeat)
-		if (this.options.retry) this.reconnect();
+		if (this.options.retry) this._reconnect();
 		else this.destroy();
 	}
 
@@ -128,8 +118,8 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _heartbeat = () => {
-		if (!this.isopen) return clock.offListener(this._heartbeat);
-		this.send('ping')
+		if (this.isopen) this.send('ping');
+		else clock.offListener(this._heartbeat);
 	}
 
 }

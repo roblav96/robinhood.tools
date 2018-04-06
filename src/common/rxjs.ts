@@ -34,8 +34,6 @@ export class ReadySubject {
 	toPromise() { return this._pipe().toPromise() }
 	subscribe(next: () => void) { return this._pipe().subscribe(next) }
 
-
-
 	// next(value?: boolean) {
 	// 	if (typeof value == 'boolean') {
 	// 		if (value != this.value) this._subject.next(value);

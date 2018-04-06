@@ -81,7 +81,7 @@ async function syncTicker(symbol: string) {
 	core.fix(instrument)
 	// console.warn('instrument ->', console.inspect(_.pick(instrument, ['symbol', 'name', 'simple_name', 'good', 'country', 'acronym'] as KeysOf<Robinhood.Instrument>)))
 
-	await clock.pEvent('250ms')
+	await clock.toPromise('250ms')
 	let response = await http.get('https://infoapi.stocks666.com/api/search/tickers2', {
 		query: { keys: symbol },
 	}) as Webull.API.Paginated<Webull.Ticker>

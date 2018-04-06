@@ -5,6 +5,7 @@ import * as _ from 'lodash'
 import * as uws from 'uws'
 import * as core from '../../common/core'
 import * as Rx from '../../common/rxjs'
+import clock from '../../common/clock'
 import WebSocketClient from '../../common/websocket.client'
 import Emitter from '../../common/emitter'
 import fastify from '../api/fastify'
@@ -29,8 +30,6 @@ if (process.MASTER) {
 			next(host == process.HOST)
 		},
 	})
-	
-	console.log('wss ->', console.inspect(wss))
 
 	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
@@ -55,7 +54,8 @@ if (process.MASTER) {
 
 	})
 
-	wss.once('listening', function() { radio.connect() })
+	// wss.once('listening', function() { radio.connect() })
+	fastify.server.once('listening', function() { radio.connect() })
 
 }
 
@@ -66,8 +66,8 @@ class Radio extends Emitter {
 	open = new Rx.ReadySubject()
 	ready = new Rx.ReadySubject()
 	socket = new WebSocketClient(ADDRESS, {
-		timeout: '5s',
 		connect: false,
+		// timeout: '1s',
 		// verbose: process.MASTER,
 		verbose: true,
 	})
@@ -102,7 +102,7 @@ class Radio extends Emitter {
 	job(name: string, data?: any) {
 		if (!process.MASTER) return;
 		let proms = core.workers().map(function(i) {
-			return radio.pEvent(`${name}.${i}`)
+			return radio.toPromise(`${name}.${i}`)
 		})
 		radio.emit(name, data)
 		return Promise.all(proms)
