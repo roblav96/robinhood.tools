@@ -45,47 +45,55 @@ async function readyTickers() {
 
 
 async function syncTickers() {
-	await syncAll()
-	
-	let symbols = await robinhood.getAllSymbols()
-	console.log('symbols ->', console.inspect(symbols))
+	if (process.MASTER) {
+		let alls = _.flatten(await Promise.all([
+			// stocks
+			http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
+				query: { pageSize: 999999 },
+			}),
+			// etfs
+			http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
+				query: { pageSize: 999999 },
+			}),
+		])) as Webull.Ticker[]
 
-	// let proms = core.array.create(process.INSTANCES).map(i => radio.pEvent('workerTickers.' + i))
-	// radio.emit('workerTickers')
-	// await Promise.all(proms)
+		_.remove(alls, v => Array.isArray(v.disSymbol.match(/\W+/)))
+
+		let grouped = _.groupBy(alls, 'disSymbol' as keyof Webull.Ticker)
+		let coms = Object.keys(grouped).map(function(symbol) {
+			return ['set', `${redis.WB.ALLS}:${symbol}`, JSON.stringify(grouped[symbol])]
+		})
+		await redis.main.coms(coms)
+
+		radio.emit('syncTickers')
+
+	}
+
+	if (process.WORKER) {
+		let symbols = await robinhood.getSymbols()
+		console.log('symbols.length ->', console.inspect(symbols.length))
+
+		await pAll(symbols.map(v => () => syncTicker(v)), { concurrency: 1 })
+		// await pAll(symbols.map((v, i) => function() {
+		// 	let prog = core.number.round((i / symbols.length) * 100)
+		// 	console.log(console.inspect(prog), 'symbol ->', console.inspect(v))
+		// 	return syncTicker(v)
+		// }), { concurrency: 1 })
+		// await syncTicker('AAIT')
+
+		console.info('workerTickers -> done')
+		radio.emit('workerTickers.' + process.INSTANCE)
+	}
 
 	console.info('syncTickers -> done')
 
 }
-
-
-
-async function syncAll() {
-	let all = _.flatten(await Promise.all([
-		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
-			query: { pageSize: 999999 },
-		}),
-		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
-			query: { pageSize: 999999 },
-		}),
-	])) as Webull.Ticker[]
-
-	_.remove(all, v => Array.isArray(v.disSymbol.match(/\W+/)))
-
-	let grouped = _.groupBy(all, 'disSymbol' as keyof Webull.Ticker)
-	let coms = Object.keys(grouped).map(function(symbol) {
-		return ['set', `${redis.WB.ALL}:${symbol}`, JSON.stringify(grouped[symbol])]
-	})
-	await redis.main.coms(coms)
-
-	console.info('syncAll -> done')
-
-}
+if (process.WORKER) radio.on('syncTickers', syncTickers);
 
 
 
 async function syncTicker(symbol: string) {
-	// console.log('symbol ->', console.inspect(symbol), console.inspect(progress))
+	console.log('syncTicker symbol ->', console.inspect(symbol))
 
 	let instrument = await redis.main.hgetall(`${redis.RH.INSTRUMENTS}:${symbol}`) as Robinhood.Instrument
 	core.fix(instrument)
@@ -128,25 +136,58 @@ async function syncTicker(symbol: string) {
 
 
 
-if (process.WORKER) {
+// async function syncAlls() {
+// 	let alls = _.flatten(await Promise.all([
+// 		// stocks
+// 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
+// 			query: { pageSize: 999999 },
+// 		}),
+// 		// etfs
+// 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
+// 			query: { pageSize: 999999 },
+// 		}),
+// 	])) as Webull.Ticker[]
 
-	radio.on('workerTickers', async function workerTickers() {
-		let symbols = await robinhood.getSymbols()
-		console.log('symbols.length ->', console.inspect(symbols.length))
+// 	_.remove(alls, v => Array.isArray(v.disSymbol.match(/\W+/)))
 
-		await pAll(symbols.map((v, i) => function() {
-			let prog = core.number.round((i / symbols.length) * 100)
-			console.log(console.inspect(prog), 'symbol ->', console.inspect(v))
-			return syncTicker(v)
-		}), { concurrency: 1 })
-		// await syncTicker('AAIT')
+// 	let grouped = _.groupBy(alls, 'disSymbol' as keyof Webull.Ticker)
+// 	let coms = Object.keys(grouped).map(function(symbol) {
+// 		return ['set', `${redis.WB.ALLS}:${symbol}`, JSON.stringify(grouped[symbol])]
+// 	})
+// 	await redis.main.coms(coms)
 
-		console.info('workerTickers -> done')
-		radio.emit('workerTickers.' + process.INSTANCE)
+// 	console.info('syncAlls -> done')
 
-	})
+// }
 
-}
+
+
+// if (process.WORKER) {
+
+// let symbols = await robinhood.getAllSymbols()
+// console.log('symbols.length ->', console.inspect(symbols.length))
+
+// let proms = core.array.create(process.INSTANCES).map(i => radio.pEvent('workerTickers.' + i))
+// radio.emit('workerTickers')
+// await Promise.all(proms)
+
+// 	radio.on('workerTickers', async function workerTickers() {
+// 		let symbols = await robinhood.getSymbols()
+// 		console.log('symbols.length ->', console.inspect(symbols.length))
+
+// 		await pAll(symbols.map((v, i) => function() {
+// 			let prog = core.number.round((i / symbols.length) * 100)
+// 			console.log(console.inspect(prog), 'symbol ->', console.inspect(v))
+// 			return syncTicker(v)
+// 		}), { concurrency: 1 })
+// 		// await syncTicker('AAIT')
+
+// 		console.info('workerTickers -> done')
+// 		radio.emit('workerTickers.' + process.INSTANCE)
+
+// 	})
+
+// }
 
 
 

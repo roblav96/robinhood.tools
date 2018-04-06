@@ -21,7 +21,7 @@ export const RH = {
 export const WB = {
 	WB: 'wb',
 	TICKERS: 'wb:tickers',
-	ALL: 'wb:all',
+	ALLS: 'wb:alls',
 }
 
 

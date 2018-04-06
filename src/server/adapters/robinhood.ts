@@ -11,8 +11,8 @@ import * as redis from './redis'
 
 
 export async function getAllSymbols() {
-	let resolved = await redis.main.get(`${redis.RH.SYMBOLS}`)
-	return (resolved ? resolved.split(',') : []) as string[]
+	let resolved = await redis.main.smembers(`${redis.RH.SYMBOLS}`) as string[]
+	return resolved.sort()
 }
 
 export async function getSymbols() {
