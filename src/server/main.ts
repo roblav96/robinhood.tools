@@ -15,15 +15,15 @@ import './process'
 import './adapters/console'
 import './adapters/redis'
 
-import('../common/clock')
-import('./adapters/radio')
-import('./adapters/cluster')
+import '../common/clock'
+import './adapters/radio'
+import './adapters/cluster'
 
-import('./watchers/robinhood.instruments')
-import('./watchers/webull.tickers')
+import './watchers/robinhood.instruments'
+import './watchers/webull.tickers'
 
 if (process.WORKER) {
-	import('./api/fastify')
+	require('./api/fastify')
 }
 
 
