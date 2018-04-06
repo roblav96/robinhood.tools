@@ -10,6 +10,8 @@ global.NODE_ENV = process.env.NODE_ENV || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
+console.log('process.env ->', process.env)
+
 import './process'
 // import './adapters/console'
 // import './adapters/redis'
