@@ -1,19 +1,18 @@
 // 
-global.NODE_ENV = process.env.NODE_ENV || 'development'
-global.DEVELOPMENT = NODE_ENV == 'development'
-global.PRODUCTION = NODE_ENV == 'production'
+const NODE_ENV = process.env.NODE_ENV || 'development'
+const DEVELOPMENT = NODE_ENV == 'development'
+const PRODUCTION = NODE_ENV == 'production'
 // 
 
-console.log('process.env.NODE_ENV ->', process.env.NODE_ENV)
+import * as eyes from 'eyes'
+import * as path from 'path'
+import * as _ from 'lodash'
+import * as dotenv from 'dotenv'
 
-const eyes = require('eyes')
-const webpack = require('webpack')
-const path = require('path')
-const _ = require('lodash')
-const dotenv = require('dotenv')
-const package = require('./package.json')
+console.log('eyes ->', eyes)
 
-
+// import packagejson = require('./package.json')
+// console.log('packagejson ->', eyes.inspect(packagejson))
 
 const config = {
 	apps: [{
@@ -30,6 +29,9 @@ const config = {
 		automation: false,
 		// max_restarts: 3,
 		// min_uptime: '3s',
+		wait_ready: true,
+		kill_timeout: 2000,
+		listen_timeout: 1000,
 		args: [
 			'--color',
 			'--inspect',
@@ -40,7 +42,7 @@ const config = {
 	}],
 }
 
-console.log('config ->', eyes.inspect(config))
+console.log('config ->', config)
 
 module.exports = config
 

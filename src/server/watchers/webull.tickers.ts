@@ -48,7 +48,7 @@ async function readyTickers() {
 async function syncTickers() {
 	if (process.MASTER) {
 		await syncAlls()
-		await radio.job('syncTickers')
+		// await radio.job('syncTickers')
 	}
 
 	if (process.WORKER) {
