@@ -122,6 +122,7 @@ export default radio
 declare global {
 	namespace Radio {
 		interface Client extends uws {
+			/** ▶ process.INSTANCE */
 			i: number
 		}
 		interface Event<T = any> {
