@@ -10,20 +10,21 @@ global.NODE_ENV = process.env.NODE_ENV || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
-// if (DEVELOPMENT) process.INSTANCES = 0;
 import './process'
-import './adapters/console'
-import './adapters/redis'
+// import './adapters/console'
+// import './adapters/redis'
 
-import '../common/clock'
-import './adapters/radio'
-import './adapters/cluster'
 
-import './watchers/robinhood.instruments'
-import './watchers/webull.tickers'
 
-if (process.WORKER) {
-	require('./api/fastify')
-}
+// import '../common/clock'
+// import './adapters/radio'
+// // import './adapters/cluster'
+
+// import './watchers/robinhood.instruments'
+// import './watchers/webull.tickers'
+
+// if (process.WORKER) {
+// 	require('./api/fastify')
+// }
 
 
