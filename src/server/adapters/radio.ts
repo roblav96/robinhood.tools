@@ -22,7 +22,6 @@ if (process.MASTER) {
 		host: HOST, port: PORT, path: PATH,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
-			console.log('incoming.req.headers ->', console.inspect(incoming.req.headers))
 			next(host == process.HOST)
 		},
 	})
@@ -59,7 +58,7 @@ if (process.MASTER) {
 
 
 
-class Radio extends Emitter {
+class Radio extends Emitter<string, Radio.Data> {
 
 	open = new Rx.ReadySubject()
 	ready = new Rx.ReadySubject()
@@ -92,19 +91,21 @@ class Radio extends Emitter {
 
 	}
 
-	emit(name: string, data?: any) {
-		this.socket.json({ n: name, d: data } as Radio.Event)
+	emit(name: string, data?: Radio.Data, ...args: any[]) {
+		this.socket.json({
+			n: name, d: data, a: args, i: process.INSTANCE,
+		} as Radio.Event)
 		return this
 	}
 
-	job(name: string, data?: any) {
-		if (!process.MASTER) return;
-		let proms = core.workers().map(function(i) {
-			return radio.toPromise(`${name}.${i}`)
-		})
-		radio.emit(name, data)
-		return Promise.all(proms)
-	}
+	// job(name: string, data?: Radio.Data) {
+	// 	if (!process.MASTER) return;
+	// 	let proms = core.workers().map(function(i) {
+	// 		return radio.toPromise(`${name}.${i}`)
+	// 	})
+	// 	radio.emit(name, data)
+	// 	return Promise.all(proms)
+	// }
 
 }
 
@@ -124,11 +125,22 @@ declare global {
 			/** ▶ name */
 			n: string
 			/** ▶ data */
-			d: Data<T>
+			d: Data & T
+			/** ▶ args */
+			a: T[]
+			/** ▶ process.INSTANCE */
+			i: number
 		}
-		interface Data<T = any> {
-			/**▶ from process.INSTANCE */
-			fi: number
+		interface Data {
+			[key: string]: any
+			/** ▶ private message */
+			_whisper: number
+			/** ▶ private messages */
+			_whispers: number[]
+			/** ▶ to master */
+			_master: boolean
+			/** ▶ to workers */
+			_workers: boolean
 		}
 	}
 }
