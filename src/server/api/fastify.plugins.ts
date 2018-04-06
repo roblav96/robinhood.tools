@@ -9,7 +9,7 @@ fastify.use(cors({ origin: process.DOMAIN }))
 
 
 
-fastify.register(require('fastify-cookie'), error => { if (error) console.error('fastify-cookie Error ->', error); })
+fastify.register(require('fastify-cookie'))
 import { CookieSerializeOptions } from 'cookie'
 declare module 'fastify' {
 	interface FastifyRequest<HttpRequest> { cookies: Dict<string> }
@@ -17,11 +17,6 @@ declare module 'fastify' {
 }
 
 
-
-// import radio from '../adapters/radio'
-// fastify.register(function(fastify, opts, next) {
-// 	radio.ready.subscribe(next)
-// })
 
 // import rhinstruments from '../watchers/robinhood.instruments'
 // fastify.register(function(fastify, opts, next) {

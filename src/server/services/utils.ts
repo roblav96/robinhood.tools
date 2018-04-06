@@ -6,6 +6,7 @@ import * as sourcemaps from 'source-map-support'
 
 
 
+/**▶ utils.requireDir(__dirname, __filename) */
 export function requireDir(dirName: string, fileName: string) {
 	fs.readdirSync(dirName).filter(v => v != fileName).forEach(function(file) {
 		let full = path.join(dirName, file)

@@ -1,5 +1,5 @@
 // 
-// if (process.MASTER) { console.error('fastify -> process.MASTER should not import fastify', '\n'); process.exit(1) }
+if (process.MASTER) { console.error('fastify -> process.MASTER should not import fastify', '\n'); process.exit(1) }
 // 
 
 import * as Fastify from 'fastify'
@@ -33,6 +33,13 @@ import './socket.api'
 import './proxy.api'
 import './recaptcha.api'
 import './search.api'
+
+
+
+import radio from '../adapters/radio'
+fastify.register(function(instance, opts, next) {
+	radio.ready.pipe(true).subscribe(next)
+})
 
 
 
