@@ -13,12 +13,11 @@ class Client {
 
 	socket = new WebSocketClient(this.address, {
 		query() { return qs.stringify(_.defaults(security.headers())) },
+		timeout: '1s',
 		verbose: true,
 	})
 
-	constructor(
-		public address: string,
-	) {
+	constructor(public address: string) {
 
 	}
 
@@ -42,7 +41,7 @@ class Socket extends Emitter {
 const socket = new Socket()
 export default socket
 
-
+console.log('socket ->', socket)
 
 
 

@@ -1,14 +1,19 @@
 // 
+
 require('@/common/polyfills')
 global.Promise = require('bluebird')
+
 global.NODE_ENV = process.env.NODE_ENV
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
+
 process.NAME = process.env.NAME
 process.VERSION = process.env.VERSION
 process.DOMAIN = process.env.DOMAIN
 process.CLIENT = true
+
 Object.assign(console, { dump() { } })
+
 // 
 
 import Vue from 'vue'

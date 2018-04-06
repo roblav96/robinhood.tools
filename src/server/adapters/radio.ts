@@ -98,14 +98,14 @@ class Radio extends Emitter<string, Radio.Data> {
 		return this
 	}
 
-	// job(name: string, data?: Radio.Data) {
-	// 	if (!process.MASTER) return;
-	// 	let proms = core.workers().map(function(i) {
-	// 		return radio.toPromise(`${name}.${i}`)
-	// 	})
-	// 	radio.emit(name, data)
-	// 	return Promise.all(proms)
-	// }
+	job(name: string, data?: Radio.Data) {
+		if (!process.MASTER) return;
+		let proms = core.workers().map(function(i) {
+			return radio.toPromise(`${name}.${i}`)
+		})
+		radio.emit(name, data)
+		return Promise.all(proms)
+	}
 
 }
 

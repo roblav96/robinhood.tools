@@ -2,14 +2,14 @@
 
 import '../common/polyfills'
 import 'source-map-support/register'
+global.Promise = require('bluebird')
+global.WebSocket = require('uws')
 
 global.NODE_ENV = process.env.NODE_ENV || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
-global.Promise = require('bluebird')
-global.WebSocket = require('uws')
 
-// if (DEVELOPMENT) process.INSTANCES = 1;
+if (DEVELOPMENT) process.INSTANCES = 0;
 import './process'
 import './adapters/console'
 import './adapters/redis'

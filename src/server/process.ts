@@ -2,11 +2,6 @@
 
 
 
-import * as bluebird from 'bluebird'
-bluebird.config({ warnings: { wForgottenReturn: false } })
-
-
-
 import * as os from 'os'
 import * as cluster from 'cluster'
 process.INSTANCES = !Number.isFinite(process.INSTANCES) ? os.cpus().length : process.INSTANCES

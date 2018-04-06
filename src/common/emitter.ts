@@ -8,6 +8,7 @@ import * as pEvent from 'p-event'
 export default class Emitter<Names extends string = string, Data = any> extends TinyEmitter<Names, Data> {
 
 	private get _e() { return this.e || (this.e = {}) }
+	get names() { return Object.keys(this._e) as Names[] }
 
 	offListener<Name extends Names>(listener: TinyEmitter.Listener<Data>) {
 		let e = this._e
@@ -26,15 +27,14 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 		return pEvent(this, name)
 	}
 
-	// get names() { return Object.keys(this._e) as Names[] }
-	// eachEvent<Name extends Names>(fn: (event: TinyEmitter.Event<Data>, index: number) => void) {
-	// 	let e = this._e; let i = 0;
-	// 	Object.keys(e).forEach(function(name: Names) {
-	// 		e[name].forEach(function(event) {
-	// 			fn(event, i); i++;
-	// 		})
-	// 	})
-	// }
+	eachEvent<Name extends Names>(fn: (event: TinyEmitter.Event<Data>, index: number) => void) {
+		let e = this._e; let i = 0;
+		Object.keys(e).forEach(function(name: Names) {
+			e[name].forEach(function(event) {
+				fn(event, i); i++;
+			})
+		})
+	}
 
 }
 

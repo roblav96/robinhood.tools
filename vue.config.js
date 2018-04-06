@@ -53,8 +53,8 @@ module.exports = {
 		// 	name: 'manifest', minChunks: Infinity,
 		// }))
 
-		const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-		config.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 12321 }))
+		// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+		// config.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: 12321 }))
 	},
 
 	chainWebpack: function(config) {
