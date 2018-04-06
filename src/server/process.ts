@@ -38,7 +38,7 @@ process.on('unhandledRejection', function(error) {
 
 
 if (process.MASTER) {
-	if (DEVELOPMENT) setInterval(function() { process.stdout.write('\x1b[K') }, 1000); // keeps terminal focused
+	// if (DEVELOPMENT) setInterval(function() { process.stdout.write('\x1b[K') }, 1000); // keeps terminal focused
 	console.log(`\n\n${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`)
 	console.log(`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}`)
 }
