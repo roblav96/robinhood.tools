@@ -1,5 +1,6 @@
 // 
 
+import * as R from '../../common/rambdax'
 import * as _ from 'lodash'
 import * as pAll from 'p-all'
 import * as fuzzy from 'fuzzysort'
@@ -46,27 +47,8 @@ async function readyTickers() {
 
 async function syncTickers() {
 	if (process.MASTER) {
-		let alls = _.flatten(await Promise.all([
-			// stocks
-			http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/8', {
-				query: { pageSize: 999999 },
-			}),
-			// etfs
-			http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/13', {
-				query: { pageSize: 999999 },
-			}),
-		])) as Webull.Ticker[]
-
-		_.remove(alls, v => Array.isArray(v.disSymbol.match(/\W+/)))
-
-		let grouped = _.groupBy(alls, 'disSymbol' as keyof Webull.Ticker)
-		let coms = Object.keys(grouped).map(function(symbol) {
-			return ['set', `${redis.WB.ALLS}:${symbol}`, JSON.stringify(grouped[symbol])]
-		})
-		await redis.main.coms(coms)
-
-		radio.emit('syncTickers')
-
+		await syncAlls()
+		await radio.job('syncTickers')
 	}
 
 	if (process.WORKER) {
@@ -136,29 +118,31 @@ async function syncTicker(symbol: string) {
 
 
 
-// async function syncAlls() {
-// 	let alls = _.flatten(await Promise.all([
-// 		// stocks
-// 		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/8', {
-// 			query: { pageSize: 999999 },
-// 		}),
-// 		// etfs
-// 		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/13', {
-// 			query: { pageSize: 999999 },
-// 		}),
-// 	])) as Webull.Ticker[]
+async function syncAlls() {
+	let alls = _.flatten(await Promise.all([
+		// stocks
+		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/8', {
+			query: { pageSize: 999999 },
+		}),
+		// etfs
+		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/13', {
+			query: { pageSize: 999999 },
+		}),
+	])) as Webull.Ticker[]
 
-// 	_.remove(alls, v => Array.isArray(v.disSymbol.match(/\W+/)))
+	_.remove(alls, v => Array.isArray(v.disSymbol.match(/\W+/)))
 
-// 	let grouped = _.groupBy(alls, 'disSymbol' as keyof Webull.Ticker)
-// 	let coms = Object.keys(grouped).map(function(symbol) {
-// 		return ['set', `${redis.WB.ALLS}:${symbol}`, JSON.stringify(grouped[symbol])]
-// 	})
-// 	await redis.main.coms(coms)
+	let grouped = _.groupBy(alls, 'disSymbol' as keyof Webull.Ticker)
+	let coms = Object.keys(grouped).map(function(symbol) {
+		return ['set', `${redis.WB.ALLS}:${symbol}`, JSON.stringify(grouped[symbol])]
+	})
+	await redis.main.coms(coms)
 
-// 	console.info('syncAlls -> done')
+	console.info('syncAlls -> done')
 
-// }
+}
+
+
 
 
 

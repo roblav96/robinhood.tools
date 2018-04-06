@@ -18,6 +18,8 @@ export function isJunk(value: any) {
 export const isBrowser = !new Function('try { return this === global; } catch(e) { return false }')()
 export const isNodejs = !isBrowser
 
+export function workers() { return array.create(process.INSTANCES) }
+
 
 
 export function fix(target: any) {

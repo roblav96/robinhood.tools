@@ -1,18 +1,18 @@
 // 
 
 export {
-	of,
-	Observable,
-	Subject,
 	BehaviorSubject,
+	Observable,
+	of,
+	Subject,
 } from 'rxjs'
 
 export {
 	filter,
-	take,
+	map,
 	mapTo,
 	scan,
-	map,
+	take,
 } from 'rxjs/operators'
 
 // 

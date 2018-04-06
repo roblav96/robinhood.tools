@@ -3,6 +3,7 @@
 import * as http from 'http'
 import * as _ from 'lodash'
 import * as uws from 'uws'
+import * as core from '../../common/core'
 import * as Rx from '../../common/rxjs'
 import WebSocketClient from '../../common/websocket.client'
 import Emitter from '../../common/emitter'
@@ -91,6 +92,15 @@ class Radio extends Emitter {
 		return this
 	}
 
+	job(name: string, data?: any) {
+		if (!process.MASTER) return;
+		let proms = core.workers().map(function(i) {
+			return radio.pEvent(`${name}.${i}`)
+		})
+		radio.emit(name, data)
+		return Promise.all(proms)
+	}
+
 }
 
 const radio = new Radio()
@@ -109,7 +119,11 @@ declare global {
 			/** ▶ name */
 			n: string
 			/** ▶ data */
-			d: T
+			d: Data<T>
+		}
+		interface Data<T = any> {
+			/**▶ from process.INSTANCE */
+			fi: number
 		}
 	}
 }
