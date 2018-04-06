@@ -29,7 +29,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 			}
 		}
 
-		if (parsed.host.includes('webull')) {
+		if (parsed.host.includes('webull') || parsed.host.includes('stocks666')) {
 			Object.assign(config.headers, {
 				origin: 'https://app.webull.com',
 				referer: 'https://app.webull.com',

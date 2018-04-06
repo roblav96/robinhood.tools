@@ -48,11 +48,11 @@ async function syncTickers() {
 	if (process.MASTER) {
 		let alls = _.flatten(await Promise.all([
 			// stocks
-			http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
+			http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/8', {
 				query: { pageSize: 999999 },
 			}),
 			// etfs
-			http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
+			http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/13', {
 				query: { pageSize: 999999 },
 			}),
 		])) as Webull.Ticker[]
@@ -100,7 +100,7 @@ async function syncTicker(symbol: string) {
 	// console.warn('instrument ->', console.inspect(_.pick(instrument, ['symbol', 'name', 'simple_name', 'good', 'country', 'acronym'] as KeysOf<Robinhood.Instrument>)))
 
 	await clock.pEvent('250ms')
-	let response = await http.get('https://infoapi.webull.com/api/search/tickers2', {
+	let response = await http.get('https://infoapi.stocks666.com/api/search/tickers2', {
 		query: { keys: symbol },
 	}) as Webull.API.Paginated<Webull.Ticker>
 	if (!Array.isArray(response.list)) return;
@@ -139,11 +139,11 @@ async function syncTicker(symbol: string) {
 // async function syncAlls() {
 // 	let alls = _.flatten(await Promise.all([
 // 		// stocks
-// 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
+// 		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/8', {
 // 			query: { pageSize: 999999 },
 // 		}),
 // 		// etfs
-// 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
+// 		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/13', {
 // 			query: { pageSize: 999999 },
 // 		}),
 // 	])) as Webull.Ticker[]
