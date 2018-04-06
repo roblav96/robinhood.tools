@@ -7,7 +7,7 @@ import radio from './radio'
 
 
 
-if (process.MASTER && process.INSTANCES > 0) {
+if (process.MASTER) {
 	radio.open.subscribe(function subscribe() {
 
 		const workers = {} as Dict<number>

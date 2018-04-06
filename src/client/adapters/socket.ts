@@ -13,7 +13,7 @@ class Client {
 
 	socket = new WebSocketClient(this.address, {
 		query() { return qs.stringify(_.defaults(security.headers())) },
-		timeout: '1s',
+		timeout: DEVELOPMENT ? '5s' : '1s',
 		verbose: true,
 	})
 

@@ -9,7 +9,7 @@ global.NODE_ENV = process.env.NODE_ENV || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
-if (DEVELOPMENT) process.INSTANCES = 0;
+// if (DEVELOPMENT) process.INSTANCES = 0;
 import './process'
 import './adapters/console'
 import './adapters/redis'
