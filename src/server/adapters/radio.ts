@@ -52,7 +52,7 @@ if (process.MASTER) {
 
 	})
 
-	wss.once('listening', function() { radio.connect() })
+	wss.once('listening', function() { radio.socket.connect() })
 
 }
 
@@ -62,23 +62,23 @@ class Radio extends Emitter {
 
 	open = new Rx.ReadySubject()
 	ready = new Rx.ReadySubject()
+
 	socket = new WebSocketClient(address, {
-		connect: false,
+		connect: process.WORKER,
 		timeout: '1s',
-		// verbose: true,
+		verbose: true,
 		// verbose: process.MASTER,
 	})
-
-	connect = _.once(() => this.socket.connect())
 
 	constructor() {
 		super()
 
-		if (process.WORKER) setImmediate(this.connect);
-
 		this.socket.on('open', () => {
-			this.open.next()
+			this.open.next(true)
 			this.socket.send('_onopen_')
+		})
+		this.socket.on('close', () => {
+			this.open.next(false)
 		})
 
 		this.socket.on('message', (message: string) => {
