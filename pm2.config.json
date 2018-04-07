@@ -7,7 +7,7 @@
 		"exec_mode": "fork_mode",
 		"out_file": "/dev/null",
 		"error_file": "/dev/null",
-		// "watch": ["dist"],
+		"watch": false,
 		// "autorestart": false,
 		// "max_memory_restart": "512M",
 		// "vizion": false,
