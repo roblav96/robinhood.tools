@@ -4,14 +4,12 @@
 	"version": "0.0.1",
 	"domain": "robinhood.tools",
 	"scripts": {
-		"postinstall": "run-s init:pm2 init:types",
-		"init:pm2": "pm2 install typescript",
-		"init:types": "rimraf node_modules/tiny-emitter/index.d.ts node_modules/vuex/types/vue.d.ts",
+		"postinstall": "rimraf node_modules/tiny-emitter/index.d.ts node_modules/vuex/types/vue.d.ts",
 		"purge": "rimraf dist node_modules",
 		"client:dev": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
 		"client:build": "rimraf dist/client && cross-env NODE_ENV=production vue-cli-service build --mode production",
-		"server:dev": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'npm run server:pm2:dev'",
-		"server:pm2:dev": "cross-env NODE_ENV=development pm2-runtime pm2.config.ts",
+		"server:dev": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'npm run server:dev:start'",
+		"server:dev:start": "cross-env NODE_ENV=development pm2-runtime ecosystem.config.js",
 		"server:build": "rimraf dist/server && tsc -p .server.tsconfig.json",
 		"terminal:clear": "clear && printf \"\\e[3J\""
 	},

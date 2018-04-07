@@ -18,10 +18,6 @@
 			"@/*": ["src/*"]
 		}
 	},
-	"include": [
-		"src/**/*.ts",
-		"src/**/*.vue",
-		"pm2.config.ts"
-	],
+	"include": ["src/**/*.ts", "src/**/*.vue"],
 	"exclude": ["node_modules"]
 }

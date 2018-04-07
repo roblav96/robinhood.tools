@@ -31,7 +31,7 @@ if (process.MASTER) {
 	wss.httpServer.timeout = 10000
 	wss.httpServer.keepAliveTimeout = 1000
 
-	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
+	wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
 	wss.on('connection', function(client: Radio.Client, req: IncomingMessage) {
@@ -69,7 +69,7 @@ class Radio extends Emitter<string, Radio.Data> {
 	socket = new WebSocketClient(ADDRESS, {
 		connect: process.WORKER,
 		timeout: '1s',
-		// verbose: true,
+		verbose: true,
 		// verbose: process.MASTER,
 	})
 
