@@ -1,3 +1,6 @@
+// 
+
+
 
 module.exports = {
     apps: [{
@@ -5,10 +8,11 @@ module.exports = {
             // cwd: process.cwd(),
             script: 'dist/server/main.js',
             exec_mode: 'fork_mode',
-            max_memory_restart: '512M',
-            vizion: false,
-            pmx: false,
-            automation: false,
+            restart_delay: 3000,
+            // max_memory_restart: '512M',
+            // vizion: false,
+            // pmx: false,
+            // automation: false,
             args: [
                 '--color',
             ],
