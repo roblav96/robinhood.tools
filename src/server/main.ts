@@ -2,13 +2,21 @@
 
 import '../common/polyfills'
 
-import * as _ from 'lodash'
+
 import * as Fastify from 'fastify'
 const fastify = Fastify()
-fastify.listen(_.random(12000, 12300), 'localhost', function(error) {
+console.log('!!fastify ->', !!fastify)
+
+import * as _ from 'lodash'
+let port = _.random(12000, 12300)
+console.log('port ->', port)
+
+fastify.listen(port, 'localhost', function(error) {
 	if (error) return console.error(' \n \nlisten Error ->', error);
 	console.info(' \n \nlisten ->', fastify.server.address().address + ':' + fastify.server.address().port, ' \n', fastify.printRoutes());
 })
+
+console.log('!!fastify.listen ->', !!fastify.listen)
 
 
 

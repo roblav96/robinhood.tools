@@ -2,9 +2,11 @@
 	"apps": [{
 		"name": "robinhood.tools",
 		"script": "dist/server/main.js",
-		// "exec_mode": "fork_mode",
-		// "exec_mode": "cluster",
-		// "instances": 8,
+		"exec_mode": "cluster",
+		"instances": 0,
+		"exec_mode": "fork_mode",
+		"out_file": "/dev/null",
+		"error_file": "/dev/null",
 		// "watch": ["dist"],
 		// "autorestart": false,
 		// "max_memory_restart": "512M",
@@ -16,6 +18,9 @@
 		"args": ["--color"],
 		"env": {
 			"NODE_ENV": "development"
+		},
+		"env_production": {
+			"NODE_ENV": "production"
 		}
 	}]
 }
