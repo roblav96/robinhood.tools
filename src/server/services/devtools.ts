@@ -32,7 +32,7 @@ export function keys(name: string, value: any, skips = [] as string[]) {
 	let keys = _.uniq(_.keys(value).concat(_.keysIn(value)))
 	let functions = _.uniq(_.functions(value).concat(_.functionsIn(value)))
 	let all = _.uniq(keys.concat(functions)).filter(v => skips.indexOf(v) == -1)
-	console.info(' \n' + chalk.bold(name), ' \n \nKEYS ->', util.inspect(keys), ' \n \nMETHODS ->', util.inspect(functions), ' \n \nALL ->', util.inspect(all))
+	console.info('\n' + chalk.bold(name), '\n\nKEYS ->', util.inspect(keys), '\n\nMETHODS ->', util.inspect(functions), '\n\nALL ->', util.inspect(all))
 }
 
 // export function dtsgen(name: string, value: any) {

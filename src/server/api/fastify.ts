@@ -1,4 +1,6 @@
 // 
+if (process.MASTER) { console.error('fastify -> process.MASTER should not import fastify', '\n'); process.exit(1) }
+// 
 
 import * as Fastify from 'fastify'
 import * as Pino from 'pino'
@@ -43,7 +45,7 @@ fastify.register(function(instance, opts, next) {
 
 fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 	if (error) return console.error('listen Error ->', error);
-	console.info('listen ->', fastify.server.address().address + ':' + fastify.server.address().port, ' \n', fastify.printRoutes());
+	// if (process.PRIMARY) console.info('listen ->', fastify.server.address().address + ':' + fastify.server.address().port, '\n', fastify.printRoutes());
 })
 
 

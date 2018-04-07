@@ -44,7 +44,7 @@ export default Object.assign(fs.createWriteStream('/dev/null'), {
 				return console.error('ERROR ->', this.inspector(_.omit(message, ['err.stack'])))
 			}
 			return console.error(
-				'ERROR ->', message.err.stack, ' \n',
+				'ERROR ->', message.err.stack, '\n',
 				this.inspector(_.omit(message, ['err.stack']))
 			)
 		}

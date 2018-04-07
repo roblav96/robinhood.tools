@@ -2,12 +2,6 @@
 
 
 
-process.on('SIGINT', function() {
-	process.exit(1)
-})
-
-
-
 import * as os from 'os'
 import * as cluster from 'cluster'
 process.INSTANCES = !Number.isFinite(process.INSTANCES) ? os.cpus().length : process.INSTANCES
@@ -44,8 +38,8 @@ process.on('unhandledRejection', function(error) {
 
 
 if (process.MASTER) {
-	// if (DEVELOPMENT) setInterval(function() { process.stdout.write('\x1b[K') }, 1000); // keeps terminal focused
-	console.log(` \n \n${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`)
+	if (DEVELOPMENT) setInterval(function() { process.stdout.write('\x1b[K') }, 1000); // keeps terminal focused
+	console.log(`\n\n${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`)
 	console.log(`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}`)
 }
 
