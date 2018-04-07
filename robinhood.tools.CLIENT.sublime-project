@@ -14,7 +14,6 @@
 			"*.sublime*",
 			"*.gitignore*",
 			"*.debug*",
-			"*pm2*",
 			"*favicon*",
 			"*nginx*",
 			"*server*",
