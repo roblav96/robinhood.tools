@@ -1,5 +1,5 @@
 // 
-if (process.MASTER) { console.error('fastify -> process.MASTER should not import fastify', '\n'); process.exit(1) }
+// if (process.MASTER) { console.error('fastify -> process.MASTER should not import fastify', '\n'); process.exit(1) }
 // 
 
 import * as Fastify from 'fastify'
@@ -16,6 +16,10 @@ const fastify = Fastify({
 
 fastify.server.timeout = 10000
 fastify.server.keepAliveTimeout = 1000
+
+fastify.after(function(error) {
+	if (error) return console.error('after Error ->', error);
+})
 
 export default fastify
 
@@ -36,16 +40,16 @@ import './search.api'
 
 
 
-import radio from '../adapters/radio'
-fastify.register(function(instance, opts, next) {
-	radio.ready.pipe(true).subscribe(next)
-})
+// import radio from '../adapters/radio'
+// fastify.register(function(instance, opts, next) {
+// 	radio.ready.pipe(true).subscribe(next)
+// })
 
 
 
 fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 	if (error) return console.error('listen Error ->', error);
-	// if (process.PRIMARY) console.info('listen ->', fastify.server.address().address + ':' + fastify.server.address().port, '\n', fastify.printRoutes());
+	console.info('listen ->', console.inspect(fastify.server.address()), '\n' + fastify.printRoutes())
 })
 
 

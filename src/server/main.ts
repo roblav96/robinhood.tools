@@ -13,17 +13,22 @@ global.PRODUCTION = NODE_ENV == 'production'
 // if (DEVELOPMENT) process.INSTANCES = 0;
 import './process'
 import './adapters/console'
-import './adapters/redis'
 
-import '../common/clock'
-import './adapters/radio'
-import './adapters/cluster'
+console.log('process.INSTANCE ->', process.INSTANCE)
 
-import './watchers/robinhood.instruments'
-import './watchers/webull.tickers'
+import './api/fastify'
 
-if (process.WORKER) {
-	import('./api/fastify')
-}
+// import '../common/clock'
+// import './adapters/radio'
+// import './adapters/redis'
+
+// import './adapters/cluster'
+
+// import './watchers/robinhood.instruments'
+// import './watchers/webull.tickers'
+
+// if (process.WORKER) {
+// 	import('./api/fastify')
+// }
 
 
