@@ -12,7 +12,7 @@ if (process.MASTER) {
 
 		const workers = {} as Dict<number>
 		function fork(i: number) {
-			let worker = cluster.fork({ INSTANCE: i })
+			let worker = cluster.fork({ NODE_APP_INSTANCE: i })
 			workers[worker.process.pid] = i
 		}
 

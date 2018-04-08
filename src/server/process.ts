@@ -5,7 +5,7 @@
 import * as os from 'os'
 import * as cluster from 'cluster'
 process.INSTANCES = !Number.isFinite(process.INSTANCES) ? os.cpus().length : process.INSTANCES
-process.INSTANCE = cluster.isWorker ? Number.parseInt(process.env.INSTANCE) : -1
+process.INSTANCE = cluster.isWorker ? Number.parseInt(process.env.NODE_APP_INSTANCE) : -1
 process.PRIMARY = process.INSTANCE == 0
 process.MASTER = cluster.isMaster
 process.WORKER = cluster.isWorker

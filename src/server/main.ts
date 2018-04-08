@@ -23,7 +23,7 @@ import './watchers/robinhood.instruments'
 import './watchers/webull.tickers'
 
 if (process.WORKER) {
-	require('./api/fastify')
+	import('./api/fastify')
 }
 
 
