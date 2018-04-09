@@ -1,7 +1,7 @@
 // 
 
 import { Duration } from 'luxon'
-import * as _ from 'lodash'
+import * as _ from './lodash'
 import * as ci from 'correcting-interval'
 import * as core from './core'
 import Emitter from './emitter'

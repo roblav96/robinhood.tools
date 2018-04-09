@@ -1,7 +1,7 @@
 // 
 
 import chalk from 'chalk'
-import * as _ from 'lodash'
+import * as _ from '../../common/lodash'
 import * as moment from 'moment'
 
 

@@ -3,7 +3,7 @@ export * from '../../common/redis.keys' // export { rdkeys as rdkeys }
 // export { RH } from '../../common/robinhood'
 // 
 
-import * as _ from 'lodash'
+import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as IORedis from 'ioredis'
 

@@ -1,7 +1,7 @@
 // 
 
 import { IncomingMessage } from 'http'
-import * as _ from 'lodash'
+import * as _ from '../../common/lodash'
 import * as uws from 'uws'
 import * as url from 'url'
 import * as qs from 'querystring'

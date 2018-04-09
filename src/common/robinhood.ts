@@ -49,8 +49,9 @@ declare global {
 			url: string
 			// 
 			acronym: string
-			good: boolean
 			mic: string
+			alive: boolean
+			// status: 'good' | 'bad'
 		}
 
 

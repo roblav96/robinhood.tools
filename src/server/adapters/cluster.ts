@@ -1,6 +1,6 @@
 // 
 
-import * as _ from 'lodash'
+import * as _ from '../../common/lodash'
 import * as cluster from 'cluster'
 import * as core from '../../common/core'
 import * as pretty from '../../common/pretty'

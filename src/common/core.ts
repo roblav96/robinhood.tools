@@ -3,7 +3,7 @@ import * as bluebird from 'bluebird'
 bluebird.config({ warnings: { wForgottenReturn: false } })
 // 
 
-import * as _ from 'lodash'
+import * as _ from './lodash'
 import * as leven from 'leven'
 
 

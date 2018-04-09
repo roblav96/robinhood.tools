@@ -1,6 +1,6 @@
 // 
 
-import * as _ from 'lodash'
+import * as _ from '../../common/lodash'
 import fastify from './fastify'
 import * as boom from 'boom'
 import * as gerrors from 'got/errors'

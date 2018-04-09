@@ -87,7 +87,7 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 
 
 
-// import * as _ from 'lodash'
+// import * as _ from './lodash'
 // import * as TinyEmitter from 'tiny-emitter'
 // type TinyListener<Data = any> = (...args: Data[]) => void
 // interface TinyEvent<Data = any> { listener: TinyListener<Data>, ctx: any }

@@ -1,6 +1,6 @@
 // 
 
-import * as _ from 'lodash'
+import * as _ from './lodash'
 import * as uws from 'uws'
 import * as url from 'url'
 import Emitter from './emitter'

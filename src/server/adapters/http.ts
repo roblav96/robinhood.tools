@@ -2,7 +2,7 @@
 export * from '../../common/http'
 // 
 
-import * as _ from 'lodash'
+import * as _ from '../../common/lodash'
 import * as url from 'url'
 import * as boom from 'boom'
 import * as got from 'got'

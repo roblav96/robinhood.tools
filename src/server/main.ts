@@ -21,7 +21,7 @@ import './api/fastify'
 import './adapters/cluster'
 import './adapters/radio'
 
-import './watchers/watchers'
+import './watchers/watchers.index'
 
 
 

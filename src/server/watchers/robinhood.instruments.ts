@@ -1,7 +1,8 @@
 // 
 
-import * as _ from 'lodash'
 import * as pForever from 'p-forever'
+import * as _ from '../../common/lodash'
+import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
@@ -46,10 +47,10 @@ async function syncInstruments() {
 
 		let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
 		_.remove(response.results, v => Array.isArray(v.symbol.match(/\W+/)))
+
 		if (DEVELOPMENT) console.log('syncInstruments ->', console.inspect(response.results.length), console.inspect(response.next));
 
 		let coms = response.results.map(v => ['hmset', `${redis.RH.INSTRUMENTS}:${v.symbol}`, v as any])
-
 		let symbols = new redis.SetsComs(redis.RH.SYMBOLS)
 		let tradables = new redis.SetsComs(redis.RH.TRADABLES)
 		let untradables = new redis.SetsComs(redis.RH.UNTRADABLES)
@@ -57,8 +58,8 @@ async function syncInstruments() {
 			symbols.sadd(v.symbol)
 			v.mic = _.compact(v.market.split('/')).pop()
 			v.acronym = robinhood.MICS[v.mic]
-			v.good = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
-			if (v.good) {
+			v.alive = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
+			if (v.alive) {
 				tradables.sadd(v.symbol)
 				untradables.srem(v.symbol)
 			} else {
