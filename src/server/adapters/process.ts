@@ -16,12 +16,16 @@ process.SERVER = true
 
 
 
-process.INSTANCES = Number.parseInt(process.env.instances) || os.cpus().length
+process.INSTANCES = process.env.instances ? Number.parseInt(process.env.instances) : os.cpus().length
 process.INSTANCE = process.env.NODE_APP_INSTANCE ? Number.parseInt(process.env.NODE_APP_INSTANCE) : 0
 process.PRIMARY = process.INSTANCE == 0
+declare global { namespace NodeJS { export interface ProcessEnv { NODE_APP_INSTANCE: string } export interface Process { INSTANCE: number, INSTANCES: number, PRIMARY: boolean } } }
+
+
+
 process.MASTER = cluster.isMaster
 process.WORKER = cluster.isWorker
-declare global { namespace NodeJS { export interface ProcessEnv { NODE_APP_INSTANCE: string, FORCE_COLOR: string } export interface Process { INSTANCE: number, INSTANCES: number, PRIMARY: boolean, MASTER: boolean, WORKER: boolean } } }
+declare global { namespace NodeJS { export interface Process { MASTER: boolean, WORKER: boolean } } }
 
 
 
