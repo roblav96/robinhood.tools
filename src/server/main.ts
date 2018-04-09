@@ -14,7 +14,7 @@ global.WebSocket = require('uws')
 // if (DEVELOPMENT) process.INSTANCES = 1;
 import './adapters/process'
 import './adapters/console'
-// import './services/cleanup'
+import './services/cleanup'
 
 import '../common/clock'
 import './api/fastify'
