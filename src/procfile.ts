@@ -3,13 +3,14 @@
 import * as _ from 'lodash'
 import * as os from 'os'
 import { ProcfileReconcilerAccessor } from 'pandora'
+import { ProcessContextAccessor } from 'pandora/dist/application/ProcessContextAccessor'
 
 
 
 module.exports = function(pandora: ProcfileReconcilerAccessor) {
 
 	const cpus = os.cpus().length
-
+	
 	// pandora
 	// 	.service('robinhood.tools', './main.js')
 	// 	.process('worker')
@@ -21,19 +22,25 @@ module.exports = function(pandora: ProcfileReconcilerAccessor) {
 
 	// console.log('this ->', this)
 
-	// pandora.cluster('./main.js')
+	pandora
+		.cluster('./dist/server/main.js')
+		.process('worker')
+		// .name('robinhood.tools')
+		.config(function(ctx: ProcessContextAccessor, idk: any) {
+			// console.log('ctx.context ->', ctx.context)
+			console.log('idk ->', idk)
+			return {}
+		})
 
 	pandora
 		.process('worker')
-		.entry('./dist/server/main.js')
-		.scale('auto')
+		.scale(cpus)
 		.env({
-			"NODE_ENV": "development",
+			'NODE_ENV': 'development',
 		})
 
 
-
-	console.log('final pandora ->', pandora)
+	// console.log('final pandora ->', pandora)
 
 
 
@@ -73,7 +80,7 @@ _.merge(util.inspect, {
 	defaultOptions: {
 		showHidden: true,
 		showProxy: true,
-		depth: 2,
+		depth: 4,
 		compact: false,
 		breakLength: Infinity,
 		maxArrayLength: Infinity,

@@ -10,11 +10,13 @@
 			"node_modules"
 		],
 		"file_exclude_patterns": [
+			"procfile*",
+			"forever.config*",
+			"pm2.config*",
 			"*.tsconfig.*",
 			"*.sublime*",
 			"*.gitignore*",
 			"*.debug*",
-			"*pm2*",
 			"*favicon*",
 			"*nginx*",
 			"*server*",

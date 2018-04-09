@@ -5,8 +5,8 @@ global.NODE_ENV = process.env.NODE_ENV
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
-import '../common/polyfills'
-import 'source-map-support/register'
+require('../common/polyfills')
+require('source-map-support').install()
 
 global.Promise = require('bluebird')
 global.WebSocket = require('uws')
@@ -25,20 +25,15 @@ import './api/fastify'
 
 
 
-// // import chalk from 'chalk'
-// // import * as os from 'os'
-// import * as cluster from 'cluster'
-// // import * as uws from './modules/uws'
+import chalk from 'chalk'
+import * as os from 'os'
+import * as cluster from 'cluster'
 
 // if (process.PRIMARY) {
-// 	// console.log('uws ->', console.dump(uws, { depth: 8 }))
-// 	// console.log('uws.http ->', console.dump(uws.http, { depth: 8 }))
-// 	// console.log('uws.native ->', console.dump(uws.native, { depth: 8 }))
-// 	// console.warn('uws ->', console.dtsgen(uws))
-// 	// console.log('process.argv ->', console.inspect(process.argv))
-// 	// console.log('process.env ->', console.inspect(process.env))
-// 	console.log('cluster.isMaster ->', console.inspect(cluster.isMaster))
-// 	console.log('cluster.isWorker ->', console.inspect(cluster.isWorker))
+// console.log('process.argv ->', console.inspect(process.argv))
+// console.log('process.env ->', console.inspect(process.env))
+console.log('cluster.isMaster ->', console.inspect(cluster.isMaster))
+console.log('cluster.isWorker ->', console.inspect(cluster.isWorker))
 // }
 
 

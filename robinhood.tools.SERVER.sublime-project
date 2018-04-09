@@ -10,6 +10,7 @@
 			"node_modules"
 		],
 		"file_exclude_patterns": [
+			"procfile.js",
 			"*.tsconfig.*",
 			"*.sublime*",
 			"*.gitignore*",

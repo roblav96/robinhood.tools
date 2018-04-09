@@ -1,0 +1,13 @@
+{
+	"id": "robinhood.tools",
+	"script": "dist/server/main.js",
+	"args": ["--colors"],
+	"minUptime": 3000,
+	"spinSleepTime": 3000,
+	"killSignal": "SIGTERM",
+	"killTree": true,
+	"watch": false,
+	"append": true,
+	"logFile": "/dev/null",
+	"errFile": "/dev/null"
+}
