@@ -12,12 +12,12 @@ global.PRODUCTION = NODE_ENV == 'production'
 
 import './adapters/process'
 import './adapters/console'
-import './services/cleanup'
+// import './adapters/cluster'
 
 import '../common/clock'
 import './api/fastify'
-// import './adapters/cluster'
 // import './adapters/radio'
+// import './services/cleanup'
 
 // import './watchers/robinhood.instruments'
 // import './watchers/webull.tickers'
@@ -26,13 +26,13 @@ import './api/fastify'
 
 // import chalk from 'chalk'
 // import * as os from 'os'
-// import * as cluster from 'cluster'
+import * as cluster from 'cluster'
 
 // if (process.PRIMARY) {
-	console.log('process.argvs ->', console.inspect(process.argv))
-// 	console.log('process.env ->', console.inspect(process.env))
-// 	console.log('cluster.isMaster ->', console.inspect(cluster.isMaster))
-// 	console.log('cluster.isWorker ->', console.inspect(cluster.isWorker))
+console.log('process.argv ->', console.inspect(process.argv))
+console.log('process.env ->', console.inspect(process.env))
+console.log('cluster.isMaster ->', console.inspect(cluster.isMaster))
+console.log('cluster.isWorker ->', console.inspect(cluster.isWorker))
 // }
 
 

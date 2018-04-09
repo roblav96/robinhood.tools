@@ -5,7 +5,7 @@
 		"args": ["--color"],
 		"node_args": [
 			"--max_old_space_size=512"
-			// "--inspect",
+			// "--inspect"
 		],
 		// 
 		"exec_mode": "fork",

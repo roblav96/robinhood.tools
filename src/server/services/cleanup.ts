@@ -6,15 +6,13 @@ import * as Rx from '../../common/rxjs'
 
 process.on('SIGINT', function(message) {
 	console.log('SIGINT ->', message)
-	setTimeout(function () {
-		process.exit(0)
-	},1000)
-})
-
-process.on('SIGTERM', function(message) {
-	console.log('SIGTERM ->', message)
 	process.exit(0)
 })
+
+// process.on('SIGTERM', function(message) {
+// 	console.log('SIGTERM ->', message)
+// 	process.exit(0)
+// })
 
 
 
