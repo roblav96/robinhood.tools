@@ -47,7 +47,6 @@ fastify.listen(process.PORT, process.HOST, function(error) {
 	if (error) return console.error('listen Error ->', error);
 	// if (process.PRIMARY) console.info('listen ->', console.inspect(fastify.server.address()), '\n' + fastify.printRoutes());
 	fastify.rxready.next()
-	process.send('ready')
 })
 
 

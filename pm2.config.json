@@ -9,7 +9,7 @@
 			// "--inspect",
 		],
 		// 
-		"exec_mode": "cluster",
+		"exec_mode": "fork",
 		"instances": "max",
 		// 
 		"source_map_support": true,
@@ -19,7 +19,7 @@
 		"pmx": false,
 		"vizion": false,
 		// 
-		"watch": "/dev/null",
+		"watch": false,
 		"autorestart": false,
 		"max_memory_restart": "512M",
 		"max_restarts": 3,

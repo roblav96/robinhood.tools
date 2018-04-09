@@ -99,7 +99,7 @@
 		"eyes": "latest",
 		"forever-fixed": "latest",
 		"node-sass": "latest",
-		"node-ts": "latest",
+		"ts-node": "latest",
 		"npm-run-all": "latest",
 		"pm2": "latest",
 		"rimraf": "latest",
