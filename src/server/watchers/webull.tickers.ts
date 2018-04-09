@@ -46,31 +46,31 @@ async function readyTickers() {
 
 
 async function syncTickers() {
-	if (process.MASTER) {
-		await syncAlls()
-		// await radio.job('syncTickers')
-	}
+// 	if (process.MASTER) {
+// 		await syncAlls()
+// 		// await radio.job('syncTickers')
+// 	}
 
-	if (process.WORKER) {
-		let symbols = await robinhood.getSymbols()
-		console.log('symbols.length ->', console.inspect(symbols.length))
+// 	if (process.WORKER) {
+// 		let symbols = await robinhood.getSymbols()
+// 		console.log('symbols.length ->', console.inspect(symbols.length))
 
-		await pAll(symbols.map(v => () => syncTicker(v)), { concurrency: 1 })
-		// await pAll(symbols.map((v, i) => function() {
-		// 	let prog = core.number.round((i / symbols.length) * 100)
-		// 	console.log(console.inspect(prog), 'symbol ->', console.inspect(v))
-		// 	return syncTicker(v)
-		// }), { concurrency: 1 })
-		// await syncTicker('AAIT')
+// 		await pAll(symbols.map(v => () => syncTicker(v)), { concurrency: 1 })
+// 		// await pAll(symbols.map((v, i) => function() {
+// 		// 	let prog = core.number.round((i / symbols.length) * 100)
+// 		// 	console.log(console.inspect(prog), 'symbol ->', console.inspect(v))
+// 		// 	return syncTicker(v)
+// 		// }), { concurrency: 1 })
+// 		// await syncTicker('AAIT')
 
-		console.info('workerTickers -> done')
-		radio.emit('workerTickers.' + process.INSTANCE)
-	}
+// 		console.info('workerTickers -> done')
+// 		radio.emit('workerTickers.' + process.INSTANCE)
+// 	}
 
-	console.info('syncTickers -> done')
+// 	console.info('syncTickers -> done')
 
 }
-if (process.WORKER) radio.on('syncTickers', syncTickers);
+// if (process.WORKER) radio.on('syncTickers', syncTickers);
 
 
 

@@ -10,25 +10,30 @@ global.NODE_ENV = process.env.NODE_ENV || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
-// if (DEVELOPMENT) process.INSTANCES = 0;
-import './process'
+import './adapters/process'
 import './adapters/console'
+// import './services/cleanup'
 
-console.log('process.INSTANCE ->', process.INSTANCE)
-
+import '../common/clock'
 import './api/fastify'
-
-// import '../common/clock'
-// import './adapters/radio'
-// import './adapters/redis'
-
 // import './adapters/cluster'
+// import './adapters/radio'
 
 // import './watchers/robinhood.instruments'
 // import './watchers/webull.tickers'
 
-// if (process.WORKER) {
-// 	import('./api/fastify')
+
+
+import chalk from 'chalk'
+import * as os from 'os'
+import * as cluster from 'cluster'
+
+// if (process.PRIMARY) {
+	// // console.log('process.argv ->', console.inspect(process.argv))
+	// // console.log('process.env.FORCE_COLOR ->', console.inspect(process.env.FORCE_COLOR))
+	// console.log('chalk.supportsColor ->', chalk.supportsColor)
+	console.log('cluster.isMaster ->', console.inspect(cluster.isMaster))
+	console.log('cluster.isWorker ->', console.inspect(cluster.isWorker))
 // }
 
 

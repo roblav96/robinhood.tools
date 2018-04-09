@@ -1,21 +1,24 @@
 // 
-// if (process.MASTER) { console.error('fastify -> process.MASTER should not import fastify', '\n'); process.exit(1) }
-// 
 
 import * as Fastify from 'fastify'
 import * as Pino from 'pino'
-import stream from './fastify.logger'
+import * as Rx from '../../common/rxjs'
+import logger from './fastify.logger'
 
 
-
-const LOG_LEVEL = 'info' as Pino.Level
 
 const fastify = Fastify({
-	logger: { level: LOG_LEVEL, extreme: PRODUCTION, stream },
+	logger: {
+		level: 'info' as Pino.Level,
+		extreme: PRODUCTION,
+		stream: logger,
+	},
 })
 
 fastify.server.timeout = 10000
 fastify.server.keepAliveTimeout = 1000
+
+fastify.rxready = new Rx.ReadySubject()
 
 fastify.after(function(error) {
 	if (error) return console.error('after Error ->', error);
@@ -31,25 +34,20 @@ import './fastify.plugins'
 import './security.hook'
 import './security.api'
 
-import './socket.server'
-import './socket.api'
+// import './socket.server'
+// import './socket.api'
 
-import './proxy.api'
-import './recaptcha.api'
-import './search.api'
-
-
-
-// import radio from '../adapters/radio'
-// fastify.register(function(instance, opts, next) {
-// 	radio.ready.pipe(true).subscribe(next)
-// })
+// import './proxy.api'
+// import './recaptcha.api'
+// import './search.api'
 
 
 
-fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
+fastify.listen(process.PORT, process.HOST, function(error) {
 	if (error) return console.error('listen Error ->', error);
-	console.info('listen ->', console.inspect(fastify.server.address()), '\n' + fastify.printRoutes())
+	// if (process.PRIMARY) console.info('listen ->', console.inspect(fastify.server.address()), '\n' + fastify.printRoutes());
+	fastify.rxready.next()
+	process.send('ready')
 })
 
 
@@ -77,6 +75,7 @@ declare module 'fastify' {
 		validation?: ErrorObject[]
 	}
 	interface FastifyInstance<HttpServer, HttpRequest, HttpResponse> {
+		rxready: Rx.ReadySubject
 		addHook(name: 'onRoute', handler: (opts: RegisterOptions<HttpServer, HttpRequest, HttpResponse>) => void): FastifyInstance
 		setErrorHandler(handler: (error: FastifyError, request: FastifyRequest<HttpRequest>, reply: FastifyReply<HttpResponse>) => void): Promise<any>
 		all(url: string, opts: RouteShorthandOptions<HttpServer, HttpRequest, HttpResponse>, handler: RequestHandler<HttpRequest, HttpResponse>): FastifyInstance

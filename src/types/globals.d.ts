@@ -14,21 +14,13 @@ declare namespace NodeJS {
 	}
 	export interface ProcessEnv {
 		NODE_ENV: typeof NODE_ENV
-		INSPECTING: string
 	}
 	export interface Process {
 		NAME: string
 		VERSION: string
 		DOMAIN: string
-		HOST: string
-		PORT: number
 		CLIENT: boolean
 		SERVER: boolean
-		INSTANCE: number
-		INSTANCES: number
-		MASTER: boolean
-		WORKER: boolean
-		PRIMARY: boolean
 	}
 }
 
@@ -39,6 +31,8 @@ type KeysOf<T> = (keyof T)[]
 interface Dict<T = any> {
 	[key: string]: T
 }
+
+
 
 interface WebpackRequireContext {
 	(file: string): void
