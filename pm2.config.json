@@ -24,6 +24,7 @@
 		"max_restarts": 3,
 		"min_uptime": "3s",
 		"restart_delay": 3000,
+		"merge_logs": true,
 		"out_file": "/dev/null",
 		"error_file": "/dev/null",
 		// 

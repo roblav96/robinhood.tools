@@ -15,7 +15,7 @@ process.SERVER = true
 
 import * as os from 'os'
 process.INSTANCES = process.env.instances ? Number.parseInt(process.env.instances) : os.cpus().length
-process.INSTANCE = process.env.NODE_APP_INSTANCE ? Number.parseInt(process.env.NODE_APP_INSTANCE) : -1
+process.INSTANCE = process.env.NODE_APP_INSTANCE ? Number.parseInt(process.env.NODE_APP_INSTANCE) : 0
 process.PRIMARY = process.INSTANCE == 0
 declare global { namespace NodeJS { export interface ProcessEnv { NODE_APP_INSTANCE: string } export interface Process { INSTANCES: number, INSTANCE: number, PRIMARY: boolean } } }
 

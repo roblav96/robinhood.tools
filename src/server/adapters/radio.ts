@@ -15,20 +15,16 @@ import fastify from '../api/fastify'
 
 
 const HOST = process.HOST
-const PORT = process.PORT - 1
+const PORT = process.PORT
 const PATH = 'radio'
 const ADDRESS = `ws://${HOST}:${PORT}/${PATH}?${qs.stringify({ instance: process.INSTANCE })}`
 
 if (process.PRIMARY) {
 
-	const uhttp = uws.http.createServer()
-
 	const wss = new uws.Server({
-		host: HOST, port: PORT,
+		// host: HOST, port: PORT,
 		path: PATH,
-		server: uhttp,
-		// server: uws.http as any,
-		// server: fastify.server,
+		server: fastify.server,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
 			next(host == process.HOST)

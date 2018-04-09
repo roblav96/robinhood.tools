@@ -9,10 +9,10 @@ process.on('SIGINT', function(message) {
 	process.exit(0)
 })
 
-// process.on('SIGTERM', function(message) {
-// 	console.log('SIGTERM ->', message)
-// 	process.exit(0)
-// })
+process.on('SIGTERM', function(message) {
+	console.log('SIGTERM ->', message)
+	process.exit(0)
+})
 
 
 
