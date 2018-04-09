@@ -15,27 +15,33 @@ import fastify from '../api/fastify'
 
 
 const HOST = process.HOST
-const PORT = process.PORT
+const PORT = process.PORT - 1
 const PATH = 'radio'
 const ADDRESS = `ws://${HOST}:${PORT}/${PATH}?${qs.stringify({ instance: process.INSTANCE })}`
 
 if (process.PRIMARY) {
 
+	const uhttp = uws.http.createServer()
+
 	const wss = new uws.Server({
-		path: PATH, server: fastify.server,
+		host: HOST, port: PORT,
+		path: PATH,
+		server: uhttp,
+		// server: uws.http as any,
+		// server: fastify.server,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
 			next(host == process.HOST)
 		},
 	})
 
-	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
+	wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
 	wss.on('connection', function(client: Radio.Client, req: IncomingMessage) {
 		client.instance = Number.parseInt(qs.parse(url.parse(req.url).query).instance as any)
 
-		console.log('wss.clients ->', wss.clients)
+		// console.log('wss.clients ->', wss.clients)
 
 		client.on('message', function(message: string) {
 			if (message == 'pong') return;
@@ -63,8 +69,8 @@ if (process.PRIMARY) {
 
 class Radio extends Emitter<string, any> {
 
-	open = new Rx.ReadySubject()
-	ready = new Rx.ReadySubject()
+	rxopen = new Rx.ReadySubject()
+	rxready = new Rx.ReadySubject()
 
 	socket = new WebSocketClient(ADDRESS, {
 		connect: false,
@@ -81,16 +87,16 @@ class Radio extends Emitter<string, any> {
 		// })
 
 		this.socket.on('open', () => {
-			this.open.next(true)
+			this.rxopen.next(true)
 			this.socket.send('__onopen')
 		})
 		this.socket.on('close', () => {
-			this.open.next(false)
+			this.rxopen.next(false)
 		})
 
 		this.socket.on('message', (message: string) => {
 			if (message == '__onready') {
-				return this.ready.next()
+				return this.rxready.next()
 			}
 			let event = JSON.parse(message) as Radio.Event
 			super.emit(event.name, ...event.args)

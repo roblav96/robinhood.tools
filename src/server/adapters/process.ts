@@ -1,10 +1,7 @@
 // 
 
 import chalk from 'chalk'
-import * as os from 'os'
-import * as cluster from 'cluster'
 import * as path from 'path'
-import * as dotenv from 'dotenv'
 
 
 
@@ -16,19 +13,22 @@ process.SERVER = true
 
 
 
+import * as os from 'os'
 process.INSTANCES = process.env.instances ? Number.parseInt(process.env.instances) : os.cpus().length
-process.INSTANCE = process.env.NODE_APP_INSTANCE ? Number.parseInt(process.env.NODE_APP_INSTANCE) : 0
+process.INSTANCE = process.env.NODE_APP_INSTANCE ? Number.parseInt(process.env.NODE_APP_INSTANCE) : -1
 process.PRIMARY = process.INSTANCE == 0
-declare global { namespace NodeJS { export interface ProcessEnv { NODE_APP_INSTANCE: string } export interface Process { INSTANCE: number, INSTANCES: number, PRIMARY: boolean } } }
+declare global { namespace NodeJS { export interface ProcessEnv { NODE_APP_INSTANCE: string } export interface Process { INSTANCES: number, INSTANCE: number, PRIMARY: boolean } } }
 
 
 
+import * as cluster from 'cluster'
 process.MASTER = cluster.isMaster
 process.WORKER = cluster.isWorker
 declare global { namespace NodeJS { export interface Process { MASTER: boolean, WORKER: boolean } } }
 
 
 
+import * as dotenv from 'dotenv'
 dotenv.config({ path: path.resolve(process.cwd(), 'config/server.' + NODE_ENV + '.env') })
 dotenv.config({ path: path.resolve(process.cwd(), 'config/server.env') })
 process.HOST = process.env.HOST || '127.0.0.1'

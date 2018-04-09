@@ -9,7 +9,7 @@ import logger from './fastify.logger'
 
 const fastify = Fastify({
 	logger: {
-		level: 'info' as Pino.Level,
+		level: 'error' as Pino.Level,
 		extreme: PRODUCTION,
 		stream: logger,
 	},

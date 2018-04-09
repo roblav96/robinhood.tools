@@ -3,6 +3,7 @@
 require('@/common/polyfills')
 global.Promise = require('bluebird')
 
+process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 global.NODE_ENV = process.env.NODE_ENV
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
@@ -37,6 +38,8 @@ Vue.use(Buefy, {
 
 require('@/client/vm')
 
-if (DEVELOPMENT) Object.assign(window, require('@/common/core'));
+if (DEVELOPMENT) {
+	Object.assign(window, require('@/common/core'))
+}
 
 

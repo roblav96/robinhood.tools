@@ -4,6 +4,8 @@
 		"module": "commonjs",
 		"lib": ["dom", "esnext"],
 		"moduleResolution": "node",
+		"allowJs": true,
+		"checkJs": false,
 		"noImplicitThis": true,
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
@@ -18,6 +20,6 @@
 			"@/*": ["src/*"]
 		}
 	},
-	"include": ["src/**/*.ts", "src/**/*.vue"],
+	"include": ["src/**/*.ts", "src/**/*.vue", "src/**/*.js"],
 	"exclude": ["node_modules"]
 }
