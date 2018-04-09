@@ -11,6 +11,7 @@
 		],
 		"file_exclude_patterns": [
 			"procfile*",
+			"final.config*",
 			"forever.config*",
 			"pm2.config*",
 			"*.tsconfig.*",
