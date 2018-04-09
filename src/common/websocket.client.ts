@@ -8,7 +8,7 @@ import clock from './clock'
 
 
 
-export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' | 'message', string | number | Error> {
+export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' | 'message'> { //, string | number | Error> {
 
 	private static readonly ecodes = {
 		1000: 'Normal',
@@ -24,11 +24,12 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	private static get options() {
 		return _.clone({
-			connect: true,
-			heartbeat: '10s' as Clock.Tick,
 			query: null as () => string,
-			retry: true,
 			timeout: '3s' as Clock.Tick,
+			heartbeat: '10s' as Clock.Tick,
+			connect: true,
+			retry: true,
+			silent: false,
 			verbose: false,
 		})
 	}
@@ -90,22 +91,22 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _onopen = (event: Event) => {
-		if (this.options.verbose) console.info(this.name, 'onopen ->', process.CLIENT ? (event.target as WebSocket).url : '');
+		if (this.options.verbose) console.info(this.name, 'onopen'); // ->', process.CLIENT ? (event.target as WebSocket).url : '');
 		clock.on(this.options.heartbeat, this._heartbeat)
 		clock.offListener(this._connect)
-		this.emit('open')
+		this.emit('open', event)
 	}
 
 	private _onclose = (event: CloseEvent) => {
-		console.warn(this.name, 'onclose ->', WebSocketClient.ecodes[event.code] || event.code, '->', event.reason)
-		this.emit('close') //, _.pick(event, ['code','reason']) as any)
+		if (!this.options.silent) console.warn(this.name, 'onclose ->', WebSocketClient.ecodes[event.code] || event.code, '->', event.reason)
+		this.emit('close', _.pick(event, ['code', 'reason']))
 		clock.offListener(this._heartbeat)
 		if (this.options.retry) this._reconnect();
 		else this.destroy();
 	}
 
 	private _onerror = (error: Error) => {
-		console.error(this.name, 'onerror Error ->', error.message || error)
+		if (!this.options.silent) console.error(this.name, 'onerror Error ->', error.message || error)
 		this.emit('error', error)
 	}
 

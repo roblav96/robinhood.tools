@@ -20,7 +20,7 @@ declare module 'fastify' {
 
 // import rhinstruments from '../watchers/robinhood.instruments'
 // fastify.register(function(fastify, opts, next) {
-// 	radio.ready.subscribe(next)
+// 	radio.rxready.subscribe(next)
 // })
 
 

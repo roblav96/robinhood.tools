@@ -14,36 +14,32 @@ import fastify from '../api/fastify'
 
 
 
-const HOST = process.HOST
-const PORT = process.PORT
 const PATH = 'radio'
-const ADDRESS = `ws://${HOST}:${PORT}/${PATH}?${qs.stringify({ instance: process.INSTANCE })}`
+const ADDRESS = `ws://${process.HOST}:${process.PORT}/${PATH}?${qs.stringify({ instance: process.INSTANCE })}`
 
-if (process.PRIMARY) {
+if (process.MASTER) {
 
 	const wss = new uws.Server({
-		// host: HOST, port: PORT,
-		path: PATH,
-		server: fastify.server,
+		server: fastify.server, path: PATH,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
 			next(host == process.HOST)
 		},
 	})
 
-	wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
+	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
 	wss.on('connection', function(client: Radio.Client, req: IncomingMessage) {
 		client.instance = Number.parseInt(qs.parse(url.parse(req.url).query).instance as any)
 
-		// console.log('wss.clients ->', wss.clients)
+		console.log('client.instance ->', client.instance)
 
 		client.on('message', function(message: string) {
 			if (message == 'pong') return;
 			if (message == 'ping') return client.send('pong');
 			if (message == '__onopen') {
-				if (wss.clients.length > process.INSTANCES) {
+				if (wss.clients.length >= process.INSTANCES) {
 					wss.broadcast('__onready')
 				}
 				return
@@ -57,8 +53,6 @@ if (process.PRIMARY) {
 
 	})
 
-	// wss.once('listening', function() { radio.socket.connect() })
-
 }
 
 
@@ -69,18 +63,16 @@ class Radio extends Emitter<string, any> {
 	rxready = new Rx.ReadySubject()
 
 	socket = new WebSocketClient(ADDRESS, {
-		connect: false,
-		// timeout: '1s',
-		// verbose: true,
-		// verbose: process.MASTER,
+		connect: process.WORKER,
+		timeout: '1s',
 	})
 
 	constructor() {
 		super()
 
-		// fastify.server.once('listening', () => {
-		// 	this.socket.connect()
-		// })
+		if (process.MASTER) {
+			fastify.rxready.subscribe(() => this.socket.connect())
+		}
 
 		this.socket.on('open', () => {
 			this.rxopen.next(true)
@@ -111,7 +103,7 @@ class Radio extends Emitter<string, any> {
 	}
 
 	// job(name: string, data?: Radio.Data) {
-	// 	if (!process.MASTER) return;
+	// 	if (!process.PRIMARY) return;
 	// 	let proms = core.workers().map(function(i) {
 	// 		return radio.toPromise(`${name}.${i}`)
 	// 	})

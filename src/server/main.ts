@@ -18,11 +18,10 @@ import './services/cleanup'
 
 import '../common/clock'
 import './api/fastify'
-import './adapters/radio'
 import './adapters/cluster'
+import './adapters/radio'
 
-// import './watchers/robinhood.instruments'
-// import './watchers/webull.tickers'
+import './watchers/watchers'
 
 
 

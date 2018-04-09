@@ -48,8 +48,8 @@ process.on('unhandledRejection', function(error) {
 
 
 
-if (process.PRIMARY) {
-	console.log('\n\n')
+if (process.MASTER) {
+	console.log('\n')
 	console.log(`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`)
 	console.log(`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}`)
 }

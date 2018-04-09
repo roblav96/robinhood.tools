@@ -6,12 +6,12 @@ import * as Rx from '../../common/rxjs'
 
 process.on('SIGINT', function(message) {
 	console.log('SIGINT ->', message)
-	process.exit(0)
+	process.exit(1)
 })
 
 process.on('SIGTERM', function(message) {
 	console.log('SIGTERM ->', message)
-	process.exit(0)
+	process.exit(1)
 })
 
 

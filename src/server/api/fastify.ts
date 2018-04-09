@@ -9,14 +9,14 @@ import logger from './fastify.logger'
 
 const fastify = Fastify({
 	logger: {
-		level: 'info' as Pino.Level,
+		level: 'error' as Pino.Level,
 		extreme: PRODUCTION,
 		stream: logger,
 	},
 })
 
 fastify.server.timeout = 10000
-// fastify.server.keepAliveTimeout = 5000
+fastify.server.keepAliveTimeout = 5000
 
 fastify.rxready = new Rx.ReadySubject()
 
@@ -45,9 +45,7 @@ import './security.api'
 
 fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 	if (error) return console.error('listen Error ->', error);
-	// if (process.PRIMARY) console.info('listen ->', console.inspect(fastify.server.address()), '\n' + fastify.printRoutes());
-	// console.info('listen ->', console.inspect(fastify.server.address()), '\n' + fastify.printRoutes())
-	// console.info('listen ->', console.inspect(fastify.server.address()))
+	if (process.PRIMARY) console.info(fastify.printRoutes());
 	fastify.rxready.next()
 })
 

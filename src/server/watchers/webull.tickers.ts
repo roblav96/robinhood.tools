@@ -1,10 +1,10 @@
 // 
 
-import * as R from '../../common/rambdax'
 import * as _ from 'lodash'
 import * as pAll from 'p-all'
 import * as fuzzy from 'fuzzysort'
 import * as boom from 'boom'
+import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
@@ -16,17 +16,17 @@ import radio from '../adapters/radio'
 
 
 
-export const ready = new Rx.ReadySubject()
-radio.once('webull.tickers.ready', () => ready.next())
+export const rxready = new Rx.ReadySubject()
+radio.once('webull.tickers.ready', () => rxready.next())
 
-// if (process.MASTER) {
-// 	radio.ready.toPromise().then(readyTickers).catch(function(error) {
-// 		console.error('readyTickers Error ->', error)
-// 	}).finally(function() {
-// 		console.warn('emit -> webull.tickers.ready')
-// 		radio.emit('webull.tickers.ready')
-// 	})
-// }
+if (process.MASTER) {
+	radio.rxready.toPromise().then(readyTickers).catch(function(error) {
+		console.error('readyTickers Error ->', error)
+	}).finally(function() {
+		console.warn('emit -> webull.tickers.ready')
+		radio.emit('webull.tickers.ready')
+	})
+}
 
 
 
