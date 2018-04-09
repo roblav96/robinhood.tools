@@ -14,7 +14,7 @@ process.SERVER = true
 
 
 import * as os from 'os'
-process.INSTANCES = process.env.instances ? Number.parseInt(process.env.instances) : os.cpus().length
+if (PRODUCTION || !Number.isFinite(process.INSTANCES)) process.INSTANCES = os.cpus().length;
 process.INSTANCE = process.env.NODE_APP_INSTANCE ? Number.parseInt(process.env.NODE_APP_INSTANCE) : 0
 process.PRIMARY = process.INSTANCE == 0
 declare global { namespace NodeJS { export interface ProcessEnv { NODE_APP_INSTANCE: string } export interface Process { INSTANCES: number, INSTANCE: number, PRIMARY: boolean } } }
@@ -49,7 +49,7 @@ process.on('unhandledRejection', function(error) {
 
 
 if (process.PRIMARY) {
-	console.log(' \n \n')
+	console.log('\n\n')
 	console.log(`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`)
 	console.log(`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}`)
 }

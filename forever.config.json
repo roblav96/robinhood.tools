@@ -1,9 +1,8 @@
 {
-	"id": "robinhood.tools",
+	"uid": "robinhood.tools",
 	"script": "dist/server/main.js",
+	"command": "node --max_old_space_size=512",
 	"args": ["--colors"],
-	"minUptime": 3000,
-	"spinSleepTime": 3000,
 	"killSignal": "SIGTERM",
 	"killTree": true,
 	"watch": false,
