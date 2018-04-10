@@ -1,16 +1,16 @@
 // 
 
+import * as R from '../../common/rambdax'
 import * as _ from '../../common/lodash'
 import * as pAll from 'p-all'
 import * as fuzzy from 'fuzzysort'
 import * as boom from 'boom'
-import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
 import * as core from '../../common/core'
-import * as robinhoodinstruments from './robinhood.instruments'
+import * as rhinstruments from './robinhood.instruments'
 import clock from '../../common/clock'
 import radio from '../adapters/radio'
 
@@ -20,7 +20,10 @@ export const rxready = new Rx.ReadySubject()
 radio.once('webull.tickers.ready', () => rxready.next())
 
 if (process.MASTER) {
-	radio.rxready.toPromise().then(readyTickers).catch(function(error) {
+	Promise.all([
+		radio.rxready.toPromise(),
+		rhinstruments.rxready.toPromise(),
+	]).then(readyTickers).catch(function(error) {
 		console.error('readyTickers Error ->', error)
 	}).finally(function() {
 		console.warn('emit -> webull.tickers.ready')
@@ -31,7 +34,7 @@ if (process.MASTER) {
 
 
 async function readyTickers() {
-	if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
+	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
 
 	let synced = await redis.main.keys(`${redis.WB.TICKERS}:*`)
 	console.log('tickers synced ->', console.inspect(synced.length))
@@ -46,28 +49,28 @@ async function readyTickers() {
 
 
 async function syncTickers() {
-// 	if (process.MASTER) {
-// 		await syncAlls()
-// 		// await radio.job('syncTickers')
-// 	}
+	// 	if (process.MASTER) {
+	// 		await syncAlls()
+	// 		// await radio.job('syncTickers')
+	// 	}
 
-// 	if (process.WORKER) {
-// 		let symbols = await robinhood.getSymbols()
-// 		console.log('symbols.length ->', console.inspect(symbols.length))
+	// 	if (process.WORKER) {
+	// 		let symbols = await robinhood.getSymbols()
+	// 		console.log('symbols.length ->', console.inspect(symbols.length))
 
-// 		await pAll(symbols.map(v => () => syncTicker(v)), { concurrency: 1 })
-// 		// await pAll(symbols.map((v, i) => function() {
-// 		// 	let prog = core.number.round((i / symbols.length) * 100)
-// 		// 	console.log(console.inspect(prog), 'symbol ->', console.inspect(v))
-// 		// 	return syncTicker(v)
-// 		// }), { concurrency: 1 })
-// 		// await syncTicker('AAIT')
+	// 		await pAll(symbols.map(v => () => syncTicker(v)), { concurrency: 1 })
+	// 		// await pAll(symbols.map((v, i) => function() {
+	// 		// 	let prog = core.number.round((i / symbols.length) * 100)
+	// 		// 	console.log(console.inspect(prog), 'symbol ->', console.inspect(v))
+	// 		// 	return syncTicker(v)
+	// 		// }), { concurrency: 1 })
+	// 		// await syncTicker('AAIT')
 
-// 		console.info('workerTickers -> done')
-// 		radio.emit('workerTickers.' + process.INSTANCE)
-// 	}
+	// 		console.info('workerTickers -> done')
+	// 		radio.emit('workerTickers.' + process.INSTANCE)
+	// 	}
 
-// 	console.info('syncTickers -> done')
+	// 	console.info('syncTickers -> done')
 
 }
 // if (process.WORKER) radio.on('syncTickers', syncTickers);
@@ -102,7 +105,7 @@ async function syncTicker(symbol: string) {
 	if (!result) result = results.find(v => v.match > 0);
 	if (!result) result = results.find(v => v.disSymbol == symbol && results.length == 1);
 	if (!result) {
-		if (instrument.good) {
+		if (instrument.valid) {
 			console.error('!result ->', console.inspect(instrument), 'response.list ->', console.inspect(response.list))
 		}
 		return
@@ -187,7 +190,7 @@ async function syncAlls() {
 // 		radio.off('webull.tickers.done')
 // 		radio.emit('webull.tickers.ready')
 // 	})
-// 	robinhoodinstruments.ready.toPromise().then(readyTickers).catch(function(error) {
+// 	rhinstruments.ready.toPromise().then(readyTickers).catch(function(error) {
 // 		console.error('readyTickers Error ->', error)
 // 	}).finally(function() {
 // 		radio.emit('webull.tickers.start')
@@ -197,7 +200,7 @@ async function syncAlls() {
 
 
 // if (process.WORKER) {
-// 	robinhoodinstruments.ready.toPromise().then(readyTickers).catch(function(error) {
+// 	rhinstruments.ready.toPromise().then(readyTickers).catch(function(error) {
 // 		console.error('readyTickers Error ->', error)
 // 	}).finally(function() {
 // 		radio.emit('webull.tickers.done')
@@ -211,7 +214,7 @@ async function syncAlls() {
 // radio.once('webull.tickers.ready', () => ready.next())
 
 // if (process.MASTER) {
-// 	robinhoodinstruments.ready.toPromise().then(readyTickers).catch(function(error) {
+// 	rhinstruments.ready.toPromise().then(readyTickers).catch(function(error) {
 // 		console.error('readyTickers Error ->', error)
 // 	}).finally(function() {
 // 		radio.emit('webull.tickers.ready')

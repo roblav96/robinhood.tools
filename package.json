@@ -63,6 +63,7 @@
 	"devDependencies": {
 		"@types/bluebird": "latest",
 		"@types/boom": "latest",
+		"@types/cli-color": "latest",
 		"@types/clipboardy": "latest",
 		"@types/cookie": "latest",
 		"@types/cors": "latest",
@@ -90,6 +91,7 @@
 		"@vue/cli-plugin-typescript": "latest",
 		"@vue/cli-service": "latest",
 		"chalk": "latest",
+		"cli-color": "latest",
 		"clipboardy": "latest",
 		"cross-env": "latest",
 		"cute-stack": "latest",

@@ -2,6 +2,14 @@
 
 
 
+export const WB = {
+	WB: 'wb',
+	TICKERS: 'wb:tickers',
+	ALLS: 'wb:alls',
+}
+
+
+
 export const TICKER_TYPES = {
 	1: 'INDEX',
 	2: 'STOCK',

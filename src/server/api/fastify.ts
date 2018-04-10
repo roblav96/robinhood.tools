@@ -9,7 +9,7 @@ import logger from './fastify.logger'
 
 const fastify = Fastify({
 	logger: {
-		level: 'error' as Pino.Level,
+		level: 'info' as Pino.Level,
 		extreme: PRODUCTION,
 		stream: logger,
 	},
@@ -45,7 +45,9 @@ import './security.api'
 
 fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 	if (error) return console.error('listen Error ->', error);
-	if (process.PRIMARY) console.info(fastify.printRoutes());
+	if (process.PRIMARY && fastify.log.levelVal <= logger.toLevel('info')) {
+		process.stdout.write(`${fastify.printRoutes()}`)
+	}
 	fastify.rxready.next()
 })
 

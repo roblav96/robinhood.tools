@@ -21,6 +21,8 @@ declare namespace NodeJS {
 		DOMAIN: string
 		CLIENT: boolean
 		SERVER: boolean
+		INSTANCES: number
+		INSTANCE: number
 	}
 }
 

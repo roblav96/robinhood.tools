@@ -2,6 +2,16 @@
 
 
 
+export const RH = {
+	RH: 'rh',
+	INSTRUMENTS: 'rh:instruments',
+	SYMBOLS: 'rh:symbols',
+	VALID_SYMBOLS: 'rh:symbols:valid',
+	INVALID_SYMBOLS: 'rh:symbols:invalid',
+}
+
+
+
 export const MICS = {
 	ARCX: 'NYSE',
 	BATS: 'BATS',
@@ -50,8 +60,7 @@ declare global {
 			// 
 			acronym: string
 			mic: string
-			alive: boolean
-			// status: 'good' | 'bad'
+			valid: boolean
 		}
 
 

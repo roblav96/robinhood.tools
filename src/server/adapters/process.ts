@@ -15,9 +15,10 @@ process.SERVER = true
 
 import * as os from 'os'
 if (PRODUCTION || !Number.isFinite(process.INSTANCES)) process.INSTANCES = os.cpus().length;
+process.INSTANCES = Math.max(process.INSTANCES, 1)
 process.INSTANCE = process.env.NODE_APP_INSTANCE ? Number.parseInt(process.env.NODE_APP_INSTANCE) : 0
 process.PRIMARY = process.INSTANCE == 0
-declare global { namespace NodeJS { export interface ProcessEnv { NODE_APP_INSTANCE: string } export interface Process { INSTANCES: number, INSTANCE: number, PRIMARY: boolean } } }
+declare global { namespace NodeJS { export interface ProcessEnv { NODE_APP_INSTANCE: string } export interface Process { PRIMARY: boolean } } }
 
 
 
@@ -49,6 +50,7 @@ process.on('unhandledRejection', function(error) {
 
 
 if (process.MASTER) {
+	// if (DEVELOPMENT) setInterval(function() { process.stdout.write(' \x1b[K') }, 3000);
 	console.log('\n')
 	console.log(`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`)
 	console.log(`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}`)

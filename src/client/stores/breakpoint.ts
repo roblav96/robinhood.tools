@@ -6,7 +6,7 @@
 // 
 
 import Vuex, { Store } from 'vuex'
-import _ from 'lodash'
+import * as _ from '@/common/lodash'
 import store from '@/client/store'
 
 

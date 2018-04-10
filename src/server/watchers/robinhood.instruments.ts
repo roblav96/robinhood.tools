@@ -1,8 +1,8 @@
 // 
 
 import * as pForever from 'p-forever'
-import * as _ from '../../common/lodash'
 import * as R from '../../common/rambdax'
+import * as _ from '../../common/lodash'
 import * as Rx from '../../common/rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
@@ -16,7 +16,9 @@ export const rxready = new Rx.ReadySubject()
 radio.once('robinhood.instruments.ready', () => rxready.next())
 
 if (process.MASTER) {
-	radio.rxready.toPromise().then(readyInstruments).catch(function(error) {
+	Promise.all([
+		radio.rxready.toPromise(),
+	]).then(readyInstruments).catch(function(error) {
 		console.error('readyInstruments Error ->', error)
 	}).finally(function() {
 		radio.emit('robinhood.instruments.ready')
@@ -28,9 +30,9 @@ if (process.MASTER) {
 async function readyInstruments() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
 
-	let synced = await redis.main.keys(`${redis.RH.INSTRUMENTS}:*`)
-	console.log('instruments synced ->', console.inspect(synced.length))
-	if (synced.length < 10000) {
+	let synced = await redis.main.scard(`${redis.RH.SYMBOLS}`)
+	console.log('instruments synced ->', console.inspect(synced))
+	if (synced < 10000) {
 		await syncInstruments()
 	}
 
@@ -52,24 +54,24 @@ async function syncInstruments() {
 
 		let coms = response.results.map(v => ['hmset', `${redis.RH.INSTRUMENTS}:${v.symbol}`, v as any])
 		let symbols = new redis.SetsComs(redis.RH.SYMBOLS)
-		let tradables = new redis.SetsComs(redis.RH.TRADABLES)
-		let untradables = new redis.SetsComs(redis.RH.UNTRADABLES)
+		let valids = new redis.SetsComs(redis.RH.VALID_SYMBOLS)
+		let invalids = new redis.SetsComs(redis.RH.INVALID_SYMBOLS)
 		response.results.forEach(function(v) {
 			symbols.sadd(v.symbol)
 			v.mic = _.compact(v.market.split('/')).pop()
 			v.acronym = robinhood.MICS[v.mic]
-			v.alive = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
-			if (v.alive) {
-				tradables.sadd(v.symbol)
-				untradables.srem(v.symbol)
+			v.valid = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
+			if (v.valid) {
+				valids.sadd(v.symbol)
+				invalids.srem(v.symbol)
 			} else {
-				tradables.srem(v.symbol)
-				untradables.sadd(v.symbol)
+				valids.srem(v.symbol)
+				invalids.sadd(v.symbol)
 			}
 		})
 		symbols.merge(coms)
-		tradables.merge(coms)
-		untradables.merge(coms)
+		valids.merge(coms)
+		invalids.merge(coms)
 
 		await redis.main.coms(coms)
 		return response.next || pForever.end
@@ -83,7 +85,7 @@ async function syncInstruments() {
 
 
 async function chunkSymbols() {
-	let rkeys = [redis.RH.SYMBOLS, redis.RH.TRADABLES, redis.RH.UNTRADABLES]
+	let rkeys = [redis.RH.SYMBOLS, redis.RH.VALID_SYMBOLS, redis.RH.INVALID_SYMBOLS]
 	let rcoms = rkeys.map(v => ['smembers', v])
 	let resolved = await redis.main.coms(rcoms) as string[][]
 

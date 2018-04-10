@@ -3,7 +3,7 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
-import _ from 'lodash'
+import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as http from '@/client/adapters/http'
 import * as security from '@/client/services/security'

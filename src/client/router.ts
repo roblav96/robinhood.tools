@@ -2,7 +2,7 @@
 
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import _ from 'lodash'
+import * as _ from '@/common/lodash'
 import store from '@/client/store'
 
 

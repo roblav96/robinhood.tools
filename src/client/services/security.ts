@@ -2,7 +2,7 @@
 export * from '@/common/security'
 // 
 
-import * as _ from 'lodash'
+import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import lockr from 'lockr'
 import Fingerprint2 from 'fingerprintjs2'
@@ -67,18 +67,14 @@ function token(): Promise<string[]> {
 	})
 }
 
-Promise.all([
-	uuid(), finger(),
-]).then(function() {
-	return token()
-}).then(function(addresses) {
-	return socket.init(addresses)
-}).then(function() {
-	state.ready = true
-})
-
-
-
-
+// Promise.all([
+// 	uuid(), finger(),
+// ]).then(function() {
+// 	return token()
+// }).then(function(addresses) {
+// 	return socket.init(addresses)
+// }).then(function() {
+// 	state.ready = true
+// })
 
 

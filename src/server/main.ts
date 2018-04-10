@@ -11,7 +11,7 @@ require('source-map-support').install()
 global.Promise = require('bluebird')
 global.WebSocket = require('uws')
 
-// if (DEVELOPMENT) process.INSTANCES = 1;
+if (DEVELOPMENT) process.INSTANCES = 2;
 import './adapters/process'
 import './adapters/console'
 import './services/cleanup'
@@ -21,7 +21,7 @@ import './api/fastify'
 import './adapters/cluster'
 import './adapters/radio'
 
-import './watchers/watchers.index'
+import './watchers/watchers'
 
 
 

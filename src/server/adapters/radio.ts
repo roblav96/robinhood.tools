@@ -33,8 +33,6 @@ if (process.MASTER) {
 	wss.on('connection', function(client: Radio.Client, req: IncomingMessage) {
 		client.instance = Number.parseInt(qs.parse(url.parse(req.url).query).instance as any)
 
-		console.log('client.instance ->', client.instance)
-
 		client.on('message', function(message: string) {
 			if (message == 'pong') return;
 			if (message == 'ping') return client.send('pong');

@@ -17,7 +17,10 @@ const recycle = _.throttle(function(reqId: number) {
 	reqs.splice(0, reqId)
 }, 1000, { leading: false, trailing: true })
 
-export default Object.assign(fs.createWriteStream('/dev/null'), {
+const logger = Object.assign(fs.createWriteStream('/dev/null'), {
+
+	toLevel(label: Pino.Level) { return fastify.log.levels.values[label] },
+	toLabel(level: number) { return fastify.log.levels.labels[level] as Pino.Level },
 
 	inspector(value: any) { return !chalk.supportsColor ? util.inspect(value) : eyes.inspect(value) },
 
@@ -55,8 +58,11 @@ export default Object.assign(fs.createWriteStream('/dev/null'), {
 			fastify.log.level == 'debug' ? message : this.inspector(message)
 		)
 
-	}
+	},
+
 })
+
+export default logger
 
 
 
@@ -64,6 +70,9 @@ export default Object.assign(fs.createWriteStream('/dev/null'), {
 
 import { Writable, Duplex, Transform } from 'stream'
 declare module 'pino' {
+	interface BaseLogger {
+		stream: typeof logger
+	}
 	interface LogRequest {
 		id: number,
 		method: string
