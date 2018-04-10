@@ -21,18 +21,23 @@ import './api/fastify'
 import './adapters/cluster'
 import './adapters/radio'
 
-import './watchers/watchers'
+// import './watchers/watchers'
 
 
 
 
 
+// import * as clc from 'cli-color'
 // if (process.MASTER) {
-// 	// console.log('process.env ->', console.inspect(process.env))
-// 	console.log('process.argv0 ->', console.inspect(process.argv0))
-// 	console.log('process.execArgv ->', console.inspect(process.execArgv))
-// 	console.log('process.argv ->', console.inspect(process.argv))
-// 	// console.log('!!global.gc ->', !!global.gc)
+
+// 	console.log('clc ->', console.dump(clc, { depth: 8 }))
+// 	// console.warn('clc ->', console.dtsgen(clc))
+
+// 	// 	// console.log('process.env ->', console.inspect(process.env))
+// 	// 	console.log('process.argv0 ->', console.inspect(process.argv0))
+// 	// 	console.log('process.execArgv ->', console.inspect(process.execArgv))
+// 	// 	console.log('process.argv ->', console.inspect(process.argv))
+// 	// 	// console.log('!!global.gc ->', !!global.gc)
 // }
 
 // import chalk from 'chalk'

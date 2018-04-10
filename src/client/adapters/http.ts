@@ -3,7 +3,7 @@ export * from '@/common/http'
 // 
 
 import * as _ from '@/common/lodash'
-import R from '@/common/rambdax'
+import * as R from '@/common/rambdax'
 import * as core from '@/common/core'
 import got from 'got'
 import url from 'url'
@@ -11,7 +11,7 @@ import vm from '@/client/vm'
 import * as security from '@/client/services/security'
 import * as http from '@/common/http'
 
-console.log('R ->', R)
+
 
 export function request(config: Partial<Http.Config>): Promise<any> {
 	return Promise.resolve().then(function() {

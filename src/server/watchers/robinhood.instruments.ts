@@ -1,8 +1,8 @@
 // 
 
 import * as pForever from 'p-forever'
-import * as R from '../../common/rambdax'
 import * as _ from '../../common/lodash'
+import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'

@@ -1,6 +1,6 @@
 // 
 
-import * as _chalk from 'chalk'
+import * as chalk from 'chalk'
 
 
 

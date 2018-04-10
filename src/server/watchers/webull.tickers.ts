@@ -1,10 +1,10 @@
 // 
 
-import * as R from '../../common/rambdax'
-import * as _ from '../../common/lodash'
 import * as pAll from 'p-all'
 import * as fuzzy from 'fuzzysort'
 import * as boom from 'boom'
+import * as _ from '../../common/lodash'
+import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'

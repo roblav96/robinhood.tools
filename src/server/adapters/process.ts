@@ -1,6 +1,7 @@
 // 
 
 import chalk from 'chalk'
+import * as clc from 'cli-color'
 import * as path from 'path'
 
 
