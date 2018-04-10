@@ -46,7 +46,7 @@ import './security.api'
 fastify.listen(process.PORT + process.INSTANCE, process.HOST, function(error) {
 	if (error) return console.error('listen Error ->', error);
 	if (process.PRIMARY && fastify.log.levelVal <= logger.toLevel('info')) {
-		process.stdout.write(`${fastify.printRoutes()}`)
+		process.stdout.write(` ${fastify.printRoutes()}`)
 	}
 	fastify.rxready.next()
 })

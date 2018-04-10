@@ -8,8 +8,10 @@
 		"patch:types": "rimraf node_modules/tiny-emitter/index.d.ts node_modules/vuex/types/vue.d.ts",
 		"patch:uws": "rimraf node_modules/uws/uws.js && cp -f src/server/modules/uws.js node_modules/uws/uws.js",
 		"purge": "rimraf dist node_modules",
+		"rc": "npm run client:dev",
 		"client:dev": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
 		"client:build": "rimraf dist/client && cross-env NODE_ENV=production vue-cli-service build --mode production",
+		"rs": "npm run server:dev",
 		"server:dev": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'forever forever.config.json'",
 		"server:build": "rimraf dist/server && tsc -p .server.tsconfig.json",
 		"cli:clear": "clear && printf \"\\e[3J\""
@@ -63,7 +65,6 @@
 	"devDependencies": {
 		"@types/bluebird": "latest",
 		"@types/boom": "latest",
-		"@types/cli-color": "latest",
 		"@types/clipboardy": "latest",
 		"@types/cookie": "latest",
 		"@types/cors": "latest",

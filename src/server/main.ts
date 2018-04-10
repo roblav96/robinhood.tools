@@ -1,17 +1,18 @@
 // 
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'development'
+if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development';
 global.NODE_ENV = process.env.NODE_ENV
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 
 require('../common/polyfills')
+require('correcting-interval')
 require('source-map-support').install()
 
 global.Promise = require('bluebird')
 global.WebSocket = require('uws')
 
-if (DEVELOPMENT) process.INSTANCES = 2;
+// if (DEVELOPMENT) process.INSTANCES = 2;
 import './adapters/process'
 import './adapters/console'
 import './services/cleanup'

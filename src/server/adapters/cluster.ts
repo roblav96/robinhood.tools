@@ -1,10 +1,13 @@
 // 
 
+import * as clc from 'cli-color'
 import * as _ from '../../common/lodash'
+import * as R from '../../common/rambdax'
+import * as Rx from '../../common/rxjs'
 import * as cluster from 'cluster'
 import * as core from '../../common/core'
 import * as pretty from '../../common/pretty'
-import * as R from '../../common/rambdax'
+import clock from '../../common/clock'
 import fastify from '../api/fastify'
 
 
@@ -36,6 +39,14 @@ function onsubscribe() {
 
 if (process.MASTER) {
 	fastify.rxready.subscribe(onsubscribe)
+
+	if (DEVELOPMENT) {
+		clock.on('500ms', function(i) {
+			let direction = (i % 2 == 0) ? 'left' : 'right' 
+			process.stdout.write(clc.move[direction](1))
+		})
+	}
+
 }
 
 

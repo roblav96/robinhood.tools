@@ -1,7 +1,6 @@
 // 
 
 import chalk from 'chalk'
-import * as clc from 'cli-color'
 import * as path from 'path'
 
 
@@ -51,7 +50,6 @@ process.on('unhandledRejection', function(error) {
 
 
 if (process.MASTER) {
-	// if (DEVELOPMENT) setInterval(function() { process.stdout.write(' \x1b[K') }, 3000);
 	console.log('\n')
 	console.log(`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`)
 	console.log(`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}`)
