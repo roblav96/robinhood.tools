@@ -18,7 +18,7 @@ function fork(i: number) {
 	workers[worker.process.pid] = i
 }
 
-function onsubscribe() {
+function onforking() {
 
 	let forks = process.INSTANCES - 1
 	console.info('Forking', `+${forks}`, pretty.plural('worker', forks), 'in cluster...')
@@ -38,10 +38,10 @@ function onsubscribe() {
 }
 
 if (process.MASTER) {
-	fastify.rxready.subscribe(onsubscribe)
+	fastify.rxready.subscribe(onforking)
 
 	if (DEVELOPMENT) {
-		clock.on('500ms', function(i) {
+		clock.on('1s', function(i) {
 			let direction = (i % 2 == 0) ? 'left' : 'right' 
 			process.stdout.write(clc.move[direction](1))
 		})

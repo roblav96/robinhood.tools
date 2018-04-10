@@ -49,7 +49,7 @@ process.on('unhandledRejection', function(error) {
 
 
 
-if (process.MASTER) {
+if (process.PRIMARY) {
 	console.log('\n')
 	console.log(`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`)
 	console.log(`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}`)

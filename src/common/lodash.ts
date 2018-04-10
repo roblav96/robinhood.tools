@@ -1,8 +1,5 @@
 // 
 
-// import * as _ from '../../common/lodash'
-// export = _
-
 export {
 	after,
 	clone,

@@ -1,5 +1,6 @@
 // 
 
+import * as path from 'path'
 import * as pAll from 'p-all'
 import * as fuzzy from 'fuzzysort'
 import * as boom from 'boom'
@@ -19,7 +20,7 @@ import radio from '../adapters/radio'
 export const rxready = new Rx.ReadySubject()
 radio.once('webull.tickers.ready', () => rxready.next())
 
-if (process.MASTER) {
+if (process.PRIMARY) {
 	Promise.all([
 		radio.rxready.toPromise(),
 		rhinstruments.rxready.toPromise(),
@@ -36,9 +37,9 @@ if (process.MASTER) {
 async function readyTickers() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
 
-	let synced = await redis.main.keys(`${redis.WB.TICKERS}:*`)
-	console.log('tickers synced ->', console.inspect(synced.length))
-	if (synced.length < 10000) {
+	let synced = await redis.main.scard(redis.WB.TICKER_IDS)
+	console.log('tickers synced ->', console.inspect(synced))
+	if (synced < 10000) {
 		await syncTickers()
 	}
 
@@ -49,31 +50,36 @@ async function readyTickers() {
 
 
 async function syncTickers() {
-	// 	if (process.MASTER) {
-	// 		await syncAlls()
-	// 		// await radio.job('syncTickers')
-	// 	}
 
-	// 	if (process.WORKER) {
-	// 		let symbols = await robinhood.getSymbols()
-	// 		console.log('symbols.length ->', console.inspect(symbols.length))
+	let alls = _.flatten(await Promise.all([
+		// stocks
+		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/8', {
+			query: { pageSize: 999999 },
+		}),
+		// etfs
+		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/13', {
+			query: { pageSize: 999999 },
+		}),
+	])) as Webull.Ticker[]
 
-	// 		await pAll(symbols.map(v => () => syncTicker(v)), { concurrency: 1 })
-	// 		// await pAll(symbols.map((v, i) => function() {
-	// 		// 	let prog = core.number.round((i / symbols.length) * 100)
-	// 		// 	console.log(console.inspect(prog), 'symbol ->', console.inspect(v))
-	// 		// 	return syncTicker(v)
-	// 		// }), { concurrency: 1 })
-	// 		// await syncTicker('AAIT')
+	_.remove(alls, v => Array.isArray(v.disSymbol.match(/\W+/)))
+	let disSymbols = _.groupBy(alls, 'disSymbol' as keyof Webull.Ticker)
 
-	// 		console.info('workerTickers -> done')
-	// 		radio.emit('workerTickers.' + process.INSTANCE)
-	// 	}
+	await radio.emitAll(AllSyncTickers)
 
-	// 	console.info('syncTickers -> done')
+	console.info('syncTickers -> done')
 
 }
-// if (process.WORKER) radio.on('syncTickers', syncTickers);
+
+radio.onAll(AllSyncTickers)
+async function AllSyncTickers(done: string) {
+	clock.once('10s', function() {
+		console.log('done ->', console.inspect(done))
+		radio.emit(done)
+	})
+}
+
+
 
 
 
@@ -121,33 +127,62 @@ async function syncTicker(symbol: string) {
 
 
 
-async function syncAlls() {
-	let alls = _.flatten(await Promise.all([
-		// stocks
-		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/8', {
-			query: { pageSize: 999999 },
-		}),
-		// etfs
-		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/13', {
-			query: { pageSize: 999999 },
-		}),
-	])) as Webull.Ticker[]
+// async function syncAlls() {
+// 	let alls = _.flatten(await Promise.all([
+// 		// stocks
+// 		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/8', {
+// 			query: { pageSize: 999999 },
+// 		}),
+// 		// etfs
+// 		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/13', {
+// 			query: { pageSize: 999999 },
+// 		}),
+// 	])) as Webull.Ticker[]
 
-	_.remove(alls, v => Array.isArray(v.disSymbol.match(/\W+/)))
+// 	_.remove(alls, v => Array.isArray(v.disSymbol.match(/\W+/)))
 
-	let grouped = _.groupBy(alls, 'disSymbol' as keyof Webull.Ticker)
-	let coms = Object.keys(grouped).map(function(symbol) {
-		return ['set', `${redis.WB.ALLS}:${symbol}`, JSON.stringify(grouped[symbol])]
-	})
-	await redis.main.coms(coms)
+// 	let grouped = _.groupBy(alls, 'disSymbol' as keyof Webull.Ticker)
+// 	let coms = Object.keys(grouped).map(function(symbol) {
+// 		return ['set', `${redis.WB.ALLS}:${symbol}`, JSON.stringify(grouped[symbol])]
+// 	})
+// 	await redis.main.coms(coms)
 
-	console.info('syncAlls -> done')
+// 	console.info('syncAlls -> done')
 
-}
-
-
+// }
 
 
+
+
+
+
+
+// if (process.PRIMARY) {
+// 	await syncAlls()
+// 	// await radio.job('syncTickers')
+// }
+
+// 	if (process.WORKER) {
+// 		let symbols = await robinhood.getSymbols()
+// 		console.log('symbols.length ->', console.inspect(symbols.length))
+
+// 		await pAll(symbols.map(v => () => syncTicker(v)), { concurrency: 1 })
+// 		// await pAll(symbols.map((v, i) => function() {
+// 		// 	let prog = core.number.round((i / symbols.length) * 100)
+// 		// 	console.log(console.inspect(prog), 'symbol ->', console.inspect(v))
+// 		// 	return syncTicker(v)
+// 		// }), { concurrency: 1 })
+// 		// await syncTicker('AAIT')
+
+// 		console.info('workerTickers -> done')
+// 		radio.emit('workerTickers.' + process.INSTANCE)
+// 	}
+
+// 	console.info('syncTickers -> done')
+
+// if (process.WORKER) radio.on('syncTickers', syncTickers);
+
+// radio.on('webull')
 
 // if (process.WORKER) {
 
@@ -182,7 +217,7 @@ async function syncAlls() {
 
 
 
-// if (process.MASTER) {
+// if (process.PRIMARY) {
 // 	let done = 0
 // 	radio.on('webull.tickers.done', function() {
 // 		done++
@@ -213,7 +248,7 @@ async function syncAlls() {
 
 // radio.once('webull.tickers.ready', () => ready.next())
 
-// if (process.MASTER) {
+// if (process.PRIMARY) {
 // 	rhinstruments.ready.toPromise().then(readyTickers).catch(function(error) {
 // 		console.error('readyTickers Error ->', error)
 // 	}).finally(function() {

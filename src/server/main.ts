@@ -1,14 +1,11 @@
 // 
 
-if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development';
-global.NODE_ENV = process.env.NODE_ENV
-global.DEVELOPMENT = NODE_ENV == 'development'
-global.PRODUCTION = NODE_ENV == 'production'
-
 require('../common/polyfills')
-require('correcting-interval')
 require('source-map-support').install()
 
+global.NODE_ENV = process.env.NODE_ENV || 'development'
+global.DEVELOPMENT = NODE_ENV == 'development'
+global.PRODUCTION = NODE_ENV == 'production'
 global.Promise = require('bluebird')
 global.WebSocket = require('uws')
 
@@ -22,34 +19,6 @@ import './api/fastify'
 import './adapters/cluster'
 import './adapters/radio'
 
-// import './watchers/watchers'
-
-
-
-
-
-// import * as clc from 'cli-color'
-// if (process.MASTER) {
-
-// 	console.log('clc ->', console.dump(clc, { depth: 8 }))
-// 	// console.warn('clc ->', console.dtsgen(clc))
-
-// 	// 	// console.log('process.env ->', console.inspect(process.env))
-// 	// 	console.log('process.argv0 ->', console.inspect(process.argv0))
-// 	// 	console.log('process.execArgv ->', console.inspect(process.execArgv))
-// 	// 	console.log('process.argv ->', console.inspect(process.argv))
-// 	// 	// console.log('!!global.gc ->', !!global.gc)
-// }
-
-// import chalk from 'chalk'
-// import * as os from 'os'
-// import * as cluster from 'cluster'
-
-// // if (process.PRIMARY) {
-// // console.log('process.argv ->', console.inspect(process.argv))
-// // console.log('process.env ->', console.inspect(process.env))
-// console.log('cluster.isMaster ->', console.inspect(cluster.isMaster))
-// console.log('cluster.isWorker ->', console.inspect(cluster.isWorker))
-// // }
+import './watchers/watchers'
 
 

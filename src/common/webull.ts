@@ -4,6 +4,7 @@
 
 export const WB = {
 	WB: 'wb',
+	TICKER_IDS: 'wb:tickerids',
 	TICKERS: 'wb:tickers',
 	ALLS: 'wb:alls',
 }

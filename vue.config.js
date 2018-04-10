@@ -25,7 +25,7 @@ module.exports = {
 		delete config.node.process
 
 		if (DEVELOPMENT) {
-			config.devtool = 'source-map'
+			config.devtool = 'inline-source-map'
 			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/]))
 			config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
 				rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
@@ -84,6 +84,14 @@ module.exports = {
 
 	},
 
+}
+
+if (DEVELOPMENT) {
+	const clc = require('cli-color'); let i = 0;
+	setInterval(function() {
+		let direction = (i % 2 == 0) ? 'left' : 'right'; i++;
+		process.stdout.write(clc.move[direction](1))
+	}, 1000)
 }
 
 

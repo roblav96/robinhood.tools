@@ -21,7 +21,7 @@ function dumpHeap() {
 	console.log('memory heap usage ->', chalk.bold(nowheap.heapUsed), 'used', chalk.bold(nowheap.heapTotal), 'total')
 }
 
-// if (process.MASTER || process.INSTANCE == process.INSTANCES) {
+// if (process.PRIMARY || process.INSTANCE == process.INSTANCES) {
 // 	// ticks.addListener(ticks.T60, dumpHeap)
 // 	// dumpHeap()
 // }

@@ -54,6 +54,7 @@
 		"repaintless": "latest",
 		"rxjs": "rc",
 		"stacktracey": "latest",
+		"string-fn": "latest",
 		"tiny-emitter": "latest",
 		"uws": "latest",
 		"vue": "latest",

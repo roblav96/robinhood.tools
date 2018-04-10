@@ -1,18 +1,21 @@
 // 
 
 require('@/common/polyfills')
-global.Promise = require('bluebird')
 
 global.NODE_ENV = process.env.NODE_ENV || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
+global.Promise = require('bluebird')
 
 process.NAME = process.env.NAME
 process.VERSION = process.env.VERSION
 process.DOMAIN = process.env.DOMAIN
 process.CLIENT = true
 
-Object.assign(console, { dump() { } })
+import * as _ from '@/common/lodash'
+Object.assign(console, { dtsgen: _.noop, dump: _.noop })
+if (DEVELOPMENT) Object.assign(window, require('@/common/core'));
+// if (DEVELOPMENT) console.dtsgen = require('@/common/dtsgen').default;
 
 // 
 
@@ -36,9 +39,5 @@ Vue.use(Buefy, {
 } as BuefyConfig)
 
 require('@/client/vm')
-
-if (DEVELOPMENT) {
-	Object.assign(window, require('@/common/core'))
-}
 
 

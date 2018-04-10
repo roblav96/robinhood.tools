@@ -1,7 +1,7 @@
 // 
+
 import * as bluebird from 'bluebird'
 bluebird.config({ warnings: { wForgottenReturn: false } })
-// 
 
 import * as _ from './lodash'
 import * as leven from 'leven'
@@ -20,8 +20,6 @@ export function isJunk(value: any) {
 
 export const isBrowser = !new Function('try { return this === global; } catch(e) { return false }')()
 export const isNodejs = !isBrowser
-
-export function workers() { return array.create(process.INSTANCES) }
 
 
 

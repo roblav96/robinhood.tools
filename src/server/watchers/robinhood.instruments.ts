@@ -15,7 +15,7 @@ import radio from '../adapters/radio'
 export const rxready = new Rx.ReadySubject()
 radio.once('robinhood.instruments.ready', () => rxready.next())
 
-if (process.MASTER) {
+if (process.PRIMARY) {
 	Promise.all([
 		radio.rxready.toPromise(),
 	]).then(readyInstruments).catch(function(error) {
@@ -30,15 +30,13 @@ if (process.MASTER) {
 async function readyInstruments() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
 
-	let synced = await redis.main.scard(`${redis.RH.SYMBOLS}`)
+	let synced = await redis.main.scard(redis.RH.SYMBOLS)
 	console.log('instruments synced ->', console.inspect(synced))
 	if (synced < 10000) {
 		await syncInstruments()
 	}
 
 	await chunkSymbols()
-
-	console.info('readyInstruments -> done')
 
 }
 
@@ -50,7 +48,12 @@ async function syncInstruments() {
 		let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
 		_.remove(response.results, v => Array.isArray(v.symbol.match(/\W+/)))
 
-		if (DEVELOPMENT) console.log('syncInstruments ->', console.inspect(response.results.length), console.inspect(response.next));
+		if (DEVELOPMENT) {
+			console.log('syncInstruments ->',
+				console.inspect(response.results.length),
+				console.inspect(response.next)
+			)
+		}
 
 		let coms = response.results.map(v => ['hmset', `${redis.RH.INSTRUMENTS}:${v.symbol}`, v as any])
 		let symbols = new redis.SetsComs(redis.RH.SYMBOLS)
@@ -99,8 +102,6 @@ async function chunkSymbols() {
 		})
 	})
 	await redis.main.coms(coms)
-
-	console.info('chunkSymbols -> done')
 
 }
 
