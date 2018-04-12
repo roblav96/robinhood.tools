@@ -3,7 +3,8 @@
 require('../common/polyfills')
 require('source-map-support').install()
 
-global.NODE_ENV = process.env.NODE_ENV || 'development'
+process.env.NODE_ENV = ['development', 'production'].includes(process.env.NODE_ENV) ? process.env.NODE_ENV : 'development'
+global.NODE_ENV = process.env.NODE_ENV
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
 global.Promise = require('bluebird')

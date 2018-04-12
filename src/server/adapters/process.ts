@@ -69,7 +69,9 @@ if (process.PRIMARY) {
 
 
 
-
-
+// process.on('SIGTERM', function(message) {
+// 	console.log('SIGTERM ->', message)
+// 	process.exit(1)
+// })
 
 

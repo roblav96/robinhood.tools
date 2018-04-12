@@ -98,7 +98,10 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _onclose = (event: CloseEvent) => {
-		if (!this.options.silent) console.warn(this.name, 'onclose ->', WebSocketClient.ecodes[event.code] || event.code, '->', event.reason)
+		let code = WebSocketClient.ecodes[event.code] || event.code
+		if (!this.options.silent && code != 'Abnormal') {
+			console.warn(this.name, 'onclose ->', code, '->', event.reason)
+		}
 		this.emit('close', _.pick(event, ['code', 'reason']))
 		clock.offListener(this._heartbeat)
 		if (this.options.retry) this._reconnect();

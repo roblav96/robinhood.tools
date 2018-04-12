@@ -8,16 +8,22 @@ import { ProcessContextAccessor } from 'pandora/dist/application/ProcessContextA
 
 
 module.exports = function(pandora: ProcfileReconcilerAccessor) {
-
 	// const cpus = os.cpus().length
 
-	pandora.fork('robinhood.tools', './dist/server/main.js')
+	pandora.fork('robinhood.tools', './dist/server/main.js').env({
+		NODE_ENV: 'development' as typeof NODE_ENV,
+	})
+
+	// pandora.process('worker').nodeArgs().push('-r', 'ts-node/register', '--trace-warnings');
+	// pandora.process('worker').scale(1)
+	// pandora.service('dashboard', './node_modules/pandora-dashboard').process('worker')
+
 
 
 
 
 	// pandora
-	// 	.fork('robinhood.tools', './dist/server/main.js');
+	// 	.fork('robinhood.tools', './dist/server/main.js')
 
 	// /**
 	//  * you can also use cluster mode to start application
@@ -96,23 +102,14 @@ module.exports = function(pandora: ProcfileReconcilerAccessor) {
 
 
 
-// import * as util from 'util'
-// _.merge(util.inspect, {
-// 	defaultOptions: {
-// 		showHidden: true,
-// 		showProxy: true,
-// 		depth: 4,
-// 		compact: false,
-// 		breakLength: Infinity,
-// 		maxArrayLength: Infinity,
-// 		colors: true,
-// 	},
-// 	styles: {
-// 		string: 'green', regexp: 'green', date: 'green',
-// 		number: 'magenta', boolean: 'blue',
-// 		undefined: 'red', null: 'red',
-// 		symbol: 'cyan', special: 'cyan',
-// 	},
-// } as Partial<typeof util.inspect>)
+import * as util from 'util'
+_.merge(util.inspect, {
+	defaultOptions: { showHidden: true, showProxy: true, depth: 4, compact: false, breakLength: Infinity, maxArrayLength: Infinity, colors: true, },
+	styles: { string: 'green', regexp: 'green', date: 'green', number: 'magenta', boolean: 'blue', undefined: 'red', null: 'red', symbol: 'cyan', special: 'cyan', },
+} as Partial<typeof util.inspect>)
+
+// import * as inspector from 'inspector'
+// inspector.open(process.debugPort - 1)
+// process.on('beforeExit', inspector.close)
 
 

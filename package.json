@@ -13,9 +13,11 @@
 		"client:build": "rimraf dist/client && cross-env NODE_ENV=production vue-cli-service build --mode production",
 		"rs": "npm run server:dev",
 		"server:dev": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'forever forever.config.json'",
-		"server:dev:pandora": "run-p server:dev:pandora:*",
+		"server:dev:pandora": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'npm run server:dev:pandora:start'",
+		"server:dev:pandora:start": "cp -f dist/server/procfile.js procfile.js && pandora dev",
+		"server:dev:pandora:all": "run-p server:dev:pandora:*",
 		"server:dev:pandora:procfile": "tsc src/server/procfile.ts --outDir . --watch",
-		"server:dev:pandora:watch": "tsc-watch -p .server.tsconfig.json --onSuccess 'pandora dev'",
+		"server:dev:pandora:watch": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'cp -f dist/server/procfile.js procfile.js'",
 		"server:build": "rimraf dist/server && tsc -p .server.tsconfig.json",
 		"cli:clear": "clear && printf \"\\e[3J\""
 	},
@@ -112,6 +114,7 @@
 		"rimraf": "latest",
 		"sass-loader": "latest",
 		"source-map-support": "latest",
+		"ts-node": "latest",
 		"tsc-watch": "latest",
 		"vue-template-compiler": "latest",
 		"webpack-bundle-analyzer": "latest"
