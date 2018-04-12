@@ -40,7 +40,7 @@ async function readyTickers() {
 		await syncTickers()
 	}
 
-	// await chunkTickerIds()
+	await chunkTickerIds()
 
 	console.info('readyTickers -> done')
 
@@ -98,7 +98,7 @@ async function syncTicker(symbol: string, tickers = [] as Webull.Ticker[]) {
 
 	if (!ticker) {
 
-		if (['ASPU', 'EQS', 'INSI', 'YESR'].includes(symbol)) return;
+		if (['ASPU', 'EQS', 'INSI', 'MUFG', 'YESR'].includes(symbol)) return;
 
 		await clock.toPromise('250ms')
 		let response = await http.get('https://infoapi.stocks666.com/api/search/tickers2', {
@@ -145,22 +145,29 @@ async function syncTicker(symbol: string, tickers = [] as Webull.Ticker[]) {
 
 
 
-// async function chunkTickerIds() {
-// 	let rkeys = [redis.WB.TICKER_IDS, redis.WB.VALID_TICKER_IDS, redis.WB.INVALID_TICKER_IDS]
-// 	let rcoms = rkeys.map(v => ['hgetall', v])
-// 	let resolved = await redis.main.coms(rcoms) as Dict<string>[]
+async function chunkTickerIds() {
+	let alls = core.array.create(process.INSTANCES)
 
-// 	let coms = [] as Redis.Coms
-// 	resolved.forEach(function(dictIds, i) {
-// 		let symbols = Object.keys(dictIds).sort()
-// 		let chunks = core.array.chunks(symbols, process.INSTANCES)
-// 		chunks.forEach(function(chunk, ii) {
-// 			coms.push(['set', `${rkeys[i]}:${process.INSTANCES}:${ii}`, chunk.toString()])
-// 		})
-// 	})
-// 	await redis.main.coms(coms)
+	let rcoms = alls.map(function(i) {
+		return ['get', `${redis.RH.SYMBOLS}:${process.INSTANCES}:${i}`]
+	})
+	rcoms.push(['hgetall', redis.WB.TICKER_IDS])
+	let resolved = await redis.main.coms(rcoms) as string[]
+	let tickerIds = (resolved.pop() as any) as Dict<string>
 
-// }
+	let coms = [] as Redis.Coms
+	resolved.forEach(function(v, i) {
+		let symbols = v.split(',')
+		console.log('symbols.length ->', symbols.length)
+		// let symbols = Object.keys(dictIds).sort()
+		// let chunks = core.array.chunks(symbols, process.INSTANCES)
+		// chunks.forEach(function(chunk, ii) {
+		// 	coms.push(['set', `${rkeys[i]}:${process.INSTANCES}:${ii}`, chunk.toString()])
+		// })
+	})
+	await redis.main.coms(coms)
+
+}
 
 
 

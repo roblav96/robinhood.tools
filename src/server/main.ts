@@ -16,7 +16,7 @@ if (DEVELOPMENT) {
 
 import './adapters/process'
 import './adapters/console'
-import './services/cleanup'
+// import './services/cleanup'
 
 import '../common/clock'
 import './api/fastify'

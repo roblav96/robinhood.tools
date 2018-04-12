@@ -117,8 +117,8 @@ class Radio extends Emitter<string, any> {
 	async emitAll(fn: (done: string, ...args: any[]) => any, ...args: any[]) {
 		if (!fn.name) throw new Error('emitAll parameter function must be named');
 		await this.rxready.toPromise()
-		let all = core.array.create(process.INSTANCES)
-		let proms = all.map(i => this.toPromise(`${fn.name}.${i}`))
+		let alls = core.array.create(process.INSTANCES)
+		let proms = alls.map(i => this.toPromise(`${fn.name}.${i}`))
 		this.emit(fn.name, fn.name, ...args)
 		await Promise.all(proms)
 	}
