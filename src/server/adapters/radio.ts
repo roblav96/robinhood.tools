@@ -23,7 +23,9 @@ if (process.PRIMARY) {
 	class WebSocketServer extends uws.Server {
 		opens() {
 			let opens = 0
-			this.clients.forEach(v => opens++)
+			this.clients.forEach(function(client) {
+				if (client.open) opens++;
+			})
 			return opens
 		}
 		find(id: string) {
@@ -63,9 +65,7 @@ if (process.PRIMARY) {
 			if (message == 'ping') return client.send('pong');
 			if (message == '__onopen__') {
 				client.open = true
-				let opens = wss.opens()
-				console.log(client.id, 'opens ->', opens)
-				if (opens == process.INSTANCES) {
+				if (wss.opens() >= process.INSTANCES) {
 					wss.broadcast('__onready__')
 				}
 				return
@@ -110,7 +110,10 @@ class Radio extends Emitter<string, any> {
 	constructor() {
 		super()
 
-		fastify.rxready.subscribe(() => this.socket.connect())
+		// fastify.rxready.subscribe(() => this.socket.connect())
+		setImmediate(() => {
+			this.socket.connect()
+		})
 
 		this.socket.on('open', () => {
 			this.rxopen.next(true)

@@ -64,6 +64,13 @@ process.on('unhandledRejection', function(error) {
 
 
 
+import * as clc from 'cli-color'
+if (DEVELOPMENT && process.PRIMARY) {
+	setInterval(() => process.stdout.write(clc.move.up(1)), 1000)
+}
+
+
+
 if (process.PRIMARY) {
 	console.log(
 		` \n \n \n \n${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`,

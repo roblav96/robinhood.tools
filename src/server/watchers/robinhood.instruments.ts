@@ -111,14 +111,6 @@ async function syncTickerIds() {
 	])) as Webull.Ticker[]
 	_.remove(tickers, v => Array.isArray(v.disSymbol.match(/\W+/)))
 
-	// if (DEVELOPMENT) {
-	// 	let total = (await robinhood.getAllSymbols()).length
-	// 	radio.on('syncTickerId.symbol', function(symbol: string) {
-	// 		total--
-	// 		console.log('total ->', total, symbol)
-	// 	})
-	// }
-
 	let disTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker)
 	await radio.emitAll(AllSyncTickerIds, disTickers)
 
@@ -146,9 +138,6 @@ async function AllSyncTickerIds(done: string, disTickers: Dict<Webull.Ticker[]>)
 
 async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 	if (DEVELOPMENT) console.log('syncTickerId ->', console.inspect(symbol));
-	// if (DEVELOPMENT) {
-	// 	radio.emitPrimary('syncTickerId.symbol', symbol)
-	// }
 
 	let instrument = await redis.main.hgetall(`${redis.RH.INSTRUMENTS}:${symbol}`) as Robinhood.Instrument
 	core.fix(instrument)
