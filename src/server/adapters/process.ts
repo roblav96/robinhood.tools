@@ -43,7 +43,7 @@ if (process.DEBUGGING) {
 	chalk.enabled = false
 	inspector.open(process.debugPort + process.INSTANCE)
 	process.on('beforeExit', inspector.close)
-	process.on('exit', inspector.close)
+	// process.on('exit', inspector.close)
 }
 declare global { namespace NodeJS { export interface Process { debugPort: number, DEBUGGING: boolean } } }
 
@@ -62,8 +62,8 @@ process.on('unhandledRejection', function(error) {
 
 if (process.PRIMARY) {
 	console.log(
-		`\n\n\n\n${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`,
-		`\n${chalk.magentaBright('█')} ${chalk(NODE_ENV)}\n\n`,
+		` \n \n \n \n${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`,
+		` \n${chalk.magentaBright('█')} ${chalk(NODE_ENV)} \n \n`,
 	)
 }
 
