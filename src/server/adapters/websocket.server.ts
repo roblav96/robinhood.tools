@@ -9,7 +9,9 @@ class WebSocketServer extends uws.Server {
 	isopens() {
 		let isopens = 0
 		this.clients.forEach(function(client) {
-			if (client.isopen) isopens++;
+			if (client.isopen) {
+				isopens++
+			}
 		})
 		return isopens
 	}
@@ -18,7 +20,9 @@ class WebSocketServer extends uws.Server {
 		let found: uws.WebSocket
 		this.clients.forEach(function(client) {
 			if (found) return;
-			if (client.uuid == uuid) found = client;
+			if (client.uuid == uuid) {
+				found = client
+			}
 		})
 		return found
 	}

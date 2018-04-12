@@ -65,7 +65,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		clock.offListener(this._connect)
 		clock.offListener(this._heartbeat)
 		if (!this.socket) return;
-		this.socket.close()
+		this.socket.close(1000)
 		if (process.SERVER) {
 			this.socket.terminate()
 			this.socket.removeAllListeners()
@@ -91,7 +91,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _onopen = (event: Event) => {
-		if (this.options.verbose) console.info(this.name, 'onopen'); // ->', process.CLIENT ? (event.target as WebSocket).url : '');
+		if (!this.options.silent && this.options.verbose) console.info(this.name, 'onopen'); // ->', process.CLIENT ? (event.target as WebSocket).url : '');
 		clock.on(this.options.heartbeat, this._heartbeat)
 		clock.offListener(this._connect)
 		this.emit('open', event)

@@ -27,9 +27,9 @@ if (process.PRIMARY) {
 			let host = incoming.req.headers['host']
 			next(host == process.HOST)
 		},
-	}, function (idk) {
-		console.warn('idk ->', idk)
 	})
+
+	process.on('SIGINT', () => wss.close())
 
 	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
@@ -82,14 +82,16 @@ class Radio extends Emitter<string, any> {
 	socket = new WebSocketClient(ADDRESS, {
 		connect: false,
 		timeout: '1s',
+		// silent: true,
 		// verbose: true,
 	})
 
 	constructor() {
 		super()
 
-		// fastify.rxready.subscribe(() => this.socket.connect())
-		fastify.rxready.subscribe(() => setImmediate(() => this.socket.connect()))
+		process.on('SIGINT', () => this.socket.destroy())
+
+		// fastify.rxready.subscribe(() => _.delay(() => this.socket.connect(), 300))
 
 		this.socket.on('open', () => {
 			this.rxopen.next(true)
@@ -135,22 +137,6 @@ class Radio extends Emitter<string, any> {
 		this.emit(fn.name, fn.name, ...args)
 		await Promise.all(proms)
 	}
-
-
-
-	// event(event: Partial<Radio.Event>) {
-	// 	event.sender = process.INSTANCE
-	// 	this.socket.json(event)
-	// 	return this
-	// }
-
-	// async everyone(name: string, ...args: any[]) {
-	// 	await this.rxready.toPromise()
-	// 	let ii = core.array.create(process.INSTANCES)
-	// 	let proms = ii.map(i => this.toPromise(name))
-	// 	this.emit(name, ...args)
-	// 	await Promise.all(proms)
-	// }
 
 }
 

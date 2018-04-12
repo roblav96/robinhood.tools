@@ -8,7 +8,7 @@ import * as pEvent from 'p-event'
 export default class Emitter<Names extends string = string, Data = any> extends TinyEmitter<Names, Data> {
 
 	private get _e() { return this.e || (this.e = {}) }
-	get names() { return Object.keys(this._e) as Names[] }
+	names() { return Object.keys(this._e) as Names[] }
 
 	offListener<Name extends Names>(listener: TinyEmitter.Listener<Data>) {
 		let e = this._e
