@@ -13,6 +13,7 @@ import WebSocketClient from '../../common/websocket.client'
 import WebSocketServer from './websocket.server'
 import Emitter from '../../common/emitter'
 import fastify from '../api/fastify'
+import pm2 from './pm2'
 
 
 
@@ -28,8 +29,6 @@ if (process.PRIMARY) {
 			next(host == process.HOST)
 		},
 	})
-
-	process.on('SIGINT', () => wss.close())
 
 	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
@@ -89,9 +88,10 @@ class Radio extends Emitter<string, any> {
 	constructor() {
 		super()
 
-		process.on('SIGINT', () => this.socket.destroy())
-
-		// fastify.rxready.subscribe(() => _.delay(() => this.socket.connect(), 300))
+		pm2.once('primary:fastify.rxready', () => this.socket.connect())
+		if (process.PRIMARY) {
+			fastify.rxready.subscribe(() => pm2.emit('primary:fastify.rxready'))
+		}
 
 		this.socket.on('open', () => {
 			this.rxopen.next(true)

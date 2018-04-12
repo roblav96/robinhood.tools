@@ -46,7 +46,7 @@ import * as inspector from 'inspector'
 if (process.DEBUGGING) {
 	chalk.enabled = false
 	inspector.open(process.debugPort + process.INSTANCE)
-	process.on('beforeExit', inspector.close)
+	// process.on('beforeExit', inspector.close)
 	// process.on('exit', inspector.close)
 }
 declare global { namespace NodeJS { export interface Process { debugPort: number, DEBUGGING: boolean } } }
@@ -55,7 +55,6 @@ declare global { namespace NodeJS { export interface Process { debugPort: number
 
 process.on('uncaughtException', function(error) {
 	console.error(chalk.bold.redBright('UNCAUGHT EXCEPTION'), '->', error)
-	// if (DEVELOPMENT) process.exit(1);
 })
 process.on('unhandledRejection', function(error) {
 	console.error(chalk.bold.redBright('UNHANDLED REJECTION'), '->', error)
@@ -77,12 +76,5 @@ if (process.PRIMARY) {
 		` \n${chalk.magentaBright('█')} ${chalk(NODE_ENV)} \n \n \n`,
 	)
 }
-
-
-
-// process.on('SIGTERM', function(message) {
-// 	console.log('SIGTERM ->', message)
-// 	process.exit(1)
-// })
 
 
