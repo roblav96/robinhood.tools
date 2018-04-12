@@ -4,8 +4,8 @@ import * as Bluebird from 'bluebird'
 
 declare global {
 
-	interface Promise<T> extends Bluebird<T> { }
-	interface PromiseLike<T> extends Bluebird<T> { }
+	interface Promise<T = any> extends Bluebird<T> { }
+	interface PromiseLike<T = any> extends Bluebird<T> { }
 
 	// type BluebirdConstructor = typeof Bluebird
 	interface BluebirdConstructor {

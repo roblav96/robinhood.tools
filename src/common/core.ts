@@ -253,27 +253,45 @@ export const time = {
 
 
 
-export class PromiseRetry {
-
-	private static get options() {
-		return _.clone({
-			times: Infinity,
-			tick: '3s' as Clock.Tick,
+import * as R from './rambdax'
+export function pRetry<T>(fn: Promise<T>) {
+	console.warn('pRetryss')
+	console.log('fn ->', fn)
+	console.log('arguments ->', arguments)
+	// console.log('fn ->', console.dump(fn, { depth: 8 }))
+	return fn.get(0 as any).then(function(idk) {
+		console.log('idk ->', idk)
+	}).catch((error) => {
+		// console.log('this ->', this)
+		console.error('pRetry Error ->', error)
+		return R.delay(1000).then(function(delay) {
+			console.log('delay ->', console.inspect(delay))
+			// return fn()
 		})
-	}
-
-	constructor(
-		promise: Promise<any>,
-		options = {} as Partial<typeof PromiseRetry.options>,
-	) {
-		console.log('arguments ->', console.inspect(arguments))
-		return promise.catch(function(error) {
-			console.error('PromiseRetry Error ->', error)
-			// return promise.call(...arguments)
-		})
-	}
-	
+	})
 }
+
+// export class PromiseRetry {
+
+// 	private static get options() {
+// 		return _.clone({
+// 			times: Infinity,
+// 			tick: '3s' as Clock.Tick,
+// 		})
+// 	}
+
+// 	constructor(
+// 		promise: Promise<any>,
+// 		options = {} as Partial<typeof PromiseRetry.options>,
+// 	) {
+// 		console.log('arguments ->', console.inspect(arguments))
+// 		return promise.catch(function(error) {
+// 			console.error('PromiseRetry Error ->', error)
+// 			// return promise.call(...arguments)
+// 		})
+// 	}
+
+// }
 
 
 

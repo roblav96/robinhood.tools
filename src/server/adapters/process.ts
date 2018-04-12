@@ -38,6 +38,15 @@ declare global { namespace NodeJS { export interface Process { HOST: string, POR
 
 
 
+import * as inspector from 'inspector'
+if (process.DEBUGGING) {
+	chalk.enabled = false
+	inspector.open(process.debugPort + process.INSTANCE)
+}
+declare global { namespace NodeJS { export interface Process { debugPort: number, DEBUGGING: boolean } } }
+
+
+
 process.on('uncaughtException', function(error) {
 	console.error(chalk.bold.redBright('UNCAUGHT EXCEPTION'), '->', error)
 })
@@ -50,9 +59,15 @@ process.on('unhandledRejection', function(error) {
 
 
 if (process.PRIMARY) {
-	console.log('\n')
-	console.log(`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`)
-	console.log(`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}`)
+	console.log(
+		`\n\n${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`,
+		`\n${chalk.magentaBright('█')} ${chalk(NODE_ENV)}\n\n`,
+	)
 }
+
+
+
+
+
 
 

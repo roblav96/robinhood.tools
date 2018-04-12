@@ -34,19 +34,34 @@ if (process.PRIMARY) {
 
 
 async function readyTickers() {
-	if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
-
-	let synced = await redis.main.hlen(redis.WB.TICKER_IDS)
-	console.log('tickers synced ->', console.inspect(synced))
-	if (synced < 9000) {
-		await syncTickers()
-	}
-
-	// await chunkTickerIds()
-
-	console.info('readyTickers -> done')
+	
+	// await core.pRetry(throwing('not awesome error'))
 
 }
+
+async function throwing(value: string) {
+	await new Promise(function(resolve, reject) {
+		setTimeout(reject, 1000, new Error(value))
+	})
+	console.info('throwing -> done')
+}
+
+
+
+// async function readyTickers() {
+// 	if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
+
+// 	let synced = await redis.main.hlen(redis.WB.TICKER_IDS)
+// 	console.log('tickers synced ->', console.inspect(synced))
+// 	if (synced < 9000) {
+// 		await syncTickers()
+// 	}
+
+// 	// await chunkTickerIds()
+
+// 	console.info('readyTickers -> done')
+
+// }
 
 
 
