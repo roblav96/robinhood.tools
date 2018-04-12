@@ -1,7 +1,7 @@
 // 
 
-import * as bluebird from 'bluebird'
-bluebird.config({ warnings: { wForgottenReturn: false } })
+import * as Bluebird from 'bluebird'
+Bluebird.config({ warnings: { wForgottenReturn: false } })
 
 import * as _ from './lodash'
 import * as leven from 'leven'
@@ -249,6 +249,30 @@ export const math = {
 import { DurationObjectUnits } from 'luxon'
 export const time = {
 	UNITS: { 'ms': 'milliseconds', 's': 'seconds', 'm': 'minutes', 'h': 'hours' } as Dict<keyof DurationObjectUnits>,
+}
+
+
+
+export class PromiseRetry {
+
+	private static get options() {
+		return _.clone({
+			times: Infinity,
+			tick: '3s' as Clock.Tick,
+		})
+	}
+
+	constructor(
+		promise: Promise<any>,
+		options = {} as Partial<typeof PromiseRetry.options>,
+	) {
+		console.log('arguments ->', console.inspect(arguments))
+		return promise.catch(function(error) {
+			console.error('PromiseRetry Error ->', error)
+			// return promise.call(...arguments)
+		})
+	}
+	
 }
 
 

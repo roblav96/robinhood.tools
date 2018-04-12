@@ -73,17 +73,19 @@ async function syncTickers() {
 }
 
 radio.onAll(AllSyncTickers)
-async function AllSyncTickers(done: string, dictTickers: Dict<Webull.Ticker[]>) {
-	// if (process.INSTANCE != 1) return radio.done(done);
+function AllSyncTickers(done: string, dictTickers: Dict<Webull.Ticker[]>) {
+	return Promise.resolve().then(async function() {
+		// if (process.INSTANCE != 1) return radio.done(done);
 
-	let symbols = await robinhood.getSymbols()
-	await pAll(symbols.map(symbol => {
-		return () => syncTicker(symbol, dictTickers[symbol])
-	}), { concurrency: 1 })
+		let symbols = await robinhood.getSymbols()
+		await pAll(symbols.map(symbol => {
+			return () => syncTicker(symbol, dictTickers[symbol])
+		}), { concurrency: 1 })
 
-	console.info('AllSyncTickers -> done')
-	radio.done(done)
+		console.info('AllSyncTickers -> done')
+		radio.done(done)
 
+	})
 }
 
 async function syncTicker(symbol: string, tickers = [] as Webull.Ticker[]) {
