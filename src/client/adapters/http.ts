@@ -27,8 +27,6 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 			headers: {},
 		} as Partial<Http.Config>, http.config)
 
-		_.defaults(config.headers, security.headers())
-
 		if (!config.silent) {
 			let ending = (config.query || config.body) ? ' ➤ ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
 			console.log('➤ ' + config.method + ' ' + config.url + ending);
@@ -36,13 +34,14 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 		if (config.url[0] == '/') {
 			config.url = process.DOMAIN + '/api' + config.url
+			_.defaults(config.headers, security.headers())
 		}
 
 		// console.log('config ->', JSON.stringify(config, null, 4))
 		return got(config.url, config as any).then(({ body }) => body)
 
-	}).catch(function(error: Http.GotError) {
-		let message = _.get(error, 'statusMessage', error.message)
+	}).catch(function(error) {
+		let message = _.get(error, 'statusMessage', error.message) as string
 		let payload = _.get(error, 'response.body') as Http.Payload
 		if (payload && payload.message) {
 			let extra = payload.attributes ? JSON.stringify(payload.attributes) : payload.message
@@ -54,7 +53,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		console.log('%c◀ ' + '[' + method + '] ' + url, 'color: red; font-weight: bolder;', message)
 		vm.$toast.open({ message: url + ' ➤ ' + message, type: 'is-danger' })
 
-		return Promise.reject(message)
+		return Promise.reject(message) as any
 
 	})
 

@@ -22,22 +22,3 @@ import './adapters/radio'
 import './watchers/watchers'
 
 
-
-
-
-// import * as Promise from 'bluebird'
-// declare global {
-// 	interface Promise<T> extends Promise<T> {
-
-// 	}
-// 	class PromiseConstructor {
-// 		attempt: typeof Promise.attempt
-// 	}
-// 	var Promise: PromiseConstructor
-// }
-
-// Promise.resolve().then(function() {
-
-// }).finally
-
-
