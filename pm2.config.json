@@ -2,20 +2,19 @@
 	"apps": [{
 		"name": "robinhood.tools",
 		"script": "dist/server/main.js",
+		// "exec_interpreter" : "ts-node",
 		"args": ["--color"],
-		"node_args": [
-			"--max_old_space_size=512"
-		],
+		"node_args": ["--max_old_space_size=512"],
 		// 
 		"exec_mode": "fork",
 		"instances": "max",
 		// 
-		"source_map_support": true,
-		"wait_ready": false,
-		"kill_timeout": 1000,
 		"automation": false,
 		"pmx": false,
 		"vizion": false,
+		// 
+		"wait_ready": false,
+		"kill_timeout": 1000,
 		// 
 		"watch": false,
 		"autorestart": false,
@@ -26,6 +25,7 @@
 		"merge_logs": true,
 		"out_file": "/dev/null",
 		"error_file": "/dev/null",
+		"source_map_support": true,
 		// 
 		"env": {
 			"NODE_ENV": "development"
