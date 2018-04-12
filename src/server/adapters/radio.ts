@@ -21,6 +21,11 @@ const ADDRESS = `ws://${process.HOST}:${process.PORT}/${PATH}?${qs.stringify({ i
 if (process.PRIMARY) {
 
 	class WebSocketServer extends uws.Server {
+		opens() {
+			let opens = 0
+			this.clients.forEach(v => opens++)
+			return opens
+		}
 		find(id: string) {
 			let found: uws.WebSocket
 			this.clients.forEach(function(client) {
@@ -49,7 +54,7 @@ if (process.PRIMARY) {
 	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
-	wss.on('connection', function(client: uws.WebSocket, req: IncomingMessage) {
+	wss.on('connection', function(this: WebSocketServer, client: uws.WebSocket, req: IncomingMessage) {
 		client.open = false
 		client.id = qs.parse(url.parse(req.url).query).id as string
 
@@ -58,10 +63,9 @@ if (process.PRIMARY) {
 			if (message == 'ping') return client.send('pong');
 			if (message == '__onopen__') {
 				client.open = true
-				let opens = 0
-				wss.clients.forEach(v => opens++)
+				let opens = wss.opens()
 				console.log(client.id, 'opens ->', opens)
-				if (opens >= process.INSTANCES) {
+				if (opens == process.INSTANCES) {
 					wss.broadcast('__onready__')
 				}
 				return
