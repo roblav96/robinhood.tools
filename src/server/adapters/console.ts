@@ -28,9 +28,9 @@ if (!process.DEBUGGING) {
 		// if (method == 'warn') {
 		// 	output = chalk.bold.yellowBright('████  WARN  ████\n') + output
 		// }
-		// if (method == 'error') {
-		// 	output = chalk.bold.redBright('████  ERROR  ████\n') + output
-		// }
+		if (method == 'error') {
+			output = chalk.bold.redBright('████  ERROR  ████\n') + output
+		}
 		return '\n\n' + chalk.underline(output) + '\n'
 	}
 }
@@ -56,11 +56,11 @@ _.merge(util.inspect, {
 	defaultOptions: {
 		showHidden: false,
 		showProxy: false,
-		depth: 2,
-		compact: false,
+		depth: chalk.enabled ? 2 : 0,
+		compact: !chalk.enabled,
 		breakLength: Infinity,
 		maxArrayLength: Infinity,
-		colors: !!chalk.supportsColor,
+		colors: chalk.enabled,
 	},
 	styles: {
 		string: 'green', regexp: 'green', date: 'green',

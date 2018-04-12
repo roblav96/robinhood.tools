@@ -3,7 +3,7 @@
 	"script": "dist/server/main.js",
 	"command": "node --max_old_space_size=512",
 	"args": ["--colors"],
-	"killSignal": "SIGINT",
+	"killSignal": "SIGTERM",
 	"killTree": true,
 	"watch": false,
 	"append": true,

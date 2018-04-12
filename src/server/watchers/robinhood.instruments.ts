@@ -32,7 +32,6 @@ async function readyInstruments() {
 
 	let synced = await redis.main.scard(redis.RH.SYMBOLS)
 	console.log('instruments synced ->', console.inspect(synced))
-	console.log('redis.main ->', console.dump(redis.main, { depth: 8 }))
 	if (synced < 10000) {
 		await syncInstruments()
 	}

@@ -42,6 +42,8 @@ import * as inspector from 'inspector'
 if (process.DEBUGGING) {
 	chalk.enabled = false
 	inspector.open(process.debugPort + process.INSTANCE)
+	process.on('beforeExit', inspector.close)
+	process.on('exit', inspector.close)
 }
 declare global { namespace NodeJS { export interface Process { debugPort: number, DEBUGGING: boolean } } }
 
@@ -49,10 +51,10 @@ declare global { namespace NodeJS { export interface Process { debugPort: number
 
 process.on('uncaughtException', function(error) {
 	console.error(chalk.bold.redBright('UNCAUGHT EXCEPTION'), '->', error)
+	if (DEVELOPMENT) process.exit(1);
 })
 process.on('unhandledRejection', function(error) {
 	console.error(chalk.bold.redBright('UNHANDLED REJECTION'), '->', error)
-	console.error('https://github.com/mcollina/make-promises-safe')
 	process.exit(1)
 })
 
