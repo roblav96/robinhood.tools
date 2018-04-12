@@ -186,8 +186,8 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 			if (instrument.valid) {
 				console.error(
 					'!result ->', console.inspect(instrument),
-					'\ntickers ->', console.inspect(tickers),
-					'\nresponse.list ->', console.inspect(response.list)
+					' \ntickers ->', console.inspect(tickers),
+					' \nresponse.list ->', console.inspect(response.list)
 				)
 			}
 			return

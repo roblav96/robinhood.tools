@@ -8,6 +8,7 @@ import * as http from 'http'
 declare module 'uws' {
 	
 	export interface WebSocket extends uws {
+		open: boolean
 		id: string
 	}
 

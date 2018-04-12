@@ -1,7 +1,7 @@
 // 
 
 import { IncomingMessage } from 'http'
-import * as WebSocket from 'uws'
+import * as uws from 'uws'
 import * as url from 'url'
 import * as qs from 'querystring'
 import * as _ from '../../common/lodash'
@@ -20,9 +20,9 @@ const ADDRESS = `ws://${process.HOST}:${process.PORT}/${PATH}?${qs.stringify({ i
 
 if (process.PRIMARY) {
 
-	class WebSocketServer extends WebSocket.Server {
+	class WebSocketServer extends uws.Server {
 		find(id: string) {
-			let found: WebSocket
+			let found: uws.WebSocket
 			this.clients.forEach(function(client) {
 				if (found) return;
 				if (client.id == id) found = client;
@@ -49,14 +49,19 @@ if (process.PRIMARY) {
 	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
-	wss.on('connection', function(client, req: IncomingMessage) {
-		client.id = qs.parse(url.parse(req.url).query).id
+	wss.on('connection', function(client: uws.WebSocket, req: IncomingMessage) {
+		client.open = false
+		client.id = qs.parse(url.parse(req.url).query).id as string
 
 		client.on('message', function(message: string) {
 			if (message == 'pong') return;
 			if (message == 'ping') return client.send('pong');
 			if (message == '__onopen__') {
-				if (wss.clients.length >= process.INSTANCES) {
+				client.open = true
+				let opens = 0
+				wss.clients.forEach(v => opens++)
+				console.log(client.id, 'opens ->', opens)
+				if (opens >= process.INSTANCES) {
 					wss.broadcast('__onready__')
 				}
 				return
@@ -71,6 +76,7 @@ if (process.PRIMARY) {
 
 		client.on('close', function(code, reason) {
 			console.warn('onclose ->', code, '->', reason)
+			client.open = false
 			if (wss.clients.length < process.INSTANCES) {
 				wss.broadcast('__onclose__')
 			}
@@ -92,16 +98,15 @@ class Radio extends Emitter<string, any> {
 	rxready = new Rx.ReadySubject()
 
 	socket = new WebSocketClient(ADDRESS, {
-		connect: !process.PRIMARY,
+		connect: false,
 		timeout: '1s',
+		// verbose: true,
 	})
 
 	constructor() {
 		super()
 
-		if (process.PRIMARY) {
-			fastify.rxready.subscribe(() => this.socket.connect())
-		}
+		fastify.rxready.subscribe(() => this.socket.connect())
 
 		this.socket.on('open', () => {
 			this.rxopen.next(true)

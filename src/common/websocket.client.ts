@@ -99,7 +99,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	private _onclose = (event: CloseEvent) => {
 		let code = WebSocketClient.ecodes[event.code] || event.code
-		if (!this.options.silent) { // && code != 'Abnormal') {
+		if (!this.options.silent && (code != 'Abnormal' || process.CLIENT)) {
 			console.warn(this.name, 'onclose ->', code, '->', event.reason)
 		}
 		this.emit('close', _.pick(event, ['code', 'reason']))

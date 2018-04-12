@@ -10,10 +10,7 @@ global.PRODUCTION = NODE_ENV == 'production'
 global.Promise = require('bluebird')
 global.WebSocket = require('uws')
 
-if (DEVELOPMENT) {
-	// process.DEBUGGING = true
-	// process.INSTANCES = 1
-}
+// if (DEVELOPMENT) process.DEBUGGING = true;
 
 import './adapters/process'
 import './adapters/console'
@@ -22,8 +19,8 @@ import './adapters/console'
 import '../common/clock'
 import './api/fastify'
 // import './adapters/cluster'
-// import './adapters/radio'
+import './adapters/radio'
 
-// import './watchers/watchers'
+import './watchers/watchers'
 
 
