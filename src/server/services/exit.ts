@@ -1,6 +1,17 @@
 // 
 
-import * as Rx from '../../common/rxjs'
+import Emitter from '../../common/emitter'
+
+
+
+class Exit extends Emitter {
+	constructor() {
+		super()
+	}
+}
+
+const exit = new Exit()
+export default exit
 
 
 

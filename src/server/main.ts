@@ -14,11 +14,10 @@ global.WebSocket = require('uws')
 
 import './adapters/process'
 import './adapters/console'
-// import './services/cleanup'
+import './services/exit'
 
 import '../common/clock'
 import './api/fastify'
-// import './adapters/cluster'
 import './adapters/radio'
 
 import './watchers/watchers'

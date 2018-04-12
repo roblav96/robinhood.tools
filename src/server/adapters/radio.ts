@@ -10,40 +10,16 @@ import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
 import clock from '../../common/clock'
 import WebSocketClient from '../../common/websocket.client'
+import WebSocketServer from './websocket.server'
 import Emitter from '../../common/emitter'
 import fastify from '../api/fastify'
 
 
 
 const PATH = 'radio'
-const ADDRESS = `ws://${process.HOST}:${process.PORT}/${PATH}?${qs.stringify({ id: process.INSTANCE })}`
+const ADDRESS = `ws://${process.HOST}:${process.PORT}/${PATH}?${qs.stringify({ uuid: process.INSTANCE })}`
 
 if (process.PRIMARY) {
-
-	class WebSocketServer extends uws.Server {
-		opens() {
-			let opens = 0
-			this.clients.forEach(function(client) {
-				if (client.open) opens++;
-			})
-			return opens
-		}
-		find(id: string) {
-			let found: uws.WebSocket
-			this.clients.forEach(function(client) {
-				if (found) return;
-				if (client.id == id) found = client;
-			})
-			return found
-		}
-		send(ids: string[], message: string) {
-			this.clients.forEach(function(client) {
-				if (ids.includes(client.id)) {
-					client.send(message)
-				}
-			})
-		}
-	}
 
 	const wss = new WebSocketServer({
 		server: fastify.server, path: PATH,
@@ -51,21 +27,23 @@ if (process.PRIMARY) {
 			let host = incoming.req.headers['host']
 			next(host == process.HOST)
 		},
+	}, function (idk) {
+		console.warn('idk ->', idk)
 	})
 
 	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
-	wss.on('connection', function(this: WebSocketServer, client: uws.WebSocket, req: IncomingMessage) {
-		client.open = false
-		client.id = qs.parse(url.parse(req.url).query).id as string
+	wss.on('connection', function(client: uws.WebSocket, req: IncomingMessage) {
+		client.isopen = false
+		client.uuid = qs.parse(url.parse(req.url).query).uuid as string
 
 		client.on('message', function(message: string) {
 			if (message == 'pong') return;
 			if (message == 'ping') return client.send('pong');
 			if (message == '__onopen__') {
-				client.open = true
-				if (wss.opens() >= process.INSTANCES) {
+				client.isopen = true
+				if (wss.isopens() >= process.INSTANCES) {
 					wss.broadcast('__onready__')
 				}
 				return
@@ -80,7 +58,7 @@ if (process.PRIMARY) {
 
 		client.on('close', function(code, reason) {
 			console.warn('onclose ->', code, '->', reason)
-			client.open = false
+			client.isopen = false
 			if (wss.clients.length < process.INSTANCES) {
 				wss.broadcast('__onclose__')
 			}
@@ -111,9 +89,7 @@ class Radio extends Emitter<string, any> {
 		super()
 
 		// fastify.rxready.subscribe(() => this.socket.connect())
-		setImmediate(() => {
-			this.socket.connect()
-		})
+		fastify.rxready.subscribe(() => setImmediate(() => this.socket.connect()))
 
 		this.socket.on('open', () => {
 			this.rxopen.next(true)

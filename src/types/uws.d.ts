@@ -6,12 +6,6 @@ import * as http from 'http'
 
 
 declare module 'uws' {
-	
-	export interface WebSocket extends uws {
-		open: boolean
-		id: string
-	}
-
 	export interface Server {
 		_passedHttpServer: http.Server
 		httpServer: http.Server
@@ -20,7 +14,6 @@ declare module 'uws' {
 		on(event: 'listening', fn: () => void): this
 		addListener(event: 'listening', fn: () => void): this
 	}
-
 }
 
 declare global {
