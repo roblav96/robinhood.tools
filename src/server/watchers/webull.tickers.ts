@@ -34,7 +34,7 @@ if (process.PRIMARY) {
 
 
 async function readyTickers() {
-	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
+	if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
 
 	let synced = await redis.main.hlen(redis.WB.TICKER_IDS)
 	console.log('tickers synced ->', console.inspect(synced))

@@ -130,7 +130,6 @@ export {
 	switcher,
 	tapAsync,
 	throttle,
-	tryCatch,
 	when,
 	where,
 } from 'rambdax'
