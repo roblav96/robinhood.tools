@@ -25,7 +25,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 		_.defaults(config, {
 			headers: {},
-		} as Partial<Http.Config>, http.config)
+		} as Partial<Http.Config>, http.config())
 
 		if (!config.silent) {
 			let ending = (config.query || config.body) ? ' ➤ ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''

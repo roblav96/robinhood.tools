@@ -12,7 +12,7 @@
 		"client:dev": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
 		"client:build": "rimraf dist/client && cross-env NODE_ENV=production vue-cli-service build --mode production",
 		"rs": "npm run server:dev",
-		"server:dev": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'forever forever.config.json' --onFailure 'forever forever.config.json'",
+		"server:dev": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'forever forever.config.json'",
 		"server:inspect": "node --inspect dist/server/main.js",
 		"server:build": "rimraf dist/server && tsc -p .server.tsconfig.json",
 		"cli:clear": "clear && printf \"\\e[3J\""

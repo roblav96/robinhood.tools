@@ -1,7 +1,7 @@
 // 
 
 import { IncomingMessage } from 'http'
-import * as uws from 'uws'
+import * as WebSocket from 'uws'
 import * as url from 'url'
 import * as qs from 'querystring'
 import * as _ from '../../common/lodash'
@@ -16,11 +16,29 @@ import fastify from '../api/fastify'
 
 
 const PATH = 'radio'
-const ADDRESS = `ws://${process.HOST}:${process.PORT}/${PATH}?${qs.stringify({ instance: process.INSTANCE })}`
+const ADDRESS = `ws://${process.HOST}:${process.PORT}/${PATH}?${qs.stringify({ id: process.INSTANCE })}`
 
 if (process.PRIMARY) {
 
-	const wss = new uws.Server({
+	class WebSocketServer extends WebSocket.Server {
+		find(id: string) {
+			let found: WebSocket
+			this.clients.forEach(function(client) {
+				if (found) return;
+				if (client.id == id) found = client;
+			})
+			return found
+		}
+		send(ids: string[], message: string) {
+			this.clients.forEach(function(client) {
+				if (ids.includes(client.id)) {
+					client.send(message)
+				}
+			})
+		}
+	}
+
+	const wss = new WebSocketServer({
 		server: fastify.server, path: PATH,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
@@ -31,16 +49,22 @@ if (process.PRIMARY) {
 	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
-	wss.on('connection', function(client: Radio.Client, req: IncomingMessage) {
-		client.instance = Number.parseInt(qs.parse(url.parse(req.url).query).instance as any)
+	wss.on('connection', function(client, req: IncomingMessage) {
+		client.id = qs.parse(url.parse(req.url).query).id
+		console.log('client.id ->', client.id)
 
 		client.on('message', function(message: string) {
 			if (message == 'pong') return;
 			if (message == 'ping') return client.send('pong');
-			if (message == '__onopen') {
+			if (message == '__onopen__') {
 				if (wss.clients.length >= process.INSTANCES) {
-					wss.broadcast('__onready')
+					wss.broadcast('__onready__')
 				}
+				return
+			}
+			if (message.indexOf('__primary__') == 0) {
+				message = message.slice('__primary__'.length)
+				wss.send(['0'], message)
 				return
 			}
 			wss.broadcast(message)
@@ -49,7 +73,7 @@ if (process.PRIMARY) {
 		client.on('close', function(code, reason) {
 			console.warn('onclose ->', code, '->', reason)
 			if (wss.clients.length < process.INSTANCES) {
-				wss.broadcast('__onclose')
+				wss.broadcast('__onclose__')
 			}
 		})
 
@@ -82,17 +106,17 @@ class Radio extends Emitter<string, any> {
 
 		this.socket.on('open', () => {
 			this.rxopen.next(true)
-			this.socket.send('__onopen')
+			this.socket.send('__onopen__')
 		})
 		this.socket.on('close', () => {
 			this.rxopen.next(false)
 		})
 
 		this.socket.on('message', (message: string) => {
-			if (message == '__onready') {
+			if (message == '__onready__') {
 				return this.rxready.next(true)
 			}
-			if (message == '__onclose') {
+			if (message == '__onclose__') {
 				return this.rxready.next(false)
 			}
 			let event = JSON.parse(message) as Radio.Event
@@ -102,12 +126,14 @@ class Radio extends Emitter<string, any> {
 	}
 
 	emit(name: string, ...args: any[]) {
-		this.socket.json({ name, args, sender: process.INSTANCE } as Radio.Event)
+		this.socket.json({ name, args } as Radio.Event)
 		return this
 	}
-	// emitPrimary(name: string, ...args: any[]) {
-	// 	this.socket.json({ name, args, sender: process.INSTANCE } as Radio.Event)
-	// }
+
+	emitPrimary(name: string, ...args: any[]) {
+		let event = JSON.stringify({ name, args } as Radio.Event)
+		this.socket.send('__primary__' + event)
+	}
 
 	done(done: string) { this.emit(`${done}.${process.INSTANCE}`) }
 	onAll(fn: (done: string, ...args: any[]) => any) {
@@ -151,13 +177,13 @@ export default radio
 declare global {
 	namespace Radio {
 		// type AllFn = (done: string, ...args: any[]) => any
-		interface Client extends uws {
-			instance: number
-		}
+		// interface Client extends WebSocket {
+		// 	id: number
+		// }
 		interface Event<T = any> {
 			name: string
 			args: T[]
-			sender: number
+			// sender: number
 		}
 	}
 }

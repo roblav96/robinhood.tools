@@ -9,8 +9,6 @@
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"inlineSourceMap": true,
-		"skipLibCheck": true,
-		"skipDefaultLibCheck": true,
 		"pretty": true,
 		"outDir": "dist",
 		"baseUrl": ".",

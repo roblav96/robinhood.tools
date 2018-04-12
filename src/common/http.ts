@@ -9,13 +9,15 @@ import clock from './clock'
 
 
 
-export const config = {
-	json: true,
-	silent: PRODUCTION,
-	timeout: 10000,
-	retries: 5,
-	tick: '5s',
-} as Partial<Http.Config>
+export function config() {
+	return {
+		json: true,
+		silent: PRODUCTION,
+		timeout: 10000,
+		retries: 5,
+		tick: '5s',
+	} as Partial<Http.Config>
+}
 
 
 

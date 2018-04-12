@@ -6,6 +6,10 @@ import * as http from 'http'
 
 
 declare module 'uws' {
+	
+	export interface WebSocket extends uws {
+		id: string
+	}
 
 	export interface Server {
 		_passedHttpServer: http.Server

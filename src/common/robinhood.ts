@@ -6,8 +6,6 @@ export const RH = {
 	RH: 'rh',
 	INSTRUMENTS: 'rh:instruments',
 	SYMBOLS: 'rh:symbols',
-	VALID_SYMBOLS: 'rh:symbols:valid',
-	INVALID_SYMBOLS: 'rh:symbols:invalid',
 }
 
 
@@ -61,6 +59,7 @@ declare global {
 			acronym: string
 			mic: string
 			valid: boolean
+			ticker_id: number
 		}
 
 

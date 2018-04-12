@@ -20,7 +20,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 				'Accept-Encoding': 'deflate, gzip',
 				'Host': parsed.host,
 			},
-		} as Partial<Http.Config>, http.config)
+		} as Partial<Http.Config>, http.config())
 
 		if (config.isProxy) return config;
 
