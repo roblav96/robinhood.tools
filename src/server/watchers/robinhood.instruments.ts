@@ -30,13 +30,12 @@ if (process.PRIMARY) {
 
 async function readyInstruments() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
-	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
 
 	let scard = await redis.main.scard(redis.RH.SYMBOLS)
 	console.log(redis.RH.SYMBOLS, 'scard ->', console.inspect(scard))
-	// if (scard < 10000) {
-	await syncInstruments()
-	// }
+	if (scard < 10000) {
+		await syncInstruments()
+	}
 
 	console.info('readyInstruments -> done')
 
@@ -46,7 +45,7 @@ async function readyInstruments() {
 
 async function syncInstruments() {
 
-	// await getInstruments()
+	await getInstruments()
 	await syncTickerIds()
 
 	console.info('syncInstruments -> done')
@@ -98,6 +97,7 @@ async function getInstruments() {
 
 
 async function syncTickerIds() {
+	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
 
 	let tickers = _.flatten(await Promise.all([
 		// stocks
@@ -110,6 +110,14 @@ async function syncTickerIds() {
 		}),
 	])) as Webull.Ticker[]
 	_.remove(tickers, v => Array.isArray(v.disSymbol.match(/\W+/)))
+
+	// if (DEVELOPMENT) {
+	// 	let total = (await robinhood.getAllSymbols()).length
+	// 	radio.on('syncTickerId.symbol', function(symbol: string) {
+	// 		total--
+	// 		console.log('total ->', total, symbol)
+	// 	})
+	// }
 
 	let disTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker)
 	await radio.emitAll(AllSyncTickerIds, disTickers)
@@ -124,6 +132,7 @@ radio.onAll(AllSyncTickerIds)
 async function AllSyncTickerIds(done: string, disTickers: Dict<Webull.Ticker[]>) {
 
 	let symbols = core.array.chunks(await robinhood.getAllSymbols(), process.INSTANCES)[process.INSTANCE]
+	console.log('AllSyncTickerIds symbols.length ->', console.inspect(symbols.length))
 	await pAll(symbols.map(symbol => {
 		return () => syncTickerId(symbol, disTickers[symbol])
 	}), { concurrency: 1 })
@@ -135,19 +144,11 @@ async function AllSyncTickerIds(done: string, disTickers: Dict<Webull.Ticker[]>)
 
 
 
-if (process.PRIMARY) {
-	let prog = 0
-	radio.on('syncTickerId', function(args) {
-		prog++
-		console.log('prog ->', prog)
-	})
-}
-
 async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
-	// if (DEVELOPMENT) console.log('syncTickerId ->', console.inspect(symbol));
-	if (DEVELOPMENT) {
-		radio.emitPrimary('syncTickerId', symbol)
-	}
+	if (DEVELOPMENT) console.log('syncTickerId ->', console.inspect(symbol));
+	// if (DEVELOPMENT) {
+	// 	radio.emitPrimary('syncTickerId.symbol', symbol)
+	// }
 
 	let instrument = await redis.main.hgetall(`${redis.RH.INSTRUMENTS}:${symbol}`) as Robinhood.Instrument
 	core.fix(instrument)

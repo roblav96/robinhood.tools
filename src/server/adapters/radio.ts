@@ -51,7 +51,6 @@ if (process.PRIMARY) {
 
 	wss.on('connection', function(client, req: IncomingMessage) {
 		client.id = qs.parse(url.parse(req.url).query).id
-		console.log('client.id ->', client.id)
 
 		client.on('message', function(message: string) {
 			if (message == 'pong') return;
