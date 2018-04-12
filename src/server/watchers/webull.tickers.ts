@@ -1,16 +1,14 @@
 // 
 
-import * as path from 'path'
 import * as pAll from 'p-all'
-import * as pRetry from 'bluebird-retry'
 import * as _ from '../../common/lodash'
 import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
+import * as core from '../../common/core'
 import * as pretty from '../../common/pretty'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
-import * as core from '../../common/core'
 import * as rhinstruments from './robinhood.instruments'
 import clock from '../../common/clock'
 import radio from '../adapters/radio'
@@ -34,34 +32,19 @@ if (process.PRIMARY) {
 
 
 async function readyTickers() {
-	
-	// await core.pRetry(throwing('not awesome error'))
+	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
+
+	let synced = await redis.main.hlen(redis.WB.TICKER_IDS)
+	console.log('tickers synced ->', console.inspect(synced))
+	if (synced < 9000) {
+		await syncTickers()
+	}
+
+	// await chunkTickerIds()
+
+	console.info('readyTickers -> done')
 
 }
-
-async function throwing(value: string) {
-	await new Promise(function(resolve, reject) {
-		setTimeout(reject, 1000, new Error(value))
-	})
-	console.info('throwing -> done')
-}
-
-
-
-// async function readyTickers() {
-// 	if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
-
-// 	let synced = await redis.main.hlen(redis.WB.TICKER_IDS)
-// 	console.log('tickers synced ->', console.inspect(synced))
-// 	if (synced < 9000) {
-// 		await syncTickers()
-// 	}
-
-// 	// await chunkTickerIds()
-
-// 	console.info('readyTickers -> done')
-
-// }
 
 
 
@@ -79,64 +62,51 @@ async function syncTickers() {
 	])) as Webull.Ticker[]
 
 	_.remove(tickers, v => Array.isArray(v.disSymbol.match(/\W+/)))
-	let dictTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker)
+	let disTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker)
 
-	await radio.emitAll(AllSyncTickers, dictTickers)
+	await radio.emitAll(AllSyncTickers, disTickers)
 
 	console.info('syncTickers -> done')
 
 }
 
-radio.onAll(AllSyncTickers)
-function AllSyncTickers(done: string, dictTickers: Dict<Webull.Ticker[]>) {
-	return Promise.resolve().then(async function() {
-		// if (process.INSTANCE != 1) return radio.done(done);
+async function AllSyncTickers(done: string, disTickers: Dict<Webull.Ticker[]>) {
 
-		let symbols = await robinhood.getSymbols()
-		await pAll(symbols.map(symbol => {
-			return () => syncTicker(symbol, dictTickers[symbol])
-		}), { concurrency: 1 })
+	let symbols = await robinhood.getSymbols()
+	await pAll(symbols.map(symbol => {
+		return () => syncTicker(symbol, disTickers[symbol])
+	}), { concurrency: 1 })
 
-		console.info('AllSyncTickers -> done')
-		radio.done(done)
+	console.info('AllSyncTickers -> done')
+	radio.done(done)
 
-	})
 }
+radio.onAll(AllSyncTickers)
+
+
 
 async function syncTicker(symbol: string, tickers = [] as Webull.Ticker[]) {
-	// console.warn('syncTicker symbol ->', console.inspect(symbol))
-	let start = Date.now()
+	if (DEVELOPMENT) console.log('syncTicker ->', console.inspect(symbol));
 
 	let instrument = await redis.main.hgetall(`${redis.RH.INSTRUMENTS}:${symbol}`) as Robinhood.Instrument
 	core.fix(instrument)
 	// console.warn('instrument ->', console.inspect(_.pick(instrument, ['symbol', 'valid', 'name', 'simple_name', 'country', 'acronym'] as KeysOf<Robinhood.Instrument>)))
 
 	// console.log('tickers ->', console.inspect(tickers))
-	// let ticker = tickers.find(v => v.disExchangeCode == instrument.acronym && v.regionIsoCode == instrument.country)
 	let ticker = tickers.find(v => v.disExchangeCode.indexOf(instrument.acronym) == 0 || v.regionIsoCode.indexOf(instrument.country) == 0)
 	// if (ticker) console.info('ticker ->', console.inspect(_.pick(ticker, ['tickerId', 'disSymbol', 'tickerName', 'tinyName', 'disExchangeCode', 'regionIsoCode'] as KeysOf<Webull.Ticker>)));
 
 	if (!ticker) {
 
-		let badcoms = [
-			['del', `${redis.WB.TICKERS}:${symbol}`],
-			['hdel', redis.WB.TICKER_IDS, symbol],
-			['hdel', redis.WB.VALID_TICKER_IDS, symbol],
-			['hdel', redis.WB.INVALID_TICKER_IDS, symbol],
-		] as Redis.Coms
-
-		if (['ASPU', 'EQS'].includes(symbol)) {
-			return redis.main.coms(badcoms)
-		}
+		if (['ASPU', 'EQS', 'INSI', 'YESR'].includes(symbol)) return;
 
 		await clock.toPromise('250ms')
 		let response = await http.get('https://infoapi.stocks666.com/api/search/tickers2', {
 			query: { keys: symbol },
+			retries: Infinity, tick: '1s',
 		}) as Webull.API.Paginated<Webull.Ticker>
 
-		if (!Array.isArray(response.list)) {
-			return redis.main.coms(badcoms)
-		}
+		if (!Array.isArray(response.list)) return;
 
 		let tags = core.string.tags(instrument.simple_name || instrument.name)
 		let results = response.list.filter(function(v) {
@@ -147,12 +117,12 @@ async function syncTicker(symbol: string, tickers = [] as Webull.Ticker[]) {
 			})
 		})
 
-		let result = results.find(v => v.match > 0 && v.disExchangeCode.indexOf(instrument.acronym) == 0 && v.regionAlias == instrument.country)
+		let result = results.find(v => v.match > 0 && v.disExchangeCode.indexOf(instrument.acronym) == 0 && v.regionAlias.indexOf(instrument.country) == 0)
 		if (!result) result = results.find(v => v.match > 0 && v.disExchangeCode.indexOf(instrument.acronym) == 0);
 		if (!result) result = results.find(v => v.disExchangeCode.indexOf(instrument.acronym) == 0);
 		if (!result) result = results.find(v => v.match > 0);
 		if (!result) result = results.find(v => results.length == 1);
-		if (!result) result = results.find(v => (v.tinyName || v.tickerName).indexOf(symbol) == 0);
+		if (!result) result = results.find(v => (v.tickerName).indexOf(symbol) == 0);
 		if (!result) {
 			if (instrument.valid) {
 				console.error(
@@ -161,31 +131,15 @@ async function syncTicker(symbol: string, tickers = [] as Webull.Ticker[]) {
 					'\nresponse.list ->', console.inspect(response.list)
 				)
 			}
-			return redis.main.coms(badcoms)
+			return
 		}
 
-		ticker = _.omit(result, ['match'])
+		ticker = result
 		// console.log('ticker ->', console.inspect(_.pick(ticker, ['tickerId', 'disSymbol', 'tickerName', 'tinyName', 'disExchangeCode', 'regionAlias'] as KeysOf<Webull.Ticker>)))
 
 	}
 
-	let coms = [
-		['hmset', `${redis.WB.TICKERS}:${symbol}`, ticker as any],
-		['hset', redis.WB.TICKER_IDS, symbol, ticker.tickerId],
-	] as Redis.Coms
-	if (instrument.valid) {
-		coms.push(['hset', redis.WB.VALID_TICKER_IDS, symbol, ticker.tickerId as any])
-		coms.push(['hdel', redis.WB.INVALID_TICKER_IDS, symbol])
-	} else {
-		coms.push(['hset', redis.WB.INVALID_TICKER_IDS, symbol, ticker.tickerId as any])
-		coms.push(['hdel', redis.WB.VALID_TICKER_IDS, symbol])
-	}
-
-	await redis.main.coms(coms)
-	// console.warn('syncTicker', pretty.ms(Date.now() - start), 'symbol ->', console.inspect(symbol))
-	console.log(pretty.ms(Date.now() - start), 'syncTicker symbol ->', console.inspect(symbol))
-
-	// await clock.toPromise('10s')
+	await redis.main.hset(redis.WB.TICKER_IDS, symbol, ticker.tickerId)
 
 }
 

@@ -4,8 +4,9 @@ export * from '../../common/http'
 
 import * as _ from '../../common/lodash'
 import * as url from 'url'
-import * as boom from 'boom'
 import * as got from 'got'
+import * as retryable from 'is-retry-allowed'
+import * as boom from 'boom'
 import * as http from '../../common/http'
 
 
@@ -48,11 +49,11 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 		return config
 
-	}).then(function(config: Http.Config) {
-		return got(config.url, config).then(({ body }) => body)
-	})
+	}).then(http.send)
 
 }
+
+
 
 export function get<T = any>(url: string, config = {} as Partial<Http.Config>): Promise<T> {
 	config.url = url

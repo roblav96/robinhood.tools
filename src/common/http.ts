@@ -3,6 +3,9 @@
 import * as stream from 'stream'
 import * as got from 'got'
 import * as boom from 'boom'
+import * as retryable from 'is-retry-allowed'
+import * as R from './rambdax'
+import clock from './clock'
 
 
 
@@ -10,12 +13,24 @@ export const config = {
 	json: true,
 	silent: PRODUCTION,
 	timeout: 10000,
-	retries: 9,
-	// retries(i, error) {
-	// 	console.warn('http retries', 'i ->', i, 'error ->', error)
-	// 	return i
-	// },
+	retries: 5,
+	tick: '5s',
 } as Partial<Http.Config>
+
+
+
+export function send(config: Http.Config) {
+	return got(config.url, config).then(function({ body }) {
+		return body
+	}).catch(function(error: got.GotError) {
+		if (config.retries > 0 && retryable(error)) {
+			config.retries--
+			if (DEVELOPMENT) console.warn('http retry ->', config.retries);
+			return clock.toPromise(config.tick).then(() => send(config))
+		}
+		return Promise.reject(error)
+	})
+}
 
 
 
@@ -24,6 +39,8 @@ export const config = {
 declare global {
 	namespace Http {
 		interface Config extends got.GotJSONOptions {
+			retries: number
+			tick: Clock.Tick
 			url: string
 			query: any
 			silent: boolean

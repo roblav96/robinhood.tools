@@ -253,23 +253,22 @@ export const time = {
 
 
 
-import * as R from './rambdax'
-export function pRetry<T>(fn: Promise<T>) {
-	console.warn('pRetryss')
-	console.log('fn ->', fn)
-	console.log('arguments ->', arguments)
-	// console.log('fn ->', console.dump(fn, { depth: 8 }))
-	return fn.get(0 as any).then(function(idk) {
-		console.log('idk ->', idk)
-	}).catch((error) => {
-		// console.log('this ->', this)
-		console.error('pRetry Error ->', error)
-		return R.delay(1000).then(function(delay) {
-			console.log('delay ->', console.inspect(delay))
-			// return fn()
-		})
-	})
-}
+// export function pRetry<T>(fn: (...args) => Promise<any>): T {
+// 	console.log('fn ->', fn)
+// 	console.dir(fn.__proto__.arguments)
+// 	return fn
+// }
+
+// import clock from './clock'
+// export function pRetry<T>(factory: () => Promise<T>, opts = {} as { times: number, tick: Clock.Tick }) {
+// 	let attempt = 0
+// 	opts.times = opts.times || Infinity
+// 	opts.tick = opts.tick || '10s'
+// 	return Promise.attempt()
+// 	return factory().catch(function(error) {
+// 		return factory()
+// 	})
+// }
 
 // export class PromiseRetry {
 

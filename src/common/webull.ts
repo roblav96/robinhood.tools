@@ -4,10 +4,7 @@
 
 export const WB = {
 	WB: 'wb',
-	TICKERS: 'wb:tickers',
 	TICKER_IDS: 'wb:tickerids',
-	VALID_TICKER_IDS: 'wb:tickerids:valid',
-	INVALID_TICKER_IDS: 'wb:tickerids:invalid',
 }
 
 

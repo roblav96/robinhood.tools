@@ -51,11 +51,11 @@ declare global { namespace NodeJS { export interface Process { debugPort: number
 
 process.on('uncaughtException', function(error) {
 	console.error(chalk.bold.redBright('UNCAUGHT EXCEPTION'), '->', error)
-	if (DEVELOPMENT) process.exit(1);
+	// if (DEVELOPMENT) process.exit(1);
 })
 process.on('unhandledRejection', function(error) {
 	console.error(chalk.bold.redBright('UNHANDLED REJECTION'), '->', error)
-	process.exit(1)
+	if (PRODUCTION) process.exit(1);
 })
 
 
