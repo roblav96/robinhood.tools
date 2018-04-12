@@ -19,6 +19,7 @@
 	"dependencies": {
 		"@ibm/plex": "latest",
 		"bluebird": "latest",
+		"bluebird-retry": "latest",
 		"boom": "latest",
 		"buefy": "latest",
 		"bulma": "latest",
@@ -65,6 +66,7 @@
 	},
 	"devDependencies": {
 		"@types/bluebird": "latest",
+		"@types/bluebird-retry": "latest",
 		"@types/boom": "latest",
 		"@types/clipboardy": "latest",
 		"@types/cookie": "latest",

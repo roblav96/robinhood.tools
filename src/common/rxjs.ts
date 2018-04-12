@@ -27,7 +27,7 @@ import * as Rx from './rxjs'
 
 export class ReadySubject {
 
-	subject = new Rx.BehaviorSubject(false)
+	private subject = new Rx.BehaviorSubject(false)
 
 	get value() { return this.subject.value }
 	next(value?: boolean) {

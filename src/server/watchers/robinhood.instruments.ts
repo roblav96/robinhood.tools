@@ -95,10 +95,9 @@ async function chunkSymbols() {
 	let coms = [] as Redis.Coms
 	resolved.forEach(function(symbols, i) {
 		symbols.sort()
-		let rkey = rkeys[i]
 		let chunks = core.array.chunks(symbols, process.INSTANCES)
 		chunks.forEach(function(chunk, ii) {
-			coms.push(['set', `${rkey}:${process.INSTANCES}:${ii}`, chunk.toString()])
+			coms.push(['set', `${rkeys[i]}:${process.INSTANCES}:${ii}`, chunk.toString()])
 		})
 	})
 	await redis.main.coms(coms)

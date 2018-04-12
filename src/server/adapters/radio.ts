@@ -102,27 +102,25 @@ class Radio extends Emitter<string, any> {
 	}
 
 	emit(name: string, ...args: any[]) {
-		this.socket.json({ name, args } as Radio.Event)
+		this.socket.json({ name, args, sender: process.INSTANCE } as Radio.Event)
 		return this
 	}
+	// emitPrimary(name: string, ...args: any[]) {
+	// 	this.socket.json({ name, args, sender: process.INSTANCE } as Radio.Event)
+	// }
 
-
-
+	done(done: string) { this.emit(`${done}.${process.INSTANCE}`) }
 	onAll(fn: (done: string, ...args: any[]) => any) {
-		if (!fn.name) throw new Error('onAll input function must be named');
+		if (!fn.name) throw new Error('onAll parameter function must be named');
 		this.on(fn.name, fn)
 	}
-
 	async emitAll(fn: (done: string, ...args: any[]) => any, ...args: any[]) {
-		if (!fn.name) throw new Error('emitAll input function must be named');
+		if (!fn.name) throw new Error('emitAll parameter function must be named');
 		await this.rxready.toPromise()
 		let all = core.array.create(process.INSTANCES)
-		await Promise.all(all.map(i => {
-			let done = `${fn.name}.${i}`
-			let prom = this.toPromise(done)
-			this.emit(fn.name, done, ...args)
-			return prom
-		}))
+		let proms = all.map(i => this.toPromise(`${fn.name}.${i}`))
+		this.emit(fn.name, fn.name, ...args)
+		await Promise.all(proms)
 	}
 
 
@@ -159,7 +157,7 @@ declare global {
 		interface Event<T = any> {
 			name: string
 			args: T[]
-			// sender: number
+			sender: number
 		}
 	}
 }

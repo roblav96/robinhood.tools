@@ -2,8 +2,6 @@
 export * from '../../common/robinhood'
 // 
 
-import * as _ from '../../common/lodash'
-import * as core from '../../common/core'
 import * as robinhood from '../../common/robinhood'
 import * as http from './http'
 import * as redis from './redis'

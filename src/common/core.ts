@@ -29,7 +29,7 @@ export function fix(target: any) {
 		if (value == null) return;
 		// else if (object.is(value)) fix(value);
 		else if (!string.is(value)) return;
-		else if (value === '') _.unset(target, key);
+		else if (value === '') delete target[key];
 		else if (value === 'true') target[key] = true;
 		else if (value === 'false') target[key] = false;
 		else if (!isNaN(value as any)) target[key] = Number.parseFloat(value);

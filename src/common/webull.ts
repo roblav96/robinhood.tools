@@ -4,14 +4,15 @@
 
 export const WB = {
 	WB: 'wb',
-	TICKER_IDS: 'wb:tickerids',
 	TICKERS: 'wb:tickers',
-	ALLS: 'wb:alls',
+	TICKER_IDS: 'wb:tickerids',
+	VALID_TICKER_IDS: 'wb:tickerids:valid',
+	INVALID_TICKER_IDS: 'wb:tickerids:invalid',
 }
 
 
 
-export const TICKER_TYPES = {
+export const TYPES = {
 	1: 'INDEX',
 	2: 'STOCK',
 	3: 'FUND',
