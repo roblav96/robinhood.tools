@@ -81,7 +81,7 @@ class Radio extends Emitter<string, any> {
 	socket = new WebSocketClient(ADDRESS, {
 		connect: false,
 		timeout: '1s',
-		// silent: true,
+		silent: true,
 		// verbose: true,
 	})
 

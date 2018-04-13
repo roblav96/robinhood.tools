@@ -37,6 +37,8 @@ async function readyInstruments() {
 		await syncInstruments()
 	}
 
+	if (DEVELOPMENT) await syncTickerIds();
+
 	console.info('readyInstruments -> done')
 
 }
@@ -112,7 +114,8 @@ async function syncTickerIds() {
 	_.remove(tickers, v => Array.isArray(v.disSymbol.match(/\W+/)))
 
 	let disTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker)
-	await radio.emitAll(AllSyncTickerIds, disTickers)
+	console.log('Object.keys(disTickers).length ->', console.inspect(Object.keys(disTickers).length))
+	// await radio.emitAll(allSyncTickerIds, disTickers)
 
 	console.info('syncTickerIds -> done')
 
@@ -120,16 +123,16 @@ async function syncTickerIds() {
 
 
 
-radio.onAll(AllSyncTickerIds)
-async function AllSyncTickerIds(done: string, disTickers: Dict<Webull.Ticker[]>) {
+radio.onAll(allSyncTickerIds)
+async function allSyncTickerIds(done: string, disTickers: Dict<Webull.Ticker[]>) {
 
 	let symbols = core.array.chunks(await robinhood.getAllSymbols(), process.INSTANCES)[process.INSTANCE]
-	console.log('AllSyncTickerIds symbols.length ->', console.inspect(symbols.length))
+	console.log('allSyncTickerIds symbols.length ->', console.inspect(symbols.length))
 	await pAll(symbols.map(symbol => {
 		return () => syncTickerId(symbol, disTickers[symbol])
 	}), { concurrency: 1 })
 
-	console.info('AllSyncTickerIds -> done')
+	console.info('allSyncTickerIds -> done')
 	radio.done(done)
 
 }
