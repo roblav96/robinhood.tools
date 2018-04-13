@@ -53,22 +53,21 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	socket: WebSocket & uws
 	isopen() { return this.socket && this.socket.readyState == this.socket.OPEN }
 
-	json<T = object>(data: T) {
-		if (!this.isopen()) return console.error(this.name, 'json Error ->', 'Socket is not open');
-		this.send(JSON.stringify(data))
-	}
+	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
 	send(message: string) {
-		if (process.PRIMARY) {
-			console.log('this.socket ->', console.inspect(this.socket))
-			console.log('this.socket.readyState ->', console.inspect(this.socket.readyState))
-			console.log('this.socket.OPEN ->', console.inspect(this.socket.OPEN))
-			console.log('this.socket.readyState == this.socket.OPEN ->', console.inspect(this.socket.readyState == this.socket.OPEN))
+		if (!this.isopen()) {
+			if (!this.options.silent) console.error(this.name, 'send Error ->', 'Socket is not open');
+			return
 		}
-		if (!this.isopen()) return console.error(this.name, 'send Error ->', 'Socket is not open');
 		this.socket.send(message)
 	}
+
 	close(code = 1000, reason?: string) {
-		if (!this.isopen()) return;
+		// if (!this.isopen()) return;
+		if (!this.isopen()) {
+			if (!this.options.silent) console.error(this.name, 'close Error ->', 'Socket is already closed');
+			return
+		}
 		this.socket.close(code, reason)
 	}
 

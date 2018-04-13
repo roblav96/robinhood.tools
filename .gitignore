@@ -8,6 +8,7 @@ procfile.js
 *.env.*
 *.local
 *.debug
+*.idea
 
 *.log
 *.DS_STORE
