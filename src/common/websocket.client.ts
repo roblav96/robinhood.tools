@@ -3,6 +3,7 @@
 import * as _ from './lodash'
 import * as uws from 'uws'
 import * as url from 'url'
+import * as core from './core'
 import Emitter from './emitter'
 import clock from './clock'
 
@@ -10,7 +11,7 @@ import clock from './clock'
 
 export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' | 'message'> { //, string | number | Error> {
 
-	private static readonly ecodes = {
+	static readonly CODES = {
 		1000: 'Normal',
 		1001: 'Going Away',
 		1002: 'Protocol Error',
@@ -50,11 +51,26 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	socket: WebSocket & uws
-	get isopen() { return this.socket && this.socket.readyState == this.socket.OPEN }
+	isopen() { return this.socket && this.socket.readyState == this.socket.OPEN }
 
-	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
-	send(message: string) { this.socket.send(message) }
-	close(code = 1000, reason?: string) { this.socket.close(code, reason) }
+	json<T = object>(data: T) {
+		if (!this.isopen()) return console.error(this.name, 'json Error ->', 'Socket is not open');
+		this.send(JSON.stringify(data))
+	}
+	send(message: string) {
+		if (process.PRIMARY) {
+			console.log('this.socket ->', console.inspect(this.socket))
+			console.log('this.socket.readyState ->', console.inspect(this.socket.readyState))
+			console.log('this.socket.OPEN ->', console.inspect(this.socket.OPEN))
+			console.log('this.socket.readyState == this.socket.OPEN ->', console.inspect(this.socket.readyState == this.socket.OPEN))
+		}
+		if (!this.isopen()) return console.error(this.name, 'send Error ->', 'Socket is not open');
+		this.socket.send(message)
+	}
+	close(code = 1000, reason?: string) {
+		if (!this.isopen()) return;
+		this.socket.close(code, reason)
+	}
 
 	destroy() {
 		this.terminate()
@@ -98,10 +114,8 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _onclose = (event: CloseEvent) => {
-		let code = WebSocketClient.ecodes[event.code] || event.code
-		if (!this.options.silent && (code != 'Abnormal' || process.CLIENT)) {
-			console.warn(this.name, 'onclose ->', code, '->', event.reason)
-		}
+		let code = WebSocketClient.CODES[event.code] || event.code
+		if (!this.options.silent && this.options.verbose) console.warn(this.name, 'onclose ->', code, '->', event.reason);
 		this.emit('close', _.pick(event, ['code', 'reason']))
 		clock.offListener(this._heartbeat)
 		if (this.options.retry) this._reconnect();
@@ -109,7 +123,12 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _onerror = (error: Error) => {
-		if (!this.options.silent) console.error(this.name, 'onerror Error ->', error.message || error)
+		if (!this.options.silent) {
+			let message = (error.message || error) as string
+			if (message != 'uWs client connection error') {
+				console.error(this.name, 'onerror Error ->', message)
+			}
+		}
 		this.emit('error', error)
 	}
 
@@ -117,12 +136,12 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		let message = event.data as string
 		if (message == 'pong') return;
 		if (message == 'ping') return this.send('pong');
-		if (this.options.verbose) console.log(this.name, 'onmessage ->', message);
+		if (!this.options.silent && this.options.verbose) console.log(this.name, 'onmessage ->', message);
 		this.emit('message', message)
 	}
 
 	private _heartbeat = () => {
-		if (this.isopen) this.send('ping');
+		if (this.isopen()) this.send('ping');
 		else clock.offListener(this._heartbeat);
 	}
 

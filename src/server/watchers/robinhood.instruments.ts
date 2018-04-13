@@ -2,6 +2,7 @@
 
 import * as pAll from 'p-all'
 import * as pForever from 'p-forever'
+import * as path from 'path'
 import * as _ from '../../common/lodash'
 import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
@@ -14,6 +15,8 @@ import radio from '../adapters/radio'
 
 
 
+const fname = path.basename(__filename)
+console.log('fname ->', fname)
 export const rxready = new Rx.ReadySubject()
 radio.once('robinhood.instruments.ready', () => rxready.next())
 

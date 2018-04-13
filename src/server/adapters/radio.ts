@@ -56,7 +56,7 @@ if (process.PRIMARY) {
 		})
 
 		client.on('close', function(code, reason) {
-			console.warn('onclose ->', code, '->', reason)
+			if (code != 1000) console.warn('onclose ->', code, '->', reason);
 			client.isopen = false
 			if (wss.clients.length < process.INSTANCES) {
 				wss.broadcast('__onclose__')
@@ -81,7 +81,7 @@ class Radio extends Emitter<string, any> {
 	socket = new WebSocketClient(ADDRESS, {
 		connect: false,
 		timeout: '1s',
-		silent: true,
+		// silent: true,
 		// verbose: true,
 	})
 
@@ -91,6 +91,9 @@ class Radio extends Emitter<string, any> {
 		pm2.once('primary:fastify.rxready', () => this.socket.connect())
 		if (process.PRIMARY) {
 			fastify.rxready.subscribe(() => pm2.emit('primary:fastify.rxready'))
+			R.delay(1000).then(function() {
+				radio.socket.destroy()
+			})
 		}
 
 		this.socket.on('open', () => {
@@ -118,13 +121,14 @@ class Radio extends Emitter<string, any> {
 		this.socket.json({ name, args } as Radio.Event)
 		return this
 	}
-
 	emitPrimary(name: string, ...args: any[]) {
 		let event = JSON.stringify({ name, args } as Radio.Event)
 		this.socket.send('__primary__' + event)
 	}
+	emitFn(fn: Function, ...args: any[]) {
+		this.emit(fn.name, ...args)
+	}
 
-	done(done: string) { this.emit(`${done}.${process.INSTANCE}`) }
 	onAll(fn: (done: string, ...args: any[]) => any) {
 		if (!fn.name) throw new Error('onAll parameter function must be named');
 		this.on(fn.name, fn)
@@ -136,6 +140,9 @@ class Radio extends Emitter<string, any> {
 		let proms = alls.map(i => this.toPromise(`${fn.name}.${i}`))
 		this.emit(fn.name, fn.name, ...args)
 		await Promise.all(proms)
+	}
+	done(done: string) {
+		this.emit(`${done}.${process.INSTANCE}`)
 	}
 
 }
