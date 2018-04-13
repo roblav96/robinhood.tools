@@ -26,16 +26,6 @@ declare global { namespace NodeJS { export interface ProcessEnv { NODE_APP_INSTA
 
 
 
-Object.assign(process, {
-	hrtime_ms(time?: [number, number]): number {
-		let time_ms = process.hrtime()
-		return time_ms[0] * 1e3 + time_ms[1] / 1e6
-	},
-})
-declare global { namespace NodeJS { export interface Process { hrtime_ms(time?: [number, number]): number } } }
-
-
-
 if (process.PRIMARY) {
 	console.log(
 		`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`,
@@ -44,7 +34,6 @@ if (process.PRIMARY) {
 }
 import * as moment from 'moment'
 console.log(`[${moment().format('ss:SSS')}]`, 'process.INSTANCE ->', process.INSTANCE)
-// console.log(`[${process.hrtime_ms()}]`, 'process.INSTANCE ->', process.INSTANCE)
 
 
 
@@ -87,7 +76,8 @@ process.on('unhandledRejection', function(error) {
 
 import * as clc from 'cli-color'
 if (DEVELOPMENT && process.PRIMARY) {
-	setInterval(() => process.stdout.write(clc.move.up(1)), 1000)
+	const int = setInterval(() => process.stdout.write(clc.move.up(1)), 1000)
+	process.on('SIGINT', () => clearInterval(int))
 }
 
 

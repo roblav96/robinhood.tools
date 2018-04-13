@@ -55,19 +55,12 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
 	send(message: string) {
-		if (!this.isopen()) {
-			if (!this.options.silent) console.error(this.name, 'send Error ->', 'Socket is not open');
-			return
-		}
+		if (!this.isopen()) return;
 		this.socket.send(message)
 	}
 
 	close(code = 1000, reason?: string) {
-		// if (!this.isopen()) return;
-		if (!this.isopen()) {
-			if (!this.options.silent) console.error(this.name, 'close Error ->', 'Socket is already closed');
-			return
-		}
+		if (!this.isopen()) return;
 		this.socket.close(code, reason)
 	}
 

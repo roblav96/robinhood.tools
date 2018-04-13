@@ -6,6 +6,11 @@ import * as uws from 'uws'
 
 class WebSocketServer extends uws.Server {
 
+	// constructor(options?: uws.IServerOptions, callback?: Function) {
+	// 	super(options, callback)
+	// 	process.on('SIGINT', () => this.close())
+	// }
+
 	isopens() {
 		let isopens = 0
 		this.clients.forEach(function(client) {

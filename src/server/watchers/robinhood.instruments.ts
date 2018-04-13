@@ -2,7 +2,6 @@
 
 import * as pAll from 'p-all'
 import * as pForever from 'p-forever'
-import * as path from 'path'
 import * as _ from '../../common/lodash'
 import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
@@ -15,32 +14,34 @@ import radio from '../adapters/radio'
 
 
 
-const fname = path.basename(__filename)
-console.log('fname ->', fname)
 export const rxready = new Rx.ReadySubject()
-radio.once('robinhood.instruments.ready', () => rxready.next())
+radio.once(`${__filename}.rxready`, () => rxready.next())
 
 if (process.PRIMARY) {
 	radio.rxready.toPromise().then(readyInstruments).catch(function(error) {
 		console.error('readyInstruments Error ->', error)
 	}).finally(function() {
-		console.info('readyInstruments -> finally')
-		radio.emit('robinhood.instruments.ready')
+		radio.emit(`${__filename}.rxready`)
 	})
 }
 
 
 
 async function readyInstruments() {
-	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
 
-	let scard = await redis.main.scard(redis.RH.SYMBOLS)
-	console.log(redis.RH.SYMBOLS, 'scard ->', console.inspect(scard))
-	if (scard < 10000) {
+	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
+	let rhcard = await redis.main.scard(redis.RH.SYMBOLS)
+	console.log(redis.RH.SYMBOLS, 'rhcard ->', console.inspect(rhcard))
+	if (rhcard < 10000) {
 		await syncInstruments()
 	}
 
-	if (DEVELOPMENT) await syncTickerIds();
+	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
+	let wblen = await redis.main.hlen(redis.WB.TICKER_IDS)
+	console.log(redis.RH.SYMBOLS, 'wblen ->', console.inspect(wblen))
+	if (wblen < 9000) {
+		await syncInstruments()
+	}
 
 	console.info('readyInstruments -> done')
 
@@ -49,24 +50,13 @@ async function readyInstruments() {
 
 
 async function syncInstruments() {
-
-	await getInstruments()
-	await syncTickerIds()
-
-	console.info('syncInstruments -> done')
-
-}
-
-
-
-async function getInstruments() {
 	await pForever(async function(url) {
 
 		let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
 		_.remove(response.results, v => Array.isArray(v.symbol.match(/\W+/)))
 
 		if (DEVELOPMENT) {
-			console.log('getInstruments ->',
+			console.log('syncInstruments ->',
 				console.inspect(response.results.length),
 				console.inspect(response.next)
 			)
@@ -95,14 +85,15 @@ async function getInstruments() {
 
 	}, 'https://api.robinhood.com/instruments/')
 
-	console.info('getInstruments -> done')
+	await syncTickerIds()
+
+	console.info('syncInstruments -> done')
 
 }
 
 
 
 async function syncTickerIds() {
-	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
 
 	let tickers = _.flatten(await Promise.all([
 		// stocks
@@ -116,9 +107,7 @@ async function syncTickerIds() {
 	])) as Webull.Ticker[]
 	_.remove(tickers, v => Array.isArray(v.disSymbol.match(/\W+/)))
 
-	let disTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker)
-	console.log('Object.keys(disTickers).length ->', console.inspect(Object.keys(disTickers).length))
-	// await radio.emitAll(allSyncTickerIds, disTickers)
+	await radio.emitAll(iSyncTickerIds, tickers)
 
 	console.info('syncTickerIds -> done')
 
@@ -126,21 +115,20 @@ async function syncTickerIds() {
 
 
 
-radio.onAll(allSyncTickerIds)
-async function allSyncTickerIds(done: string, disTickers: Dict<Webull.Ticker[]>) {
+radio.onAll(iSyncTickerIds)
+async function iSyncTickerIds(done: string, tickers: Webull.Ticker[]) {
 
 	let symbols = core.array.chunks(await robinhood.getAllSymbols(), process.INSTANCES)[process.INSTANCE]
-	console.log('allSyncTickerIds symbols.length ->', console.inspect(symbols.length))
+	console.log('iSyncTickerIds symbols.length ->', console.inspect(symbols.length))
+	let disTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker) as Dict<Webull.Ticker[]>
 	await pAll(symbols.map(symbol => {
 		return () => syncTickerId(symbol, disTickers[symbol])
 	}), { concurrency: 1 })
 
-	console.info('allSyncTickerIds -> done')
-	radio.done(done)
+	console.info('iSyncTickerIds -> done')
+	radio.iDone(done)
 
 }
-
-
 
 async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 	if (DEVELOPMENT) console.log('syncTickerId ->', console.inspect(symbol));

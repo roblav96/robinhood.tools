@@ -38,7 +38,7 @@ export class ReadySubject {
 		}
 	}
 
-	pipe(opts = { void: false }) {
+	private pipe(opts = { void: false }) {
 		let args = opts.void ? [Rx.mapTo(void 0)] : []
 		return this.subject.pipe(Rx.filter(v => !!v), Rx.take(1), ...args)
 	}

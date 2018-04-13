@@ -13,7 +13,6 @@ import WebSocketClient from '../../common/websocket.client'
 import WebSocketServer from './websocket.server'
 import Emitter from '../../common/emitter'
 import fastify from '../api/fastify'
-import pm2 from './pm2'
 
 
 
@@ -88,13 +87,7 @@ class Radio extends Emitter<string, any> {
 	constructor() {
 		super()
 
-		pm2.once('primary:fastify.rxready', () => this.socket.connect())
-		if (process.PRIMARY) {
-			fastify.rxready.subscribe(() => pm2.emit('primary:fastify.rxready'))
-			R.delay(1000).then(function() {
-				radio.socket.destroy()
-			})
-		}
+		fastify.rxready.subscribe(() => this.socket.connect())
 
 		this.socket.on('open', () => {
 			this.rxopen.next(true)
@@ -141,7 +134,7 @@ class Radio extends Emitter<string, any> {
 		this.emit(fn.name, fn.name, ...args)
 		await Promise.all(proms)
 	}
-	done(done: string) {
+	iDone(done: string) {
 		this.emit(`${done}.${process.INSTANCE}`)
 	}
 

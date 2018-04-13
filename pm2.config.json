@@ -14,7 +14,7 @@
 		"vizion": false,
 		// 
 		"wait_ready": false,
-		"kill_timeout": 10000,
+		"kill_timeout": 1000,
 		// 
 		"watch": false,
 		"autorestart": false,

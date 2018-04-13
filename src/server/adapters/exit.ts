@@ -1,51 +1,59 @@
 // 
 
-import * as pm2 from 'pm2'
-import Emitter from '../../common/emitter'
+import * as R from '../../common/rambdax'
+import * as core from '../../common/core'
 
 
 
-export default new class Pm2 extends Emitter<string, any> {
+process.on('SIGINT', function() {
+	let xms = 10
+	let ms = core.math.dispersed(xms * process.INSTANCES, process.INSTANCE, process.INSTANCES)
+	R.delay(ms + xms).then(() => process.exit(0))
+})
 
-	constructor() {
-		super()
 
-		process.on('message', message => {
-			super.emit(message.topic, ...message.data.args)
-		})
 
-	}
 
-	emit(name: string, ...args: any[]) {
-		pm2.connect(function(error) {
-			if (error) return console.error('pm2.connect Error ->', error);
-			pm2.list(function(error, procs) {
-				if (error) return console.error('pm2.list Error ->', error);
-				let ids = procs.filter(v => v.name == process.NAME).map(v => v.pm_id)
-				return Promise.all(ids.map(function(id) {
-					return new Promise(function(resolve, reject) {
-						pm2.sendDataToProcessId(id, { topic: name, data: { args } }, function(error) {
-							if (error) return reject(error);
-							resolve()
-						})
-					})
-				})).catch(function(error) {
-					console.error('pm2.send Error ->', error)
-				}).finally(() => pm2.disconnect())
-			})
-		})
-		return this
-	}
 
-}
+// class PM2 extends Emitter<string, any> {
+
+// 	constructor() {
+// 		super()
+
+// 		process.on('message', message => {
+// 			super.emit(message.topic, ...message.data.args)
+// 		})
+
+// 	}
+
+// 	emit(name: string, ...args: any[]) {
+// 		pm2.connect(function(error) {
+// 			if (error) return console.error('pm2.connect Error ->', error);
+// 			pm2.list(function(error, procs) {
+// 				if (error) return console.error('pm2.list Error ->', error);
+// 				let ids = procs.filter(v => v.name == process.NAME).map(v => v.pm_id)
+// 				return Promise.all(ids.map(function(id) {
+// 					return new Promise(function(resolve, reject) {
+// 						pm2.sendDataToProcessId(id, { topic: name, data: { args } }, function(error) {
+// 							if (error) return reject(error);
+// 							resolve()
+// 						})
+// 					})
+// 				})).catch(function(error) {
+// 					console.error('pm2.send Error ->', error)
+// 				}).finally(() => pm2.disconnect())
+// 			})
+// 		})
+// 		return this
+// 	}
+
+// }
+
+// export default new PM2()
 
 
 
 // process.on('SIGINT', () => process.kill(process.pid))
-
-
-
-
 
 // process.on('SIGINT', function() {
 // 	process.kill(process.pid)
