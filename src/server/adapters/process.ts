@@ -26,14 +26,20 @@ declare global { namespace NodeJS { export interface ProcessEnv { NODE_APP_INSTA
 
 
 
+import * as clc from 'cli-color'
 if (process.PRIMARY) {
+	process.stdout.write(clc.erase.screen)
+	if (DEVELOPMENT) {
+		const int = setInterval(() => process.stdout.write(clc.move.up(1)), 1000)
+		process.on('SIGINT', () => clearInterval(int))
+	}
 	console.log(
-		`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`,
+		` \n \n${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`,
 		` \n${chalk.magentaBright('█')} ${chalk(NODE_ENV)}`,
 	)
 }
-import * as moment from 'moment'
-console.log(`[${moment().format('ss:SSS')}]`, 'process.INSTANCE ->', process.INSTANCE)
+// import * as moment from 'moment'
+// console.log(`[${moment().format('ss:SSS')}]`, 'id ->', process.INSTANCE)
 
 
 
@@ -71,13 +77,5 @@ process.on('unhandledRejection', function(error) {
 	console.error(chalk.bold.redBright('UNHANDLED REJECTION'), '->', error)
 	if (PRODUCTION) process.exit(1);
 })
-
-
-
-import * as clc from 'cli-color'
-if (DEVELOPMENT && process.PRIMARY) {
-	const int = setInterval(() => process.stdout.write(clc.move.up(1)), 1000)
-	process.on('SIGINT', () => clearInterval(int))
-}
 
 

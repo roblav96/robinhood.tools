@@ -30,16 +30,16 @@ if (process.PRIMARY) {
 async function readyInstruments() {
 
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
-	let rhcard = await redis.main.scard(redis.RH.SYMBOLS)
-	console.log(redis.RH.SYMBOLS, 'rhcard ->', console.inspect(rhcard))
-	if (rhcard < 10000) {
+	let scard = await redis.main.scard(redis.RH.SYMBOLS)
+	console.log(redis.RH.SYMBOLS, console.inspect(scard))
+	if (scard < 10000) {
 		await syncInstruments()
 	}
 
 	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
-	let wblen = await redis.main.hlen(redis.WB.TICKER_IDS)
-	console.log(redis.RH.SYMBOLS, 'wblen ->', console.inspect(wblen))
-	if (wblen < 9000) {
+	let hlen = await redis.main.hlen(redis.WB.TICKER_IDS)
+	console.log(redis.WB.TICKER_IDS, console.inspect(hlen))
+	if (hlen < 9000) {
 		await syncInstruments()
 	}
 
