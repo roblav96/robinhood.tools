@@ -40,7 +40,7 @@ async function readyInstruments() {
 	let hlen = await redis.main.hlen(redis.WB.TICKER_IDS)
 	console.log(redis.WB.TICKER_IDS, console.inspect(hlen))
 	if (hlen < 9000) {
-		await syncInstruments()
+		await syncTickerIds()
 	}
 
 	console.info('readyInstruments -> done')
@@ -98,11 +98,11 @@ async function syncTickerIds() {
 	let tickers = _.flatten(await Promise.all([
 		// stocks
 		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/8', {
-			query: { pageSize: 999999 },
+			query: { pageSize: 9999 },
 		}),
 		// etfs
 		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/13', {
-			query: { pageSize: 999999 },
+			query: { pageSize: 9999 },
 		}),
 	])) as Webull.Ticker[]
 	_.remove(tickers, v => Array.isArray(v.disSymbol.match(/\W+/)))
@@ -120,6 +120,7 @@ async function iSyncTickerIds(done: string, tickers: Webull.Ticker[]) {
 
 	let symbols = core.array.chunks(await robinhood.getAllSymbols(), process.INSTANCES)[process.INSTANCE]
 	console.log('iSyncTickerIds symbols.length ->', console.inspect(symbols.length))
+
 	let disTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker) as Dict<Webull.Ticker[]>
 	await pAll(symbols.map(symbol => {
 		return () => syncTickerId(symbol, disTickers[symbol])
