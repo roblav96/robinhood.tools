@@ -23,21 +23,6 @@ declare global { namespace NodeJS { export interface ProcessEnv { NODE_APP_INSTA
 
 
 
-import chalk from 'chalk'
-import * as clc from 'cli-color'
-if (process.PRIMARY) {
-	if (DEVELOPMENT) {
-		setInterval(() => process.stdout.write(clc.erase.lineRight), 1000)
-	}
-	process.stdout.write(
-		`\n\n\n\n` +
-		`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}\n` +
-		`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}\n`
-	)
-}
-
-
-
 import * as cluster from 'cluster'
 process.MASTER = cluster.isMaster
 process.WORKER = cluster.isWorker
@@ -60,16 +45,18 @@ declare global { namespace NodeJS { export interface Process { onexit: (fn: () =
 
 
 
-import * as inspector from 'inspector'
-if (process.DEBUGGING) {
-	chalk.enabled = false
-	inspector.open(process.debugPort + process.INSTANCE)
-	process.onexit(inspector.close)
-	console.log('inspector ->', inspector)
+import chalk from 'chalk'
+import * as clc from 'cli-color'
+if (process.PRIMARY) {
+	if (DEVELOPMENT) {
+		setInterval(() => process.stdout.write(clc.erase.lineRight), 1000)
+	}
+	process.stdout.write(
+		`\n\n\n\n` +
+		`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}\n` +
+		`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}\n`
+	)
 }
-declare global { namespace NodeJS { export interface Process { debugPort: number, DEBUGGING: boolean } } }
-
-
 
 process.on('uncaughtException', function(error) {
 	console.error(chalk.bold.redBright('UNCAUGHT EXCEPTION'), '->', error)
@@ -78,5 +65,16 @@ process.on('unhandledRejection', function(error) {
 	console.error(chalk.bold.redBright('UNHANDLED REJECTION'), '->', error)
 	if (PRODUCTION) process.exit(1);
 })
+
+
+
+import * as inspector from 'inspector'
+if (process.DEBUGGING) {
+	chalk.enabled = false
+	inspector.open(process.debugPort + process.INSTANCE)
+	process.onexit(inspector.close)
+	console.clear()
+}
+declare global { namespace NodeJS { export interface Process { debugPort: number, DEBUGGING: boolean } } }
 
 
