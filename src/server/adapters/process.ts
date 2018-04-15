@@ -69,11 +69,11 @@ process.on('unhandledRejection', function(error) {
 
 
 import * as inspector from 'inspector'
-if (process.DEBUGGING) {
+if (DEVELOPMENT && process.DEBUGGING) {
 	chalk.enabled = false
 	inspector.open(process.debugPort + process.INSTANCE)
 	process.onexit(inspector.close)
-	console.clear()
+	// console.clear()
 }
 declare global { namespace NodeJS { export interface Process { debugPort: number, DEBUGGING: boolean } } }
 

@@ -5,11 +5,12 @@ import * as core from '../../common/core'
 
 
 
-process.on('SIGINT', function() {
-	let xms = 10
-	let ms = core.math.dispersed(xms * process.INSTANCES, process.INSTANCE, process.INSTANCES)
-	R.delay(ms + xms).then(() => process.exit(0))
-})
+// process.on('SIGINT', function(message) {
+// 	console.log('message ->', message)
+// 	let xms = 10
+// 	let ms = core.math.dispersed(xms * process.INSTANCES, process.INSTANCE, process.INSTANCES)
+// 	R.delay(ms + xms).then(() => process.exit(0))
+// })
 
 
 

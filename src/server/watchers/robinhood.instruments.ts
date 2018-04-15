@@ -15,28 +15,28 @@ import radio from '../adapters/radio'
 
 
 export const rxready = new Rx.ReadySubject()
-radio.once(`${__filename}.rxready`, () => rxready.next())
+radio.once(`${__filename}.ready`, () => rxready.next())
 
 if (process.PRIMARY) {
 	radio.rxready.toPromise().then(readyInstruments).catch(function(error) {
 		console.error('readyInstruments Error ->', error)
 	}).finally(function() {
-		radio.emit(`${__filename}.rxready`)
+		radio.emit(`${__filename}.ready`)
 	})
 }
 
 
 
 async function readyInstruments() {
-
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
+	if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
+
 	let scard = await redis.main.scard(redis.RH.SYMBOLS)
 	console.log(redis.RH.SYMBOLS, console.inspect(scard))
 	if (scard < 10000) {
 		await syncInstruments()
 	}
 
-	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
 	let hlen = await redis.main.hlen(redis.WB.TICKER_IDS)
 	console.log(redis.WB.TICKER_IDS, console.inspect(hlen))
 	if (hlen < 9000) {
@@ -62,16 +62,16 @@ async function syncInstruments() {
 			)
 		}
 
-		const BLACKLIST = ['ASPU', 'EQS', 'INSI', 'MUFG', 'YESR']
+		// const BLACKLIST = ['ASPU', 'EQS', 'INSI', 'MUFG', 'YESR']
 
 		let coms = [] as Redis.Coms
 		let symbols = new redis.SetsComs(redis.RH.SYMBOLS)
 		response.results.forEach(function(v) {
-			if (BLACKLIST.includes(v.symbol)) {
-				symbols.srem(v.symbol)
-				coms.push(['del', `${redis.RH.INSTRUMENTS}:${v.symbol}`])
-				return
-			}
+			// if (BLACKLIST.includes(v.symbol)) {
+			// 	symbols.srem(v.symbol)
+			// 	coms.push(['del', `${redis.RH.INSTRUMENTS}:${v.symbol}`])
+			// 	return
+			// }
 			symbols.sadd(v.symbol)
 			v.mic = _.compact(v.market.split('/')).pop()
 			v.acronym = robinhood.MICS[v.mic]
@@ -97,12 +97,16 @@ async function syncTickerIds() {
 
 	let tickers = _.flatten(await Promise.all([
 		// stocks
-		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/8', {
-			query: { pageSize: 9999 },
+		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
+			query: { pageSize: 999999 },
 		}),
 		// etfs
-		http.get('https://securitiesapi.stocks666.com/api/securities/market/tabs/v2/6/cards/13', {
-			query: { pageSize: 9999 },
+		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
+			query: { pageSize: 999999 },
+		}),
+		// etfs
+		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/14', {
+			query: { pageSize: 999999 },
 		}),
 	])) as Webull.Ticker[]
 	_.remove(tickers, v => Array.isArray(v.disSymbol.match(/\W+/)))
