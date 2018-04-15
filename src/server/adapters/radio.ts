@@ -4,11 +4,11 @@ import { IncomingMessage } from 'http'
 import * as uws from 'uws'
 import * as url from 'url'
 import * as qs from 'querystring'
-import * as cluster from 'cluster'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
+import * as msgpack from '../../common/msgpack'
 import clock from '../../common/clock'
 import WebSocketClient from '../../common/websocket.client'
 import WebSocketServer from './websocket.server'
@@ -40,6 +40,7 @@ if (process.PRIMARY) {
 		client.on('message', function(message: string) {
 			if (message == 'pong') return;
 			if (message == 'ping') return client.send('pong');
+			console.log('message ->', message)
 			if (message == '__onopen__') {
 				client.isopen = true
 				if (wss.isopens() >= process.INSTANCES) {
@@ -105,6 +106,7 @@ class Radio extends Emitter<string, any> {
 			if (message == '__onclose__') {
 				return this.rxready.next(false)
 			}
+			// let event = msgpack.decode(message) as Radio.Event
 			let event = JSON.parse(message) as Radio.Event
 			super.emit(event.name, ...event.args)
 		})
@@ -112,7 +114,18 @@ class Radio extends Emitter<string, any> {
 	}
 
 	emit(name: string, ...args: any[]) {
-		this.socket.json({ name, args } as Radio.Event)
+		// this.socket.json({ name, args } as Radio.Event)
+		let event = { name, args } as Radio.Event
+		console.log('event ->', event)
+
+		let encoded = msgpack.encode(event)
+		console.log('encoded ->', encoded)
+		// console.log('encoded.toString(hex) ->', encoded.toString('hex'))
+
+		// let decoded = msgpack.parse()
+
+		this.socket.send(encoded as any, 'binary')
+
 		return this
 	}
 	emitPrimary(name: string, ...args: any[]) {

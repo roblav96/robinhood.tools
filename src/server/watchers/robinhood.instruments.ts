@@ -2,6 +2,7 @@
 
 import * as pAll from 'p-all'
 import * as pForever from 'p-forever'
+import * as path from 'path'
 import * as _ from '../../common/lodash'
 import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
@@ -16,13 +17,14 @@ import radio from '../adapters/radio'
 
 
 export const rxready = new Rx.ReadySubject()
-radio.once(`${__filename}.ready`, () => rxready.next())
+const __fname = path.basename(__filename)
+radio.once(`${__fname}.ready`, () => rxready.next())
 
 if (process.PRIMARY) {
 	radio.rxready.toPromise().then(readyInstruments).catch(function(error) {
 		console.error('readyInstruments Error ->', error)
 	}).finally(function() {
-		radio.emit(`${__filename}.ready`)
+		radio.emit(`${__fname}.ready`)
 	})
 }
 
@@ -34,15 +36,15 @@ async function readyInstruments() {
 
 	let scard = await redis.main.scard(redis.RH.SYMBOLS)
 	console.log(redis.RH.SYMBOLS, console.inspect(scard))
-	if (scard < 10000) {
-		await syncInstruments()
-	}
+	// if (scard < 10000) {
+	// 	await syncInstruments()
+	// }
 
 	let hlen = await redis.main.hlen(redis.WB.TICKER_IDS)
 	console.log(redis.WB.TICKER_IDS, console.inspect(hlen))
-	if (hlen < 9000) {
-		await syncTickerIds()
-	}
+	// if (hlen < 9000) {
+	// 	await syncTickerIds()
+	// }
 
 	console.info('readyInstruments -> done')
 
@@ -63,16 +65,9 @@ async function syncInstruments() {
 			)
 		}
 
-		// const BLACKLIST = ['ASPU', 'EQS', 'INSI', 'MUFG', 'YESR']
-
 		let coms = [] as Redis.Coms
 		let symbols = new redis.SetsComs(redis.RH.SYMBOLS)
 		response.results.forEach(function(v) {
-			// if (BLACKLIST.includes(v.symbol)) {
-			// 	symbols.srem(v.symbol)
-			// 	coms.push(['del', `${redis.RH.INSTRUMENTS}:${v.symbol}`])
-			// 	return
-			// }
 			symbols.sadd(v.symbol)
 			v.mic = _.compact(v.market.split('/')).pop()
 			v.acronym = robinhood.MICS[v.mic]
@@ -184,13 +179,13 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 		}
 
 		if (!ticker) {
-			if (instrument.valid) {
-				console.error(
-					'!ticker ->', console.inspect(instrument),
-					' \ntickers ->', console.inspect(tickers),
-					' \nresponse.list ->', console.inspect(response.list)
-				)
-			}
+			// if (instrument.valid) {
+			console.error(
+				'!ticker ->', console.inspect(instrument),
+				' \ntickers ->', console.inspect(tickers),
+				' \nresponse.list ->', console.inspect(response.list)
+			)
+			// }
 			return
 		}
 

@@ -53,10 +53,15 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	socket: WebSocket & uws
 	isopen() { return this.socket && this.socket.readyState == this.socket.OPEN }
 
-	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
-	send(message: string) {
+	binary(buffer: Buffer) {
 		if (!this.isopen()) return;
-		this.socket.send(message)
+		this.socket.send(buffer, { binary: true })
+	}
+
+	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
+	send(message: string, binary?: 'binary') {
+		if (!this.isopen()) return;
+		this.socket.send(message, { binary: binary == 'binary' })
 	}
 
 	close(code = 1000, reason?: string) {

@@ -54,7 +54,7 @@ if (process.PRIMARY) {
 	process.stdout.write(
 		`\n\n\n\n` +
 		`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}\n` +
-		`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}\n`
+		`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}\n\n\n`
 	)
 }
 
@@ -73,7 +73,10 @@ if (DEVELOPMENT && process.DEBUGGING) {
 	chalk.enabled = false
 	inspector.open(process.debugPort + process.INSTANCE)
 	process.onexit(inspector.close)
-	// console.clear()
+	process.on('SIGUSR2', function () {
+		console.clear()
+		process.exit(0)
+	})
 }
 declare global { namespace NodeJS { export interface Process { debugPort: number, DEBUGGING: boolean } } }
 
