@@ -34,6 +34,13 @@ declare global {
 			}
 		}
 
+		namespace Instrument {
+			type State = 'unlisted' | 'active' | 'inactive'
+			type Tradability = 'untradable' | 'tradable' | 'position_closing_only'
+			type Type = 'wrt' | 'pfd' | 'stock' | 'etp' | 'unit' | 'adr' | 'nyrs' | 'right' | 'cef' | 'reit' | 'mlp' | 'tracking' | 'lp' | 'rlt'
+			
+		}
+
 		interface Instrument {
 			bloomberg_unique: string
 			country: string
@@ -49,11 +56,11 @@ declare global {
 			quote: string
 			simple_name: string
 			splits: string
-			state: 'unlisted' | 'active' | 'inactive'
+			state: Instrument.State
 			symbol: string
-			tradability: 'untradable' | 'tradable' | 'position_closing_only'
+			tradability: Instrument.Tradability
 			tradeable: boolean
-			type: 'wrt' | 'pfd' | 'stock' | 'etp' | 'unit' | 'adr' | 'nyrs' | 'right' | 'cef' | 'reit' | 'mlp' | 'tracking' | 'lp' | 'rlt'
+			type: Instrument.Type
 			url: string
 			// 
 			acronym: string

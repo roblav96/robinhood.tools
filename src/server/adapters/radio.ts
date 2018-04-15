@@ -135,8 +135,8 @@ class Radio extends Emitter<string, any> {
 		this.emit(fn.name, fn.name, ...args)
 		await Promise.all(proms)
 	}
-	iDone(done: string) {
-		this.emit(`${done}.${process.INSTANCE}`)
+	done(done: string, primary?: 'primary') {
+		this[primary ? 'emitPrimary' : 'emit'](`${done}.${process.INSTANCE}`)
 	}
 
 }

@@ -16,7 +16,7 @@ if (cluster.isMaster) {
 	}
 
 	let forks = process.INSTANCES - 1
-	console.info('Forking', `+${forks}`, pretty.plural('worker', forks), 'in cluster...')
+	console.info('Forking', `+${forks}`, 'additional', pretty.plural('worker', forks), 'in cluster...')
 
 	const INSTANCE = 1
 	let i: number, len = process.INSTANCES

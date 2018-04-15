@@ -15,8 +15,8 @@ export function config() {
 		silent: PRODUCTION,
 		timeout: 10000,
 		retries: 5,
-		tick: '5s',
-	} as Partial<Http.Config>
+		retryTick: '5s',
+	} as Http.Config
 }
 
 
@@ -28,7 +28,7 @@ export function send(config: Http.Config) {
 		if (config.retries > 0 && retryable(error)) {
 			config.retries--
 			if (DEVELOPMENT) console.warn('http retry ->', config.retries);
-			return clock.toPromise(config.tick).then(() => send(config))
+			return clock.toPromise(config.retryTick).then(() => send(config))
 		}
 		return Promise.reject(error)
 	})
@@ -42,7 +42,7 @@ declare global {
 	namespace Http {
 		interface Config extends got.GotJSONOptions {
 			retries: number
-			tick: Clock.Tick
+			retryTick: Clock.Tick
 			url: string
 			query: any
 			silent: boolean
