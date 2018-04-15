@@ -24,6 +24,11 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 		if (config.isProxy) return config;
 
+		if (!config.silent) {
+			let ending = (config.query || config.body) ? ' -> ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
+			console.log('-> ' + config.method + ' ' + config.url + ending);
+		}
+
 		if (parsed.host.includes('robinhood')) {
 			if (config.robinhoodToken) {
 				config.headers['Authorization'] = 'Bearer ' + config.robinhoodToken

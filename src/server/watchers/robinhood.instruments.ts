@@ -9,6 +9,7 @@ import * as core from '../../common/core'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
+import * as utils from '../services/utils'
 import clock from '../../common/clock'
 import radio from '../adapters/radio'
 
@@ -128,7 +129,7 @@ async function onSyncTickerIds(done: string, tickers: Webull.Ticker[]) {
 	let disTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker) as Dict<Webull.Ticker[]>
 	await pAll(symbols.map(symbol => {
 		return () => syncTickerId(symbol, disTickers[symbol])
-	}), { concurrency: 1 })
+	}), { concurrency: 3 })
 
 	console.info('onSyncTickerIds -> done')
 	radio.done(done, 'primary')
@@ -147,22 +148,22 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 	// if (ticker) console.info('ticker ->', console.inspect(_.pick(ticker, ['tickerId', 'disSymbol', 'tickerName', 'tinyName', 'disExchangeCode', 'regionIsoCode'] as KeysOf<Webull.Ticker>)));
 
 	if (!ticker) {
+		if (DEVELOPMENT) console.log('!ticker ->', console.inspect(symbol));
 
 		let tickerType: number
 		if (instrument.type == 'stock') tickerType = 2;
 		if (instrument.type == 'etp') tickerType = 3;
 
 		await clock.toPromise('250ms')
-		let response = await http.get('https://infoapi.webull.com/api/search/tickers2', {
+		let response = await http.get('https://infoapi.stocks666.com/api/search/tickers2', {
 			query: { keys: symbol, tickerType },
-			retries: Infinity, retryTick: '3s',
 		}) as Webull.API.Paginated<Webull.Ticker>
 
 		if (!Array.isArray(response.list)) return;
 
 		let tags = core.string.tags(instrument.simple_name || instrument.name)
 		let results = response.list.filter(function(v) {
-			return v && v.disSymbol.indexOf(symbol) == 0 && (v.tinyName || v.tickerName)
+			return v && v.disSymbol.indexOf(symbol) == 0 && Number.isFinite(v.tickerId) && (v.tinyName || v.tickerName)
 		}).map(function(v) {
 			let match = _.intersection(tags, core.string.tags(v.tinyName || v.tickerName)).length
 			return Object.assign(v, { match })
@@ -173,20 +174,25 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 		if (!result) result = results.find(v => v.disExchangeCode.indexOf(instrument.acronym) == 0);
 		if (!result) result = results.find(v => v.match > 0);
 		if (!result) result = results.find(v => results.length == 1);
-		if (!result) result = results.find(v => (v.tickerName).indexOf(symbol) == 0);
-		if (!result) {
+		if (!result) result = results.find(v => v.tickerName.includes(symbol));
+
+		if (result) {
+			ticker = result
+			// console.log('ticker ->', console.inspect(_.pick(ticker, ['tickerId', 'disSymbol', 'tickerName', 'tinyName', 'disExchangeCode', 'regionAlias'] as KeysOf<Webull.Ticker>)))
+		} else {
+			ticker = tickers[0] || response.list[0]
+		}
+
+		if (!ticker) {
 			if (instrument.valid) {
 				console.error(
-					'!result ->', console.inspect(instrument),
+					'!ticker ->', console.inspect(instrument),
 					' \ntickers ->', console.inspect(tickers),
 					' \nresponse.list ->', console.inspect(response.list)
 				)
 			}
 			return
 		}
-
-		ticker = result
-		// console.log('ticker ->', console.inspect(_.pick(ticker, ['tickerId', 'disSymbol', 'tickerName', 'tinyName', 'disExchangeCode', 'regionAlias'] as KeysOf<Webull.Ticker>)))
 
 	}
 

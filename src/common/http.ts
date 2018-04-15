@@ -12,7 +12,7 @@ import clock from './clock'
 export function config() {
 	return {
 		json: true,
-		silent: PRODUCTION,
+		silent: true,
 		timeout: 10000,
 		retries: 5,
 		retryTick: '5s',
