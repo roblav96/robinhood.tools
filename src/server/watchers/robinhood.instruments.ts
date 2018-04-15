@@ -129,7 +129,7 @@ async function onSyncTickerIds(done: string, tickers: Webull.Ticker[]) {
 	let disTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker) as Dict<Webull.Ticker[]>
 	await pAll(symbols.map(symbol => {
 		return () => syncTickerId(symbol, disTickers[symbol])
-	}), { concurrency: 3 })
+	}), { concurrency: 1 })
 
 	console.info('onSyncTickerIds -> done')
 	radio.done(done, 'primary')
