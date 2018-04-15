@@ -1,11 +1,12 @@
 // 
 
-import chalk from 'chalk'
+process.DIRNAME = __dirname.split('/').slice(0, -3).join('/')
+declare global { namespace NodeJS { export interface Process { DIRNAME: string } } }
+
+
+
 import * as path from 'path'
-
-
-
-const pkg = require(path.resolve(process.cwd(), 'package.json'))
+const pkg = require(path.resolve(process.DIRNAME, 'package.json'))
 process.NAME = pkg.name
 process.VERSION = pkg.version
 process.DOMAIN = (DEVELOPMENT ? 'dev.' : '') + pkg.domain
@@ -17,29 +18,23 @@ import * as os from 'os'
 if (PRODUCTION || !Number.isFinite(process.INSTANCES)) process.INSTANCES = os.cpus().length;
 process.INSTANCES = Math.max(process.INSTANCES, 1)
 process.INSTANCE = process.env.NODE_APP_INSTANCE ? Number.parseInt(process.env.NODE_APP_INSTANCE) : 0
-if (process.env.pm_uptime) {
-	process.INSTANCES = Number.parseInt(process.env.instances) || os.cpus().length
-	process.INSTANCE = Number.parseInt(process.env.NODE_APP_INSTANCE)
-}
 process.PRIMARY = process.INSTANCE == 0
 declare global { namespace NodeJS { export interface ProcessEnv { NODE_APP_INSTANCE: string } export interface Process { PRIMARY: boolean } } }
 
 
 
+import chalk from 'chalk'
 import * as clc from 'cli-color'
 if (process.PRIMARY) {
-	process.stdout.write(clc.erase.screen)
 	if (DEVELOPMENT) {
-		const int = setInterval(() => process.stdout.write(clc.move.up(1)), 1000)
-		process.on('SIGINT', () => clearInterval(int))
+		setInterval(() => process.stdout.write(clc.erase.lineRight), 1000)
 	}
-	console.log(
-		` \n \n${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}`,
-		` \n${chalk.magentaBright('█')} ${chalk(NODE_ENV)}`,
+	process.stdout.write(
+		`\n\n\n\n` +
+		`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}\n` +
+		`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}\n`
 	)
 }
-// import * as moment from 'moment'
-// console.log(`[${moment().format('ss:SSS')}]`, 'id ->', process.INSTANCE)
 
 
 
@@ -51,11 +46,17 @@ declare global { namespace NodeJS { export interface Process { MASTER: boolean, 
 
 
 import * as dotenv from 'dotenv'
-dotenv.config({ path: path.resolve(process.cwd(), 'config/server.' + NODE_ENV + '.env') })
-dotenv.config({ path: path.resolve(process.cwd(), 'config/server.env') })
+dotenv.config({ path: path.resolve(process.DIRNAME, 'config/server.' + NODE_ENV + '.env') })
+dotenv.config({ path: path.resolve(process.DIRNAME, 'config/server.env') })
 process.HOST = process.env.HOST || '127.0.0.1'
 process.PORT = Number.parseInt(process.env.PORT) || 12300
 declare global { namespace NodeJS { export interface Process { HOST: string, PORT: number } } }
+
+
+
+import * as onexit from 'exit-hook'
+process.onexit = onexit
+declare global { namespace NodeJS { export interface Process { onexit: (fn: () => any) => any } } }
 
 
 
@@ -63,8 +64,8 @@ import * as inspector from 'inspector'
 if (process.DEBUGGING) {
 	chalk.enabled = false
 	inspector.open(process.debugPort + process.INSTANCE)
-	// process.on('beforeExit', inspector.close)
-	// process.on('exit', inspector.close)
+	process.onexit(inspector.close)
+	console.log('inspector ->', inspector)
 }
 declare global { namespace NodeJS { export interface Process { debugPort: number, DEBUGGING: boolean } } }
 

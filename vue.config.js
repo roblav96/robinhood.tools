@@ -87,11 +87,8 @@ module.exports = {
 }
 
 if (DEVELOPMENT) {
-	const clc = require('cli-color'); let i = 0;
-	setInterval(function() {
-		let direction = (i % 2 == 0) ? 'left' : 'right'; i++;
-		process.stdout.write(clc.move[direction](1))
-	}, 1000)
+	const clc = require('cli-color')
+	setInterval(() => process.stdout.write(clc.move.down(1)), 1000)
 }
 
 
