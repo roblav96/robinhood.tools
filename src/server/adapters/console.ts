@@ -2,10 +2,10 @@
 
 import chalk from 'chalk'
 import * as _ from '../../common/lodash'
+
+
+
 import * as moment from 'moment'
-
-
-
 if (!process.DEBUGGING) {
 	require('debug-trace')()
 	console.format = function(args) {
@@ -31,36 +31,20 @@ if (!process.DEBUGGING) {
 		if (method == 'error') {
 			output = chalk.bold.redBright('████  ERROR  ████ \n') + output
 		}
-		return ' \n \n' + chalk.underline(output) + ' \n'
+		return '\n\n' + chalk.underline(output) + '\n'
 	}
 }
 declare global { interface Console { format(args: any): void } }
 
 
 
-import * as eyes from 'eyes'
-_.merge(eyes.defaults, {
-	maxLength: 65536, stream: null, showHidden: true, pretty: true,
-	styles: { all: null, key: 'grey', special: 'red' },
-} as eyes.EyesOptions)
-
-Object.assign(console, {
-	inspect(value: any) { return !process.DEBUGGING ? eyes.inspect(value) : value },
-})
-declare global { interface Console { inspect(value: any): string } }
-
-
-
 import * as util from 'util'
 _.merge(util.inspect, {
 	defaultOptions: {
-		showHidden: false,
-		showProxy: false,
-		depth: chalk.enabled ? 2 : 0,
-		compact: !chalk.enabled,
-		breakLength: Infinity,
-		maxArrayLength: Infinity,
-		colors: chalk.enabled,
+		depth: 2,
+		showHidden: false, showProxy: false,
+		compact: false, colors: chalk.enabled,
+		breakLength: Infinity, maxArrayLength: Infinity,
 	},
 	styles: {
 		string: 'green', regexp: 'green', date: 'green',
@@ -70,28 +54,16 @@ _.merge(util.inspect, {
 	},
 } as Partial<typeof util.inspect>)
 
-Object.assign(console, {
-	dump(value: any, opts = {}) {
-		if (process.DEBUGGING) return value;
-		_.defaults(opts, {
-			depth: 4, showHidden: true, showProxy: true,
-		} as NodeJS.InspectOptions)
-		return util.inspect(value, opts)
-	},
-})
-declare global { interface Console { dump(value: any, opts?: NodeJS.InspectOptions): string } }
 
 
-
+import * as clipboardy from 'clipboardy'
+import dtsgen from '../../common/dtsgen'
 Object.assign(console, { dtsgen: _.noop })
 if (DEVELOPMENT) {
-	const dtsgen = require('../../common/dtsgen').default
-	const clipboardy = require('clipboardy')
 	Object.assign(console, {
 		dtsgen(value: any) {
-			let results = dtsgen(value) as string
-			let paste = results.trim()
-			clipboardy.write(paste.substring(1, paste.length - 2).trim())
+			let results = dtsgen(value)
+			clipboardy.write(results.trim())
 			return results
 		},
 	})

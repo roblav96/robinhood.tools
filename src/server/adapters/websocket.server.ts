@@ -11,14 +11,14 @@ class WebSocketServer extends uws.Server {
 	// 	process.on('SIGINT', () => this.close())
 	// }
 
-	isopens() {
-		let isopens = 0
+	count() {
+		let total = 0
 		this.clients.forEach(function(client) {
 			if (client.isopen) {
-				isopens++
+				total++
 			}
 		})
-		return isopens
+		return total
 	}
 
 	find(uuid: string) {

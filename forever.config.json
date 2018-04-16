@@ -5,6 +5,7 @@
 	"args": ["--colors"],
 	"killSignal": "SIGTERM",
 	"killTree": true,
+	"silent": false,
 	"watch": false,
 	"append": true,
 	"logFile": "/dev/null",

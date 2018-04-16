@@ -35,13 +35,13 @@ async function readyInstruments() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
 
 	let scard = await redis.main.scard(redis.RH.SYMBOLS)
-	console.log(redis.RH.SYMBOLS, console.inspect(scard))
+	console.log(redis.RH.SYMBOLS, scard)
 	// if (scard < 10000) {
 	// 	await syncInstruments()
 	// }
 
 	let hlen = await redis.main.hlen(redis.WB.TICKER_IDS)
-	console.log(redis.WB.TICKER_IDS, console.inspect(hlen))
+	console.log(redis.WB.TICKER_IDS, hlen)
 	// if (hlen < 9000) {
 	// 	await syncTickerIds()
 	// }
@@ -59,10 +59,7 @@ async function syncInstruments() {
 		_.remove(response.results, v => Array.isArray(v.symbol.match(/\W+/)))
 
 		if (DEVELOPMENT) {
-			console.log('syncInstruments ->',
-				console.inspect(response.results.length),
-				console.inspect(response.next)
-			)
+			console.log('syncInstruments ->', response.results.length, response.next)
 		}
 
 		let coms = [] as Redis.Coms
@@ -119,7 +116,7 @@ radio.onAll(onSyncTickerIds)
 async function onSyncTickerIds(done: string, tickers: Webull.Ticker[]) {
 
 	let symbols = core.array.chunks(await robinhood.getAllSymbols(), process.INSTANCES)[process.INSTANCE]
-	console.log('onSyncTickerIds symbols.length ->', console.inspect(symbols.length))
+	console.log('onSyncTickerIds symbols.length ->', symbols.length)
 
 	let disTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker) as Dict<Webull.Ticker[]>
 	await pAll(symbols.map(symbol => {
@@ -127,7 +124,7 @@ async function onSyncTickerIds(done: string, tickers: Webull.Ticker[]) {
 	}), { concurrency: 1 })
 
 	console.info('onSyncTickerIds -> done')
-	radio.done(done, 'primary')
+	radio.donePrimary(done)
 
 }
 
@@ -143,7 +140,7 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 	// if (ticker) console.info('ticker ->', console.inspect(_.pick(ticker, ['tickerId', 'disSymbol', 'tickerName', 'tinyName', 'disExchangeCode', 'regionIsoCode'] as KeysOf<Webull.Ticker>)));
 
 	if (!ticker) {
-		if (DEVELOPMENT) console.log('!ticker ->', console.inspect(symbol));
+		if (DEVELOPMENT) console.log('!ticker ->', symbol);
 
 		let tickerType: number
 		if (instrument.type == 'stock') tickerType = 2;
@@ -179,13 +176,7 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 		}
 
 		if (!ticker) {
-			// if (instrument.valid) {
-			console.error(
-				'!ticker ->', console.inspect(instrument),
-				' \ntickers ->', console.inspect(tickers),
-				' \nresponse.list ->', console.inspect(response.list)
-			)
-			// }
+			console.error('!ticker ->', instrument, 'tickers ->', tickers, 'response.list ->', response.list)
 			return
 		}
 

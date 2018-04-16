@@ -59,9 +59,9 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
-	send(message: string, binary?: 'binary') {
+	send(message: string) {
 		if (!this.isopen()) return;
-		this.socket.send(message, { binary: binary == 'binary' })
+		this.socket.send(message)
 	}
 
 	close(code = 1000, reason?: string) {

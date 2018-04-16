@@ -4,6 +4,7 @@ import { IncomingMessage } from 'http'
 import * as uws from 'uws'
 import * as url from 'url'
 import * as qs from 'querystring'
+import * as Sockette from 'sockette'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as R from '../../common/rambdax'
@@ -43,7 +44,7 @@ if (process.PRIMARY) {
 			console.log('message ->', message)
 			if (message == '__onopen__') {
 				client.isopen = true
-				if (wss.isopens() >= process.INSTANCES) {
+				if (wss.count() >= process.INSTANCES) {
 					wss.broadcast('__onready__')
 				}
 				return
@@ -74,6 +75,15 @@ if (process.PRIMARY) {
 
 
 
+const sock = new Sockette(ADDRESS, {
+	onopen() {
+		console.log('open')
+	},
+})
+console.log('sock ->', sock)
+
+
+
 class Radio extends Emitter<string, any> {
 
 	rxopen = new Rx.ReadySubject()
@@ -83,7 +93,7 @@ class Radio extends Emitter<string, any> {
 		connect: false,
 		timeout: '1s',
 		// silent: true,
-		// verbose: true,
+		verbose: true,
 	})
 
 	constructor() {
@@ -114,7 +124,8 @@ class Radio extends Emitter<string, any> {
 	}
 
 	emit(name: string, ...args: any[]) {
-		// this.socket.json({ name, args } as Radio.Event)
+		this.socket.json({ name, args } as Radio.Event)
+		
 		let event = { name, args } as Radio.Event
 		console.log('event ->', event)
 
@@ -124,7 +135,7 @@ class Radio extends Emitter<string, any> {
 
 		// let decoded = msgpack.parse()
 
-		this.socket.send(encoded as any, 'binary')
+		// this.socket.binary(encoded as any)
 
 		return this
 	}
@@ -148,8 +159,11 @@ class Radio extends Emitter<string, any> {
 		this.emit(fn.name, fn.name, ...args)
 		await Promise.all(proms)
 	}
-	done(done: string, primary?: 'primary') {
-		this[primary ? 'emitPrimary' : 'emit'](`${done}.${process.INSTANCE}`)
+	done(done: string) {
+		this.emit(`${done}.${process.INSTANCE}`)
+	}
+	donePrimary(done: string) {
+		this.emitPrimary(`${done}.${process.INSTANCE}`)
 	}
 
 }

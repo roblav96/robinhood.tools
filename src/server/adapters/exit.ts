@@ -2,6 +2,16 @@
 
 import * as R from '../../common/rambdax'
 import * as core from '../../common/core'
+import Emitter from '../../common/emitter'
+
+
+
+// const exit = new Emitter()
+// export default function onexit(fn: () => any) {
+// 	exit.once('', fn)
+// }
+
+
 
 
 
@@ -11,8 +21,6 @@ import * as core from '../../common/core'
 // 	let ms = core.math.dispersed(xms * process.INSTANCES, process.INSTANCE, process.INSTANCES)
 // 	R.delay(ms + xms).then(() => process.exit(0))
 // })
-
-
 
 
 

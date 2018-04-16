@@ -1,16 +1,20 @@
 // 
 
 require('../common/polyfills')
-require('source-map-support').install()
 
 if (!['development', 'production'].includes(process.env.NODE_ENV)) process.env.NODE_ENV = 'development'
 global.NODE_ENV = process.env.NODE_ENV
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
+
+import * as sourcemaps from 'source-map-support'
+sourcemaps.install()
+
 global.Promise = require('bluebird')
 global.WebSocket = require('uws')
 
 process.DEBUGGING = true
+process.INSTANCES = 1
 
 import './adapters/process'
 import './adapters/console'

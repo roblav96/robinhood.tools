@@ -39,8 +39,19 @@ declare global { namespace NodeJS { export interface Process { HOST: string, POR
 
 
 
-import * as onexit from 'exit-hook'
-process.onexit = onexit
+function exiting(signal: NodeJS.Signals) {
+	if (!signal || signal.constructor != String) signal = 'SIGKILL';
+	eexit.emit('onexit')
+	setImmediate(process.kill, process.pid, signal)
+}
+process.once('exit' as any, exiting);
+process.once('SIGINT', exiting)
+process.once('SIGTERM', exiting)
+process.once('SIGUSR2', exiting)
+
+import * as TinyEmitter from 'tiny-emitter'
+let eexit = new TinyEmitter<'onexit'>()
+process.onexit = function onexit(fn) { eexit.once('onexit', fn) }
 declare global { namespace NodeJS { export interface Process { onexit: (fn: () => any) => any } } }
 
 
@@ -48,13 +59,12 @@ declare global { namespace NodeJS { export interface Process { onexit: (fn: () =
 import chalk from 'chalk'
 import * as clc from 'cli-color'
 if (process.PRIMARY) {
-	if (DEVELOPMENT) {
-		setInterval(() => process.stdout.write(clc.erase.lineRight), 1000)
-	}
+	if (DEVELOPMENT) setInterval(() => process.stdout.write(clc.erase.lineRight), 1000);
 	process.stdout.write(
 		`\n\n\n\n` +
 		`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}\n` +
-		`${chalk.magentaBright('█')} ${chalk(NODE_ENV)}\n\n\n`
+		`${chalk.magentaBright('█')} ${NODE_ENV}\n` +
+		`\n\n`
 	)
 }
 
@@ -69,13 +79,12 @@ process.on('unhandledRejection', function(error) {
 
 
 import * as inspector from 'inspector'
-if (DEVELOPMENT && process.DEBUGGING) {
+if (process.DEBUGGING && DEVELOPMENT) {
 	chalk.enabled = false
 	inspector.open(process.debugPort + process.INSTANCE)
-	process.onexit(inspector.close)
-	process.on('SIGUSR2', function () {
+	process.onexit(function() {
 		console.clear()
-		process.exit(0)
+		inspector.close()
 	})
 }
 declare global { namespace NodeJS { export interface Process { debugPort: number, DEBUGGING: boolean } } }
