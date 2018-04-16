@@ -13,8 +13,8 @@ sourcemaps.install()
 global.Promise = require('bluebird')
 global.WebSocket = require('uws')
 
-process.DEBUGGING = true
-process.INSTANCES = 1
+// process.DEBUGGING = true
+// process.INSTANCES = 1
 
 import './adapters/process'
 import './adapters/console'

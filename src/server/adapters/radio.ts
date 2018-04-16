@@ -35,12 +35,7 @@ if (process.PRIMARY) {
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
 	wss.on('connection', function(client: uws.WebSocket, req: IncomingMessage) {
-		console.log('client ->', client)
-		// console.warn('client ->', console.dtsgen(client))
-		console.log('req ->', req)
-		// console.warn('req ->', console.dtsgen(req))
-
-		client.isopen = false
+		client.alive = false
 		client.uuid = qs.parse(url.parse(req.url).query).uuid as string
 
 		client.on('message', function(message: string) {
@@ -48,7 +43,7 @@ if (process.PRIMARY) {
 			if (message == 'ping') return client.send('pong');
 			console.log('message ->', message)
 			if (message == '__onopen__') {
-				client.isopen = true
+				client.alive = true
 				if (wss.connections() >= process.INSTANCES) {
 					wss.broadcast('__onready__')
 				}
@@ -64,7 +59,7 @@ if (process.PRIMARY) {
 
 		client.on('close', function(code, reason) {
 			if (code != 1000) console.warn('onclose ->', code, '->', reason);
-			client.isopen = false
+			client.alive = false
 			if (wss.clients.length < process.INSTANCES) {
 				wss.broadcast('__onclose__')
 			}

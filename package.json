@@ -95,6 +95,7 @@
 		"@types/pretty-bytes": "latest",
 		"@types/pretty-ms": "latest",
 		"@types/source-map-support": "latest",
+		"@types/uws": "latest",
 		"@vue/cli-plugin-typescript": "latest",
 		"@vue/cli-service": "latest",
 		"chalk": "latest",
