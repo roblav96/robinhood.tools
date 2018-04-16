@@ -63,8 +63,8 @@ if (process.PRIMARY) {
 	process.stdout.write(
 		`\n\n\n\n` +
 		`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}\n` +
-		`${chalk.magentaBright('█')} ${NODE_ENV}\n` +
-		`\n\n`
+		`${chalk.magentaBright('█')} ${NODE_ENV}\n`
+		// + `\n\n`
 	)
 }
 
@@ -80,7 +80,7 @@ process.on('unhandledRejection', function(error) {
 
 import * as inspector from 'inspector'
 if (process.DEBUGGING && DEVELOPMENT) {
-	// chalk.enabled = false
+	chalk.enabled = false
 	inspector.open(process.debugPort + process.INSTANCE)
 	process.onexit(function() {
 		console.clear()

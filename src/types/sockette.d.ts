@@ -7,7 +7,7 @@ declare module 'sockette' {
 			protocols: string[]
 			timeout: number
 			maxAttempts: number
-			onopen: () => void
+			onopen: (event?: any) => void
 			onerror: (error: Error) => void
 			onclose: (code: number, message: string) => void
 			onmessage: (event: any) => void

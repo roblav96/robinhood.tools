@@ -27,7 +27,7 @@ if (process.PRIMARY) {
 		server: fastify.server, path: PATH,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
-			next(host == process.HOST)
+			next(host == `${process.HOST}:${process.PORT}`)
 		},
 	})
 
@@ -35,6 +35,8 @@ if (process.PRIMARY) {
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
 	wss.on('connection', function(client: uws.WebSocket, req: IncomingMessage) {
+		console.log('client ->', client)
+		console.log('req ->', req)
 		client.isopen = false
 		client.uuid = qs.parse(url.parse(req.url).query).uuid as string
 
@@ -44,7 +46,7 @@ if (process.PRIMARY) {
 			console.log('message ->', message)
 			if (message == '__onopen__') {
 				client.isopen = true
-				if (wss.count() >= process.INSTANCES) {
+				if (wss.connections() >= process.INSTANCES) {
 					wss.broadcast('__onready__')
 				}
 				return
@@ -75,12 +77,26 @@ if (process.PRIMARY) {
 
 
 
-const sock = new Sockette(ADDRESS, {
-	onopen() {
-		console.log('open')
-	},
-})
-console.log('sock ->', sock)
+// const sock = new Sockette(ADDRESS, {
+// 	onopen(event) {
+// 		console.log('open', event)
+// 	},
+// })
+// console.log('sock ->', sock)
+
+// fastify.rxready.subscribe(function() {
+// 	const ws = new Sockette(ADDRESS, {
+// 		timeout: 5e3,
+// 		maxAttempts: 10,
+// 		onopen: e => console.log('Connected!', e),
+// 		onmessage: e => console.log('Received:', e),
+// 		onreconnect: e => console.log('Reconnecting...', e),
+// 		onmaximum: e => console.log('Stop Attempting!', e),
+// 		onclose: e => console.log('Closed!', e),
+// 		onerror: e => console.log('Error:', e)
+// 	})
+// 	console.log('ws ->', ws)
+// })
 
 
 
@@ -91,8 +107,7 @@ class Radio extends Emitter<string, any> {
 
 	socket = new WebSocketClient(ADDRESS, {
 		connect: false,
-		timeout: '1s',
-		// silent: true,
+		// timeout: '1s',
 		verbose: true,
 	})
 
@@ -124,20 +139,19 @@ class Radio extends Emitter<string, any> {
 	}
 
 	emit(name: string, ...args: any[]) {
-		this.socket.json({ name, args } as Radio.Event)
-		
-		let event = { name, args } as Radio.Event
-		console.log('event ->', event)
+		return !!this.socket.json({ name, args } as Radio.Event)
 
-		let encoded = msgpack.encode(event)
-		console.log('encoded ->', encoded)
+		// let event = { name, args } as Radio.Event
+		// console.log('event ->', event)
+
+		// let encoded = msgpack.encode(event)
+		// console.log('encoded ->', encoded)
 		// console.log('encoded.toString(hex) ->', encoded.toString('hex'))
 
 		// let decoded = msgpack.parse()
 
 		// this.socket.binary(encoded as any)
 
-		return true
 	}
 	emitPrimary(name: string, ...args: any[]) {
 		let event = JSON.stringify({ name, args } as Radio.Event)

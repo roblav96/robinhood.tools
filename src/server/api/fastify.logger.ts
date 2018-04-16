@@ -23,6 +23,7 @@ const logger = Object.assign(fs.createWriteStream('/dev/null'), {
 	toLabel(level: number) { return fastify.log.levels.labels[level] as Pino.Level },
 
 	inspector(value: any) { return chalk.enabled ? eyes.inspect(value) : util.inspect(value) },
+	// inspector(value: any) { return util.inspect(value) },
 
 	write(log: Pino.LogDescriptor) {
 		if (!core.json.is(log)) {

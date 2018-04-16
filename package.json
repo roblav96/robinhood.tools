@@ -5,6 +5,7 @@
 	"domain": "robinhood.tools",
 	"scripts": {
 		"postinstall": "rimraf node_modules/vuex/types/vue.d.ts",
+		"patch:uws": "rimraf node_modules/uws/uws.js && cp -f src/server/modules/uws.js node_modules/uws/uws.js",
 		"purge": "rimraf dist node_modules",
 		"rc": "npm run client:dev",
 		"client:dev": "cross-env NODE_ENV=development vue-cli-service serve --mode development",

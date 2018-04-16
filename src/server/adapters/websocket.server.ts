@@ -11,7 +11,7 @@ class WebSocketServer extends uws.Server {
 	// 	process.on('SIGINT', () => this.close())
 	// }
 
-	count() {
+	connections() {
 		let total = 0
 		this.clients.forEach(function(client) {
 			if (client.isopen) {
