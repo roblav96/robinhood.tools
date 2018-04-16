@@ -9,7 +9,6 @@ import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
-import * as msgpack from '../../common/msgpack'
 import clock from '../../common/clock'
 import WebSocketClient from '../../common/websocket.client'
 import WebSocketServer from './websocket.server'
@@ -38,23 +37,33 @@ if (process.PRIMARY) {
 		client.alive = false
 		client.uuid = qs.parse(url.parse(req.url).query).uuid as string
 
-		client.on('message', function(message: string) {
-			if (message == 'pong') return;
-			if (message == 'ping') return client.send('pong');
-			if (message == '__onopen__') {
-				client.alive = true
-				if (wss.connections() >= process.INSTANCES) {
-					wss.broadcast('__onready__')
+		client.on('message', function(message) {
+			// console.log('message ->', message)
+			if (core.string.is(message)) {
+				if (message == 'pong') return;
+				if (message == 'ping') return client.send('pong');
+				if (message == '__onopen__') {
+					client.alive = true
+					if (wss.getSize() >= process.INSTANCES) {
+						wss.broadcast('__onready__')
+					}
+					return
 				}
-				return
+				if (message.indexOf('__primary__') == 0) {
+					message = message.slice('__primary__'.length)
+					wss.sendTo(['0'], message)
+					return
+				}
+
+			} else {
+				console.log('message ->', message)
+				// let decoded = msgpack.decode(message)
+				// console.log('decoded ->', decoded)
 			}
-			if (message.indexOf('__primary__') == 0) {
-				message = message.slice('__primary__'.length)
-				wss.send(['0'], message)
-				return
-			}
-			console.log('message ->', message)
+
+			// console.log('message ->', message)
 			wss.broadcast(message)
+
 		})
 
 		client.on('close', function(code, reason) {
@@ -82,7 +91,7 @@ class Radio extends Emitter<string, any> {
 
 	socket = new WebSocketClient(ADDRESS, {
 		connect: false,
-		timeout: '1s',
+		timeout: '10s',
 		// verbose: true,
 	})
 
@@ -100,6 +109,7 @@ class Radio extends Emitter<string, any> {
 		})
 
 		this.socket.on('message', (message: string) => {
+			console.log('message ->', message)
 			if (message == '__onready__') {
 				return this.rxready.next(true)
 			}
@@ -114,28 +124,16 @@ class Radio extends Emitter<string, any> {
 	}
 
 	emit(name: string, ...args: any[]) {
-		// this.socket.json({ name, args } as Radio.Event)
-
-		// let event = { name, args } as Radio.Event
-		// console.log('event ->', event)
-
-		// let encoded = msgpack.encode(event)
-		// console.log('encoded ->', encoded)
-		// console.log('encoded.toString(hex) ->', encoded.toString('hex'))
-
-		// let decoded = msgpack.parse()
-
-		// this.socket.binary(encoded as any)
-
+		console.log('args.length ->', args.length)
+		console.log('{ name, args } ->', { name, args })
+		this.socket.binary({ name, args } as Radio.Event)
 	}
 	emitPrimary(name: string, ...args: any[]) {
-		let event = JSON.stringify({ name, args } as Radio.Event)
-		this.socket.send('__primary__' + event)
+		this.socket.binary({ primary: true, name, args } as Radio.Event)
 	}
-	// emitFn(fn: Function, ...args: any[]) {
-	// 	this.emit(fn.name, ...args)
-	// }
 
+	done(done: string) { this.emit(`${done}.${process.INSTANCE}`) }
+	donePrimary(done: string) { this.emitPrimary(`${done}.${process.INSTANCE}`) }
 	onAll(fn: (done: string, ...args: any[]) => any) {
 		if (!fn.name) throw new Error('onAll parameter function must be named');
 		this.on(fn.name, fn)
@@ -148,12 +146,10 @@ class Radio extends Emitter<string, any> {
 		this.emit(fn.name, fn.name, ...args)
 		await Promise.all(proms)
 	}
-	done(done: string) {
-		this.emit(`${done}.${process.INSTANCE}`)
-	}
-	donePrimary(done: string) {
-		this.emitPrimary(`${done}.${process.INSTANCE}`)
-	}
+
+	// emitFn(fn: Function, ...args: any[]) {
+	// 	this.emit(fn.name, ...args)
+	// }
 
 }
 
@@ -166,14 +162,10 @@ export default radio
 
 declare global {
 	namespace Radio {
-		// type AllFn = (done: string, ...args: any[]) => any
-		// interface Client extends WebSocket {
-		// 	id: number
-		// }
 		interface Event<T = any> {
 			name: string
 			args: T[]
-			// sender: number
+			primary: boolean
 		}
 	}
 }

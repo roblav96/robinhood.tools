@@ -8,10 +8,12 @@ const BufferList = require('bl') as typeof bl
 
 
 
-// const msgpack = msgpack5()
-export default msgpack5()
+const msgpack = msgpack5()
+export const { encode, decode } = msgpack
 
-// export const { encode, decode } = msgpack
+const encoder = msgpack.encoder()
+const decoder = msgpack.decoder()
+export { encoder, decoder }
 
 // export function encode(value: any) {
 // 	return msgpack.encode(value).toString()

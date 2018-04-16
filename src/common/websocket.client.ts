@@ -4,6 +4,7 @@ import * as _ from './lodash'
 import * as uws from 'uws'
 import * as url from 'url'
 import * as core from './core'
+import * as msgpack from './msgpack'
 import Emitter from './emitter'
 import clock from './clock'
 
@@ -50,21 +51,20 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	socket: WebSocket & uws
-	isopen() { return this.socket && this.socket.readyState == this.socket.OPEN }
+	alive() { return this.socket && this.socket.readyState == this.socket.OPEN }
 
-	binary(buffer: Buffer) {
-		if (!this.isopen()) return;
-		this.socket.send(buffer, { binary: true })
-	}
-
-	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
 	send(message: string) {
-		if (!this.isopen()) return;
+		if (!this.alive()) return;
 		this.socket.send(message)
+	}
+	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
+	binary<T = object>(data: T) {
+		if (!this.alive()) return;
+		this.socket.send(msgpack.encode(data), { binary: true })
 	}
 
 	close(code = 1000, reason?: string) {
-		if (!this.isopen()) return;
+		if (!this.alive()) return;
 		this.socket.close(code, reason)
 	}
 
@@ -113,9 +113,8 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		let code = WebSocketClient.CODES[event.code] || event.code
 		if (this.options.verbose) console.warn(this.name, 'onclose ->', code, '->', event.reason);
 		this.emit('close', _.pick(event, ['code', 'reason']))
-		clock.offListener(this._heartbeat)
-		if (this.options.retry) this._reconnect();
-		else this.destroy();
+		if (this.options.retry) return this._reconnect();
+		this.destroy()
 	}
 
 	private _onerror = (error: Error) => {
@@ -135,8 +134,8 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _heartbeat = () => {
-		if (this.isopen()) this.send('ping');
-		else clock.offListener(this._heartbeat);
+		if (this.alive()) return this.send('ping');
+		clock.offListener(this._heartbeat)
 	}
 
 }
