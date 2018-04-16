@@ -7,6 +7,8 @@
 	"killTree": true,
 	"silent": false,
 	"watch": false,
+	"minUptime": 1000,
+	"spinSleepTime": 1000,
 	"append": true,
 	"logFile": "/dev/null",
 	"errFile": "/dev/null"

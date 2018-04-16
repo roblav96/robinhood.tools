@@ -25,7 +25,7 @@ if (cluster.isMaster) {
 	// cluster.on('online', function(worker) { console.info('worker', workers[worker.process.pid], 'online') })
 	cluster.on('exit', function(worker, code, signal) {
 		let id = workers[worker.process.pid]
-		console.error('worker', id, 'exit ->', 'ID', worker.id, 'PID', worker.process.pid, 'CODE', code, 'SIGNAL', signal)
+		console.error(id, 'worker exit ->', 'id', worker.id, 'pid', worker.process.pid, 'code', code, 'signal', signal)
 		let ms = core.math.dispersed(3000, id, process.INSTANCES)
 		_.delay(fork, ms, id)
 	})

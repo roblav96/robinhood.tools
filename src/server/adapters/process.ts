@@ -61,7 +61,7 @@ import * as clc from 'cli-color'
 if (process.PRIMARY) {
 	if (DEVELOPMENT) setInterval(() => process.stdout.write(clc.erase.lineRight), 1000);
 	process.stdout.write(
-		`\n\n\n` +
+		`\n\n\n\n` +
 		`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}\n` +
 		`${chalk.magentaBright('█')} ${NODE_ENV}\n`
 		+ (process.DEBUGGING ? `\n\n` : '')

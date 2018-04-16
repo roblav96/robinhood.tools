@@ -41,7 +41,6 @@ if (process.PRIMARY) {
 		client.on('message', function(message: string) {
 			if (message == 'pong') return;
 			if (message == 'ping') return client.send('pong');
-			console.log('message ->', message)
 			if (message == '__onopen__') {
 				client.alive = true
 				if (wss.connections() >= process.INSTANCES) {
@@ -54,6 +53,7 @@ if (process.PRIMARY) {
 				wss.send(['0'], message)
 				return
 			}
+			console.log('message ->', message)
 			wss.broadcast(message)
 		})
 
@@ -82,8 +82,8 @@ class Radio extends Emitter<string, any> {
 
 	socket = new WebSocketClient(ADDRESS, {
 		connect: false,
-		// timeout: '1s',
-		verbose: true,
+		timeout: '1s',
+		// verbose: true,
 	})
 
 	constructor() {

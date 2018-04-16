@@ -2,13 +2,16 @@
 
 import * as Buffer from 'buffer'
 import * as msgpack5 from 'msgpack5'
+
 import bl from 'bl'
 const BufferList = require('bl') as typeof bl
 
 
 
-const msgpack = msgpack5()
-export const { encode, decode } = msgpack
+// const msgpack = msgpack5()
+export default msgpack5()
+
+// export const { encode, decode } = msgpack
 
 // export function encode(value: any) {
 // 	return msgpack.encode(value).toString()
