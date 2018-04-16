@@ -8,6 +8,7 @@ declare const PRODUCTION: boolean
 
 declare namespace NodeJS {
 	export interface Global {
+		WebSocket: WebSocket
 		NODE_ENV: typeof NODE_ENV
 		DEVELOPMENT: typeof DEVELOPMENT
 		PRODUCTION: typeof PRODUCTION

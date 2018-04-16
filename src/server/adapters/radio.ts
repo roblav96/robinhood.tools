@@ -36,7 +36,10 @@ if (process.PRIMARY) {
 
 	wss.on('connection', function(client: uws.WebSocket, req: IncomingMessage) {
 		console.log('client ->', client)
+		// console.warn('client ->', console.dtsgen(client))
 		console.log('req ->', req)
+		// console.warn('req ->', console.dtsgen(req))
+		
 		client.isopen = false
 		client.uuid = qs.parse(url.parse(req.url).query).uuid as string
 
@@ -74,29 +77,6 @@ if (process.PRIMARY) {
 	})
 
 }
-
-
-
-// const sock = new Sockette(ADDRESS, {
-// 	onopen(event) {
-// 		console.log('open', event)
-// 	},
-// })
-// console.log('sock ->', sock)
-
-// fastify.rxready.subscribe(function() {
-// 	const ws = new Sockette(ADDRESS, {
-// 		timeout: 5e3,
-// 		maxAttempts: 10,
-// 		onopen: e => console.log('Connected!', e),
-// 		onmessage: e => console.log('Received:', e),
-// 		onreconnect: e => console.log('Reconnecting...', e),
-// 		onmaximum: e => console.log('Stop Attempting!', e),
-// 		onclose: e => console.log('Closed!', e),
-// 		onerror: e => console.log('Error:', e)
-// 	})
-// 	console.log('ws ->', ws)
-// })
 
 
 
@@ -139,7 +119,7 @@ class Radio extends Emitter<string, any> {
 	}
 
 	emit(name: string, ...args: any[]) {
-		return !!this.socket.json({ name, args } as Radio.Event)
+		// this.socket.json({ name, args } as Radio.Event)
 
 		// let event = { name, args } as Radio.Event
 		// console.log('event ->', event)
@@ -157,9 +137,9 @@ class Radio extends Emitter<string, any> {
 		let event = JSON.stringify({ name, args } as Radio.Event)
 		this.socket.send('__primary__' + event)
 	}
-	emitFn(fn: Function, ...args: any[]) {
-		this.emit(fn.name, ...args)
-	}
+	// emitFn(fn: Function, ...args: any[]) {
+	// 	this.emit(fn.name, ...args)
+	// }
 
 	onAll(fn: (done: string, ...args: any[]) => any) {
 		if (!fn.name) throw new Error('onAll parameter function must be named');
@@ -202,5 +182,30 @@ declare global {
 		}
 	}
 }
+
+
+
+
+
+// const sock = new Sockette(ADDRESS, {
+// 	onopen(event) {
+// 		console.log('open', event)
+// 	},
+// })
+// console.log('sock ->', sock)
+
+// fastify.rxready.subscribe(function() {
+// 	const ws = new Sockette(ADDRESS, {
+// 		timeout: 5e3,
+// 		maxAttempts: 10,
+// 		onopen: e => console.log('Connected!', e),
+// 		onmessage: e => console.log('Received:', e),
+// 		onreconnect: e => console.log('Reconnecting...', e),
+// 		onmaximum: e => console.log('Stop Attempting!', e),
+// 		onclose: e => console.log('Closed!', e),
+// 		onerror: e => console.log('Error:', e)
+// 	})
+// 	console.log('ws ->', ws)
+// })
 
 

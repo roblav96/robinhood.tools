@@ -30,7 +30,6 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 			heartbeat: '10s' as Clock.Tick,
 			connect: true,
 			retry: true,
-			silent: false,
 			verbose: false,
 		})
 	}
@@ -104,7 +103,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _onopen = (event: Event) => {
-		if (!this.options.silent && this.options.verbose) console.info(this.name, 'onopen'); // ->', process.CLIENT ? (event.target as WebSocket).url : '');
+		if (this.options.verbose) console.info(this.name, 'onopen'); // ->', process.CLIENT ? (event.target as WebSocket).url : '');
 		clock.on(this.options.heartbeat, this._heartbeat)
 		clock.offListener(this._connect)
 		this.emit('open', event)
@@ -112,7 +111,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	private _onclose = (event: CloseEvent) => {
 		let code = WebSocketClient.CODES[event.code] || event.code
-		if (!this.options.silent && this.options.verbose) console.warn(this.name, 'onclose ->', code, '->', event.reason);
+		if (this.options.verbose) console.warn(this.name, 'onclose ->', code, '->', event.reason);
 		this.emit('close', _.pick(event, ['code', 'reason']))
 		clock.offListener(this._heartbeat)
 		if (this.options.retry) this._reconnect();
@@ -120,11 +119,9 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _onerror = (error: Error) => {
-		if (!this.options.silent) {
-			let message = (error.message || error) as string
-			if (message != 'uWs client connection error') {
-				console.error(this.name, 'onerror Error ->', message)
-			}
+		let message = (error.message || error) as string
+		if (message != 'uWs client connection error') {
+			console.error(this.name, 'onerror Error ->', message)
 		}
 		this.emit('error', error)
 	}
@@ -133,7 +130,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		let message = event.data as string
 		if (message == 'pong') return;
 		if (message == 'ping') return this.send('pong');
-		if (!this.options.silent && this.options.verbose) console.log(this.name, 'onmessage ->', message);
+		if (this.options.verbose) console.log(this.name, 'onmessage ->', message);
 		this.emit('message', message)
 	}
 

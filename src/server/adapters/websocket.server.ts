@@ -48,15 +48,11 @@ export default WebSocketServer
 
 
 
-import { IncomingMessage } from 'http'
-declare module 'uws' {
-	export interface WebSocket extends uws {
-		isopen: boolean
-		uuid: string
-	}
-	export interface Server {
-		// on(event: 'connection', fn: (this: WebSocketServer, client: uws.WebSocket, req: IncomingMessage) => void): this
-	}
-}
+// declare module 'uws' {
+// 	export interface WebSocket extends uws {
+// 		isopen: boolean
+// 		uuid: string
+// 	}
+// }
 
 

@@ -19,7 +19,7 @@ declare module 'eventemitter3' {
 		eventNames<Name extends Names>(): Name[]
 		listeners<Name extends Names>(name?: Name): EventEmitter3.Listener<Data>[]
 		listenerCount<Name extends Names>(name?: Name): number
-		emit<Name extends Names>(name: Name, ...args: Data[]): boolean
+		emit<Name extends Names>(name: Name, ...args: Data[]): any
 		on<Name extends Names>(name: Name, listener: EventEmitter3.Listener<Data>, context?: any): this
 		addListener<Name extends Names>(name: Name, listener: EventEmitter3.Listener<Data>, context?: any): this
 		once<Name extends Names>(name: Name, listener: EventEmitter3.Listener<Data>, context?: any): this
