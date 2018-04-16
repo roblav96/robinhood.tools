@@ -1,43 +1,72 @@
 // 
+export { Event, Listener } from 'eventemitter3'
+// 
 
-import * as TinyEmitter from 'tiny-emitter'
+import * as EventEmitter3 from 'eventemitter3'
 import * as pEvent from 'p-event'
 
 
 
-export default class Emitter<Names extends string = string, Data = any> extends TinyEmitter<Names, Data> {
+export default class Emitter<Names extends string = string, Data = any> extends EventEmitter3<Names, Data> {
 
-	private get _e() { return this.e || (this.e = {}) }
-	names() { return Object.keys(this._e) as Names[] }
-
-	offListener<Name extends Names>(listener: TinyEmitter.Listener<Data>) {
-		let e = this._e
-		Object.keys(e).forEach((name: Names) => { e[name].forEach(event => { this.off(name, listener) }) })
+	offListener<Name extends Names>(listener: EventEmitter3.Listener<Data>, context?: any, once?: boolean): this {
+		this.eventNames().forEach(name => {
+			this.listeners(name).forEach(fn => {
+				this.off(name, listener, context, once)
+			})
+		})
 		return this
 	}
 
-	offAll<Name extends Names>() {
-		let e = this._e
-		Object.keys(e).forEach((name: Names) => { this.off(name) })
-		delete this.e
-		return this
+	offAll<Name extends Names>(name?: Names) {
+		return this.removeAllListeners(name)
 	}
 
 	toPromise<Name extends Names>(name: Names) {
 		return pEvent(this, name)
 	}
 
-	eachEvent<Name extends Names>(fn: (event: TinyEmitter.Event<Data>, index: number) => void) {
-		let e = this._e; let i = 0;
-		Object.keys(e).forEach(function(name: Names) {
-			e[name].forEach(function(event) {
-				fn(event, i); i++;
-			})
-		})
-	}
-
 }
 
+
+
+
+
+
+
+// import * as TinyEmitter from 'tiny-emitter'
+// export default class Emitter<Names extends string = string, Data = any> extends TinyEmitter<Names, Data> {
+
+// 	private get _e() { return this.e || (this.e = {}) }
+// 	names() { return Object.keys(this._e) as Names[] }
+
+// 	offListener<Name extends Names>(listener: TinyEmitter.Listener<Data>) {
+// 		let e = this._e
+// 		Object.keys(e).forEach((name: Names) => { e[name].forEach(event => { this.off(name, listener) }) })
+// 		return this
+// 	}
+
+// 	offAll<Name extends Names>() {
+// 		let e = this._e
+// 		Object.keys(e).forEach((name: Names) => { this.off(name) })
+// 		delete this.e
+// 		return this
+// 	}
+
+// 	toPromise<Name extends Names>(name: Names) {
+// 		return pEvent(this, name)
+// 	}
+
+// 	eachEvent<Name extends Names>(fn: (event: TinyEmitter.Event<Data>, index: number) => void) {
+// 		let e = this._e; let i = 0;
+// 		Object.keys(e).forEach(function(name: Names) {
+// 			e[name].forEach(function(event) {
+// 				fn(event, i); i++;
+// 			})
+// 		})
+// 	}
+
+// }
 
 
 
@@ -59,27 +88,6 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 // // console.log('clock.ee ->', clock.ee)
 
 // console.log('clock ->', console.dump(clock, { depth: 8 }))
-
-
-
-
-
-// import * as EventEmitter from 'eventemitter3'
-// export default class Emitter<Names extends string = string, Data = any> extends EventEmitter<Names, Data> {
-
-// 	offListener(listener: EventEmitter.Listener<Data>, context?: any, once?: boolean): this {
-// 		this.eventNames().forEach(name => {
-// 			this.listeners(name).forEach(fn => {
-// 				if (listener == fn) {
-// 					console.warn('removeListener ->', name, listener)
-// 					this.removeListener(name, listener, context, once)
-// 				}
-// 			})
-// 		})
-// 		return this
-// 	}
-
-// }
 
 
 

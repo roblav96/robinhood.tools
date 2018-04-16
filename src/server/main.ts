@@ -14,7 +14,7 @@ global.Promise = require('bluebird')
 global.WebSocket = require('uws')
 
 process.DEBUGGING = true
-process.INSTANCES = 1
+// process.INSTANCES = 1
 
 import './adapters/process'
 import './adapters/console'

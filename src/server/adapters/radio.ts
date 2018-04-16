@@ -137,7 +137,7 @@ class Radio extends Emitter<string, any> {
 
 		// this.socket.binary(encoded as any)
 
-		return this
+		return true
 	}
 	emitPrimary(name: string, ...args: any[]) {
 		let event = JSON.stringify({ name, args } as Radio.Event)

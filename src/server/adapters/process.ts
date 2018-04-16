@@ -49,8 +49,8 @@ process.once('SIGINT', exiting)
 process.once('SIGTERM', exiting)
 process.once('SIGUSR2', exiting)
 
-import * as TinyEmitter from 'tiny-emitter'
-let eexit = new TinyEmitter<'onexit'>()
+import * as EventEmitter3 from 'eventemitter3'
+let eexit = new EventEmitter3<'onexit'>()
 process.onexit = function onexit(fn) { eexit.once('onexit', fn) }
 declare global { namespace NodeJS { export interface Process { onexit: (fn: () => any) => any } } }
 
@@ -80,7 +80,7 @@ process.on('unhandledRejection', function(error) {
 
 import * as inspector from 'inspector'
 if (process.DEBUGGING && DEVELOPMENT) {
-	chalk.enabled = false
+	// chalk.enabled = false
 	inspector.open(process.debugPort + process.INSTANCE)
 	process.onexit(function() {
 		console.clear()
