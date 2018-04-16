@@ -39,7 +39,7 @@ if (process.PRIMARY) {
 		// console.warn('client ->', console.dtsgen(client))
 		console.log('req ->', req)
 		// console.warn('req ->', console.dtsgen(req))
-		
+
 		client.isopen = false
 		client.uuid = qs.parse(url.parse(req.url).query).uuid as string
 

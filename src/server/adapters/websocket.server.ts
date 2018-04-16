@@ -2,7 +2,9 @@
 
 import * as uws from 'uws'
 
-
+// let wss = new uws.Server({port: 1234})
+// console.log('uws.native ->', uws.native)
+// console.warn('uws.native ->', console.dtsgen(uws.native))
 
 class WebSocketServer extends uws.Server {
 

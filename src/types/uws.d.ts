@@ -9,15 +9,23 @@ declare module 'uws' {
 
 
 
-	interface WebSocketClient extends WebSocket {
+	class WebSocket {
 
 	}
 
-	class WebSocketClient extends events.EventEmitter {
-
+	class WebSocketClient extends WebSocket {
+		static OPEN: number
+		static CLOSED: number
+		OPEN: number
+		CLOSED: number
+		readyState: number
 	}
 
 	namespace WebSocketClient {
+
+		// interface WebSocketClient extends WebSocket {
+
+		// }
 
 		interface VerifyClientInfo {
 			origin: string
@@ -48,9 +56,23 @@ declare module 'uws' {
 			verifyClient: VerifyClient
 		}
 
-		class Server<T extends WebSocketClient> extends events.EventEmitter {
-			constructor(options: Partial<ServerOptions>, listening?: () => void)
+		interface MessageOptions {
+			binary?: boolean
 		}
+
+		class Server<T extends WebSocketClient = WebSocketClient> extends events.EventEmitter {
+			constructor(options: Partial<ServerOptions>, callback?: () => void)
+			handleUpgrade(request: http.IncomingMessage, socket: net.Socket, upgradeHead: ArrayBuffer, callback: (client: T) => void): void
+			startAutoPing(interval: number, message?: string): void
+			broadcast(message: string, options?: MessageOptions): void
+			close(cb?: (error?: any) => void): void
+			clients: T[]
+		}
+
+		// interface Clients<T = any> {
+		// 	length: number
+		// 	forEach<T>(client: T): void
+		// }
 
 	}
 
