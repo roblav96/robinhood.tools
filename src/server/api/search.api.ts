@@ -6,7 +6,6 @@ import * as core from '../../common/core'
 
 import fastify from './fastify'
 import * as boom from 'boom'
-import * as fuzzysort from 'fuzzysort'
 import * as webull from '../adapters/webull'
 
 

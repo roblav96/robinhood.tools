@@ -212,6 +212,9 @@ export const object = {
 			target[key] = null
 		})
 	},
+	sortKeys<T = object>(target: T): T {
+		return _.fromPairs(_.sortBy(_.toPairs(target as any))) as any
+	},
 	// pick<T>(target: T, keys?: KeysOf<T>): T { return _.pick(target, keys) as any },
 }
 

@@ -20,7 +20,10 @@ if (cluster.isMaster) {
 
 	const INSTANCE = 1
 	let i: number, len = process.INSTANCES
-	for (i = INSTANCE; i < len; i++) { fork(i) }
+	for (i = INSTANCE; i < len; i++) {
+		let ms = core.math.dispersed(100 * process.INSTANCES, i, process.INSTANCES)
+		_.delay(fork, ms, i)
+	}
 
 	// cluster.on('online', function(worker) { console.info('worker', workers[worker.process.pid], 'online') })
 	cluster.on('exit', function(worker, code, signal) {

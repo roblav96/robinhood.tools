@@ -4,11 +4,11 @@ import { IncomingMessage } from 'http'
 import * as uws from 'uws'
 import * as url from 'url'
 import * as qs from 'querystring'
-import * as Sockette from 'sockette'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as R from '../../common/rambdax'
 import * as Rx from '../../common/rxjs'
+import * as msgpack from '../../common/msgpack'
 import clock from '../../common/clock'
 import WebSocketClient from '../../common/websocket.client'
 import WebSocketServer from './websocket.server'
@@ -33,35 +33,36 @@ if (process.PRIMARY) {
 	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
+	function sendPrimary(client: uws.WebSocket, event: Radio.Event) {
+
+	}
+
 	wss.on('connection', function(client: uws.WebSocket, req: IncomingMessage) {
 		client.alive = false
 		client.uuid = qs.parse(url.parse(req.url).query).uuid as string
 
-		client.on('message', function(message) {
-			// console.log('message ->', message)
-			if (core.string.is(message)) {
-				if (message == 'pong') return;
-				if (message == 'ping') return client.send('pong');
-				if (message == '__onopen__') {
-					client.alive = true
-					if (wss.getSize() >= process.INSTANCES) {
-						wss.broadcast('__onready__')
-					}
-					return
-				}
-				if (message.indexOf('__primary__') == 0) {
-					message = message.slice('__primary__'.length)
-					wss.sendTo(['0'], message)
-					return
-				}
+		client.on('message', function(message: string) {
+			// console.log('client message ->', message)
 
-			} else {
-				console.log('message ->', message)
-				// let decoded = msgpack.decode(message)
-				// console.log('decoded ->', decoded)
+			if (R.is(ArrayBuffer, message)) {
+				// let event = msgpack.decode(message as any) as Radio.Event
+				return wss.broadcast(message, { binary: true })
 			}
 
-			// console.log('message ->', message)
+			if (message == 'pong') return;
+			if (message == 'ping') return client.send('pong');
+			if (message == '__onopen__') {
+				client.alive = true
+				if (wss.getSize() >= process.INSTANCES) {
+					wss.broadcast('__onready__')
+				}
+				return
+			}
+			if (message.indexOf('__primary__') == 0) {
+				message = message.slice('__primary__'.length)
+				wss.sendTo(['0'], message)
+				return
+			}
 			wss.broadcast(message)
 
 		})
@@ -91,7 +92,7 @@ class Radio extends Emitter<string, any> {
 
 	socket = new WebSocketClient(ADDRESS, {
 		connect: false,
-		timeout: '10s',
+		timeout: '1s',
 		// verbose: true,
 	})
 
@@ -109,31 +110,40 @@ class Radio extends Emitter<string, any> {
 		})
 
 		this.socket.on('message', (message: string) => {
-			console.log('message ->', message)
+			// console.log('socket.on message ->', message)
+
+			if (R.is(ArrayBuffer, message)) {
+				let event = msgpack.decode(message as any) as Radio.Event
+				return super.emit(event.name, ...event.args)
+			}
+
 			if (message == '__onready__') {
 				return this.rxready.next(true)
 			}
 			if (message == '__onclose__') {
 				return this.rxready.next(false)
 			}
-			// let event = msgpack.decode(message) as Radio.Event
-			let event = JSON.parse(message) as Radio.Event
-			super.emit(event.name, ...event.args)
+
+			if (core.json.is(message)) {
+				let event = JSON.parse(message) as Radio.Event
+				return super.emit(event.name, ...event.args)
+			}
+			super.emit(message)
+
 		})
 
 	}
 
 	emit(name: string, ...args: any[]) {
-		console.log('args.length ->', args.length)
-		console.log('{ name, args } ->', { name, args })
-		this.socket.binary({ name, args } as Radio.Event)
+		if (args.length == 0) this.socket.send(name);
+		else this.socket.binary({ name, args } as Radio.Event);
 	}
-	emitPrimary(name: string, ...args: any[]) {
-		this.socket.binary({ primary: true, name, args } as Radio.Event)
-	}
+	emitPrimary(name: string) { this.socket.send('__primary__' + name) }
+	// emitPrimary(name: string, ...args: any[]) {
+	// 	if (args.length == 0) this.socket.send('__primary__' + name);
+	// 	else this.socket.binary({ primary: true, name, args } as Radio.Event);
+	// }
 
-	done(done: string) { this.emit(`${done}.${process.INSTANCE}`) }
-	donePrimary(done: string) { this.emitPrimary(`${done}.${process.INSTANCE}`) }
 	onAll(fn: (done: string, ...args: any[]) => any) {
 		if (!fn.name) throw new Error('onAll parameter function must be named');
 		this.on(fn.name, fn)
@@ -147,6 +157,8 @@ class Radio extends Emitter<string, any> {
 		await Promise.all(proms)
 	}
 
+	done(done: string) { this.emit(`${done}.${process.INSTANCE}`) }
+	donePrimary(done: string) { this.emitPrimary(`${done}.${process.INSTANCE}`) }
 	// emitFn(fn: Function, ...args: any[]) {
 	// 	this.emit(fn.name, ...args)
 	// }
@@ -165,7 +177,7 @@ declare global {
 		interface Event<T = any> {
 			name: string
 			args: T[]
-			primary: boolean
+			// primary: boolean
 		}
 	}
 }
@@ -181,6 +193,7 @@ declare global {
 // })
 // console.log('sock ->', sock)
 
+// import * as Sockette from 'sockette'
 // fastify.rxready.subscribe(function() {
 // 	const ws = new Sockette(ADDRESS, {
 // 		timeout: 5e3,

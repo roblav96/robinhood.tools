@@ -36,17 +36,36 @@ async function readyInstruments() {
 
 	let scard = await redis.main.scard(redis.RH.SYMBOLS)
 	console.log(redis.RH.SYMBOLS, scard)
-	// if (scard < 10000) {
-	// 	await syncInstruments()
-	// }
+	if (scard < 10000) {
+		await syncInstruments()
+	}
 
 	let hlen = await redis.main.hlen(redis.WB.TICKER_IDS)
 	console.log(redis.WB.TICKER_IDS, hlen)
-	// if (hlen < 9000) {
-	await syncTickerIds()
-	// }
+	if (hlen < 9000) {
+		await syncTickerIds()
+	}
+
+	await chunkSymbols()
 
 	console.info('readyInstruments -> done')
+
+}
+
+
+
+async function chunkSymbols() {
+
+	let tickerIds = await redis.main.hgetall(redis.WB.TICKER_IDS)
+	let tpairs = _.toPairs(tickerIds).sort()
+	let chunks = core.array.chunks(tpairs, process.INSTANCES)
+
+	let coms = chunks.map(function(chunk, i) {
+		chunk.forEach(v => v[1] = Number.parseInt(v[1] as any))
+		let fpairs = JSON.stringify(_.fromPairs(chunk))
+		return ['set', `${redis.SYMBOLS.STOCKS}:${process.INSTANCES}:${i}`, fpairs]
+	})
+	await redis.main.coms(coms as any)
 
 }
 
@@ -80,7 +99,9 @@ async function syncInstruments() {
 
 	await syncTickerIds()
 
-	console.info('syncInstruments -> done')
+	await chunkSymbols()
+
+	// console.info('syncInstruments -> done')
 
 }
 
@@ -88,29 +109,30 @@ async function syncInstruments() {
 
 async function syncTickerIds() {
 
-	let tickers = _.flatten(await Promise.all([
+	let proms = [
+		// stocks
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
-			query: { pageSize: 1 },
+			query: { pageSize: 999999 }
 		}),
-		// // stocks
-		// http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
-		// 	query: { pageSize: 999999 },
-		// }),
-		// // etfs
-		// http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
-		// 	query: { pageSize: 999999 },
-		// }),
-		// // funds
-		// http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/14', {
-		// 	query: { pageSize: 999999 },
-		// }),
-	])) as Webull.Ticker[]
+		// etfs
+		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
+			query: { pageSize: 999999 }
+		})
+	]
+
+	if (PRODUCTION) {
+		// funds
+		proms.push(http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/14', {
+			query: { pageSize: 999999 }
+		}))
+	}
+
+	let tickers = _.flatten(await Promise.all(proms)) as Webull.Ticker[]
 	_.remove(tickers, v => Array.isArray(v.disSymbol.match(/\W+/)))
 
-	radio.emit('haiii')
 	await radio.emitAll(onSyncTickerIds, tickers)
 
-	console.info('syncTickerIds -> done')
+	// console.info('syncTickerIds -> done')
 
 }
 
@@ -127,13 +149,13 @@ async function onSyncTickerIds(done: string, tickers: Webull.Ticker[]) {
 		return () => syncTickerId(symbol, disTickers[symbol])
 	}), { concurrency: 1 })
 
-	console.info('onSyncTickerIds -> done')
+	// console.info('onSyncTickerIds -> done')
 	radio.donePrimary(done)
 
 }
 
 async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
-	if (DEVELOPMENT) console.log('syncTickerId ->', symbol);
+	// if (DEVELOPMENT) console.log('syncTickerId ->', symbol);
 
 	let instrument = await redis.main.hgetall(`${redis.RH.INSTRUMENTS}:${symbol}`) as Robinhood.Instrument
 	core.fix(instrument)
@@ -143,14 +165,6 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 	let ticker = tickers.find(v => v.disExchangeCode.indexOf(instrument.acronym) == 0 || v.regionIsoCode.indexOf(instrument.country) == 0)
 	// if (ticker) console.info('ticker ->', console.inspect(_.pick(ticker, ['tickerId', 'disSymbol', 'tickerName', 'tinyName', 'disExchangeCode', 'regionIsoCode'] as KeysOf<Webull.Ticker>)));
 
-
-
-	await clock.toPromise('10s')
-	console.info('syncTickerId ->', symbol);
-	radio.emit('syncTickerId', { symbol, instrument })
-
-
-
 	if (!ticker) {
 		// if (DEVELOPMENT) console.log('!ticker ->', symbol);
 
@@ -158,10 +172,12 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 		if (instrument.type == 'stock') tickerType = 2;
 		if (instrument.type == 'etp') tickerType = 3;
 
-		await clock.toPromise('250ms')
+		await clock.toPromise('100ms')
+		console.time('search/tickers2')
 		let response = await http.get('https://infoapi.stocks666.com/api/search/tickers2', {
-			query: { keys: symbol, tickerType },
+			query: { keys: symbol, tickerType }
 		}) as Webull.API.Paginated<Webull.Ticker>
+		console.timeEnd('search/tickers2')
 
 		if (!Array.isArray(response.list)) return;
 
@@ -197,29 +213,6 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 	await redis.main.hset(redis.WB.TICKER_IDS, symbol, ticker.tickerId)
 
 }
-
-
-
-radio.on('syncTickerId', function(data: any) {
-	console.log('syncTickerId data ->', data)
-})
-
-// async function chunkSymbols() {
-// 	let rkeys = [redis.RH.SYMBOLS, redis.RH.VALID_SYMBOLS, redis.RH.INVALID_SYMBOLS]
-// 	let rcoms = rkeys.map(v => ['smembers', v])
-// 	let resolved = await redis.main.coms(rcoms) as string[][]
-
-// 	let coms = [] as Redis.Coms
-// 	resolved.forEach(function(symbols, i) {
-// 		symbols.sort()
-// 		let chunks = core.array.chunks(symbols, process.INSTANCES)
-// 		chunks.forEach(function(chunk, ii) {
-// 			coms.push(['set', `${rkeys[i]}:${process.INSTANCES}:${ii}`, chunk.toString()])
-// 		})
-// 	})
-// 	await redis.main.coms(coms)
-
-// }
 
 
 

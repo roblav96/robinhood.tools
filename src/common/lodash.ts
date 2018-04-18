@@ -10,6 +10,7 @@ export {
 	delay,
 	difference,
 	flatten,
+	fromPairs,
 	functions,
 	functionsIn,
 	get,
@@ -25,11 +26,14 @@ export {
 	once,
 	pick,
 	remove,
+	sortBy,
 	startCase,
 	throttle,
+	toPairs,
 	truncate,
 	uniq,
 	unset,
+	values,
 } from 'lodash'
 
 

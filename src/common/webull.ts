@@ -50,25 +50,39 @@ export const MARKET_TYPE = {
 	'5': 'FOREX',
 }
 
-
-
-
-
 export const TYPES = {
-	1: 'INDEX',
-	2: 'STOCK',
-	3: 'FUND',
-	4: 'FUTURES',
-	5: 'BOND',
-	6: 'CURRENCY',
-	34: 'FUND_ETF',
-	40: 'FUTURES_COMMODITY',
-	41: 'FUTURES_INDEX',
-	42: 'FUTURES_STOCK',
-	50: 'INDEX_STOCK',
-	51: 'INDEX_CURRENCY',
-	52: 'INDEX_COMMODITY',
-	53: 'INDEX_FUND',
+	'1': 'INDEX',
+	'2': 'STOCK',
+	'3': 'FUND',
+	'4': 'FUTURES',
+	'5': 'BOND',
+	'6': 'CURRENCY',
+	'34': 'FUND_ETF',
+	'40': 'FUTURES_COMMODITY',
+	'41': 'FUTURES_INDEX',
+	'42': 'FUTURES_STOCK',
+	'50': 'INDEX_STOCK',
+	'51': 'INDEX_CURRENCY',
+	'52': 'INDEX_COMMODITY',
+	'53': 'INDEX_FUND',
+}
+
+export enum MQTT_TOPICS {
+	MARKET_SECTOR = 1,
+	MARKET_POSITIVE = 2,
+	MARKET_DECLIE = 3,
+	MARKET_TURNOVER_RATE = 4,
+	TICKER = 5,
+    TICKER_DETAIL = 6,
+    TICKER_MARKET_INDEX = 8,
+    COMMODITY = 9,
+    FOREIGN_EXCHANGE = 10,
+    MARKET_VOLUME = 11,
+    TICKER_STATUS = 12,
+    TICKER_HANDICAP = 13,
+    TICKER_BID_ASK = 14,
+    TICKER_DEAL_DETAILS = 15,
+	MARKET_ETFS = 16,
 }
 
 
@@ -82,6 +96,11 @@ declare global {
 				categoryName: string
 				hasMore: boolean
 				list: T[]
+			}
+			interface TupleArrayList<T = any> {
+				id: number
+				name: string
+				tickerTupleArrayList: T[]
 			}
 		}
 
@@ -118,8 +137,6 @@ declare global {
 			type: number
 			volume: number
 		}
-
-
 
 	}
 }

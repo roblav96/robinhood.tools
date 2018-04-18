@@ -64,7 +64,7 @@ if (process.PRIMARY) {
 		`\n\n\n\n` +
 		`${chalk.magentaBright('█')} ${chalk.underline.bold(process.NAME)}\n` +
 		`${chalk.magentaBright('█')} ${NODE_ENV}\n`
-		+ (process.DEBUGGING ? `\n\n` : '')
+		+ (Number.isFinite(process.DEBUGGERS) ? `\n\n` : '')
 	)
 }
 
@@ -79,7 +79,7 @@ process.on('unhandledRejection', function(error) {
 
 
 import * as inspector from 'inspector'
-if (process.DEBUGGING && DEVELOPMENT) {
+if (Number.isFinite(process.DEBUGGERS) && process.INSTANCE < process.DEBUGGERS && DEVELOPMENT) {
 	chalk.enabled = false
 	inspector.open(process.debugPort + process.INSTANCE)
 	process.onexit(function() {
@@ -87,6 +87,6 @@ if (process.DEBUGGING && DEVELOPMENT) {
 		inspector.close()
 	})
 }
-declare global { namespace NodeJS { export interface Process { debugPort: number, DEBUGGING: boolean } } }
+declare global { namespace NodeJS { export interface Process { debugPort: number, DEBUGGERS: number } } }
 
 

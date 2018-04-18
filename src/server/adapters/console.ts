@@ -6,7 +6,7 @@ import * as _ from '../../common/lodash'
 
 
 import * as moment from 'moment'
-if (!process.DEBUGGING) {
+if (!Number.isFinite(process.DEBUGGERS)) {
 	require('debug-trace')()
 	console.format = function(args) {
 		let method = args.method as keyof Console
@@ -32,10 +32,6 @@ if (!process.DEBUGGING) {
 			output = chalk.bold.redBright('████  ERROR  ████ \n') + output
 		}
 		output = '\n\n' + chalk.underline(output) + '\n'
-		// if (process.DEBUGGING) {
-		// 	process.stdout.write(output)
-		// 	return ''
-		// }
 		return output
 	}
 }
