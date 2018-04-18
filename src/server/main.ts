@@ -1,6 +1,6 @@
 // 
 
-require('../common/polyfills')
+import '../common/polyfills'
 
 if (!['development', 'production'].includes(process.env.NODE_ENV)) process.env.NODE_ENV = 'development'
 global.NODE_ENV = process.env.NODE_ENV

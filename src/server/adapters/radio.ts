@@ -33,10 +33,6 @@ if (process.PRIMARY) {
 	// wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 	wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
-	function sendPrimary(client: uws.WebSocket, event: Radio.Event) {
-
-	}
-
 	wss.on('connection', function(client: uws.WebSocket, req: IncomingMessage) {
 		client.alive = false
 		client.uuid = qs.parse(url.parse(req.url).query).uuid as string

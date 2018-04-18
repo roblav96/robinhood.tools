@@ -89,6 +89,13 @@ export enum MQTT_TOPICS {
 
 declare global {
 	namespace Webull {
+		
+		namespace Mqtt {
+			interface Topic {
+				type: string
+				tid: number
+			}
+		}
 
 		namespace API {
 			interface Paginated<T = any> {
