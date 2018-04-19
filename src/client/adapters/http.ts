@@ -41,7 +41,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 	}).then(http.send).catch(function(error) {
 
-		console.error('http error.message Error ->', error.message)
+		// console.error('http error.message Error ->', error.message)
 		let message = _.get(error, 'statusMessage', error.message) as string
 		let payload = _.get(error, 'response.body') as Http.Payload
 		if (payload && payload.message) {
@@ -54,7 +54,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		console.log('%c◀ ' + '[' + method + '] ' + url, 'color: red; font-weight: bolder;', message)
 		vm.$toast.open({ message: url + ' ➤ ' + message, type: 'is-danger' })
 
-		return Promise.reject(message) as any
+		return Promise.reject(error)
 
 	})
 

@@ -4,17 +4,6 @@
 <style>
 /**/
 
-div.home-boxes span.icon {
-	width: initial;
-	height: initial;
-}
-
-div.home-boxes span.icon > i.mdi,
-div.home-boxes span.icon > i.mdi:before {
-	font-size: 200%;
-	line-height: 1;
-}
-
 </style>
 
 <template>

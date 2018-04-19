@@ -14,16 +14,7 @@ import * as security from '@/client/services/security'
 export default class extends Vue {
 
 	mounted() {
-		// if (DEVELOPMENT) setTimeout(() => this.query = 'nvda', 300);
-		// http.get('/awesome', {
-		// http.get('https://infoapi.webull.com/api/search/tickers2', {
-		// 	isProxy: true,
-		// 	query: { keys: 'nvda' },
-		// }).then(function(response) {
-		// 	console.log('response ->', response)
-		// }).catch(function(error) {
-		// 	console.error('mounted Error ->', error)
-		// })
+		
 	}
 
 	busy = false
@@ -35,9 +26,7 @@ export default class extends Vue {
 		if (!query) return this.results.splice(0);
 		this.busy = true
 		http.post('/search', { query }).then(response => {
-			console.log('response ->', core.json.clone(response))
-			this.results = response.list
-
+			this.results = response
 		}).catch(error => {
 			console.error('sync Error ->', error)
 		}).finally(() => this.busy = false)

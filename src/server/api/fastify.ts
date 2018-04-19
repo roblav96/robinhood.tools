@@ -40,8 +40,8 @@ import './socket.server'
 import './socket.api'
 
 import './proxy.api'
+import './search.api'
 // import './recaptcha.api'
-// import './search.api'
 
 
 
