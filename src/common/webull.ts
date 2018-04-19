@@ -1,5 +1,7 @@
 // 
 
+import * as _ from './lodash'
+
 
 
 export const WB = {
@@ -9,62 +11,54 @@ export const WB = {
 
 
 
-export const TICKER_STATUS = {
-	'3': 'DELISTED',
-	'W': 'WILL_OPEN',
-	'C': 'SET_AUCTION',
-	'T': 'OPENING',
-	'F': 'PRE_TRADE',
-	'A': 'POST_TRADE',
-	'M': 'NOON_CLOSED',
-	'B': 'CLOSED',
-	'D': 'HAS_CLOSED',
-	'H': 'NOT_OPEN',
-	'P': 'SUSPENSION',
+export enum TICKER_STATUS {
+	CLOSED = 'B',
+	DELISTED = '3',
+	HAS_CLOSED = 'D',
+	NOON_CLOSED = 'M',
+	NOT_OPEN = 'H',
+	OPENING = 'T',
+	POST_TRADE = 'A',
+	PRE_TRADE = 'F',
+	SET_AUCTION = 'C',
+	SUSPENSION = 'P',
+	WILL_OPEN = 'W',
+}
+Object.assign(TICKER_STATUS, _.invert(TICKER_STATUS))
+
+export enum TICKER_TYPES {
+	INDICE = 1,
+	STOCK = 2,
+	FUND = 3,
+	FUTURES = 4,
+	BONDS = 5,
+	EXCHANGE = 6,
+	INDEX_FUTURES = 7,
+	STOCK_FUTURES = 8,
+	INDEX_OPTIONS = 9,
+	STOCK_OPTIONS = 10,
+	FUND_ETF = 34,
+	FUTURES_COMMODITY = 40,
+	FUTURES_INDEX = 41,
+	FUTURES_STOCK = 42,
+	INDEX_STOCK = 50,
+	INDEX_CURRENCY = 51,
+	INDEX_COMMODITY = 52,
+	INDEX_FUND = 53,
 }
 
-export const TICKER_TYPE = {
-	'1': 'INDICE',
-	'2': 'STOCK',
-	'3': 'FUND',
-	'4': 'FUTURES',
-	'5': 'BONDS',
-	'6': 'EXCHANGE',
-	'7': 'INDEX_FUTURES',
-	'8': 'STOCK_FUTURES',
-	'9': 'INDEX_OPTIONS',
-	'10': 'STOCK_OPTIONS',
+export enum FUND_TYPES {
+	ETF = 0,
+	COMMON = 1,
 }
 
-export const FUND_TYPE = {
-	'0': 'ETF',
-	'1': 'COMMON',
-}
-
-export const MARKET_TYPE = {
-	'0': 'FUND',
-	'1': 'ETF_FUND',
-	'2': 'COMMODITY',
-	'3': 'EXCHANGE',
-	'4': 'GLOBALINDEX',
-	'5': 'FOREX',
-}
-
-export const TYPES = {
-	'1': 'INDEX',
-	'2': 'STOCK',
-	'3': 'FUND',
-	'4': 'FUTURES',
-	'5': 'BOND',
-	'6': 'CURRENCY',
-	'34': 'FUND_ETF',
-	'40': 'FUTURES_COMMODITY',
-	'41': 'FUTURES_INDEX',
-	'42': 'FUTURES_STOCK',
-	'50': 'INDEX_STOCK',
-	'51': 'INDEX_CURRENCY',
-	'52': 'INDEX_COMMODITY',
-	'53': 'INDEX_FUND',
+export enum MARKET_TYPES {
+	FUND = 0,
+	ETF_FUND = 1,
+	COMMODITY = 2,
+	EXCHANGE = 3,
+	GLOBALINDEX = 4,
+	FOREX = 5,
 }
 
 export enum MQTT_TOPICS {
@@ -73,15 +67,15 @@ export enum MQTT_TOPICS {
 	MARKET_DECLIE = 3,
 	MARKET_TURNOVER_RATE = 4,
 	TICKER = 5,
-    TICKER_DETAIL = 6,
-    TICKER_MARKET_INDEX = 8,
-    COMMODITY = 9,
-    FOREIGN_EXCHANGE = 10,
-    MARKET_VOLUME = 11,
-    TICKER_STATUS = 12,
-    TICKER_HANDICAP = 13,
-    TICKER_BID_ASK = 14,
-    TICKER_DEAL_DETAILS = 15,
+	TICKER_DETAIL = 6,
+	TICKER_MARKET_INDEX = 8,
+	COMMODITY = 9,
+	FOREIGN_EXCHANGE = 10,
+	MARKET_VOLUME = 11,
+	TICKER_STATUS = 12,
+	TICKER_HANDICAP = 13,
+	TICKER_BID_ASK = 14,
+	TICKER_DEAL_DETAILS = 15,
 	MARKET_ETFS = 16,
 }
 
@@ -89,7 +83,7 @@ export enum MQTT_TOPICS {
 
 declare global {
 	namespace Webull {
-		
+
 		namespace Mqtt {
 			interface Topic {
 				type: string

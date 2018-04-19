@@ -16,6 +16,7 @@ export {
 	get,
 	groupBy,
 	intersection,
+	invert,
 	isEmpty,
 	isPlainObject,
 	keys,
