@@ -9,7 +9,7 @@ import * as core from '../../common/core'
 import * as http from '../adapters/http'
 import * as redis from '../adapters/redis'
 import * as webull from '../adapters/webull'
-import * as rhstocks from './robinhood.stocks'
+import * as rhinstruments from './robinhood.instruments'
 import radio from '../adapters/radio'
 
 
@@ -21,7 +21,7 @@ mqtt.on('message', function(quote) {
 
 
 
-rhstocks.rxready.subscribe(onLiveTickers)
+rhinstruments.rxready.subscribe(onLiveTickers)
 radio.on(onLiveTickers.name, onLiveTickers)
 async function onLiveTickers() {
 	// if (process.WORKER) return;

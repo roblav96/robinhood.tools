@@ -21,8 +21,8 @@ const __fname = path.basename(__filename)
 radio.once(`${__fname}.ready`, () => rxready.next())
 
 if (process.PRIMARY) {
-	radio.rxready.toPromise().then(readyStocks).catch(function(error) {
-		console.error('readyStocks Error ->', error)
+	radio.rxready.toPromise().then(readyInstruments).catch(function(error) {
+		console.error('readyInstruments Error ->', error)
 	}).finally(function() {
 		radio.emit(`${__fname}.ready`)
 	})
@@ -30,7 +30,7 @@ if (process.PRIMARY) {
 
 
 
-async function readyStocks() {
+async function readyInstruments() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
 	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
 
@@ -48,7 +48,7 @@ async function readyStocks() {
 
 	await chunkSymbols()
 
-	console.info('readyStocks -> done')
+	console.info('readyInstruments -> done')
 
 }
 

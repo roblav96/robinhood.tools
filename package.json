@@ -51,7 +51,6 @@
 		"p-forever": "latest",
 		"p-queue": "latest",
 		"pino": "latest",
-		"polka": "latest",
 		"pretty-bytes": "latest",
 		"pretty-ms": "latest",
 		"rambda": "latest",
