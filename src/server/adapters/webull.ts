@@ -16,11 +16,13 @@ import clock from '../../common/clock'
 
 export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'message'> {
 
+	private static topics = {
+		forex: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.MQTT_TOPICS>,
+	}
+
 	private static get options() {
 		return _.clone({
-			// topics: [
-			// 	'TICKER',
-			// ] as KeysOf<typeof webull.MQTT_TOPICS>,
+			topics: null as keyof typeof WebullMqtt.topics,
 			host: 'push.webull.com', port: 9018,
 			timeout: '5s' as Clock.Tick,
 			connect: true,
@@ -31,15 +33,27 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 
 	get name() { return 'mqtt://' + this.options.host + ':' + this.options.port }
 
+	debug = {
+		topics: [] as string[],
+		quote: {} as any,
+	}
+
 	constructor(
-		public tickerIds: number[],
+		public fsymbols: Dict<number>,
 		public options = {} as Partial<typeof WebullMqtt.options>,
 	) {
 		super()
 		_.defaults(this.options, WebullMqtt.options)
 		if (this.options.connect) this.connect();
+		if (DEVELOPMENT) {
+			setInterval(() => {
+				console.warn('debug topics ->', _.uniq(this.debug.topics))
+				console.warn('debug quote ->', console.dtsgen(this.debug.quote))
+			}, 10000)
+		}
 	}
 
+	tdict: Dict<string>
 	client: MqttConnection
 
 	private _nextId() { return core.math.random(1, 999) }
@@ -51,17 +65,9 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 
 	terminate() {
 		if (this.client) {
-			// this.client.unsubscribe({
-			// 	messageId: this._nextId(),
-			// 	unsubscriptions: ['ALL'],
-			// }, () => {
-			// 	this.client.disconnect({}, () => {
-			this.client.end()
 			this.client.destroy()
 			this.client.removeAllListeners()
 			this.client = null
-			// 	})
-			// })
 		}
 	}
 
@@ -95,8 +101,9 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 			clock.offListener(this._connect)
 			this.emit('connect')
 
+			this.tdict = _.invert(this.fsymbols)
 			let topic = {
-				tickerIds: this.tickerIds,
+				tickerIds: Object.values(this.fsymbols),
 				header: {
 					app: 'stocks',
 					did: process.env.WEBULL_DID,
@@ -104,6 +111,9 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 				},
 			}
 			let topics = Object.keys(webull.MQTT_TOPICS).filter(v => !isNaN(v as any))
+			if (this.options.topics) {
+				topics = WebullMqtt.topics[this.options.topics].map(v => webull.MQTT_TOPICS[v].toString())
+			}
 			let subscriptions = topics.map(type => ({
 				topic: JSON.stringify(Object.assign(topic, { type })), qos: 0,
 			}))
@@ -113,6 +123,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 		}
 
 		if (packet.cmd == 'suback') {
+			if (this.options.verbose) console.info(this.name, '-> subscribed');
 			this.emit('subscribed')
 			return
 		}
@@ -126,20 +137,29 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 
 		if (packet.cmd == 'publish') {
 			let topic = (qs.parse(packet.topic) as any) as Webull.Mqtt.Topic
+			let symbol = this.tdict[topic.tid]
 			let tid = Number.parseInt(topic.tid)
+
 			let payload = JSON.parse(packet.payload.toString()) as Webull.Mqtt.Payload
 			// if (!Array.isArray(payload.data) || payload.data.length == 0) return;
 
-			payload.data.forEach(function(data) {
-				data.topic = webull.MQTT_TOPICS[topic.type]
-				data.tickerId = tid
-				console.log('data ->', data)
+			payload.data.forEach((quote: Webull.Quote) => {
+				core.fix(quote)
+				webull.parseQuote(quote)
+				quote.tickerId = tid
+				quote.symbol = symbol
+				quote.topic = webull.MQTT_TOPICS[topic.type]
+				if (DEVELOPMENT) {
+					this.debug.topics.push(quote.topic)
+					Object.assign(this.debug.quote, quote)
+				}
+				// console.log('data ->', data)
 			})
 
 			return
 		}
 
-		console.log('packet ->', packet)
+		console.error('packet Error ->', packet)
 
 	}
 
@@ -148,9 +168,6 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 	}
 
 }
-
-
-
 
 
 

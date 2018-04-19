@@ -30,19 +30,23 @@ async function onLiveTickers() {
 	// let symbols = Object.keys(resolved)
 	// let tickerIds = Object.values(resolved)
 
-	let cryptos = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/8', {
-		query: {}
-	}) as Webull.API.TupleArrayList<Webull.Ticker>[]
-	let tickerIds = cryptos[0].tickerTupleArrayList.map(v => v.tickerId)
-	console.log('tickerIds.length ->', tickerIds.length)
+	let fsymbols = {} as Dict<number>
+	// let cryptos = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/8', {
+	// 	query: {}
+	// }) as Webull.API.TupleArrayList<Webull.Ticker>[]
+	// cryptos[0].tickerTupleArrayList.forEach(function(ticker) {
+	let forex = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/3/foreignExchanges/1', {
+		query: { regionIds: '1', hl: 'en', }
+	}) as Webull.Ticker[]
+	forex.forEach(function(ticker) {
+		fsymbols[ticker.symbol] = ticker.tickerId
+	})
+	// console.log('fsymbols ->', fsymbols)
 
-
-
-	let mqtt = new webull.WebullMqtt(tickerIds, { verbose: true })
+	let mqtt = new webull.WebullMqtt(fsymbols, { topics: 'forex', verbose: true })
 	mqtt.on('message', function(packet: Mqtt.Packet) {
 
 	})
-
 
 	// let socket = net.connect(9018, 'push.webull.com')
 	// let client = new MqttConnection(socket)

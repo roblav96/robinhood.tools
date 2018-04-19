@@ -1,6 +1,7 @@
 // 
 
 import * as _ from './lodash'
+import * as core from './core'
 
 
 
@@ -81,6 +82,23 @@ export enum MQTT_TOPICS {
 
 
 
+export function parseQuote(quote: Webull.Quote) {
+	if (Array.isArray(quote.bidList) && quote.bidList.length > 0) {
+		quote.bidList.forEach(v => core.fix(v))
+		quote.bid = _.max(_.compact(quote.bidList.map(v => v.price)))
+		quote.bidSize = _.sum(quote.bidList.map(v => v.volume).concat(0))
+	}
+	delete quote.bidList
+	if (Array.isArray(quote.askList) && quote.askList.length > 0) {
+		quote.askList.forEach(v => core.fix(v))
+		quote.ask = _.min(_.compact(quote.askList.map(v => v.price)))
+		quote.askSize = _.sum(quote.askList.map(v => v.volume).concat(0))
+	}
+	delete quote.askList
+}
+
+
+
 declare global {
 	namespace Webull {
 
@@ -110,9 +128,10 @@ declare global {
 		}
 
 		interface Ticker {
-			change: number
-			changeRatio: number
-			close: number
+			[key: string]: any
+			// change: number
+			// changeRatio: number
+			// close: number
 			currencyId: number
 			disExchangeCode: string
 			disSymbol: string
@@ -123,7 +142,7 @@ declare global {
 			fundSecType: number[]
 			listStatus: number
 			name: string
-			price: number
+			// price: number
 			regionAlias: string
 			regionAreaCode: string
 			regionId: number
@@ -140,7 +159,43 @@ declare global {
 			tickerType: number
 			tinyName: string
 			type: number
+			// volume: number
+		}
+
+		interface Quote {
+			[key: string]: any
+			ask: number
+			askSize: number
+			bid: number
+			bidSize: number
+			change: number
+			changeRatio: number
+			close: number
+			dealNum: number
+			fiftyTwoWkHigh: number
+			fiftyTwoWkLow: number
+			high: number
+			low: number
+			mktradeTime: string
+			monthHigh: number
+			monthLow: number
+			open: number
+			pPrice: number
+			preClose: number
+			price: number
+			quoteMaker: string
+			quoteMakerAddress: string
+			status: string
+			symbol: string
+			tickerId: number
+			topic: string
+			tradeTime: string
+			vibrateRatio: number
 			volume: number
+			weekHigh: number
+			weekLow: number
+			yrHigh: number
+			yrLow: number
 		}
 
 	}
