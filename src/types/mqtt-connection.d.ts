@@ -3,8 +3,12 @@
 declare module 'mqtt-connection' {
 	
 	// import * as duplexify from 'duplexify'
+	import * as Mqtt from 'mqtt'
 
 	class MqttConnection {
+		
+		// connect(opts: Partial<Mqtt.IConnectPacket>, cb?: Function): void
+		
 		constructor(stream?: any)
 		allowHalfOpen: boolean
 		destroyed: boolean

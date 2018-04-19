@@ -5,6 +5,7 @@ import * as Mqtt from 'mqtt'
 import * as MqttConnection from 'mqtt-connection'
 import * as qs from 'querystring'
 import * as core from '../../common/core'
+import * as msgpack from '../../common/msgpack'
 import * as http from '../adapters/http'
 import * as redis from '../adapters/redis'
 import * as webull from '../adapters/webull'
@@ -30,91 +31,55 @@ async function onLiveTickers() {
 	// let symbols = Object.keys(resolved)
 	// let tickerIds = Object.values(resolved)
 
-	let response = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/3/foreignExchanges/1', {
-		query: { regionIds: '1', hl: 'en', }
-	}) as Webull.Ticker[]
-	let tickerIds = response.map(v => v.tickerId)
+	let response = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/8', {
+		query: {}
+	}) as Webull.API.TupleArrayList<Webull.Ticker>[]
+	let tickerIds = response[0].tickerTupleArrayList.map(v => v.tickerId)
 	console.log('tickerIds.length ->', tickerIds.length)
 
 
 
-	let stream = net.createConnection(9018, 'push.webull.com')
-	let client = new MqttConnection(stream)
-	// console.log('client ->', client)
+	let socket = net.connect(9018, 'push.webull.com')
+	let client = new MqttConnection(socket)
 
 	client.connect({
-		username: process.env.WEBULL_DID,
-		password: process.env.WEBULL_TOKEN,
+		clientId: Math.random().toString(), // 'mqtt_' + Math.random().toString(16).substr(2, 8),
 		protocolId: 'MQTT',
 		protocolVersion: 4,
-		clientId: 'mqttjs_' + Math.random().toString(16).substr(2, 8),
+		keepalive: 60,
+		clean: true,
+		username: process.env.WEBULL_DID,
+		password: process.env.WEBULL_TOKEN,
 	})
 
-	client.on('connack', function(packet) {
-		console.log('client connack ->', packet)
-		// client.connack({ returnCode: packet.returnCode })
+	client.on('data', function(packet: Mqtt.Packet) {
 
-		let topic = {
-			tickerIds, type: '',
-			header: {
-				app: 'desktop',
-				did: process.env.WEBULL_DID,
-				access_token: process.env.WEBULL_TOKEN,
-			},
+		if (packet.cmd == 'connack') {
+			let topic = {
+				tickerIds, type: '',
+				header: {
+					app: 'desktop',
+					did: process.env.WEBULL_DID,
+					access_token: process.env.WEBULL_TOKEN,
+				},
+			}
+			client.subscribe({
+				messageId: packet.returnCode,
+				subscriptions: [{
+					topic: JSON.stringify(Object.assign(topic, { type: '5' })),
+					qos: 0,
+				}],
+			})
+			return
 		}
-		client.subscribe({
-			messageId: 2,
-			subscriptions: [{
-				topic: JSON.stringify(Object.assign(topic, { type: '5' })),
-				qos: 0,
-			}],
-		})
 
-	})
+		if (packet.cmd == 'publish') {
+			let message = JSON.parse(packet.payload.toString())
+			return
+		}
 
-	client.on('connect', function(packet) {
-		console.log('client connect ->', packet)
-		// client.connack({ returnCode: 0 })
-	})
+		console.log('client packet ->', packet)
 
-	// client.on('data', function(packet) {
-	// 	console.log('client data ->', packet)
-	// })
-	// client.on('message', function(packet) {
-	// 	console.log('client message ->', packet)
-	// })
-
-	client.on('publish', function(packet) {
-		console.log('client publish ->', packet)
-	})
-	client.on('puback', function(packet) {
-		console.log('client puback ->', packet)
-	})
-	client.on('pubrec', function(packet) {
-		console.log('client pubrec ->', packet)
-	})
-	client.on('pubrel', function(packet) {
-		console.log('client pubrel ->', packet)
-	})
-	client.on('pubcomp', function(packet) {
-		console.log('client pubcomp ->', packet)
-	})
-	client.on('suback', function(packet) {
-		console.log('client suback ->', packet)
-	})
-
-	client.on('pingreq', function(packet) {
-		console.log('client pingreq ->', packet)
-		// client.pingresp()
-	})
-	client.on('pingresp', function(packet) {
-		console.log('client pingresp ->', packet)
-		// client.pingresp()
-	})
-
-	client.on('subscribe', function(packet) {
-		console.log('client subscribe ->', packet)
-		client.suback({ granted: [packet.qos], messageId: packet.messageId })
 	})
 
 	client.on('close', function(reason) {
@@ -129,6 +94,58 @@ async function onLiveTickers() {
 		console.warn('client disconnect ->', reason)
 		client.destroy()
 	})
+
+	// client.on('connack', function(packet) {
+	// 	console.log('client connack ->', packet)
+	// 	// client.connack({ returnCode: packet.returnCode })
+	// })
+
+	// client.on('connect', function(packet) {
+	// 	console.log('client connect ->', packet)
+	// 	// client.connack({ returnCode: 0 })
+	// })
+
+	// client.on('data', function(packet: Mqtt.Packet) {
+	// 	console.log('client data ->', packet)
+	// })
+	// // client.on('message', function(packet) {
+	// // 	console.log('client message ->', packet)
+	// // })
+
+	// client.on('publish', function(packet) {
+	// 	console.log('client publish ->', packet)
+	// })
+	// client.on('puback', function(packet) {
+	// 	console.log('client puback ->', packet)
+	// })
+	// client.on('pubrec', function(packet) {
+	// 	console.log('client pubrec ->', packet)
+	// })
+	// client.on('pubrel', function(packet) {
+	// 	console.log('client pubrel ->', packet)
+	// })
+	// client.on('pubcomp', function(packet) {
+	// 	console.log('client pubcomp ->', packet)
+	// })
+	// client.on('suback', function(packet) {
+	// 	console.log('client suback ->', packet)
+	// })
+
+	// client.on('pingreq', function(packet) {
+	// 	console.log('client pingreq ->', packet)
+	// 	// client.pingresp()
+	// })
+	// client.on('pingresp', function(packet) {
+	// 	console.log('client pingresp ->', packet)
+	// 	// client.pingresp()
+	// })
+
+	// client.on('subscribe', function(packet) {
+	// 	console.log('client subscribe ->', packet)
+	// 	// client.suback({ granted: [packet.qos], messageId: packet.messageId })
+	// })
+
+
 
 
 
