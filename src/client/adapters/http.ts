@@ -37,10 +37,11 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 			_.defaults(config.headers, security.headers())
 		}
 
-		// console.log('config ->', JSON.stringify(config, null, 4))
-		return got(config.url, config as any).then(({ body }) => body)
+		return config
 
-	}).catch(function(error) {
+	}).then(http.send).catch(function(error) {
+
+		console.error('http error.message Error ->', error.message)
 		let message = _.get(error, 'statusMessage', error.message) as string
 		let payload = _.get(error, 'response.body') as Http.Payload
 		if (payload && payload.message) {

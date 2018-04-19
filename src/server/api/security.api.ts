@@ -25,11 +25,13 @@ fastify.route({
 		reply.setCookie('x-bytes', request.doc.bytes, cookie)
 		let token = security.generateToken(request.doc, prime)
 		reply.setCookie('x-token', token, cookie)
+		
+		return ''
 
-		let address = 'ws' + (PRODUCTION ? 's' : '') + '://' + process.DOMAIN
-		return core.array.create(process.INSTANCES).map(function(i) {
-			return address + '/websocket/' + i
-		})
+		// let address = 'ws' + (PRODUCTION ? 's' : '') + '://' + process.DOMAIN
+		// return core.array.create(process.INSTANCES).map(function(i) {
+		// 	return address + '/websocket/' + i
+		// })
 
 	},
 })

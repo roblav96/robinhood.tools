@@ -71,6 +71,8 @@ Promise.all([
 	uuid(), finger(),
 ]).then(function() {
 	return token()
+}).then(function() {
+	return http.get('/websocket/addresses')
 }).then(function(addresses) {
 	return socket.init(addresses)
 }).then(function() {

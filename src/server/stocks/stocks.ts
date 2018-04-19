@@ -28,7 +28,7 @@ mqtt.on('message', function(quote) {
 rhinstruments.rxready.subscribe(onLiveTickers)
 radio.on(onLiveTickers.name, onLiveTickers)
 async function onLiveTickers() {
-	
+
 	if (process.WORKER) return;
 
 	// let fsymbols = (await redis.main.get(`${redis.SYMBOLS.STOCKS}:${process.INSTANCES}:${process.INSTANCE}`) as any) as Dict<number>

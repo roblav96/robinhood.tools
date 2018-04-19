@@ -14,7 +14,7 @@ export function config() {
 		json: true,
 		silent: true,
 		timeout: 10000,
-		retries: 5,
+		retries: process.CLIENT ? 1 : 5,
 		retryTick: '5s',
 	} as Http.Config
 }

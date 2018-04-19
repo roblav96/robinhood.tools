@@ -20,7 +20,7 @@ div.home-boxes span.icon > i.mdi:before {
 <template>
 	<section>
 
-		<section class="hero is-bold is-primary">
+		<section class="hero is-bold is-primary is-small">
 			<div class="hero-body">
 				<div class="container">
 					<div class="columns level is-mobile">

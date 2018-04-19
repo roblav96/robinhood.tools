@@ -16,8 +16,6 @@ const wss = new uws.Server({
 	path: 'websocket/' + process.INSTANCE,
 	server: fastify.server,
 	verifyClient(incoming, next) {
-		
-		console.log('incoming ->', incoming)
 
 		let ip = security.getip(incoming.req)
 		let headers = incoming.req.headers as Dict<string>
@@ -62,9 +60,9 @@ wss.on('connection', function(client: uws.WebSocket, req: IncomingMessage) {
 		client.removeAllListeners()
 	})
 
-	client.on('close', function(code, reason) {
-		console.warn('onclose ->', code, '->', reason);
-	})
+	// client.on('close', function(code, reason) {
+	// 	console.warn('onclose ->', code, '->', reason);
+	// })
 	client.on('error', function(error) { console.error('client.on Error ->', error) })
 
 })

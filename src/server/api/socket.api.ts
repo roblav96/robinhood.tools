@@ -12,13 +12,12 @@ import wss from './socket.server'
 
 fastify.route({
 	method: 'GET',
-	url: '/api/socket/addresses',
+	url: '/api/websocket/addresses',
 	handler: async function(request, reply) {
 		let address = 'ws' + (PRODUCTION ? 's' : '') + '://' + process.DOMAIN
-		let addresses = core.array.create(process.INSTANCES).map(function(i) {
+		return core.array.create(process.INSTANCES).map(function(i) {
 			return address + '/websocket/' + i
 		})
-		return addresses
 	},
 })
 

@@ -1,6 +1,8 @@
 // 
 // 
 // 
+@import '~bulma/sass/utilities/functions';
+// 
 @mixin with-breakpoints($class) {
 	.#{$class} {
 		@content;
@@ -22,7 +24,7 @@
 	@if (colorLuminance($color) > 0.66) {
 		@return $dark;
 	}
-	@return $light;
+	@return white;
 }
 
 // 

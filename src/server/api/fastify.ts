@@ -11,7 +11,7 @@ import logger from './fastify.logger'
 
 const fastify = Fastify({
 	logger: {
-		level: 'error' as Pino.Level,
+		level: 'info' as Pino.Level,
 		extreme: PRODUCTION,
 		stream: logger,
 	},
@@ -39,7 +39,7 @@ import './security.api'
 import './socket.server'
 import './socket.api'
 
-// import './proxy.api'
+import './proxy.api'
 // import './recaptcha.api'
 // import './search.api'
 

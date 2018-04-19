@@ -22,9 +22,6 @@ const logger = Object.assign(fs.createWriteStream('/dev/null'), {
 	toLevel(label: Pino.Level) { return fastify.log.levels.values[label] },
 	toLabel(level: number) { return fastify.log.levels.labels[level] as Pino.Level },
 
-	inspector(value: any) { return chalk.enabled ? eyes.inspect(value) : util.inspect(value) },
-	// inspector(value: any) { return util.inspect(value) },
-
 	write(log: Pino.LogDescriptor) {
 		if (!core.json.is(log)) {
 			return console.error('log not parsable ->', log)
@@ -45,19 +42,16 @@ const logger = Object.assign(fs.createWriteStream('/dev/null'), {
 
 		if (log.err && log.err.stack) {
 			if (log.err.isGot) {
-				return console.error('ERROR ->', this.inspector(_.omit(message, ['err.stack'])))
+				return console.error('ERROR ->', _.omit(message, ['err.stack']))
 			}
 			return console.error(
 				'ERROR ->', message.err.stack, '\n',
-				this.inspector(_.omit(message, ['err.stack']))
+				_.omit(message, ['err.stack'])
 			)
 		}
 
 		let fn = console[log.label] ? log.label : 'error'
-		console[fn](
-			log.label.toUpperCase(), '->',
-			fastify.log.level == 'debug' ? message : this.inspector(message)
-		)
+		console[fn](log.label.toUpperCase(), '->', message)
 
 	},
 

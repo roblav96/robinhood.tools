@@ -17,16 +17,17 @@ import fastify from '../api/fastify'
 
 
 
+const PORT = process.PORT - 1
 const PATH = 'radio'
-const ADDRESS = `ws://${process.HOST}:${process.PORT}/${PATH}?${qs.stringify({ uuid: process.INSTANCE })}`
+const ADDRESS = `ws://${process.HOST}:${PORT}/${PATH}?${qs.stringify({ uuid: process.INSTANCE })}`
 
 if (process.PRIMARY) {
 
 	const wss = new WebSocketServer({
-		server: fastify.server, path: PATH,
+		host: process.HOST, port: PORT, path: PATH,
 		verifyClient(incoming, next) {
 			let host = incoming.req.headers['host']
-			next(host == `${process.HOST}:${process.PORT}`)
+			next(host == `${process.HOST}:${PORT}`)
 		},
 	})
 

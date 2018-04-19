@@ -3,11 +3,9 @@
 // 
 // ████  UTILS  ████
 // 
-// https://bulma.io
-@import '~bulma/sass/utilities/all';
-// https://buefy.github.io
-@import '~buefy/src/scss/utils/all';
-// 
+// @import '~bulma/sass/utilities/all';
+// @import '~buefy/src/scss/utils/all';
+@import '~bulma/sass/utilities/initial-variables';
 @import './utils';
 // 
 // ████  THEME  ████
@@ -19,6 +17,10 @@
 @import './variables';
 // 
 // ████  MERGERS  ████
+// 
+// @import '~bulma/sass/utilities/derived-variables';
+@import '~bulma/sass/utilities/all';
+@import '~buefy/src/scss/utils/all';
 // 
 $colors: map-merge($colors, ('primary':($primary, $primary-invert)));
 $colors: map-merge($colors, ('secondary':($secondary, $secondary-invert)));

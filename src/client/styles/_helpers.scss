@@ -1,54 +1,50 @@
 // 
 // 
 // 
-$prefix: '';
-// 
-// 
-// 
 /* ████  SIZING  ████ */
 
 @each $size in (0, 25, 50, 75, 100) {
-	.#{$prefix}min-w-#{$size} {
+	.min-w-#{$size} {
 		min-width: percentage($size/100) !important;
 	}
-	.#{$prefix}max-w-#{$size} {
+	.max-w-#{$size} {
 		max-width: percentage($size/100) !important;
 	}
-	.#{$prefix}w-#{$size} {
+	.w-#{$size} {
 		width: percentage($size/100) !important;
 	}
-	.#{$prefix}min-h-#{$size} {
+	.min-h-#{$size} {
 		min-height: percentage($size/100) !important;
 	}
-	.#{$prefix}max-h-#{$size} {
+	.max-h-#{$size} {
 		max-height: percentage($size/100) !important;
 	}
-	.#{$prefix}h-#{$size} {
+	.h-#{$size} {
 		height: percentage($size/100) !important;
 	}
 }
 
-.#{$prefix}min-w-initial {
+.min-w-initial {
 	min-width: initial !important;
 }
 
-.#{$prefix}max-w-initial {
+.max-w-initial {
 	max-width: initial !important;
 }
 
-.#{$prefix}w-initial {
+.w-initial {
 	width: initial !important;
 }
 
-.#{$prefix}min-h-initial {
+.min-h-initial {
 	min-height: initial !important;
 }
 
-.#{$prefix}max-h-initial {
+.max-h-initial {
 	max-height: initial !important;
 }
 
-.#{$prefix}h-initial {
+.h-initial {
 	height: initial !important;
 }
 
@@ -58,7 +54,7 @@ $prefix: '';
 /* ████  POSITION  ████ */
 
 @each $position in (static, relative, absolute, fixed, sticky) {
-	.#{$prefix}p-#{$position} {
+	.p-#{$position} {
 		position: $position !important;
 	}
 }
@@ -69,7 +65,7 @@ $prefix: '';
 /* ████  DISPLAY  ████ */
 
 @each $display in (none, block, inline, inline-block, table, table-row, table-cell, flex, inline-flex) {
-	.#{$prefix}d-#{$display} {
+	.d-#{$display} {
 		display: $display !important;
 	}
 }
@@ -80,64 +76,64 @@ $prefix: '';
 /* ████  FLEXBOX  ████ */
 
 @each $flex-direction in (row, column, row-reverse, column-reverse) {
-	.#{$prefix}fx-#{$flex-direction} {
+	.fx-#{$flex-direction} {
 		flex-direction: $flex-direction !important;
 	}
 }
 
 @each $flex-wrap in (wrap, nowrap, wrap-reverse) {
-	.#{$prefix}fx-#{$flex-wrap} {
+	.fx-#{$flex-wrap} {
 		flex-wrap: $flex-wrap !important;
 	}
 }
 
-.#{$prefix}fx-initial {
+.fx-initial {
 	flex: initial !important;
 }
 
-.#{$prefix}fx-none {
+.fx-none {
 	display: block !important;
 	flex: none !important;
 }
 
-.#{$prefix}fx-shrink {
+.fx-shrink {
 	flex: 0 0 auto !important;
 }
 
-.#{$prefix}fx-fill {
+.fx-fill {
 	flex: 1 1 auto !important;
 }
 
 @each $fill in (0, 1, 2, 3) {
-	.#{$prefix}fx-#{$fill} {
+	.fx-#{$fill} {
 		flex: $fill $fill auto !important;
 	}
 }
 
 @each $name,
 $justify in (('start', flex-start), ('end', flex-end), ('center', center), ('between', space-between), ('around', space-around)) {
-	.#{$prefix}fx-justify-#{$name} {
+	.fx-justify-#{$name} {
 		justify-content: $justify !important;
 	}
 }
 
 @each $name,
 $align-items in (('start', flex-start), ('end', flex-end), ('center', center), ('baseline', baseline), ('stretch', stretch)) {
-	.#{$prefix}fx-items-#{$name} {
+	.fx-items-#{$name} {
 		align-items: $align-items !important;
 	}
 }
 
 @each $name,
 $align-content in (('start', flex-start), ('end', flex-end), ('center', center), ('between', space-between), ('around', space-around), ('stretch', stretch)) {
-	.#{$prefix}fx-content-#{$name} {
+	.fx-content-#{$name} {
 		align-content: $align-content !important;
 	}
 }
 
 @each $name,
 $align-self in (('auto', auto), ('start', flex-start), ('end', flex-end), ('center', center), ('baseline', baseline), ('stretch', stretch)) {
-	.#{$prefix}fx-self-#{$name} {
+	.fx-self-#{$name} {
 		align-self: $align-self !important;
 	}
 }
@@ -148,7 +144,7 @@ $align-self in (('auto', auto), ('start', flex-start), ('end', flex-end), ('cent
 /* ████  VERTICAL ALIGN  ████ */
 
 @each $vertical-align in (baseline, top, middle, bottom, text-top, text-bottom) {
-	.#{$prefix}va-#{$vertical-align} {
+	.va-#{$vertical-align} {
 		vertical-align: $vertical-align !important;
 	}
 }
@@ -164,46 +160,46 @@ $spaces: (0, 1, 2, 3, 4, 5);
 @each $property,
 $letter in ('margin': m, 'padding': p) {
 	@each $space in $spaces {
-		.#{$prefix}#{$letter}a-#{$space} {
+		.#{$letter}a-#{$space} {
 			#{$property}: calcSpace($space) + px !important;
 		}
-		.#{$prefix}#{$letter}t-#{$space},
-		.#{$prefix}#{$letter}y-#{$space} {
+		.#{$letter}t-#{$space},
+		.#{$letter}y-#{$space} {
 			#{$property}-top: calcSpace($space) + px !important;
 		}
-		.#{$prefix}#{$letter}r-#{$space},
-		.#{$prefix}#{$letter}x-#{$space} {
+		.#{$letter}r-#{$space},
+		.#{$letter}x-#{$space} {
 			#{$property}-right: calcSpace($space) + px !important;
 		}
-		.#{$prefix}#{$letter}b-#{$space},
-		.#{$prefix}#{$letter}y-#{$space} {
+		.#{$letter}b-#{$space},
+		.#{$letter}y-#{$space} {
 			#{$property}-bottom: calcSpace($space) + px !important;
 		}
-		.#{$prefix}#{$letter}l-#{$space},
-		.#{$prefix}#{$letter}x-#{$space} {
+		.#{$letter}l-#{$space},
+		.#{$letter}x-#{$space} {
 			#{$property}-left: calcSpace($space) + px !important;
 		}
 	}
 }
 
 @each $other in (auto, initial) {
-	.#{$prefix}ma-#{$other} {
+	.ma-#{$other} {
 		margin: $other !important;
 	}
-	.#{$prefix}mt-#{$other},
-	.#{$prefix}my-#{$other} {
+	.mt-#{$other},
+	.my-#{$other} {
 		margin-top: $other !important;
 	}
-	.#{$prefix}mr-#{$other},
-	.#{$prefix}mx-#{$other} {
+	.mr-#{$other},
+	.mx-#{$other} {
 		margin-right: $other !important;
 	}
-	.#{$prefix}mb-#{$other},
-	.#{$prefix}my-#{$other} {
+	.mb-#{$other},
+	.my-#{$other} {
 		margin-bottom: $other !important;
 	}
-	.#{$prefix}ml-#{$other},
-	.#{$prefix}mx-#{$other} {
+	.ml-#{$other},
+	.mx-#{$other} {
 		margin-left: $other !important;
 	}
 }
@@ -211,7 +207,7 @@ $letter in ('margin': m, 'padding': p) {
 @each $property,
 $letter in ('width': w, 'height': h) {
 	@each $space in $spaces {
-		.#{$prefix}#{$letter}-#{$space} {
+		.#{$letter}-#{$space} {
 			#{$property}: calcSpace($space) + px !important;
 		}
 	}
@@ -223,7 +219,7 @@ $letter in ('width': w, 'height': h) {
 /* ████  LINE HEIGHT  ████ */
 
 @each $line-height in (0, 1, 2, 3, 4, 5, 10) {
-	.#{$prefix}lh-#{$line-height} {
+	.lh-#{$line-height} {
 		line-height: 1 + ($line-height/10) !important;
 	}
 }
@@ -247,12 +243,12 @@ $letter in ('width': w, 'height': h) {
 
 @each $name,
 $pair in $colors {
-	.#{$prefix}bg-#{$name} {
+	.bg-#{$name} {
 		background-color: nth($pair, 1) !important; // color: nth($pair, 2) !important;
 	}
 }
 
-.#{$prefix}bg-transparent {
+.bg-transparent {
 	background-color: transparent !important;
 }
 
@@ -263,36 +259,36 @@ $pair in $colors {
 
 @each $name,
 $pair in $colors {
-	.#{$prefix}text-#{$name} {
+	.text-#{$name} {
 		color: nth($pair, 1) !important;
 	}
 }
 
 @each $name,
 $white-space in (('wrap', normal), ('nowrap', nowrap)) {
-	@include with-breakpoints('#{$prefix}text-#{$name}') {
+	@include with-breakpoints('text-#{$name}') {
 		white-space: $white-space !important;
 	}
 }
 
 @each $text-align in (left, right, center, justify, justify-all) {
-	.#{$prefix}text-#{$text-align} {
+	.text-#{$text-align} {
 		text-align: $text-align !important;
 	}
 }
 
 @each $text-transform in (lowercase, uppercase, capitalize) {
-	.#{$prefix}text-#{$text-transform} {
+	.text-#{$text-transform} {
 		text-transform: $text-transform !important;
 	}
 }
 
-.#{$prefix}text-normal {
+.text-normal {
 	text-transform: none !important;
 	text-decoration: none !important;
 }
 
-.#{$prefix}text-underline {
+.text-underline {
 	text-decoration: underline !important;
 }
 
@@ -303,22 +299,22 @@ $white-space in (('wrap', normal), ('nowrap', nowrap)) {
 
 @each $name,
 $weight in (('thin', 200), ('light', $weight-light), ('normal', $weight-normal), ('medium', $weight-medium), ('semibold', $weight-semibold), ('bold', $weight-bold), ('heavy', 800)) {
-	.#{$prefix}font-#{$name} {
+	.font-#{$name} {
 		font-weight: $weight !important;
 	}
 }
 
 @each $weight in (200, 300, 400, 500, 600, 700, 800) {
-	.#{$prefix}font-#{$weight} {
+	.font-#{$weight} {
 		font-weight: $weight !important;
 	}
 }
 
-.#{$prefix}font-italic {
+.font-italic {
 	font-style: italic !important;
 }
 
-.#{$prefix}font-normal {
+.font-normal {
 	font-style: normal !important;
 	font-weight: normal !important;
 }
@@ -330,16 +326,16 @@ $weight in (('thin', 200), ('light', $weight-light), ('normal', $weight-normal),
 
 @each $name,
 $speed in (('', $speed), ('-slow', $speed-slow), ('-slower', $speed-slower), ('-slowest', 500ms)) {
-	.#{$prefix}anim#{$name} {
+	.anim#{$name} {
 		animation-duration: $speed !important;
 	}
 }
 
-.#{$prefix}anim-infinite {
+.anim-infinite {
 	animation-iteration-count: infinite !important;
 }
 
-.#{$prefix}anim-loading {
+.anim-loading {
 	opacity: 0 !important;
 }
 
