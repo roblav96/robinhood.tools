@@ -2,8 +2,6 @@
 
 import { IncomingMessage } from 'http'
 import * as uws from 'uws'
-import * as turbo from 'turbo-http'
-import * as net from 'net'
 import * as url from 'url'
 import * as qs from 'querystring'
 import * as _ from '../../common/lodash'
@@ -23,35 +21,6 @@ const PATH = 'radio'
 const ADDRESS = `ws://${process.HOST}:${process.PORT}/${PATH}?${qs.stringify({ uuid: process.INSTANCE })}`
 
 if (process.PRIMARY) {
-
-	// // let server = uws.native.httpServer.createServer(function(req, res) {
-	// console.log('turbo ->', turbo)
-	// let server = turbo.createServer(function(req, res) {
-	// 	console.log('req ->', req)
-	// 	console.log('res ->', res)
-	// })
-	// console.log('server ->', server)
-	// server.listen(process.PORT, process.HOST, function(error) {
-	// 	if (error) return console.error('listen Error ->', error);
-	// 	console.log('server.listen ->', process.PORT)
-	// })
-	// // server.on('end', function(socket) {
-	// // 	console.log('end ->', socket)
-	// // })
-	// // server.on('connection', function(socket) {
-	// // 	console.log('connection ->', socket)
-	// // })
-	// // server.on('listening', function() {
-	// // 	console.info('server -> listening')
-	// // })
-	// // server.on('close', function() {
-	// // 	console.warn('server -> close')
-	// // })
-	// // server.on('error', function(error) {
-	// // 	console.error('server Error ->', error)
-	// // })
-
-
 
 	const wss = new WebSocketServer({
 		server: fastify.server, path: PATH,

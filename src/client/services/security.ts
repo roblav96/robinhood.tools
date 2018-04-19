@@ -3,10 +3,10 @@ export * from '@/common/security'
 // 
 
 import * as _ from '@/common/lodash'
+import * as R from '@/common/rambdax'
 import * as core from '@/common/core'
 import lockr from 'lockr'
 import Fingerprint2 from 'fingerprintjs2'
-import pdelay from 'delay'
 import store from '@/client/store'
 import socket from '@/client/adapters/socket'
 import * as http from '@/client/adapters/http'
@@ -63,18 +63,18 @@ function finger(): Promise<void> {
 function token(): Promise<string[]> {
 	return http.get('/security/token').catch(function(error) {
 		console.error('token Error ->', error)
-		return pdelay(3000).then(token)
+		return R.delay(3000).then(token)
 	})
 }
 
-// Promise.all([
-// 	uuid(), finger(),
-// ]).then(function() {
-// 	return token()
-// }).then(function(addresses) {
-// 	return socket.init(addresses)
-// }).then(function() {
-// 	state.ready = true
-// })
+Promise.all([
+	uuid(), finger(),
+]).then(function() {
+	return token()
+}).then(function(addresses) {
+	return socket.init(addresses)
+}).then(function() {
+	state.ready = true
+})
 
 

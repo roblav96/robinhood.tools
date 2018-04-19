@@ -36,8 +36,8 @@ import './fastify.plugins'
 import './security.hook'
 import './security.api'
 
-// import './socket.server'
-// import './socket.api'
+import './socket.server'
+import './socket.api'
 
 // import './proxy.api'
 // import './recaptcha.api'

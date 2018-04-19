@@ -1,12 +1,13 @@
 // 
 
-import * as http from 'http'
+import { IncomingMessage } from 'http'
 import * as _ from '../../common/lodash'
 import * as uws from 'uws'
 import * as cookie from 'cookie'
 import * as url from 'url'
 import * as qs from 'querystring'
 import * as security from '../services/security'
+import WebSocketServer from '../adapters/websocket.server'
 import fastify from '../api/fastify'
 
 
@@ -15,6 +16,8 @@ const wss = new uws.Server({
 	path: 'websocket/' + process.INSTANCE,
 	server: fastify.server,
 	verifyClient(incoming, next) {
+		
+		console.log('incoming ->', incoming)
 
 		let ip = security.getip(incoming.req)
 		let headers = incoming.req.headers as Dict<string>
@@ -49,8 +52,7 @@ const wss = new uws.Server({
 // wss.on('listening', function() { console.info('listening ->', wss.httpServer.address()) })
 wss.on('error', function(error) { console.error('wss.on Error ->', error) })
 
-wss.on('connection', function(client: uws, req: http.IncomingMessage) {
-	client.on('error', function(error) { console.error('client.on Error ->', error) })
+wss.on('connection', function(client: uws.WebSocket, req: IncomingMessage) {
 
 	client.on('message', function(message: string) {
 		if (message == 'pong') return;
@@ -60,15 +62,20 @@ wss.on('connection', function(client: uws, req: http.IncomingMessage) {
 		client.removeAllListeners()
 	})
 
+	client.on('close', function(code, reason) {
+		console.warn('onclose ->', code, '->', reason);
+	})
+	client.on('error', function(error) { console.error('client.on Error ->', error) })
+
 })
 
 export default wss
 
 
 
-fastify.addHook('onClose', function(fastify, done) {
-	wss.close(done)
-})
+// fastify.addHook('onClose', function(fastify, done) {
+// 	wss.close(done)
+// })
 
 // fastify.decorate('wss', wss)
 // declare module 'fastify' { interface FastifyInstance { wss: typeof wss } }

@@ -1,5 +1,6 @@
 // 
 
+import * as Sockette from 'sockette'
 import * as _ from '@/common/lodash'
 import Emitter from '@/common/emitter'
 import WebSocketClient from '@/common/websocket.client'
@@ -41,7 +42,7 @@ class Socket extends Emitter {
 const socket = new Socket()
 export default socket
 
-console.log('socket ->', socket)
+// console.log('socket ->', socket)
 
 
 

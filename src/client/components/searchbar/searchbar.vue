@@ -3,7 +3,7 @@
 
 <style lang="scss">
 // 
-@import '~bulma/sass/utilities/mixins';
+@import '~bulma/sass/utilities/all';
 @include mobile {
 	div.searchbar .autocomplete .dropdown-content {
 		position: fixed;

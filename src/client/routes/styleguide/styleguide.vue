@@ -44,8 +44,8 @@
 					<button class="button is-large is-primary">primary</button>
 					<button class="button is-large is-secondary">secondary</button>
 					<button class="button is-large is-accent">accent</button>
-					<button class="button is-large is-robinhood-green">robinhood-green</button>
-					<button class="button is-large is-robinhood-red">robinhood-red</button>
+					<button class="button is-large is-rh-green">rh-green</button>
+					<button class="button is-large is-rh-red">rh-red</button>
 					<hr>
 					<button class="button is-large is-link">link</button>
 					<button class="button is-large is-info">info</button>

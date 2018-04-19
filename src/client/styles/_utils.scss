@@ -1,9 +1,22 @@
 // 
-@import '~bulma/sass/utilities/functions';
 // 
 // 
-// 
-// ████  FUNCTIONS  ████
+@mixin with-breakpoints($class) {
+	.#{$class} {
+		@content;
+	}
+	@include touch {
+		.#{$class}-touch {
+			@content;
+		}
+	}
+	@include desktop {
+		.#{$class}-desktop {
+			@content;
+		}
+	}
+}
+
 // 
 @function inverted($color) {
 	@if (colorLuminance($color) > 0.66) {

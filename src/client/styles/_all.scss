@@ -1,9 +1,14 @@
 // 
 @charset 'utf-8';
 // 
-@import '~bulma/sass/utilities/initial-variables';
-@import './functions';
-@import './mixins';
+// ████  UTILS  ████
+// 
+// https://bulma.io
+@import '~bulma/sass/utilities/all';
+// https://buefy.github.io
+@import '~buefy/src/scss/utils/all';
+// 
+@import './utils';
 // 
 // ████  THEME  ████
 // 
@@ -13,20 +18,13 @@
 // 
 @import './variables';
 // 
-// ████  UTILS  ████
-// 
-// https://bulma.io
-@import '~bulma/sass/utilities/all';
-// https://buefy.github.io
-@import '~buefy/src/scss/utils/all';
-// 
 // ████  MERGERS  ████
 // 
 $colors: map-merge($colors, ('primary':($primary, $primary-invert)));
 $colors: map-merge($colors, ('secondary':($secondary, $secondary-invert)));
 $colors: map-merge($colors, ('accent':($accent, $accent-invert)));
-$colors: map-merge($colors, ('robinhood-green':($robinhood-green, $robinhood-green-invert)));
-$colors: map-merge($colors, ('robinhood-red':($robinhood-red, $robinhood-red-invert)));
+$colors: map-merge($colors, ('rh-green':($rh-green, $rh-green-invert)));
+$colors: map-merge($colors, ('rh-red':($rh-red, $rh-red-invert)));
 // 
 // ████  EXTERNALS  ████
 // 
