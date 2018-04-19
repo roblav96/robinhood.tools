@@ -3,8 +3,8 @@
 		"name": "robinhood.tools",
 		"script": "dist/server/main.js",
 		// "exec_interpreter" : "ts-node",
-		"args": ["--color"],
-		"node_args": ["--max_old_space_size=512"],
+		"args": "--color",
+		"node_args": "--expose-gc --max_old_space_size=512 --no-warnings",
 		// 
 		"exec_mode": "fork",
 		"instances": "max",

@@ -1,7 +1,7 @@
 {
 	"uid": "robinhood.tools",
 	"script": "dist/server/main.js",
-	"command": "node --no-warnings --max_old_space_size=512",
+	"command": "node --expose-gc --max_old_space_size=512 --no-warnings",
 	"args": ["--colors"],
 	"killSignal": "SIGTERM",
 	"killTree": true,
