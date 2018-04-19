@@ -1,5 +1,6 @@
 // 
 
+import { DateTime } from 'luxon'
 import * as _ from './lodash'
 import * as core from './core'
 
@@ -82,10 +83,11 @@ export enum MQTT_TOPICS {
 
 
 
-export function parseQuote(quote: Webull.Quote) {
-	if (quote.status) {
-		quote.status = TICKER_STATUS[quote.status]
-	}
+export function fixQuote(quote: Webull.Quote) {
+	if (quote.status) quote.status = TICKER_STATUS[quote.status];
+	if (quote.faTradeTime) quote.faTradeTime = DateTime.fromISO(quote.faTradeTime as any).valueOf();
+	if (quote.mktradeTime) quote.mktradeTime = DateTime.fromISO(quote.mktradeTime as any).valueOf();
+	if (quote.tradeTime) quote.tradeTime = DateTime.fromISO(quote.tradeTime as any).valueOf();
 	if (Array.isArray(quote.bidList) && quote.bidList.length > 0) {
 		quote.bidList.forEach(v => core.fix(v))
 		quote.bid = _.max(_.compact(quote.bidList.map(v => v.price)))
@@ -182,7 +184,7 @@ declare global {
 			dealNum: number
 			dividend: number
 			eps: number
-			faTradeTime: string
+			faTradeTime: number
 			fiftyTwoWkHigh: number
 			fiftyTwoWkLow: number
 			high: number
@@ -190,7 +192,7 @@ declare global {
 			limitUp: number
 			low: number
 			marketValue: number
-			mktradeTime: string
+			mktradeTime: number
 			monthHigh: number
 			monthLow: number
 			negMarketValue: number
@@ -213,7 +215,7 @@ declare global {
 			topic: string
 			totalShares: number
 			tradeBsFlag: string
-			tradeTime: string
+			tradeTime: number
 			turnoverRate: number
 			vibrateRatio: number
 			volume: number

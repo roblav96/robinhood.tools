@@ -14,7 +14,7 @@ import clock from '../../common/clock'
 
 
 
-export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'message'> {
+export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'message', Webull.Quote> {
 
 	private static topics = {
 		forex: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.MQTT_TOPICS>,
@@ -47,7 +47,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 		super()
 		_.defaults(this.options, WebullMqtt.options)
 		if (this.options.connect) this.connect();
-		this.debug.dev = process.PRIMARY
+		// this.debug.dev = process.PRIMARY
 		if (this.debug.dev) {
 			clock.on('10s', () => {
 				console.warn('debug topics ->', _.uniq(this.debug.topics))
@@ -143,12 +143,14 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 			let symbol = this.tdict[topic.tid]
 			let tid = Number.parseInt(topic.tid)
 
-			let payload = JSON.parse(packet.payload.toString()) as Webull.Mqtt.Payload
+			let payload = JSON.parse(packet.payload.toString()) as Webull.Mqtt.Payload<Webull.Quote>
 			// if (!Array.isArray(payload.data) || payload.data.length == 0) return;
 
-			payload.data.forEach((quote: Webull.Quote) => {
+			let i: number, len = payload.data.length
+			for (i = 0; i < len; i++) {
+				let quote = payload.data[i]
 				core.fix(quote)
-				webull.parseQuote(quote)
+				webull.fixQuote(quote)
 				quote.tickerId = tid
 				quote.symbol = symbol
 				quote.topic = webull.MQTT_TOPICS[topic.type]
@@ -158,7 +160,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 				}
 				// console.log('data ->', data)
 				this.emit('message', quote)
-			})
+			}
 
 			return
 		}

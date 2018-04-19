@@ -100,6 +100,8 @@
 		"@types/uws": "latest",
 		"@vue/cli-plugin-typescript": "latest",
 		"@vue/cli-service": "latest",
+		"appmetrics": "latest",
+		"appmetrics-dash": "latest",
 		"chalk": "latest",
 		"cli-color": "latest",
 		"clipboardy": "latest",

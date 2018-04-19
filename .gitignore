@@ -9,6 +9,7 @@ procfile.js
 *.local
 *.debug
 *.idea
+*.heapsnapshot
 
 *.log
 *.DS_STORE

@@ -15,7 +15,7 @@ import radio from '../adapters/radio'
 
 
 export const mqtt = new webull.WebullMqtt(null, { connect: false, verbose: true })
-mqtt.on('message', function(quote: Webull.Quote) {
+mqtt.on('message', function(quote) {
 	// console.log('quote ->', quote)
 })
 

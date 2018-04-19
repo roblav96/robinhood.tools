@@ -42,7 +42,7 @@ async function readyInstruments() {
 
 	let hlen = await redis.main.hlen(redis.WB.TICKER_IDS)
 	console.log(redis.WB.TICKER_IDS, hlen)
-	if (hlen < 9000) {
+	if (hlen < 10000) {
 		await syncTickerIds()
 	}
 
@@ -75,7 +75,7 @@ async function syncInstruments() {
 	await pForever(async function(url) {
 
 		let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
-		_.remove(response.results, v => Array.isArray(v.symbol.match(/\W+/)))
+		// _.remove(response.results, v => Array.isArray(v.symbol.match(/\W+/)))
 
 		if (DEVELOPMENT) {
 			console.log('syncInstruments ->', response.results.length, response.next)
@@ -128,7 +128,7 @@ async function syncTickerIds() {
 	}
 
 	let tickers = _.flatten(await Promise.all(proms)) as Webull.Ticker[]
-	_.remove(tickers, v => Array.isArray(v.disSymbol.match(/\W+/)))
+	// _.remove(tickers, v => Array.isArray(v.disSymbol.match(/\W+/)))
 
 	await radio.emitAll(onSyncTickerIds, tickers)
 
@@ -163,21 +163,22 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 
 	// console.log('tickers ->', console.inspect(tickers))
 	let ticker = tickers.find(v => v.disExchangeCode.indexOf(instrument.acronym) == 0 || v.regionIsoCode.indexOf(instrument.country) == 0)
+	if (DEVELOPMENT && ticker) console.info('ticker ->', symbol);
 	// if (ticker) console.info('ticker ->', console.inspect(_.pick(ticker, ['tickerId', 'disSymbol', 'tickerName', 'tinyName', 'disExchangeCode', 'regionIsoCode'] as KeysOf<Webull.Ticker>)));
 
 	if (!ticker) {
-		// if (DEVELOPMENT) console.log('!ticker ->', symbol);
+		if (DEVELOPMENT) console.log('!ticker ->', symbol);
 
 		let tickerType: number
 		if (instrument.type == 'stock') tickerType = 2;
 		if (instrument.type == 'etp') tickerType = 3;
 
 		await clock.toPromise('100ms')
-		console.time('search/tickers2')
+		// console.time('search/tickers2')
 		let response = await http.get('https://infoapi.stocks666.com/api/search/tickers2', {
 			query: { keys: symbol, tickerType }
 		}) as Webull.API.Paginated<Webull.Ticker>
-		console.timeEnd('search/tickers2')
+		// console.timeEnd('search/tickers2')
 
 		if (!Array.isArray(response.list)) return;
 

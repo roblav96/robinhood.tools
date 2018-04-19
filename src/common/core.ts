@@ -3,6 +3,9 @@
 import * as Bluebird from 'bluebird'
 Bluebird.config({ warnings: { wForgottenReturn: false } })
 
+import { Settings } from 'luxon'
+Settings.defaultZoneName = 'America/New_York'
+
 import * as _ from './lodash'
 import * as leven from 'leven'
 

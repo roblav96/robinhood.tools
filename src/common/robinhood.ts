@@ -66,7 +66,6 @@ declare global {
 			acronym: string
 			mic: string
 			valid: boolean
-			ticker_id: number
 		}
 
 
