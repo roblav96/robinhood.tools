@@ -178,6 +178,7 @@ declare global {
 			close: number
 			countryISOCode: string
 			deal: number
+			dealAmount: number
 			dealNum: number
 			dividend: number
 			eps: number
@@ -185,6 +186,8 @@ declare global {
 			fiftyTwoWkHigh: number
 			fiftyTwoWkLow: number
 			high: number
+			limitDown: number
+			limitUp: number
 			low: number
 			marketValue: number
 			mktradeTime: string
@@ -197,6 +200,8 @@ declare global {
 			pChange: number
 			pChRatio: number
 			pe: number
+			positionsIncr: number
+			positionsNum: number
 			pPrice: number
 			preClose: number
 			price: number
