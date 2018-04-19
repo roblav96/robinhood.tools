@@ -57,15 +57,16 @@ _.merge(util.inspect, {
 
 
 
-import * as clipboardy from 'clipboardy'
+// import * as clipboardy from 'clipboardy'
 import dtsgen from '../../common/dtsgen'
 Object.assign(console, { dtsgen: _.noop })
 if (DEVELOPMENT) {
 	Object.assign(console, {
 		dtsgen(value: any) {
-			let results = dtsgen(value)
-			clipboardy.write(results.trim())
-			return results
+			return dtsgen(value)
+			// let results = dtsgen(value)
+			// clipboardy.write(results.trim())
+			// return results
 		},
 	})
 }

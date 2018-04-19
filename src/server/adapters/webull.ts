@@ -24,7 +24,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 		return _.clone({
 			topics: null as keyof typeof WebullMqtt.topics,
 			host: 'push.webull.com', port: 9018,
-			timeout: '5s' as Clock.Tick,
+			timeout: '10s' as Clock.Tick,
 			connect: true,
 			retry: true,
 			verbose: false,
@@ -34,7 +34,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 	get name() { return 'mqtt://' + this.options.host + ':' + this.options.port }
 
 	debug = {
-		dev: false, // DEVELOPMENT && process.PRIMARY,
+		dev: false,
 		topics: [] as string[],
 		quote: {} as any,
 	}
@@ -46,11 +46,12 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 		super()
 		_.defaults(this.options, WebullMqtt.options)
 		if (this.options.connect) this.connect();
+		this.debug.dev = process.PRIMARY
 		if (this.debug.dev) {
-			setInterval(() => {
+			clock.on('10s', () => {
 				console.warn('debug topics ->', _.uniq(this.debug.topics))
 				console.warn('debug quote ->', console.dtsgen(this.debug.quote))
-			}, 10000)
+			})
 		}
 	}
 
@@ -155,6 +156,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 					Object.assign(this.debug.quote, quote)
 				}
 				// console.log('data ->', data)
+				this.emit('message', quote)
 			})
 
 			return
@@ -166,6 +168,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 
 	private _onerror = (error: Error) => {
 		console.error(this.name, 'onerror Error ->', error)
+		if (this.options.retry) this._reconnect();
 	}
 
 }

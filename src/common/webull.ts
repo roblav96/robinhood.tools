@@ -83,6 +83,9 @@ export enum MQTT_TOPICS {
 
 
 export function parseQuote(quote: Webull.Quote) {
+	if (quote.status) {
+		quote.status = TICKER_STATUS[quote.status]
+	}
 	if (Array.isArray(quote.bidList) && quote.bidList.length > 0) {
 		quote.bidList.forEach(v => core.fix(v))
 		quote.bid = _.max(_.compact(quote.bidList.map(v => v.price)))
@@ -166,20 +169,34 @@ declare global {
 			[key: string]: any
 			ask: number
 			askSize: number
+			avg: number
+			avgVolume: number
 			bid: number
 			bidSize: number
 			change: number
 			changeRatio: number
 			close: number
+			countryISOCode: string
+			deal: number
 			dealNum: number
+			dividend: number
+			eps: number
+			faTradeTime: string
 			fiftyTwoWkHigh: number
 			fiftyTwoWkLow: number
 			high: number
 			low: number
+			marketValue: number
 			mktradeTime: string
 			monthHigh: number
 			monthLow: number
+			negMarketValue: number
 			open: number
+			outstandingShares: number
+			pb: number
+			pChange: number
+			pChRatio: number
+			pe: number
 			pPrice: number
 			preClose: number
 			price: number
@@ -189,11 +206,15 @@ declare global {
 			symbol: string
 			tickerId: number
 			topic: string
+			totalShares: number
+			tradeBsFlag: string
 			tradeTime: string
+			turnoverRate: number
 			vibrateRatio: number
 			volume: number
 			weekHigh: number
 			weekLow: number
+			yield: number
 			yrHigh: number
 			yrLow: number
 		}
