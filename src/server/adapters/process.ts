@@ -82,8 +82,8 @@ import * as inspector from 'inspector'
 if (Number.isFinite(process.DEBUGGERS) && process.INSTANCE < process.DEBUGGERS && DEVELOPMENT) {
 	chalk.enabled = false
 	inspector.open(process.debugPort + process.INSTANCE)
+	console.clear()
 	process.onexit(function() {
-		console.clear()
 		inspector.close()
 	})
 }
