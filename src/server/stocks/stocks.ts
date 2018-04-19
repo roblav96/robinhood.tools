@@ -5,7 +5,6 @@ import * as Mqtt from 'mqtt'
 import * as MqttConnection from 'mqtt-connection'
 import * as qs from 'querystring'
 import * as core from '../../common/core'
-import * as msgpack from '../../common/msgpack'
 import * as http from '../adapters/http'
 import * as redis from '../adapters/redis'
 import * as webull from '../adapters/webull'
@@ -31,69 +30,75 @@ async function onLiveTickers() {
 	// let symbols = Object.keys(resolved)
 	// let tickerIds = Object.values(resolved)
 
-	let response = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/8', {
+	let cryptos = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/8', {
 		query: {}
 	}) as Webull.API.TupleArrayList<Webull.Ticker>[]
-	let tickerIds = response[0].tickerTupleArrayList.map(v => v.tickerId)
+	let tickerIds = cryptos[0].tickerTupleArrayList.map(v => v.tickerId)
 	console.log('tickerIds.length ->', tickerIds.length)
 
 
 
-	let socket = net.connect(9018, 'push.webull.com')
-	let client = new MqttConnection(socket)
-
-	client.connect({
-		clientId: Math.random().toString(), // 'mqtt_' + Math.random().toString(16).substr(2, 8),
-		protocolId: 'MQTT',
-		protocolVersion: 4,
-		keepalive: 60,
-		clean: true,
-		username: process.env.WEBULL_DID,
-		password: process.env.WEBULL_TOKEN,
-	})
-
-	client.on('data', function(packet: Mqtt.Packet) {
-
-		if (packet.cmd == 'connack') {
-			let topic = {
-				tickerIds, type: '',
-				header: {
-					app: 'desktop',
-					did: process.env.WEBULL_DID,
-					access_token: process.env.WEBULL_TOKEN,
-				},
-			}
-			client.subscribe({
-				messageId: packet.returnCode,
-				subscriptions: [{
-					topic: JSON.stringify(Object.assign(topic, { type: '5' })),
-					qos: 0,
-				}],
-			})
-			return
-		}
-
-		if (packet.cmd == 'publish') {
-			let message = JSON.parse(packet.payload.toString())
-			return
-		}
-
-		console.log('client packet ->', packet)
+	let mqtt = new webull.WebullMqtt(tickerIds, { verbose: true })
+	mqtt.on('message', function(packet: Mqtt.Packet) {
 
 	})
 
-	client.on('close', function(reason) {
-		console.warn('client close ->', reason)
-		client.destroy()
-	})
-	client.on('error', function(error) {
-		console.error('client Error ->', error)
-		client.destroy()
-	})
-	client.on('disconnect', function(reason) {
-		console.warn('client disconnect ->', reason)
-		client.destroy()
-	})
+
+	// let socket = net.connect(9018, 'push.webull.com')
+	// let client = new MqttConnection(socket)
+
+	// client.connect({
+	// 	clientId: 'mqtt_' + Math.random().toString(),
+	// 	protocolId: 'MQTT',
+	// 	protocolVersion: 4,
+	// 	keepalive: 60,
+	// 	clean: true,
+	// 	username: process.env.WEBULL_DID,
+	// 	password: process.env.WEBULL_TOKEN,
+	// })
+
+	// client.on('data', function(packet: Mqtt.Packet) {
+
+	// 	if (packet.cmd == 'connack') {
+	// 		let topic = {
+	// 			tickerIds, type: '',
+	// 			header: {
+	// 				app: 'desktop',
+	// 				did: process.env.WEBULL_DID,
+	// 				access_token: process.env.WEBULL_TOKEN,
+	// 			},
+	// 		}
+	// 		client.subscribe({
+	// 			messageId: packet.returnCode,
+	// 			subscriptions: [{
+	// 				topic: JSON.stringify(Object.assign(topic, { type: '5' })),
+	// 				qos: 0,
+	// 			}],
+	// 		})
+	// 		return
+	// 	}
+
+	// 	if (packet.cmd == 'publish') {
+	// 		let message = JSON.parse(packet.payload.toString())
+	// 		return
+	// 	}
+
+	// 	console.log('client packet ->', packet)
+
+	// })
+
+	// client.on('close', function(reason) {
+	// 	console.warn('client close ->', reason)
+	// 	client.destroy()
+	// })
+	// client.on('error', function(error) {
+	// 	console.error('client Error ->', error)
+	// 	client.destroy()
+	// })
+	// client.on('disconnect', function(reason) {
+	// 	console.warn('client disconnect ->', reason)
+	// 	client.destroy()
+	// })
 
 	// client.on('connack', function(packet) {
 	// 	console.log('client connack ->', packet)

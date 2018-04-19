@@ -42,7 +42,7 @@ declare global { interface Console { format(args: any): void } }
 import * as util from 'util'
 _.merge(util.inspect, {
 	defaultOptions: {
-		depth: 1,
+		depth: 2,
 		showHidden: false, showProxy: false,
 		compact: !chalk.enabled, colors: chalk.enabled,
 		breakLength: Infinity, maxArrayLength: Infinity,

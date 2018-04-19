@@ -1,14 +1,14 @@
 // 
 
 declare module 'mqtt-connection' {
-	
+
 	// import * as duplexify from 'duplexify'
 	import * as Mqtt from 'mqtt'
 
 	class MqttConnection {
-		
+
 		// connect(opts: Partial<Mqtt.IConnectPacket>, cb?: Function): void
-		
+
 		constructor(stream?: any)
 		allowHalfOpen: boolean
 		destroyed: boolean
@@ -64,9 +64,7 @@ declare module 'mqtt-connection' {
 		write(chunk?: any, encoding?: any, cb?: any): any
 	}
 
-	namespace MqttConnection {
-
-	}
+	namespace MqttConnection { }
 
 	export = MqttConnection
 

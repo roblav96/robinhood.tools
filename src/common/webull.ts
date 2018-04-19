@@ -87,7 +87,11 @@ declare global {
 		namespace Mqtt {
 			interface Topic {
 				type: string
-				tid: number
+				tid: string
+			}
+			interface Payload<T = any> {
+				type: string
+				data: T[]
 			}
 		}
 
