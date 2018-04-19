@@ -9,24 +9,24 @@ import * as core from '../../common/core'
 import * as http from '../adapters/http'
 import * as redis from '../adapters/redis'
 import * as webull from '../adapters/webull'
-import * as rhinstruments from './robinhood.instruments'
+import * as rhstocks from './robinhood.stocks'
 import radio from '../adapters/radio'
 
 
 
-export const mqtt = new webull.WebullMqtt(null, { connect: false, verbose: true })
+export const mqtt = new webull.WebullMqtt({ connect: false, verbose: true })
 mqtt.on('message', function(quote) {
-	console.log('quote ->', quote)
+	// console.log('quote ->', quote)
 })
 
 
 
-rhinstruments.rxready.subscribe(onLiveTickers)
+rhstocks.rxready.subscribe(onLiveTickers)
 radio.on(onLiveTickers.name, onLiveTickers)
 async function onLiveTickers() {
-	if (process.WORKER) return;
+	// if (process.WORKER) return;
 
-	let fsymbols = (await redis.main.get(`${redis.SYMBOLS.STOCKS}:${process.INSTANCES}:${process.INSTANCE}`) as any) as Dict<number>
+	let fsymbols = (await redis.main.get(`${redis.SYMBOLS.STOCKS}:${process.INSTANCES}:${process.INSTANCE}`) as any) as Webull.FullSymbol[]
 	fsymbols = JSON.parse(fsymbols as any)
 	// fsymbols = _.fromPairs(_.toPairs(fsymbols).splice(1024))
 
@@ -43,8 +43,8 @@ async function onLiveTickers() {
 	// })
 
 	// console.log('fsymbols ->', fsymbols)
-	mqtt.fsymbols = fsymbols
-	mqtt.connect()
+	// mqtt.fsymbols = fsymbols
+	// mqtt.connect()
 
 
 

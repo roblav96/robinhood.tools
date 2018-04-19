@@ -132,6 +132,11 @@ declare global {
 			}
 		}
 
+		interface FullSymbol {
+			0: string
+			1: number
+		}
+
 		interface Ticker {
 			[key: string]: any
 			// change: number

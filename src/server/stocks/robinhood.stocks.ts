@@ -21,8 +21,8 @@ const __fname = path.basename(__filename)
 radio.once(`${__fname}.ready`, () => rxready.next())
 
 if (process.PRIMARY) {
-	radio.rxready.toPromise().then(readyInstruments).catch(function(error) {
-		console.error('readyInstruments Error ->', error)
+	radio.rxready.toPromise().then(readyStocks).catch(function(error) {
+		console.error('readyStocks Error ->', error)
 	}).finally(function() {
 		radio.emit(`${__fname}.ready`)
 	})
@@ -30,7 +30,7 @@ if (process.PRIMARY) {
 
 
 
-async function readyInstruments() {
+async function readyStocks() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
 	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
 
@@ -48,7 +48,7 @@ async function readyInstruments() {
 
 	await chunkSymbols()
 
-	console.info('readyInstruments -> done')
+	console.info('readyStocks -> done')
 
 }
 
@@ -62,7 +62,7 @@ async function chunkSymbols() {
 
 	let coms = chunks.map(function(chunk, i) {
 		chunk.forEach(v => v[1] = Number.parseInt(v[1] as any))
-		let fpairs = JSON.stringify(_.fromPairs(chunk))
+		let fpairs = JSON.stringify(chunk) // JSON.stringify(_.fromPairs(chunk))
 		return ['set', `${redis.SYMBOLS.STOCKS}:${process.INSTANCES}:${i}`, fpairs]
 	})
 	await redis.main.coms(coms as any)
@@ -75,7 +75,7 @@ async function syncInstruments() {
 	await pForever(async function(url) {
 
 		let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
-		// _.remove(response.results, v => Array.isArray(v.symbol.match(/\W+/)))
+		_.remove(response.results, v => Array.isArray(v.symbol.match(/[^A-Z-]/)))
 
 		if (DEVELOPMENT) {
 			console.log('syncInstruments ->', response.results.length, response.next)
@@ -128,7 +128,7 @@ async function syncTickerIds() {
 	}
 
 	let tickers = _.flatten(await Promise.all(proms)) as Webull.Ticker[]
-	// _.remove(tickers, v => Array.isArray(v.disSymbol.match(/\W+/)))
+	_.remove(tickers, v => Array.isArray(v.disSymbol.match(/[^A-Z-]/)))
 
 	await radio.emitAll(onSyncTickerIds, tickers)
 

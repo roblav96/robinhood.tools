@@ -23,6 +23,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 
 	private static get options() {
 		return _.clone({
+			fsymbols: [] as Webull.FullSymbol[],
 			topics: null as keyof typeof WebullMqtt.topics,
 			host: 'push.webull.com', port: 9018,
 			timeout: '10s' as Clock.Tick,
@@ -41,7 +42,6 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 	}
 
 	constructor(
-		public fsymbols: Dict<number>,
 		public options = {} as Partial<typeof WebullMqtt.options>,
 	) {
 		super()
