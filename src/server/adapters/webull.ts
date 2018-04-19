@@ -9,6 +9,7 @@ import * as qs from 'querystring'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as webull from '../../common/webull'
+import * as http from './http'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
 
@@ -23,20 +24,20 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 
 	private static get options() {
 		return _.clone({
-			fsymbols: [] as Webull.FullSymbol[],
+			fsymbols: {} as Dict<number>,
 			topics: null as keyof typeof WebullMqtt.topics,
 			host: 'push.webull.com', port: 9018,
 			timeout: '10s' as Clock.Tick,
 			connect: true,
 			retry: true,
 			verbose: false,
+			debug: false,
 		})
 	}
 
 	get name() { return 'mqtt://' + this.options.host + ':' + this.options.port }
 
 	debug = {
-		dev: false,
 		topics: [] as string[],
 		quote: {} as any,
 	}
@@ -47,8 +48,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 		super()
 		_.defaults(this.options, WebullMqtt.options)
 		if (this.options.connect) this.connect();
-		// this.debug.dev = process.PRIMARY
-		if (this.debug.dev) {
+		if (this.options.debug) {
 			clock.on('10s', () => {
 				console.warn('debug topics ->', _.uniq(this.debug.topics))
 				console.warn('debug quote ->', console.dtsgen(this.debug.quote))
@@ -104,9 +104,9 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 			clock.offListener(this._connect)
 			this.emit('connect')
 
-			this.tdict = _.invert(this.fsymbols)
+			this.tdict = _.invert(this.options.fsymbols)
 			let topic = {
-				tickerIds: Object.values(this.fsymbols),
+				tickerIds: Object.values(this.options.fsymbols),
 				header: {
 					app: 'stocks',
 					did: process.env.WEBULL_DID,
@@ -154,7 +154,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 				quote.tickerId = tid
 				quote.symbol = symbol
 				quote.topic = webull.MQTT_TOPICS[topic.type]
-				if (this.debug.dev) {
+				if (this.options.debug) {
 					this.debug.topics.push(quote.topic)
 					Object.assign(this.debug.quote, quote)
 				}
@@ -177,6 +177,21 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 }
 
 
+
+export async function getFullQuotes(tickerIds: number[]) {
+	let chunks = core.array.chunks(tickerIds, _.ceil(tickerIds.length / 512))
+	let quotes = _.flatten(await Promise.all(chunks.map(function(chunk) {
+		return http.get('https://quoteapi.webull.com/api/quote/tickerRealTimes/full', {
+			query: { tickerIds: chunk.join(','), hl: 'en', },
+			webullAuth: true,
+		})
+	}))) as Webull.Quote[]
+	quotes.forEach(function(quote) {
+		core.fix(quote)
+		webull.fixQuote(quote)
+	})
+	return quotes
+}
 
 
 

@@ -28,15 +28,16 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 			let ending = (config.query || config.body) ? ' -> ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
 			console.log('-> ' + config.method + ' ' + config.url + ending);
 		}
-
-		if (parsed.host.includes('robinhood')) {
+		
+		if (parsed.host.includes('robinhood.com')) {
 			if (config.robinhoodToken) {
 				config.headers['Authorization'] = 'Bearer ' + config.robinhoodToken
 			}
 		}
 
-		if (parsed.host.includes('webull') || parsed.host.includes('stocks666')) {
+		if (parsed.host.includes('webull.com') || parsed.host.includes('stocks666.com')) {
 			Object.assign(config.headers, {
+				pragma: 'no-cache',
 				origin: 'https://app.webull.com',
 				referer: 'https://app.webull.com',
 				ver: '1.8.4',

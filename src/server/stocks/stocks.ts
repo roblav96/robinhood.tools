@@ -14,9 +14,13 @@ import radio from '../adapters/radio'
 
 
 
-export const mqtt = new webull.WebullMqtt({ connect: false, verbose: true })
+export const mqtt = new webull.WebullMqtt({
+	connect: false,
+	// verbose: true,
+	// debug: process.PRIMARY,
+})
 mqtt.on('message', function(quote) {
-	// console.log('quote ->', quote)
+	console.log('quote ->', quote)
 })
 
 
@@ -24,11 +28,27 @@ mqtt.on('message', function(quote) {
 rhinstruments.rxready.subscribe(onLiveTickers)
 radio.on(onLiveTickers.name, onLiveTickers)
 async function onLiveTickers() {
-	// if (process.WORKER) return;
+	
+	if (process.WORKER) return;
 
-	let fsymbols = (await redis.main.get(`${redis.SYMBOLS.STOCKS}:${process.INSTANCES}:${process.INSTANCE}`) as any) as Webull.FullSymbol[]
+	let fsymbols = (await redis.main.get(`${redis.SYMBOLS.STOCKS}:${process.INSTANCES}:${process.INSTANCE}`) as any) as Dict<number>
 	fsymbols = JSON.parse(fsymbols as any)
 	// fsymbols = _.fromPairs(_.toPairs(fsymbols).splice(1024))
+	mqtt.options.fsymbols = fsymbols
+	mqtt.connect()
+
+
+
+	// let tickerIds = Object.values(fsymbols)
+	// let quotes = await webull.getFullQuotes(tickerIds)
+	// let quote = {}
+	// quotes.forEach(function(v) {
+	// 	_.merge(quote, v)
+	// })
+	// console.log('quote ->', quote)
+	// console.warn('quote ->', console.dtsgen(quote))
+
+
 
 	// let fsymbols = {} as Dict<number>
 	// // // let cryptos = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/8', {
@@ -41,12 +61,6 @@ async function onLiveTickers() {
 	// forex.forEach(function(ticker) {
 	// 	fsymbols[ticker.symbol] = ticker.tickerId
 	// })
-
-	// console.log('fsymbols ->', fsymbols)
-	// mqtt.fsymbols = fsymbols
-	// mqtt.connect()
-
-
 
 }
 

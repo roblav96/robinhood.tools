@@ -2,6 +2,7 @@
 
 export {
 	after,
+	ceil,
 	clone,
 	compact,
 	concat,

@@ -62,7 +62,7 @@ async function chunkSymbols() {
 
 	let coms = chunks.map(function(chunk, i) {
 		chunk.forEach(v => v[1] = Number.parseInt(v[1] as any))
-		let fpairs = JSON.stringify(chunk) // JSON.stringify(_.fromPairs(chunk))
+		let fpairs = JSON.stringify(_.fromPairs(chunk))
 		return ['set', `${redis.SYMBOLS.STOCKS}:${process.INSTANCES}:${i}`, fpairs]
 	})
 	await redis.main.coms(coms as any)
@@ -175,7 +175,7 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 
 		await clock.toPromise('100ms')
 		// console.time('search/tickers2')
-		let response = await http.get('https://infoapi.stocks666.com/api/search/tickers2', {
+		let response = await http.get('https://infoapi.webull.com/api/search/tickers2', {
 			query: { keys: symbol, tickerType }
 		}) as Webull.API.Paginated<Webull.Ticker>
 		// console.timeEnd('search/tickers2')

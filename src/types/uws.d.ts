@@ -13,6 +13,7 @@ declare module 'uws' {
 		on(event: 'listening', fn: () => void): this
 		addListener(event: 'listening', fn: () => void): this
 	}
+	export const native: any
 }
 
 declare global {

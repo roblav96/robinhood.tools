@@ -85,9 +85,12 @@ export enum MQTT_TOPICS {
 
 export function fixQuote(quote: Webull.Quote) {
 	if (quote.status) quote.status = TICKER_STATUS[quote.status];
+
 	if (quote.faTradeTime) quote.faTradeTime = DateTime.fromISO(quote.faTradeTime as any).valueOf();
 	if (quote.mktradeTime) quote.mktradeTime = DateTime.fromISO(quote.mktradeTime as any).valueOf();
 	if (quote.tradeTime) quote.tradeTime = DateTime.fromISO(quote.tradeTime as any).valueOf();
+	// if (quote.nextEarningDay) quote.nextEarningDay = DateTime.fromISO(quote.nextEarningDay as any).valueOf();
+
 	if (Array.isArray(quote.bidList) && quote.bidList.length > 0) {
 		quote.bidList.forEach(v => core.fix(v))
 		quote.bid = _.max(_.compact(quote.bidList.map(v => v.price)))
@@ -100,6 +103,7 @@ export function fixQuote(quote: Webull.Quote) {
 		quote.askSize = _.sum(quote.askList.map(v => v.volume).concat(0))
 	}
 	delete quote.askList
+
 }
 
 
@@ -175,53 +179,87 @@ declare global {
 		interface Quote {
 			[key: string]: any
 			ask: number
+			askList: Array<{ price: number, volume: number }>
 			askSize: number
 			avg: number
+			avgVol10D: number
+			avgVol3M: number
 			avgVolume: number
+			baNum: number
+			beta: number
 			bid: number
+			bidList: Array<{ price: number, volume: number }>
 			bidSize: number
 			change: number
 			changeRatio: number
 			close: number
 			countryISOCode: string
+			currency: string
 			deal: number
 			dealAmount: number
 			dealNum: number
 			dividend: number
 			eps: number
+			exchangeId: number
+			faceValue: number
 			faTradeTime: number
 			fiftyTwoWkHigh: number
+			fiftyTwoWkHighCalc: number
 			fiftyTwoWkLow: number
+			fiftyTwoWkLowCalc: number
+			forwardPe: number
 			high: number
+			indicatedPe: number
+			lfHigh: number
+			lfLow: number
 			limitDown: number
 			limitUp: number
+			lotSize: number
 			low: number
 			marketValue: number
 			mktradeTime: number
 			monthHigh: number
 			monthLow: number
 			negMarketValue: number
+			nextEarningDay: string
 			open: number
 			outstandingShares: number
 			pb: number
 			pChange: number
 			pChRatio: number
 			pe: number
+			peTtm: number
 			positionsIncr: number
 			positionsNum: number
 			pPrice: number
+			preChange: number
+			preChangeRatio: number
 			preClose: number
+			preSettlement: number
 			price: number
+			projDps: number
+			projEps: number
+			projLtGrowthRate: number
+			projPe: number
+			projProfit: number
+			projSales: number
 			quoteMaker: string
 			quoteMakerAddress: string
+			regionAlias: string
+			regionId: number
+			settlDate: string
+			settlement: number
 			status: string
 			symbol: string
+			targetPrice: number
 			tickerId: number
+			timeZone: string
 			topic: string
 			totalShares: number
 			tradeBsFlag: string
 			tradeTime: number
 			turnoverRate: number
+			utcOffset: string
 			vibrateRatio: number
 			volume: number
 			weekHigh: number

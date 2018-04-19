@@ -27,7 +27,10 @@ export function send(config: Http.Config) {
 	}).catch(function(error: got.GotError) {
 		if (config.retries > 0 && retryable(error)) {
 			config.retries--
-			if (DEVELOPMENT) console.warn('http retry ->', config.retries);
+			if (DEVELOPMENT) {
+				console.error('http Error ->', error)
+				console.warn('http retry ->', config.retries)
+			}
 			return clock.toPromise(config.retryTick).then(() => send(config))
 		}
 		return Promise.reject(error)
