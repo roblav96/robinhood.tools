@@ -34,6 +34,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 	get name() { return 'mqtt://' + this.options.host + ':' + this.options.port }
 
 	debug = {
+		dev: false, // DEVELOPMENT && process.PRIMARY,
 		topics: [] as string[],
 		quote: {} as any,
 	}
@@ -45,7 +46,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 		super()
 		_.defaults(this.options, WebullMqtt.options)
 		if (this.options.connect) this.connect();
-		if (DEVELOPMENT) {
+		if (this.debug.dev) {
 			setInterval(() => {
 				console.warn('debug topics ->', _.uniq(this.debug.topics))
 				console.warn('debug quote ->', console.dtsgen(this.debug.quote))
@@ -149,7 +150,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 				quote.tickerId = tid
 				quote.symbol = symbol
 				quote.topic = webull.MQTT_TOPICS[topic.type]
-				if (DEVELOPMENT) {
+				if (this.debug.dev) {
 					this.debug.topics.push(quote.topic)
 					Object.assign(this.debug.quote, quote)
 				}
