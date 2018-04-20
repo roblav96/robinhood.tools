@@ -45,25 +45,50 @@ $link-invert: $white;
 $family-sans-serif: ('IBM Plex Sans', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif);
 $family-monospace: ('IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace);
 // 
+// PERFECT!
+$gap: 32px;
+$tablet: 768px;
+$desktop: 992px;
+$widescreen: 1200px;
+$fullhd: 1408px;
+// 
+// almost there
+// $gap: 24px;
+// $tablet: 768px;
+// $desktop: 960px;
+// $widescreen: 1200px;
+// $fullhd: 1408px;
+// 
+// bootstrap
+// $tablet: 576px;
+// $desktop: 768px;
+// $widescreen: 992px;
+// $fullhd: 1200px;
+// 
+// bulma
+// $gap: 64px;
+// $tablet: 768px;
+// $desktop: 1024px;
+// $widescreen: 1216px;
+// $fullhd: 1408px;
+// 
 @import '~bulma/sass/utilities/all';
 @import '~buefy/src/scss/utils/all';
 // 
 $colors: map-merge($colors, ('secondary':($secondary, $white)));
 $colors: map-merge($colors, ('accent':($accent, $white)));
 // 
-// $tablet: 576px;
-// $desktop: 768px;
-// $widescreen: 992px;
-// $fullhd: 1200px;
+$body-background-color: $white-bis;
+// $button-disabled-opacity: 0.33;
 // 
 $link-visited: $pink;
 $link-focus-border: $link;
-$navbar-item-active-color: $link;
 // 
-$body-background-color: $white-bis;
+$navbar-item-active-color: $link;
+$navbar-item-img-max-height: initial;
+// 
 $modal-content-width: 480px;
 $modal-background-background-color: rgba($black, 0.66);
-// $button-disabled-opacity: 0.33;
 // 
 @import '~bulma';
 @import '~buefy/src/scss/buefy';

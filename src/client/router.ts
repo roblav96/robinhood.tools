@@ -2,7 +2,6 @@
 
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import * as _ from '@/common/lodash'
 import store from '@/client/store'
 
 
@@ -27,6 +26,7 @@ export const routes = [
 	{
 		name: 'styleguide', path: '/styleguide',
 		component: () => import('@/client/routes/styleguide/styleguide'),
+		dev: true,
 	},
 
 	{ path: '*', redirect: { name: 'home' } },
@@ -44,8 +44,6 @@ const router = new VueRouter({
 	},
 })
 
-
-
 export default router
 
 
@@ -57,10 +55,10 @@ declare module 'vue-router/types/router' {
 		options: RouterOptions
 	}
 	export interface RouteConfig {
-		dev: boolean
 		title: string
 		icon: string
-		bold: boolean
+		navbar: boolean
+		dev: boolean
 	}
 }
 

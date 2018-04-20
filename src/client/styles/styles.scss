@@ -1,6 +1,13 @@
 // 
 // 
 // 
+.navbar-brand a[href].navbar-item:hover {
+	background-color: $navbar-item-hover-background-color;
+}
+
+// 
+// 
+// 
 :root {
 	@for $i from 1 through length($colors) {
 		$color: nth($colors, $i);

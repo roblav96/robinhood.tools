@@ -4,10 +4,6 @@
 <style>
 /**/
 
-.navbar-brand a.navbar-item:hover {
-	background-color: inherit;
-}
-
 </style>
 
 <template>
@@ -16,22 +12,23 @@
 
 			<div class="navbar-brand">
 				<router-link class="navbar-item" :to="{ name: 'home' }" active-class exact-active-class>
-					<svg-logo class="h-full" style="width: 32px;" :fill="$store.state.colors.primary"></svg-logo>
+					<svg-logo class="image is-32x32" style="width: auto; max-height: 100% !important;" :fill="$store.state.colors.primary"></svg-logo>
+					<!-- <img class="" src="@/assets/logo-primary.svg"> -->
 				</router-link>
 
-				<div class="navbar-item">
-					<!-- <v-searchbar></v-searchbar> -->
-				</div>
+				<!-- <div class="navbar-item">
+					<v-searchbar></v-searchbar>
+				</div> -->
 
 				<div class="flex-grow is-hidden-desktop"></div>
-				<a class="navbar-item is-hidden-desktop" v-on:click="showMobileMenu = !showMobileMenu">
+				<a class="navbar-item is-hidden-desktop" v-on:click="isMenu = !isMenu">
 					<b-icon icon="menu" />
 				</a>
 			</div>
 
-			<div class="navbar-menu" :class="{ 'is-active': showMobileMenu }">
+			<div class="navbar-menu" :class="{ 'is-active': isMenu }">
 				<div class="navbar-start">
-					<router-link class="navbar-item" v-for="route in v_routes" :key="route.name" :to="{ name: route.name }">
+					<router-link class="navbar-item" v-for="route in routes" :key="route.name" :to="{ name: route.name }">
 						<b-icon class="mr-2 va-middle" :icon="route.icon" />
 						<span class="va-middle">{{ route.title }}</span>
 					</router-link>

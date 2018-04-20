@@ -9,18 +9,22 @@ import VUtilsMixin from '@/client/mixins/v-utils.mixin'
 
 @Vts.Component({
 	components: {
-		
+
 	},
 })
 export default class extends Mixins(VUtilsMixin) {
 
-	showMobileMenu = false
-	
+	isMenu = false
+
 	created() {
 		document.documentElement.classList.add('has-navbar-fixed-top')
 	}
 
-
+	get routes() {
+		return this.$router.options.routes.filter(function(route) {
+			return route.navbar
+		})
+	}
 
 }
 
