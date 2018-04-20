@@ -14,15 +14,20 @@ process.CLIENT = true
 
 import * as _ from '@/common/lodash'
 Object.assign(console, { dtsgen: _.noop, dump: _.noop })
-if (DEVELOPMENT) Object.assign(window, require('@/common/core'));
+// if (DEVELOPMENT) Object.assign(window, require('@/common/core'));
 // if (DEVELOPMENT) console.dtsgen = require('@/common/dtsgen').default;
 
 // 
 
+// import 'tailwindcss/dist/utilities.css'
+import 'repaintless/repaintless-css/repaintless.css'
+import '@/client/styles/fonts.scss'
+import '@/client/styles/spectre.scss'
+import '@/client/styles/styles.css'
+
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Vuex from 'vuex'
-import Buefy, { BuefyConfig } from 'buefy'
 
 Vue.config.productionTip = false
 Vue.config.performance = false
@@ -30,13 +35,6 @@ Vue.config.devtools = false
 
 Vue.use(VueRouter)
 Vue.use(Vuex)
-Vue.use(Buefy, {
-	defaultSnackbarDuration: 5000,
-	defaultToastDuration: 5000,
-	defaultInputAutocomplete: 'off',
-	defaultNoticeQueue: false,
-	defaultTooltipType: 'is-dark',
-} as BuefyConfig)
 
 require('@/client/vm')
 

@@ -20,32 +20,8 @@ export const routes = [
 	},
 
 	{
-		title: 'Watchlist', icon: 'wunderlist',
-		name: 'watchlist', path: '/watchlist',
-		// component: () => import('@/client/routes/watchlist/watchlist'),
-	},
-
-	{
-		title: 'Markets', icon: 'web',
-		name: 'markets', path: '/markets',
-		// component: () => import('@/client/routes/markets/markets'),
-	},
-
-	{
-		title: 'Crypto', icon: 'bitcoin',
-		name: 'crypto', path: '/crypto',
-		// component: () => import('@/client/routes/crypto/crypto'),
-	},
-
-	{
-		title: 'Style Guide', icon: 'palette', dev: true,
-		name: 'styleguide', path: '/styleguide',
-		component: () => import('@/client/routes/styleguide/styleguide'),
-	},
-
-	{
-		name: 'symbol', path: '/symbol',
-		// component: () => import('@/client/routes/symbol/symbol'),
+		name: 'symbol', path: '/symbol/:symbol',
+		component: () => import('@/client/routes/symbol/symbol'),
 	},
 
 	{ path: '*', redirect: { name: 'home' } },

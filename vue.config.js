@@ -15,7 +15,7 @@ const package = require('./package.json')
 module.exports = {
 
 	outputDir: 'dist/client',
-	dll: DEVELOPMENT,
+	// dll: DEVELOPMENT,
 	css: { sourceMap: false },
 	vueLoader: { hotReload: false },
 
@@ -23,6 +23,7 @@ module.exports = {
 
 		config.entry.app = './src/client/main.ts'
 		delete config.node.process
+		delete config.node.setImmediate
 
 		if (DEVELOPMENT) {
 			config.devtool = 'inline-source-map'
@@ -88,7 +89,7 @@ module.exports = {
 
 if (DEVELOPMENT) {
 	const clc = require('cli-color')
-	setInterval(() => process.stdout.write(clc.move.down(1)), 1000)
+	setInterval(() => process.stdout.write(clc.erase.lineRight), 1000)
 }
 
 
