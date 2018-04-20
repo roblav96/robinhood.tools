@@ -3,6 +3,7 @@
 node_modules
 dist
 
+*tailwind*.css
 procfile.js
 *.env
 *.env.*
