@@ -12,7 +12,7 @@
 
 			<div class="navbar-brand">
 				<router-link class="navbar-item" :to="{ name: 'home' }" active-class exact-active-class>
-					<svg-logo class="flex flex-grow" style="height: 100%; " :fill="$store.state.colors.primary"></svg-logo>
+					<svg-logo class="flex flex-grow h-full" :fill="$store.state.colors.primary"></svg-logo>
 				</router-link>
 
 				<div class="navbar-item">

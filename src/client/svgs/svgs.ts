@@ -6,7 +6,7 @@ import Vue from 'vue'
 
 
 
-Vue.component('svg-logo', () => import('@/client/svgs/logo.svg.vue'))
+Vue.component('svg-logo', require('@/client/svgs/logo.svg.vue').default)
 
 @Vts.Component
 export default class extends Vue {

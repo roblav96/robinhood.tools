@@ -252,6 +252,7 @@ module.exports = {
 	*/
 
 	textSizes: {
+		'initial': 'initial',
 		'xs': '.75rem',     // 12px
 		'sm': '.875rem',    // 14px
 		'base': '1rem',     // 16px
@@ -279,6 +280,7 @@ module.exports = {
 	*/
 
 	fontWeights: {
+		'initial': 'initial',
 		'hairline': 100,
 		'thin': 200,
 		'light': 300,
@@ -304,6 +306,7 @@ module.exports = {
 	*/
 
 	leading: {
+		'initial': 'initial',
 		'none': 1,
 		'tight': 1.25,
 		'normal': 1.5,
@@ -324,6 +327,7 @@ module.exports = {
 	*/
 
 	tracking: {
+		'initial': 'initial',
 		'tight': '-0.05em',
 		'normal': '0',
 		'wide': '0.05em',
@@ -376,6 +380,7 @@ module.exports = {
 	*/
 
 	backgroundSize: {
+		'initial': 'initial',
 		'auto': 'auto',
 		'cover': 'cover',
 		'contain': 'contain',
@@ -396,6 +401,7 @@ module.exports = {
 	*/
 
 	borderWidths: {
+		'initial': 'initial',
 		default: '1px',
 		'0': '0',
 		'2': '2px',
@@ -441,6 +447,7 @@ module.exports = {
 	*/
 
 	borderRadius: {
+		'initial': 'initial',
 		'none': '0',
 		'sm': '.125rem',
 		default: '.25rem',
@@ -470,6 +477,7 @@ module.exports = {
 	*/
 
 	width: {
+		'initial': 'initial',
 		'auto': 'auto',
 		'px': '1px',
 		'1': '0.25rem',
@@ -517,6 +525,7 @@ module.exports = {
 	*/
 
 	height: {
+		'initial': 'initial',
 		'auto': 'auto',
 		'px': '1px',
 		'1': '0.25rem',
@@ -552,6 +561,7 @@ module.exports = {
 	*/
 
 	minWidth: {
+		'initial': 'initial',
 		'0': '0',
 		'full': '100%',
 	},
@@ -572,6 +582,7 @@ module.exports = {
 	*/
 
 	minHeight: {
+		'initial': 'initial',
 		'0': '0',
 		'full': '100%',
 		'screen': '100vh'
@@ -594,6 +605,7 @@ module.exports = {
 	*/
 
 	maxWidth: {
+		'initial': 'initial',
 		'xs': '20rem',
 		'sm': '30rem',
 		'md': '40rem',
@@ -622,6 +634,7 @@ module.exports = {
 	*/
 
 	maxHeight: {
+		'initial': 'initial',
 		'full': '100%',
 		'screen': '100vh',
 	},
@@ -643,6 +656,7 @@ module.exports = {
 	*/
 
 	padding: {
+		'initial': 'initial',
 		'px': '1px',
 		'0': '0',
 		'1': '0.25rem',
@@ -670,6 +684,7 @@ module.exports = {
 	*/
 
 	margin: {
+		'initial': 'initial',
 		'auto': 'auto',
 		'px': '1px',
 		'0': '0',
@@ -698,6 +713,7 @@ module.exports = {
 	*/
 
 	negativeMargin: {
+		'initial': 'initial',
 		'px': '1px',
 		'0': '0',
 		'1': '0.25rem',
@@ -726,6 +742,7 @@ module.exports = {
 	*/
 
 	shadows: {
+		'initial': 'initial',
 		default: '0 2px 4px 0 rgba(0,0,0,0.10)',
 		'md': '0 4px 8px 0 rgba(0,0,0,0.12), 0 2px 4px 0 rgba(0,0,0,0.08)',
 		'lg': '0 15px 30px 0 rgba(0,0,0,0.11), 0 5px 15px 0 rgba(0,0,0,0.08)',
@@ -748,6 +765,7 @@ module.exports = {
 	*/
 
 	zIndex: {
+		'initial': 'initial',
 		'auto': 'auto',
 		'0': 0,
 		'10': 10,
@@ -772,6 +790,7 @@ module.exports = {
 	*/
 
 	opacity: {
+		'initial': 'initial',
 		'0': '0',
 		'25': '.25',
 		'50': '.5',
@@ -795,6 +814,7 @@ module.exports = {
 	*/
 
 	svgFill: {
+		'initial': 'initial',
 		'current': 'currentColor',
 	},
 
@@ -814,6 +834,7 @@ module.exports = {
 	*/
 
 	svgStroke: {
+		'initial': 'initial',
 		'current': 'currentColor',
 	},
 
