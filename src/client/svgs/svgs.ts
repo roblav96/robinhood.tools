@@ -6,12 +6,13 @@ import Vue from 'vue'
 
 
 
+Vue.component('svg-logo', () => import('@/client/svgs/logo.svg.vue'))
+
 @Vts.Component
 export default class extends Vue {
 
-	created() {
-		
-	}
+	@Vts.Prop({ default: 'black' })
+	fill: string
 
 }
 

@@ -23,6 +23,10 @@ export default class extends Mixins(VUtilsMixin) {
 	mounted() {
 
 	}
+	
+	get routes() {
+		return this.$router.options.routes.filter(v => !!v.name)
+	}
 
 }
 

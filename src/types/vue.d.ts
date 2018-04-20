@@ -1,11 +1,8 @@
 // 
 
-import _Vue from 'vue'
-
-
-
 declare module '*.vue' {
-	export default _Vue
+	import Vue from 'vue'
+	export default Vue
 }
 
 

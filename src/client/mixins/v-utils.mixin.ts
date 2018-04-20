@@ -14,6 +14,10 @@ export default class extends Vue {
 	v_development = DEVELOPMENT
 	v_production = PRODUCTION
 
+	created() {
+
+	}
+
 	v_truncate(input: string, length = 64) { return _.truncate(input, { length }) }
 
 	get v_routes() {

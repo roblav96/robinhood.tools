@@ -15,7 +15,7 @@ const package = require('./package.json')
 module.exports = {
 
 	outputDir: 'dist/client',
-	dll: DEVELOPMENT,
+	// dll: DEVELOPMENT,
 	css: { sourceMap: false },
 	vueLoader: {
 		hotReload: false,

@@ -1,0 +1,39 @@
+// 
+// 
+// 
+:root {
+	@for $i from 1 through length($colors) {
+		$color: nth($colors, $i);
+		$name: nth($color, 1);
+		$hex: nth($color, 2);
+		--#{$name}: #{nth($hex, 1)};
+		--#{$name}-inverse: #{nth($hex, 2)};
+		--js-#{$i}: #{$name};
+	}
+	@each $name,
+	$shade in $shades {
+		--#{$name}: #{$shade};
+	}
+}
+
+// 
+// 
+// 
+@each $key,
+$value in (('', $speed), ('-slow', $speed-slow), ('-slower', $speed-slower), ('-slowest', 500ms)) {
+	.anim#{$key} {
+		animation-duration: $value !important;
+	}
+}
+
+.anim-infinite {
+	animation-iteration-count: infinite !important;
+}
+
+.anim-loading {
+	opacity: 0 !important;
+}
+
+// 
+// 
+//

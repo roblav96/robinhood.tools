@@ -21,6 +21,18 @@
 						<span>Open Source</span>
 					</a>
 				</div>
+
+				<template v-show="v_development">
+					<div class="tabs is-toggle is-centered">
+						<ul>
+							<router-link tag="li" v-for="route in routes" :key="route.name" :to="{ name: route.name }">
+								<a>
+									<span>{{ route.name }}</span>
+								</a>
+							</router-link>
+						</ul>
+					</div>
+				</template>
 			</div>
 		</footer>
 

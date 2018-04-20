@@ -5,7 +5,7 @@ require('@/common/polyfills')
 global.NODE_ENV = process.env.NODE_ENV || 'development'
 global.DEVELOPMENT = NODE_ENV == 'development'
 global.PRODUCTION = NODE_ENV == 'production'
-global.Promise = require('bluebird')
+global.Promise = require('bluebird/js/browser/bluebird.core.js')
 
 process.NAME = process.env.NAME
 process.VERSION = process.env.VERSION

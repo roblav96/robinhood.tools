@@ -4,6 +4,8 @@
 <style>
 /**/
 
+/**/
+
 </style>
 
 <template>
@@ -15,7 +17,7 @@
 					<div class="columns level is-mobile">
 						<div class="column is-narrow is-hidden-mobile">
 							<figure class="image is-64x64">
-								<img src="@/assets/logo-white.svg" alt="Robinhood Tools">
+								<svg-logo :fill="'white'"></svg-logo>
 							</figure>
 						</div>
 						<div class="column">

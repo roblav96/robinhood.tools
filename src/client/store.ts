@@ -17,7 +17,7 @@ export default new Vuex.Store<Store.State>({
 
 
 
-// import all stores
+// import all stores in directory
 let load = require.context('./stores/', true, /\.ts$/)
 load.keys().forEach(file => load(file))
 
