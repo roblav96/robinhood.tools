@@ -14,10 +14,7 @@ process.CLIENT = true
 
 import * as _ from '@/common/lodash'
 Object.assign(console, { dtsgen: _.noop, dump: _.noop })
-// if (DEVELOPMENT) Object.assign(window, require('@/common/core'));
 // if (DEVELOPMENT) console.dtsgen = require('@/common/dtsgen').default;
-
-// 
 
 // import 'tailwindcss/dist/utilities.css'
 import 'repaintless/repaintless-css/repaintless.css'
