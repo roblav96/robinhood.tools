@@ -16,11 +16,11 @@ import * as _ from '@/common/lodash'
 Object.assign(console, { dtsgen: _.noop, dump: _.noop })
 // if (DEVELOPMENT) console.dtsgen = require('@/common/dtsgen').default;
 
-import 'tailwindcss/dist/utilities.css'
 import 'repaintless/repaintless-css/repaintless.css'
 import '@/client/styles/theme.scss'
 import '@/client/styles/fonts.scss'
 import '@/client/styles/styles.css'
+import '@/client/styles/tailwind.css'
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'

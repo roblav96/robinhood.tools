@@ -8,7 +8,6 @@ import App from '@/client/app/app'
 
 
 
-const app = new App({ router, store }).$mount('#app')
-export default app
+export default new App({ router, store }).$mount('#app')
 
 

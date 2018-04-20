@@ -24,6 +24,11 @@ export const routes = [
 		component: () => import('@/client/routes/symbol/symbol'),
 	},
 
+	{
+		name: 'styleguide', path: '/styleguide',
+		component: () => import('@/client/routes/styleguide/styleguide'),
+	},
+
 	{ path: '*', redirect: { name: 'home' } },
 
 ] as Array<RouteConfig>
@@ -45,6 +50,24 @@ export default router
 
 
 
+
+
+declare module 'vue-router/types/router' {
+	export interface VueRouter {
+		options: RouterOptions
+	}
+	export interface RouteConfig {
+		dev: boolean
+		title: string
+		icon: string
+		bold: boolean
+	}
+}
+
+
+
+
+
 // store.registerModule('routes', {
 // 	state: routes.filter(function(route) {
 // 		if (route.dev && PRODUCTION) return false;
@@ -59,21 +82,5 @@ export default router
 // 		}
 // 	}
 // }
-
-
-
-
-
-declare module 'vue-router/types/router' {
-	export interface VueRouter {
-		options: RouterOptions
-	}
-	export interface RouteConfig {
-		dev: boolean
-		title: string
-		icon: string
-		bold: boolean
-	}
-}
 
 
