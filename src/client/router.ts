@@ -14,8 +14,8 @@ export const routes = [
 	},
 
 	{
-		name: 'about', path: '/about',
-		component: () => import('@/client/routes/about/about'),
+		name: 'crypto', path: '/crypto',
+		title: 'Crypto', icon: 'bitcoin',
 	},
 
 	{
@@ -57,7 +57,6 @@ declare module 'vue-router/types/router' {
 	export interface RouteConfig {
 		title: string
 		icon: string
-		navbar: boolean
 		dev: boolean
 	}
 }

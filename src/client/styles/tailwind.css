@@ -6310,7 +6310,7 @@
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 992px) {
   .md\:list-reset {
     list-style: none !important;
     padding: 0 !important;
@@ -9459,7 +9459,7 @@
   }
 }
 
-@media (min-width: 1216px) {
+@media (min-width: 1200px) {
   .lg\:list-reset {
     list-style: none !important;
     padding: 0 !important;

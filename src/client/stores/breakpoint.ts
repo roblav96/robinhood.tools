@@ -27,8 +27,8 @@ function update() {
 	let height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
 
 	let mobile = width < 768
-	let tablet = width < 1024 && !mobile
-	let desktop = width < 1216 && !(tablet || mobile)
+	let tablet = width < 992 && !mobile
+	let desktop = width < 1200 && !(tablet || mobile)
 	let widescreen = width < 1408 && !(desktop || tablet || mobile)
 	let fullhd = width >= 1408 && !(widescreen || desktop || tablet || mobile)
 

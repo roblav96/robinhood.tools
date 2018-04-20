@@ -170,8 +170,8 @@ module.exports = {
 
 	screens: {
 		'sm': '768px',
-		'md': '1024px',
-		'lg': '1216px',
+		'md': '992px',
+		'lg': '1200px',
 		'xl': '1408px',
 	},
 

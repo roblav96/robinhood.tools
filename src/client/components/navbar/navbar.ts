@@ -22,7 +22,7 @@ export default class extends Mixins(VUtilsMixin) {
 
 	get routes() {
 		return this.$router.options.routes.filter(function(route) {
-			return route.navbar
+			return route.title && route.icon
 		})
 	}
 
