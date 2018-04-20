@@ -1,6 +1,12 @@
 {
 	"folders": [{
-		"name": "Spectre",
-		"path": "node_modules/spectre.css/src"
+		"name": "Bulma",
+		"path": "node_modules/bulma/sass"
+	}, {
+		"name": "Buefy",
+		"path": "node_modules/buefy/src/scss"
+	}, {
+		"name": "Bootstrap",
+		"path": "node_modules/bootstrap/scss"
 	}]
 }

@@ -7,20 +7,33 @@
 </style>
 
 <template>
-	<div class="container bg-gray">
-		<header class="navbar py-2">
-			<section class="navbar-section">
-				<a href="#" class="navbar-brand mr-2">Spectre.css</a>
-				<a href="#" class="btn btn-link">Docs</a>
-				<a href="https://github.com/picturepan2/spectre" class="btn btn-link">GitHub</a>
-				<button class="btn text-justify"><i class="mdi mdi-bell mdi-24px"></i>default button</button>
-			</section>
-			<section class="navbar-section">
-				<div class="input-group input-inline">
-					<input class="form-input" type="text" placeholder="search">
-					<button class="btn btn-primary input-group-btn">Search</button>
+	<nav class="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
+		<div class="container">
+
+			<div class="navbar-brand">
+				<router-link class="navbar-item" :to="{ name: 'home' }" active-class exact-active-class>
+					<img src="@/assets/logo-primary.svg">
+				</router-link>
+
+				<div class="navbar-item">
+					<!-- <v-searchbar></v-searchbar> -->
 				</div>
-			</section>
-		</header>
-	</div>
+
+				<div class="fx-fill is-hidden-desktop"></div>
+				<a class="navbar-item is-hidden-desktop" v-on:click="showMobileMenu = !showMobileMenu">
+					<b-icon icon="menu" />
+				</a>
+			</div>
+
+			<div class="navbar-menu" :class="{ 'is-active': showMobileMenu }">
+				<div class="navbar-start">
+					<router-link class="navbar-item" v-for="route in v_routes" :key="route.name" :to="{ name: route.name }">
+						<b-icon class="mr-2 va-middle" :icon="route.icon" />
+						<span class="va-middle">{{ route.title }}</span>
+					</router-link>
+				</div>
+			</div>
+
+		</div>
+	</nav>
 </template>

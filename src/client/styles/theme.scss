@@ -1,0 +1,38 @@
+// 
+@charset 'utf-8';
+// 
+// 
+// 
+@import '~bulma/sass/utilities/initial-variables';
+// 
+$primary: #9561E2;
+$info: #3490DC;
+$success: #38C172;
+$warning: #F6993F;
+$danger: #E3342F;
+$link: #F66D9B;
+// 
+$warning-invert: $white-ter;
+// 
+@import '~bulma/sass/utilities/all';
+@import '~buefy/src/scss/utils/all';
+// 
+$family-primary: ('IBM Plex Sans', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif);
+$family-code: ('IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace);
+// 
+$body-background-color: $light;
+// 
+$link: $primary;
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
+$navbar-item-active-color: $primary;
+// 
+$modal-content-width: 480px;
+$modal-background-background-color: rgba($black, 0.66);
+$button-disabled-opacity: 0.33;
+// 
+@import '~bulma';
+@import '~buefy/src/scss/buefy';
+// 
+// 
+//

@@ -14,8 +14,10 @@ import VUtilsMixin from '@/client/mixins/v-utils.mixin'
 })
 export default class extends Mixins(VUtilsMixin) {
 
+	showMobileMenu = false
+	
 	created() {
-		
+		document.documentElement.classList.add('has-navbar-fixed-top')
 	}
 
 
