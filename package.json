@@ -53,6 +53,7 @@
 		"p-queue": "latest",
 		"pino": "latest",
 		"polka": "latest",
+		"popmotion": "^8.1.22",
 		"pretty-bytes": "latest",
 		"pretty-ms": "latest",
 		"rambda": "latest",
