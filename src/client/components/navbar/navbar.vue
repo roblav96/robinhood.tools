@@ -50,7 +50,7 @@ span.navbar-burger.burger > span {
 					Logged as <b>Rafael Beraldo</b>
 				</b-dropdown-item>
 				<hr class="dropdown-divider">
-				<b-dropdown-item has-link >
+				<b-dropdown-item has-link>
 					<a href="https://google.com" target="_blank" class="flex items-center">
 						<b-icon icon="link"></b-icon>
 						Google (link)
