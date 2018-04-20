@@ -22,9 +22,7 @@ export function config() {
 
 
 export function send(config: Http.Config) {
-	return got(config.url, config).then(function({ body }) {
-		return body
-	}).catch(function(error: got.GotError) {
+	return got(config.url, config).then(({ body }) => body).catch(function(error: got.GotError) {
 		if (config.retries > 0 && retryable(error)) {
 			config.retries--
 			if (DEVELOPMENT) {

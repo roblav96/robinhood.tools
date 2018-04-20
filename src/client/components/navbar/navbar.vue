@@ -4,6 +4,10 @@
 <style>
 /**/
 
+.navbar-brand a.navbar-item:hover {
+	background-color: inherit;
+}
+
 </style>
 
 <template>
@@ -12,14 +16,14 @@
 
 			<div class="navbar-brand">
 				<router-link class="navbar-item" :to="{ name: 'home' }" active-class exact-active-class>
-					<svg-logo class="flex flex-grow h-full" :fill="$store.state.colors.primary"></svg-logo>
+					<svg-logo class="h-full" style="width: 32px;" :fill="$store.state.colors.primary"></svg-logo>
 				</router-link>
 
 				<div class="navbar-item">
 					<!-- <v-searchbar></v-searchbar> -->
 				</div>
 
-				<div class="fx-fill is-hidden-desktop"></div>
+				<div class="flex-grow is-hidden-desktop"></div>
 				<a class="navbar-item is-hidden-desktop" v-on:click="showMobileMenu = !showMobileMenu">
 					<b-icon icon="menu" />
 				</a>

@@ -8,19 +8,18 @@
 // $black: #22292F;
 // $black-bis: #3D4852;
 // $black-ter: #606F7B;
-// $grey-darker: #606F7B;
-// $grey-dark: #8795A1;
-// $grey: #B8C2CC;
-// $grey-light: #DAE1E7;
-// $grey-lighter: #F1F5F8;
-// $white-ter: #F1F5F8;
-// $white-bis: #F8FAFC;
-// $white: #FFFFFF;
+$grey-darker: #22292F;
+$grey-dark: #3D4852;
+$grey: #606F7B;
+$grey-light: #8795A1;
+$grey-lighter: #B8C2CC;
+$white-ter: #F1F5F8;
+$white-bis: #F8FAFC;
+$white: #FFFFFF;
 // 
 // $light: $white-ter;
 // $dark: $black;
 // 
-$white: #fff;
 $orange: #F6993F;
 $yellow: #FFED4A;
 $green: #38C172;
@@ -69,7 +68,6 @@ $modal-background-background-color: rgba($black, 0.66);
 @import '~bulma';
 @import '~buefy/src/scss/buefy';
 // 
-@import './styles'
-// 
+@import './styles' // 
 // 
 //

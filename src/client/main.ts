@@ -16,9 +16,10 @@ import * as _ from '@/common/lodash'
 Object.assign(console, { dtsgen: _.noop, dump: _.noop })
 // if (DEVELOPMENT) console.dtsgen = require('@/common/dtsgen').default;
 
-import 'repaintless/repaintless-css/repaintless.css'
+import 'repaintless/repaintless-scss/repaintless.scss'
 import '@/client/styles/theme.scss'
-import '@/client/styles/fonts.scss'
+import '@/client/styles/plex.scss'
+import '@/client/styles/mdi.scss'
 import '@/client/styles/styles.css'
 import '@/client/styles/tailwind.css'
 
