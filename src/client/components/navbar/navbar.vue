@@ -23,14 +23,14 @@ span.navbar-burger.burger > span {
 				<svg-logo class="image is-32x32" :fill="$store.state.colors.primary"></svg-logo>
 			</router-link>
 
-			<span class="navbar-burger burger px-6" :class="{ 'is-active': isMenu }" v-on:click="isMenu = !isMenu">
+			<span class="navbar-burger burger px-6" :class="{ 'is-active': isMobileMenu }" v-on:click="isMobileMenu = !isMobileMenu">
 				<span></span>
 				<span></span>
 				<span></span>
 			</span>
 		</div>
 
-		<div class="navbar-menu is-hidden-desktop" :class="{ 'is-active': isMenu }">
+		<div class="navbar-menu is-hidden-desktop" :class="{ 'is-active': isMobileMenu }">
 			<div class="navbar-start">
 				<router-link class="navbar-item flex items-center" v-for="route in routes" :key="route.name" :to="{ name: route.name }">
 					<b-icon class="mr-1" :icon="route.icon" />
@@ -40,7 +40,7 @@ span.navbar-burger.burger > span {
 		</div>
 
 		<div class="navbar-end is-hidden-touch">
-			<b-dropdown v-model="navigation" position="is-bottom-left">
+			<b-dropdown position="is-bottom-left" v-on:active-change="ondropdown">
 				<a class="navbar-item" slot="trigger">
 					<span>Menu</span>
 					<b-icon icon="menu-down"></b-icon>

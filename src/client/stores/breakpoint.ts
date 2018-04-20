@@ -66,6 +66,9 @@ const onresize = _.throttle(update, 300, { leading: false })
 window.addEventListener('resize', onresize, { passive: true })
 
 store.registerModule('breakpoint', { state })
-declare global { namespace Store { interface State { breakpoint: typeof state } } }
+declare global {
+	type Breakpoint = typeof state
+	namespace Store { interface State { breakpoint: Breakpoint } }
+}
 
 

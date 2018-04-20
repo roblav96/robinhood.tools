@@ -18,7 +18,7 @@ module.exports = {
 	// dll: DEVELOPMENT,
 	css: { sourceMap: false },
 	vueLoader: {
-		hotReload: true,
+		hotReload: false,
 		// postcss: [require('tailwindcss')(path.resolve(process.cwd(), 'src/client/styles/tailwind.js'))],
 	},
 

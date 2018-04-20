@@ -21,7 +21,7 @@ import '@/client/styles/theme.scss'
 import '@/client/styles/plex.scss'
 import '@/client/styles/mdi.scss'
 import '@/client/styles/styles.css'
-import '@/client/styles/tailwind.css'
+import '@/client/styles/tailwind.out.css'
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
