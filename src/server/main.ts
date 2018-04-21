@@ -18,7 +18,7 @@ global.WebSocket = require('uws')
 
 import './adapters/process'
 import './adapters/console'
-import './adapters/cluster'
+// import './adapters/cluster'
 
 import '../common/clock'
 import './api/fastify'

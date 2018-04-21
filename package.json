@@ -17,6 +17,7 @@
 		"server:dev:node": "rimraf dist/server && tsc-watch -p .server.tsconfig.json --onSuccess 'node dist/server/main.js'",
 		"server:dev:pm2": "rimraf dist/server && pm2 list && tsc-watch -p .server.tsconfig.json --onSuccess 'pm2-runtime pm2.config.json'",
 		"server:build": "rimraf dist/server && tsc -p .server.tsconfig.json",
+		"pandora:watch": "tsc config/procfile.ts --watch --removeComments --outDir .",
 		"cli:clear": "clear && printf \"\\e[3J\""
 	},
 	"dependencies": {
@@ -113,9 +114,12 @@
 		"dotenv": "latest",
 		"dts-gen-v2": "latest",
 		"eyes": "latest",
+		"fastbench": "latest",
 		"forever-fixed": "latest",
+		"nanobench": "latest",
 		"node-sass": "latest",
 		"npm-run-all": "latest",
+		"pandora": "latest",
 		"rimraf": "latest",
 		"sass-loader": "latest",
 		"source-map-support": "latest",
