@@ -3,7 +3,6 @@ export * from '@/common/security'
 // 
 
 import * as _ from '@/common/lodash'
-import * as R from '@/common/rambdax'
 import * as core from '@/common/core'
 import lockr from 'lockr'
 import Fingerprint2 from 'fingerprintjs2'
@@ -63,7 +62,7 @@ function finger(): Promise<void> {
 function token(): Promise<string[]> {
 	return http.get('/security/token').catch(function(error) {
 		console.error('token Error ->', error)
-		return R.delay(3000).then(token)
+		return Promise.delay(3000).then(token)
 	})
 }
 

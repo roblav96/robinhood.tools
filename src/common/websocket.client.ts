@@ -4,7 +4,6 @@ import * as _ from './lodash'
 import * as uws from 'uws'
 import * as url from 'url'
 import * as core from './core'
-import * as msgpack from './msgpack'
 import Emitter from './emitter'
 import clock from './clock'
 
@@ -60,7 +59,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
 	binary<T = object>(data: T) {
 		if (!this.alive()) return;
-		this.socket.send(msgpack.encode(data), { binary: true })
+		this.socket.send(Buffer.from(data as any), { binary: true })
 	}
 
 	close(code = 1000, reason?: string) {

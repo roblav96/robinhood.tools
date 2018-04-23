@@ -1,7 +1,5 @@
 // 
 
-
-
 declare module 'cli-color' {
 	import * as erase from 'cli-color/erase'
 	import * as trim from 'cli-color/trim'

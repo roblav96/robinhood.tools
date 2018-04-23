@@ -4,7 +4,6 @@ import * as stream from 'stream'
 import * as got from 'got'
 import * as boom from 'boom'
 import * as retryable from 'is-retry-allowed'
-import * as R from './rambdax'
 import clock from './clock'
 
 

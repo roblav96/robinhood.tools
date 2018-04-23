@@ -29,7 +29,6 @@ declare namespace NodeJS {
 
 
 type KeysOf<T> = (keyof T)[]
-
 interface Dict<T = any> {
 	[key: string]: T
 }
@@ -41,12 +40,10 @@ interface WebpackRequireContext {
 	id: string
 	name: string
 	resolve: RequireResolve
-	keys: () => string[]
+	keys(): string[]
 }
 interface NodeRequire {
-	context: (path: string, descending: boolean, regex: RegExp) => WebpackRequireContext
+	context(path: string, descending: boolean, regex: RegExp): WebpackRequireContext
 }
-
-
 
 
