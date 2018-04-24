@@ -3,7 +3,7 @@
 import * as pandora from 'pandora'
 import * as qs from 'querystring'
 import * as Polka from 'polka'
-import * as boom from 'boom'
+import * as Boom from 'boom'
 import * as turbo from 'turbo-http'
 import * as jsonparse from 'fast-json-parse'
 
@@ -13,7 +13,8 @@ const polka = Polka({
 	server: turbo.createServer(),
 
 	onError(error, req, res, next) {
-		if (!error.isBoom) error = new boom(error);
+		if (res.headerSent) return next();
+		if (!error.isBoom) error = new Boom(error);
 		if (error.data) {
 			Object.assign(error.output.payload, { attributes: error.data })
 		}
@@ -25,7 +26,7 @@ const polka = Polka({
 	},
 
 	onNoMatch(req, res) {
-		polka.onError(boom.notFound(req.path), req, res)
+		polka.onError(Boom.notFound(req.path), req, res)
 	},
 
 })
@@ -33,9 +34,7 @@ const polka = Polka({
 polka.use(function(req, res, next) {
 
 	Object.assign(res, {
-		set code(this: any, code) {
-			this.statusCode = code
-		},
+		// set code(this: any, code) { this.statusCode = code },
 		writeHead(this: any, code, headers) {
 			this.statusCode = code
 			Object.keys(headers).forEach(key => {
@@ -43,22 +42,24 @@ polka.use(function(req, res, next) {
 			})
 		},
 		send(this: any, data) {
-			if (data != null) {
-				if (data.constructor == String || Buffer.isBuffer(data)) {
-					this.setHeader('Content-Length', data.length)
-					this.write(data)
-					return
-				}
-				if (data instanceof Object) {
-					let json = JSON.stringify(data)
-					this.setHeader('Content-Type', 'application/json')
-					this.setHeader('Content-Length', json.length)
-					this.write(json)
-					return
-				}
+			if (data == null) {
+				this.setHeader('Content-Length', 0)
+				this.write('')
+				return
 			}
-			this.setHeader('Content-Length', 0)
-			this.write('')
+			if (data.constructor == String || Buffer.isBuffer(data)) {
+				this.setHeader('Content-Length', data.length)
+				this.write(data)
+				return
+			}
+			if (data.constructor == Object || data instanceof Object) {
+				let json = JSON.stringify(data)
+				this.setHeader('Content-Type', 'application/json')
+				this.setHeader('Content-Length', json.length)
+				this.write(json)
+				return
+			}
+			this.write(data)
 		},
 	})
 
@@ -74,7 +75,8 @@ polka.use(function(req, res, next) {
 				if (type == 'application/json') {
 					let parsed = jsonparse(req.body)
 					if (parsed.err) {
-						return next(parsed.err)
+						next(parsed.err)
+						return
 					}
 					req.body = parsed.value
 				} else if (type == 'application/x-www-form-urlencoded') {
@@ -98,5 +100,7 @@ process.on('SIGTERM', function() {
 	polka.server.connections.forEach(v => v.close())
 	polka.server.close()
 })
+
+if (process.env.PRIMARY) console.log('polka.route ->', polka.route);
 
 

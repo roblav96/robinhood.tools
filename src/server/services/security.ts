@@ -4,7 +4,7 @@ export * from '../../common/security'
 
 import * as http from 'http'
 import * as url from 'url'
-import * as boom from 'boom'
+import * as Boom from 'boom'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as security from '../../common/security'
@@ -26,22 +26,22 @@ export async function authorize(
 	required = (required || []).concat(['x-uuid', 'x-finger', 'user-agent', 'hostname', 'x-forwarded-for', 'x-real-ip'])
 	let missing = _.difference(required, keys)
 	if (missing.length > 0) {
-		throw boom.preconditionFailed('Missing security headers' + (process.env.DEVELOPMENT ? `: '${missing}'` : ''))
+		throw Boom.preconditionFailed('Missing security headers' + (process.env.DEVELOPMENT ? `: '${missing}'` : ''))
 	}
 
 	let host = url.parse(referer || origin).host
 	if (!host || host.indexOf(process.env.DOMAIN) != 0) {
 		let which = Object.keys(core.object.compact({ referer, origin }, true))[0]
-		throw boom.preconditionFailed('Invalid security header' + (process.env.DEVELOPMENT ? `: '${which}'` : ''))
+		throw Boom.preconditionFailed('Invalid security header' + (process.env.DEVELOPMENT ? `: '${which}'` : ''))
 	}
 
 	let split = doc.finger.split('.')
 	if (split.length != 2) {
-		throw boom.preconditionFailed('Invalid security header' + (process.env.DEVELOPMENT ? `: 'x-finger'` : ''))
+		throw Boom.preconditionFailed('Invalid security header' + (process.env.DEVELOPMENT ? `: 'x-finger'` : ''))
 	}
 	doc.finger = split[0]
 	if (Math.abs(Date.now() - Number.parseInt(split[1])) > 10000) {
-		throw boom.preconditionFailed('Expired security header' + (process.env.DEVELOPMENT ? `: 'x-finger'` : ''))
+		throw Boom.preconditionFailed('Expired security header' + (process.env.DEVELOPMENT ? `: 'x-finger'` : ''))
 	}
 
 	if (doc.token) {
