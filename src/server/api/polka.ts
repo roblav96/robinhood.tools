@@ -35,8 +35,8 @@ polka.use(function(req, res, next) {
 
 	Object.assign(res, {
 		// set code(this: any, code) { this.statusCode = code },
-		writeHead(this: any, code, headers) {
-			this.statusCode = code
+		writeHead(this: any, code, headers = {}) {
+			if (Number.isFinite(code)) this.statusCode = code;
 			Object.keys(headers).forEach(key => {
 				this.setHeader(key, headers[key])
 			})
