@@ -77,7 +77,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		clock.offListener(this._heartbeat)
 		if (!this.socket) return;
 		this.socket.close(1000)
-		if (process.SERVER) {
+		if (process.env.SERVER) {
 			this.socket.terminate()
 			this.socket.removeAllListeners()
 		}

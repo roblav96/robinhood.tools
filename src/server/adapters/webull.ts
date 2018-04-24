@@ -144,7 +144,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 			let tid = Number.parseInt(topic.tid)
 
 			let payload = JSON.parse(packet.payload.toString()) as Webull.Mqtt.Payload<Webull.Quote>
-			// if (!Array.isArray(payload.data) || payload.data.length == 0) return;
+			if (!Array.isArray(payload.data) || payload.data.length == 0) return;
 
 			let i: number, len = payload.data.length
 			for (i = 0; i < len; i++) {

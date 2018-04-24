@@ -4,9 +4,6 @@ export * from '../../common/http'
 
 import * as _ from '../../common/lodash'
 import * as url from 'url'
-import * as got from 'got'
-import * as retryable from 'is-retry-allowed'
-import * as boom from 'boom'
 import * as http from '../../common/http'
 
 

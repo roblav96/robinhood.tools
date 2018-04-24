@@ -9,7 +9,8 @@ import Emitter from './emitter'
 
 
 enum TICKS {
-	'100ms', '250ms', '500ms',
+	// '100ms',
+	'250ms', '500ms',
 	'1s', '2s', '3s', '5s', '10s', '15s', '30s',
 	'1m', '5m', '10m', '15m', '30m',
 	'1h', '2h', '3h', '6h', '12h',
@@ -49,7 +50,7 @@ function tickGenesis(tick: Clock.Tick) {
 	let now = Date.now()
 	let from = now - (now % ms)
 	let to = from + ms
-	let ims = process.CLIENT ? 0 : core.math.dispersed(ms, process.INSTANCE, process.INSTANCES)
+	let ims = process.env.CLIENT ? 0 : core.math.dispersed(ms, +process.env.INSTANCE, +process.env.INSTANCES)
 	let delay = (from + ims) - now
 	if (delay <= 0) delay = (to + ims) - now;
 	_.delay(startTicking, delay, tick, ms)

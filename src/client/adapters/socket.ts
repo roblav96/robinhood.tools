@@ -14,7 +14,7 @@ class Client {
 
 	socket = new WebSocketClient(this.address, {
 		query() { return qs.stringify(_.defaults(security.headers())) },
-		timeout: DEVELOPMENT ? '5s' : '1s',
+		timeout: process.env.DEVELOPMENT ? '5s' : '1s',
 		verbose: true,
 	})
 

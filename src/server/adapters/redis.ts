@@ -16,11 +16,11 @@ class Redis extends IORedis {
 			host: process.env.REDIS_HOST || '127.0.0.1',
 			port: (Number.parseInt(process.env.REDIS_PORT) || 6379) + offset,
 			password: process.env.REDIS_PASSWORD,
-			connectionName: '[' + process.INSTANCE + '][' + core.string.alphanumeric(process.NAME) + '][' + name + '][' + NODE_ENV + ']',
+			connectionName: '[' + process.env.INSTANCE + '][' + core.string.alphanumeric(process.env.NAME) + '][' + name + '][' + process.env.NODE_ENV + ']',
 			db: 0, dropBufferSupport: true,
 		} as IORedis.RedisOptions
 
-		if (PRODUCTION) {
+		if (process.env.PRODUCTION) {
 			options.path = '/var/run/redis_' + options.port + '.sock'
 			_.unset(options, 'host'); _.unset(options, 'port');
 		}

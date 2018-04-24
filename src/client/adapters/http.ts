@@ -2,10 +2,9 @@
 export * from '@/common/http'
 // 
 
+import url from 'url'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
-import got from 'got'
-import url from 'url'
 import * as security from '@/client/services/security'
 import * as http from '@/common/http'
 import vm from '@/client/vm'
@@ -32,7 +31,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		}
 
 		if (config.url[0] == '/') {
-			config.url = process.DOMAIN + '/api' + config.url
+			config.url = process.env.DOMAIN + '/api' + config.url
 			_.defaults(config.headers, security.headers())
 		}
 
@@ -42,14 +41,14 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 		// console.error('http error.message Error ->', error.message)
 		let message = _.get(error, 'statusMessage', error.message) as string
-		let payload = _.get(error, 'response.body') as Http.Payload
+		let payload = _.get(error, 'response.body')
 		if (payload && payload.message) {
 			let extra = payload.attributes ? JSON.stringify(payload.attributes) : payload.message
 			message += `: "${extra}"`
 		}
 
 		let method = _.get(error, 'method', config.method)
-		let url = _.get(error, 'url', config.url).replace(process.DOMAIN, '')
+		let url = _.get(error, 'url', config.url).replace(process.env.DOMAIN, '')
 		console.log('%c◀ ' + '[' + method + '] ' + url, 'color: red; font-weight: bolder;', message)
 		vm.$toast.open({ message: url + ' ➤ ' + message, type: 'is-danger' })
 

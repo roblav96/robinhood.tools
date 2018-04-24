@@ -18,10 +18,10 @@ export const routes = [
 		title: 'Crypto', icon: 'bitcoin',
 	},
 
-	{
-		name: 'symbol', path: '/symbol/:symbol',
-		component: () => import('@/client/routes/symbol/symbol'),
-	},
+	// {
+	// 	name: 'symbol', path: '/symbol/:symbol',
+	// 	component: () => import('@/client/routes/symbol/symbol'),
+	// },
 
 	{
 		name: 'styleguide', path: '/styleguide',

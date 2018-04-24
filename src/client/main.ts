@@ -1,20 +1,19 @@
 // 
 
 require('@/common/polyfills')
+// require('source-map-support').install()
+// import * as sourcemaps from 'source-map-support'
+// sourcemaps.install({
+// 	overrideRetrieveFile: true,
+// 	overrideRetrieveSourceMap:true,
+// })
 
-global.NODE_ENV = process.env.NODE_ENV || 'development'
-global.DEVELOPMENT = NODE_ENV == 'development'
-global.PRODUCTION = NODE_ENV == 'production'
 global.Promise = require('bluebird/js/browser/bluebird.core.js')
-
-process.NAME = process.env.NAME
-process.VERSION = process.env.VERSION
-process.DOMAIN = process.env.DOMAIN
-process.CLIENT = true
+{ (global.Promise as any).config({ warnings: { wForgottenReturn: false } }) }
 
 import * as _ from '@/common/lodash'
 Object.assign(console, { dtsgen: _.noop, dump: _.noop })
-// if (DEVELOPMENT) console.dtsgen = require('@/common/dtsgen').default;
+// if (process.env.DEVELOPMENT) console.dtsgen = require('@/common/dtsgen').default;
 
 import 'repaintless/repaintless-scss/repaintless.scss'
 import '@/client/styles/theme.scss'

@@ -1,7 +1,6 @@
 // 
-global.NODE_ENV = process.env.NODE_ENV || 'development'
-global.DEVELOPMENT = NODE_ENV == 'development'
-global.PRODUCTION = NODE_ENV == 'production'
+if (process.env.NODE_ENV == 'development') process.env.DEVELOPMENT = true;
+if (process.env.NODE_ENV == 'production') process.env.PRODUCTION = true;
 // 
 
 const webpack = require('webpack')
@@ -15,12 +14,9 @@ const package = require('./package.json')
 module.exports = {
 
 	outputDir: 'dist/client',
-	// dll: DEVELOPMENT,
+	dll: process.env.DEVELOPMENT,
 	css: { sourceMap: false },
-	vueLoader: {
-		hotReload: false,
-		// postcss: [require('tailwindcss')(path.resolve(process.cwd(), 'src/client/styles/tailwind.js'))],
-	},
+	vueLoader: { hotReload: false },
 
 	configureWebpack: function(config) {
 
@@ -28,7 +24,7 @@ module.exports = {
 		delete config.node.process
 		delete config.node.setImmediate
 
-		if (DEVELOPMENT) {
+		if (process.env.DEVELOPMENT) {
 			config.devtool = 'inline-source-map'
 			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/]))
 			config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
@@ -65,11 +61,13 @@ module.exports = {
 	chainWebpack: function(config) {
 
 		config.plugin('define').tap(function(args) {
+			args[0]['process.env'].CLIENT = `"${true}"`
+			args[0]['process.env'][process.env.NODE_ENV.toUpperCase()] = `"${true}"`
 			args[0]['process.env'].NAME = `"${package.name}"`
 			args[0]['process.env'].VERSION = `"${package.version}"`
-			args[0]['process.env'].DOMAIN = `"${(DEVELOPMENT ? 'http://dev.' : 'https://') + package.domain}"`
-			let env = dotenv.config({ path: path.resolve(process.cwd(), 'config/client.env') }).parsed || {}
-			Object.assign(env, dotenv.config({ path: path.resolve(process.cwd(), 'config/client.' + NODE_ENV + '.env') }).parsed || {})
+			args[0]['process.env'].DOMAIN = `"${(process.env.DEVELOPMENT ? 'http://dev.' : 'https://') + package.domain}"`
+			let env = dotenv.config({ path: path.resolve(process.cwd(), 'env/client.env') }).parsed || {}
+			Object.assign(env, dotenv.config({ path: path.resolve(process.cwd(), 'env/client.' + process.env.NODE_ENV + '.env') }).parsed || {})
 			Object.keys(env).forEach(k => args[0]['process.env'][k] = `"${env[k]}"`)
 			return args
 		})
@@ -90,7 +88,7 @@ module.exports = {
 
 }
 
-if (DEVELOPMENT) {
+if (process.env.DEVELOPMENT) {
 	const clc = require('cli-color')
 	setInterval(() => process.stdout.write(clc.erase.lineRight), 1000)
 }

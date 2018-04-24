@@ -218,7 +218,6 @@ export const object = {
 	sortKeys<T = object>(target: T): T {
 		return _.fromPairs(_.sortBy(_.toPairs(target as any))) as any
 	},
-	// pick<T>(target: T, keys?: KeysOf<T>): T { return _.pick(target, keys) as any },
 }
 
 
@@ -256,60 +255,5 @@ import { DurationObjectUnits } from 'luxon'
 export const time = {
 	UNITS: { 'ms': 'milliseconds', 's': 'seconds', 'm': 'minutes', 'h': 'hours' } as Dict<keyof DurationObjectUnits>,
 }
-
-
-
-
-
-// export function pRetry<T>(fn: (...args) => Promise<any>): T {
-// 	console.log('fn ->', fn)
-// 	console.dir(fn.__proto__.arguments)
-// 	return fn
-// }
-
-
-
-// import clock from './clock'
-// export function pRetry<T>(factory: () => Promise<T>, opts = {} as { times: number, tick: Clock.Tick }) {
-// 	let attempt = 0
-// 	opts.times = opts.times || Infinity
-// 	opts.tick = opts.tick || '10s'
-// 	return Promise.attempt()
-// 	return factory().catch(function(error) {
-// 		return factory()
-// 	})
-// }
-
-// export class PromiseRetry {
-
-// 	private static get options() {
-// 		return _.clone({
-// 			times: Infinity,
-// 			tick: '3s' as Clock.Tick,
-// 		})
-// 	}
-
-// 	constructor(
-// 		promise: Promise<any>,
-// 		options = {} as Partial<typeof PromiseRetry.options>,
-// 	) {
-// 		console.log('arguments ->', console.inspect(arguments))
-// 		return promise.catch(function(error) {
-// 			console.error('PromiseRetry Error ->', error)
-// 			// return promise.call(...arguments)
-// 		})
-// 	}
-
-// }
-
-
-
-// export const promise = {
-// 	retry<T = any>(wrapper: Promise<T>): Promise<T> {
-// 		return wrapper.then( function () {
-
-// 		} )
-// 	},
-// }
 
 

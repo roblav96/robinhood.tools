@@ -2,27 +2,25 @@
 
 
 
-declare const NODE_ENV: 'development' | 'production'
-declare const DEVELOPMENT: boolean
-declare const PRODUCTION: boolean
-
 declare namespace NodeJS {
-	export interface Global {
-		NODE_ENV: typeof NODE_ENV
-		DEVELOPMENT: typeof DEVELOPMENT
-		PRODUCTION: typeof PRODUCTION
-	}
 	export interface ProcessEnv {
-		NODE_ENV: typeof NODE_ENV
-	}
-	export interface Process {
-		NAME: string
-		VERSION: string
-		DOMAIN: string
-		CLIENT: boolean
-		SERVER: boolean
-		INSTANCES: number
-		INSTANCE: number
+		NODE_ENV: 'development' | 'production'
+		DEVELOPMENT: any // string // boolean
+		PRODUCTION: any // string // boolean
+		NAME: any // string
+		VERSION: any // string
+		DOMAIN: any // string
+		CLIENT: any // string // boolean
+		SERVER: any // string // boolean
+		PROJECT: any // string
+		HOST: any // string
+		PORT: any // string // number
+		MASTER: any // string // boolean
+		WORKER: any // string // boolean
+		PRIMARY: any // string // boolean
+		INSTANCES: any // string // number
+		INSTANCE: any // string // number
+		DEBUGGER: any // string // boolean
 	}
 }
 

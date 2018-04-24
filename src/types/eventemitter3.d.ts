@@ -1,7 +1,5 @@
 // 
 
-
-
 declare module 'eventemitter3' {
 
 	namespace EventEmitter3 {

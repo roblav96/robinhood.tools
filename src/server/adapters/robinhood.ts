@@ -14,7 +14,7 @@ export async function getAllSymbols() {
 }
 
 export async function getSymbols() {
-	let resolved = await redis.main.get(`${redis.RH.SYMBOLS}:${process.INSTANCES}:${process.INSTANCE}`)
+	let resolved = await redis.main.get(`${redis.RH.SYMBOLS}:${process.env.INSTANCES}:${process.env.INSTANCE}`)
 	return (resolved ? resolved.split(',') : []) as string[]
 }
 

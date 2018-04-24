@@ -136,16 +136,13 @@ declare global {
 			}
 		}
 
-		interface FullSymbol {
-			0: string
-			1: number
-		}
+		// interface FullSymbol {
+		// 	0: string
+		// 	1: number
+		// }
 
 		interface Ticker {
 			[key: string]: any
-			// change: number
-			// changeRatio: number
-			// close: number
 			currencyId: number
 			disExchangeCode: string
 			disSymbol: string
@@ -156,7 +153,6 @@ declare global {
 			fundSecType: number[]
 			listStatus: number
 			name: string
-			// price: number
 			regionAlias: string
 			regionAreaCode: string
 			regionId: number
@@ -173,7 +169,6 @@ declare global {
 			tickerType: number
 			tinyName: string
 			type: number
-			// volume: number
 		}
 
 		interface Quote {

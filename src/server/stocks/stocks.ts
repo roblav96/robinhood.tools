@@ -10,7 +10,6 @@ import * as http from '../adapters/http'
 import * as redis from '../adapters/redis'
 import * as webull from '../adapters/webull'
 import * as rhinstruments from './robinhood.instruments'
-import radio from '../adapters/radio'
 
 
 
@@ -26,10 +25,9 @@ mqtt.on('message', function(quote) {
 
 
 rhinstruments.rxready.subscribe(onLiveTickers)
-radio.on(onLiveTickers.name, onLiveTickers)
 async function onLiveTickers() {
 
-	if (process.WORKER) return;
+	if (process.env.WORKER) return;
 
 	// let fsymbols = (await redis.main.get(`${redis.SYMBOLS.STOCKS}:${process.INSTANCES}:${process.INSTANCE}`) as any) as Dict<number>
 	// fsymbols = JSON.parse(fsymbols as any)
