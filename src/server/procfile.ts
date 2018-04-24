@@ -28,7 +28,7 @@ module.exports = function(pandora: ProcfileReconcilerAccessor) {
 
 
 	const api = _.defaults({
-		INSTANCES: 2,
+		INSTANCES: 1,
 		DEBUGGER: true,
 	} as NodeJS.ProcessEnv, env)
 	pandora.process('api').env(api).scale(api.INSTANCES).nodeArgs(['--no-warnings'])

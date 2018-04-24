@@ -14,7 +14,7 @@
 		"rs": "npm run server:dev",
 		"server:dev": "rimraf dist/server && run-p server:watch server:onchange",
 		"server:watch": "tsc --project .server.tsconfig.json --watch",
-		"server:onchange": "onchange 'dist/server/**/*.js' --delay 500 -- pandora dev dist/server",
+		"server:onchange": "onchange 'dist/server/**/*.js' --delay 1000 -- pandora dev dist/server",
 		"cli:clear": "clear && printf \"\\e[3J\""
 	},
 	"dependencies": {
@@ -23,6 +23,7 @@
 		"boom": "latest",
 		"buefy": "latest",
 		"bulma": "latest",
+		"clusterws": "git://github.com/ClusterWS/ClusterWS.git#next",
 		"cookie": "latest",
 		"correcting-interval": "latest",
 		"cors": "latest",

@@ -11,7 +11,7 @@ export function config() {
 		json: true,
 		silent: true,
 		timeout: 10000,
-		retries: process.env.CLIENT ? 1 : 5,
+		retries: process.env.CLIENT ? 0 : 5,
 		retryTick: '5s',
 	} as Http.Config
 }
