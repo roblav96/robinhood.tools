@@ -4,7 +4,6 @@ import '../main'
 import { ServiceContextAccessor } from 'pandora/dist/service/ServiceContextAccessor'
 import * as pandora from 'pandora'
 import * as os from 'os'
-import polka from './polka.api'
 
 
 

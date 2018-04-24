@@ -14,7 +14,7 @@
 		"rs": "npm run server:dev",
 		"server:dev": "rimraf dist/server && run-p server:watch server:onchange",
 		"server:watch": "tsc --project .server.tsconfig.json --watch",
-		"server:onchange": "onchange 'dist/server/**/*.js' --delay 1000 -- pandora dev dist/server",
+		"server:onchange": "onchange 'dist/server/**/*.js' --delay 500 -- pandora dev dist/server",
 		"cli:clear": "clear && printf \"\\e[3J\""
 	},
 	"dependencies": {
@@ -29,7 +29,7 @@
 		"cors": "latest",
 		"cron": "latest",
 		"eventemitter3": "latest",
-		"fast-json-parse": "^1.0.3",
+		"fast-json-parse": "latest",
 		"fastest-validator": "latest",
 		"fingerprintjs2": "latest",
 		"got": "latest",
@@ -48,7 +48,7 @@
 		"p-event": "latest",
 		"p-forever": "latest",
 		"p-queue": "latest",
-		"pkg-up": "^2.0.0",
+		"pkg-up": "latest",
 		"polka": "latest",
 		"pretty-bytes": "latest",
 		"pretty-ms": "latest",

@@ -1,8 +1,5 @@
 // 
 
-import * as Bluebird from 'bluebird'
-Bluebird.config({ warnings: { wForgottenReturn: false } })
-
 import { Settings } from 'luxon'
 Settings.defaultZoneName = 'America/New_York'
 

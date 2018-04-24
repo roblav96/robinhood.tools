@@ -1,10 +1,12 @@
 // 
 
 import * as uws from 'uws'
+const clusterws = require('clusterws/dist')
+const uWebSocketServer = clusterws.uWebSocketServer as typeof uws.Server
 
 
 
-class WebSocketServer extends uws.Server {
+class WebSocketServer extends uWebSocketServer {
 
 	getSize() {
 		let total = 0

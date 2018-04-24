@@ -28,11 +28,18 @@ module.exports = function(pandora: ProcfileReconcilerAccessor) {
 
 
 	const api = _.defaults({
-		INSTANCES: 1,
+		INSTANCES: 4,
 		DEBUGGER: true,
 	} as NodeJS.ProcessEnv, env)
-	pandora.process('api').env(api).scale(api.INSTANCES).nodeArgs(['--no-warnings'])
+	pandora.process('api').order(1).env(api).scale(api.INSTANCES).nodeArgs(['--no-warnings'])
 	pandora.service('api', './api/api.js').process('api').publish(true)
+
+	const socket = _.defaults({
+		INSTANCES: 4,
+		DEBUGGER: true,
+	} as NodeJS.ProcessEnv, env)
+	pandora.process('socket').order(2).env(socket).scale(socket.INSTANCES).nodeArgs(['--no-warnings'])
+	pandora.service('socket', './socket/socket.js').process('socket').publish(true)
 
 
 

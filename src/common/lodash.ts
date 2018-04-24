@@ -26,6 +26,7 @@ export {
 	mean,
 	merge,
 	min,
+	mixin,
 	noop,
 	omit,
 	once,

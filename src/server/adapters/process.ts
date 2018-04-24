@@ -33,4 +33,6 @@ process.on('unhandledRejection', function(error) {
 	if (process.env.PRODUCTION) process.exit(1);
 })
 
+process.once('beforeExit', () => setTimeout(() => process.kill(process.pid), 300))
+
 
