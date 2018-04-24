@@ -32,19 +32,29 @@ const polka = Polka({
 
 polka.use(function(req, res, next) {
 	Object.assign(res, {
-		send(this: any, data: any) {
-			if (data.constructor == String || Buffer.isBuffer(data)) {
-				this.setHeader('Content-Length', data.length)
-				this.write(data)
-			} else if (data instanceof Object) {
-				let json = JSON.stringify(data)
-				this.setHeader('Content-Type', 'application/json')
-				this.setHeader('Content-Length', json.length)
-				this.write(json)
-			} else {
-				this.setHeader('Content-Length', 0)
-				this.write('')
+		writeHead(this: any, code, headers) {
+			this.statusCode = code
+			Object.keys(headers).forEach(key => {
+				this.setHeader(key, headers[key])
+			})
+		},
+		send(this: any, data) {
+			if (data != null) {
+				if (data.constructor == String || Buffer.isBuffer(data)) {
+					this.setHeader('Content-Length', data.length)
+					this.write(data)
+					return
+				}
+				if (data instanceof Object) {
+					let json = JSON.stringify(data)
+					this.setHeader('Content-Type', 'application/json')
+					this.setHeader('Content-Length', json.length)
+					this.write(json)
+					return
+				}
 			}
+			this.setHeader('Content-Length', 0)
+			this.write('')
 		},
 	})
 	next()
