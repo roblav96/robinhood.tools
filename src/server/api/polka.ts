@@ -1,6 +1,6 @@
 // 
 
-import * as _ from '../../common/lodash'
+import * as pandora from 'pandora'
 import * as qs from 'querystring'
 import * as Polka from 'polka'
 import * as boom from 'boom'
@@ -11,10 +11,6 @@ import * as jsonparse from 'fast-json-parse'
 
 const polka = Polka({
 	server: turbo.createServer(),
-
-	onNoMatch(req, res) {
-		polka.onError(boom.notFound(req.path), req, res)
-	},
 
 	onError(error, req, res, next) {
 		if (!error.isBoom) error = new boom(error);
@@ -28,10 +24,18 @@ const polka = Polka({
 		res.send(error.output.payload)
 	},
 
+	onNoMatch(req, res) {
+		polka.onError(boom.notFound(req.path), req, res)
+	},
+
 })
 
 polka.use(function(req, res, next) {
+
 	Object.assign(res, {
+		set code(this: any, code) {
+			this.statusCode = code
+		},
 		writeHead(this: any, code, headers) {
 			this.statusCode = code
 			Object.keys(headers).forEach(key => {
@@ -57,10 +61,7 @@ polka.use(function(req, res, next) {
 			this.write('')
 		},
 	})
-	next()
-})
 
-polka.use(function(req, res, next) {
 	Object.assign(req, {
 		ondata(this: any, buffer, start, length) {
 			if (!this.body) this.body = [];
@@ -83,8 +84,19 @@ polka.use(function(req, res, next) {
 			next()
 		},
 	})
+
 })
 
 export default polka
+
+setImmediate(async function() {
+	await polka.listen(+process.env.PORT, process.env.HOST)
+	console.info('polka listening ->', process.env.HOST + ':' + process.env.PORT)
+})
+
+process.on('SIGTERM', function() {
+	polka.server.connections.forEach(v => v.close())
+	polka.server.close()
+})
 
 
