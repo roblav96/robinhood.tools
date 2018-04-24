@@ -15,7 +15,6 @@ declare namespace NodeJS {
 		PROJECT: any // string
 		HOST: any // string
 		PORT: any // string // number
-		WSPORT: any // string // number
 		MASTER: any // string // boolean
 		WORKER: any // string // boolean
 		PRIMARY: any // string // boolean

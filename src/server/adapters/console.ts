@@ -1,5 +1,7 @@
 // 
 
+import * as pandora from 'pandora'
+
 
 
 import * as util from 'util'
@@ -27,7 +29,8 @@ for (i = 0; i < len; i++) {
 			let square = chalk[color + 'Bright']('█') as string
 			if (method == 'error') color = color + 'Bright';
 			let file = chalk.bold(`${chalk[color](site.fileName)}:${site.line}`)
-			let output = `${square}[${file}]${site.callee}[${chalk.grey(stamp)}]`
+			let name = pandora.processName
+			let output = `${square}[${file}]${site.callee}[${process.env.INSTANCE}][${name}][${chalk.grey(stamp)}]`
 			process.stdout.write(`\r\n${chalk.underline(output)}\r\n`)
 			_console[method].apply(console, args)
 			process.stdout.write(`\r\n`)
@@ -37,13 +40,11 @@ for (i = 0; i < len; i++) {
 
 
 
-import * as pandora from 'pandora'
 import * as inspector from 'inspector'
 if (process.env.DEBUGGER) {
 	let offset = pandora.processContext.context.processRepresentation.offset
 	inspector.open(process.debugPort + offset + +process.env.INSTANCE)
-	process.once('beforeExit', function() {
-		// if (process.env.PRIMARY) console.clear();
+	process.on('SIGTERM', function() {
 		inspector.close()
 	})
 }

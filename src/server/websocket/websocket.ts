@@ -24,8 +24,7 @@ wss.on('connection', function(client) {
 
 
 setTimeout(function() {
-	let port = +process.env.PORT + os.cpus().length
-	let address = 'ws://' + process.env.HOST + ':' + port
+	let address = 'ws://' + process.env.HOST + ':' + +process.env.PORT
 	let ws = new WebSocketClient(address)
 	ws.on('open', function() {
 		console.log('opened')

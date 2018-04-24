@@ -5,6 +5,7 @@ import * as Bluebird from 'bluebird'
 declare global {
 	
 	interface PromiseConstructor {
+		config: any
 		delay(ms: number): Promise<void>
 	}
 

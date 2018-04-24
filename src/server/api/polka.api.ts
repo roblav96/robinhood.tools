@@ -9,32 +9,13 @@ import * as jsonparse from 'fast-json-parse'
 
 
 
-const server = turbo.createServer(function(req, res) {
-	Object.assign(res, {
-		send(this: any, data: any) {
-			if (data.constructor == String || Buffer.isBuffer(data)) {
-				this.setHeader('Content-Length', data.length)
-				this.write(data)
-			} if (data instanceof Object) {
-				let json = JSON.stringify(data)
-				this.setHeader('Content-Type', 'application/json')
-				this.setHeader('Content-Length', json.length)
-				this.write(json)
-			} else {
-				this.setHeader('Content-Length', 0)
-				this.write('')
-			}
-		},
-	})
-})
-
-
-
 const polka = Polka({
-	server,
-	onNoMatch: function(req, res) {
+	server: turbo.createServer(),
+
+	onNoMatch(req, res) {
 		polka.onError(boom.notFound(req.path), req, res)
 	},
+
 	onError(error, req, res, next) {
 		if (!error.isBoom) error = new boom(error);
 		if (error.data) {
@@ -46,9 +27,28 @@ const polka = Polka({
 		})
 		res.send(error.output.payload)
 	},
+
 })
 
-
+polka.use(function(req, res, next) {
+	Object.assign(res, {
+		send(this: any, data: any) {
+			if (data.constructor == String || Buffer.isBuffer(data)) {
+				this.setHeader('Content-Length', data.length)
+				this.write(data)
+			} else if (data instanceof Object) {
+				let json = JSON.stringify(data)
+				this.setHeader('Content-Type', 'application/json')
+				this.setHeader('Content-Length', json.length)
+				this.write(json)
+			} else {
+				this.setHeader('Content-Length', 0)
+				this.write('')
+			}
+		},
+	})
+	next()
+})
 
 polka.use(function(req, res, next) {
 	Object.assign(req, {
@@ -74,8 +74,6 @@ polka.use(function(req, res, next) {
 		},
 	})
 })
-
-
 
 export default polka
 
