@@ -9,7 +9,6 @@ import * as pkgup from 'pkg-up'
 
 
 
-const CPUS = os.cpus().length
 const PROJECT = path.dirname(pkgup.sync())
 const PACKAGE = require(path.join(PROJECT, 'package.json'))
 
@@ -28,7 +27,7 @@ module.exports = function(pandora: ProcfileReconcilerAccessor) {
 
 
 	const api = _.defaults({
-		INSTANCES: 4,
+		INSTANCES: 2, // os.cpus().length,
 		DEBUGGER: true,
 	} as NodeJS.ProcessEnv, env)
 	pandora.process('api').entry('./api/api.main.js').nodeArgs(['--no-warnings']).env(api).scale(api.INSTANCES)
