@@ -1,9 +1,9 @@
 // 
 
 import '../main'
+import './socket.api'
 import * as pandora from 'pandora'
 import polka from './polka.api'
-import './socket.api'
 
 
 

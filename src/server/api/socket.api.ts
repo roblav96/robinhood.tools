@@ -9,27 +9,25 @@ import * as uws from 'uws'
 
 
 
-const PORT = +process.env.PORT + os.cpus().length
-console.log('PORT ->', PORT)
 const wss = new WebSocketServer({
-	host: process.env.HOST, port: PORT,
+	host: process.env.HOST,
+	port: +process.env.PORT + os.cpus().length,
 	path: `websocket/${process.env.INSTANCE}`,
 
 	verifyClient(incoming, next) {
-		console.log('incoming ->', incoming)
+		// console.log('incoming ->', incoming)
 		next(true)
 	},
 
 })
 
-wss.on('listening', function() { console.info('listening ->', PORT) })
+wss.on('listening', function() { console.info('wss listening ->', wss.httpServer.address().port) })
 process.on('SIGTERM', function() { wss.httpServer.close() })
 
-wss.on('error', function(error) { console.error('wss.on Error ->', error) })
+wss.on('error', function(error) { console.error('wss Error ->', error) })
 
-wss.on('connection', function(client, request) {
-	// console.log('client ->', client)
-	console.log('request ->', request)
+wss.on('connection', function(client) {
+	
 })
 
 
@@ -63,7 +61,7 @@ setImmediate(function() {
 	// let address = `ws://${process.env.HOST}:${PORT}/websocket/${process.env.INSTANCE}`
 	let address = `ws://${process.env.DOMAIN}/websocket/${process.env.INSTANCE}`
 	let ws = new WebSocketClient(address, {
-		verbose: true,
+		// verbose: true,
 	})
 	ws.on('message', function(message) { console.log('onmessage ->', message) })
 	ws.on('open', function() { console.info('onopen ->', address) })
