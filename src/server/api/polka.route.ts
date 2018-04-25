@@ -6,7 +6,7 @@ import polka from './polka'
 
 Object.assign(polka, {
 	route(this: any, opts: {
-		method: 'GET' | 'POST' | 'PUT' | 'HEAD' | 'DELETE'
+		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
 		pattern: string
 		validator?: never // WIP
 		handler: (req, res) => void

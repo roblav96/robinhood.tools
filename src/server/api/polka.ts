@@ -1,9 +1,11 @@
 // 
 
 import * as pandora from 'pandora'
+import * as onexit from 'exit-hook'
 import * as qs from 'querystring'
 import * as Polka from 'polka'
 import * as Boom from 'boom'
+import * as http from 'http'
 import * as turbo from 'turbo-http'
 import * as jsonparse from 'fast-json-parse'
 
@@ -34,7 +36,6 @@ const polka = Polka({
 polka.use(function(req, res, next) {
 
 	Object.assign(res, {
-		// set code(this: any, code) { this.statusCode = code },
 		writeHead(this: any, code, headers = {}) {
 			if (Number.isFinite(code)) this.statusCode = code;
 			Object.keys(headers).forEach(key => {
@@ -62,6 +63,13 @@ polka.use(function(req, res, next) {
 			this.write(data)
 		},
 	})
+
+	// req.headers = {} as any
+	// req.rawHeaders = req._options.headers
+	// let i: number, len = req.rawHeaders.length
+	// for (i = 0; i < len; i += 2) {
+	// 	req.headers[req.rawHeaders[i]] = req.rawHeaders[i + 1]
+	// }
 
 	Object.assign(req, {
 		ondata(this: any, buffer, start, length) {
@@ -91,16 +99,18 @@ polka.use(function(req, res, next) {
 
 export default polka
 
-setImmediate(async function() {
-	await polka.listen(+process.env.PORT, process.env.HOST)
-	console.info('polka listening ->', process.env.HOST + ':' + process.env.PORT)
+setImmediate(function() {
+	polka.listen(+process.env.PORT, process.env.HOST).then(function() {
+		console.info('polka listening ->', process.env.HOST + ':' + process.env.PORT)
+	}).catch(function(error) {
+		console.error('polka listen Error ->', error)
+	})
 })
 
-process.on('SIGTERM', function() {
+onexit(function() {
 	polka.server.connections.forEach(v => v.close())
 	polka.server.close()
 })
 
-if (process.env.PRIMARY) console.log('polka.route ->', polka.route);
 
 

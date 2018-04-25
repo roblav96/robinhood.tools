@@ -88,9 +88,4 @@ module.exports = {
 
 }
 
-if (process.env.DEVELOPMENT) {
-	const clc = require('cli-color')
-	setInterval(() => process.stdout.write(clc.erase.lineRight), 1000)
-}
-
 

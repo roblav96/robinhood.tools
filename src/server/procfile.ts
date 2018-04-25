@@ -49,7 +49,4 @@ module.exports = function(pandora: ProcfileReconcilerAccessor) {
 
 }
 
-import * as clc from 'cli-color'
-if (process.env.DEVELOPMENT) setInterval(() => process.stdout.write(clc.erase.lineRight), 1000);
-
 

@@ -3,6 +3,7 @@
 const WebSocketServer = require('clusterws/dist').uWebSocketServer as typeof uws.Server
 import WebSocketClient from '../../common/websocket.client'
 import * as _ from '../../common/lodash'
+import * as onexit from 'exit-hook'
 import * as os from 'os'
 import * as http from 'http'
 import * as uws from 'uws'
@@ -22,14 +23,15 @@ const wss = new WebSocketServer({
 })
 
 wss.on('listening', function() { console.info('wss listening ->', wss.httpServer.address().port) })
-process.on('SIGTERM', function() { wss.httpServer.close() })
+onexit(function() { wss.httpServer.close() })
 
 wss.on('error', function(error) { console.error('wss Error ->', error) })
 
 wss.on('connection', function(client) {
-	
+
 })
 
+export default wss
 
 
 // process.on('SIGTERM', function() { wss.httpServer.close() })
@@ -37,10 +39,6 @@ wss.on('connection', function(client) {
 // 	if (error) return console.error('listen Error ->', error);
 // 	console.info('listening ->', process.env.PORT)
 // })
-
-
-
-export default wss
 
 
 

@@ -41,12 +41,11 @@ for (i = 0; i < len; i++) {
 
 
 import * as inspector from 'inspector'
+import * as onexit from 'exit-hook'
 if (process.env.DEBUGGER) {
 	let offset = pandora.processContext.context.processRepresentation.offset
 	inspector.open(process.debugPort + offset + +process.env.INSTANCE)
-	process.on('SIGTERM', function() {
-		inspector.close()
-	})
+	onexit(function() { inspector.close() })
 }
 declare global { namespace NodeJS { export interface Process { debugPort: number } } }
 

@@ -36,8 +36,4 @@ process.on('unhandledRejection', function(error) {
 	if (process.env.PRODUCTION) process.exit(1);
 })
 
-process.on('SIGTERM', function() {
-	setTimeout(() => process.exit(0), 500)
-})
-
 

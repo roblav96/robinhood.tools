@@ -33,3 +33,16 @@ interface Dict<T = any> {
 }
 
 
+
+interface WebpackRequireContext {
+	(file: string): void
+	id: string
+	name: string
+	resolve: RequireResolve
+	keys: () => string[]
+}
+interface NodeRequire {
+	context: (path: string, descending: boolean, regex: RegExp) => WebpackRequireContext
+}
+
+
