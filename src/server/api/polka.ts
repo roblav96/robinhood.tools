@@ -64,13 +64,6 @@ polka.use(function(req, res, next) {
 		},
 	})
 
-	// req.headers = {} as any
-	// req.rawHeaders = req._options.headers
-	// let i: number, len = req.rawHeaders.length
-	// for (i = 0; i < len; i += 2) {
-	// 	req.headers[req.rawHeaders[i]] = req.rawHeaders[i + 1]
-	// }
-
 	Object.assign(req, {
 		ondata(this: any, buffer, start, length) {
 			if (!this.body) this.body = [];
