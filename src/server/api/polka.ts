@@ -20,14 +20,14 @@ const polka = Polka({
 			console.error('polka Error ->', error)
 			error = new Boom(error)
 		} else {
-			console.error('polka Error ->', error.output.payload.error, error.message, error.output, error.data || '')
+			if (error.data) Object.assign(error.output.payload, { attributes: error.data });
+			console.error('polka Error ->', error.output.payload.error, error.message, error.output)
 		}
-		if (res.headerSent) return next();
+		if (res.headerSent) return;
 		res.statusCode = error.output.statusCode
 		Object.keys(error.output.headers).forEach(function(key) {
 			res.setHeader(key, error.output.headers[key])
 		})
-		if (error.data) Object.assign(error.output.payload, { attributes: error.data });
 		res.send(error.output.payload)
 	},
 
@@ -48,6 +48,7 @@ Object.assign(polka, {
 	route(this: any, opts: {
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
 		url: string
+		authed?: boolean
 		schema?: {
 			query: any
 			body: any
@@ -60,6 +61,9 @@ Object.assign(polka, {
 				validate[key] = new FastestValidator().compile(opts.schema[key])
 			})
 			this.use(opts.url, function(req, res, next) {
+				if (opts.authed && !req.authed) {
+					return next(Boom.unauthorized())
+				}
 				let keys = Object.keys(validate)
 				let i: number, len = keys.length
 				for (i = 0; i < len; i++) {

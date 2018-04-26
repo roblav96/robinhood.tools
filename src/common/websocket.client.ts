@@ -79,6 +79,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.socket.close(1000)
 		if (process.env.SERVER) {
 			this.socket.terminate()
+			this.socket.removeAllListeners()
 		}
 		this.socket = null
 	}
@@ -92,19 +93,11 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	connect() {
 		this.terminate()
 		let address = this.options.query ? `${this.address}?${this.options.query()}` : this.address
-		this.socket = new WebSocket(address) as any
-		if (process.env.CLIENT) {
-			this.socket.onopen = this._onopen as any
-			this.socket.onclose = this._onclose as any
-			this.socket.onerror = this._onerror as any
-			this.socket.onmessage = this._onmessage as any
-		}
-		if (process.env.SERVER) {
-			this.socket.on('open', this._onopen)
-			this.socket.on('close', this._onclose)
-			this.socket.on('error', this._onerror)
-			this.socket.on('message', this._onmessage)
-		}
+		this.socket = new uws(address) as any
+		this.socket.onopen = this._onopen as any
+		this.socket.onclose = this._onclose as any
+		this.socket.onerror = this._onerror as any
+		this.socket.onmessage = this._onmessage as any
 		this._reconnect()
 	}
 
@@ -125,9 +118,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	private _onerror = (error: Error) => {
 		let message = (error.message || error) as string
-		if (message != 'uWs client connection error') {
-			console.error(this.name, 'onerror Error ->', message)
-		}
+		console.error(this.name, 'onerror Error ->', message)
 		this.emit('error', error)
 	}
 

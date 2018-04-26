@@ -1,9 +1,9 @@
 // 
 
 import { CookieSerializeOptions } from 'cookie'
-import polka from './polka'
 import * as redis from '../adapters/redis'
 import * as security from '../adapters/security'
+import polka from './polka'
 
 
 

@@ -1,6 +1,5 @@
 // 
 
-const WebSocketServer = require('clusterws/dist').uWebSocketServer as typeof uws.Server
 import WebSocketClient from '../../common/websocket.client'
 import * as _ from '../../common/lodash'
 import * as onexit from 'exit-hook'
@@ -10,7 +9,7 @@ import * as uws from 'uws'
 
 
 
-const wss = new WebSocketServer({
+const wss = new uws.Server({
 	host: process.env.HOST,
 	port: +process.env.PORT + os.cpus().length,
 	path: `websocket/${process.env.INSTANCE}`,
@@ -27,8 +26,22 @@ onexit(function() { wss.httpServer.close() })
 
 wss.on('error', function(error) { console.error('wss Error ->', error) })
 
-wss.on('connection', function(client, req) {
+wss.on('connection', function(client: uws.WebSocket, req: http.IncomingMessage) {
 	// console.log('req.headers ->', req.headers)
+
+	client.on('message', function(message: string) {
+		if (message == 'pong') return;
+		if (message == 'ping') return client.send('pong');
+		client.close(1003, 'Sending messages via the client not allowed!')
+	})
+
+	client.on('close', function(code, reason) {
+		client.terminate()
+		client.removeAllListeners()
+	})
+
+	client.on('error', function(error) { console.error('client Error ->', error) })
+
 })
 
 export default wss
@@ -56,7 +69,6 @@ declare module 'uws' {
 
 
 setImmediate(function() {
-	// let address = `ws://${process.env.HOST}:${+process.env.PORT + os.cpus().length}/websocket/${process.env.INSTANCE}`
 	let address = `ws://${process.env.DOMAIN}/websocket/${process.env.INSTANCE}`
 	let ws = new WebSocketClient(address, {
 		// verbose: true,
