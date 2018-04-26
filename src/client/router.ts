@@ -14,7 +14,7 @@ export const routes = [
 	},
 
 	{
-		title: 'Portfolio', icon: 'wunderlist',
+		title: 'Portfolio', icon: 'chart-pie',
 		name: 'portfolio', path: '/portfolio',
 	},
 
@@ -26,6 +26,11 @@ export const routes = [
 	{
 		title: 'Screener', icon: 'radar',
 		name: 'screener', path: '/screener',
+	},
+
+	{
+		title: 'Indexes', icon: 'flag-variant',
+		name: 'indexes', path: '/indexes',
 	},
 
 	{

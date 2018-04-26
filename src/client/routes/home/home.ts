@@ -23,8 +23,8 @@ export default class extends Vue {
 		desc: 'Transaction feed informs you on who\'s buying long and selling short.',
 	}, {
 		icon: 'newspaper',
-		title: 'News Feed',
-		desc: 'Our bots aggregate articles 24/7 allowing you to be the first reader.',
+		title: 'News Articles',
+		desc: 'Our bots aggregate media 24/7 allowing you to be the first reader.',
 		// }, {
 		// 	icon: '____',
 		// 	title: '____',

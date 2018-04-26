@@ -12,7 +12,7 @@ import * as http from '@/client/adapters/http'
 export default class extends Vue {
 
 	mounted() {
-		this.sync()
+		// this.sync()
 		// if (process.env.DEVELOPMENT) (this.$refs.searchbar_input as HTMLElement).focus();
 	}
 
@@ -32,10 +32,10 @@ export default class extends Vue {
 	}
 
 	onfocus(event: Event) {
-		console.log('event ->', event)
+		console.log('onfocus ->', event)
 	}
 	onblur(event: Event) {
-		console.log('event ->', event)
+		console.log('onblur ->', event)
 	}
 
 	onselect(result) {

@@ -10,8 +10,10 @@ import Vue from 'vue'
 export default class extends Vue {
 
 	created() {
-		
+
 	}
+
+	get symbol() { return this.$route.params.symbol }
 
 }
 
