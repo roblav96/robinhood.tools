@@ -29,8 +29,8 @@ $blue: #3490DC;
 $purple: #9561E2;
 $red: #E3342F;
 $pink: #F66D9B;
-// $rhgreen: #21CE99;
-// $rhred: #F45531;
+$rhgreen: #21CE99;
+$rhred: #F45531;
 // 
 $primary: $purple;
 $secondary: $cyan;
@@ -58,11 +58,12 @@ $fullhd: 1408px;
 // 
 $colors: map-merge($colors, ('secondary':($secondary, $white)));
 $colors: map-merge($colors, ('accent':($accent, $white)));
-// $colors: map-merge($colors, ('rhgreen':($rhgreen, $white)));
-// $colors: map-merge($colors, ('rhred':($rhred, $white)));
+$colors: map-merge($colors, ('rhgreen':($rhgreen, $white)));
+$colors: map-merge($colors, ('rhred':($rhred, $white)));
 // 
 $body-background-color: $white-ter;
 $footer-background-color: $white;
+// $hr-background-color: $grey-lighter;
 // $button-disabled-opacity: 0.33;
 // 
 $link-visited: $pink;

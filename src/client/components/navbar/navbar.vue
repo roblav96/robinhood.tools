@@ -28,7 +28,7 @@ span.navbar-burger.burger > span {
 					<b-input class="" type="search" placeholder="Search anything..." icon="magnify" />
 				</b-field>
 
-				<span class="navbar-burger burger px-6" :class="{ 'is-active': isMobileMenu }" v-on:click="isMobileMenu = !isMobileMenu">
+				<span class="navbar-burger burger" :class="{ 'is-active': isMobileMenu }" v-on:click="isMobileMenu = !isMobileMenu">
 					<span></span>
 					<span></span>
 					<span></span>
@@ -37,13 +37,15 @@ span.navbar-burger.burger > span {
 
 			<div class="navbar-menu" :class="{ 'is-active': isMobileMenu }">
 				<div class="navbar-start">
-					<a class="navbar-item flex items-center">
-						<img class=" mr-2" src="@/assets/robinhood-logo.svg" alt="Robinhood">
-						<span>Login</span>
-					</a>
 					<router-link class="navbar-item flex items-center" v-for="route in routes" :key="route.name" :to="{ name: route.name }">
 						<b-icon class="mr-2" :icon="route.icon" />
 						<span>{{ route.title }}</span>
+					</router-link>
+				</div>
+				<div class="navbar-end">
+					<router-link class="navbar-item flex items-center" :to="{ name: 'login' }">
+						<img class="image is-24x24 mr-2" src="@/assets/robinhood-logo.svg" alt="Robinhood"></img>
+						<span class="has-text-rhgreen">Login</span>
 					</router-link>
 				</div>
 			</div>

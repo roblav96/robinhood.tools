@@ -33,6 +33,10 @@ export const routes = [
 		name: 'news', path: '/news',
 	},
 
+	{
+		name: 'login', path: '/login',
+	},
+
 	// {
 	// 	title: 'Crypto', icon: 'bitcoin',
 	// 	name: 'crypto', path: '/crypto',

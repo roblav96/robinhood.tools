@@ -15,8 +15,8 @@
 					<button class="button is-large is-primary">primary</button>
 					<button class="button is-large is-secondary">secondary</button>
 					<button class="button is-large is-accent">accent</button>
-					<!-- <button class="button is-large is-rhgreen">rhgreen</button> -->
-					<!-- <button class="button is-large is-rhred">rhred</button> -->
+					<button class="button is-large is-rhgreen">rhgreen</button>
+					<button class="button is-large is-rhred">rhred</button>
 					<hr>
 					<button class="button is-large is-info">info</button>
 					<button class="button is-large is-success">success</button>
@@ -38,8 +38,8 @@
 					<button class="button is-large is-inverted is-primary">primary</button>
 					<button class="button is-large is-inverted is-secondary">secondary</button>
 					<button class="button is-large is-inverted is-accent">accent</button>
-					<!-- <button class="button is-large is-inverted is-rhgreen">rhgreen</button> -->
-					<!-- <button class="button is-large is-inverted is-rhred">rhred</button> -->
+					<button class="button is-large is-inverted is-rhgreen">rhgreen</button>
+					<button class="button is-large is-inverted is-rhred">rhred</button>
 					<hr>
 					<button class="button is-large is-inverted is-info">info</button>
 					<button class="button is-large is-inverted is-success">success</button>

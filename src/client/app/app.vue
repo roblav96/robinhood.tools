@@ -13,7 +13,7 @@
 
 		<router-view></router-view>
 
-		<footer class="footer py-4">
+		<footer class="footer py-12">
 			<div class="container">
 				<div class="content has-text-centered">
 					<a class="button" href="https://github.com/roblav96/robinhood.tools" target="_blank">
@@ -22,7 +22,7 @@
 					</a>
 				</div>
 
-				<template v-show="v_development">
+				<template v-show="development">
 					<div class="tabs is-toggle is-centered">
 						<ul>
 							<router-link tag="li" v-for="route in routes" :key="route.name" :to="{ name: route.name }">
