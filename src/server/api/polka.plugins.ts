@@ -1,12 +1,11 @@
 // 
 
-import * as _ from '../../common/lodash'
 import polka from './polka'
 
 
 
 polka.use(function(req, res, next) {
-	// res.setHeader('Access-Control-Allow-Credentials', 'true')
+	// res.setHeader('Access-Control-Allow-Credentials', 'false')
 	// res.setHeader('Access-Control-Expose-Headers', '*')
 	// res.setHeader('Access-Control-Allow-Headers', '*')
 	res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')

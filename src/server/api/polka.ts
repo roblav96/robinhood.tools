@@ -1,6 +1,5 @@
 // 
 
-import * as pandora from 'pandora'
 import * as onexit from 'exit-hook'
 import * as qs from 'querystring'
 import * as Polka from 'polka'
@@ -92,12 +91,9 @@ polka.use(function(req, res, next) {
 
 export default polka
 
-setImmediate(function() {
-	polka.listen(+process.env.PORT, process.env.HOST).then(function() {
-		console.info('polka listening ->', process.env.HOST + ':' + process.env.PORT)
-	}).catch(function(error) {
-		console.error('polka listen Error ->', error)
-	})
+setImmediate(async function() {
+	await polka.listen(+process.env.PORT, process.env.HOST)
+	console.info('polka listening ->', process.env.HOST + ':' + process.env.PORT)
 })
 
 onexit(function() {

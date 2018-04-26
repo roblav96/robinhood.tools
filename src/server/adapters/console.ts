@@ -1,7 +1,5 @@
 // 
 
-import * as pandora from 'pandora'
-
 
 
 import * as util from 'util'
@@ -11,6 +9,7 @@ Object.assign(util.inspect.styles, { string: 'green', regexp: 'green', date: 'gr
 
 
 import chalk from 'chalk'
+import * as pandora from 'pandora'
 import * as luxon from 'luxon'
 import * as StackTracey from 'stacktracey'
 const _console = {} as typeof console

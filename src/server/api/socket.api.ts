@@ -27,8 +27,8 @@ onexit(function() { wss.httpServer.close() })
 
 wss.on('error', function(error) { console.error('wss Error ->', error) })
 
-wss.on('connection', function(client) {
-
+wss.on('connection', function(client, request) {
+	console.log('request.headers ->', request.headers)
 })
 
 export default wss
@@ -56,15 +56,15 @@ declare module 'uws' {
 
 
 setImmediate(function() {
-	// let address = `ws://${process.env.HOST}:${PORT}/websocket/${process.env.INSTANCE}`
+	// let address = `ws://${process.env.HOST}:${+process.env.PORT + os.cpus().length}/websocket/${process.env.INSTANCE}`
 	let address = `ws://${process.env.DOMAIN}/websocket/${process.env.INSTANCE}`
 	let ws = new WebSocketClient(address, {
 		// verbose: true,
 	})
-	ws.on('message', function(message) { console.log('onmessage ->', message) })
-	ws.on('open', function() { console.info('onopen ->', address) })
-	ws.on('close', function(code, reason) { console.warn('onclose ->', code, reason) })
-	ws.on('error', function(error) { console.error('onerror ->', error) })
+	ws.on('message', function onmessage(message) { console.log('onmessage ->', message) })
+	ws.on('open', function onopen() { console.info('onopen ->', address) })
+	ws.on('close', function onclose(code, reason) { console.warn('onclose ->', code, reason) })
+	ws.on('error', function onerror(error) { console.error('onerror ->', error) })
 })
 
 
