@@ -11,24 +11,24 @@ export default class extends Vue {
 
 	boxes = [{
 		icon: 'clock-fast',
-		title: 'Real-Time Everything',
-		desc: `Absolutely everything displayed reflects the most recent information.`,
+		title: 'Real-Time',
+		desc: 'Absolutely everything displayed reflects the most recent information.',
 	}, {
 		icon: 'scale-balance',
 		title: 'Bid/Ask Quotes',
-		desc: `Make accurate trades by knowing the supply/demand of an asset.`,
+		desc: 'Make accurate trades by knowing the supply/demand of an asset.',
 	}, {
 		icon: 'backburger',
-		title: 'Last Sale',
-		desc: `____`,
+		title: 'Last Sale History',
+		desc: 'Transaction feed informs you on who\'s buying long and selling short.',
 	}, {
-		icon: '____',
-		title: '____',
-		desc: `____`,
-	}, {
-		icon: '____',
-		title: '____',
-		desc: `____`,
+		icon: 'newspaper',
+		title: 'News Feed',
+		desc: 'Our bots aggregate articles 24/7 allowing you to be the first reader.',
+		// }, {
+		// 	icon: '____',
+		// 	title: '____',
+		// 	desc: '____',
 	}]
 
 }
