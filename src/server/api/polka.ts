@@ -21,7 +21,7 @@ const polka = Polka({
 			error = new Boom(error)
 		} else {
 			if (error.data) Object.assign(error.output.payload, { attributes: error.data });
-			console.error('polka Error ->', error.output.payload.error, error.message, error.output)
+			console.warn('polka onError ->', error.output.payload) // error.output.payload.error, error.message, error.output.payload)
 		}
 		if (res.headerSent) return;
 		res.statusCode = error.output.statusCode
