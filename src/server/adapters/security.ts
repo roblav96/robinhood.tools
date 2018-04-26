@@ -22,8 +22,6 @@ export async function authorize(
 	},
 ) {
 	let authed = false
-	
-	console.log('arguments ->', arguments)
 
 	required = (required || []).concat(['x-uuid', 'x-finger', 'user-agent', 'hostname', 'x-forwarded-for', 'x-real-ip'])
 	let missing = _.difference(required, keys)

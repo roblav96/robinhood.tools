@@ -60,13 +60,9 @@ function finger(): Promise<void> {
 	})
 }
 
-function token(): Promise<string[]> {
-	// return http.get('/security/token').catch(function(error) {
-	return http.post('/security/token', { uuid: doc.uuid }, {
-		query: { finger: doc.finger },
-	}).catch(function(error) {
-		// console.error('token Error ->', error.message)
-		return clock.toPromise('10s').then(token)
+function token(): Promise<void> {
+	return http.get('/security/token').catch(function(error) {
+		return clock.toPromise('5s').then(token)
 	})
 }
 

@@ -5,7 +5,7 @@ import * as _ from '@/common/lodash'
 import Emitter from '@/common/emitter'
 import WebSocketClient from '@/common/websocket.client'
 import qs from 'querystring'
-import * as security from '../services/security'
+import * as security from '../adapters/security'
 import * as http from './http'
 
 

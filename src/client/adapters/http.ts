@@ -5,7 +5,7 @@ export * from '@/common/http'
 import url from 'url'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
-import * as security from '@/client/services/security'
+import * as security from '@/client/adapters/security'
 import * as http from '@/common/http'
 import vm from '@/client/vm'
 
@@ -50,7 +50,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		let method = _.get(error, 'method', config.method)
 		let url = _.get(error, 'url', config.url).replace(process.env.DOMAIN, '')
 		console.log('%c◀ ' + '[' + method + '] ' + url, 'color: red; font-weight: bolder;', message)
-		vm.$toast.open({ message: url + ' ➤ ' + message, type: 'is-danger' })
+		vm.$toast.open({ message: '[' + method + '] ' + url + ' ➤ ' + message, type: 'is-danger' })
 
 		return Promise.reject(error)
 

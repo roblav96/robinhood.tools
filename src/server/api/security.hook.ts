@@ -10,20 +10,20 @@ polka.hook(async function(req, res) {
 	req.ip = security.reqip(req)
 
 	req.doc = {
-		id: req.getHeader('x-id'),
-		uuid: req.getHeader('x-uuid'),
-		finger: req.getHeader('x-finger'),
+		id: req.headers['x-id'],
+		uuid: req.headers['x-uuid'],
+		finger: req.headers['x-finger'],
 		bytes: req.cookies['x-bytes'],
 		token: req.cookies['x-token'],
-		hostname: security.sha1(req.getHeader('hostname')),
-		useragent: security.sha1(req.getHeader('user-agent')),
+		hostname: security.sha1(req.headers['hostname']),
+		useragent: security.sha1(req.headers['user-agent']),
 	} as Security.Doc
-	
+
 	req.authed = await security.authorize({
 		doc: req.doc,
-		keys: req._headers.keys(),
+		keys: Object.keys(req.headers),
 		required: ['referer'],
-		referer: req.getHeader('referer'),
+		referer: req.headers['referer'],
 	})
 
 })

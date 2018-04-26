@@ -12,17 +12,17 @@ import * as FastestValidator from 'fastest-validator'
 
 
 
-const polka = new Polka.Polka({
+const polka = Polka({
 	server: turbo.createServer(),
 
 	onError(error: Boom, req, res, next) {
-		// if (res.headerSent) return next();
 		if (!error.isBoom) {
 			console.error('polka Error ->', error)
 			error = new Boom(error)
 		} else {
-			console.error('polka Error ->', error.name, error.message, error.output)
+			console.error('polka Error ->', error.output.payload.error, error.message, error.output, error.data || '')
 		}
+		if (res.headerSent) return next();
 		res.statusCode = error.output.statusCode
 		Object.keys(error.output.headers).forEach(function(key) {
 			res.setHeader(key, error.output.headers[key])
@@ -75,8 +75,14 @@ Object.assign(polka, {
 				next()
 			})
 		}
-		this[opts.method.toLowerCase()](opts.url, function(req, res, next) {
-			opts.handler(req, res).then(next).catch(next)
+		this[opts.method.toLowerCase()](opts.url, function(req, res) {
+			opts.handler(req, res).then(function() {
+				if (!res.headerSent) {
+					res.end()
+				}
+			}).catch(function(error) {
+				polka.onError(error, req, res)
+			})
 		})
 	},
 
@@ -112,6 +118,12 @@ polka.use(function(req, res, next) {
 			this.write(data)
 		},
 	})
+
+	req.headers = {} as any
+	let i: number, len = req._options.headers.length
+	for (i = 0; i < len; i += 2) {
+		req.headers[req._options.headers[i].toLowerCase()] = req._options.headers[i + 1]
+	}
 
 	Object.assign(req, {
 		ondata(this: any, buffer, start, length) {
