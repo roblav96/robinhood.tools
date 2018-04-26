@@ -21,6 +21,7 @@ export async function authorize(
 		origin?: string
 	},
 ) {
+
 	let authed = false
 
 	required = (required || []).concat(['x-uuid', 'x-finger', 'user-agent', 'hostname', 'x-forwarded-for', 'x-real-ip'])
@@ -40,7 +41,7 @@ export async function authorize(
 		throw Boom.preconditionFailed('Invalid security header' + (process.env.DEVELOPMENT ? `: 'x-finger'` : ''))
 	}
 	doc.finger = split[0]
-	if (Math.abs(Date.now() - Number.parseInt(split[1])) > 10000) {
+	if (Math.abs(Date.now() - Number.parseInt(split[1])) > 60000) {
 		throw Boom.preconditionFailed('Expired security header' + (process.env.DEVELOPMENT ? `: 'x-finger'` : ''))
 	}
 

@@ -29,13 +29,12 @@ const doc = {
 	finger: lockr.get('security.finger'),
 } as Security.Doc
 
-export function headers() {
-	let headers = {
+export function headers(): Dict<string> {
+	return {
 		'x-id': doc.id,
 		'x-uuid': doc.uuid,
 		'x-finger': doc.finger + '.' + Date.now(),
-	} as Dict<string>
-	return headers
+	}
 }
 
 
@@ -60,18 +59,12 @@ function finger(): Promise<void> {
 	})
 }
 
-function token(): Promise<void> {
-	return http.get('/security/token').catch(function(error) {
-		return clock.toPromise('5s').then(token)
-	})
-}
-
 Promise.all([
 	uuid(), finger(),
 ]).then(function() {
-	return token()
+	return http.get('/security/token', { retries: Infinity })
 }).then(function() {
-	return http.get('/websocket/addresses')
+	return http.get('/websocket/discover', { retries: Infinity })
 }).then(function(addresses) {
 	return socket.init(addresses)
 }).then(function() {

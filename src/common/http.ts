@@ -19,20 +19,14 @@ export function config() {
 
 
 export function send(config: Http.Config) {
-	if (!Number.isFinite(config._retries)) {
-		config._retries = config.retries
-		config.retries = 0
-	}
 	return got(config.url, config).then(({ body }) => body).catch(function(error: got.GotError) {
-		if (config._retries > 0 && retryable(error)) {
-			config._retries--
+		if (config.retries > 0 && retryable(error)) {
+			config.retries--
 			if (process.env.DEVELOPMENT) {
 				// console.error('http got retry Error ->', error)
-				// console.warn('http got config._retries ->', config._retries)
+				// console.warn('http got config.retries ->', config.retries)
 			}
 			return clock.toPromise(config.retryTick).then(() => send(config))
-			// let ms = 1000 + Math.round(Math.random() * 4000)
-			// return Promise.delay(ms).then(() => send(config))
 		}
 		return Promise.reject(error)
 	})
@@ -46,7 +40,6 @@ declare global {
 	namespace Http {
 		interface Config extends got.GotJSONOptions {
 			retries: number
-			_retries: number
 			retryTick: Clock.Tick
 			url: string
 			query: any

@@ -26,18 +26,6 @@ export default class extends Mixins(VUtilsMixin) {
 		})
 	}
 
-	ondropdown(active: boolean) {
-		// this.isMenu = active
-	}
-	// @Vts.Watch('isMenu') onisMenu(isMenu: boolean) {
-	// 	console.log('isMenu ->', isMenu)
-	// }
-	// disabled = this.$store.state.breakpoint.tabletAndDown
-	// @Vts.Watch('$store.state.breakpoint', { deep: true }) onbreakpoint(breakpoint: Breakpoint) {
-	// 	this.disabled = breakpoint.tabletAndDown
-	// 	console.log('this.disabled ->', this.disabled)
-	// }
-
 }
 
 

@@ -9,4 +9,8 @@ img.is-png {
 	backface-visibility: hidden;
 }
 
+nav.navbar div.field.navbar-item {
+	margin-bottom: 0px;
+}
+
 /**/

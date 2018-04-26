@@ -14,19 +14,38 @@ export const routes = [
 	},
 
 	{
-		name: 'crypto', path: '/crypto',
-		title: 'Crypto', icon: 'bitcoin',
+		title: 'Portfolio', icon: 'wunderlist',
+		name: 'portfolio', path: '/portfolio',
+	},
+
+	{
+		title: 'Watchlist', icon: 'wunderlist',
+		name: 'watchlist', path: '/watchlist',
+	},
+
+	{
+		title: 'Screener', icon: 'radar',
+		name: 'screener', path: '/screener',
+	},
+
+	{
+		title: 'News', icon: 'newspaper',
+		name: 'news', path: '/news',
 	},
 
 	// {
-	// 	name: 'symbol', path: '/symbol/:symbol',
-	// 	component: () => import('@/client/routes/symbol/symbol'),
+	// 	title: 'Crypto', icon: 'bitcoin',
+	// 	name: 'crypto', path: '/crypto',
 	// },
+
+	{
+		name: 'symbol', path: '/symbol/:symbol',
+		component: () => import('@/client/routes/symbol/symbol'),
+	},
 
 	{
 		name: 'styleguide', path: '/styleguide',
 		component: () => import('@/client/routes/styleguide/styleguide'),
-		dev: true,
 	},
 
 	{ path: '*', redirect: { name: 'home' } },
@@ -57,7 +76,6 @@ declare module 'vue-router/types/router' {
 	export interface RouteConfig {
 		title: string
 		icon: string
-		dev: boolean
 	}
 }
 

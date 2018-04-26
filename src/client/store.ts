@@ -6,8 +6,6 @@ import Vuex, { Store } from 'vuex'
 
 
 const state = {} as Store.State
-// console.log('state >', state)
-// console.log('state >', JSON.stringify(state, null, 4))
 
 export default new Vuex.Store<Store.State>({
 	state, strict: false,
@@ -17,7 +15,6 @@ export default new Vuex.Store<Store.State>({
 
 
 
-// import all stores in directory
 let load = require.context('./stores/', true, /\.ts$/)
 load.keys().forEach(file => load(file))
 

@@ -2,7 +2,6 @@
 
 import '@/common/clock'
 import '@/client/adapters/security'
-import '@/client/svgs/svgs'
 import router from '@/client/router'
 import store from '@/client/store'
 import App from '@/client/app/app'

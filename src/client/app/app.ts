@@ -21,7 +21,7 @@ export default class extends Mixins(VUtilsMixin) {
 	}
 
 	get routes() {
-		return this.$router.options.routes.filter(v => !!v.name)
+		return this.$router.options.routes.filter(v => v.name && !v.path.includes('/:'))
 	}
 
 }

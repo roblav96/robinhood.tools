@@ -32,7 +32,7 @@ const polka = Polka({
 	},
 
 	onNoMatch(req, res) {
-		polka.onError(Boom.notFound(req.path), req, res)
+		polka.onError(Boom.notFound(void 0, { method: req.method, path: req.path }), req, res)
 	},
 
 })
@@ -61,9 +61,6 @@ Object.assign(polka, {
 				validate[key] = new FastestValidator().compile(opts.schema[key])
 			})
 			this.use(opts.url, function(req, res, next) {
-				if (opts.authed && !req.authed) {
-					return next(Boom.unauthorized())
-				}
 				let keys = Object.keys(validate)
 				let i: number, len = keys.length
 				for (i = 0; i < len; i++) {
@@ -80,6 +77,9 @@ Object.assign(polka, {
 			})
 		}
 		this[opts.method.toLowerCase()](opts.url, function(req, res) {
+			if (opts.authed && !req.authed) {
+				return polka.onError(Boom.unauthorized(), req, res)
+			}
 			opts.handler(req, res).then(function() {
 				if (!res.headerSent) {
 					res.end()

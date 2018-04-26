@@ -16,7 +16,7 @@
 		"server:dev": "rimraf dist/server && run-p server:watch server:onchange cli:focus --silent",
 		"server:watch": "tsc --project .server.tsconfig.json --watch",
 		"server:onchange": "onchange 'dist/server/**/*.js' --delay 100 -- pandora dev dist/server",
-		"cli:focus": "node -e 'setInterval(() => process.stdout.write(require(\"cli-color\").erase.lineRight), 1000)'",
+		"cli:focus": "node -e 'setInterval(() => process.stdout.write(require(\"cli-color\").erase.lineRight), 300)'",
 		"cli:clear": "clear && printf \"\\e[3J\""
 	},
 	"dependencies": {
