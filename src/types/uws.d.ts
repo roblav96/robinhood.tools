@@ -6,7 +6,6 @@ import * as http from 'http'
 declare module 'uws' {
 	export interface WebSocket extends uws { }
 	export interface Server {
-		_passedHttpServer: http.Server
 		httpServer: http.Server
 		broadcast(message: string, options?: { binary: boolean }): void
 		startAutoPing(interval: number, message: string): void

@@ -93,7 +93,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	connect() {
 		this.terminate()
 		let address = this.options.query ? `${this.address}?${this.options.query()}` : this.address
-		this.socket = new uws(address) as any
+		this.socket = new WebSocket(address) as any
 		this.socket.onopen = this._onopen as any
 		this.socket.onclose = this._onclose as any
 		this.socket.onerror = this._onerror as any

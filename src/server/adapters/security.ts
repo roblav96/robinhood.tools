@@ -59,8 +59,8 @@ export function generateToken(doc: Security.Doc, prime: string) {
 	return security.hmac256(doc.uuid + doc.finger + doc.bytes + doc.useragent + doc.hostname, prime)
 }
 
-export function reqip(req) {
-	return (req.getHeader('x-forwarded-for') || req.getHeader('x-real-ip')) as string
+export function reqip(req): string {
+	return req.headers['x-forwarded-for'] || req.headers['x-real-ip']
 }
 
 
