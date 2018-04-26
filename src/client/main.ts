@@ -8,6 +8,7 @@ Promise.config({ warnings: { wForgottenReturn: false } })
 import * as _ from '@/common/lodash'
 Object.assign(console, { dtsgen: _.noop, dump: _.noop })
 // if (process.env.DEVELOPMENT) console.dtsgen = require('@/common/dtsgen').default;
+if (process.env.DEVELOPMENT) Object.assign(window, require('@/common/core'));
 
 import 'repaintless/repaintless-scss/repaintless.scss'
 import '@/client/styles/theme.scss'

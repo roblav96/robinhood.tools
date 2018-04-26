@@ -10,4 +10,6 @@ import './security.api'
 
 import './socket.api'
 
+import './search.api'
+
 

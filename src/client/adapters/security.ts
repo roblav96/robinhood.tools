@@ -63,10 +63,10 @@ Promise.all([
 	uuid(), finger(),
 ]).then(function() {
 	return http.get('/security/token', { retries: Infinity })
-}).then(function() {
-	return http.get('/websocket/discover', { retries: Infinity })
-}).then(function(addresses) {
-	return socket.init(addresses)
+	// }).then(function() {
+	// 	return http.get('/websocket/discover', { retries: Infinity })
+	// }).then(function(addresses) {
+	// 	return socket.init(addresses)
 }).then(function() {
 	state.ready = true
 })

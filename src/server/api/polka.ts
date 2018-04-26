@@ -80,10 +80,9 @@ Object.assign(polka, {
 			if (opts.authed && !req.authed) {
 				return polka.onError(Boom.unauthorized(), req, res)
 			}
-			opts.handler(req, res).then(function() {
-				if (!res.headerSent) {
-					res.end()
-				}
+			opts.handler(req, res).then(function(response) {
+				if (response != null) res.send(response);
+				if (!res.headerSent) res.end();
 			}).catch(function(error) {
 				polka.onError(error, req, res)
 			})

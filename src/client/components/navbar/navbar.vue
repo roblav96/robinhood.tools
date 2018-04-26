@@ -24,9 +24,7 @@ span.navbar-burger.burger > span {
 					<img src="@/assets/logo-primary.svg" alt="Robinhood Tools">
 				</router-link>
 
-				<b-field class="navbar-item">
-					<b-input class="" type="search" placeholder="Search anything..." icon="magnify" />
-				</b-field>
+				<v-searchbar></v-searchbar>
 
 				<span class="navbar-burger burger" :class="{ 'is-active': isMobileMenu }" v-on:click="isMobileMenu = !isMobileMenu">
 					<span></span>

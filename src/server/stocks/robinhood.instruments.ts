@@ -62,7 +62,7 @@ async function chunkSymbols() {
 async function syncInstruments() {
 	await pForever(async function(url) {
 
-		let response = await http.get(url) as Robinhood.API.Paginated<Robinhood.Instrument>
+		let response = await http.get(url) as Robinhood.Api.Paginated<Robinhood.Instrument>
 		_.remove(response.results, v => Array.isArray(v.symbol.match(/[^A-Z-]/)))
 
 		if (process.env.DEVELOPMENT) {
@@ -165,7 +165,7 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 		// console.time('search/tickers2')
 		let response = await http.get('https://infoapi.webull.com/api/search/tickers2', {
 			query: { keys: symbol, tickerType }
-		}) as Webull.API.Paginated<Webull.Ticker>
+		}) as Webull.Api.Paginated<Webull.Ticker>
 		// console.timeEnd('search/tickers2')
 
 		if (!Array.isArray(response.list)) return;

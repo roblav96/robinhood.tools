@@ -122,7 +122,7 @@ declare global {
 			}
 		}
 
-		namespace API {
+		namespace Api {
 			interface Paginated<T = any> {
 				categoryId: number
 				categoryName: string

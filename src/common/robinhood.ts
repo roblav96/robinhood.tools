@@ -26,7 +26,7 @@ export const MICS = {
 declare global {
 	namespace Robinhood {
 
-		namespace API {
+		namespace Api {
 			interface Paginated<T = any> {
 				next: string
 				previous: string
@@ -38,7 +38,6 @@ declare global {
 			type State = 'unlisted' | 'active' | 'inactive'
 			type Tradability = 'untradable' | 'tradable' | 'position_closing_only'
 			type Type = 'wrt' | 'pfd' | 'stock' | 'etp' | 'unit' | 'adr' | 'nyrs' | 'right' | 'cef' | 'reit' | 'mlp' | 'tracking' | 'lp' | 'rlt'
-			
 		}
 
 		interface Instrument {
