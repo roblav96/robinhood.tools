@@ -11,19 +11,17 @@ import * as http from '@/client/adapters/http'
 @Vts.Component
 export default class extends Vue {
 
-	// mounted() {
-	// 	if (process.env.DEVELOPMENT) {
-	// 		(this.$refs.searchbar_input as HTMLElement).focus()
-	// 		this.sync('')
-	// 	}
-	// }
+	mounted() {
+		this.sync()
+		// if (process.env.DEVELOPMENT) (this.$refs.searchbar_input as HTMLElement).focus();
+	}
 
 	busy = false
 	query = ''
 	results = []
 
 	oninput = _.debounce(this.sync, 300)
-	sync(query: string) {
+	sync(query = this.query) {
 		// if (!query) return this.results.splice(0);
 		this.busy = true
 		http.post('/search', { query }).then(response => {
@@ -32,7 +30,7 @@ export default class extends Vue {
 			console.error('sync Error ->', error)
 		}).finally(() => this.busy = false)
 	}
-	
+
 	onfocus(event: Event) {
 		console.log('event ->', event)
 	}
