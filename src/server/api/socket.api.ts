@@ -27,8 +27,8 @@ onexit(function() { wss.httpServer.close() })
 
 wss.on('error', function(error) { console.error('wss Error ->', error) })
 
-wss.on('connection', function(client, request) {
-	console.log('request.headers ->', request.headers)
+wss.on('connection', function(client, req) {
+	console.log('req.headers ->', req.headers)
 })
 
 export default wss
