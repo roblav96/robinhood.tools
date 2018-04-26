@@ -20,9 +20,7 @@ polka.use(function(req, res, next) {
 import * as cookie from 'cookie'
 polka.use(function(req, res, next) {
 	let header = req.getHeader('cookie')
-	Object.assign(req, {
-		cookies: header ? cookie.parse(header) : {},
-	})
+	req.cookies = header ? cookie.parse(header) : {}
 	Object.assign(res, {
 		setCookie(this: any, name, value, opts = {} as any) {
 			if (Number.isFinite(opts.expires)) {
