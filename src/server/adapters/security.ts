@@ -22,11 +22,13 @@ export async function authorize(
 	},
 ) {
 	let authed = false
+	
+	console.log('arguments ->', arguments)
 
 	required = (required || []).concat(['x-uuid', 'x-finger', 'user-agent', 'hostname', 'x-forwarded-for', 'x-real-ip'])
 	let missing = _.difference(required, keys)
 	if (missing.length > 0) {
-		throw Boom.preconditionFailed('Missing security headers' + (process.env.DEVELOPMENT ? `: '${missing}'` : ''))
+		throw Boom.preconditionRequired('Missing security headers' + (process.env.DEVELOPMENT ? `: '${missing}'` : ''))
 	}
 
 	let host = url.parse(referer || origin).host
@@ -59,8 +61,8 @@ export function generateToken(doc: Security.Doc, prime: string) {
 	return security.hmac256(doc.uuid + doc.finger + doc.bytes + doc.useragent + doc.hostname, prime)
 }
 
-export function getip(req: http.IncomingMessage) {
-	return (req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.connection.remoteAddress || req.socket.remoteAddress) as string
+export function reqip(req) {
+	return (req.getHeader('x-forwarded-for') || req.getHeader('x-real-ip')) as string
 }
 
 

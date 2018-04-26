@@ -1,11 +1,12 @@
 // 
 
 import '../main'
-import './polka'
 
+import './polka'
 import './polka.plugins'
-import './polka.route'
-import './polka.middle'
+
+import './security.hook'
+import './security.api'
 
 import './socket.api'
 

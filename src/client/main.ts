@@ -1,15 +1,9 @@
 // 
 
 require('@/common/polyfills')
-// require('source-map-support').install()
-// import * as sourcemaps from 'source-map-support'
-// sourcemaps.install({
-// 	overrideRetrieveFile: true,
-// 	overrideRetrieveSourceMap:true,
-// })
 
 global.Promise = require('bluebird/js/browser/bluebird.core.js')
-{ (global.Promise as any).config({ warnings: { wForgottenReturn: false } }) }
+Promise.config({ warnings: { wForgottenReturn: false } })
 
 import * as _ from '@/common/lodash'
 Object.assign(console, { dtsgen: _.noop, dump: _.noop })

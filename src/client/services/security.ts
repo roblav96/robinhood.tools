@@ -66,7 +66,7 @@ function token(): Promise<string[]> {
 		query: { finger: doc.finger },
 	}).catch(function(error) {
 		// console.error('token Error ->', error.message)
-		return clock.toPromise('5s').then(token)
+		return clock.toPromise('10s').then(token)
 	})
 }
 

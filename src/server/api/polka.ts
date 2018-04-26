@@ -1,5 +1,6 @@
 // 
 
+import * as _ from '../../common/lodash'
 import * as onexit from 'exit-hook'
 import * as qs from 'querystring'
 import * as Polka from 'polka'
@@ -7,27 +8,76 @@ import * as Boom from 'boom'
 import * as http from 'http'
 import * as turbo from 'turbo-http'
 import * as jsonparse from 'fast-json-parse'
+import * as FastestValidator from 'fastest-validator'
 
 
 
-const polka = Polka({
+const polka = new Polka.Polka({
 	server: turbo.createServer(),
 
-	onError(error, req, res, next) {
-		if (res.headerSent) return next();
-		if (!error.isBoom) error = new Boom(error);
-		if (error.data) {
-			Object.assign(error.output.payload, { attributes: error.data })
+	onError(error: Boom, req, res, next) {
+		// if (res.headerSent) return next();
+		if (!error.isBoom) {
+			console.error('polka Error ->', error)
+			error = new Boom(error)
+		} else {
+			console.error('polka Error ->', error.name, error.message, error.output)
 		}
 		res.statusCode = error.output.statusCode
 		Object.keys(error.output.headers).forEach(function(key) {
 			res.setHeader(key, error.output.headers[key])
 		})
+		if (error.data) Object.assign(error.output.payload, { attributes: error.data });
 		res.send(error.output.payload)
 	},
 
 	onNoMatch(req, res) {
 		polka.onError(Boom.notFound(req.path), req, res)
+	},
+
+})
+
+Object.assign(polka, {
+
+	hook(this: any, handler: (req, res) => Promise<void>) {
+		this.use(function(req, res, next) {
+			handler(req, res).then(next).catch(next)
+		})
+	},
+
+	route(this: any, opts: {
+		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
+		url: string
+		schema?: {
+			query: any
+			body: any
+		}
+		handler: (req, res) => Promise<void>
+	}) {
+		if (opts.schema) {
+			const validate = {} as any
+			Object.keys(opts.schema).forEach(function(key) {
+				validate[key] = new FastestValidator().compile(opts.schema[key])
+			})
+			this.use(opts.url, function(req, res, next) {
+				let keys = Object.keys(validate)
+				let i: number, len = keys.length
+				for (i = 0; i < len; i++) {
+					let key = keys[i]
+					if (req[key] == null) return next(Boom.preconditionRequired(key));
+					let invalid = validate[key](req[key])
+					if (Array.isArray(invalid)) {
+						let error = Boom.preconditionFailed(key)
+						error.data = invalid as any
+						return next(error)
+					}
+				}
+				next()
+			})
+		}
+		this[opts.method.toLowerCase()](opts.url, function(req, res, next) {
+			opts.handler(req, res).then(next).catch(next)
+		})
 	},
 
 })
@@ -83,6 +133,7 @@ polka.use(function(req, res, next) {
 					req.body = qs.parse(req.body)
 				}
 			}
+			Object.assign(this, { ondata: _.noop, onend: _.noop })
 			next()
 		},
 	})
@@ -100,6 +151,5 @@ onexit(function() {
 	polka.server.connections.forEach(v => v.close())
 	polka.server.close()
 })
-
 
 

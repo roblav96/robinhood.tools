@@ -9,7 +9,7 @@ import * as core from '../../common/core'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
-import * as utils from '../services/utils'
+import * as utils from '../adapters/utils'
 import clock from '../../common/clock'
 
 
