@@ -12,23 +12,31 @@ import * as FastestValidator from 'fastest-validator'
 
 
 
+// import * as Trouter from 'trouter'
+// console.info('Trouter ->', Trouter)
+// console.dir(Trouter)
+// let trouter = new Trouter()
+// console.info('trouter ->', trouter)
+// console.dir(trouter)
+
+
 // let socket = net.createServer()
 
-console.log('turbo ->', turbo)
-console.warn('turbo ->', console.dtsgen(turbo))
-const server = turbo.createServer(function(req, res) {
-	console.log('req ->', req)
-	console.warn('req ->', console.dtsgen(req))
-	console.log('res ->', res)
-	console.warn('res ->', console.dtsgen(res))
-})
-console.log('server ->', server)
-console.warn('server ->', console.dtsgen(server))
+// console.log('turbo ->', turbo)
+// console.warn('turbo ->', console.dtsgen(turbo))
+// const server = turbo.createServer(function(req, res) {
+// 	console.log('req ->', req)
+// 	console.warn('req ->', console.dtsgen(req))
+// 	console.log('res ->', res)
+// 	console.warn('res ->', console.dtsgen(res))
+// })
+// console.log('server ->', server)
+// console.warn('server ->', console.dtsgen(server))
 
 
 
 const polka = Polka({
-	// server,
+	server: turbo.createServer(),
 
 	onError(error: Boom, req, res, next) {
 		if (!error.isBoom) {
@@ -51,6 +59,9 @@ const polka = Polka({
 	},
 
 })
+
+console.log('polka ->', polka)
+console.warn('polka ->', console.dtsgen(polka))
 
 Object.assign(polka, {
 
@@ -107,6 +118,13 @@ Object.assign(polka, {
 })
 
 polka.use(function(req, res, next) {
+	
+	console.log('req ->', req)
+	console.warn('req ->', console.dtsgen(req))
+	console.log('res ->', res)
+	console.warn('res ->', console.dtsgen(res))
+	console.log('next ->', next)
+	console.warn('next ->', console.dtsgen(next))
 
 	Object.assign(res, {
 		writeHead(this: any, code, headers = {}) {
@@ -173,13 +191,13 @@ polka.use(function(req, res, next) {
 export default polka
 
 setImmediate(async function() {
-	await server.listen(+process.env.PORT, process.env.HOST)
+	await polka.listen(+process.env.PORT, process.env.HOST)
 	console.info('turbo listening ->', process.env.HOST + ':' + process.env.PORT)
 })
 
 onexit(function() {
-	server.connections.forEach(v => v.close())
-	server.close()
+	polka.server.connections.forEach(v => v.close())
+	polka.server.close()
 })
 
 
