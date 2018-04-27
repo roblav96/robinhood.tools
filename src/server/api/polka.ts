@@ -31,7 +31,7 @@ server.on('')
 server.on('', function() {
 
 })
-server.on('request', function(socket) {
+server.on('request', function(req, res) {
 
 })
 

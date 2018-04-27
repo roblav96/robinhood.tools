@@ -1,10 +1,7 @@
 // 
 
 declare module 'turbo-net' {
-
 	import { EventEmitter } from 'events'
-
-
 
 	namespace Server {
 		interface Options {
@@ -31,8 +28,6 @@ declare module 'turbo-net' {
 	}
 	export function createServer(handler?: (socket: Connection) => void): Server
 	export function createServer(options?: Server.Options, handler?: (socket: Connection) => void): Server
-
-
 
 	namespace Connection {
 		interface Options {
@@ -65,8 +60,6 @@ declare module 'turbo-net' {
 		addListener<Name extends keyof Connection.Events>(event: Name, fn: (arg0?: Connection.Events[Name][0], arg1?: Connection.Events[Name][1]) => void)
 	}
 	export function connect(port: number, host?: string, options?: Connection.Options): Connection
-
-
 
 }
 
