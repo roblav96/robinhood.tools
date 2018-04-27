@@ -3,13 +3,13 @@
 import '../main'
 
 import './polka'
-// import './polka.plugins'
+import './polka.plugins'
 
-// import './security.hook'
-// import './security.api'
+import './security.hook'
+import './security.api'
 
-// import './socket.api'
+import './socket.api'
 
-// import './search.api'
+import './search.api'
 
 
