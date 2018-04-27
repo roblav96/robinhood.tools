@@ -29,7 +29,7 @@ for (i = 0; i < len; i++) {
 			if (method == 'error') color = color + 'Bright';
 			let file = chalk.bold(`${chalk[color](site.fileName)}:${site.line}`)
 			let name = pandora.processName
-			let output = `${square}[${file}](${process.env.INSTANCE})[${name}]${site.callee}[${chalk.grey(stamp)}]`
+			let output = `${square}[${file}][${process.env.INSTANCE}](${name})${site.callee}[${chalk.grey(stamp)}]`
 			process.stdout.write(`\r\n${chalk.underline(output)}\r\n`)
 			_console[method].apply(console, args)
 			process.stdout.write(`\r\n`)

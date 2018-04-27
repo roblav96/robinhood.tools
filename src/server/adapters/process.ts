@@ -18,7 +18,7 @@ if (cluster.isMaster) process.env.MASTER = true;
 if (cluster.isWorker) process.env.WORKER = true;
 process.env.INSTANCES = process.env.INSTANCES || 1
 process.env.INSTANCE = cluster.isWorker ? cluster.worker.id - 1 : 0;
-if (process.env.INSTANCE == 0) process.env.PRIMARY = true;
+if (+process.env.INSTANCE == 0) process.env.PRIMARY = true;
 
 
 

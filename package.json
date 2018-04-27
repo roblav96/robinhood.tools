@@ -80,7 +80,7 @@
 		"@types/lodash": "latest",
 		"@types/lunr": "latest",
 		"@types/luxon": "latest",
-		"@types/node": "latest",
+		"@types/node": "9.6.7",
 		"@types/node-forge": "latest",
 		"@types/p-all": "latest",
 		"@types/p-event": "latest",
