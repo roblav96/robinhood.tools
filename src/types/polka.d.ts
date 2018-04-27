@@ -34,7 +34,7 @@ declare module 'polka' {
 		handler(req: Request, res: Response, parsed: url.UrlWithStringQuery)
 		listen(port: number, hostname?: string): Promise<void>
 	}
-	function Polka<Server, Request, Response, ErrorCtor = Error>(options?: Options<Server, Request & Polka.Request, Response, ErrorCtor>): Router<Server, Request & Polka.Request, Response, ErrorCtor>
+	function Polka<Server, Request, Response, ErrorCtor = Error>(options?: Partial<Options<Server, Request & Polka.Request, Response, ErrorCtor>>): Router<Server, Request & Polka.Request, Response, ErrorCtor>
 	export = Polka
 
 }

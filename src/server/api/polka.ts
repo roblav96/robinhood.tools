@@ -131,11 +131,11 @@ polka.use(function(req, res, next) {
 	}
 
 	Object.assign(req, {
-		ondata(this: any, buffer, start, length) {
+		ondata(buffer, start, length) {
 			if (!this.body) this.body = [];
 			this.body.push(Buffer.from(buffer.slice(start, length + start)))
 		},
-		onend(this: any) {
+		onend() {
 			if (this.body) {
 				this.body = Buffer.concat(this.body).toString()
 				let type = req.getHeader('Content-Type')
@@ -151,10 +151,18 @@ polka.use(function(req, res, next) {
 				}
 			}
 			Object.assign(this, { ondata: _.noop, onend: _.noop })
+			console.log('this ->', this)
 			next()
 		},
-	})
+	} as typeof req)
 
+})
+
+polka.use(function(req, res, next) {
+	console.log('req ->', req)
+	console.log('req.awesome ->', req.awesome)
+	req.awesome()
+	next()
 })
 
 export default polka
