@@ -5,7 +5,7 @@
 	"domain": "robinhood.tools",
 	"scripts": {
 		"postinstall": "run-p patch:types patch:polka client:tailwind",
-		"patch:types": "rimraf node_modules/vuex/types/vue.d.ts",
+		"patch:types": "tsc-wtf && rimraf node_modules/vuex/types/vue.d.ts",
 		"patch:polka": "curl --output node_modules/polka/index.js 'https://raw.githubusercontent.com/lukeed/polka/master/packages/polka/index.js'",
 		"purge": "rimraf dist node_modules",
 		"rc": "npm run client:dev",
@@ -109,6 +109,7 @@
 		"source-map-support": "latest",
 		"stacktracey": "latest",
 		"tailwindcss": "latest",
+		"tsc-wtf": "latest",
 		"typescript": "latest",
 		"vue-template-compiler": "latest",
 		"webpack-bundle-analyzer": "latest"
