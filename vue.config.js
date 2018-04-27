@@ -3,12 +3,12 @@ const DEVELOPMENT = process.env.NODE_ENV == 'development'
 const PRODUCTION = process.env.NODE_ENV == 'production'
 // 
 
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const webpack = require('webpack')
 const path = require('path')
 const _ = require('lodash')
 const dotenv = require('dotenv')
 const package = require('./package.json')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 
 
@@ -17,16 +17,18 @@ module.exports = {
 	outputDir: 'dist/client',
 	dll: DEVELOPMENT,
 	css: { sourceMap: DEVELOPMENT },
-	vueLoader: { hotReload: false },
+	vueLoader: { hotReload: DEVELOPMENT },
 
 	configureWebpack: function(config) {
 
 		config.entry.app = './src/client/main.ts'
 		delete config.node.process
 		delete config.node.setImmediate
+		// config.output.filename = '[name].bundle.js'
+		// config.output.chunkFilename = '[name].chunk.js'
 
 		if (DEVELOPMENT) {
-			config.devtool = 'inline-source-map'
+			config.devtool = 'source-map'
 			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/, /env/]))
 			config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
 				rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
@@ -34,27 +36,12 @@ module.exports = {
 					delete use.options.limit
 				})
 			})
+			config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
+				name: 'vendor', minChunks: module => module.context && module.context.includes('node_modules'),
+			}))
 		}
 
-		config.plugins.push(new BundleAnalyzerPlugin())
-
-		config.output.filename = '[name].bundle.js'
-		config.output.chunkFilename = '[name].chunk.js'
-		// const dlls = ['bluebird', 'node-forge', 'lodash', 'vue', 'buefy']
-		// dlls.forEach(function(dll) {
-		// 	config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-		// 		name: dll, minChunks: module => module.context && module.context.includes(dll),
-		// 	}))
-		// })
-		// config.plugins.push(new webpack.optimize.AggressiveSplittingPlugin({
-		// 	minSize: 30000, maxSize: 50000,
-		// }))
-		// config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-		// 	name: 'vendors', minChunks: module => module.context && module.context.includes('node_modules'),
-		// }))
-		// config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-		// 	name: 'manifest', minChunks: Infinity,
-		// }))
+		// config.plugins.push(new BundleAnalyzerPlugin())
 
 	},
 
@@ -66,8 +53,8 @@ module.exports = {
 			args[0]['process.env'].NAME = `"${package.name}"`
 			args[0]['process.env'].VERSION = `"${package.version}"`
 			args[0]['process.env'].DOMAIN = `"${(DEVELOPMENT ? 'http://dev.' : 'https://') + package.domain}"`
-			let env = dotenv.config({ path: path.resolve(process.cwd(), 'env/client.env') }).parsed || {}
-			Object.assign(env, dotenv.config({ path: path.resolve(process.cwd(), 'env/client.' + process.env.NODE_ENV + '.env') }).parsed || {})
+			let env = dotenv.config({ path: path.join(__dirname, 'env/client.env') }).parsed || {}
+			Object.assign(env, dotenv.config({ path: path.join(__dirname, 'env/client.' + process.env.NODE_ENV + '.env') }).parsed || {})
 			Object.keys(env).forEach(k => args[0]['process.env'][k] = `"${env[k]}"`)
 			return args
 		})

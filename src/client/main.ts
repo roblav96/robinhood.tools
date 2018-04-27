@@ -13,7 +13,7 @@ if (process.env.DEVELOPMENT) Object.assign(window, require('@/common/core'));
 import 'animate.css'
 import '@/client/styles/theme.scss'
 import '@/client/styles/vendors.scss'
-import '@/client/styles/tailwind.build.css'
+import '@/client/styles/tailwind.css'
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
