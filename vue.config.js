@@ -3,6 +3,7 @@ const DEVELOPMENT = process.env.NODE_ENV == 'development'
 const PRODUCTION = process.env.NODE_ENV == 'production'
 // 
 
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const webpack = require('webpack')
 const path = require('path')
 const _ = require('lodash')
@@ -14,9 +15,9 @@ const package = require('./package.json')
 module.exports = {
 
 	outputDir: 'dist/client',
-	dll: DEVELOPMENT,
+	dll: false,
 	css: { sourceMap: DEVELOPMENT },
-	vueLoader: { hotReload: DEVELOPMENT },
+	vueLoader: { hotReload: false },
 
 	configureWebpack: function(config) {
 
@@ -35,8 +36,7 @@ module.exports = {
 			})
 		}
 
-		// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-		// config.plugins.push(new BundleAnalyzerPlugin({ analyzerPort: _.random(10000, 12345) }))
+		config.plugins.push(new BundleAnalyzerPlugin())
 
 		// config.output.filename = '[name].bundle.js'
 		// config.output.chunkFilename = '[name].chunk.js'
