@@ -5,19 +5,34 @@ import * as onexit from 'exit-hook'
 import * as qs from 'querystring'
 import * as Polka from 'polka'
 import * as Boom from 'boom'
-import * as http from 'http'
-import * as turbonet from 'turbo-net'
-import * as turbohttp from 'turbo-http'
+import * as net from 'turbo-net'
+import * as turbo from 'turbo-http'
 import * as jsonparse from 'fast-json-parse'
 import * as FastestValidator from 'fastest-validator'
 
 
 
+let socket = net.createServer()
+socket.on('')
+
+// console.log('turbo ->', turbo)
+// console.warn('turbo ->', console.dtsgen(turbo))
+
+const server = turbo.createServer(function(req, res) {
+	console.log('req ->', req)
+	console.log('res ->', res)
+})
+server.on('')
+
+// console.log('server ->', server)
+// console.warn('server ->', console.dtsgen(server))
+
+
+
+
+
 const polka = Polka({
-	server: turbohttp.createServer(function(req, res) {
-		console.log('req.socket ->', req.socket)
-		console.warn('req.socket ->', console.dtsgen(req.socket))
-	}),
+	server,
 
 	onError(error: Boom, req, res, next) {
 		if (!error.isBoom) {
@@ -40,9 +55,6 @@ const polka = Polka({
 	},
 
 })
-
-console.log('polka.server ->', polka.server)
-console.warn('polka.server ->', console.dtsgen(polka.server))
 
 Object.assign(polka, {
 

@@ -1,6 +1,4 @@
 // 
-import * as http from 'http'
-
 
 declare module 'polka' {
 
@@ -8,7 +6,7 @@ declare module 'polka' {
 
 	}
 
-	function Polka(): any
+	function Polka(options: any): any
 
 	export = Polka
 
