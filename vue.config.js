@@ -1,6 +1,6 @@
 // 
-if (process.env.NODE_ENV == 'development') process.env.DEVELOPMENT = true;
-if (process.env.NODE_ENV == 'production') process.env.PRODUCTION = true;
+const DEVELOPMENT = process.env.NODE_ENV == 'development'
+const PRODUCTION = process.env.NODE_ENV == 'production'
 // 
 
 const webpack = require('webpack')
@@ -14,9 +14,9 @@ const package = require('./package.json')
 module.exports = {
 
 	outputDir: 'dist/client',
-	dll: process.env.DEVELOPMENT,
-	css: { sourceMap: false },
-	vueLoader: { hotReload: false },
+	dll: DEVELOPMENT,
+	css: { sourceMap: DEVELOPMENT },
+	vueLoader: { hotReload: DEVELOPMENT },
 
 	configureWebpack: function(config) {
 
@@ -24,9 +24,9 @@ module.exports = {
 		delete config.node.process
 		delete config.node.setImmediate
 
-		if (process.env.DEVELOPMENT) {
+		if (DEVELOPMENT) {
 			config.devtool = 'inline-source-map'
-			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/]))
+			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/, /env/]))
 			config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
 				rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
 					use.loader = 'file-loader'
@@ -65,7 +65,7 @@ module.exports = {
 			args[0]['process.env'][process.env.NODE_ENV.toUpperCase()] = `"${true}"`
 			args[0]['process.env'].NAME = `"${package.name}"`
 			args[0]['process.env'].VERSION = `"${package.version}"`
-			args[0]['process.env'].DOMAIN = `"${(process.env.DEVELOPMENT ? 'http://dev.' : 'https://') + package.domain}"`
+			args[0]['process.env'].DOMAIN = `"${(DEVELOPMENT ? 'http://dev.' : 'https://') + package.domain}"`
 			let env = dotenv.config({ path: path.resolve(process.cwd(), 'env/client.env') }).parsed || {}
 			Object.assign(env, dotenv.config({ path: path.resolve(process.cwd(), 'env/client.' + process.env.NODE_ENV + '.env') }).parsed || {})
 			Object.keys(env).forEach(k => args[0]['process.env'][k] = `"${env[k]}"`)

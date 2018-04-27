@@ -4,6 +4,7 @@
 		"./src/server",
 		"./src/assets",
 		"./config",
+		"./env",
 		"./public",
 		"./dist",
 		"./node_modules"
