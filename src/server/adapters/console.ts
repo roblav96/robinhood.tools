@@ -49,7 +49,7 @@ if (process.env.DEBUGGER) {
 		if (process.env.PRIMARY) {
 			let stdout = (console as any)._stdout
 			if (stdout.isTTY) { stdout.isTTY = false; process.nextTick(() => stdout.isTTY = true) }
-			console.clear()
+			// console.clear()
 		}
 		inspector.close()
 	})

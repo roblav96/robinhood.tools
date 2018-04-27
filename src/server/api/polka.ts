@@ -6,6 +6,7 @@ import * as qs from 'querystring'
 import * as Polka from 'polka'
 import * as Boom from 'boom'
 import * as http from 'http'
+import * as turbonet from 'turbo-net'
 import * as turbohttp from 'turbo-http'
 import * as jsonparse from 'fast-json-parse'
 import * as FastestValidator from 'fastest-validator'
@@ -13,7 +14,10 @@ import * as FastestValidator from 'fastest-validator'
 
 
 const polka = Polka({
-	server: turbohttp.createServer(),
+	server: turbohttp.createServer(function(req, res) {
+		console.log('req.socket ->', req.socket)
+		console.warn('req.socket ->', console.dtsgen(req.socket))
+	}),
 
 	onError(error: Boom, req, res, next) {
 		if (!error.isBoom) {
@@ -36,6 +40,9 @@ const polka = Polka({
 	},
 
 })
+
+console.log('polka.server ->', polka.server)
+console.warn('polka.server ->', console.dtsgen(polka.server))
 
 Object.assign(polka, {
 
