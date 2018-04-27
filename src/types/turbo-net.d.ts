@@ -10,43 +10,41 @@ declare module 'turbo-net' {
 		interface Options {
 			allowHalfOpen?: boolean
 		}
-		// interface Events {
-		// 	close: () => void
-		// 	connection: (socket: Connection) => void
-		// 	listening: () => void
-		// 	// [event: string]: any
-		// }
-
+		interface Events {
+			'close': void[]
+			'connection': [Connection]
+			'error': [Error]
+			'listening': void[]
+		}
 	}
-	class Events { }
-	interface Events extends EventEmitter {
-		on(event: 'close', fn: () => void)
-		on(event: 'connection', fn: (socket: Connection) => void)
-		on(event: 'listening', fn: () => void)
-	}
-	export class Server extends Events {
-		constructor(options: Server.Options)
+	export class Server extends EventEmitter {
+		constructor(options?: Server.Options)
 		allowHalfOpen: boolean
 		connections: Connection[]
 		address(): { address: string, family: string, port: number }
 		close(cb?: () => void): void
 		listen(port: number, address: string, cb?: () => void): void
-		// on<Name extends keyof Server.Events>(event: Name, fn: Server.Events[Name])
-		// on(event: string, fn: () => void)
-
-		// on(event: 'close', fn: () => void)
-		// on(event: 'connection', fn: (socket: Connection) => void)
-		// on(event: 'listening', fn: () => void)
-		// on(event: string, fn: (...args: any[]) => void)
-		// on(event: any, fn: any)
+		emit<Name extends keyof Server.Events>(event: Name, arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1])
+		on<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
+		once<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
+		addListener<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
 	}
 	export function createServer(handler?: (socket: Connection) => void): Server
 	export function createServer(options?: Server.Options, handler?: (socket: Connection) => void): Server
 
 
 
-	export namespace Connection {
-		interface Options { allowHalfOpen?: boolean }
+	namespace Connection {
+		interface Options {
+			allowHalfOpen?: boolean
+		}
+		interface Events {
+			'close': void[]
+			'connect': void[]
+			'end': void[]
+			'error': [Error]
+			'finish': void[]
+		}
 	}
 	export class Connection extends EventEmitter {
 		constructor(server: Server)
@@ -61,11 +59,10 @@ declare module 'turbo-net' {
 		read(buffer: Buffer, callback: (error: Error, buffer: Buffer, bytesRead: number) => void): void
 		write(buffer: Buffer, length: number, callback: (error: Error, buffer: Buffer, length: number) => void)
 		writev(buffers: Buffer[], lengths: number[], callback: (error: Error, buffers: Buffer[], lengths: number[]) => void)
-		on(event: 'close', fn: () => void)
-		on(event: 'connect', fn: () => void)
-		on(event: 'end', fn: () => void)
-		on(event: 'error', fn: (error: Error) => void)
-		on(event: 'finish', fn: () => void)
+		emit<Name extends keyof Connection.Events>(event: Name, arg0?: Connection.Events[Name][0], arg1?: Connection.Events[Name][1])
+		on<Name extends keyof Connection.Events>(event: Name, fn: (arg0?: Connection.Events[Name][0], arg1?: Connection.Events[Name][1]) => void)
+		once<Name extends keyof Connection.Events>(event: Name, fn: (arg0?: Connection.Events[Name][0], arg1?: Connection.Events[Name][1]) => void)
+		addListener<Name extends keyof Connection.Events>(event: Name, fn: (arg0?: Connection.Events[Name][0], arg1?: Connection.Events[Name][1]) => void)
 	}
 	export function connect(port: number, host?: string, options?: Connection.Options): Connection
 

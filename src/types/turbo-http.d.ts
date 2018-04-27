@@ -2,33 +2,36 @@
 
 declare module 'turbo-http' {
 
+	import { EventEmitter } from 'events'
 	import * as turbo from 'turbo-net'
 
 
 
-	export namespace Server {
-		type Handler = (req, res) => void
-		// interface Events extends turbo.Server.Events {
-		// 	request: Handler
-		// }
+	namespace Server {
+		interface Options extends turbo.Server.Options {
+
+		}
+		interface Handler {
+			(req, res): void
+		}
+		interface Events extends turbo.Server.Events {
+			'request': Server.Handler
+		}
 	}
-	type TEvents = typeof turbo.Events
-	interface Events extends TEvents {
-		on(event: 'request', fn: (req, res) => void)
+	type Both = Server & turbo.Server
+	interface Server extends Both {
+		on(event: 'request', fn: Server.Handler)
+		
 	}
-	class Events { }
-	export class Server extends Events {
-		constructor(options: turbo.Server.Options)
-
-		// on<Name extends keyof Server.Events>(event: Name, fn: Server.Events[Name])
-
-		// on(event: 'request', fn: (req, res) => void)
-		// on(event: string, fn: (...args: any[]) => void)
-		// on(event: any, fn: any)
-
+	export class Server extends turbo.Server {
+		constructor(options: Server.Options)
+		emit<Name extends keyof Connection.Events>(event: Name, value: Connection.Events[Name])
+		on<Name extends keyof Connection.Events>(event: Name, fn: (value: Connection.Events[Name]) => void)
+		once<Name extends keyof Connection.Events>(event: Name, fn: (value: Connection.Events[Name]) => void)
+		addListener<Name extends keyof Connection.Events>(event: Name, fn: (value: Connection.Events[Name]) => void)
 	}
 	export function createServer(handler?: Server.Handler): Server
-	export function createServer(options?: turbo.Server.Options, handler?: Server.Handler): Server
+	export function createServer(options?: Server.Options, handler?: Server.Handler): Server
 
 
 

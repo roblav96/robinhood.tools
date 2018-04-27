@@ -14,6 +14,10 @@ import * as FastestValidator from 'fastest-validator'
 
 let socket = net.createServer()
 socket.on('')
+socket.on('', function() { })
+socket.on('listening', function(sdw) { })
+socket.on('connection', function(socket) { })
+socket.on('error', function(error) { })
 
 // console.log('turbo ->', turbo)
 // console.warn('turbo ->', console.dtsgen(turbo))
@@ -22,7 +26,14 @@ const server = turbo.createServer(function(req, res) {
 	console.log('req ->', req)
 	console.log('res ->', res)
 })
+server.address
 server.on('')
+server.on('', function() {
+
+})
+server.on('connection', function(socket) {
+
+})
 
 // console.log('server ->', server)
 // console.warn('server ->', console.dtsgen(server))
