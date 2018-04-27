@@ -1,5 +1,6 @@
 // 
 
+import * as _ from '../../common/lodash'
 import * as qs from 'querystring'
 import * as jsonparse from 'fast-json-parse'
 import * as TurboRequest from 'turbo-http/lib/request'
@@ -24,7 +25,7 @@ declare module 'turbo-http/lib/response' {
 }
 
 polka.use(function(req, res, next) {
-
+	
 	Object.assign(res, {
 		writeHead(code, headers = {}) {
 			if (Number.isFinite(code)) this.statusCode = code;
