@@ -8,7 +8,7 @@ declare module 'polka' {
 	interface Handler<Request, Response> {
 		(req: Request, res: Response, next: (error?: Error) => void): void
 	}
-	class Options<Server, Request, Response> extends Trouter<(req: Request, res: Response) => void> {
+	class Options<Server, Request, Response> extends Trouter<(req: Request, res: Response) => void, Options<Server, Request, Response>> {
 		server: Server
 		onError(error: Error, req: Request, res: Response, next: (error?: Error) => void): void
 		onNoMatch(req: Request, res: Response): void
@@ -20,9 +20,10 @@ declare module 'polka' {
 		wares: Handler<Request, Response>[]
 		bwares: { [base: string]: Handler<Request, Response>[] }
 		parse(req: Request): url.UrlWithStringQuery
-		use()
-		handler()
-		listen(port: number, hostname: string): Promise<void>
+		use(base: string, fn: Handler<Request, Response>)
+		use(...fn: Handler<Request, Response>[])
+		handler(req: Request, res: Response, parsed: url.UrlWithStringQuery)
+		listen(port: number, hostname?: string): Promise<void>
 	}
 	function polka<Server = http.Server, Request = http.IncomingMessage, Response = http.ServerResponse>(options: Options<Server, Request, Response>): Polka
 	export = polka

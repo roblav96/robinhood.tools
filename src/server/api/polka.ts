@@ -38,155 +38,157 @@ import * as FastestValidator from 'fastest-validator'
 const polka = Polka({
 	server: turbo.createServer(),
 
-	onError(error: Boom, req, res, next) {
-		if (!error.isBoom) {
-			console.error('polka Error ->', error)
-			error = new Boom(error)
-		} else {
-			if (error.data) Object.assign(error.output.payload, { attributes: error.data });
-			console.warn('polka onError ->', error.output.payload) // error.output.payload.error, error.message, error.output.payload)
-		}
-		if (res.headerSent) return;
-		res.statusCode = error.output.statusCode
-		Object.keys(error.output.headers).forEach(function(key) {
-			res.setHeader(key, error.output.headers[key])
-		})
-		res.send(error.output.payload)
-	},
+	// onError(error: Boom, req, res, next) {
+	// 	if (!error.isBoom) {
+	// 		console.error('polka Error ->', error)
+	// 		error = new Boom(error)
+	// 	} else {
+	// 		if (error.data) Object.assign(error.output.payload, { attributes: error.data });
+	// 		console.warn('polka onError ->', error.output.payload) // error.output.payload.error, error.message, error.output.payload)
+	// 	}
+	// 	if (res.headerSent) return;
+	// 	res.statusCode = error.output.statusCode
+	// 	Object.keys(error.output.headers).forEach(function(key) {
+	// 		res.setHeader(key, error.output.headers[key])
+	// 	})
+	// 	res.send(error.output.payload)
+	// },
 
-	onNoMatch(req, res) {
-		polka.onError(Boom.notFound(void 0, { method: req.method, path: req.path }), req, res)
-	},
+	// onNoMatch(req, res) {
+	// 	polka.onError(Boom.notFound(void 0, { method: req.method, path: req.path }), req, res)
+	// },
 
 })
 
 console.log('polka ->', polka)
 console.warn('polka ->', console.dtsgen(polka))
 
-Object.assign(polka, {
-
-	hook(this: any, handler: (req, res) => Promise<void>) {
-		this.use(function(req, res, next) {
-			handler(req, res).then(next).catch(next)
-		})
-	},
-
-	route(this: any, opts: {
-		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
-		url: string
-		authed?: boolean
-		schema?: {
-			query: any
-			body: any
-		}
-		handler: (req, res) => Promise<void>
-	}) {
-		if (opts.schema) {
-			const validate = {} as any
-			Object.keys(opts.schema).forEach(function(key) {
-				validate[key] = new FastestValidator().compile(opts.schema[key])
-			})
-			this.use(opts.url, function(req, res, next) {
-				let keys = Object.keys(validate)
-				let i: number, len = keys.length
-				for (i = 0; i < len; i++) {
-					let key = keys[i]
-					if (req[key] == null) return next(Boom.preconditionRequired(key));
-					let invalid = validate[key](req[key])
-					if (Array.isArray(invalid)) {
-						let error = Boom.preconditionFailed(key)
-						error.data = invalid as any
-						return next(error)
-					}
-				}
-				next()
-			})
-		}
-		this[opts.method.toLowerCase()](opts.url, function(req, res) {
-			if (opts.authed && !req.authed) {
-				return polka.onError(Boom.unauthorized(), req, res)
-			}
-			opts.handler(req, res).then(function(response) {
-				if (response != null) res.send(response);
-				if (!res.headerSent) res.end();
-			}).catch(function(error) {
-				polka.onError(error, req, res)
-			})
-		})
-	},
-
-})
-
 polka.use(function(req, res, next) {
-	
 	console.log('req ->', req)
 	console.warn('req ->', console.dtsgen(req))
 	console.log('res ->', res)
 	console.warn('res ->', console.dtsgen(res))
 	console.log('next ->', next)
 	console.warn('next ->', console.dtsgen(next))
-
-	Object.assign(res, {
-		writeHead(this: any, code, headers = {}) {
-			if (Number.isFinite(code)) this.statusCode = code;
-			Object.keys(headers).forEach(key => {
-				this.setHeader(key, headers[key])
-			})
-		},
-		send(this: any, data) {
-			if (data == null) {
-				this.setHeader('Content-Length', 0)
-				this.write('')
-				return
-			}
-			if (data.constructor == String || Buffer.isBuffer(data)) {
-				this.setHeader('Content-Length', data.length)
-				this.write(data)
-				return
-			}
-			if (data.constructor == Object || data instanceof Object) {
-				let json = JSON.stringify(data)
-				this.setHeader('Content-Type', 'application/json')
-				this.setHeader('Content-Length', json.length)
-				this.write(json)
-				return
-			}
-			this.write(data)
-		},
-	})
-
-	req.headers = {} as any
-	let i: number, len = req._options.headers.length
-	for (i = 0; i < len; i += 2) {
-		req.headers[req._options.headers[i].toLowerCase()] = req._options.headers[i + 1]
-	}
-
-	Object.assign(req, {
-		ondata(this: any, buffer, start, length) {
-			if (!this.body) this.body = [];
-			this.body.push(Buffer.from(buffer.slice(start, length + start)))
-		},
-		onend(this: any) {
-			if (this.body) {
-				this.body = Buffer.concat(this.body).toString()
-				let type = req.getHeader('Content-Type')
-				if (type == 'application/json') {
-					let parsed = jsonparse(req.body)
-					if (parsed.err) {
-						next(parsed.err)
-						return
-					}
-					req.body = parsed.value
-				} else if (type == 'application/x-www-form-urlencoded') {
-					req.body = qs.parse(req.body)
-				}
-			}
-			Object.assign(this, { ondata: _.noop, onend: _.noop })
-			next()
-		},
-	})
-
 })
+
+// Object.assign(polka, {
+
+// 	hook(this: any, handler: (req, res) => Promise<void>) {
+// 		this.use(function(req, res, next) {
+// 			handler(req, res).then(next).catch(next)
+// 		})
+// 	},
+
+// 	route(this: any, opts: {
+// 		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
+// 		url: string
+// 		authed?: boolean
+// 		schema?: {
+// 			query: any
+// 			body: any
+// 		}
+// 		handler: (req, res) => Promise<void>
+// 	}) {
+// 		if (opts.schema) {
+// 			const validate = {} as any
+// 			Object.keys(opts.schema).forEach(function(key) {
+// 				validate[key] = new FastestValidator().compile(opts.schema[key])
+// 			})
+// 			this.use(opts.url, function(req, res, next) {
+// 				let keys = Object.keys(validate)
+// 				let i: number, len = keys.length
+// 				for (i = 0; i < len; i++) {
+// 					let key = keys[i]
+// 					if (req[key] == null) return next(Boom.preconditionRequired(key));
+// 					let invalid = validate[key](req[key])
+// 					if (Array.isArray(invalid)) {
+// 						let error = Boom.preconditionFailed(key)
+// 						error.data = invalid as any
+// 						return next(error)
+// 					}
+// 				}
+// 				next()
+// 			})
+// 		}
+// 		this[opts.method.toLowerCase()](opts.url, function(req, res) {
+// 			if (opts.authed && !req.authed) {
+// 				return polka.onError(Boom.unauthorized(), req, res)
+// 			}
+// 			opts.handler(req, res).then(function(response) {
+// 				if (response != null) res.send(response);
+// 				if (!res.headerSent) res.end();
+// 			}).catch(function(error) {
+// 				polka.onError(error, req, res)
+// 			})
+// 		})
+// 	},
+
+// })
+
+// polka.use(function(req, res, next) {
+
+// 	Object.assign(res, {
+// 		writeHead(this: any, code, headers = {}) {
+// 			if (Number.isFinite(code)) this.statusCode = code;
+// 			Object.keys(headers).forEach(key => {
+// 				this.setHeader(key, headers[key])
+// 			})
+// 		},
+// 		send(this: any, data) {
+// 			if (data == null) {
+// 				this.setHeader('Content-Length', 0)
+// 				this.write('')
+// 				return
+// 			}
+// 			if (data.constructor == String || Buffer.isBuffer(data)) {
+// 				this.setHeader('Content-Length', data.length)
+// 				this.write(data)
+// 				return
+// 			}
+// 			if (data.constructor == Object || data instanceof Object) {
+// 				let json = JSON.stringify(data)
+// 				this.setHeader('Content-Type', 'application/json')
+// 				this.setHeader('Content-Length', json.length)
+// 				this.write(json)
+// 				return
+// 			}
+// 			this.write(data)
+// 		},
+// 	})
+
+// 	req.headers = {} as any
+// 	let i: number, len = req._options.headers.length
+// 	for (i = 0; i < len; i += 2) {
+// 		req.headers[req._options.headers[i].toLowerCase()] = req._options.headers[i + 1]
+// 	}
+
+// 	Object.assign(req, {
+// 		ondata(this: any, buffer, start, length) {
+// 			if (!this.body) this.body = [];
+// 			this.body.push(Buffer.from(buffer.slice(start, length + start)))
+// 		},
+// 		onend(this: any) {
+// 			if (this.body) {
+// 				this.body = Buffer.concat(this.body).toString()
+// 				let type = req.getHeader('Content-Type')
+// 				if (type == 'application/json') {
+// 					let parsed = jsonparse(req.body)
+// 					if (parsed.err) {
+// 						next(parsed.err)
+// 						return
+// 					}
+// 					req.body = parsed.value
+// 				} else if (type == 'application/x-www-form-urlencoded') {
+// 					req.body = qs.parse(req.body)
+// 				}
+// 			}
+// 			Object.assign(this, { ondata: _.noop, onend: _.noop })
+// 			next()
+// 		},
+// 	})
+
+// })
 
 export default polka
 

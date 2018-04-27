@@ -62,7 +62,7 @@ function finger(): Promise<void> {
 Promise.all([
 	uuid(), finger(),
 ]).then(function() {
-	return http.get('/security/token', { retries: Infinity })
+	return http.get('/security/token', { retries: 0 })
 	// }).then(function() {
 	// 	return http.get('/websocket/discover', { retries: Infinity })
 	// }).then(function(addresses) {
