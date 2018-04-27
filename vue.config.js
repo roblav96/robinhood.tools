@@ -15,7 +15,7 @@ const package = require('./package.json')
 module.exports = {
 
 	outputDir: 'dist/client',
-	dll: false,
+	dll: DEVELOPMENT,
 	css: { sourceMap: DEVELOPMENT },
 	vueLoader: { hotReload: false },
 
@@ -38,8 +38,8 @@ module.exports = {
 
 		config.plugins.push(new BundleAnalyzerPlugin())
 
-		// config.output.filename = '[name].bundle.js'
-		// config.output.chunkFilename = '[name].chunk.js'
+		config.output.filename = '[name].bundle.js'
+		config.output.chunkFilename = '[name].chunk.js'
 		// const dlls = ['bluebird', 'node-forge', 'lodash', 'vue', 'buefy']
 		// dlls.forEach(function(dll) {
 		// 	config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
@@ -50,7 +50,7 @@ module.exports = {
 		// 	minSize: 30000, maxSize: 50000,
 		// }))
 		// config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-		// 	name: 'node_modules', minChunks: module => module.context && module.context.includes('node_modules'),
+		// 	name: 'vendors', minChunks: module => module.context && module.context.includes('node_modules'),
 		// }))
 		// config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
 		// 	name: 'manifest', minChunks: Infinity,
