@@ -6,27 +6,23 @@ declare module 'turbo-http' {
 	import * as TurboResponse from 'turbo-http/lib/response'
 
 	namespace Server {
-		interface Options extends turbo.Server.Options {
-
-		}
 		interface Events extends turbo.Server.Events {
 			'request': [TurboRequest, TurboResponse]
 		}
 	}
 	export class Server extends turbo.Server {
-		constructor(options: Server.Options)
+		constructor(options?: turbo.Server.Options)
 		emit<Name extends keyof Server.Events>(event: Name, arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1])
 		on<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
 		once<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
 		addListener<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
 	}
 	export function createServer(handler?: (req: TurboRequest, res: TurboResponse) => void): Server
-	export function createServer(options?: Server.Options, handler?: (req: TurboRequest, res: TurboResponse) => void): Server
+	export function createServer(options?: turbo.Server.Options, handler?: (req: TurboRequest, res: TurboResponse) => void): Server
 
 }
 
 declare module 'turbo-http/lib/request' {
-	export = TurboRequest
 	import { Connection } from 'turbo-net'
 
 	namespace TurboRequest {
@@ -39,42 +35,45 @@ declare module 'turbo-http/lib/request' {
 			versionMajor: number
 			versionMinor: number
 		}
+		interface TurboRequest {
+			constructor(socket: Connection, options: Options)
+			_options: Options
+			method: 'GET' | 'POST' | 'PUT' | 'HEAD' | 'PATCH' | 'DELETE' | 'OPTIONS'
+			socket: Connection
+			url: string
+			getAllHeaders(): Map<string, string>
+			getHeader(header: string): string
+			ondata(buffer: Buffer, start: number, length: number): void
+			onend(): void
+		}
 	}
-	interface TurboRequest { }
-	class TurboRequest {
-		constructor(socket: Connection, options: TurboRequest.Options)
-		_options: TurboRequest.Options
-		method: 'GET' | 'POST' | 'PUT' | 'HEAD' | 'PATCH' | 'DELETE' | 'OPTIONS'
-		socket: Connection
-		url: string
-		getAllHeaders(): Map<string, string>
-		getHeader(header: string): string
-		ondata(buffer: Buffer, start: number, length: number): void
-		onend(): void
-	}
+	interface TurboRequest extends TurboRequest.TurboRequest { }
+	export = TurboRequest
+
 }
 
 declare module 'turbo-http/lib/response' {
 	import { Connection } from 'turbo-net'
 	import { Server } from 'turbo-http'
 
-	namespace Response { }
-	interface Response { }
-	class Response {
-		constructor(server: Server, socket: Connection, headers: Buffer)
-		_headers: Buffer
-		_headersLength: number
-		headerSent: boolean
-		server: Server
-		socket: Connection
-		statusCode: number
-		end(buffer: Buffer | string, length?: number, cb?: () => void)
-		endv(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void)
-		setHeader(name: string, value: string)
-		write(buffer: Buffer | string, length?: number, cb?: () => void)
-		writev(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void)
+	namespace TurboResponse {
+		interface TurboResponse {
+			constructor(server: Server, socket: Connection, headers: Buffer)
+			_headers: Buffer
+			_headersLength: number
+			headerSent: boolean
+			server: Server
+			socket: Connection
+			statusCode: number
+			end(buffer: Buffer | string, length?: number, cb?: () => void)
+			endv(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void)
+			setHeader(name: string, value: string)
+			write(buffer: Buffer | string, length?: number, cb?: () => void)
+			writev(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void)
+		}
 	}
-	export = Response
+	interface TurboResponse extends TurboResponse.TurboResponse { }
+	export = TurboResponse
 
 }
 

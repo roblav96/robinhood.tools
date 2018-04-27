@@ -3,6 +3,7 @@
 import '../main'
 
 import './polka'
+import './turbo'
 import './polka.plugins'
 
 import './security.hook'
