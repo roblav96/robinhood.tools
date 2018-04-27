@@ -14,70 +14,59 @@ import polka from './polka'
 
 declare module 'turbo-http/lib/request' {
 	interface TurboRequest {
-		cookies: Dict<string>
-		headers: Dict<string>
+		// cookies: Dict<string>
+		// headers: Dict<string>
 		body: any
 	}
 }
 
+polka.use(function(req, res, next) {
+
+	// req.headers = {}
+	// let i: number, len = req._options.headers.length
+	// for (i = 0; i < len; i += 2) {
+	// 	req.headers[req._options.headers[i].toLowerCase()] = req._options.headers[i + 1]
+	// }
+
+	Object.assign(req, {
+		ondata(buffer, start, length) {
+			if (!this.body) this.body = [];
+			this.body.push(Buffer.from(buffer.slice(start, length + start)))
+			// console.log('this.body.length ->', this.body.length)
+		},
+		onend() {
+			if (this.body) {
+				this.body = Buffer.concat(this.body).toString()
+				let content = this.getHeader('Content-Type')
+				if (content == 'application/json') {
+					let parsed = jsonparse(this.body)
+					if (parsed.err) {
+						next(parsed.err)
+						return
+					}
+					this.body = parsed.value
+				} else if (content == 'application/x-www-form-urlencoded') {
+					this.body = qs.parse(this.body)
+				}
+			}
+			Object.assign(this, { ondata: _.noop, onend: _.noop })
+			next()
+		},
+	} as typeof req)
+
+})
+
+
+
 declare module 'turbo-http/lib/response' {
 	interface TurboResponse {
-		headers: Dict<string>
-		_setHeader: typeof TurboResponse.prototype.setHeader
 		writeHead(code?: number, headers?: Dict<string>): void
 		setCookie(name: string, value: string, opts: cookie.CookieSerializeOptions): void
 		send(data?: any): void
 	}
 }
 
-
-
-Object.assign(TurboResponse.prototype, {
-	headers: {},
-	_setHeader: TurboResponse.prototype.setHeader,
-	setHeader(name, value) {
-		this.headers[name] = value
-		return this._setHeader(name, value)
-	},
-} as TurboResponse)
-// console.info('TurboResponse ->', TurboResponse)
-// console.dir(TurboResponse)
-
-
-
 polka.use(function(req, res, next) {
-
-	req.headers = {}
-	let i: number, len = req._options.headers.length
-	for (i = 0; i < len; i += 2) {
-		req.headers[req._options.headers[i].toLowerCase()] = req._options.headers[i + 1]
-	}
-
-	Object.assign(req, {
-		ondata(buffer, start, length) {
-			if (!this.body) this.body = [];
-			this.body.push(Buffer.from(buffer.slice(start, length + start)))
-		},
-		onend() {
-			if (this.body) {
-				this.body = Buffer.concat(this.body).toString()
-				let type = req.getHeader('Content-Type')
-				if (type == 'application/json') {
-					let parsed = jsonparse(req.body)
-					if (parsed.err) {
-						next(parsed.err)
-						return
-					}
-					req.body = parsed.value
-				} else if (type == 'application/x-www-form-urlencoded') {
-					req.body = qs.parse(req.body)
-				}
-			}
-			Object.assign(this, { ondata: _.noop, onend: _.noop })
-			console.log('this ->', this)
-			next()
-		},
-	} as typeof req)
 
 	Object.assign(res, {
 		setCookie(name, value, opts = {}) {
@@ -116,8 +105,38 @@ polka.use(function(req, res, next) {
 			this.write(data)
 		},
 	} as typeof res)
+	
+	next()
 
 })
+
+
+
+// class Assign {
+// 	headers = {} as Dict<string>
+// 	setHeader_: typeof TurboResponse.prototype.setHeader
+// 	setHeader(name, value) {
+// 		this.headers[name] = value
+// 		return this.setHeader_(name, value)
+// 	}
+// }
+// declare module 'turbo-http/lib/response' {
+// 	// type IAssign = typeof Assign
+// 	interface TurboResponse extends Assign { }
+// }
+
+
+
+// Object.assign(TurboResponse.prototype, {
+// 	headers: {},
+// 	_setHeader: TurboResponse.prototype.setHeader,
+// 	setHeader(name, value) {
+// 		this.headers[name] = value
+// 		return this._setHeader(name, value)
+// 	},
+// } as TurboResponse)
+// console.info('TurboResponse ->', TurboResponse)
+// console.dir(TurboResponse)
 
 // polka.use(function(req, res, next) {
 // 	console.log('req ->', req)

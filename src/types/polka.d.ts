@@ -28,7 +28,7 @@ declare module 'polka' {
 			wares: Handler<Request, Response, NextError>[]
 			bwares: { [base: string]: Handler<Request, Response, NextError>[] }
 			parse(req: Request): url.UrlWithStringQuery
-			use(base: string, fn: Handler<Request, Response, NextError>)
+			use(base: string, ...fn: Handler<Request, Response, NextError>[])
 			use(...fn: Handler<Request, Response, NextError>[])
 			handler(req: Request, res: Response, parsed: url.UrlWithStringQuery)
 			listen(port: number, hostname?: string): Promise<void>

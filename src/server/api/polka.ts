@@ -2,7 +2,6 @@
 
 import * as _ from '../../common/lodash'
 import * as onexit from 'exit-hook'
-import { Server as TurboServer } from 'turbo-http'
 import * as TurboRequest from 'turbo-http/lib/request'
 import * as TurboResponse from 'turbo-http/lib/response'
 import * as turbo from 'turbo-http'
@@ -13,10 +12,10 @@ import * as FastestValidator from 'fastest-validator'
 
 
 { (Polka as any).Router = Polka().constructor }
-class Router<Server, Request, Response, NextError> extends Polka.Router<Server, Request & Polka.Request, Response, NextError> {
+class Router<Server = turbo.Server, Request = TurboRequest & Polka.Request, Response = TurboResponse, NextError = Boom> extends Polka.Router<Server, Request, Response, NextError> {
 
 	hook(fn: (req: Request, res: Response) => Promise<void>) {
-		super.use(function(req, res, next) {
+		this.use(function(req, res, next) {
 			fn(req, res).then(function(resolved) {
 				console.log('resolved ->', resolved)
 				next(resolved as any)
@@ -76,7 +75,7 @@ class Router<Server, Request, Response, NextError> extends Polka.Router<Server, 
 
 
 
-const polka = new Router<TurboServer, TurboRequest, TurboResponse, Boom>({
+const polka = new Router({
 	server: turbo.createServer(),
 
 	onError(error, req, res, next) {
@@ -100,6 +99,11 @@ const polka = new Router<TurboServer, TurboRequest, TurboResponse, Boom>({
 	},
 
 })
+
+// polka.use(function(req, res, next) {
+// 	console.log('req ->', req)
+// 	next()
+// })
 
 export default polka
 
