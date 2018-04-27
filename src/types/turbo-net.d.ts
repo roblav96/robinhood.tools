@@ -12,8 +12,8 @@ declare module 'turbo-net' {
 		}
 		interface Events {
 			'close': void[]
-			'connection': [Connection]
-			'error': [Error]
+			'connection': [Connection, void]
+			'error': [Error, void]
 			'listening': void[]
 		}
 	}
@@ -42,7 +42,7 @@ declare module 'turbo-net' {
 			'close': void[]
 			'connect': void[]
 			'end': void[]
-			'error': [Error]
+			'error': [Error, void]
 			'finish': void[]
 		}
 	}

@@ -15,20 +15,15 @@ declare module 'turbo-http' {
 			(req, res): void
 		}
 		interface Events extends turbo.Server.Events {
-			'request': Server.Handler
+			'request': [any, any]
 		}
-	}
-	type Both = Server & turbo.Server
-	interface Server extends Both {
-		on(event: 'request', fn: Server.Handler)
-		
 	}
 	export class Server extends turbo.Server {
 		constructor(options: Server.Options)
-		emit<Name extends keyof Connection.Events>(event: Name, value: Connection.Events[Name])
-		on<Name extends keyof Connection.Events>(event: Name, fn: (value: Connection.Events[Name]) => void)
-		once<Name extends keyof Connection.Events>(event: Name, fn: (value: Connection.Events[Name]) => void)
-		addListener<Name extends keyof Connection.Events>(event: Name, fn: (value: Connection.Events[Name]) => void)
+		emit<Name extends keyof Server.Events>(event: Name, arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1])
+		on<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
+		once<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
+		addListener<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
 	}
 	export function createServer(handler?: Server.Handler): Server
 	export function createServer(options?: Server.Options, handler?: Server.Handler): Server

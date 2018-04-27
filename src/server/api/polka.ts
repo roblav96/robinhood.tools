@@ -16,8 +16,8 @@ let socket = net.createServer()
 socket.on('')
 socket.on('', function() { })
 socket.on('listening', function(sdw) { })
-socket.on('connection', function(socket) { })
-socket.on('error', function(error) { })
+socket.on('connection', function(socket, idk) { })
+socket.on('error', function(error, haiii) { })
 
 // console.log('turbo ->', turbo)
 // console.warn('turbo ->', console.dtsgen(turbo))
@@ -31,7 +31,7 @@ server.on('')
 server.on('', function() {
 
 })
-server.on('connection', function(socket) {
+server.on('request', function(socket) {
 
 })
 
