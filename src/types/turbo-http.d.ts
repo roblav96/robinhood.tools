@@ -26,23 +26,52 @@ declare module 'turbo-http' {
 }
 
 declare module 'turbo-http/lib/request' {
-	import * as turbo from 'turbo-net'
+	import { Connection } from 'turbo-net'
 
-	namespace Request { }
+	namespace Request {
+		interface Options {
+			headers: string[]
+			method: number
+			shouldKeepAlive: boolean
+			upgrade: boolean
+			url: string
+			versionMajor: number
+			versionMinor: number
+		}
+	}
 	class Request {
-		constructor(socket: turbo.Connection, options)
+		constructor(socket: Connection, options: Request.Options)
+		_options: Request.Options
 		method: 'GET' | 'POST' | 'PUT' | 'HEAD' | 'PATCH' | 'DELETE' | 'OPTIONS'
+		socket: Connection
+		url: string
+		getAllHeaders(): Map<string, string>
+		getHeader(header: string): string
+		ondata(buffer: Buffer, start: number, length: number): void
+		onend(): void
 	}
 	export = Request
 
 }
 
 declare module 'turbo-http/lib/response' {
-	import * as turbo from 'turbo-net'
+	import { Connection } from 'turbo-net'
+	import { Server } from 'turbo-http'
 
 	namespace Response { }
 	class Response {
-		constructor(socket, options)
+		constructor(server: Server, socket: Connection, headers: Buffer)
+		_headers: Buffer
+		_headersLength: number
+		headerSent: boolean
+		server: Server
+		socket: Connection
+		statusCode: number
+		end(buffer: Buffer | string, length?: number, cb?: () => void)
+		endv(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void)
+		setHeader(name: string, value: string)
+		write(buffer: Buffer | string, length?: number, cb?: () => void)
+		writev(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void)
 	}
 	export = Response
 

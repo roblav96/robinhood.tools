@@ -16,6 +16,8 @@ declare module 'turbo-net' {
 	}
 	export class Server extends EventEmitter {
 		constructor(options?: Server.Options)
+		_address: string
+		_closed: boolean
 		allowHalfOpen: boolean
 		connections: Connection[]
 		address(): { address: string, family: string, port: number }
@@ -43,6 +45,9 @@ declare module 'turbo-net' {
 	}
 	export class Connection extends EventEmitter {
 		constructor(server: Server)
+		_handle: Buffer
+		_paused: boolean
+		_server: Server
 		allowHalfOpen: boolean
 		closed: boolean
 		ended: boolean

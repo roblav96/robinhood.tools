@@ -12,38 +12,23 @@ import * as FastestValidator from 'fastest-validator'
 
 
 
-let socket = net.createServer()
-socket.on('')
-socket.on('', function() { })
-socket.on('listening', function(sdw) { })
-socket.on('connection', function(socket, idk) { })
-socket.on('error', function(error, haiii) { })
+// let socket = net.createServer()
 
-// console.log('turbo ->', turbo)
-// console.warn('turbo ->', console.dtsgen(turbo))
-
+console.log('turbo ->', turbo)
+console.warn('turbo ->', console.dtsgen(turbo))
 const server = turbo.createServer(function(req, res) {
 	console.log('req ->', req)
+	console.warn('req ->', console.dtsgen(req))
 	console.log('res ->', res)
+	console.warn('res ->', console.dtsgen(res))
 })
-server.address
-server.on('')
-server.on('', function() {
-
-})
-server.on('request', function(req, res) {
-
-})
-
-// console.log('server ->', server)
-// console.warn('server ->', console.dtsgen(server))
-
-
+console.log('server ->', server)
+console.warn('server ->', console.dtsgen(server))
 
 
 
 const polka = Polka({
-	server,
+	// server,
 
 	onError(error: Boom, req, res, next) {
 		if (!error.isBoom) {
@@ -188,13 +173,13 @@ polka.use(function(req, res, next) {
 export default polka
 
 setImmediate(async function() {
-	await polka.listen(+process.env.PORT, process.env.HOST)
-	console.info('polka listening ->', process.env.HOST + ':' + process.env.PORT)
+	await server.listen(+process.env.PORT, process.env.HOST)
+	console.info('turbo listening ->', process.env.HOST + ':' + process.env.PORT)
 })
 
 onexit(function() {
-	polka.server.connections.forEach(v => v.close())
-	polka.server.close()
+	server.connections.forEach(v => v.close())
+	server.close()
 })
 
 
