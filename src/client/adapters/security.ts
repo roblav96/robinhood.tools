@@ -59,16 +59,28 @@ function finger(): Promise<void> {
 	})
 }
 
-Promise.all([
-	uuid(), finger(),
-]).then(function() {
-	return http.get('/security/token', { retries: 0 })
-	// }).then(function() {
-	// 	return http.get('/websocket/discover', { retries: Infinity })
-	// }).then(function(addresses) {
-	// 	return socket.init(addresses)
-}).then(function() {
-	state.ready = true
+// Promise.all([
+// 	uuid(), finger(),
+// ]).then(function() {
+// 	return http.get('/security/token', { retries: 0 })
+// 	// }).then(function() {
+// 	// 	return http.get('/websocket/discover', { retries: Infinity })
+// 	// }).then(function(addresses) {
+// 	// 	return socket.init(addresses)
+// }).then(function() {
+// 	state.ready = true
+// })
+
+
+
+
+
+// clock.on('30s', function ontock(i: number) {
+http.post('/polka', { tock: Math.random().toString(16) }).then(function(response) {
+	console.log('response ->', response)
+}).catch(function(error) {
+	console.error('polka Error ->', error)
 })
+// }).emit('30s', 0)
 
 

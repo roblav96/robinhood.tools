@@ -8,18 +8,19 @@ import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
 import * as Boom from 'boom'
 import * as FastestValidator from 'fastest-validator'
+import server from './turbo'
 
 
 
 { (Polka as any).Router = Polka().constructor }
-class Router<Server = turbo.Server, Request = TurboRequest & Polka.Request, Response = TurboResponse, NextError = Boom> extends Polka.Router<Server, Request, Response, NextError> {
+class Router<Server extends turbo.Server, Request extends TurboRequest & Polka.Request, Response extends TurboResponse> extends Polka.Router<Server, Request, Response> {
 
 	hook(fn: (req: Request, res: Response) => Promise<void>) {
 		this.use(function(req, res, next) {
 			fn(req, res).then(function(resolved) {
 				console.log('resolved ->', resolved)
 				next(resolved as any)
-			}).catch(function(error: NextError) {
+			}).catch(function(error) {
 				console.info('hook error ->', error)
 				console.dir(error)
 				next(error)
@@ -27,7 +28,7 @@ class Router<Server = turbo.Server, Request = TurboRequest & Polka.Request, Resp
 		})
 	}
 
-	route(this: any, opts: {
+	route(opts: {
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
 		url: string
 		authed?: boolean
@@ -100,16 +101,11 @@ const polka = new Router({
 
 })
 
-// polka.use(function(req, res, next) {
-// 	console.log('req ->', req)
-// 	next()
-// })
-
 export default polka
 
 
 
-setImmediate(async function() {
+setImmediate(async function start() {
 	await polka.listen(+process.env.PORT, process.env.HOST)
 	console.info('turbo listening ->', process.env.HOST + ':' + process.env.PORT)
 })
