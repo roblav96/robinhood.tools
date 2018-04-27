@@ -65,15 +65,17 @@ span.icon.is-xxlarge > i.mdi::before {
 // 
 @each $key,
 $value in (('', $speed), ('-slow', $speed-slow), ('-slower', $speed-slower), ('-slowest', 500ms), ('-debug', 1s)) {
-	.animate#{$key} {
+	.animated#{$key} {
 		animation-duration: $value !important;
+		animation-fill-mode: both;
 	}
 }
 
-.animate-infinite {
-	animation-iteration-count: infinite !important;
-}
-
+// .animated {
+// 	transform: translateZ(0);
+// 	transform-style: preserve-3d;
+// 	backface-visibility: hidden;
+// }
 // 
 // ████  TEXT  ████
 // 

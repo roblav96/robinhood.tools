@@ -20,6 +20,12 @@ export default class extends Mixins(VUtilsMixin) {
 
 	}
 
+	initing = true
+	mounted() {
+		setTimeout(() => this.initing = false, 100)
+		setTimeout(() => this.initing = null, 1000)
+	}
+
 	get routes() {
 		return this.$router.options.routes.filter(v => v.name && !v.path.includes('/:'))
 	}

@@ -33,7 +33,7 @@ span.navbar-burger.burger > span {
 				</span>
 			</div>
 
-			<div class="navbar-menu animate-debug fade-in slide-from-top" :class="{ 'is-active': isMobileMenu }">
+			<div class="navbar-menu" :class="{ 'is-active animated-slow fadeIn': isMobileMenu }">
 				<div class="navbar-start">
 					<router-link class="navbar-item flex items-center" v-for="route in routes" v-on:click.native="isMobileMenu = false"
 					    :key="route.name" :to="{ name: route.name }">

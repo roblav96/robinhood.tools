@@ -7,11 +7,13 @@
 </style>
 
 <template>
-	<div id="app">
+	<div id="app" :class="{ 'opacity-0': initing == true, 'animated-slower fadeIn': initing == false }">
 
 		<v-navbar></v-navbar>
 
-		<router-view></router-view>
+		<transition :enter-active-class="initing == null ? 'animated-slower fadeIn' : ''" leave-active-class="opacity-0">
+			<router-view></router-view>
+		</transition>
 
 		<footer class="footer py-12">
 			<div class="container">

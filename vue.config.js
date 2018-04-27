@@ -17,15 +17,15 @@ module.exports = {
 	outputDir: 'dist/client',
 	dll: DEVELOPMENT,
 	css: { sourceMap: DEVELOPMENT },
-	vueLoader: { hotReload: DEVELOPMENT },
+	vueLoader: { hotReload: false },
 
 	configureWebpack: function(config) {
 
 		config.entry.app = './src/client/main.ts'
+		config.output.filename = '[name].bundle.js'
+		config.output.chunkFilename = '[name].chunk.js'
 		delete config.node.process
 		delete config.node.setImmediate
-		// config.output.filename = '[name].bundle.js'
-		// config.output.chunkFilename = '[name].chunk.js'
 
 		if (DEVELOPMENT) {
 			config.devtool = 'source-map'
