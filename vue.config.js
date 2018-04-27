@@ -66,10 +66,10 @@ module.exports = {
 
 		config.plugins.delete('no-emit-on-errors')
 
-		// config.plugin('friendly-errors').tap(function(args) {
-		// 	args[0].clearConsole = false
-		// 	return args
-		// })
+		config.plugin('friendly-errors').tap(function(args) {
+			args[0].clearConsole = false
+			return args
+		})
 
 	},
 

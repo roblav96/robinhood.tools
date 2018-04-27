@@ -1,6 +1,6 @@
 // 
 
-declare module 'turbo-http' {
+declare module 'turbo-net' {
 	import * as http from 'http'
 
 	interface Server extends http.Server {
@@ -14,3 +14,5 @@ declare module 'turbo-http' {
 	export function createServer(opts?: Partial<ServerOptions>, handler?: Function): Server
 
 }
+
+

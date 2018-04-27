@@ -6,14 +6,14 @@ import * as qs from 'querystring'
 import * as Polka from 'polka'
 import * as Boom from 'boom'
 import * as http from 'http'
-import * as turbo from 'turbo-http'
+import * as turbohttp from 'turbo-http'
 import * as jsonparse from 'fast-json-parse'
 import * as FastestValidator from 'fastest-validator'
 
 
 
 const polka = Polka({
-	server: turbo.createServer(),
+	server: turbohttp.createServer(),
 
 	onError(error: Boom, req, res, next) {
 		if (!error.isBoom) {

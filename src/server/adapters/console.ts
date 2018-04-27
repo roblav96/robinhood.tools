@@ -41,11 +41,16 @@ for (i = 0; i < len; i++) {
 
 import * as inspector from 'inspector'
 import * as onexit from 'exit-hook'
+import * as clc from 'cli-color'
 if (process.env.DEBUGGER) {
 	let offset = pandora.processContext.context.processRepresentation.offset
 	inspector.open(process.debugPort + offset + +process.env.INSTANCE)
-	onexit(function() {
-		if (process.env.PRIMARY) console.clear();
+	onexit(function(signal) {
+		if (process.env.PRIMARY) {
+			let stdout = (console as any)._stdout
+			if (stdout.isTTY) { stdout.isTTY = false; process.nextTick(() => stdout.isTTY = true) }
+			console.clear()
+		}
 		inspector.close()
 	})
 }
@@ -59,4 +64,5 @@ Object.assign(console, { dtsgen: _.noop })
 if (process.env.DEVELOPMENT) {
 	Object.assign(console, { dtsgen(value: any) { return dtsgen(value) } })
 }
+
 
