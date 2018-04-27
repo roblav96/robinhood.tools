@@ -25,7 +25,7 @@ declare module 'turbo-http/lib/response' {
 }
 
 polka.use(function(req, res, next) {
-	
+
 	Object.assign(res, {
 		writeHead(code, headers = {}) {
 			if (Number.isFinite(code)) this.statusCode = code;
@@ -59,7 +59,6 @@ polka.use(function(req, res, next) {
 	} as typeof res)
 
 	Object.assign(req, {
-		headers: {},
 		ondata(buffer, start, length) {
 			if (!this.body) this.body = [];
 			this.body.push(Buffer.from(buffer.slice(start, length + start)))
@@ -85,6 +84,7 @@ polka.use(function(req, res, next) {
 		},
 	} as typeof req)
 
+	req.headers = {}
 	let i: number, len = req._options.headers.length
 	for (i = 0; i < len; i += 2) {
 		req.headers[req._options.headers[i].toLowerCase()] = req._options.headers[i + 1]
