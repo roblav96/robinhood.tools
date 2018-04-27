@@ -29,10 +29,10 @@ process.env.PORT = +process.env.PORT + offset + +process.env.INSTANCE
 
 
 process.on('uncaughtException', function(error) {
-	console.error('UNCAUGHT EXCEPTION Error ->', error)
+	console.error('UNCAUGHT EXCEPTION ->', error)
 })
 process.on('unhandledRejection', function(error) {
-	console.error('UNHANDLED REJECTION Error ->', error)
+	console.error('UNHANDLED PROMISE REJECTION ->', error)
 	if (process.env.PRODUCTION) process.exit(1);
 })
 

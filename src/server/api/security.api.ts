@@ -25,6 +25,8 @@ polka.route({
 		res.setCookie('x-bytes', req.doc.bytes, cookie)
 		let token = security.generateToken(req.doc, prime)
 		res.setCookie('x-token', token, cookie)
+		
+		return {should: 'throw'}
 
 	}
 })

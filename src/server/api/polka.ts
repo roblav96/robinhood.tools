@@ -12,38 +12,21 @@ import * as FastestValidator from 'fastest-validator'
 
 
 
-const polka = Polka<TurboServer, TurboRequest, TurboResponse, Boom>({
-	server: turbo.createServer(),
+{ (Polka as any).Router = Polka().constructor }
+class Router<Server, Request, Response, NextError> extends Polka.Router<Server, Request & Polka.Request, Response, NextError> {
 
-	onError(error, req, res, next) {
-		if (!error.isBoom) {
-			console.error('polka Error ->', error)
-			error = new Boom(error)
-		} else {
-			if (error.data) Object.assign(error.output.payload, { attributes: error.data });
-			console.warn('polka onError ->', error.output.payload) // error.output.payload.error, error.message, error.output.payload)
-		}
-		if (res.headerSent) return;
-		res.statusCode = error.output.statusCode
-		Object.keys(error.output.headers).forEach(function(key) {
-			res.setHeader(key, error.output.headers[key])
+	hook(fn: (req: Request, res: Response) => Promise<void>) {
+		super.use(function(req, res, next) {
+			fn(req, res).then(function(resolved) {
+				console.log('resolved ->', resolved)
+				next(resolved as any)
+			}).catch(function(error: NextError) {
+				console.info('hook error ->', error)
+				console.dir(error)
+				next(error)
+			})
 		})
-		res.send(error.output.payload)
-	},
-
-	onNoMatch(req, res) {
-		polka.onError(Boom.notFound(void 0, { method: req.method, path: req.path }), req, res, void 0)
-	},
-
-})
-
-Object.assign(polka, {
-
-	hook(this: any, handler: (req, res) => Promise<void>) {
-		this.use(function(req, res, next) {
-			handler(req, res).then(next).catch(next)
-		})
-	},
+	}
 
 	route(this: any, opts: {
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
@@ -78,20 +61,49 @@ Object.assign(polka, {
 		}
 		this[opts.method.toLowerCase()](opts.url, function(req, res) {
 			if (opts.authed && !req.authed) {
-				return polka.onError(Boom.unauthorized(), req, res)
+				return polka.onError(Boom.unauthorized(), req, res, _.noop)
 			}
 			opts.handler(req, res).then(function(response) {
 				if (response != null) res.send(response);
 				if (!res.headerSent) res.end();
 			}).catch(function(error) {
-				polka.onError(error, req, res)
+				polka.onError(error, req, res, _.noop)
 			})
 		})
+	}
+
+}
+
+
+
+const polka = new Router<TurboServer, TurboRequest, TurboResponse, Boom>({
+	server: turbo.createServer(),
+
+	onError(error, req, res, next) {
+		if (!error.isBoom) {
+			console.error('polka Error ->', error)
+			error = new Boom(error)
+		} else {
+			if (error.data) Object.assign(error.output.payload, { attributes: error.data });
+			console.warn('polka onError ->', error.output.payload) // error.output.payload.error, error.message, error.output.payload)
+		}
+		if (res.headerSent) return;
+		res.statusCode = error.output.statusCode
+		Object.keys(error.output.headers).forEach(function(key) {
+			res.setHeader(key, error.output.headers[key])
+		})
+		res.send(error.output.payload)
+	},
+
+	onNoMatch(req, res) {
+		polka.onError(Boom.notFound(null, { method: req.method, path: req.path }), req, res, _.noop)
 	},
 
 })
 
 export default polka
+
+
 
 setImmediate(async function() {
 	await polka.listen(+process.env.PORT, process.env.HOST)
