@@ -40,6 +40,7 @@ export {
 	toPairs,
 	truncate,
 	uniq,
+	uniqBy,
 	unset,
 	values,
 } from 'lodash'

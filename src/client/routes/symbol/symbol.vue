@@ -11,24 +11,17 @@
 		<div class="hero-body">
 			<div class="container">
 				<div class="columns is-mobile is-gapless">
-					<img class="column is-narrow p-0 is-png image is-64x64 self-center rounded mr-6" :src="'https://storage.googleapis.com/iex/api/logos/'+symbol+'.png'"
-					    v-on:error="onerror">
-					<div class="column content">
-						<h1 class="title leading-none is-spaced my-0 is-1">{{symbol}}</h1>
-						<h2 class="subtitle leading-none my-0 is-5">Walk Disney</h2>
+					<v-symbol-logo class="column is-narrow p-0 image is-64x64 self-center mr-6" :symbol="symbol"></v-symbol-logo>
+					<div class="column">
+						<h1 class="title is-spaced my-0 is-2">{{symbol}}</h1>
+						<h2 class="subtitle my-0 is-6">Company Name</h2>
 					</div>
 				</div>
-				<!-- <h1 class="title">
-					{{ symbol }}
-				</h1>
-				<h2 class="subtitle">
-					Primary subtitle
-				</h2> -->
 			</div>
 		</div>
 
 		<div class="hero-foot">
-			<nav class="tabs is-centered is-fullwidth">
+			<nav class="tabs is-boxed">
 				<div class="container">
 					<ul>
 						<li class="is-active">

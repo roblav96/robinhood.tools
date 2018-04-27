@@ -42,11 +42,6 @@ export default class extends Vue {
 		this.$router.push({ name: 'symbol', params: { symbol: result.symbol } })
 	}
 
-	onerror(event: Event) {
-		let el = event.target as HTMLImageElement
-		el.src = 'https://logo.clearbit.com/www.nasdaq.com'
-	}
-
 }
 
 

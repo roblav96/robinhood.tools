@@ -19,18 +19,13 @@ export const routes = [
 	},
 
 	{
-		title: 'Watchlist', icon: 'wunderlist',
-		name: 'watchlist', path: '/watchlist',
+		title: 'Indexes', icon: 'earth',
+		name: 'indexes', path: '/indexes',
 	},
 
 	{
 		title: 'Screener', icon: 'radar',
 		name: 'screener', path: '/screener',
-	},
-
-	{
-		title: 'Indexes', icon: 'flag-variant',
-		name: 'indexes', path: '/indexes',
 	},
 
 	{

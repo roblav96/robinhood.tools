@@ -33,15 +33,16 @@ span.navbar-burger.burger > span {
 				</span>
 			</div>
 
-			<div class="navbar-menu" :class="{ 'is-active': isMobileMenu }">
+			<div class="navbar-menu animate-debug fade-in slide-from-top" :class="{ 'is-active': isMobileMenu }">
 				<div class="navbar-start">
-					<router-link class="navbar-item flex items-center" v-for="route in routes" :key="route.name" :to="{ name: route.name }">
+					<router-link class="navbar-item flex items-center" v-for="route in routes" v-on:click.native="isMobileMenu = false"
+					    :key="route.name" :to="{ name: route.name }">
 						<b-icon class="mr-2" :icon="route.icon" />
 						<span>{{ route.title }}</span>
 					</router-link>
 				</div>
 				<div class="navbar-end">
-					<router-link class="navbar-item flex items-center" :to="{ name: 'login' }">
+					<router-link class="navbar-item flex items-center" v-on:click.native="isMobileMenu = false" :to="{ name: 'login' }">
 						<img class="image is-24x24 mr-2" src="@/assets/robinhood-logo.svg" alt="Robinhood"></img>
 						<span class="has-text-rhgreen">Login</span>
 					</router-link>

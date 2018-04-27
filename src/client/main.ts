@@ -10,12 +10,10 @@ Object.assign(console, { dtsgen: _.noop, dump: _.noop })
 // if (process.env.DEVELOPMENT) console.dtsgen = require('@/common/dtsgen').default;
 if (process.env.DEVELOPMENT) Object.assign(window, require('@/common/core'));
 
-import 'repaintless/repaintless-scss/repaintless.scss'
+import 'animate.css'
 import '@/client/styles/theme.scss'
-import '@/client/styles/plex.scss'
-import '@/client/styles/mdi.scss'
-import '@/client/styles/styles.css'
-import '@/client/styles/tailwind.out.css'
+import '@/client/styles/vendors.scss'
+import '@/client/styles/tailwind.build.css'
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
@@ -33,7 +31,7 @@ Vue.use(Buefy, {
 	defaultToastDuration: 5000,
 	defaultInputAutocomplete: 'off',
 	defaultNoticeQueue: false,
-	defaultTooltipType: 'is-dark',
+	defaultTooltipType: 'is-primary',
 } as BuefyConfig)
 
 require('@/client/vm')

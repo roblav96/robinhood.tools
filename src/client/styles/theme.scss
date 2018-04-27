@@ -1,8 +1,4 @@
 // 
-@charset 'utf-8';
-// 
-// 
-// 
 @import '~bulma/sass/utilities/initial-variables';
 // 
 // $black: #22292F;
@@ -17,8 +13,8 @@ $white-ter: #F1F5F8;
 $white-bis: #F8FAFC;
 $white: #FFFFFF;
 // 
-// $light: $white-ter;
-// $dark: $black;
+$light: $white-ter;
+$dark: $grey-darker;
 // 
 $orange: #F6993F;
 $yellow: #FFED4A;
@@ -61,7 +57,7 @@ $colors: map-merge($colors, ('accent':($accent, $white)));
 $colors: map-merge($colors, ('rhgreen':($rhgreen, $white)));
 $colors: map-merge($colors, ('rhred':($rhred, $white)));
 // 
-$body-background-color: $white-ter;
+$body-background-color: $white-bis;
 $footer-background-color: $white;
 // $hr-background-color: $grey-lighter;
 // $button-disabled-opacity: 0.33;
@@ -81,6 +77,7 @@ $modal-background-background-color: rgba($black, 0.66);
 @import '~bulma';
 @import '~buefy/src/scss/buefy';
 // 
-@import './styles' // 
+@import './styles';
+// 
 // 
 //
