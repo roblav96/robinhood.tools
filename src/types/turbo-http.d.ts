@@ -35,7 +35,7 @@ declare module 'turbo-http/lib/request' {
 			versionMajor: number
 			versionMinor: number
 		}
-		interface TurboRequest {
+		class TurboRequest {
 			constructor(socket: Connection, options: Options)
 			_options: Options
 			method: 'GET' | 'POST' | 'PUT' | 'HEAD' | 'PATCH' | 'DELETE' | 'OPTIONS'
@@ -48,6 +48,7 @@ declare module 'turbo-http/lib/request' {
 		}
 	}
 	interface TurboRequest extends TurboRequest.TurboRequest { }
+	class TurboRequest { }
 	export = TurboRequest
 
 }
@@ -57,7 +58,7 @@ declare module 'turbo-http/lib/response' {
 	import { Server } from 'turbo-http'
 
 	namespace TurboResponse {
-		interface TurboResponse {
+		class TurboResponse {
 			constructor(server: Server, socket: Connection, headers: Buffer)
 			_headers: Buffer
 			_headersLength: number
@@ -73,6 +74,7 @@ declare module 'turbo-http/lib/response' {
 		}
 	}
 	interface TurboResponse extends TurboResponse.TurboResponse { }
+	class TurboResponse { }
 	export = TurboResponse
 
 }

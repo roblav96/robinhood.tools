@@ -8,8 +8,6 @@ import * as TurboResponse from 'turbo-http/lib/response'
 import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
 import * as Boom from 'boom'
-import * as qs from 'querystring'
-import * as jsonparse from 'fast-json-parse'
 import * as FastestValidator from 'fastest-validator'
 
 

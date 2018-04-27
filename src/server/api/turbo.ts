@@ -1,6 +1,9 @@
 // 
 
-import * as http from 'http'
+import * as qs from 'querystring'
+import * as jsonparse from 'fast-json-parse'
+import * as TurboRequest from 'turbo-http/lib/request'
+import * as TurboResponse from 'turbo-http/lib/response'
 import * as turbo from 'turbo-http'
 import polka from './polka'
 
@@ -19,8 +22,6 @@ declare module 'turbo-http/lib/response' {
 		writeHead(code: number, headers?: Dict<string>): void
 	}
 }
-
-
 
 polka.use(function(req, res, next) {
 
@@ -56,13 +57,8 @@ polka.use(function(req, res, next) {
 		},
 	} as typeof res)
 
-	req.headers = {} as any
-	let i: number, len = req._options.headers.length
-	for (i = 0; i < len; i += 2) {
-		req.headers[req._options.headers[i].toLowerCase()] = req._options.headers[i + 1]
-	}
-
 	Object.assign(req, {
+		headers: {},
 		ondata(buffer, start, length) {
 			if (!this.body) this.body = [];
 			this.body.push(Buffer.from(buffer.slice(start, length + start)))
@@ -88,13 +84,18 @@ polka.use(function(req, res, next) {
 		},
 	} as typeof req)
 
+	let i: number, len = req._options.headers.length
+	for (i = 0; i < len; i += 2) {
+		req.headers[req._options.headers[i].toLowerCase()] = req._options.headers[i + 1]
+	}
+
 })
 
-polka.use(function(req, res, next) {
-	console.log('req ->', req)
-	console.log('req.awesome ->', req.awesome)
-	req.awesome()
-	next()
-})
+// polka.use(function(req, res, next) {
+// 	console.log('req ->', req)
+// 	console.log('req.awesome ->', req.awesome)
+// 	req.awesome()
+// 	next()
+// })
 
 
