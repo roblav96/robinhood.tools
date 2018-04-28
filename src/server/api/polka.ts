@@ -97,8 +97,8 @@ export default polka
 
 polka.get('/', function get(req, res) { res.end('hello world') })
 polka.post('/', function post(req, res) { res.end('hello world') })
-polka.get('/api/polka', function get(req, res) { res.end('polka') })
-polka.post('/api/polka', function post(req, res) { res.end('polka') })
+polka.get('/api/polka', function get(req, res) { res.end() })
+polka.post('/api/polka', function post(req, res) { res.end() })
 
 
 
@@ -111,5 +111,14 @@ onexit(function() {
 	polka.server.connections.forEach(v => v.close())
 	polka.server.close()
 })
+
+
+
+// const server = turbo.createServer(function(req, res) {
+// 	res.setHeader('Content-Length', '11')
+// 	res.write(Buffer.from('hello world'))
+// })
+// server.listen(12301)
+// onexit(function() { server.close() })
 
 

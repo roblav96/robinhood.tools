@@ -1,8 +1,6 @@
 // 
 
 import * as _ from '../../common/lodash'
-// import * as TurboRequest from 'turbo-http/lib/request'
-// import * as TurboResponse from 'turbo-http/lib/response'
 import * as qs from 'querystring'
 import * as cookie from 'cookie'
 import * as jsonparse from 'fast-json-parse'
