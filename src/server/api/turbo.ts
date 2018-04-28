@@ -1,6 +1,8 @@
 // 
 
 import * as _ from '../../common/lodash'
+// import * as TurboRequest from 'turbo-http/lib/request'
+// import * as TurboResponse from 'turbo-http/lib/response'
 import * as qs from 'querystring'
 import * as cookie from 'cookie'
 import * as jsonparse from 'fast-json-parse'
@@ -9,15 +11,9 @@ import polka from './polka'
 
 
 
-declare module 'turbo-net' {
-	namespace Connection {
-		interface Events { 'next': void[] }
-	}
-}
-
 declare module 'turbo-http/lib/request' {
 	interface TurboRequest {
-		next: boolean
+		headers: { [header: string]: string }
 		body: any
 	}
 }
@@ -34,21 +30,21 @@ declare module 'turbo-http/lib/response' {
 
 
 polka.use(function(req, res, next) {
-	console.time('use')
+
+	req.socket.on('connect', function() { console.log('connection -> connect') })
+	req.socket.on('finish', function() { console.log('connection -> finish') })
+	req.socket.on('close', function() { console.log('connection -> close') })
+	req.socket.on('end', function() { console.log('connection -> end') })
+	req.socket.on('error', function() { console.log('connection -> error') })
 
 
-	req.socket.once('close', function() { console.log('req -> close') })
-	req.socket.once('end', function() { console.log('req -> end') })
-	req.socket.once('finish', function() { console.log('req -> finish') })
-	req.socket.once('connect', function() { console.log('req -> connect') })
-	req.socket.once('error', function() { console.log('req -> error') })
-	res.socket.once('close', function() { console.log('res -> close') })
-	res.socket.once('end', function() { console.log('res -> end') })
-	res.socket.once('finish', function() { console.log('res -> finish') })
-	res.socket.once('connect', function() { console.log('res -> connect') })
-	res.socket.once('error', function() { console.log('res -> error') })
 
-
+	req.headers = {}
+	let rawheaders = req._options.headers
+	let i: number, len = rawheaders.length
+	for (i = 0; i < len; i += 2) {
+		req.headers[rawheaders[i].toLowerCase()] = rawheaders[i + 1]
+	}
 
 	Object.assign(req, {
 		ondata(buffer, start, length) {
@@ -76,7 +72,7 @@ polka.use(function(req, res, next) {
 
 
 	Object.assign(res, {
-		// finished: false,
+		finished: false,
 		setCookie(name, value, opts = {}) {
 			if (Number.isFinite(opts.expires as any)) {
 				opts.expires = new Date(opts.expires)
@@ -143,12 +139,6 @@ polka.use(function(req, res, next) {
 // }
 
 // polka.use(function(req, res, next) {
-
-// 	// req.headers = {}
-// 	// let i: number, len = req._options.headers.length
-// 	// for (i = 0; i < len; i += 2) {
-// 	// 	req.headers[req._options.headers[i].toLowerCase()] = req._options.headers[i + 1]
-// 	// }
 
 // 	Object.assign(req, {
 // 		ondata(buffer, start, length) {

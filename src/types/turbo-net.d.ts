@@ -22,7 +22,9 @@ declare module 'turbo-net' {
 		connections: Connection[]
 		address(): { address: string, family: string, port: number }
 		close(cb?: () => void): void
-		listen(port: number, address: string, cb?: () => void): void
+		listen(cb?: () => void): void
+		listen(port?: number, cb?: () => void): void
+		listen(port?: number, address?: string, cb?: () => void): void
 		emit<Name extends keyof Server.Events>(event: Name, arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1])
 		on<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
 		once<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
@@ -56,9 +58,11 @@ declare module 'turbo-net' {
 		writable: boolean
 		close(cb?: () => void): void
 		end(cb?: () => void)
-		read(buffer: Buffer, callback: (error: Error, buffer: Buffer, bytesRead: number) => void): void
-		write(buffer: Buffer, length: number, callback: (error: Error, buffer: Buffer, length: number) => void)
-		writev(buffers: Buffer[], lengths: number[], callback: (error: Error, buffers: Buffer[], lengths: number[]) => void)
+		read(buffer: Buffer, cb: (error: Error, buffer: Buffer, bytesRead: number) => void): void
+		write(buffer: Buffer, cb?: (error: Error, buffer: Buffer, length: number) => void)
+		write(buffer: Buffer, length?: number, cb?: (error: Error, buffer: Buffer, length: number) => void)
+		writev(buffers: Buffer[], cb?: (error: Error, buffers: Buffer[], lengths: number[]) => void)
+		writev(buffers: Buffer[], lengths?: number[], cb?: (error: Error, buffers: Buffer[], lengths: number[]) => void)
 		emit<Name extends keyof Connection.Events>(event: Name, arg0?: Connection.Events[Name][0], arg1?: Connection.Events[Name][1])
 		on<Name extends keyof Connection.Events>(event: Name, fn: (arg0?: Connection.Events[Name][0], arg1?: Connection.Events[Name][1]) => void)
 		once<Name extends keyof Connection.Events>(event: Name, fn: (arg0?: Connection.Events[Name][0], arg1?: Connection.Events[Name][1]) => void)

@@ -6,6 +6,7 @@ declare module 'turbo-http' {
 	import * as TurboResponse from 'turbo-http/lib/response'
 
 	namespace Server {
+		type Methods = 'GET' | 'POST' | 'PUT' | 'HEAD' | 'PATCH' | 'DELETE' | 'OPTIONS'
 		interface Events extends turbo.Server.Events {
 			'request': [TurboRequest, TurboResponse]
 		}
@@ -24,6 +25,7 @@ declare module 'turbo-http' {
 
 declare module 'turbo-http/lib/request' {
 	import { Connection } from 'turbo-net'
+	import { Server } from 'turbo-http'
 
 	namespace TurboRequest {
 		interface Options {
@@ -38,7 +40,7 @@ declare module 'turbo-http/lib/request' {
 		class TurboRequest {
 			constructor(socket: Connection, options: Options)
 			_options: Options
-			method: 'GET' | 'POST' | 'PUT' | 'HEAD' | 'PATCH' | 'DELETE' | 'OPTIONS'
+			method: Server.Methods
 			socket: Connection
 			url: string
 			getAllHeaders(): Map<string, string>
@@ -60,17 +62,20 @@ declare module 'turbo-http/lib/response' {
 	namespace TurboResponse {
 		class TurboResponse {
 			constructor(server: Server, socket: Connection, headers: Buffer)
-			_headers: Buffer
-			_headersLength: number
 			headerSent: boolean
 			server: Server
 			socket: Connection
 			statusCode: number
+			end(cb?: () => void): void
+			end(buffer?: Buffer | string, cb?: () => void): void
 			end(buffer?: Buffer | string, length?: number, cb?: () => void)
-			endv(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void)
-			setHeader(name: string, value: string | number)
-			write(buffer: Buffer | string, length?: number, cb?: () => void)
-			writev(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void)
+			endv(buffers: (Buffer | string)[], cb?: () => void): void
+			endv(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void): void
+			setHeader(name: string, value: string | number): void
+			write(buffer: Buffer | string, cb?: () => void): void
+			write(buffer: Buffer | string, length?: number, cb?: () => void): void
+			writev(buffers: (Buffer | string)[], cb?: () => void): void
+			writev(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void): void
 		}
 	}
 	interface TurboResponse extends TurboResponse.TurboResponse { }

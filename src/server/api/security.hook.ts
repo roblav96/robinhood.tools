@@ -1,6 +1,6 @@
 // 
 
-import * as Boom from 'boom'
+import * as boom from 'boom'
 import * as security from '../adapters/security'
 import polka from './polka'
 
@@ -9,7 +9,7 @@ import polka from './polka'
 polka.hook(async function(req, res) {
 
 	req.ip = security.reqip(req)
-	if (!req.ip) throw Boom.preconditionRequired('Missing IP address');
+	if (!req.ip) throw boom.preconditionRequired('Missing IP address');
 
 	req.doc = {
 		id: req.headers['x-id'],

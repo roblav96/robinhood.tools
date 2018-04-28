@@ -1,5 +1,6 @@
 // 
 
+import * as http from 'http'
 import * as got from 'got'
 import * as retryable from 'is-retry-allowed'
 import clock from './clock'
@@ -13,6 +14,7 @@ export function config() {
 		timeout: 10000,
 		retries: process.env.CLIENT ? 0 : 5,
 		retryTick: '5s',
+		agent: new http.Agent({ keepAlive: false }),
 	} as Http.Config
 }
 
