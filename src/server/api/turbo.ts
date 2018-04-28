@@ -7,19 +7,20 @@ import * as jsonparse from 'fast-json-parse'
 import * as TurboRequest from 'turbo-http/lib/request'
 import * as TurboResponse from 'turbo-http/lib/response'
 import * as turbo from 'turbo-http'
+import polka from './polka'
 
 
 
 declare module 'turbo-net' {
 	namespace Connection {
 		interface Events {
-			'onnext': void[]
+			'next': void[]
 		}
 	}
 }
 declare module 'turbo-http/lib/request' {
 	interface TurboRequest {
-		onnext: boolean
+		next: boolean
 		body: any
 	}
 }
@@ -30,25 +31,34 @@ declare module 'turbo-http/lib/response' {
 	}
 }
 
-const server = turbo.createServer(function(req, res) {
-	console.log('req.onnext ->', req.onnext)
+polka.use(function(req, res, next) {
+	if (req.next) next();
+	else req.socket.once('next', next);
 
 	Object.assign(req, {
 		ondata(buffer, start, length) {
+			console.log('ondata')
 			if (!this.body) this.body = [];
 			this.body.push(Buffer.from(buffer.slice(start, length + start)))
 		},
 		onend() {
-			console.log('this.body ->', this.body)
+			console.timeEnd('onend')
 			this.onnext = true
 			Object.assign(this, { ondata: _.noop, onend: _.noop })
 			this.socket.emit('onnext')
+			// console.log('req.onnext ->', req.onnext)
 		},
 	} as typeof req)
 
 })
 
-export default server
+
+
+
+
+
+
+// export default server
 
 
 

@@ -8,12 +8,11 @@ import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
 import * as Boom from 'boom'
 import * as FastestValidator from 'fastest-validator'
-import server from './turbo'
 
 
 
 { (Polka as any).Router = Polka().constructor }
-class Router<Server extends turbo.Server, Request extends TurboRequest & Polka.Request, Response extends TurboResponse> extends Polka.Router<Server, Request, Response> {
+class Router<Server extends turbo.Server, Request extends (TurboRequest & Polka.Request), Response extends TurboResponse> extends Polka.Router<Server, Request, Response> {
 
 	hook(fn: (req: Request, res: Response) => Promise<void>) {
 		this.use(function(req, res, next) {
@@ -76,12 +75,29 @@ class Router<Server extends turbo.Server, Request extends TurboRequest & Polka.R
 
 
 
-const polka = new Router({
-	server: turbo.createServer(),
+const server = turbo.createServer(function(req, res) {
+	Object.assign(req, {
+		ondata(buffer, start, length) {
+			if (!this.body) this.body = [];
+			let chunk = buffer.slice(start, length + start)
+			this.body.push(Buffer.from(chunk))
+		},
+		onend() {
+			this.ondata = _.noop; this.onend = _.noop
+			this.next = true
+			this.socket.emit('next')
+		},
+	} as typeof req)
+})
 
-	onError(error, req, res, next) {
+
+
+const polka = new Router({
+	server,
+
+	onError(error: Boom, req, res, next) {
 		if (!error.isBoom) {
-			console.error('polka Error ->', error)
+			console.error('polka onError ->', error)
 			error = new Boom(error)
 		} else {
 			if (error.data) Object.assign(error.output.payload, { attributes: error.data });
