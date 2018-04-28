@@ -6,13 +6,13 @@ import * as TurboRequest from 'turbo-http/lib/request'
 import * as TurboResponse from 'turbo-http/lib/response'
 import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
-import * as Boom from 'boom'
+import * as boom from 'boom'
 import * as FastestValidator from 'fastest-validator'
 
 
 
 { (Polka as any).Router = Polka().constructor }
-class Router<Server extends turbo.Server, Request extends (TurboRequest & Polka.Request), Response extends TurboResponse> extends Polka.Router<Server, Request, Response> {
+class Router<Server extends turbo.Server = turbo.Server, Request extends (TurboRequest & Polka.Request) = (TurboRequest & Polka.Request), Response extends TurboResponse = TurboResponse> extends Polka.Router<Server, Request, Response> {
 
 	hook(fn: (req: Request, res: Response) => Promise<void>) {
 		this.use(function(req, res, next) {
@@ -47,10 +47,10 @@ class Router<Server extends turbo.Server, Request extends (TurboRequest & Polka.
 				let i: number, len = keys.length
 				for (i = 0; i < len; i++) {
 					let key = keys[i]
-					if (req[key] == null) return next(Boom.preconditionRequired(key));
+					if (req[key] == null) return next(boom.preconditionRequired(key));
 					let invalid = validate[key](req[key])
 					if (Array.isArray(invalid)) {
-						let error = Boom.preconditionFailed(key)
+						let error = boom.preconditionFailed(key)
 						error.data = invalid as any
 						return next(error)
 					}
@@ -60,7 +60,7 @@ class Router<Server extends turbo.Server, Request extends (TurboRequest & Polka.
 		}
 		this[opts.method.toLowerCase()](opts.url, function(req, res) {
 			if (opts.authed && !req.authed) {
-				return polka.onError(Boom.unauthorized(), req, res, _.noop)
+				return polka.onError(boom.unauthorized(), req, res, _.noop)
 			}
 			opts.handler(req, res).then(function(response) {
 				if (response != null) res.send(response);
@@ -75,48 +75,14 @@ class Router<Server extends turbo.Server, Request extends (TurboRequest & Polka.
 
 
 
-// const server = turbo.createServer(function(this: turbo.Server, req, res) {
-
-// 	console.log('this.connections ->', this.connections)
-// 	console.log('req.socket ->', req.socket)
-
-// 	req.socket.addListener('close', function() { console.log('req -> close') })
-// 	req.socket.addListener('end', function() { console.log('req -> end') })
-// 	req.socket.addListener('finish', function() { console.log('req -> finish') })
-// 	req.socket.addListener('connect', function() { console.log('req -> connect') })
-// 	req.socket.addListener('error', function() { console.log('req -> error') })
-
-// 	res.socket.addListener('close', function() { console.log('res -> close') })
-// 	res.socket.addListener('end', function() { console.log('res -> end') })
-// 	res.socket.addListener('finish', function() { console.log('res -> finish') })
-// 	res.socket.addListener('connect', function() { console.log('res -> connect') })
-// 	res.socket.addListener('error', function() { console.log('res -> error') })
-
-// 	Object.assign(req, {
-// 		ondata(buffer, start, length) {
-// 			if (!this.body) this.body = [];
-// 			let chunk = buffer.slice(start, length + start)
-// 			this.body.push(Buffer.from(chunk))
-// 		},
-// 		onend() {
-// 			this.ondata = _.noop; this.onend = _.noop
-// 			this.next = true
-// 			this.socket.emit('next')
-// 		},
-// 	} as typeof req)
-
-// })
-
 const polka = new Router({
-	server: turbo.createServer(),
 
-	onError(error: Boom, req, res, next) {
-		
-		console.log('req ->', req)
-		
+	server: turbo.createServer({ allowHalfOpen: true }),
+
+	onError(error: boom, req, res, next) {
 		if (!error.isBoom) {
 			console.error('polka onError ->', error)
-			error = new Boom(error)
+			error = new boom(error)
 		} else {
 			if (error.data) Object.assign(error.output.payload, { attributes: error.data });
 			console.warn('polka onError ->', error.output.payload) // error.output.payload.error, error.message, error.output.payload)
@@ -127,20 +93,26 @@ const polka = new Router({
 			res.setHeader(key, error.output.headers[key])
 		})
 		res.send(error.output.payload)
+		console.log('this ->', this)
+		// res.socket.close()
 	},
 
 	onNoMatch(req, res) {
-		polka.onError(Boom.notFound(null, { method: req.method, path: req.path }), req, res, _.noop)
+		console.log('this ->', this)
+		polka.onError(boom.notFound(null, { method: req.method, path: req.path }), req, res, _.noop)
 	},
 
 })
 
-// polka.use(function(req, res, next) {
-// 	if (req.next) next();
-// 	else req.socket.once('next', next as any);
-// })
-
 export default polka
+
+
+
+polka.post('/api/polka', function(req, res) {
+	console.log('res ->', res)
+	res.end(JSON.stringify('found it'))
+	console.timeEnd('use')
+})
 
 
 

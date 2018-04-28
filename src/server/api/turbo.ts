@@ -34,7 +34,7 @@ declare module 'turbo-http/lib/response' {
 
 
 polka.use(function(req, res, next) {
-
+	console.time('use')
 
 
 	req.socket.once('close', function() { console.log('req -> close') })
@@ -91,25 +91,26 @@ polka.use(function(req, res, next) {
 		},
 		send(data) {
 			if (data == null) {
-				this.setHeader('Content-Length', '0')
-				this.write('')
+				this.setHeader('Content-Length', 0)
+				this.write(Buffer.from(''))
 				return
 			}
 			if (data.constructor == String || Buffer.isBuffer(data)) {
-				this.setHeader('Content-Length', data.length.toString())
+				if (data.constructor == String) data = Buffer.from(data);
+				this.setHeader('Content-Length', data.length)
 				this.write(data)
 				return
 			}
 			if (data.constructor == Object || data instanceof Object) {
 				// const circ = {} as any; circ.me = circ;
 				// JSON.stringify(circ)
-				let json = JSON.stringify(data)
+				data = Buffer.from(JSON.stringify(data))
 				this.setHeader('Content-Type', 'application/json')
-				this.setHeader('Content-Length', json.length.toString())
-				this.write(json)
+				this.setHeader('Content-Length', data.length)
+				this.write(data)
 				return
 			}
-			this.write(data)
+			this.end(Buffer.isBuffer(data) ? data : Buffer.from(data))
 		},
 	} as typeof res)
 

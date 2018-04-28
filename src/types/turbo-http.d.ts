@@ -68,7 +68,7 @@ declare module 'turbo-http/lib/response' {
 			statusCode: number
 			end(buffer?: Buffer | string, length?: number, cb?: () => void)
 			endv(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void)
-			setHeader(name: string, value: string)
+			setHeader(name: string, value: string | number)
 			write(buffer: Buffer | string, length?: number, cb?: () => void)
 			writev(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void)
 		}
