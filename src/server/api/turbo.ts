@@ -4,55 +4,118 @@ import * as _ from '../../common/lodash'
 import * as qs from 'querystring'
 import * as cookie from 'cookie'
 import * as jsonparse from 'fast-json-parse'
-import * as TurboRequest from 'turbo-http/lib/request'
-import * as TurboResponse from 'turbo-http/lib/response'
-import * as turbo from 'turbo-http'
+import * as boom from 'boom'
 import polka from './polka'
 
 
 
 declare module 'turbo-net' {
 	namespace Connection {
-		interface Events {
-			'next': void[]
-		}
+		interface Events { 'next': void[] }
 	}
 }
+
 declare module 'turbo-http/lib/request' {
 	interface TurboRequest {
 		next: boolean
 		body: any
 	}
 }
+
 declare module 'turbo-http/lib/response' {
 	interface TurboResponse {
-		writeHead(code?: number, headers?: Dict<string>): void
-		send(data?: any): void
+		finished: boolean
+		setCookie(name: string, value: string, opts: cookie.CookieSerializeOptions): void
+		writeHead(code: number, headers?: Dict<string>): void
+		send(data: any): void
 	}
 }
 
+
+
 polka.use(function(req, res, next) {
-	if (req.next) next();
-	else req.socket.once('next', next);
+
+
+
+	req.socket.once('close', function() { console.log('req -> close') })
+	req.socket.once('end', function() { console.log('req -> end') })
+	req.socket.once('finish', function() { console.log('req -> finish') })
+	req.socket.once('connect', function() { console.log('req -> connect') })
+	req.socket.once('error', function() { console.log('req -> error') })
+	res.socket.once('close', function() { console.log('res -> close') })
+	res.socket.once('end', function() { console.log('res -> end') })
+	res.socket.once('finish', function() { console.log('res -> finish') })
+	res.socket.once('connect', function() { console.log('res -> connect') })
+	res.socket.once('error', function() { console.log('res -> error') })
+
+
 
 	Object.assign(req, {
 		ondata(buffer, start, length) {
-			console.log('ondata')
 			if (!this.body) this.body = [];
-			this.body.push(Buffer.from(buffer.slice(start, length + start)))
+			let chunk = buffer.slice(start, length + start)
+			this.body.push(Buffer.from(chunk))
 		},
 		onend() {
-			console.timeEnd('onend')
-			this.onnext = true
-			Object.assign(this, { ondata: _.noop, onend: _.noop })
-			this.socket.emit('onnext')
-			// console.log('req.onnext ->', req.onnext)
+			this.ondata = _.noop; this.onend = _.noop
+			if (req.body) {
+				req.body = Buffer.concat(req.body).toString()
+				let content = req.getHeader('Content-Type')
+				if (content == 'application/json') {
+					let parsed = jsonparse(req.body)
+					if (parsed.err) return next(boom.badData(parsed.err));
+					req.body = parsed.value
+				} else if (content == 'application/x-www-form-urlencoded') {
+					req.body = qs.parse(req.body)
+				}
+			}
+			next()
 		},
 	} as typeof req)
 
+
+
+	Object.assign(res, {
+		// finished: false,
+		setCookie(name, value, opts = {}) {
+			if (Number.isFinite(opts.expires as any)) {
+				opts.expires = new Date(opts.expires)
+			}
+			this.setHeader('Set-Cookie', cookie.serialize(name, value, opts))
+		},
+		writeHead(code, headers = {}) {
+			if (Number.isFinite(code)) this.statusCode = code;
+			Object.keys(headers).forEach(key => {
+				this.setHeader(key, headers[key])
+			})
+		},
+		send(data) {
+			if (data == null) {
+				this.setHeader('Content-Length', '0')
+				this.write('')
+				return
+			}
+			if (data.constructor == String || Buffer.isBuffer(data)) {
+				this.setHeader('Content-Length', data.length.toString())
+				this.write(data)
+				return
+			}
+			if (data.constructor == Object || data instanceof Object) {
+				// const circ = {} as any; circ.me = circ;
+				// JSON.stringify(circ)
+				let json = JSON.stringify(data)
+				this.setHeader('Content-Type', 'application/json')
+				this.setHeader('Content-Length', json.length.toString())
+				this.write(json)
+				return
+			}
+			this.write(data)
+		},
+	} as typeof res)
+
+
+
 })
-
-
 
 
 
@@ -62,22 +125,7 @@ polka.use(function(req, res, next) {
 
 
 
-// if (this.body) {
-// 	this.body = Buffer.concat(this.body).toString()
-// 	let content = this.getHeader('Content-Type')
-// 	if (content == 'application/json') {
-// 		let parsed = jsonparse(this.body)
-// 		if (parsed.err) {
-// 			this.ready = true
-// 			this.socket.emit('ready', parsed.err)
-// 			// next(parsed.err)
-// 			return
-// 		}
-// 		this.body = parsed.value
-// 	} else if (content == 'application/x-www-form-urlencoded') {
-// 		this.body = qs.parse(this.body)
-// 	}
-// }
+
 // this.ready = true
 // this.
 
@@ -141,43 +189,7 @@ polka.use(function(req, res, next) {
 
 // polka.use(function(req, res, next) {
 
-// 	Object.assign(res, {
-// 		setCookie(name, value, opts = {}) {
-// 			if (Number.isFinite(opts.expires as any)) {
-// 				opts.expires = new Date(opts.expires)
-// 			}
-// 			this.setHeader('Set-Cookie', cookie.serialize(name, value, opts))
-// 		},
-// 		writeHead(code, headers = {}) {
-// 			if (Number.isFinite(code)) this.statusCode = code;
-// 			Object.keys(headers).forEach(key => {
-// 				this.setHeader(key, headers[key])
-// 			})
-// 		},
-// 		send(data) {
-// 			if (data == null) {
-// 				this.setHeader('Content-Length', '0')
-// 				this.write('')
-// 				return
-// 			}
-// 			if (data.constructor == String || Buffer.isBuffer(data)) {
-// 				this.setHeader('Content-Length', data.length.toString())
-// 				this.write(data)
-// 				return
-// 			}
-// 			if (data.constructor == Object || data instanceof Object) {
-// 				const circ = {} as any; circ.me = circ;
-// 				JSON.stringify(circ)
 
-// 				let json = JSON.stringify(data)
-// 				this.setHeader('Content-Type', 'application/json')
-// 				this.setHeader('Content-Length', json.length.toString())
-// 				this.write(json)
-// 				return
-// 			}
-// 			this.write(data)
-// 		},
-// 	} as typeof res)
 
 // 	next()
 

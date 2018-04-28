@@ -4,13 +4,15 @@ import '../main'
 
 import './polka'
 import './turbo'
-import './polka.plugins'
+import './cors.api'
 
-import './security.hook'
-import './security.api'
+// import './polka.plugins'
 
-import './socket.api'
+// import './security.hook'
+// import './security.api'
 
-import './search.api'
+// import './socket.api'
+
+// import './search.api'
 
 

@@ -75,27 +75,45 @@ class Router<Server extends turbo.Server, Request extends (TurboRequest & Polka.
 
 
 
-const server = turbo.createServer(function(req, res) {
-	Object.assign(req, {
-		ondata(buffer, start, length) {
-			if (!this.body) this.body = [];
-			let chunk = buffer.slice(start, length + start)
-			this.body.push(Buffer.from(chunk))
-		},
-		onend() {
-			this.ondata = _.noop; this.onend = _.noop
-			this.next = true
-			this.socket.emit('next')
-		},
-	} as typeof req)
-})
+// const server = turbo.createServer(function(this: turbo.Server, req, res) {
 
+// 	console.log('this.connections ->', this.connections)
+// 	console.log('req.socket ->', req.socket)
 
+// 	req.socket.addListener('close', function() { console.log('req -> close') })
+// 	req.socket.addListener('end', function() { console.log('req -> end') })
+// 	req.socket.addListener('finish', function() { console.log('req -> finish') })
+// 	req.socket.addListener('connect', function() { console.log('req -> connect') })
+// 	req.socket.addListener('error', function() { console.log('req -> error') })
+
+// 	res.socket.addListener('close', function() { console.log('res -> close') })
+// 	res.socket.addListener('end', function() { console.log('res -> end') })
+// 	res.socket.addListener('finish', function() { console.log('res -> finish') })
+// 	res.socket.addListener('connect', function() { console.log('res -> connect') })
+// 	res.socket.addListener('error', function() { console.log('res -> error') })
+
+// 	Object.assign(req, {
+// 		ondata(buffer, start, length) {
+// 			if (!this.body) this.body = [];
+// 			let chunk = buffer.slice(start, length + start)
+// 			this.body.push(Buffer.from(chunk))
+// 		},
+// 		onend() {
+// 			this.ondata = _.noop; this.onend = _.noop
+// 			this.next = true
+// 			this.socket.emit('next')
+// 		},
+// 	} as typeof req)
+
+// })
 
 const polka = new Router({
-	server,
+	server: turbo.createServer(),
 
 	onError(error: Boom, req, res, next) {
+		
+		console.log('req ->', req)
+		
 		if (!error.isBoom) {
 			console.error('polka onError ->', error)
 			error = new Boom(error)
@@ -116,6 +134,11 @@ const polka = new Router({
 	},
 
 })
+
+// polka.use(function(req, res, next) {
+// 	if (req.next) next();
+// 	else req.socket.once('next', next as any);
+// })
 
 export default polka
 
