@@ -65,17 +65,18 @@ declare module 'fastest-validator' {
 			[key: string]: SchemaValue | Type
 		}
 
+		type CompiledValidator = (value: any) => boolean
 		interface Options { messages: Messages }
 		class FastestValidator {
 			constructor(opts?: Options)
 			opts: Options
 			messages: Messages
-			add(type: any, fn: (input: any) => boolean): void
-			compile(schema: any): (input: any) => boolean
+			add(type: any, fn: (value: any) => boolean): void
+			compile(schema: any): CompiledValidator
 			handleResult(errors: any, fieldPath: any, result: any): void
 			makeError(type: any, expected: any, actual: any): any
 			resolveMessage(error: any): any
-			validate(input: any, schema: any): any
+			validate(value: any, schema: any): any
 		}
 
 	}

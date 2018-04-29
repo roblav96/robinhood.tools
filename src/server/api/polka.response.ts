@@ -9,8 +9,8 @@ import polka from './polka'
 
 
 
-export default interface PolkaResponse extends TurboResponse { }
-export default class PolkaResponse {
+export interface PolkaResponse extends TurboResponse { }
+export class PolkaResponse {
 	setCookie(key: string, value: string, opts: cookie.CookieSerializeOptions) {
 		this.setHeader('set-cookie', cookie.serialize(key, value, opts))
 	}
@@ -34,6 +34,7 @@ util.inherits(TurboResponse, PolkaResponse)
 
 
 polka.use(function(req, res, next) {
+	
 	next()
 })
 

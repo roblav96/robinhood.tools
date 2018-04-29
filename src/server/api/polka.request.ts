@@ -4,6 +4,7 @@ import * as _ from '../../common/lodash'
 import * as util from 'util'
 import * as TurboRequest from 'turbo-http/lib/request'
 import * as qs from 'querystring'
+import * as Polka from 'polka'
 import * as cookie from 'cookie'
 import * as jsonparse from 'fast-json-parse'
 import * as boom from 'boom'
@@ -11,9 +12,11 @@ import polka from './polka'
 
 
 
-export default interface PolkaRequest extends TurboRequest { }
-export default class PolkaRequest {
+export interface PolkaRequest extends TurboRequest, Polka.Request { }
+export class PolkaRequest {
 	body: any
+	query: string
+	params: string
 	headers: Dict<string>
 	cookies: Dict<string>
 }
@@ -22,7 +25,7 @@ util.inherits(TurboRequest, PolkaRequest)
 
 
 polka.use(function(req, res, next) {
-	
+
 	// req.socket.on('connect', function() { console.log('connection -> connect') })
 	// req.socket.on('finish', function() { console.log('connection -> finish') })
 	// req.socket.on('end', function() { console.log('connection -> end') })

@@ -1,11 +1,12 @@
 // 
 
 import { Server as PolkaServer } from 'turbo-http'
-import PolkaRequest from './polka.request'
-import PolkaResponse from './polka.response'
+import { PolkaRequest } from './polka.request'
+import { PolkaResponse } from './polka.response'
 import * as _ from '../../common/lodash'
 import * as Polka from 'polka'
 import * as boom from 'boom'
+import PolkaRoute from './polka.route'
 
 
 
@@ -75,8 +76,16 @@ const polka = Polka<PolkaServer, PolkaRequest, PolkaResponse>({
 
 })
 
-polka.get('/api/hello', function hello(req, res) { res.end() })
+// polka.get('/api/hello', function hello(req, res) { res.end() })
 
 export default polka
+
+new PolkaRoute({
+	method: 'GET',
+	url: '/api/hello',
+	async handler(req, res) {
+		
+	},
+})
 
 

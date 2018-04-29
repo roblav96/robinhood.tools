@@ -14,7 +14,7 @@ declare module 'polka' {
 			search: string
 		}
 		interface Handler<Request, Response> {
-			(req: Request, res: Response, next: (error?: Error) => void): void
+			(req: Request, res: Response, next?: (error?: Error) => void): void
 		}
 		class Options<Server, Request, Response> {
 			server: Server
