@@ -6,7 +6,7 @@ import * as sourcemaps from 'source-map-support'
 sourcemaps.install()
 
 global.Promise = require('bluebird')
-Promise.config({ warnings: { wForgottenReturn: false } })
+Promise.config({ warnings: { wForgottenReturn: false }, longStackTraces: false })
 global.WebSocket = require('uws')
 
 import './adapters/process'

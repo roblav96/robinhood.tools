@@ -40,11 +40,11 @@ export default class Route {
 			let schema = this.opts.schemas[key]
 			this.validators[key] = new FastestValidator().compile(schema)
 		})
+		if (opts.url[0] == '/') opts.url = '/api' + opts.url;
 		polka[opts.method.toLowerCase()](opts.url, this.handler)
 	}
 
 	private handler = (req: PolkaRequest, res: PolkaResponse) => {
-		console.log('this ->', this)
 		this.phandler(req, res).then(function onthen(response) {
 			if (res.headerSent) {
 				throw boom.resourceGone('route handler -> res.headerSent', { url: req.url })
@@ -53,11 +53,10 @@ export default class Route {
 			res.send(response)
 		}).catch(function onerror(error) {
 			polka.onError(error, req, res, _.noop)
-		}).finally(function onfinally() { console.log('finally') })
+		})//.finally(function onfinally() { console.log('finally') })
 	}
 
 	private async phandler(req: PolkaRequest, res: PolkaResponse) {
-		console.log('this ->', this)
 		let keys = Object.keys(this.validators)
 		let i: number, len = keys.length
 		for (i = 0; i < len; i++) {
@@ -71,7 +70,6 @@ export default class Route {
 			}
 		}
 		let response = await this.opts.handler(req, res)
-		console.log('response ->', response)
 		return response
 	}
 

@@ -26,6 +26,29 @@ interface ProcEnv extends Partial<NodeJS.ProcessEnv> { [key: string]: any }
 
 
 
+export default function procfile(pandora: ProcfileReconcilerAccessor) {
+
+	Process(pandora.process('api').order(1), {
+		INSTANCES: os.cpus().length,
+		DEBUGGER: false,
+	})
+
+	Process(pandora.process('benchmarks').order(2), {
+		// INSTANCES: 4,
+		DEBUGGER: false,
+	})
+
+
+
+	if (!PANDORA_DEV) {
+		pandora.process('dashboard').scale(1)
+		pandora.service('dashboard', path.resolve(PROJECT, 'node_modules/pandora-dashboard/dist/Dashboard')).process('dashboard')
+	}
+
+}
+
+
+
 function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv) {
 	_.defaults(env, PROC_ENV)
 	let pname = chain.name()
@@ -35,28 +58,6 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv)
 		.entry(`./${pname}/_${pname}.main`)
 		.env(env).scale(env.INSTANCES)
 	)
-}
-
-
-
-export default function procfile(pandora: ProcfileReconcilerAccessor) {
-
-	Process(pandora.process('api').order(1), {
-		// INSTANCES: 4,
-	})
-
-	// Process(pandora.process('benchmarks').order(2), {
-	// 	// INSTANCES: 4,
-	// 	DEBUGGER: false,
-	// })
-
-
-
-	if (!PANDORA_DEV) {
-		pandora.process('dashboard').scale(1)
-		pandora.service('dashboard', path.resolve(PROJECT, 'node_modules/pandora-dashboard/dist/Dashboard')).process('dashboard')
-	}
-
 }
 
 

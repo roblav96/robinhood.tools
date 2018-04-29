@@ -25,6 +25,7 @@ util.inherits(TurboRequest, PolkaRequest)
 
 
 polka.use(function(req, res, next) {
+	if (!req._options) return next(); // node http
 
 	// req.socket.on('connect', function() { console.log('connection -> connect') })
 	// req.socket.on('finish', function() { console.log('connection -> finish') })
@@ -48,7 +49,6 @@ polka.use(function(req, res, next) {
 		chunks.push(chunk.toString())
 	}
 	req.onend = function onend() {
-		res.setCookie('bevis', 'butthead', {})
 		req.ondata = _.noop; req.onend = _.noop
 		let body = chunks.join('')
 		if (!body) return next();

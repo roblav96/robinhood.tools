@@ -33,9 +33,8 @@ util.inherits(TurboResponse, PolkaResponse)
 
 
 
-polka.use(function(req, res, next) {
-	
-	next()
-})
+// polka.use(function(req, res, next) {
+// 	next()
+// })
 
 
