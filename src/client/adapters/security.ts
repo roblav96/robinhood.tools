@@ -76,8 +76,8 @@ function finger(): Promise<void> {
 
 
 // clock.on('30s', function ontock(i: number) {
-// http.post('/polka', {
-http.post('http://localhost:12300/api/polka', {
+// http.post('http://localhost:12300/api/dev', {
+http.post('/dev', {
 	random: Math.random().toString(16),
 }).then(function(response) {
 	console.log('response ->', response)

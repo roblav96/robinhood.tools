@@ -1,6 +1,10 @@
 // 
 
 import * as _ from '../../common/lodash'
+import * as util from 'util'
+import * as TurboRequest from 'turbo-http/lib/request'
+import * as TurboResponse from 'turbo-http/lib/response'
+import * as turbo from 'turbo-http'
 import * as qs from 'querystring'
 import * as cookie from 'cookie'
 import * as jsonparse from 'fast-json-parse'
@@ -9,19 +13,50 @@ import polka from './polka'
 
 
 
-declare module 'turbo-http/lib/request' {
-	interface TurboRequest {
-		headers: { [header: string]: string }
-		body: any
+export interface Request extends TurboRequest { }
+export class Request {
+	body: any
+	authed = false
+	headers = {} as Dict<string>
+	cookies = {} as Dict<string>
+	build() {
+		let rawheaders = this._options.headers
+		let i: number, len = rawheaders.length
+		for (i = 0; i < len; i += 2) {
+			this.headers[rawheaders[i].toLowerCase()] = rawheaders[i + 1]
+		}
+		let cookies = this.getHeader('cookie')
+		if (cookies) this.cookies = cookie.parse(cookies);
 	}
 }
 
-declare module 'turbo-http/lib/response' {
-	interface TurboResponse {
-		finished: boolean
-		setCookie(name: string, value: string, opts: cookie.CookieSerializeOptions): void
-		writeHead(code: number, headers?: Dict<string>): void
-		send(data: any): void
+
+
+export interface Response extends TurboResponse { }
+export class Response {
+	finished = false
+	build() { }
+	setCookie(name, value, opts = {} as cookie.CookieSerializeOptions) {
+		if (Number.isFinite(opts.expires as any)) {
+			opts.expires = new Date(opts.expires)
+		}
+		this.setHeader('set-cookie', cookie.serialize(name, value, opts))
+	}
+	writeHead(code: number, headers: Dict<string>) {
+		this.statusCode = code;
+		Object.keys(headers).forEach(key => {
+			this.setHeader(key, headers[key])
+		})
+	}
+	send(data?: any) {
+		data = data || ''
+		if (typeof data == 'object' && data.constructor == Object) {
+			data = JSON.stringify(data)
+			this.setHeader('content-type', 'application/json')
+		}
+		if (typeof data == 'string') data = Buffer.from(data);
+		this.setHeader('content-length', data.length)
+		this.write(data)
 	}
 }
 
@@ -29,20 +64,19 @@ declare module 'turbo-http/lib/response' {
 
 polka.use(function(req, res, next) {
 
-	req.socket.on('connect', function() { console.log('connection -> connect') })
-	req.socket.on('finish', function() { console.log('connection -> finish') })
-	req.socket.on('close', function() { console.log('connection -> close') })
-	req.socket.on('end', function() { console.log('connection -> end') })
-	req.socket.on('error', function() { console.log('connection -> error') })
+	// req.socket.on('connect', function() { console.log('connection -> connect') })
+	// req.socket.on('finish', function() { console.log('connection -> finish') })
+	// req.socket.on('end', function() { console.log('connection -> end') })
+	// req.socket.on('close', function() { console.log('connection -> close') })
+	// req.socket.on('error', function() { console.log('connection -> error') })
 
+	Object.assign(req, new Request())
+	util.inherits(req.constructor, Request)
+	req.build()
 
-
-	req.headers = {}
-	let rawheaders = req._options.headers
-	let i: number, len = rawheaders.length
-	for (i = 0; i < len; i += 2) {
-		req.headers[rawheaders[i].toLowerCase()] = rawheaders[i + 1]
-	}
+	Object.assign(res, new Response())
+	util.inherits(res.constructor, Response)
+	res.build()
 
 	Object.assign(req, {
 		ondata(buffer, start, length) {
@@ -54,7 +88,7 @@ polka.use(function(req, res, next) {
 			this.ondata = _.noop; this.onend = _.noop
 			if (req.body) {
 				req.body = Buffer.concat(req.body).toString()
-				let content = req.getHeader('Content-Type')
+				let content = req.getHeader('content-type')
 				if (content == 'application/json') {
 					let parsed = jsonparse(req.body)
 					if (parsed.err) return next(boom.badData(parsed.err));
@@ -66,49 +100,6 @@ polka.use(function(req, res, next) {
 			next()
 		},
 	} as typeof req)
-
-
-
-	Object.assign(res, {
-		finished: false,
-		setCookie(name, value, opts = {}) {
-			if (Number.isFinite(opts.expires as any)) {
-				opts.expires = new Date(opts.expires)
-			}
-			this.setHeader('Set-Cookie', cookie.serialize(name, value, opts))
-		},
-		writeHead(code, headers = {}) {
-			if (Number.isFinite(code)) this.statusCode = code;
-			Object.keys(headers).forEach(key => {
-				this.setHeader(key, headers[key])
-			})
-		},
-		send(data) {
-			if (data == null) {
-				this.setHeader('Content-Length', 0)
-				this.write(Buffer.from(''))
-				return
-			}
-			if (data.constructor == String || Buffer.isBuffer(data)) {
-				if (data.constructor == String) data = Buffer.from(data);
-				this.setHeader('Content-Length', data.length)
-				this.write(data)
-				return
-			}
-			if (data.constructor == Object || data instanceof Object) {
-				// const circ = {} as any; circ.me = circ;
-				// JSON.stringify(circ)
-				data = Buffer.from(JSON.stringify(data))
-				this.setHeader('Content-Type', 'application/json')
-				this.setHeader('Content-Length', data.length)
-				this.write(data)
-				return
-			}
-			this.end(Buffer.isBuffer(data) ? data : Buffer.from(data))
-		},
-	} as typeof res)
-
-
 
 })
 

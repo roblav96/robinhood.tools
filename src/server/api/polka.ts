@@ -1,9 +1,8 @@
 // 
 
+import { Request as TurboRequest, Response as TurboResponse } from './turbo'
 import * as _ from '../../common/lodash'
 import * as onexit from 'exit-hook'
-import * as TurboRequest from 'turbo-http/lib/request'
-import * as TurboResponse from 'turbo-http/lib/response'
 import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
 import * as boom from 'boom'
@@ -14,8 +13,13 @@ import * as FastestValidator from 'fastest-validator'
 { (Polka as any).Router = Polka().constructor }
 class Router<Server extends turbo.Server = turbo.Server, Request extends (TurboRequest & Polka.Request) = (TurboRequest & Polka.Request), Response extends TurboResponse = TurboResponse> extends Polka.Router<Server, Request, Response> {
 
-	hook(fn: (req: Request, res: Response) => Promise<void>) {
-		this.use(function use(req, res, next) {
+	// hook(fn: Polka.Handler<Request, Response>) {
+	// 	this.use(function hook(req, res, next) {
+	// 		fn(req, res, next)
+	// 	})
+	// }
+	puse(fn: (req: Request, res: Response) => Promise<void>) {
+		this.use(function puse(req, res, next) {
 			fn(req, res).then(next as any).catch(next)
 		})
 	}
@@ -86,19 +90,13 @@ const polka = new Router({
 	},
 
 	onNoMatch(req, res) {
+		// if (res.headerSent) return;
 		polka.onError(boom.notFound(null, { method: req.method, path: req.path }), req, res, _.noop)
 	},
 
 })
 
 export default polka
-
-
-
-polka.get('/', function get(req, res) { res.end('hello world') })
-polka.post('/', function post(req, res) { res.end('hello world') })
-polka.get('/api/polka', function get(req, res) { res.end() })
-polka.post('/api/polka', function post(req, res) { res.end() })
 
 
 
@@ -114,11 +112,19 @@ onexit(function() {
 
 
 
-// const server = turbo.createServer(function(req, res) {
-// 	res.setHeader('Content-Length', '11')
-// 	res.write(Buffer.from('hello world'))
-// })
-// server.listen(12301)
-// onexit(function() { server.close() })
+
+
+const bench = turbo.createServer(function(req, res) {
+	res.setHeader('Content-Length', '11')
+	res.write(Buffer.from('hello world'))
+})
+bench.listen(8080)
+onexit(function() { bench.close() })
+
+
+
+polka.options('/api/dev', function options(req, res) { res.send({ hello: 'world' }) })
+polka.get('/api/dev', function get(req, res) { res.send({ hello: 'world' }) })
+polka.post('/api/dev', function post(req, res) { res.send({ hello: 'world' }) })
 
 
