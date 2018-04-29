@@ -16,10 +16,7 @@
 		"rs": "npm run server:dev",
 		"server:dev": "rimraf dist/server && run-p server:watch server:onchange cli:focus",
 		"server:watch": "tsc --project .server.tsconfig.json --watch",
-		"server:onchange": "onchange 'dist/server/**/*.js' --delay 300 -- pandora dev dist/server --silent",
-		"b": "npm run benchmark:watch",
-		"benchmark:watch": "onchange 'dist/server/benchmarks/**/*.js' --initial --delay 300 -- run-p benchmark:api cli:focus",
-		"benchmark:api": "node --no-warnings dist/server/benchmarks/api.benchmark.js",
+		"server:onchange": "onchange 'dist/server/**/*.js' 'dist/common/**/*.js' --delay 300 -- pandora dev dist/server --silent",
 		"cli:focus": "node -e 'setInterval(() => process.stdout.write(require(\"cli-color\").erase.lineRight), 300)'",
 		"cli:clear": "clear && printf \"\\e[3J\""
 	},

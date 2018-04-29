@@ -3,6 +3,7 @@
 import '../main'
 
 import './polka'
+import './polka.route'
 import './polka.server'
 import './polka.request'
 import './polka.response'

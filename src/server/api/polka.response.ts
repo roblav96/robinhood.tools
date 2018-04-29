@@ -12,8 +12,6 @@ import polka from './polka'
 export default interface PolkaResponse extends TurboResponse { }
 export default class PolkaResponse {
 	setCookie(key: string, value: string, opts: cookie.CookieSerializeOptions) {
-		console.info('this ->', this)
-		console.dir(this)
 		this.setHeader('set-cookie', cookie.serialize(key, value, opts))
 	}
 	writeHead(code: number, headers: Dict<string>) {
@@ -32,5 +30,11 @@ export default class PolkaResponse {
 	}
 }
 util.inherits(TurboResponse, PolkaResponse)
+
+
+
+polka.use(function(req, res, next) {
+	next()
+})
 
 
