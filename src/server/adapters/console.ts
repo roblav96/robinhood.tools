@@ -8,8 +8,8 @@ Object.assign(util.inspect.styles, { string: 'green', regexp: 'green', date: 'gr
 
 
 
+const pandora = process.env.PANDORA_CWD ? require('pandora') : null;
 import chalk from 'chalk'
-import * as pandora from 'pandora'
 import * as luxon from 'luxon'
 import * as StackTracey from 'stacktracey'
 const _console = {} as typeof console
@@ -28,8 +28,8 @@ for (i = 0; i < len; i++) {
 			let square = chalk[color + 'Bright']('█') as string
 			if (method == 'error') color = color + 'Bright';
 			let file = chalk.bold(`${chalk[color](site.fileName)}:${site.line}`)
-			let name = pandora.processName
-			let output = chalk.underline(`${square}[${file}][${process.env.INSTANCE}](${name})${site.callee}[${chalk.grey(stamp)}]`)
+			let pname = pandora ? `(${pandora.processName})` : ''
+			let output = chalk.underline(`${square}[${file}][${process.env.INSTANCE}]${pname}${site.callee}[${chalk.grey(stamp)}]`)
 			if (method == 'error') output = chalk.bold.redBright('████  ERROR  ████\r\n') + output;
 			process.stdout.write(`\r\n${output}\r\n`)
 			_console[method].apply(console, args)
@@ -44,7 +44,7 @@ import * as inspector from 'inspector'
 import * as onexit from 'exit-hook'
 import * as clc from 'cli-color'
 if (process.env.DEBUGGER) {
-	let offset = pandora.processContext.context.processRepresentation.offset
+	let offset = pandora ? pandora.processContext.context.processRepresentation.offset : 0
 	inspector.open(process.debugPort + offset + +process.env.INSTANCE)
 	onexit(function(signal) {
 		if (process.env.PRIMARY) {

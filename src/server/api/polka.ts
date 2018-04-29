@@ -114,17 +114,8 @@ onexit(function() {
 
 
 
-const bench = turbo.createServer(function(req, res) {
-	res.setHeader('Content-Length', '11')
-	res.write(Buffer.from('hello world'))
-})
-bench.listen(8080)
-onexit(function() { bench.close() })
-
-
-
-polka.options('/api/dev', function options(req, res) { res.send({ hello: 'world' }) })
-polka.get('/api/dev', function get(req, res) { res.send({ hello: 'world' }) })
-polka.post('/api/dev', function post(req, res) { res.send({ hello: 'world' }) })
+polka.options('/api/hello', function options(req, res) { res.send({ hello: 'world' }) })
+polka.get('/api/hello', function get(req, res) { res.send({ hello: 'world' }) })
+polka.post('/api/hello', function post(req, res) { res.send({ hello: 'world' }) })
 
 
