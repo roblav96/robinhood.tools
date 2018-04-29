@@ -2,7 +2,7 @@
 
 import chalk from 'chalk'
 import * as execa from 'execa'
-import * as onexit from 'exit-hook'
+import * as exithook from 'exit-hook'
 import * as url from 'url'
 import * as http from 'http'
 import * as turbo from 'turbo-http'
@@ -66,17 +66,31 @@ async function start() {
 const polka = Polka()
 polka.get('/', function get(req: any, res: any) { res.end() })
 
-// const server = http.createServer(polka.handler as any)
 const server = turbo.createServer(polka.handler as any)
 server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
 	console.info('listening ->', process.env.HOST + ':' + process.env.IPORT)
-	if (process.env.PRIMARY) {
-		start().catch(error => console.error(`'${error.cmd}' ->`, error))
-	}
+	if (process.env.PRIMARY) start().catch(error => console.error(`'${error.cmd}' ->`, error));
 })
-onexit(function close() {
+
+exithook(function onexit() {
 	if (Array.isArray(server.connections)) server.connections.forEach(v => v.close());
 	server.close()
 })
+
+
+
+
+
+// const polka = Polka({ server: turbo.createServer() })
+// polka.get('/', function get(req: any, res: any) { res.end() })
+
+// polka.listen(+process.env.IPORT, process.env.HOST).then(function() {
+// 	console.info('turbo listening ->', process.env.HOST + ':' + process.env.PORT)
+// 	if (process.env.PRIMARY) start().catch(error => console.error(`'${error.cmd}' ->`, error));
+// })
+// exithook(function onexit() {
+// 	polka.server.connections.forEach(v => v.close())
+// 	polka.server.close()
+// })
 
 

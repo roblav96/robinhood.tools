@@ -36,6 +36,8 @@ const polka = Polka<PolkaServer, PolkaRequest, PolkaResponse>({
 
 })
 
+polka.get('/api/hello', function hello(req, res) { res.end() })
+
 export default polka
 
 
@@ -47,17 +49,6 @@ server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
 exithook(function onexit() {
 	server.connections.forEach(v => v.close())
 	server.close()
-})
-
-
-
-
-
-const HELLO = JSON.stringify({ hello: 'world' })
-polka.get('/api/hello', function hello(req, res) {
-	res.end()
-	// res.end(HELLO)
-	// res.send(HELLO)
 })
 
 
