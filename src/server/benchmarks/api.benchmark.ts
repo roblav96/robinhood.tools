@@ -1,8 +1,5 @@
 // 
 
-process.env.DEBUGGER = true
-import '../main'
-import * as clc from 'cli-color'
 import * as execa from 'execa'
 import * as onexit from 'exit-hook'
 import * as net from 'turbo-net'
@@ -31,7 +28,7 @@ function start() {
 		console.error(`'${error.cmd}' ->`, error)
 	}).finally(function() {
 		console.log('done')
-		process.emit('SIGTERM')
+		// process.emit('SIGTERM')
 		// process.exit(0)
 	})
 }
@@ -39,16 +36,12 @@ function start() {
 
 
 const BUFFER = Buffer.from(JSON.stringify({ hello: 'world' }))
-onexit(function onexit() { server.close() })
-
 const server = http.createServer(function handler(req, res) {
 	res.setHeader('Content-Length', BUFFER.length)
 	res.write(BUFFER)
 })
 server.listen(8080, 'localhost', start)
-
-
-
+onexit(function onexit() { server.close() })
 
 
 

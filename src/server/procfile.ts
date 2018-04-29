@@ -22,16 +22,22 @@ module.exports = function(pandora: ProcfileReconcilerAccessor) {
 		VERSION: PACKAGE.version,
 		DOMAIN: (process.env.NODE_ENV == 'development' ? 'dev.' : '') + PACKAGE.domain,
 		HOST: '127.0.0.1', PORT: 12300,
+		INSTANCES: 1,
 	} as NodeJS.ProcessEnv
 
 
 
 	const api = _.defaults({
-		INSTANCES: 1, // os.cpus().length,
+		// INSTANCES: os.cpus().length,
 		DEBUGGER: true,
 	} as NodeJS.ProcessEnv, env)
-	pandora.process('api').entry('./api/api.main.js').nodeArgs(['--no-warnings']).env(api).scale(api.INSTANCES)
+	pandora.process('api').entry('./api/api.main.js').order(1).nodeArgs(['--no-warnings']).env(api).scale(api.INSTANCES)
 	// pandora.service('api', './api/api.service.js').process('api').publish(true)
+
+	const benchmark = _.defaults({
+		DEBUGGER: true,
+	} as NodeJS.ProcessEnv, env)
+	pandora.process('benchmark').entry('./benchmarks/benchmarks.main.js').order(2).nodeArgs(['--no-warnings']).env(benchmark).scale(benchmark.INSTANCES)
 
 	// const websocket = _.defaults({
 	// 	INSTANCES: 4,
