@@ -4,7 +4,7 @@ import { ServiceRepresentationChainModifier } from 'pandora/dist/application/Ser
 import { ProcessRepresentationChainModifier } from 'pandora/dist/application/ProcessRepresentationChainModifier'
 import { ProcessContextAccessor } from 'pandora/dist/application/ProcessContextAccessor'
 import { ProcfileReconcilerAccessor, DefaultEnvironment, ProcessRepresentation } from 'pandora'
-import * as _ from 'lodash'
+import * as _ from '../common/lodash'
 import * as os from 'os'
 import * as path from 'path'
 import * as pkgup from 'pkg-up'
@@ -30,7 +30,11 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv)
 	_.defaults(env, PROC_ENV)
 	let pname = chain.name()
 	if (pname == 'benchmarks') env.INSTANCES++;
-	return chain.nodeArgs(['--no-warnings']).entry(`./${pname}/_${pname}.main`).env(env).scale(env.INSTANCES)
+	return (chain
+		.nodeArgs(['--no-warnings', '--nouse_idle_notification', '--expose_gc', '--max_old_space_size=2048'])
+		.entry(`./${pname}/_${pname}.main`)
+		.env(env).scale(env.INSTANCES)
+	)
 }
 
 

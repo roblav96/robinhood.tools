@@ -8,7 +8,6 @@ import polka from './polka'
 
 
 const server = turbo.createServer(polka.handler)
-export default server
 
 server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
 	console.info('turbo listening ->', process.env.HOST + ':' + process.env.IPORT)
@@ -18,5 +17,7 @@ exithook(function onexit() {
 	server.connections.forEach(v => v.close())
 	server.close()
 })
+
+export default server
 
 
