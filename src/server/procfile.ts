@@ -1,8 +1,4 @@
 // 
-process.env.NODE_ENV = process.env.PANDORA_DEV ? 'development' : 'production'
-if (process.env.NODE_ENV == 'development') process.env.DEVELOPMENT = true;
-if (process.env.NODE_ENV == 'production') process.env.PRODUCTION = true;
-// 
 
 import { ServiceRepresentationChainModifier } from 'pandora/dist/application/ServiceRepresentationChainModifier'
 import { ProcessRepresentationChainModifier } from 'pandora/dist/application/ProcessRepresentationChainModifier'
@@ -15,18 +11,22 @@ import * as pkgup from 'pkg-up'
 
 
 
+const PANDORA_DEV = process.env.PANDORA_DEV == 'true'
 const PROJECT = path.dirname(pkgup.sync())
 const PACKAGE = require(path.join(PROJECT, 'package.json'))
 const PROC_ENV = {
-	NODE_ENV: process.env.NODE_ENV,
-	DOMAIN: (process.env.DEVELOPMENT ? 'dev.' : '') + PACKAGE.domain,
-	HOST: '127.0.0.1',
-	PORT: 12300,
+	PROJECT, NAME: PACKAGE.name, VERSION: PACKAGE.version,
+	NODE_ENV: PANDORA_DEV ? 'development' : 'production',
+	DOMAIN: (PANDORA_DEV ? 'dev.' : '') + PACKAGE.domain,
+	HOST: '127.0.0.1', PORT: 12300,
 	INSTANCES: 1,
-	PROJECT: PROJECT,
-	NAME: PACKAGE.name,
-	VERSION: PACKAGE.version,
 } as ProcEnv
+interface ProcEnv extends Partial<NodeJS.ProcessEnv> { [key: string]: any }
+
+function Process(chain: ProcessRepresentationChainModifier, env: ProcEnv) {
+	_.defaults(env, PROC_ENV)
+	return chain.nodeArgs(['--no-warnings']).env(env).scale(env.INSTANCES)
+}
 
 export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
@@ -64,19 +64,11 @@ export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
 
 
-	if (process.env.PRODUCTION) {
+	if (!PANDORA_DEV) {
 		pandora.process('dashboard').scale(1)
 		pandora.service('dashboard', path.resolve(PROJECT, 'node_modules/pandora-dashboard/dist/Dashboard')).process('dashboard')
 	}
 
-}
-
-
-
-interface ProcEnv extends Partial<NodeJS.ProcessEnv> { [key: string]: any }
-function Process(chain: ProcessRepresentationChainModifier, env: ProcEnv) {
-	_.defaults(env, PROC_ENV)
-	return chain.nodeArgs(['--no-warnings']).env(env).scale(env.INSTANCES)
 }
 
 
