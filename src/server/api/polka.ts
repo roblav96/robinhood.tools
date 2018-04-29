@@ -1,28 +1,15 @@
 // 
 
-import { Request as TurboRequest, Response as TurboResponse } from './turbo'
 import * as _ from '../../common/lodash'
-import * as onexit from 'exit-hook'
-import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
 import * as boom from 'boom'
 import * as FastestValidator from 'fastest-validator'
+import * as turbo from './turbo'
 
 
 
 { (Polka as any).Router = Polka().constructor }
-class Router<Server extends turbo.Server = turbo.Server, Request extends (TurboRequest & Polka.Request) = (TurboRequest & Polka.Request), Response extends TurboResponse = TurboResponse> extends Polka.Router<Server, Request, Response> {
-
-	// hook(fn: Polka.Handler<Request, Response>) {
-	// 	this.use(function hook(req, res, next) {
-	// 		fn(req, res, next)
-	// 	})
-	// }
-	// puse(fn: (req: Request, res: Response) => Promise<void>) {
-	// 	this.use(function puse(req, res, next) {
-	// 		fn(req, res).then(next as any).catch(next)
-	// 	})
-	// }
+class Router<Server extends typeof turbo.server = typeof turbo.server, Request extends (turbo.NitroRequest & Polka.Request) = (turbo.NitroRequest & Polka.Request), Response extends turbo.NitroResponse = turbo.NitroResponse> extends Polka.Router<Server, Request, Response> {
 
 	route(opts: {
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
@@ -65,13 +52,22 @@ class Router<Server extends turbo.Server = turbo.Server, Request extends (TurboR
 		})
 	}
 
+	// hook(fn: Polka.Handler<Request, Response>) {
+	// 	this.use(function hook(req, res, next) {
+	// 		fn(req, res, next)
+	// 	})
+	// }
+	// puse(fn: (req: Request, res: Response) => Promise<void>) {
+	// 	this.use(function puse(req, res, next) {
+	// 		fn(req, res).then(next as any).catch(next)
+	// 	})
+	// }
+
 }
 
 
 
 const polka = new Router({
-
-	server: turbo.createServer(),
 
 	onError(error: boom, req, res, next) {
 		if (!error.isBoom) {
@@ -96,25 +92,17 @@ const polka = new Router({
 
 })
 
+turbo.server.on('request', polka.handler as any)
+
 export default polka
 
 
 
-setImmediate(async function start() {
-	await polka.listen(+process.env.IPORT, process.env.HOST)
-	console.info('turbo listening ->', process.env.HOST + ':' + process.env.IPORT)
-})
-
-onexit(function() {
-	polka.server.connections.forEach(v => v.close())
-	polka.server.close()
-})
-
 
 
 polka.get('/api/hello', function get(req, res) {
-	res.end()
-	// res.end(JSON.stringify({ hello: 'world' }))
+	// res.end()
+	res.end(JSON.stringify({ hello: 'world' }))
 	// res.send({ hello: 'world' })
 })
 
