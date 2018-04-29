@@ -44,7 +44,7 @@ for (i = 0; i < len; i++) {
 import * as inspector from 'inspector'
 import * as onexit from 'exit-hook'
 import * as clc from 'cli-color'
-if (process.env.DEBUGGER) {
+if (process.env.DEBUGGER == 'true') {
 	inspector.open(process.debugPort + +process.env.OFFSET + +process.env.INSTANCE)
 	onexit(function(signal) {
 		if (process.env.PRIMARY) {
