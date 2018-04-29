@@ -1,6 +1,7 @@
 // 
 
 process.env.SERVER = true
+if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development';
 if (process.env.NODE_ENV == 'development') process.env.DEVELOPMENT = true;
 if (process.env.NODE_ENV == 'production') process.env.PRODUCTION = true;
 
@@ -8,8 +9,10 @@ if (process.env.NODE_ENV == 'production') process.env.PRODUCTION = true;
 
 import * as path from 'path'
 import * as dotenv from 'dotenv'
-dotenv.config({ path: path.resolve(process.env.PROJECT, 'env/server.env') })
-dotenv.config({ path: path.resolve(process.env.PROJECT, 'env/server.' + process.env.NODE_ENV + '.env') })
+if (process.env.PROJECT) {
+	dotenv.config({ path: path.resolve(process.env.PROJECT, 'env/server.env') })
+	dotenv.config({ path: path.resolve(process.env.PROJECT, 'env/server.' + process.env.NODE_ENV + '.env') })
+}
 
 
 
@@ -23,7 +26,7 @@ if (+process.env.INSTANCE == 0) process.env.PRIMARY = true;
 
 
 import * as pandora from 'pandora'
-let offset = pandora.processContext.context.processRepresentation.offset
+let offset = pandora.processContext ? pandora.processContext.context.processRepresentation.offset : 0
 process.env.PORT = +process.env.PORT + offset + +process.env.INSTANCE
 
 

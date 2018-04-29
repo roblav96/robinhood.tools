@@ -13,10 +13,10 @@ declare module 'turbo-http' {
 	}
 	export class Server extends turbo.Server {
 		constructor(options?: turbo.Server.Options)
-		emit<Name extends keyof Server.Events>(event: Name, arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1])
-		on<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
-		once<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
-		addListener<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void)
+		emit<Name extends keyof Server.Events>(event: Name, arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]): boolean
+		on<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void): this
+		once<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void): this
+		addListener<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void): this
 	}
 	export function createServer(handler?: (req: TurboRequest, res: TurboResponse) => void): Server
 	export function createServer(options?: turbo.Server.Options, handler?: (req: TurboRequest, res: TurboResponse) => void): Server
@@ -68,7 +68,7 @@ declare module 'turbo-http/lib/response' {
 			statusCode: number
 			end(cb?: () => void): void
 			end(buffer?: Buffer | string, cb?: () => void): void
-			end(buffer?: Buffer | string, length?: number, cb?: () => void)
+			end(buffer?: Buffer | string, length?: number, cb?: () => void): void
 			endv(buffers: (Buffer | string)[], cb?: () => void): void
 			endv(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void): void
 			setHeader(name: string, value: string | number): void

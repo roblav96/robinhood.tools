@@ -29,7 +29,8 @@ for (i = 0; i < len; i++) {
 			if (method == 'error') color = color + 'Bright';
 			let file = chalk.bold(`${chalk[color](site.fileName)}:${site.line}`)
 			let pname = pandora ? `(${pandora.processName})` : ''
-			let output = chalk.underline(`${square}[${file}][${process.env.INSTANCE}]${pname}${site.callee}[${chalk.grey(stamp)}]`)
+			let pi = process.env.INSTANCE ? `[${process.env.INSTANCE}]` : ''
+			let output = chalk.underline(`${square}[${file}]${pi}${pname}${site.callee}[${chalk.grey(stamp)}]`)
 			if (method == 'error') output = chalk.bold.redBright('████  ERROR  ████\r\n') + output;
 			process.stdout.write(`\r\n${output}\r\n`)
 			_console[method].apply(console, args)
