@@ -1,57 +1,30 @@
 // 
 
 import * as _ from '../../common/lodash'
-import * as onexit from 'exit-hook'
 import * as util from 'util'
 import * as TurboRequest from 'turbo-http/lib/request'
 import * as TurboResponse from 'turbo-http/lib/response'
-import * as turbo from 'turbo-http'
 import * as qs from 'querystring'
 import * as cookie from 'cookie'
 import * as jsonparse from 'fast-json-parse'
 import * as boom from 'boom'
+import polka from './polka'
 
 
 
-export interface NitroRequest extends TurboRequest { }
-export class NitroRequest {
+export interface PolkaRequest extends TurboRequest { }
+export class PolkaRequest {
 	body: any
-	authed = false
-	headers = {} as Dict<string>
-	cookies = {} as Dict<string>
-	ondata(buffer, start, length) {
-		if (!this.body) this.body = [];
-		let chunk = buffer.slice(start, length + start)
-		this.body.push(Buffer.from(chunk))
-	}
-	onend() {
-		this.ondata = _.noop; this.onend = _.noop
-		if (this.body) {
-			this.body = Buffer.concat(this.body).toString()
-			// let content = this.getHeader('content-type')
-			// if (content == 'application/json') {
-			// 	let parsed = jsonparse(this.body)
-			// 	if (parsed.err) return next(boom.badData(parsed.err));
-			// 	this.body = parsed.value
-			// } else if (content == 'application/x-www-form-urlencoded') {
-			// 	this.body = qs.parse(this.body)
-			// }
-		}
-		
-		// next()
-	}
+	authed: boolean
+	headers: Dict<string>
+	cookies: Dict<string>
 }
-// util.inherits(TurboRequest, NitroRequest)
-
-console.info('TurboRequest ->', TurboRequest)
-console.dir(TurboRequest)
-console.info('NitroRequest ->', NitroRequest)
-console.dir(NitroRequest)
+util.inherits(TurboRequest, PolkaRequest)
 
 
 
-export interface NitroResponse extends TurboResponse { }
-export class NitroResponse {
+export interface PolkaResponse extends TurboResponse { }
+export class PolkaResponse {
 	setCookie(name, value, opts = {} as cookie.CookieSerializeOptions) {
 		if (Number.isFinite(opts.expires as any)) {
 			opts.expires = new Date(opts.expires)
@@ -70,54 +43,92 @@ export class NitroResponse {
 			data = JSON.stringify(data)
 			this.setHeader('content-type', 'application/json')
 		}
-		if (typeof data == 'string') data = Buffer.from(data);
-		this.setHeader('content-length', data.length)
-		this.write(data)
+		this.end(data)
+		// if (typeof data == 'string') data = Buffer.from(data);
+		// this.setHeader('content-length', data.length)
+		// this.write(data)
 	}
 }
+util.inherits(TurboResponse, PolkaResponse)
 
 
 
-declare module 'turbo-http' {
-	namespace Server {
-		interface Events {
-			'next': void[]
-		}
-	}
-}
+polka.use(function(req, res, next) {
 
-export const server = turbo.createServer(function handler(req, res) {
-	// console.log('req ->', req)
-	// console.log('req.__proto__ ->', req.__proto__)
-	// console.info('TurboRequest ->', TurboRequest)
-	// console.dir(TurboRequest)
-
-	req.socket.on('connect', function() { console.log('connection -> connect') })
-	req.socket.on('finish', function() { console.log('connection -> finish') })
-	req.socket.on('end', function() { console.log('connection -> end') })
-	req.socket.on('close', function() { console.log('connection -> close') })
-	req.socket.on('error', function(error) { console.log('connection Error ->', error) })
-
-	let rawheaders = this._options.headers
+	req.headers = {}
+	let rawheaders = req._options.headers
 	let i: number, len = rawheaders.length
 	for (i = 0; i < len; i += 2) {
-		this.headers[rawheaders[i].toLowerCase()] = rawheaders[i + 1]
+		let header = rawheaders[i].toLowerCase()
+		req.headers[header] = rawheaders[i + 1]
 	}
-	let cookies = this.getHeader('cookie')
-	if (cookies) this.cookies = cookie.parse(cookies);
+	let cookies = req.headers['cookie']
+	if (cookies) req.cookies = cookie.parse(cookies);
+
+	let chunks = [] as string[]
+	req.ondata = function ondata(buffer, start, length) {
+		let chunk = buffer.slice(start, length + start)
+		chunks.push(chunk.toString())
+	}
+	req.onend = function onend() {
+		req.ondata = _.noop; req.onend = _.noop
+		let body = chunks.join('')
+		if (!body) return next();
+		let content = req.headers['content-type']
+		if (content == 'application/json') {
+			let parsed = jsonparse(body)
+			if (parsed.err) return next(boom.badData(parsed.err));
+			req.body = parsed.value
+		} else if (content == 'application/x-www-form-urlencoded') {
+			req.body = qs.parse(body)
+		} else {
+			req.body = body
+		}
+		next()
+	}
 
 })
 
-setImmediate(function listen() {
-	server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
-		console.info('turbo listening ->', process.env.HOST + ':' + process.env.IPORT)
-	})
-})
+// declare module 'turbo-http' {
+// 	namespace Server {
+// 		interface Events {
+// 			'next': void[]
+// 		}
+// 	}
+// }
 
-onexit(function() {
-	server.connections.forEach(v => v.close())
-	server.close()
-})
+// export const server = turbo.createServer(function handler(req, res) {
+// 	// console.log('req ->', req)
+// 	// console.log('req.__proto__ ->', req.__proto__)
+// 	// console.info('TurboRequest ->', TurboRequest)
+// 	// console.dir(TurboRequest)
+
+// 	req.socket.on('connect', function() { console.log('connection -> connect') })
+// 	req.socket.on('finish', function() { console.log('connection -> finish') })
+// 	req.socket.on('end', function() { console.log('connection -> end') })
+// 	req.socket.on('close', function() { console.log('connection -> close') })
+// 	req.socket.on('error', function(error) { console.log('connection Error ->', error) })
+
+// 	let rawheaders = this._options.headers
+// 	let i: number, len = rawheaders.length
+// 	for (i = 0; i < len; i += 2) {
+// 		this.headers[rawheaders[i].toLowerCase()] = rawheaders[i + 1]
+// 	}
+// 	let cookies = this.getHeader('cookie')
+// 	if (cookies) this.cookies = cookie.parse(cookies);
+
+// })
+
+// setImmediate(function listen() {
+// 	server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
+// 		console.info('turbo listening ->', process.env.HOST + ':' + process.env.IPORT)
+// 	})
+// })
+
+// onexit(function() {
+// 	server.connections.forEach(v => v.close())
+// 	server.close()
+// })
 
 
 

@@ -4,7 +4,9 @@ import chalk from 'chalk'
 import * as execa from 'execa'
 import * as onexit from 'exit-hook'
 import * as url from 'url'
+import * as http from 'http'
 import * as turbo from 'turbo-http'
+import * as Polka from 'polka'
 import * as pAll from 'p-all'
 import * as Table from 'cli-table2'
 import * as core from '../../common/core'
@@ -28,6 +30,7 @@ async function start() {
 	// 	urls.push(`http://${process.env.HOST}:${+process.env.IPORT + i}`)
 	// })
 	// urls.push(`http://${process.env.HOST}:${process.env.PORT}`)
+	// urls.push(`http://localhost:8080`)
 	urls.push(`http://${process.env.HOST}:${+process.env.IPORT + 1}`)
 	urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/hello`)
 	urls.push(`http://${process.env.DOMAIN}/api/hello`)
@@ -60,10 +63,11 @@ async function start() {
 
 
 
-const server = turbo.createServer(function handler(req, res) {
-	res.end()
-	// res.end(JSON.stringify({ hello: 'world' }))
-})
+const polka = Polka()
+polka.get('/', function get(req: any, res: any) { res.end() })
+
+// const server = http.createServer(polka.handler as any)
+const server = turbo.createServer(polka.handler as any)
 server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
 	console.info('listening ->', process.env.HOST + ':' + process.env.IPORT)
 	if (process.env.PRIMARY) {
@@ -71,7 +75,7 @@ server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
 	}
 })
 onexit(function close() {
-	server.connections.forEach(v => v.close())
+	if (Array.isArray(server.connections)) server.connections.forEach(v => v.close());
 	server.close()
 })
 

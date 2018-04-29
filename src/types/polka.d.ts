@@ -30,11 +30,11 @@ declare module 'polka' {
 			parse(req: Request): url.UrlWithStringQuery
 			use(base: string, ...fn: Handler<Request, Response>[])
 			use(...fn: Handler<Request, Response>[])
-			handler(req: Request, res: Response, parsed: url.UrlWithStringQuery)
+			handler(req: Request, res: Response, parsed?: url.UrlWithStringQuery)
 			listen(port: number, hostname?: string): Promise<void>
 		}
 	}
-	function Polka<Server = http.Server, Request = http.IncomingMessage, Response = http.ServerResponse>(options?: Partial<Polka.Options<Server, Request & Polka.Request, Response>>): Polka.Router<Server, Request & Polka.Request, Response>
+	function Polka<Server, Request, Response>(options?: Partial<Polka.Options<Server, Request & Polka.Request, Response>>): Polka.Router<Server, Request & Polka.Request, Response>
 	export = Polka
 
 }

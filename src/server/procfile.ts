@@ -39,10 +39,10 @@ export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
 	Process(pandora.process('api').order(1))
 
-	// Process(pandora.process('benchmarks').order(2), {
-	// 	// INSTANCES: 4,
-	// 	DEBUGGER: false,
-	// })
+	Process(pandora.process('benchmarks').order(2), {
+		// INSTANCES: 4,
+		DEBUGGER: false,
+	})
 
 
 

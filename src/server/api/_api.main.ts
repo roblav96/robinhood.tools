@@ -2,8 +2,8 @@
 
 import '../main'
 
-import './turbo'
 import './polka'
+import './turbo'
 import './cors.api'
 
 // import './security.hook'
