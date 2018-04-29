@@ -90,7 +90,7 @@ const polka = new Router({
 	},
 
 	onNoMatch(req, res) {
-		// if (res.headerSent) return;
+		if (res.headerSent) return;
 		polka.onError(boom.notFound(null, { method: req.method, path: req.path }), req, res, _.noop)
 	},
 
@@ -101,16 +101,14 @@ export default polka
 
 
 setImmediate(async function start() {
-	await polka.listen(+process.env.PORT, process.env.HOST)
-	console.info('turbo listening ->', process.env.HOST + ':' + process.env.PORT)
+	await polka.listen(+process.env.IPORT, process.env.HOST)
+	console.info('turbo listening ->', process.env.HOST + ':' + process.env.IPORT)
 })
 
 onexit(function() {
 	polka.server.connections.forEach(v => v.close())
 	polka.server.close()
 })
-
-
 
 
 

@@ -12,7 +12,7 @@ import * as uws from 'uws'
 
 const wss = new uws.Server({
 	host: process.env.HOST,
-	port: +process.env.PORT + os.cpus().length,
+	port: +process.env.IPORT + os.cpus().length,
 	path: `websocket/${process.env.INSTANCE}`,
 
 	verifyClient(incoming, next) {

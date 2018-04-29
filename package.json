@@ -72,6 +72,7 @@
 	"devDependencies": {
 		"@types/bluebird": "latest",
 		"@types/boom": "latest",
+		"@types/cli-table2": "latest",
 		"@types/cookie": "latest",
 		"@types/cron": "latest",
 		"@types/dotenv": "latest",
@@ -99,6 +100,7 @@
 		"@vue/cli-service": "latest",
 		"chalk": "latest",
 		"cli-color": "latest",
+		"cli-table2": "latest",
 		"cross-env": "latest",
 		"dotenv": "latest",
 		"dts-gen-v2": "latest",

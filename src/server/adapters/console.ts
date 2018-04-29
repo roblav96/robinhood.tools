@@ -45,8 +45,7 @@ import * as inspector from 'inspector'
 import * as onexit from 'exit-hook'
 import * as clc from 'cli-color'
 if (process.env.DEBUGGER) {
-	let offset = pandora ? pandora.processContext.context.processRepresentation.offset : 0
-	inspector.open(process.debugPort + offset + +process.env.INSTANCE)
+	inspector.open(process.debugPort + +process.env.OFFSET + +process.env.INSTANCE)
 	onexit(function(signal) {
 		if (process.env.PRIMARY) {
 			let stdout = (console as any)._stdout

@@ -34,8 +34,6 @@ export class Request {
 
 export interface Response extends TurboResponse { }
 export class Response {
-	finished = false
-	build() { }
 	setCookie(name, value, opts = {} as cookie.CookieSerializeOptions) {
 		if (Number.isFinite(opts.expires as any)) {
 			opts.expires = new Date(opts.expires)
@@ -76,7 +74,6 @@ polka.use(function(req, res, next) {
 
 	Object.assign(res, new Response())
 	util.inherits(res.constructor, Response)
-	res.build()
 
 	Object.assign(req, {
 		ondata(buffer, start, length) {

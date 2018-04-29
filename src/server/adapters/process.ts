@@ -26,8 +26,8 @@ if (+process.env.INSTANCE == 0) process.env.PRIMARY = true;
 
 
 import * as pandora from 'pandora'
-let offset = pandora.processContext ? pandora.processContext.context.processRepresentation.offset : 0
-process.env.PORT = +process.env.PORT + offset + +process.env.INSTANCE
+process.env.OFFSET = pandora.processContext ? pandora.processContext.context.processRepresentation.offset : 0
+process.env.IPORT = +process.env.PORT + +process.env.OFFSET + +process.env.INSTANCE
 
 
 
