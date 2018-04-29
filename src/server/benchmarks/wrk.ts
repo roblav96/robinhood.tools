@@ -5,12 +5,13 @@
 import * as _ from '../../common/lodash'
 
 
+
 export interface Results {
 	duration: string
-	errors: { non2xx3xx: number, connect: number, read: number, write: number, timeout: number }
-	latency: { avg: string, max: string, p50: string, p75: string, p90: string, p99: string, pStdev: number, stdev: string }
 	requests: { avg: string, max: string, pStdev: number, rate: number, stdev: string, total: number }
 	transfer: { rate: string, total: string }
+	latency: { avg: string, max: string, p50: string, p75: string, p90: string, p99: string, pStdev: number, stdev: string }
+	errors: { non2xx3xx: number, connect: number, read: number, write: number, timeout: number }
 }
 
 export function parse(stdout: string) {
@@ -20,6 +21,7 @@ export function parse(stdout: string) {
 		requests: {},
 		transfer: {},
 		latency: {},
+		errors: {},
 	} as Results
 	result.requests.rate = Number.parseFloat(lines[lines.length - 3].split(':')[1].trim())
 	result.transfer.rate = lines[lines.length - 2].split(':')[1].trim()
@@ -55,6 +57,7 @@ export function parse(stdout: string) {
 			result.latency[key] = _.round(Number.parseFloat(value) * 0.001, 3) + 'ms'
 		}
 	})
+	result.errors.non2xx3xx = result.errors.non2xx3xx || 0
 	return result
 }
 
