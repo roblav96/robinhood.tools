@@ -57,7 +57,7 @@ export default polka
 
 
 
-polka.get('/api/hello', function hello(req, res) { res.end() })
+polka.get('/api/hello', function hello(req, res) { res.send() })
 
 // new PolkaRoute({
 // 	method: 'GET',
