@@ -37,7 +37,9 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv)
 
 export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
-	Process(pandora.process('api').order(1))
+	Process(pandora.process('api').order(1), {
+		// INSTANCES: 4,
+	})
 
 	// Process(pandora.process('benchmarks').order(2), {
 	// 	// INSTANCES: 4,

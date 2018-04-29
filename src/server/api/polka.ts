@@ -1,7 +1,8 @@
 // 
 
 import { Server as PolkaServer } from 'turbo-http'
-import { PolkaRequest, PolkaResponse } from './turbo'
+import PolkaRequest from './polka.request'
+import PolkaResponse from './polka.response'
 import * as _ from '../../common/lodash'
 import * as exithook from 'exit-hook'
 import * as turbo from 'turbo-http'
@@ -39,16 +40,5 @@ const polka = Polka<PolkaServer, PolkaRequest, PolkaResponse>({
 polka.get('/api/hello', function hello(req, res) { res.end() })
 
 export default polka
-
-
-
-const server = turbo.createServer(polka.handler)
-server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
-	console.info('turbo listening ->', process.env.HOST + ':' + process.env.IPORT)
-})
-exithook(function onexit() {
-	server.connections.forEach(v => v.close())
-	server.close()
-})
 
 

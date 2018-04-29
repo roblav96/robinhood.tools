@@ -3,7 +3,10 @@
 import '../main'
 
 import './polka'
-import './turbo'
+import './polka.server'
+import './polka.request'
+import './polka.response'
+
 import './cors.api'
 
 // import './security.hook'
