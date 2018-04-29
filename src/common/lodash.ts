@@ -32,6 +32,7 @@ export {
 	once,
 	pick,
 	remove,
+	round,
 	sample,
 	sortBy,
 	startCase,

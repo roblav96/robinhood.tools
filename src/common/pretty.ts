@@ -14,9 +14,15 @@ export function bytes(bytes: number) {
 
 
 
-import * as Humanize from 'humanize-plus'
+import * as humanize from 'humanize-plus'
 export function plural(input: string, value: number) {
-	return Humanize.pluralize(value, input)
+	return humanize.pluralize(value, input)
+}
+export function formatNumber(value: any, precision = 0) {
+	let formatted = !isNaN(value) && humanize.formatNumber(value, precision)
+	if (formatted) return formatted;
+	let unit = value.replace(/[0-9.]/g, '')
+	return humanize.formatNumber(Number.parseFloat(value), precision) + unit
 }
 
 

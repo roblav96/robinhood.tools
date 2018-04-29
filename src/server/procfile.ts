@@ -18,49 +18,27 @@ const PROC_ENV = {
 	PROJECT, NAME: PACKAGE.name, VERSION: PACKAGE.version,
 	NODE_ENV: PANDORA_DEV ? 'development' : 'production',
 	DOMAIN: (PANDORA_DEV ? 'dev.' : '') + PACKAGE.domain,
+	INSTANCES: PANDORA_DEV ? 1 : os.cpus().length,
+	DEBUGGER: PANDORA_DEV,
 	HOST: '127.0.0.1', PORT: 12300,
-	INSTANCES: 1,
 } as ProcEnv
 interface ProcEnv extends Partial<NodeJS.ProcessEnv> { [key: string]: any }
 
-function Process(chain: ProcessRepresentationChainModifier, env: ProcEnv) {
+
+
+function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv) {
 	_.defaults(env, PROC_ENV)
-	return chain.nodeArgs(['--no-warnings']).env(env).scale(env.INSTANCES)
+	let pname = chain.name()
+	return chain.nodeArgs(['--no-warnings']).entry(`./${pname}/${pname}.main`).env(env).scale(env.INSTANCES)
 }
+
+
 
 export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
-	let api = Process(pandora
-		.process('api')
-		.entry('./api/api.main.js')
-		.order(1), {
-			// INSTANCES: os.cpus().length,
-			DEBUGGER: true,
-		}
-	)
+	Process(pandora.process('api').order(1))
 
-	console.log('api.env() ->', api.env())
-
-
-
-	// const api = _.defaults({
-	// 	// INSTANCES: os.cpus().length,
-	// 	DEBUGGER: true,
-	// } as NodeJS.ProcessEnv, env)
-	// let idk = pandora.process('api').entry('./api/api.main.js').order(1).nodeArgs(['--no-warnings']).env(api).scale(api.INSTANCES)
-	// pandora.service('api', './api/api.service.js').process('api').publish(true)
-
-	// const benchmark = _.defaults({
-	// 	DEBUGGER: true,
-	// } as NodeJS.ProcessEnv, env)
-	// pandora.process('benchmark').entry('./benchmarks/benchmarks.main.js').order(2).nodeArgs(['--no-warnings']).env(benchmark).scale(benchmark.INSTANCES)
-
-	// const websocket = _.defaults({
-	// 	INSTANCES: 4,
-	// 	DEBUGGER: true,
-	// } as NodeJS.ProcessEnv, env)
-	// pandora.process('websocket').env(websocket).scale(websocket.INSTANCES).nodeArgs(['--no-warnings'])
-	// pandora.service('websocket', './websocket/websocket.service.js').process('websocket').publish(true)
+	Process(pandora.process('benchmarks').order(2), { DEBUGGER: false })
 
 
 
