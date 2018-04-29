@@ -21,39 +21,13 @@ export class PolkaRequest {
 }
 util.inherits(TurboRequest, PolkaRequest)
 
-
-
-export interface PolkaResponse extends TurboResponse { }
-export class PolkaResponse {
-	setCookie(name, value, opts = {} as cookie.CookieSerializeOptions) {
-		if (Number.isFinite(opts.expires as any)) {
-			opts.expires = new Date(opts.expires)
-		}
-		this.setHeader('set-cookie', cookie.serialize(name, value, opts))
-	}
-	writeHead(code: number, headers: Dict<string>) {
-		this.statusCode = code;
-		Object.keys(headers).forEach(key => {
-			this.setHeader(key, headers[key])
-		})
-	}
-	send(data?: any) {
-		data = data || ''
-		if (typeof data == 'object' && data.constructor == Object) {
-			data = JSON.stringify(data)
-			this.setHeader('content-type', 'application/json')
-		}
-		this.end(data)
-		// if (typeof data == 'string') data = Buffer.from(data);
-		// this.setHeader('content-length', data.length)
-		// this.write(data)
-	}
-}
-util.inherits(TurboResponse, PolkaResponse)
-
-
-
 polka.use(function(req, res, next) {
+	
+	// req.socket.on('connect', function() { console.log('connection -> connect') })
+	// req.socket.on('finish', function() { console.log('connection -> finish') })
+	// req.socket.on('end', function() { console.log('connection -> end') })
+	// req.socket.on('close', function() { console.log('connection -> close') })
+	// req.socket.on('error', function(error) { console.log('connection Error ->', error) })
 
 	req.headers = {}
 	let rawheaders = req._options.headers
@@ -71,6 +45,7 @@ polka.use(function(req, res, next) {
 		chunks.push(chunk.toString())
 	}
 	req.onend = function onend() {
+		res.setCookie('bevis', 'butthead', {})
 		req.ondata = _.noop; req.onend = _.noop
 		let body = chunks.join('')
 		if (!body) return next();
@@ -88,6 +63,36 @@ polka.use(function(req, res, next) {
 	}
 
 })
+
+
+
+export interface PolkaResponse extends TurboResponse { }
+export class PolkaResponse {
+	setCookie(key: string, value: string, opts: cookie.CookieSerializeOptions) {
+		console.info('this ->', this)
+		console.dir(this)
+		this.setHeader('set-cookie', cookie.serialize(key, value, opts))
+	}
+	writeHead(code: number, headers: Dict<string>) {
+		this.statusCode = code;
+		Object.keys(headers).forEach(key => {
+			this.setHeader(key, headers[key])
+		})
+	}
+	send(data?: any) {
+		data = data || ''
+		if (typeof data == 'object' && data.constructor == Object) {
+			data = JSON.stringify(data)
+			this.setHeader('content-type', 'application/json')
+		}
+		this.end(data)
+	}
+}
+util.inherits(TurboResponse, PolkaResponse)
+
+
+
+
 
 // declare module 'turbo-http' {
 // 	namespace Server {

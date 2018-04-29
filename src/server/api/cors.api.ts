@@ -7,15 +7,15 @@ import polka from './polka'
 const ORIGIN = process.env.DOMAIN
 const ALLOW_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'].join(',')
 const ALLOW_HEADERS = [
-	// 'x-id', 'x-uuid', 'x-finger', 'x-bytes', 'x-prime', 'x-token', 'x-version',
 	'accept', 'accept-version', 'content-type', 'origin',
+	// 'x-id', 'x-uuid', 'x-finger', 'x-bytes', 'x-prime', 'x-token', 'x-version',
 ].join(',')
 
 
 
 polka.use(function(req, res, next) {
 
-	let origin = req.getHeader('origin')
+	let origin = req.headers['origin']
 	if (!origin || !origin.includes(ORIGIN)) {
 		if (req.method == 'OPTIONS') res.send();
 		return next()
