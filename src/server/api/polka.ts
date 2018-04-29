@@ -18,11 +18,11 @@ class Router<Server extends turbo.Server = turbo.Server, Request extends (TurboR
 	// 		fn(req, res, next)
 	// 	})
 	// }
-	puse(fn: (req: Request, res: Response) => Promise<void>) {
-		this.use(function puse(req, res, next) {
-			fn(req, res).then(next as any).catch(next)
-		})
-	}
+	// puse(fn: (req: Request, res: Response) => Promise<void>) {
+	// 	this.use(function puse(req, res, next) {
+	// 		fn(req, res).then(next as any).catch(next)
+	// 	})
+	// }
 
 	route(opts: {
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
@@ -112,8 +112,10 @@ onexit(function() {
 
 
 
-polka.options('/api/hello', function options(req, res) { res.send({ hello: 'world' }) })
-polka.get('/api/hello', function get(req, res) { res.send({ hello: 'world' }) })
-polka.post('/api/hello', function post(req, res) { res.send({ hello: 'world' }) })
+polka.get('/api/hello', function get(req, res) {
+	res.end()
+	// res.end(JSON.stringify({ hello: 'world' }))
+	// res.send({ hello: 'world' })
+})
 
 

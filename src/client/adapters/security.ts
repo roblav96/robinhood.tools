@@ -76,10 +76,10 @@ function finger(): Promise<void> {
 
 
 // clock.on('30s', function ontock(i: number) {
-// http.post('http://localhost:12300/api/benchmark', {
-http.post('/benchmark', {
-	random: Math.random().toString(16),
-}).then(function(response) {
+// http.post('http://localhost:12300/api/hello', {
+// http.post('/hello', {
+// 	random: Math.random().toString(16),
+http.get('/hello').then(function(response) {
 	console.log('response ->', response)
 }).catch(function(error) {
 	console.error('polka Error ->', error)

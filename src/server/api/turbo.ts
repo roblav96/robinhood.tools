@@ -66,14 +66,14 @@ polka.use(function(req, res, next) {
 	// req.socket.on('finish', function() { console.log('connection -> finish') })
 	// req.socket.on('end', function() { console.log('connection -> end') })
 	// req.socket.on('close', function() { console.log('connection -> close') })
-	// req.socket.on('error', function() { console.log('connection -> error') })
+	// req.socket.on('error', function(error) { console.log('connection Error ->', error) })
 
-	Object.assign(req, new Request())
-	util.inherits(req.constructor, Request)
-	req.build()
+	// Object.assign(req, new Request())
+	// util.inherits(req.constructor, Request)
+	// req.build()
 
-	Object.assign(res, new Response())
-	util.inherits(res.constructor, Response)
+	// Object.assign(res, new Response())
+	// util.inherits(res.constructor, Response)
 
 	Object.assign(req, {
 		ondata(buffer, start, length) {

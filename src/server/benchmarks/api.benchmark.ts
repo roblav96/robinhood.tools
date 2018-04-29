@@ -15,7 +15,7 @@ import * as wrk from './wrk'
 
 async function run(url: string) {
 	console.log('run ->', url)
-	let cli = await execa('wrk', ['-t1', '-c100', '-d3s', url])
+	let cli = await execa('wrk', ['-t4', '-c100', '-d1s', url])
 	// console.log(cli.stdout)
 	return wrk.parse(cli.stdout)
 }
@@ -23,12 +23,12 @@ async function run(url: string) {
 async function start() {
 
 	let urls = []
-	core.array.create(+process.env.INSTANCES).forEach(function(i) {
-		if (i == 0) return;
-		urls.push(`http://${process.env.HOST}:${+process.env.IPORT + i}`)
-	})
-	// urls.push(`http://${process.env.HOST}:${process.env.IPORT}`)
+	// core.array.create(+process.env.INSTANCES).forEach(function(i) {
+	// 	if (i == 0) return;
+	// 	urls.push(`http://${process.env.HOST}:${+process.env.IPORT + i}`)
+	// })
 	// urls.push(`http://${process.env.HOST}:${process.env.PORT}`)
+	urls.push(`http://${process.env.HOST}:${+process.env.IPORT + 1}`)
 	urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/hello`)
 	urls.push(`http://${process.env.DOMAIN}/api/hello`)
 
@@ -42,7 +42,7 @@ async function start() {
 
 	results.forEach(function(v, i) {
 		let parsed = url.parse(urls[i])
-		let dropped = pretty.formatNumber(v.errors.non2xx3xx) + '/' + v.requests.total
+		let dropped = pretty.formatNumber(v.errors.non2xx3xx) + '/' + pretty.formatNumber(v.requests.total)
 		table.push([
 			parsed.host.concat(parsed.path),
 			pretty.formatNumber(v.requests.rate),
@@ -60,17 +60,15 @@ async function start() {
 
 
 
-const INSTANCE = +process.env.INSTANCE
-const BUFFER = Buffer.from(JSON.stringify({ hello: 'world' }))
 const server = turbo.createServer(function handler(req, res) {
 	res.end()
+	// res.end(JSON.stringify({ hello: 'world' }))
 })
 server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
 	console.info('listening ->', process.env.HOST + ':' + process.env.IPORT)
-	if (!process.env.PRIMARY) return;
-	start().catch(function(error: Error & execa.ExecaReturns) {
-		console.error(`'${error.cmd}' ->`, error)
-	})
+	if (process.env.PRIMARY) {
+		start().catch(error => console.error(`'${error.cmd}' ->`, error))
+	}
 })
 onexit(function close() {
 	server.connections.forEach(v => v.close())
