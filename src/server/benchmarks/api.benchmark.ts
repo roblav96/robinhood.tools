@@ -17,7 +17,7 @@ import * as wrk from './wrk'
 
 async function run(url: string) {
 	console.log('run ->', url)
-	let cli = await execa('wrk', ['-t4', '-c100', '-d1s', url])
+	let cli = await execa('wrk', ['-t1', '-c100', '-d1s', url])
 	// console.log(cli.stdout)
 	return wrk.parse(cli.stdout)
 }

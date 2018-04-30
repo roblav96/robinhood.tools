@@ -31,10 +31,13 @@ process.env.IPORT = +process.env.PORT + +process.env.OFFSET + +process.env.INSTA
 
 
 
+import chalk from 'chalk'
 process.on('uncaughtException', function(error) {
+	process.stdout.write(chalk.bold.redBright('UNCAUGHT EXCEPTION') + '\r\n')
 	console.error('UNCAUGHT EXCEPTION ->', error)
 })
 process.on('unhandledRejection', function(error) {
+	process.stdout.write(chalk.bold.redBright('UNHANDLED PROMISE REJECTION') + '\r\n')
 	console.error('UNHANDLED PROMISE REJECTION ->', error)
 	if (process.env.PRODUCTION) process.exit(1);
 })

@@ -47,7 +47,7 @@ polka.use(function(req, res, next) {
 		chunks.push(chunk.toString())
 	}
 	req.onend = function onend() {
-		// req.ondata = _.noop; req.onend = _.noop
+		req.ondata = _.noop; req.onend = _.noop
 		let body = chunks.join('')
 		if (!body) return next();
 		let content = req.headers['content-type']
