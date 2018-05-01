@@ -44,7 +44,6 @@ export function config(config: Partial<Http.Config>) {
 
 export function send(config: Http.Config) {
 	// console.log('config ->', config)
-	config.timeout = 1000
 	return new Promise(function(resolve, reject) {
 		simple.concat(config, function(error, res, data) {
 			if (error && !res) return reject(error);
@@ -55,10 +54,10 @@ export function send(config: Http.Config) {
 					if (parsed.value) data = parsed.value;
 				}
 			}
-			console.info('error ->')
-			console.dir(error)
-			console.log('res ->', res)
-			console.log('data ->', data)
+			// console.info('error ->')
+			// console.dir(error)
+			// console.log('res ->', res)
+			// console.log('data ->', data)
 			if (error || res.statusCode >= 400) {
 				let boomerror = new boom(error, {
 					statusCode: res.statusCode,

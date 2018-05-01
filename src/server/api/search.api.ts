@@ -16,7 +16,7 @@ polka.route({
 	},
 	handler(req, res) {
 		let query = core.string.clean(req.body.query).toLowerCase()
-		return http.get('https://api.robinhood.com/instruments', {
+		return http.get('https://api.robinhood.com/instruments/', {
 			query: { query },
 		}).then(function(response: Robinhood.Api.Paginated<Robinhood.Instrument>) {
 			return response.results.map(function(v) {
