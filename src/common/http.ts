@@ -1,32 +1,82 @@
 // 
 
-import * as http from 'http'
-import * as got from 'got'
+import * as _ from './lodash'
+import * as qs from 'querystring'
+import * as jsonparse from 'fast-json-parse'
+import * as simple from 'simple-get'
 import * as retryable from 'is-retry-allowed'
+import * as boom from 'boom'
 import clock from './clock'
 
 
 
-export function config() {
-	return {
-		json: true,
+export function config(config: Partial<Http.Config>) {
+
+	_.defaults(config, {
 		silent: true,
 		timeout: 10000,
-		retries: process.env.CLIENT ? 0 : 5,
+		retries: process.env.CLIENT ? 0 : 3,
 		retryTick: '5s',
-		agent: new http.Agent({ keepAlive: false }),
-	} as Http.Config
+		headers: {},
+	} as Http.Config)
+
+	if (config.query) {
+		config.url += '?' + qs.stringify(config.query)
+		delete config.query
+	}
+
+	if (config.body) {
+		config.headers['Accept'] = 'application/json'
+		config.headers['Content-Type'] = 'application/json'
+		config.body = JSON.stringify(config.body)
+	}
+
+	if (!config.silent) {
+		let ending = (config.query || config.body) ? ' ➤ ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
+		console.log('➤ ' + config.method + ' ' + config.url + ending);
+	}
+
+	return config
+
 }
 
 
 
 export function send(config: Http.Config) {
-	return got(config.url, config).then(({ body }) => body).catch(function(error: got.GotError) {
+	// console.log('config ->', config)
+	config.timeout = 1000
+	return new Promise(function(resolve, reject) {
+		simple.concat(config, function(error, res, data) {
+			if (error && !res) return reject(error);
+			if (data) {
+				data = data.toString()
+				if (res.headers['content-type'] == 'application/json') {
+					let parsed = jsonparse(data)
+					if (parsed.value) data = parsed.value;
+				}
+			}
+			console.info('error ->')
+			console.dir(error)
+			console.log('res ->', res)
+			console.log('data ->', data)
+			if (error || res.statusCode >= 400) {
+				let boomerror = new boom(error, {
+					statusCode: res.statusCode,
+					message: res.statusMessage || error.message,
+					decorate: { data },
+				})
+				// console.info('boomerror ->', boomerror)
+				// console.dir(boomerror)
+				return reject(boomerror)
+			}
+			resolve(data)
+		})
+	}).catch(function(error) {
 		if (config.retries > 0 && retryable(error)) {
 			config.retries--
 			if (process.env.DEVELOPMENT) {
-				// console.error('http got retry Error ->', error)
-				// console.warn('http got config.retries ->', config.retries)
+				console.error('retry Error ->', error)
+				console.warn('retry config.retries ->', config.retries)
 			}
 			return clock.toPromise(config.retryTick).then(() => send(config))
 		}
@@ -40,11 +90,13 @@ export function send(config: Http.Config) {
 
 declare global {
 	namespace Http {
-		interface Config extends got.GotJSONOptions {
+		interface Config extends simple.RequestOptions {
+			query: any
 			retries: number
 			retryTick: Clock.Tick
-			url: string
-			query: any
+			hHost: boolean
+			hOrigin: boolean
+			hReferrer: boolean
 			silent: boolean
 			isProxy: boolean
 			robinhoodToken: string

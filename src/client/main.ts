@@ -2,9 +2,6 @@
 
 require('@/common/polyfills')
 
-global.Promise = require('bluebird/js/browser/bluebird.core.js')
-Promise.config({ warnings: { wForgottenReturn: false } })
-
 import * as _ from '@/common/lodash'
 Object.assign(console, { dtsgen: _.noop, dump: _.noop })
 // if (process.env.DEVELOPMENT) console.dtsgen = require('@/common/dtsgen').default;

@@ -12,6 +12,12 @@ export const SYMBOLS = {
 	STOCKS: 'symbols:stocks',
 }
 
+export const BENCHMARKS = {
+	API: {
+		PREVIOUS: 'benchmarks:api:previous',
+	},
+}
+
 
 
 // export const ITEMS = 'items'

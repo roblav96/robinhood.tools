@@ -22,7 +22,7 @@ util.inherits(TurboRequest, PolkaRequest)
 
 
 
-polka.use(function(req, res, next) {
+polka.use(function request(req, res, next) {
 	if (!req._options) return next(); // node http
 
 	// req.socket.on('connect', function() { console.log('connection -> connect') })
@@ -41,6 +41,9 @@ polka.use(function(req, res, next) {
 	let cookies = req.headers['cookie']
 	if (cookies) req.cookies = cookie.parse(cookies);
 
+	req.body = {}
+	if (req.method == 'GET') return next();
+
 	let chunks = [] as string[]
 	req.ondata = function ondata(buffer, start, length) {
 		let chunk = buffer.slice(start, length + start)
@@ -53,7 +56,7 @@ polka.use(function(req, res, next) {
 		let content = req.headers['content-type']
 		if (content == 'application/json') {
 			let parsed = jsonparse(body)
-			if (parsed.err) return next(boom.badData(parsed.err));
+			if (parsed.err) return next(boom.badData(parsed.err.message));
 			req.body = parsed.value
 		} else if (content == 'application/x-www-form-urlencoded') {
 			req.body = qs.parse(body)

@@ -21,8 +21,8 @@ export class PolkaResponse {
 		})
 	}
 	send(data?: any) {
-		data = data || ''
-		if (typeof data == 'object' && data.constructor == Object) {
+		if (data == null) return this.end();
+		if (typeof data == 'object') {
 			data = JSON.stringify(data)
 			this.setHeader('content-type', 'application/json')
 		}

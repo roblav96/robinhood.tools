@@ -1,6 +1,6 @@
 // 
-export * from '../../common/redis.keys' // export { rdkeys as rdkeys }
-// export { RH } from '../../common/robinhood'
+export * from '../../common/redis.keys'
+// export { rdkeys as rdkeys }
 // 
 
 import * as _ from '../../common/lodash'
@@ -11,8 +11,8 @@ import * as IORedis from 'ioredis'
 
 class Redis extends IORedis {
 
-	private static options(name: string, offset: number) {
-		const options = {
+	private static opts(name: string, offset: number) {
+		const opts = {
 			host: process.env.REDIS_HOST || '127.0.0.1',
 			port: (Number.parseInt(process.env.REDIS_PORT) || 6379) + offset,
 			password: process.env.REDIS_PASSWORD,
@@ -21,15 +21,15 @@ class Redis extends IORedis {
 		} as IORedis.RedisOptions
 
 		if (process.env.PRODUCTION) {
-			options.path = '/var/run/redis_' + options.port + '.sock'
-			_.unset(options, 'host'); _.unset(options, 'port');
+			opts.path = '/var/run/redis_' + opts.port + '.sock'
+			delete opts.host; delete opts.port
 		}
 
-		return options
+		return opts
 	}
 
 	constructor(name: string, offset: number) {
-		super(Redis.options(name, offset))
+		super(Redis.opts(name, offset))
 	}
 
 	coms(coms: Redis.Coms): Promise<any[]> {

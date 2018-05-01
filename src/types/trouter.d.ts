@@ -3,9 +3,9 @@
 declare module 'trouter' {
 
 	namespace Trouter {
-		type Methods = 'GET' | 'POST' | 'PUT' | 'HEAD' | 'PATCH' | 'DELETE' | 'OPTIONS'
-		interface Found<Handler, Params> {
-			params: Params
+		type Method = 'GET' | 'POST' | 'PUT' | 'HEAD' | 'PATCH' | 'DELETE' | 'OPTIONS'
+		interface Found<Handler> {
+			params: { [key: string]: string }
 			handler: Handler
 		}
 		class Trouter<Handler, Options> {
@@ -13,8 +13,8 @@ declare module 'trouter' {
 			opts: Options
 			handlers: { [method: string]: { [pattern: string]: Handler } }
 			routes: { [method: string]: any[] }
-			add(method: Methods, pattern: string, handler: Handler): this
-			find<Params = any>(method: Methods, url: string): Found<Handler, Params> | boolean
+			add(method: Method, pattern: string, handler: Handler): this
+			find(method: Method, url: string): Found<Handler> | boolean
 			get(pattern: string, fn: Handler): void
 			post(pattern: string, fn: Handler): void
 			put(pattern: string, fn: Handler): void

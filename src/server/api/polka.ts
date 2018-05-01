@@ -5,20 +5,20 @@ import { PolkaRequest } from './polka.request'
 import { PolkaResponse } from './polka.response'
 import * as _ from '../../common/lodash'
 import * as exithook from 'exit-hook'
-import * as http from 'http'
 import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
 import * as boom from 'boom'
-import PolkaRoute from './polka.route'
+import * as pandora from 'pandora'
+import PolkaRouter from './polka.router'
 
 
 
-const polka = Polka<PolkaServer, PolkaRequest, PolkaResponse>({
+const polka = new PolkaRouter({
 
 	onError(error: boom<any>, req, res, next) {
 		if (!error.isBoom) {
 			console.error('polka onError ->', error)
-			error = new boom(error)
+			error = new boom(error, { message: error.message })
 		} else {
 			if (error.data) Object.assign(error.output.payload, { attributes: error.data });
 			console.warn('polka onError ->', error.output.payload) // error.output.payload.error, error.message, error.output.payload)
@@ -38,10 +38,7 @@ const polka = Polka<PolkaServer, PolkaRequest, PolkaResponse>({
 
 })
 
-
-
 const server = turbo.createServer(polka.handler)
-
 server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
 	console.info('turbo listening ->', process.env.HOST + ':' + process.env.IPORT)
 })
@@ -51,18 +48,31 @@ exithook(function onexit() {
 	server.close()
 })
 
-
-
 export default polka
 
 
 
-polka.get('/api/hello', function hello(req, res) { res.send() })
+polka.get('/api/blank', function blank(req, res) { res.end() })
 
-// new PolkaRoute({
-// 	method: 'GET',
-// 	url: '/hello',
-// 	async handler(req, res) { },
-// })
+polka.route({
+	method: 'GET',
+	url: '/api/route',
+	handler(req, res) {
+		// res.end()
+		return Promise.resolve()
+	},
+})
+
+polka.route({
+	method: 'GET',
+	url: '/api/validate/:valid',
+	schema: {
+		params: { valid: 'string' }
+	},
+	handler(req, res) {
+		// res.end()
+		return Promise.resolve()
+	},
+})
 
 

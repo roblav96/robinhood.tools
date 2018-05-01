@@ -34,7 +34,7 @@ export default function procfile(pandora: ProcfileReconcilerAccessor) {
 	})
 
 	// Process(pandora.process('benchmarks').order(2), {
-	// 	// INSTANCES: 4,
+	// 	INSTANCES: 3,
 	// 	DEBUGGER: false,
 	// })
 
@@ -52,9 +52,8 @@ export default function procfile(pandora: ProcfileReconcilerAccessor) {
 function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv) {
 	_.defaults(env, PROC_ENV)
 	let pname = chain.name()
-	if (pname == 'benchmarks') env.INSTANCES++;
 	return (chain
-		.nodeArgs(['--no-warnings', '--nouse_idle_notification', '--expose_gc', '--max_old_space_size=2048'])
+		.nodeArgs(['--no-warnings', '--expose-gc', '--max_old_space_size=2048'])
 		.entry(`./${pname}/_${pname}.main`)
 		.env(env).scale(env.INSTANCES)
 	)

@@ -21,6 +21,7 @@ for (i = 0; i < len; i++) {
 	Object.assign(console, {
 		[method](...args: any[]) {
 			let stack = new StackTracey()
+			// process.stdout.write(util.inspect(stack))
 			let site = stack[1]
 			let stamp = luxon.DateTime.local().toFormat('hh:mm:ss:SSS')
 			let colors = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' }

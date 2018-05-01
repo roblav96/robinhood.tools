@@ -13,21 +13,13 @@ import vm from '@/client/vm'
 
 export function request(config: Partial<Http.Config>): Promise<any> {
 	return Promise.resolve().then(function() {
-		config.json = true
+
+		http.config(config)
 
 		if (config.isProxy) {
 			config.body = core.json.clone(config)
 			config.method = 'POST'
 			config.url = '/proxy'
-		}
-
-		_.defaults(config, {
-			headers: {},
-		} as Partial<Http.Config>, http.config())
-
-		if (!config.silent) {
-			let ending = (config.query || config.body) ? ' ➤ ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
-			console.log('➤ ' + config.method + ' ' + config.url + ending);
 		}
 
 		if (config.url[0] == '/') {
@@ -41,7 +33,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 		// console.error('http error.message Error ->', error.message)
 		let message = _.get(error, 'statusMessage', error.message) as string
-		let payload = _.get(error, 'response.body')
+		let payload = _.get(error, 'data')
 		if (payload && payload.message) {
 			let extra = payload.attributes ? JSON.stringify(payload.attributes) : payload.message
 			message += `: "${extra}"`

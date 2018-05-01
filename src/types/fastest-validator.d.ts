@@ -54,18 +54,26 @@ declare module 'fastest-validator' {
 		type Type = keyof Messages | keyof Rules
 		interface SchemaValue {
 			type: Type
-			items: Type
-			enum: string[]
-			positive: boolean
-			integer: boolean
-			min: number
-			max: number
+			items?: Type
+			enum?: string[]
+			positive?: boolean
+			integer?: boolean
+			min?: number
+			max?: number
 		}
 		interface Schema {
 			[key: string]: SchemaValue | Type
 		}
 
-		type CompiledValidator = (value: any) => boolean
+		interface Invalid {
+			actual: any
+			expected: any
+			field: string
+			message: string
+			type: string
+		}
+
+		type CompiledValidator = (value: any) => boolean | Invalid[]
 		interface Options { messages: Messages }
 		class FastestValidator {
 			constructor(opts?: Options)

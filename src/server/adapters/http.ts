@@ -4,6 +4,10 @@ export * from '../../common/http'
 
 import * as _ from '../../common/lodash'
 import * as url from 'url'
+import * as qs from 'querystring'
+import * as jsonparse from 'fast-json-parse'
+import * as simple from 'simple-get'
+import * as got from 'got'
 import * as http from '../../common/http'
 
 
@@ -11,21 +15,15 @@ import * as http from '../../common/http'
 export function request(config: Partial<Http.Config>): Promise<any> {
 	return Promise.resolve().then(function() {
 
+		http.config(config)
+
 		let parsed = url.parse(config.url)
-		_.defaults(config, {
-			headers: {
-				'Accept-Encoding': 'deflate, gzip',
-				'Host': parsed.host,
-			},
-		} as Partial<Http.Config>, http.config())
+		if (config.hHost) config.headers['Host'] = parsed.host;
+		if (config.hOrigin) config.headers['Origin'] = `${parsed.protocol}//${parsed.host}`;
+		if (config.hReferrer) config.headers['Referrer'] = `${parsed.protocol}//${parsed.host}`;
 
 		if (config.isProxy) return config;
 
-		if (!config.silent) {
-			let ending = (config.query || config.body) ? ' -> ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
-			console.log('-> ' + config.method + ' ' + config.url + ending);
-		}
-		
 		if (parsed.host.includes('robinhood.com')) {
 			if (config.robinhoodToken) {
 				config.headers['Authorization'] = 'Bearer ' + config.robinhoodToken
@@ -67,7 +65,7 @@ export function get<T = any>(url: string, config = {} as Partial<Http.Config>): 
 export function post<B = any, T = any>(url: string, body?: B, config = {} as Partial<Http.Config>): Promise<T> {
 	config.url = url
 	config.method = 'POST'
-	if (body) config.body = body as any;
+	if (body) config.body = body;
 	return request(config)
 }
 

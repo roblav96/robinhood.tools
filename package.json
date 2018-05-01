@@ -14,9 +14,10 @@
 		"client:build": "rimraf dist/client && cross-env NODE_ENV=production vue-cli-service build --mode production",
 		"client:tailwind": "tailwind build node_modules/tailwindcss/utilities.css --config src/client/styles/tailwind.js --output src/client/styles/tailwind.css",
 		"rs": "npm run server:dev",
-		"server:dev": "rimraf dist/server && run-p server:watch server:onchange cli:focus",
+		"server:dev": "rimraf dist/common dist/server && run-p server:watch server:onchange cli:focus --silent",
 		"server:watch": "tsc --project .server.tsconfig.json --watch",
-		"server:onchange": "onchange 'dist/server/**/*.js' 'dist/common/**/*.js' --delay 300 -- pandora dev dist/server --silent",
+		"server:onchange": "onchange 'dist/**/*.js' --delay 300 -- pandora dev dist/server",
+		"server:build": "tsc --project .server.tsconfig.json",
 		"cli:focus": "node -e 'setInterval(() => process.stdout.write(require(\"cli-color\").erase.lineRight), 300)'",
 		"cli:clear": "clear && printf \"\\e[3J\""
 	},
@@ -47,6 +48,7 @@
 		"mqtt": "latest",
 		"mqtt-connection": "latest",
 		"node-forge": "latest",
+		"nodent": "latest",
 		"p-all": "latest",
 		"p-event": "latest",
 		"p-forever": "latest",
@@ -56,6 +58,7 @@
 		"pretty-bytes": "latest",
 		"pretty-ms": "latest",
 		"rxjs": "rc",
+		"simple-get": "latest",
 		"sockette": "latest",
 		"turbo-http": "latest",
 		"turbo-net": "latest",
@@ -64,7 +67,8 @@
 		"vue-class-component": "latest",
 		"vue-property-decorator": "latest",
 		"vue-router": "latest",
-		"vuex": "latest"
+		"vuex": "latest",
+		"zousan": "latest"
 	},
 	"devDependencies": {
 		"@types/bluebird": "latest",

@@ -1,6 +1,6 @@
 // 
 
-
+export { }
 
 Array.prototype.forEach = function(fn, arg) {
 	let array = this
@@ -78,6 +78,11 @@ Array.prototype.find = function(fn, arg) {
 	}
 	return undefined
 }
+
+
+
+// global.Promise = require('bluebird'); { (Promise as any).config({ warnings: { wForgottenReturn: false } }) }
+global.Promise = require('zousan/src/zousan'); { (global as any).Zousan.suppressUncaughtRejectionError = true }
 
 
 

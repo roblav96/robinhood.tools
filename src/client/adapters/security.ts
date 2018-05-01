@@ -73,17 +73,12 @@ function finger(): Promise<void> {
 
 
 
-
-
-// clock.on('30s', function ontock(i: number) {
-// http.post('http://localhost:12300/api/hello', {
-// http.post('/hello', {
-// 	random: Math.random().toString(16),
-http.get('/hello').then(function(response) {
-	console.log('response ->', response)
-}).catch(function(error) {
-	console.error('polka Error ->', error)
-})
-// }).emit('30s', 0)
+// http.post('/search', {
+// 	query: 'nvda',
+// }).then(function(response) {
+// 	// console.log('response ->', response)
+// }).catch(function(error) {
+// 	console.error('polka Error ->', error)
+// })
 
 

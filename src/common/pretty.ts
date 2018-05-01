@@ -17,7 +17,8 @@ export function formatNumber(value: any, precision = 0) {
 	let formatted = !isNaN(value) && humanize.formatNumber(value, precision)
 	if (formatted) return formatted;
 	let unit = value.replace(/[0-9.]/g, '').trim()
-	if (unit.toUpperCase() == unit) unit = ' ' + unit;
+	// if (unit.toUpperCase() == unit) unit = ' ' + unit;
+	unit = ' ' + unit
 	return humanize.formatNumber(Number.parseFloat(value), precision) + unit
 }
 

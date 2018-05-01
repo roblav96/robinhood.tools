@@ -7,17 +7,17 @@ import polka from './polka'
 const ORIGIN = process.env.DOMAIN
 const ALLOW_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'].join(',')
 const ALLOW_HEADERS = [
-	'accept', 'accept-version', 'content-type', 'origin',
+	'accept', 'accept-version', 'content-type', 'date', 'origin',
 	// 'x-id', 'x-uuid', 'x-finger', 'x-bytes', 'x-prime', 'x-token', 'x-version',
 ].join(',')
 
 
 
-polka.use(function(req, res, next) {
+polka.use(function cors(req, res, next) {
 
 	let origin = req.headers['origin']
 	if (!origin || !origin.includes(ORIGIN)) {
-		if (req.method == 'OPTIONS') res.send();
+		if (req.method == 'OPTIONS') res.end();
 		return next()
 	}
 	res.setHeader('access-control-allow-origin', origin)
@@ -31,7 +31,7 @@ polka.use(function(req, res, next) {
 		res.setHeader('access-control-allow-headers', ALLOW_HEADERS)
 		// res.setHeader('access-control-allow-credentials', 'true')
 		res.setHeader('vary', 'origin')
-		res.send()
+		res.end()
 	}
 
 	next()

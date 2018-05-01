@@ -9,6 +9,7 @@
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"inlineSourceMap": true,
+		"removeComments": true,
 		"pretty": true,
 		"outDir": "dist",
 		"baseUrl": ".",

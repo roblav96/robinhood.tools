@@ -9,36 +9,42 @@ import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
 import * as pAll from 'p-all'
 import * as Table from 'cli-table2'
+import * as Pandora from 'pandora'
 import * as core from '../../common/core'
 import * as pretty from '../../common/pretty'
 import * as wrk from './wrk'
+import * as redis from '../adapters/redis'
 
 
 
 async function run(url: string) {
 	console.log('run ->', url)
+	let hub = Pandora.getHub()
+	await hub.getHubClient().invoke({ processName: 'api' }, 'gc', 'clear')
+	await new Promise(r => setTimeout(r, 300))
+	let proxy = await hub.getProxy({ name: 'memory' })
+	let fromheap = await (proxy as any).memoryUsage() as NodeJS.MemoryUsage
 	let cli = await execa('wrk', ['-t1', '-c100', '-d1s', url])
+	let toheap = await (proxy as any).memoryUsage() as NodeJS.MemoryUsage
 	// console.log(cli.stdout)
-	return wrk.parse(cli.stdout)
+	let parsed = wrk.parse(cli.stdout)
+	return Object.assign(parsed, { fromheap, toheap })
 }
 
 async function start() {
 
 	let urls = []
-	// core.array.create(+process.env.INSTANCES).forEach(function(i) {
-	// 	if (i == 0) return;
-	// 	urls.push(`http://${process.env.HOST}:${+process.env.IPORT + i}`)
-	// })
-	// urls.push(`http://${process.env.HOST}:${process.env.PORT}`)
-	// urls.push(`http://localhost:8080`)
-	urls.push(`http://${process.env.HOST}:${+process.env.IPORT + 1}`)
-	urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/hello`)
-	urls.push(`http://${process.env.DOMAIN}/api/hello`)
+	// urls.push(`http://${process.env.HOST}:${+process.env.IPORT + 1}/turbo`)
+	// urls.push(`http://${process.env.HOST}:${+process.env.IPORT + 2}/polka`)
+	urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/blank`)
+	urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/route`)
+	urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/validate/valid`)
+	// // urls.push(`http://${process.env.DOMAIN}/api/hello`)
 
 	let results = await pAll(urls.map(v => () => run(v)), { concurrency: 1 })
 
 	let table = new Table({
-		head: ['Address', 'Req/sec', 'Data/sec', 'Latency', 'Stdev', '+/- Stdev', 'Dropped'],
+		head: ['Address', 'Req/sec', 'Data/sec', 'Heap Used', 'Latency', 'Stdev', '+/- Stdev', 'Dropped'],
 		colAligns: ['left', 'right', 'right', 'right', 'right', 'right', 'right', 'right'],
 		style: { head: ['bold', 'blue'] },
 	}) as string[][]
@@ -50,6 +56,7 @@ async function start() {
 			parsed.host.concat(parsed.path),
 			pretty.formatNumber(v.requests.rate),
 			pretty.formatNumber(v.transfer.rate, 2),
+			pretty.formatNumber(pretty.bytes(v.toheap.heapUsed - v.fromheap.heapUsed)),
 			pretty.formatNumber(v.latency.avg, 2),
 			pretty.formatNumber(v.latency.stdev, 2),
 			pretty.formatNumber(v.latency.pStdev, 2) + '%',
@@ -57,25 +64,48 @@ async function start() {
 		])
 	})
 
-	process.stdout.write('\r\n' + table.toString() + '\r\n\r\n')
+	let previous = await redis.main.get(redis.BENCHMARKS.API.PREVIOUS)
+	if (previous) process.stdout.write('\r\n' + previous + '\r\n\r\n');
+	let output = table.toString()
+
+	process.stdout.write('\r\n' + output + '\r\n\r\n')
+	redis.main.set(redis.BENCHMARKS.API.PREVIOUS, output)
 
 }
 
 
 
-const polka = Polka()
-polka.get('/', function get(req: any, res: any) { res.end() })
+let server = turbo.createServer(function handler(req, res) { res.end() })
+if (+process.env.INSTANCE == 2) {
+	const polka = Polka()
+	polka.get('/polka', function get(req, res) { res.end() })
+	server = turbo.createServer(polka.handler as any)
+}
 
-const server = turbo.createServer(polka.handler as any)
 server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
 	console.info('listening ->', process.env.HOST + ':' + process.env.IPORT)
-	if (process.env.PRIMARY) start().catch(error => console.error(`'${error.cmd}' ->`, error));
+	if (process.env.PRIMARY) {
+		setImmediate(() => start().catch(error => console.error(`'${error.cmd}' ->`, error)))
+	}
 })
 
 exithook(function onexit() {
 	if (Array.isArray(server.connections)) server.connections.forEach(v => v.close());
 	server.close()
 })
+
+
+
+
+
+// if (process.env.PRIMARY) {
+// 	setTimeout(async function() {
+// 		let proxy = await Pandora.getHub().getProxy({ name: 'memory' })
+// 		console.log('proxy ->', proxy)
+// 		let memory = await proxy.getProperty('memoryUsage')
+// 		console.log('memory ->', memory)
+// 	}, 1000)
+// }
 
 
 
