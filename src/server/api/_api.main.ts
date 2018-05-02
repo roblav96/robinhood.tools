@@ -2,6 +2,7 @@
 
 import '../main'
 import '../adapters/pandora'
+import '../adapters/socket'
 
 import './polka'
 import './polka.request'

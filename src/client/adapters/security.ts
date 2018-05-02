@@ -61,16 +61,18 @@ function finger(): Promise<void> {
 	})
 }
 
+
+
 Promise.all([
 	uuid(), finger(),
 ]).then(function() {
-	return http.get('/security/token')
-	// }).then(function() {
-	// 	return http.get('/websocket/discover', { retries: Infinity })
-	// }).then(function(addresses) {
-	// 	return socket.init(addresses)
+	return http.get('/security/token', { retries: Infinity })
+}).then(function() {
+	return socket.discover()
 }).then(function() {
 	state.ready = true
+}).catch(function(error) {
+	console.error('init Error ->', error)
 })
 
 

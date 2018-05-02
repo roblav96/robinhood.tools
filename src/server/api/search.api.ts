@@ -3,7 +3,6 @@
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as http from '../adapters/http'
-import * as got from 'got'
 import polka from './polka'
 
 

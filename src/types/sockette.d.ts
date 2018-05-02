@@ -7,18 +7,18 @@ declare module 'sockette' {
 			protocols: string[]
 			timeout: number
 			maxAttempts: number
-			onopen: (event?: any) => void
-			onerror: (error: Error) => void
-			onclose: (code: number, message: string) => void
-			onmessage: (event: any) => void
-			onreconnect: (event: any) => void
-			onmaximum: (event: any) => void
+			onopen: (event: Event) => void
+			onclose: (event: CloseEvent) => void
+			onmessage: (event: MessageEvent) => void
+			onerror: (event: Event) => void
+			onreconnect: (event: Event) => void
+			onmaximum: (event: CloseEvent) => void
 		}
 	}
 
 	class Sockette {
 		constructor(address: string, options: Partial<Sockette.Options>)
-		send(data: any): void
+		send(message: string): void
 		close(code?: number, reason?: string): void
 		json(data: any): void
 		reconnect(): void

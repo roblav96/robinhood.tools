@@ -21,7 +21,6 @@ for (i = 0; i < len; i++) {
 	Object.assign(console, {
 		[method](...args: any[]) {
 			let stack = new StackTracey()
-			// process.stdout.write(util.inspect(stack))
 			let site = stack[1]
 			let stamp = luxon.DateTime.local().toFormat('hh:mm:ss:SSS')
 			let colors = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' }
@@ -32,7 +31,12 @@ for (i = 0; i < len; i++) {
 			let pname = pandora ? `(${pandora.processName})` : ''
 			let pi = process.env.INSTANCE ? `[${process.env.INSTANCE}]` : ''
 			let output = chalk.underline(`${square}[${file}]${pi}${pname}${site.callee}[${chalk.grey(stamp)}]`)
-			if (method == 'error') output = chalk.bold.redBright('████  ERROR  ████\r\n') + output;
+			if (method == 'error' && args.length > 0) {
+				let error = 'ERROR'
+				let first = args[0]
+				if (util.isString(first) && first.indexOf('UN') == 0) error = first;
+				output = chalk.bold.redBright(`████  ${error}  ████\r\n`) + output
+			}
 			process.stdout.write(`\r\n${output}\r\n`)
 			_console[method].apply(console, args)
 			process.stdout.write(`\r\n`)
