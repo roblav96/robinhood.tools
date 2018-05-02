@@ -21,6 +21,7 @@ const PROC_ENV = {
 	INSTANCES: PANDORA_DEV ? 1 : os.cpus().length,
 	DEBUGGER: PANDORA_DEV,
 	HOST: '127.0.0.1', PORT: 12300,
+	// BENCHMARK: true,
 } as ProcEnv
 interface ProcEnv extends Partial<NodeJS.ProcessEnv> { [key: string]: any }
 
@@ -30,13 +31,15 @@ export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
 	Process(pandora.process('api').order(1), {
 		// INSTANCES: os.cpus().length,
-		// DEBUGGER: false,
+		DEBUGGER: !PROC_ENV.BENCHMARK,
 	})
 
-	// Process(pandora.process('benchmarks').order(2), {
-	// 	INSTANCES: 3,
-	// 	DEBUGGER: false,
-	// })
+	if (PROC_ENV.BENCHMARK) {
+		Process(pandora.process('benchmarks').order(2), {
+			INSTANCES: 3,
+			DEBUGGER: false,
+		})
+	}
 
 
 

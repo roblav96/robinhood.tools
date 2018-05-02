@@ -23,8 +23,16 @@ export function hmac256(message: string, prime: string): string {
 	return hash.digest().toHex()
 }
 
-export function randomBytes(size: number): string {
-	return forge.util.bytesToHex(forge.random.getBytesSync(Math.round(size * 0.5)))
+// export function randomBytes(size: number): string {
+// 	return forge.util.bytesToHex(forge.random.getBytesSync(Math.round(size * 0.5)))
+// }
+export function randomBytes(size: number) {
+	let btyes = ''
+	while (btyes.length < size && size > 0) {
+		let rand = Math.random()
+		btyes += (rand < 0.1 ? Math.floor(rand * 100) : String.fromCharCode(Math.floor(rand * 26) + (rand > 0.5 ? 97 : 65)))
+	}
+	return btyes
 }
 
 export function generateProbablePrime(size: number): Promise<string> {
@@ -80,6 +88,7 @@ export function decryptObjectValues<T = any>(encrypted: T, privatePem: string): 
 declare global {
 	namespace Security {
 		interface Doc {
+			ip: string
 			id: string
 			uuid: string
 			finger: string
@@ -87,6 +96,7 @@ declare global {
 			token: string
 			hostname: string
 			useragent: string
+			stamp: number
 		}
 		interface PemKeyPair {
 			publicPem: string

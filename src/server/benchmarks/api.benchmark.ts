@@ -12,6 +12,7 @@ import * as Table from 'cli-table2'
 import * as Pandora from 'pandora'
 import * as core from '../../common/core'
 import * as pretty from '../../common/pretty'
+import * as security from '../../common/security'
 import * as wrk from './wrk'
 import * as redis from '../adapters/redis'
 
@@ -24,7 +25,13 @@ async function run(url: string) {
 	await new Promise(r => setTimeout(r, 300))
 	let proxy = await hub.getProxy({ name: 'memory' })
 	let fromheap = await (proxy as any).memoryUsage() as NodeJS.MemoryUsage
-	let cli = await execa('wrk', ['-t1', '-c100', '-d1s', url])
+	let cli = await execa('wrk', [
+		'-t1', '-c100', '-d1s',
+		'-H', 'x-uuid: ' + security.randomBytes(32),
+		'-H', 'x-finger: ' + security.randomBytes(32),
+		'-H', 'user-agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)',
+		url,
+	])
 	let toheap = await (proxy as any).memoryUsage() as NodeJS.MemoryUsage
 	// console.log(cli.stdout)
 	let parsed = wrk.parse(cli.stdout)
@@ -36,10 +43,12 @@ async function start() {
 	let urls = []
 	// urls.push(`http://${process.env.HOST}:${+process.env.IPORT + 1}/turbo`)
 	// urls.push(`http://${process.env.HOST}:${+process.env.IPORT + 2}/polka`)
-	urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/blank`)
-	urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/route`)
-	urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/validate/valid`)
-	// // urls.push(`http://${process.env.DOMAIN}/api/hello`)
+	// urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/blank`)
+	// urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/route`)
+	// urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/security/token`)
+	// urls.push(`http://${process.env.DOMAIN}/api/blank`)
+	urls.push(`http://${process.env.DOMAIN}/api/route`)
+	urls.push(`http://${process.env.DOMAIN}/api/security/token`)
 
 	let results = await pAll(urls.map(v => () => run(v)), { concurrency: 1 })
 

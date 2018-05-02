@@ -17,23 +17,25 @@ const polka = new PolkaRouter({
 
 	onError(error: boom<any>, req, res, next) {
 		if (!error.isBoom) {
-			console.error('polka onError ->', error)
+			if (!process.env.BENCHMARK) console.error('polka onError ->', error);
 			error = new boom(error, { message: error.message })
 		} else {
 			if (error.data) Object.assign(error.output.payload, { attributes: error.data });
-			console.warn('polka onError ->', error.output.payload) // error.output.payload.error, error.message, error.output.payload)
+			if (!process.env.BENCHMARK) console.warn('polka onError ->', error.output.payload);
 		}
 		if (res.headerSent) return;
 		res.statusCode = error.output.statusCode
-		Object.keys(error.output.headers).forEach(function(key) {
-			res.setHeader(key, error.output.headers[key])
-		})
+		let keys = Object.keys(error.output.headers)
+		if (keys.length > 0) {
+			keys.forEach(k => res.setHeader(k, error.output.headers[k]))
+		}
 		res.send(error.output.payload)
 	},
 
 	onNoMatch(req, res) {
 		if (res.headerSent) return;
-		polka.onError(boom.notFound(null, { method: req.method, path: req.path }), req, res, _.noop)
+		let { method, path } = req
+		this.onError(boom.notFound(method.concat(path), { method, path }), req, res, _.noop)
 	},
 
 })
@@ -57,10 +59,7 @@ polka.get('/api/blank', function blank(req, res) { res.end() })
 polka.route({
 	method: 'GET',
 	url: '/api/route',
-	handler(req, res) {
-		// res.end()
-		return Promise.resolve()
-	},
+	handler(req, res) { res.end() },
 })
 
 polka.route({
@@ -69,10 +68,7 @@ polka.route({
 	schema: {
 		params: { valid: 'string' }
 	},
-	handler(req, res) {
-		// res.end()
-		return Promise.resolve()
-	},
+	handler(req, res) { res.end() },
 })
 
 

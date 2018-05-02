@@ -81,11 +81,6 @@ Array.prototype.find = function(fn, arg) {
 
 
 
-// global.Promise = require('bluebird'); { (Promise as any).config({ warnings: { wForgottenReturn: false } }) }
-global.Promise = require('zousan/src/zousan'); { (global as any).Zousan.suppressUncaughtRejectionError = true }
-
-
-
 const isBrowser = !new Function('try { return this === global; } catch(e) { return false }')()
 if (isBrowser && !Error.captureStackTrace) {
 	Error.captureStackTrace = function captureStackTrace(error) {

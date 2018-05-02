@@ -25,26 +25,38 @@ export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest,
 	route(opts: {
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
 		url: string
+		public?: boolean
 		schema?: {
 			[key: string]: FastestValidator.Schema
 			params?: FastestValidator.Schema
 			query?: FastestValidator.Schema
 			body?: FastestValidator.Schema
 		}
-		handler(req: PolkaRequest, res: PolkaResponse): Promise<any>
+		handler(req: PolkaRequest, res: PolkaResponse): any
 	}) {
+		if (opts.schema) {
+			this.validators[opts.url] = {}
+			Object.keys(opts.schema).forEach(key => {
+				let schema = opts.schema[key]
+				this.validators[opts.url][key] = new FastestValidator().compile(schema)
+			})
+		}
 		this.add(opts.method, opts.url, (req, res) => {
-			opts.handler(req, res).then(response => {
-				res.send(response)
-			}).catch(error => {
+			if (!req.authed && !opts.public) {
+				let error = boom.unauthorized(req.path)
+				return this.onError(error, req, res, _.noop)
+			}
+			Promise.resolve().then(() => {
+				return opts.handler(req, res)
+			}).then(data => res.send(data)).catch(error => {
 				this.onError(error, req, res, _.noop)
 			})
 		})
-		if (!opts.schema) return;
-		this.validators[opts.url] = {}
-		Object.keys(opts.schema).forEach(key => {
-			let schema = opts.schema[key]
-			this.validators[opts.url][key] = new FastestValidator().compile(schema)
+	}
+
+	hook(handler: (req: PolkaRequest, res: PolkaResponse) => any) {
+		this.use((req, res, next) => {
+			Promise.resolve().then(() => handler(req, res)).then(next).catch(next)
 		})
 	}
 

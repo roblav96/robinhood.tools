@@ -29,12 +29,14 @@ const doc = {
 	finger: lockr.get('security.finger'),
 } as Security.Doc
 
-export function headers(): Dict<string> {
-	return {
-		'x-id': doc.id,
-		'x-uuid': doc.uuid,
-		'x-finger': doc.finger + '.' + Date.now(),
-	}
+export function headers() {
+	let headers = {
+		'x-uuid': doc.uuid, // + '.' + Date.now(),
+		'x-finger': doc.finger,
+		'x-stamp': Date.now().toString(),
+	} as Dict<string>
+	if (doc.id) headers['x-id'] = doc.id;
+	return headers
 }
 
 
@@ -59,17 +61,17 @@ function finger(): Promise<void> {
 	})
 }
 
-// Promise.all([
-// 	uuid(), finger(),
-// ]).then(function() {
-// 	return http.get('/security/token', { retries: 0 })
-// 	// }).then(function() {
-// 	// 	return http.get('/websocket/discover', { retries: Infinity })
-// 	// }).then(function(addresses) {
-// 	// 	return socket.init(addresses)
-// }).then(function() {
-// 	state.ready = true
-// })
+Promise.all([
+	uuid(), finger(),
+]).then(function() {
+	return http.get('/security/token')
+	// }).then(function() {
+	// 	return http.get('/websocket/discover', { retries: Infinity })
+	// }).then(function(addresses) {
+	// 	return socket.init(addresses)
+}).then(function() {
+	state.ready = true
+})
 
 
 

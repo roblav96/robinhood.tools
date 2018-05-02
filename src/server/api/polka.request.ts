@@ -17,13 +17,14 @@ export class PolkaRequest {
 	body: any
 	headers: Dict<string>
 	cookies: Dict<string>
+	authed: boolean
+	doc: Security.Doc
 }
 util.inherits(TurboRequest, PolkaRequest)
 
 
 
 polka.use(function request(req, res, next) {
-	if (!req._options) return next(); // node http
 
 	// req.socket.on('connect', function() { console.log('connection -> connect') })
 	// req.socket.on('finish', function() { console.log('connection -> finish') })
@@ -38,8 +39,9 @@ polka.use(function request(req, res, next) {
 		let header = rawheaders[i].toLowerCase()
 		req.headers[header] = rawheaders[i + 1]
 	}
+
 	let cookies = req.headers['cookie']
-	if (cookies) req.cookies = cookie.parse(cookies);
+	req.cookies = cookies ? cookie.parse(cookies) : {}
 
 	req.body = {}
 	if (req.method == 'GET') return next();

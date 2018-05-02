@@ -27,13 +27,3 @@ polka.route({
 })
 
 
-
-// http.get('https://api.robinhood.com/instruments', {
-// 	// query: { query: 'nvda' }
-// }).then(function(response) {
-// 	console.log('response ->', response)
-// }).catch(function(error) {
-// 	console.error('setTimeout Error ->', error)
-// })
-
-

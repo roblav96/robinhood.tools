@@ -24,6 +24,7 @@ declare namespace NodeJS {
 		INSTANCE: any
 		DEBUGGER: any
 		PANDORA_DEV: any
+		BENCHMARK: any
 	}
 }
 

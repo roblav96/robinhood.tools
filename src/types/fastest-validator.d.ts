@@ -80,7 +80,7 @@ declare module 'fastest-validator' {
 			opts: Options
 			messages: Messages
 			add(type: any, fn: (value: any) => boolean): void
-			compile(schema: any): CompiledValidator
+			compile(schema: Schema): CompiledValidator
 			handleResult(errors: any, fieldPath: any, result: any): void
 			makeError(type: any, expected: any, actual: any): any
 			resolveMessage(error: any): any
