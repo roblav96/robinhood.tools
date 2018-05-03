@@ -42,7 +42,9 @@ process.on('unhandledRejection', function(error) {
 
 
 
-import * as exithook from 'exit-hook'
-exithook(() => process.nextTick(() => process.exit(1)))
+// import * as exithook from 'exit-hook'
+// exithook(() => process.nextTick(() => process.kill(process.pid, 123)))
+// process.on('SIGTERM', () => process.kill(process.pid, 123))
+// process.on('SIGTERM', () => process.exit(1))
 
 

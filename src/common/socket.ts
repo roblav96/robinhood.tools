@@ -22,6 +22,7 @@ declare global {
 		interface Event<Data = any> {
 			name: string
 			data: Data
+			action: string
 		}
 	}
 }

@@ -88,26 +88,29 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 		if (message == 'pong') return;
 		if (message == 'ping') return client.send('pong');
 
-		if (message[0] == WS.ACT) {
-			if (message.substr(1, WS.SUBS.length) == WS.SUBS) {
-				client.subs = JSON.parse(message.substr(WS.SUBS.length + 1))
-				return
-			}
-		}
-
 		let parsed = fastjsonparse(message)
 		if (parsed.err) return client.close(1007, parsed.err.message);
 		let event = parsed.value as Socket.Event
 
+		if (event.action == 'sync') {
+			let subs = event.data as string[]
+			console.log('subs ->', subs)
+			return
+		}
+
 		console.log('client event ->', event)
 
-
-
+		// if (message[0] == WS.ACT) {
+		// 	if (message.substr(1, WS.SUBS.length) == WS.SUBS) {
+		// 		client.subs = JSON.parse(message.substr(WS.SUBS.length + 1))
+		// 		return
+		// 	}
+		// }
 		// client.close(1003, 'Sending messages via the client not allowed!')
 	})
 
 	client.on('close', function onclose(code, reason) {
-		if (process.env.PRIMARY) console.warn('client close ->', code, reason);
+		if (code != 1001) console.warn('client close ->', code, reason);
 		client.doc = null
 		client.subs.splice(0)
 		client.terminate()

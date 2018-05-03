@@ -3,17 +3,27 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
+import socket from '@/client/adapters/socket'
 
 
 
 @Vts.Component
 export default class extends Vue {
 
-	created() {
+	get symbol() { return this.$route.params.symbol }
 
+	mounted() {
+		console.log('this.$route ->', this.$route)
+		socket.on(`symbol:${this.symbol}:quote`, this.onquote, this)
 	}
 
-	get symbol() { return this.$route.params.symbol }
+	beforeDestroy() {
+		socket.offListener(this.onquote, this)
+	}
+
+	onquote(quote: Webull.Quote) {
+		console.log('quote ->', quote)
+	}
 
 }
 

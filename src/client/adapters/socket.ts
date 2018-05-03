@@ -7,6 +7,7 @@ import WebSocketClient from '@/common/websocket.client'
 import Emitter, { Event, Listener } from '@/common/emitter'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
+import * as proxy from '@/common/proxy'
 import clock from '@/common/clock'
 import store from '@/client/store'
 import * as security from './security'
@@ -15,6 +16,17 @@ import * as http from './http'
 
 
 class Socket extends Emitter {
+
+	constructor() {
+		super()
+		let keys = ['once', 'on', 'addListener', 'off', 'removeListener', 'offListener', 'removeAllListeners', 'offAll'] as KeysOf<Emitter>
+		proxy.observe.apply(this, [keys, this.onsync])
+	}
+
+	onsync(key: string) {
+		console.log('key ->', key)
+		console.log('this ->', this)
+	}
 
 	private clients = [] as WebSocketClient[]
 	discover() {
@@ -41,22 +53,13 @@ class Socket extends Emitter {
 
 	private resync = _.debounce(this.sync, 1, { leading: false, trailing: true })
 	private sync() {
-		let action = WS.ACT + WS.SUBS + JSON.stringify(this.eventNames())
-		this.clients.forEach(v => v.send(action))
+		let event = JSON.stringify({
+			action: 'sync', data: this.eventNames(),
+		} as Socket.Event)
+		this.clients.forEach(v => v.send(event))
 	}
 
-	// once() { return new Error('No can do...') as any }
 
-	on(name: string, fn: Listener) {
-		this.resync()
-		return super.on(name, fn)
-	}
-	addListener(name: string, fn: Listener) { return this.on(name, fn) }
-	off(name: string, fn: Listener) {
-		this.resync()
-		return super.off(name, fn)
-	}
-	removeListener(name: string, fn: Listener) { return this.on(name, fn) }
 
 }
 const socket = new Socket()

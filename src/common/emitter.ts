@@ -3,10 +3,16 @@
 export { Event, Listener } from 'eventemitter3'
 import * as EventEmitter3 from 'eventemitter3'
 import * as pEvent from 'p-event'
+import * as proxy from './proxy'
 
 
 
 export default class Emitter<Names extends string = string, Data = any> extends EventEmitter3<Names, Data> {
+
+	// constructor(observe?: (property: string) => void) {
+	// 	super()
+	// 	if (observe) return proxy.observe(this, observe);
+	// }
 
 	get events() { return this._events }
 
@@ -48,11 +54,11 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 		return this
 	}
 
-	offAll<Name extends Names>(name?: Name) {
+	offAll<Name extends Names>(name?: Name): this {
 		return this.removeAllListeners(name)
 	}
 
-	toPromise<Name extends Names>(name: Name) {
+	toPromise<Name extends Names>(name: Name): Promise<any> {
 		return pEvent(this, name)
 	}
 
@@ -77,6 +83,8 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 
 
 
+// console.info('socket ->', socket)
+// console.dir(socket)
 // setTimeout(function() {
 // 	console.log('setTimeout')
 // 	socket.once('idk', function() {
@@ -94,7 +102,5 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 // 		socket.off('where')
 // 	}, 3000)
 // }, 1000)
-
-
 
 
