@@ -3,9 +3,7 @@
 
 
 export const WS = {
-	ACT: {
-		SUBS: 'subs',
-	}
+	SUBS: 'subs',
 }
 
 

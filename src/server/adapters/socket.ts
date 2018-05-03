@@ -83,14 +83,8 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 		if (message == 'pong') return;
 		if (message == 'ping') return client.send('pong');
 		if (message[0] == '#') {
-			let split = message.split('#')
-			let action = split[1]
-			console.log('action ->', action)
-			let data = JSON.parse(split[2])
-			console.log('data ->', data)
-			if (message.indexOf(WS.ACT.SUBS) == 0) {
-				let subs = JSON.parse(message.substr(WS.ACT.SUBS.length)) as string[]
-				console.log('subs ->', subs)
+			if (message.substr(1, WS.SUBS.length) == WS.SUBS) {
+				client.subs = JSON.parse(message.substr(WS.SUBS.length + 1))
 				return
 			}
 		}
