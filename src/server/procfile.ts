@@ -31,7 +31,7 @@ export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
 	Process(pandora.process('api').order(1), {
 		INSTANCES: os.cpus().length,
-		DEBUGGER: !PROC_ENV.BENCHMARK,
+		DEBUGGER: false, // !PROC_ENV.BENCHMARK,
 	})
 
 	if (PROC_ENV.BENCHMARK) {
@@ -61,5 +61,10 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv)
 		.env(env).scale(env.INSTANCES)
 	)
 }
+
+
+
+import * as exithook from 'exit-hook'
+exithook(() => process.nextTick(() => process.exit(1)))
 
 

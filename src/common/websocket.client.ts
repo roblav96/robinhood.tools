@@ -88,10 +88,12 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.ws = null
 	}
 
-	private heartbeat() {
+	private heartbeat(i: number) {
+		if (i <= 1) return;
 		this.send('ping')
 	}
-	private reconnect() {
+	private reconnect(i: number) {
+		if (i <= 1) return;
 		if (this.alive()) return;
 		this.connect()
 	}

@@ -74,6 +74,11 @@ wss.on('error', function onerror(error) {
 	console.error('wss Error ->', error)
 })
 
+
+
+// const subs = {} as Dict<Socket.Client[]>
+const emitter = new Emitter()
+
 wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequest) {
 	client.subs = []
 	client.authed = req.authed
@@ -113,12 +118,8 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 
 })
 
-
-
-const SUBS = {} as Dict<Socket.Client[]>
-
-export function emit() {
-
+export function emit(name: string, data: any) {
+	emitter.emit(name, data)
 }
 
 

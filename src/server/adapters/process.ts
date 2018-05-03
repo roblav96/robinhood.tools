@@ -41,3 +41,8 @@ process.on('unhandledRejection', function(error) {
 })
 
 
+
+import * as exithook from 'exit-hook'
+exithook(() => process.nextTick(() => process.exit(1)))
+
+
