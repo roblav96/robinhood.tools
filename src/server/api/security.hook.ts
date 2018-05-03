@@ -40,8 +40,8 @@ polka.use(function(req, res, next) {
 			return next(boom.preconditionRequired(key))
 		}
 	}
+	
 	if (!req.doc.token) return next();
-
 	redis.main.hget('security:doc:' + req.doc.uuid, 'prime').then(function(prime) {
 		if (prime) {
 			req.authed = req.doc.token == security.generateToken(req.doc, prime)
