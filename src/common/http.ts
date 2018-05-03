@@ -2,7 +2,7 @@
 
 import * as _ from './lodash'
 import * as qs from 'querystring'
-import * as jsonparse from 'fast-json-parse'
+import * as fastjsonparse from 'fast-json-parse'
 import * as simple from 'simple-get'
 import * as retryable from 'is-retry-allowed'
 import * as boom from 'boom'
@@ -51,7 +51,7 @@ export function send(config: Http.Config) {
 			if (data) {
 				data = data.toString()
 				if (res.headers['content-type'] == 'application/json') {
-					let parsed = jsonparse(data)
+					let parsed = fastjsonparse(data)
 					if (parsed.value) data = parsed.value;
 				}
 			}

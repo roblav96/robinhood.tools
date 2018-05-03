@@ -10,7 +10,7 @@ import * as url from 'url'
 import * as os from 'os'
 import * as uws from 'uws'
 import * as cookie from 'cookie'
-import * as jsonparse from 'fast-json-parse'
+import * as fastjsonparse from 'fast-json-parse'
 import * as redis from './redis'
 import * as security from './security'
 import Emitter from '../../common/emitter'
@@ -83,13 +83,14 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 		if (message == 'pong' as any) return;
 		if (message == 'ping' as any) return client.send('pong');
 
-		let parsed = jsonparse(message)
+		let parsed = fastjsonparse(message)
 		if (parsed.err) return client.close(1007, parsed.err.message);
 		message = parsed.value
 
 		if (Array.isArray(message.subs)) {
 			client.subs = message.subs
 		}
+
 		console.log('client message ->', message)
 
 		// if (message[0] == '#') {

@@ -6,7 +6,7 @@ import * as TurboRequest from 'turbo-http/lib/request'
 import * as qs from 'querystring'
 import * as Polka from 'polka'
 import * as cookie from 'cookie'
-import * as jsonparse from 'fast-json-parse'
+import * as fastjsonparse from 'fast-json-parse'
 import * as boom from 'boom'
 import polka from './polka'
 
@@ -57,7 +57,7 @@ polka.use(function request(req, res, next) {
 		if (!body) return next();
 		let content = req.headers['content-type']
 		if (content == 'application/json') {
-			let parsed = jsonparse(body)
+			let parsed = fastjsonparse(body)
 			if (parsed.err) return next(boom.badData(parsed.err.message));
 			req.body = parsed.value
 		} else if (content == 'application/x-www-form-urlencoded') {
