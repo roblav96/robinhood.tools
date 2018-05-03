@@ -74,19 +74,26 @@ wss.on('error', function onerror(error) {
 	console.error('wss Error ->', error)
 })
 
-wss.on('connection', function onconnection(client: uws.WebSocket, req: PolkaRequest) {
-	// console.log('req.headers ->', req.headers)
-	console.log('req.authed ->', req.authed)
-	console.log('req.doc ->', req.doc)
+wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequest) {
+	client.subs = []
+	client.authed = req.authed
+	client.doc = req.doc
 
 	client.on('message', function onmessage(message: string) {
 		if (message == 'pong') return;
 		if (message == 'ping') return client.send('pong');
-		// if (message.indexOf(WS.SYNC) == 0) {
-		// 	let subs = JSON.parse(message.substr(WS.SYNC.length))
-		// 	console.log('subs ->', subs)
-		// 	return
-		// }
+		if (message[0] == '#') {
+			let split = message.split('#')
+			let action = split[1]
+			console.log('action ->', action)
+			let data = JSON.parse(split[2])
+			console.log('data ->', data)
+			if (message.indexOf(WS.ACT.SUBS) == 0) {
+				let subs = JSON.parse(message.substr(WS.ACT.SUBS.length)) as string[]
+				console.log('subs ->', subs)
+				return
+			}
+		}
 		console.log('client message ->', message)
 		// client.close(1003, 'Sending messages via the client not allowed!')
 	})
@@ -107,15 +114,6 @@ export default wss
 
 export function emit() {
 
-}
-
-
-
-declare module 'uws' {
-	interface WebSocket {
-		authed: boolean
-		doc: Security.Doc
-	}
 }
 
 

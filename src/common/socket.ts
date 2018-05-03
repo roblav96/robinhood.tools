@@ -3,16 +3,23 @@
 
 
 export const WS = {
-	SYMBOL: 'symbol',
-	QUOTE: 'symbol:quote',
+	ACT: {
+		SUBS: 'subs',
+	}
 }
 
 
 
 
 
+import * as uws from 'uws'
 declare global {
 	namespace Socket {
+		interface Client extends uws.WebSocket {
+			subs: string[]
+			authed: boolean
+			doc: Security.Doc
+		}
 		interface Message<Data = any> {
 			name: string
 			data: Data

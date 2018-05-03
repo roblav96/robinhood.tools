@@ -1,6 +1,5 @@
 // 
 
-import { WS } from './socket'
 import * as _ from './lodash'
 import * as qs from 'querystring'
 import * as uws from 'uws'

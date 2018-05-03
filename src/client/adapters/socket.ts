@@ -24,26 +24,20 @@ class Socket extends Emitter {
 			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
 				return new WebSocketClient(v, {
 					query: security.headers,
-					timeout: '10s',
-				}).on('open', this.onopen).on('message', this.onmessage)
+					heartbeat: '5s',
+				}).on('open', this.sync, this).on('message', this.onmessage, this)
 			}))
 		})
 	}
 
-	private onopen = () => this.resync()
-
-	private onmessage = (message: Socket.Message) => {
+	private onmessage(message: Socket.Message) {
 		message = JSON.parse(message as any)
 		console.log('message ->', message)
 	}
 
-	resync = _.throttle(this.sync, 100, { leading: false, trailing: true })
+	private resync = _.throttle(this.sync, 100, { leading: false, trailing: true })
 	private sync() {
-		console.log('this ->', this)
-		let message = JSON.stringify({
-			action: 'subs',
-			subs: this.eventNames(),
-		} as Socket.Message)
+		let message = `#${WS.ACT.SUBS}#${JSON.stringify(this.eventNames())}`
 		this.clients.forEach(v => v.send(message))
 	}
 
