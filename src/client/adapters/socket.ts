@@ -75,7 +75,7 @@ class Client {
 
 
 
-class Socket extends Emitter {
+const socket = new class extends Emitter {
 
 	clients = [] as Client[]
 	discover() {
@@ -103,7 +103,6 @@ class Socket extends Emitter {
 	}
 
 }
-const socket = new Socket()
 export default socket
 
 
