@@ -3,20 +3,10 @@
 export { Event, Listener } from 'eventemitter3'
 import * as EventEmitter3 from 'eventemitter3'
 import * as pEvent from 'p-event'
-import * as proxy from './proxy'
 
 
 
 export default class Emitter<Names extends string = string, Data = any> extends EventEmitter3<Names, Data> {
-
-	constructor(useproxy?: boolean) {
-		super()
-		if (useproxy) return proxy.proxy(this, this.__onproxy);
-	}
-
-	private __onproxy(method: string, property: string) {
-		this.emit('__onproxy' as any, method as any, property as any)
-	}
 
 	get events() { return this._events }
 
@@ -82,29 +72,5 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 	// }
 
 }
-
-
-
-
-
-// console.info('socket ->', socket)
-// console.dir(socket)
-// setTimeout(function() {
-// 	console.log('setTimeout')
-// 	socket.once('idk', function() {
-// 		// console.log('idk')
-// 	})
-// 	setTimeout(function() {
-// 		socket.emit('idk', 'wut')
-// 	}, 1000)
-// 	setTimeout(function() {
-// 		socket.on('where', function() {
-
-// 		})
-// 	}, 2000)
-// 	setTimeout(function() {
-// 		socket.off('where')
-// 	}, 3000)
-// }, 1000)
 
 

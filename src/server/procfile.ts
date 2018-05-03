@@ -27,19 +27,36 @@ interface ProcEnv extends Partial<NodeJS.ProcessEnv> { [key: string]: any }
 
 
 
+function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv) {
+	_.defaults(env, PROC_ENV)
+	// let pname = chain.name()
+	return (chain
+		// .entry(`./${pname}/_${pname}.main`)
+		.nodeArgs(['--no-warnings', '--expose-gc', '--max_old_space_size=2048'])
+		.env(env).scale(env.INSTANCES)
+	)
+}
+
+
+
 export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
-	Process(pandora.process('api').order(1), {
+	Process(pandora.process('app').entry('./app').order(1), {
 		INSTANCES: os.cpus().length,
-		DEBUGGER: false, // !PROC_ENV.BENCHMARK,
+		// DEBUGGER: false, // !PROC_ENV.BENCHMARK,
 	})
 
-	if (PROC_ENV.BENCHMARK) {
-		Process(pandora.process('benchmarks').order(2), {
-			INSTANCES: 3,
-			DEBUGGER: false,
-		})
-	}
+	// Process(pandora.process('api').order(1), {
+	// 	INSTANCES: os.cpus().length,
+	// 	// DEBUGGER: false, // !PROC_ENV.BENCHMARK,
+	// })
+
+	// if (PROC_ENV.BENCHMARK) {
+	// 	Process(pandora.process('benchmarks').order(2), {
+	// 		INSTANCES: 3,
+	// 		DEBUGGER: false,
+	// 	})
+	// }
 
 
 
@@ -48,18 +65,6 @@ export default function procfile(pandora: ProcfileReconcilerAccessor) {
 		pandora.service('dashboard', path.resolve(PROJECT, 'node_modules/pandora-dashboard/dist/Dashboard')).process('dashboard')
 	}
 
-}
-
-
-
-function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv) {
-	_.defaults(env, PROC_ENV)
-	let pname = chain.name()
-	return (chain
-		.nodeArgs(['--no-warnings', '--expose-gc', '--max_old_space_size=2048'])
-		.entry(`./${pname}/_${pname}.main`)
-		.env(env).scale(env.INSTANCES)
-	)
 }
 
 

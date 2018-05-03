@@ -17,7 +17,11 @@ import Emitter from '../../common/emitter'
 
 
 
-export const wss = new uws.Server({
+class WebSocketServer extends uws.Server {
+	emitter = new Emitter()
+}
+
+export const wss = new WebSocketServer({
 	host: process.env.HOST,
 	port: +process.env.IPORT + os.cpus().length,
 	path: `/websocket/${process.env.INSTANCE}`,
@@ -76,29 +80,37 @@ wss.on('error', function onerror(error) {
 
 
 
-// const subs = {} as Dict<Socket.Client[]>
-const emitter = new Emitter()
-
 wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequest) {
 	client.subs = []
 	client.authed = req.authed
 	client.doc = req.doc
 
+	client.onsub = function onsub(message) {
+		this.send(message)
+	}
+
 	client.on('message', function onmessage(message: string) {
 		if (message == 'pong') return;
-		if (message == 'ping') return client.send('pong');
+		if (message == 'ping') return this.send('pong');
 
 		let parsed = fastjsonparse(message)
-		if (parsed.err) return client.close(1007, parsed.err.message);
+		if (parsed.err) return this.close(1007, parsed.err.message);
 		let event = parsed.value as Socket.Event
 
-		if (event.action == 'sync') {
-			let subs = event.data as string[]
-			console.log('subs ->', subs)
-			return
+		if (event.action) {
+			let action = event.action
+
+			if (action == 'sync') {
+				this.subs.forEach(v => wss.emitter.off(v, this.onsub, this))
+				let subs = event.data as string[]
+				this.subs.splice(0, Infinity, ...subs)
+				this.subs.forEach(v => wss.emitter.on(v, this.onsub, this))
+				return
+			}
+
 		}
 
-		console.log('client event ->', event)
+		// console.log('client event ->', event)
 
 		// if (message[0] == WS.ACT) {
 		// 	if (message.substr(1, WS.SUBS.length) == WS.SUBS) {
@@ -111,10 +123,11 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 
 	client.on('close', function onclose(code, reason) {
 		if (code != 1001) console.warn('client close ->', code, reason);
-		client.doc = null
-		client.subs.splice(0)
-		client.terminate()
-		client.removeAllListeners()
+		this.doc = null
+		this.subs.forEach(v => wss.emitter.off(v, this.onsub, this))
+		this.subs.splice(0)
+		this.terminate()
+		this.removeAllListeners()
 	})
 
 	client.on('error', function onerror(error) { console.error('client Error ->', error) })
@@ -122,7 +135,7 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 })
 
 export function emit(name: string, data: any) {
-	emitter.emit(name, data)
+	wss.emitter.emit(name, data)
 }
 
 

@@ -18,7 +18,7 @@ export const mqtt = new webull.WebullMqtt({
 	// verbose: true,
 	// debug: process.PRIMARY,
 })
-mqtt.on('message', function(quote) {
+mqtt.on('quote', function(quote) {
 	// console.log('quote ->', quote)
 })
 
@@ -26,8 +26,9 @@ mqtt.on('message', function(quote) {
 
 rhinstruments.rxready.subscribe(onLiveTickers)
 async function onLiveTickers() {
-
-	if (process.env.WORKER) return;
+	// if (!process.env.PRIMARY) return;
+	
+	console.warn('onLiveTickers')
 
 	// let fsymbols = (await redis.main.get(`${redis.SYMBOLS.STOCKS}:${process.INSTANCES}:${process.INSTANCE}`) as any) as Dict<number>
 	// fsymbols = JSON.parse(fsymbols as any)

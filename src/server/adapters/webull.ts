@@ -15,7 +15,7 @@ import clock from '../../common/clock'
 
 
 
-export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'message', Webull.Quote> {
+export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'quote', Webull.Quote> {
 
 	private static topics = {
 		forex: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.MQTT_TOPICS>,
@@ -159,7 +159,7 @@ export class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 					Object.assign(this.debug.quote, quote)
 				}
 				// console.log('data ->', data)
-				this.emit('message', quote)
+				this.emit('quote', quote)
 			}
 
 			return

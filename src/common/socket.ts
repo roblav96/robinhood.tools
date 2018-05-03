@@ -18,6 +18,7 @@ declare global {
 			subs: string[]
 			authed: boolean
 			doc: Security.Doc
+			onsub(message: string): void
 		}
 		interface Event<Data = any> {
 			name: string

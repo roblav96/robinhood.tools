@@ -51,7 +51,7 @@ import * as onexit from 'exit-hook'
 import * as clc from 'cli-color'
 if (process.env.DEBUGGER == 'true') {
 	inspector.open(process.debugPort + +process.env.OFFSET + +process.env.INSTANCE)
-	onexit(function(signal) {
+	onexit(function() {
 		if (process.env.PRIMARY) {
 			let stdout = (console as any)._stdout
 			if (stdout.isTTY) { stdout.isTTY = false; process.nextTick(() => stdout.isTTY = true) }

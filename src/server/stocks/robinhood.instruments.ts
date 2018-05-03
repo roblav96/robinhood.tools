@@ -15,6 +15,9 @@ import clock from '../../common/clock'
 
 
 export const rxready = new Rx.ReadySubject()
+if (process.env.PRIMARY) {
+	
+}
 
 
 

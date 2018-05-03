@@ -8,8 +8,6 @@ import Emitter, { Event, Listener } from '@/common/emitter'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as proxy from '@/common/proxy'
-import clock from '@/common/clock'
-import store from '@/client/store'
 import * as security from './security'
 import * as http from './http'
 
@@ -17,18 +15,33 @@ import * as http from './http'
 
 class Socket extends Emitter {
 
+	// private eventsCount = 0
 	// constructor() {
-	// 	super(k => this.onsync(k))
-	// 	// let keys = ['once', 'on', 'addListener', 'off', 'removeListener', 'offListener', 'removeAllListeners', 'offAll'] as KeysOf<Emitter>
-	// 	// let keys = ['emit'] as KeysOf<Emitter>
-	// 	// proxy.observe.apply(this, [keys, this.onsync])
+	// 	super()
+	// 	return proxy.observe<Socket>(this, (method, property) => {
+	// 		if (property == '_eventsCount' && this._eventsCount != this.eventsCount) {
+	// 			this.eventsCount = this._eventsCount
+	// 			if (this.ready()) this.resync();
+	// 		}
+	// 	})
 	// }
 
-	// onsync(key: string) {
-
-	// }
+	constructor() {
+		super()
+		return proxy.observe<Socket>(this, (method, property) => {
+			if (property == '_events' && this.ready()) {
+				console.log('_events ->', 'resync')
+				this.resync()
+			}
+		})
+	}
 
 	private clients = [] as WebSocketClient[]
+	ready() {
+		let alives = this.clients.map(v => v.alive()).filter(v => v).length
+		return alives == this.clients.length
+	}
+
 	discover() {
 		return http.get('/websocket/discover').then((addresses: string[]) => {
 			this.clients.forEach(v => v.destroy())
@@ -46,20 +59,20 @@ class Socket extends Emitter {
 	}
 
 	private opensync() {
-		let total = this.clients.length
-		let opens = this.clients.map(v => v.alive()).filter(v => v).length
-		if (opens == total) this.sync();
+		if (this.ready()) {
+			console.log('opensync ->', 'resync')
+			this.resync()
+		}
 	}
 
-	private resync = _.debounce(this.sync, 1, { leading: false, trailing: true })
+	private resync = _.debounce(this.sync, 100, { leading: false, trailing: true })
 	private sync() {
 		let event = JSON.stringify({
 			action: 'sync', data: this.eventNames(),
 		} as Socket.Event)
+		console.log('sync ->', event)
 		this.clients.forEach(v => v.send(event))
 	}
-
-
 
 }
 const socket = new Socket()
@@ -69,7 +82,41 @@ export default socket
 
 
 
+// console.info('socket ->', socket)
+// console.dir(socket)
+// setTimeout(function() {
+// 	console.log('setTimeout')
+// 	socket.once('idk', function() {
+// 		console.log('idk')
+// 	})
+// 	socket.resync()
+// 	setTimeout(function() {
+// 		socket.emit('idk', 'wut')
+// 		socket.opensync()
+// 	}, 1000)
+// 	setTimeout(function() {
+// 		socket.on('where', function() {
+
+// 		})
+// 	}, 2000)
+// 	setTimeout(function() {
+// 		socket.off('where')
+// 	}, 3000)
+// }, 1000)
+
+
+
+
+
 // import * as bench from 'nanobench'
+// bench('socket.emit -> native', function({ start, end }) {
+// 	start()
+// 	let i: number, len = 1000000
+// 	for (i = 0; i < len; i++) {
+// 		socket.emit('hello', { hello: 'world' })
+// 	}
+// 	end()
+// })
 // bench('socket.emit -> native', function({ start, end }) {
 // 	class Native extends Emitter {
 // 		emit(...args) {
@@ -84,7 +131,7 @@ export default socket
 // 	}
 // 	end()
 // })
-// bench('socket.emit -> proxy.proxy', function({ start, end }) {
+// bench('socket.emit -> proxy', function({ start, end }) {
 // 	class ProxyProxy extends Emitter {
 // 		constructor() {
 // 			super(true)
