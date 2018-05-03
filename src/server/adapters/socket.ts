@@ -3,7 +3,8 @@ export * from '../../common/socket'
 // 
 
 import { WS } from '../../common/socket'
-import { IncomingMessage, ClientRequest } from 'http'
+import { IncomingMessage } from 'http'
+import { PolkaRequest } from '../api/polka.request'
 import * as exithook from 'exit-hook'
 import * as qs from 'querystring'
 import * as url from 'url'
@@ -22,37 +23,42 @@ const wss = new uws.Server({
 	port: +process.env.IPORT + os.cpus().length,
 	path: `/websocket/${process.env.INSTANCE}`,
 
-	verifyClient({ req }, next) {
-		// let ip = security.reqip(req)
-		// if (ip == process.env.HOST) return next(true);
-		console.log('req ->', req)
-		// let cookies = cookie.parse(req.headers.cookie)
-		// let query = qs.parse(url.parse(req.url).query)
-		let doc = {
-			// ip: security.reqip(req),
-			// id: req.headers['x-id'],
-			// uuid: req.headers['x-uuid'],
-			// finger: req.headers['x-finger'],
-			// stamp: req.headers['x-stamp'] as any,
-			// hostname: req.headers['hostname'],
-			// useragent: req.headers['user-agent'],
-			// bytes: req.cookies['x-bytes'],
-			// token: req.cookies['x-token'],
-		} as Security.Doc
-		// next(false)
-		next(false, 403, 'no way bro')
-		// next(true)
+	verifyClient(incoming, next: Function) {
+		let req = (incoming as any).req as PolkaRequest
+		return Promise.resolve().then(function() {
+			let cookies = req.headers.cookie
+			if (!cookies) return next(false, 412, `Precondition Failed: "cookies"`);
+
+			let cparsed = cookie.parse(cookies) as Dict<string>
+			let qparsed = qs.parse(url.parse(req.url).query) as Dict<string>
+
+			let doc = {
+				ip: security.ip(req.headers),
+				id: qparsed['x-id'],
+				uuid: qparsed['x-uuid'],
+				finger: qparsed['x-finger'],
+				hostname: req.headers['hostname'],
+				useragent: req.headers['user-agent'],
+				bits: cparsed['x-bits'],
+				token: cparsed['x-token'],
+			} as Security.Doc
+
+			let failed = security.isDoc(doc)
+			if (failed) return next(false, 412, `Precondition Failed: "${failed}"`);
+			req.doc = doc
+			next(true)
+
+		}).catch(function(error) {
+			console.error('verifyClient Error ->', error)
+			next(false, 500, 'Internal Server Error')
+		})
 	},
 
 })
 
 wss.httpServer.timeout = 10000
-wss.httpServer.keepAliveTimeout = 100
 
-exithook(function onexit() {
-	wss.clients.forEach(v => v.close(1001))
-	wss.close()
-})
+exithook(function onexit() { wss.close() })
 
 wss.on('listening', function onlistening() {
 	console.info('wss listening ->', process.env.HOST + ':' + wss.httpServer.address().port)
@@ -64,6 +70,7 @@ wss.on('error', function onerror(error) {
 
 wss.on('connection', function onconnection(client: uws.WebSocket, req: IncomingMessage) {
 	// console.log('req.headers ->', req.headers)
+	console.log('req.doc ->', req.doc)
 
 	client.on('message', function onmessage(message: string) {
 		if (message == 'pong') return;

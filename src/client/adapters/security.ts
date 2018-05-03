@@ -31,9 +31,8 @@ const doc = {
 
 export function headers() {
 	let headers = {
-		'x-uuid': doc.uuid,
+		'x-uuid': doc.uuid + '#' + Date.now(),
 		'x-finger': doc.finger,
-		'x-stamp': Date.now().toString(),
 	} as Dict<string>
 	if (doc.id) headers['x-id'] = doc.id;
 	return headers

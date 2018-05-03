@@ -14,8 +14,8 @@ polka.route({
 	public: true,
 	handler(req, res) {
 		return Promise.resolve(core.array.create(+process.env.INSTANCES).map(function(i) {
-			// return `ws://${process.env.DOMAIN}/websocket/${i}`
-			return `ws://${process.env.HOST}:${+process.env.IPORT + os.cpus().length + i}/websocket/${i}`
+			return `ws://${process.env.DOMAIN}/websocket/${i}`
+			// return `ws://${process.env.HOST}:${+process.env.IPORT + os.cpus().length + i}/websocket/${i}`
 		}))
 	}
 })

@@ -25,7 +25,7 @@ polka.use(function validator(req, res, next) {
 		let validator = validators[key]
 
 		if (Object.keys(value).length == 0) {
-			return next(boom.preconditionRequired(key, value))
+			return next(boom.preconditionFailed(key, value))
 		}
 
 		let results = validator(value)

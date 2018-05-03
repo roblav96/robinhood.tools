@@ -23,16 +23,16 @@ export function hmac256(message: string, prime: string): string {
 	return hash.digest().toHex()
 }
 
-// export function randomBytes(size: number): string {
-// 	return forge.util.bytesToHex(forge.random.getBytesSync(Math.round(size * 0.5)))
-// }
-export function randomBytes(size: number) {
-	let btyes = ''
-	while (btyes.length < size && size > 0) {
+export function randomBytes(size: number): string {
+	return forge.util.bytesToHex(forge.random.getBytesSync(Math.round(size * 0.5)))
+}
+export function randomBits(size: number): string {
+	let bits = ''
+	while (bits.length < size && size > 0) {
 		let rand = Math.random()
-		btyes += (rand < 0.1 ? Math.floor(rand * 100) : String.fromCharCode(Math.floor(rand * 26) + (rand > 0.5 ? 97 : 65)))
+		bits += (rand < 0.1 ? Math.floor(rand * 100) : String.fromCharCode(Math.floor(rand * 26) + (rand > 0.5 ? 97 : 65)))
 	}
-	return btyes
+	return bits
 }
 
 export function generateProbablePrime(size: number): Promise<string> {
@@ -92,7 +92,7 @@ declare global {
 			id: string
 			uuid: string
 			finger: string
-			bytes: string
+			bits: string
 			token: string
 			hostname: string
 			useragent: string

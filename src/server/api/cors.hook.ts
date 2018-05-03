@@ -8,7 +8,7 @@ const ORIGIN = process.env.DOMAIN
 const ALLOW_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'].join(',')
 const ALLOW_HEADERS = [
 	'accept', 'accept-version', 'content-type', 'date', 'origin',
-	// 'x-id', 'x-uuid', 'x-finger', 'x-bytes', 'x-prime', 'x-token', 'x-version',
+	// 'x-id', 'x-uuid', 'x-finger', 'x-bits', 'x-prime', 'x-token', 'x-version',
 ].join(',')
 
 

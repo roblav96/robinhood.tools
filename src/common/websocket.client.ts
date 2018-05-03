@@ -102,10 +102,10 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		let address = this.options.query ? `${this.address}?${qs.stringify(this.options.query())}` : this.address
 		this.ws = new WebSocket(address) as any
 		this.ws.binaryType = 'arraybuffer'
-		this.ws.onopen = this._onopen as any
-		this.ws.onclose = this._onclose as any
-		this.ws.onerror = this._onerror as any
-		this.ws.onmessage = this._onmessage as any
+		this.ws.onopen = this.onopen as any
+		this.ws.onclose = this.onclose as any
+		this.ws.onerror = this.onerror as any
+		this.ws.onmessage = this.onmessage as any
 		if (!clock.hasListener(this.reconnect, this)) {
 			clock.on(this.options.timeout, this.reconnect, this)
 		}
@@ -114,12 +114,12 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		}
 	}
 
-	private _onopen = (event: Event) => {
+	private onopen = (event: Event) => {
 		if (this.options.verbose) console.info(this.name, 'onopen');
 		this.emit('open', event)
 	}
 
-	private _onclose = (event: CloseEvent) => {
+	private onclose = (event: CloseEvent) => {
 		if (this.options.verbose) {
 			let code = (WebSocketClient.CODES[event.code]) || event.code
 			if (!Number.isFinite(code)) code += ` (${event.code})`;
@@ -130,13 +130,13 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.destroy()
 	}
 
-	private _onerror = (error: Error) => {
+	private onerror = (error: Error) => {
 		let message = (error.message || error) as string
 		if (this.options.verbose) console.error(this.name, 'onerror Error ->', message);
 		this.emit('error', error)
 	}
 
-	private _onmessage = (event: MessageEvent) => {
+	private onmessage = (event: MessageEvent) => {
 		let message = event.data as string
 		if (message == 'pong') return;
 		if (message == 'ping') return this.send('pong');
