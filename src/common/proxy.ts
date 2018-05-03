@@ -11,7 +11,7 @@ export function observe(this: any, keys: string[], handler: (key: string) => voi
 		Object.assign(this, { [`_${key}_`]: this[key] })
 		Object.assign(this, {
 			[key](...args) {
-				handler.apply(this, [key])
+				handler.call(this, key)
 				return this[`_${key}_`](...args)
 			}
 		})
@@ -20,24 +20,25 @@ export function observe(this: any, keys: string[], handler: (key: string) => voi
 
 
 
-export function proxy<T = any>(target: T, fn: (property: any) => void): T {
+export function proxy<T = any>(target: T, fn: (method: string, property: string) => void): T {
 	const handler = {
 		get(target, property, receiver) {
-			console.log('get ->', property)
+			fn.apply(target, ['get', property])
+			return Reflect.get(target, property, receiver)
 			// try {
 			// 	return new Proxy(target[property], handler)
 			// } catch (err) {
-			return Reflect.get(target, property, receiver)
+			// 	return Reflect.get(target, property, receiver)
 			// }
 		},
 		defineProperty(target, property, descriptor) {
-			console.log('defineProperty ->', property, descriptor)
-			fn(property)
+			fn.apply(target, ['defineProperty', property])
+			// console.log('defineProperty ->', property, descriptor)
 			return Reflect.defineProperty(target, property, descriptor)
 		},
 		deleteProperty(target, property) {
-			console.log('deleteProperty ->', property)
-			fn(property)
+			fn.apply(target, ['deleteProperty', property])
+			// console.log('deleteProperty ->', property)
 			return Reflect.deleteProperty(target, property)
 		}
 	} as ProxyHandler<object>

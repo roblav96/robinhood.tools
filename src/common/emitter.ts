@@ -9,10 +9,14 @@ import * as proxy from './proxy'
 
 export default class Emitter<Names extends string = string, Data = any> extends EventEmitter3<Names, Data> {
 
-	// constructor(observe?: (property: string) => void) {
-	// 	super()
-	// 	if (observe) return proxy.observe(this, observe);
-	// }
+	constructor(useproxy?: boolean) {
+		super()
+		if (useproxy) return proxy.proxy(this, this.__onproxy);
+	}
+
+	private __onproxy(method: string, property: string) {
+		this.emit('__onproxy' as any, method as any, property as any)
+	}
 
 	get events() { return this._events }
 

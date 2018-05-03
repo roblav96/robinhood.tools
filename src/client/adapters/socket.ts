@@ -17,16 +17,16 @@ import * as http from './http'
 
 class Socket extends Emitter {
 
-	constructor() {
-		super()
-		let keys = ['once', 'on', 'addListener', 'off', 'removeListener', 'offListener', 'removeAllListeners', 'offAll'] as KeysOf<Emitter>
-		proxy.observe.apply(this, [keys, this.onsync])
-	}
+	// constructor() {
+	// 	super(k => this.onsync(k))
+	// 	// let keys = ['once', 'on', 'addListener', 'off', 'removeListener', 'offListener', 'removeAllListeners', 'offAll'] as KeysOf<Emitter>
+	// 	// let keys = ['emit'] as KeysOf<Emitter>
+	// 	// proxy.observe.apply(this, [keys, this.onsync])
+	// }
 
-	onsync(key: string) {
-		console.log('key ->', key)
-		console.log('this ->', this)
-	}
+	// onsync(key: string) {
+
+	// }
 
 	private clients = [] as WebSocketClient[]
 	discover() {
@@ -64,5 +64,63 @@ class Socket extends Emitter {
 }
 const socket = new Socket()
 export default socket
+
+
+
+
+
+// import * as bench from 'nanobench'
+// bench('socket.emit -> native', function({ start, end }) {
+// 	class Native extends Emitter {
+// 		emit(...args) {
+// 			super.emit(...args)
+// 		}
+// 	}
+// 	const native = new Native()
+// 	start()
+// 	let i: number, len = 1000000
+// 	for (i = 0; i < len; i++) {
+// 		native.emit('hello', { hello: 'world' })
+// 	}
+// 	end()
+// })
+// bench('socket.emit -> proxy.proxy', function({ start, end }) {
+// 	class ProxyProxy extends Emitter {
+// 		constructor() {
+// 			super(true)
+// 		}
+// 	}
+// 	const proxyproxy = new ProxyProxy()
+// 	// proxyproxy.on('__onproxy', function (method, property) {
+// 	// 	console.log('method ->', method)
+// 	// 	console.log('property ->', property)
+// 	// })
+// 	start()
+// 	let i: number, len = 1000000
+// 	for (i = 0; i < len; i++) {
+// 		proxyproxy.emit('hello', { hello: 'world' })
+// 	}
+// 	end()
+// })
+// bench('socket.emit -> Object.assign', function({ start, end }) {
+// 	class ObjectAssign extends Emitter {
+// 		constructor() {
+// 			super()
+// 			let keys = ['emit'] as KeysOf<Emitter>
+// 			proxy.observe.apply(this, [keys, this.onsync])
+// 		}
+// 		onsync(property: string) {
+
+// 		}
+// 	}
+// 	const objectassign = new ObjectAssign()
+// 	start()
+// 	let i: number, len = 1000000
+// 	for (i = 0; i < len; i++) {
+// 		objectassign.emit('hello', { hello: 'world' })
+// 	}
+// 	end()
+// })
+
 
 
