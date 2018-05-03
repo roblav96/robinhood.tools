@@ -10,13 +10,31 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 
 	events() { return this._events }
 
-	hasListener(listener: EventEmitter3.Listener<Data>): boolean {
-		let names = this.eventNames()
+	hasListener(listener: EventEmitter3.Listener<Data>, context?: any, once?: boolean): boolean {
+		let ee3s = this.events()
+		let names = Object.keys(ee3s)
 		let i: number, len = names.length
 		for (i = 0; i < len; i++) {
 			let name = names[i]
-			let listeners = this.listeners(name)
-			if (listeners.includes(listener)) return true;
+			let events = ee3s[name] as EventEmitter3.Event<Data>[]
+			if (!Array.isArray(events)) events = [events];
+			let ii: number, lenn = events.length
+			for (ii = 0; ii < lenn; ii++) {
+				let event = events[ii]
+				if (arguments.length == 1) {
+					if (listener == event.fn) {
+						return true
+					}
+				} else if (arguments.length == 2) {
+					if (listener == event.fn && context == event.context) {
+						return true
+					}
+				} else if (arguments.length == 3) {
+					if (listener == event.fn && context == event.context && once == event.once) {
+						return true
+					}
+				}
+			}
 		}
 		return false
 	}
@@ -37,6 +55,21 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 	toPromise<Name extends Names>(name: Name) {
 		return pEvent(this, name)
 	}
+
+	// hasListener(listener: EventEmitter3.Listener<Data>, context?: any, once?: boolean): boolean {
+	// 	if (arguments.length == 1) {
+	// 		let names = this.eventNames()
+	// 		let i: number, len = names.length
+	// 		for (i = 0; i < len; i++) {
+	// 			let name = names[i]
+	// 			let listeners = this.listeners(name)
+	// 			if (listeners.includes(listener)) {
+	// 				return true
+	// 			}
+	// 		}
+	// 		return false
+	// 	}
+	// }
 
 }
 

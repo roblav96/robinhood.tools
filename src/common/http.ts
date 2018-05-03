@@ -74,7 +74,7 @@ export function send(config: Http.Config) {
 	}).catch(function(error) {
 		if (config.retries > 0 && retryable(error)) {
 			config.retries--
-			if (process.env.DEVELOPMENT) {
+			if (process.env.DEVELOPMENT && process.env.SERVER) {
 				// console.error('retry Error ->', error)
 				console.warn('retry config.retries ->', config.retries)
 			}

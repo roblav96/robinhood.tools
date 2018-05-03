@@ -68,13 +68,13 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	close(code = 1000, reason = '') {
-		if (!this.alive()) return;
+		if (this.ws == null) return;
 		this.ws.close(code, reason)
 	}
 
 	destroy() {
-		clock.offListener(this._connect)
-		clock.offListener(this._heartbeat)
+		clock.offListener(this.reconnect, this)
+		clock.offListener(this.heartbeat, this)
 		this.terminate()
 		this.offAll()
 	}
@@ -89,8 +89,10 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.ws = null
 	}
 
-	private _heartbeat = () => this.send('ping')
-	private _connect = () => {
+	private heartbeat() {
+		this.send('ping')
+	}
+	private reconnect() {
 		if (this.alive()) return;
 		this.connect()
 	}
@@ -104,11 +106,11 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.ws.onclose = this._onclose as any
 		this.ws.onerror = this._onerror as any
 		this.ws.onmessage = this._onmessage as any
-		if (!clock.hasListener(this._connect)) {
-			clock.on(this.options.timeout, this._connect)
+		if (!clock.hasListener(this.reconnect, this)) {
+			clock.on(this.options.timeout, this.reconnect, this)
 		}
-		if (!clock.hasListener(this._heartbeat)) {
-			clock.on(this.options.heartbeat, this._heartbeat)
+		if (!clock.hasListener(this.heartbeat, this)) {
+			clock.on(this.options.heartbeat, this.heartbeat, this)
 		}
 	}
 

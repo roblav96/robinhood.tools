@@ -108,23 +108,23 @@ declare module 'uws' {
 
 
 
-import * as Sockette from 'sockette'
-import WebSocketClient from '../../common/websocket.client'
-setImmediate(function() {
-	const address = `ws://${process.env.DOMAIN}/websocket/${process.env.INSTANCE}`
-	const ws = new WebSocketClient(address, {
-		timeout: '1s',
-		heartbeat: '5s',
-		// verbose: true,
-	})
-	// const ws = new Sockette(address, {
-	// 	timeout: 1000,
-	// 	maxAttempts: Infinity,
-	// 	onopen: event => console.info('onopen ->', address),
-	// 	onclose: event => console.warn('onclose ->', event.code, event.reason),
-	// 	onmessage: event => console.log('onmessage ->', event.data),
-	// 	onerror: event => console.error('onerror ->', event),
-	// })
-})
+// import * as Sockette from 'sockette'
+// import WebSocketClient from '../../common/websocket.client'
+// setImmediate(function() {
+// 	const address = `ws://${process.env.DOMAIN}/websocket/${process.env.INSTANCE}`
+// 	const ws = new WebSocketClient(address, {
+// 		timeout: '1s',
+// 		heartbeat: '5s',
+// 		// verbose: true,
+// 	})
+// 	// const ws = new Sockette(address, {
+// 	// 	timeout: 1000,
+// 	// 	maxAttempts: Infinity,
+// 	// 	onopen: event => console.info('onopen ->', address),
+// 	// 	onclose: event => console.warn('onclose ->', event.code, event.reason),
+// 	// 	onmessage: event => console.log('onmessage ->', event.data),
+// 	// 	onerror: event => console.error('onerror ->', event),
+// 	// })
+// })
 
 

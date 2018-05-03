@@ -24,9 +24,7 @@ class Socket extends Emitter {
 			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
 				return new WebSocketClient(v, {
 					query: security.headers,
-					timeout: '1s',
-					heartbeat: '5s',
-					verbose: true,
+					timeout: '10s',
 				}).on('open', this.onopen).on('message', this.onmessage)
 			}))
 		})
