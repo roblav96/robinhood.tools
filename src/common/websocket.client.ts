@@ -50,25 +50,25 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		if (this.options.connect) this.connect();
 	}
 
-	socket: WebSocket & uws
-	alive() { return this.socket && this.socket.readyState == this.socket.OPEN }
+	ws: WebSocket & uws
+	alive() { return this.ws && this.ws.readyState == this.ws.OPEN }
 
 	send(message: string) {
 		if (!this.alive()) return;
-		this.socket.send(message)
+		this.ws.send(message)
 	}
 	json(data: any) {
 		if (!this.alive()) return;
-		this.socket.send(JSON.stringify(data))
+		this.ws.send(JSON.stringify(data))
 	}
 	binary(data: any) {
 		if (!this.alive()) return;
-		this.socket.send(Buffer.from(data), { binary: true })
+		this.ws.send(Buffer.from(data), { binary: true })
 	}
 
 	close(code = 1000, reason = '') {
 		if (!this.alive()) return;
-		this.socket.close(code, reason)
+		this.ws.close(code, reason)
 	}
 
 	destroy() {
@@ -79,13 +79,13 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	terminate() {
 		clock.offListener(this._connect)
 		clock.offListener(this._heartbeat)
-		if (!this.socket) return;
-		this.socket.close()
+		if (!this.ws) return;
+		this.ws.close()
 		if (process.env.SERVER) {
-			this.socket.terminate()
-			this.socket.removeAllListeners()
+			this.ws.terminate()
+			this.ws.removeAllListeners()
 		}
-		this.socket = null
+		this.ws = null
 	}
 
 	private _reconnect() {
@@ -97,12 +97,12 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	connect() {
 		this.terminate()
 		let address = this.options.query ? `${this.address}?${this.options.query()}` : this.address
-		this.socket = new WebSocket(address) as any
-		this.socket.binaryType = 'arraybuffer'
-		this.socket.onopen = this._onopen as any
-		this.socket.onclose = this._onclose as any
-		this.socket.onerror = this._onerror as any
-		this.socket.onmessage = this._onmessage as any
+		this.ws = new WebSocket(address) as any
+		this.ws.binaryType = 'arraybuffer'
+		this.ws.onopen = this._onopen as any
+		this.ws.onclose = this._onclose as any
+		this.ws.onerror = this._onerror as any
+		this.ws.onmessage = this._onmessage as any
 		this._reconnect()
 	}
 
