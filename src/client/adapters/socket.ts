@@ -37,7 +37,10 @@ class Socket extends Emitter {
 
 	private resync = _.throttle(this.sync, 100, { leading: false, trailing: true })
 	private sync() {
-		let message = `#${WS.SUBS}${JSON.stringify(this.eventNames())}`
+		let message = JSON.stringify({
+			subs: this.eventNames(),
+		} as Socket.Message)
+		// let message = `#${WS.SUBS}${JSON.stringify(this.eventNames())}`
 		this.clients.forEach(v => v.send(message))
 	}
 

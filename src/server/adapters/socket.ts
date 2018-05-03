@@ -79,16 +79,25 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 	client.authed = req.authed
 	client.doc = req.doc
 
-	client.on('message', function onmessage(message: string) {
-		if (message == 'pong') return;
-		if (message == 'ping') return client.send('pong');
-		if (message[0] == '#') {
-			if (message.substr(1, WS.SUBS.length) == WS.SUBS) {
-				client.subs = JSON.parse(message.substr(WS.SUBS.length + 1))
-				return
-			}
+	client.on('message', function onmessage(message: Socket.Message) {
+		if (message == 'pong' as any) return;
+		if (message == 'ping' as any) return client.send('pong');
+
+		let parsed = jsonparse(message)
+		if (parsed.err) return client.close(1007, parsed.err.message);
+		message = parsed.value
+
+		if (Array.isArray(message.subs)) {
+			client.subs = message.subs
 		}
 		console.log('client message ->', message)
+
+		// if (message[0] == '#') {
+		// 	if (message.substr(1, WS.SUBS.length) == WS.SUBS) {
+		// 		client.subs = JSON.parse(message.substr(WS.SUBS.length + 1))
+		// 		return
+		// 	}
+		// }
 		// client.close(1003, 'Sending messages via the client not allowed!')
 	})
 
