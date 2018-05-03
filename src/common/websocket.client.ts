@@ -2,6 +2,7 @@
 
 import { WS } from './socket'
 import * as _ from './lodash'
+import * as qs from 'querystring'
 import * as uws from 'uws'
 import * as url from 'url'
 import * as core from './core'
@@ -26,7 +27,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	private static get options() {
 		return _.clone({
-			query: null as () => string,
+			query: null as () => object,
 			timeout: '3s' as Clock.Tick,
 			heartbeat: '10s' as Clock.Tick,
 			connect: true,
@@ -96,7 +97,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private _connect = () => this.connect()
 	connect() {
 		this.terminate()
-		let address = this.options.query ? `${this.address}?${this.options.query()}` : this.address
+		let address = this.options.query ? `${this.address}?${qs.stringify(this.options.query())}` : this.address
 		this.ws = new WebSocket(address) as any
 		this.ws.binaryType = 'arraybuffer'
 		this.ws.onopen = this._onopen as any
@@ -107,7 +108,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private _onopen = (event: Event) => {
-		if (this.options.verbose) console.info(this.name, 'onopen'); // ->', process.CLIENT ? (event.target as WebSocket).url : '');
+		if (this.options.verbose) console.info(this.name, 'onopen');
 		if (this.options.heartbeat) clock.on(this.options.heartbeat, this._heartbeat);
 		clock.offListener(this._connect)
 		this.emit('open', event)
@@ -123,7 +124,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	private _onerror = (error: Error) => {
 		let message = (error.message || error) as string
-		console.error(this.name, 'onerror Error ->', message)
+		if (this.options.verbose) console.error(this.name, 'onerror Error ->', message);
 		this.emit('error', error)
 	}
 

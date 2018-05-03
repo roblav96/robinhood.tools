@@ -12,9 +12,9 @@ polka.route({
 	url: '/api/websocket/discover',
 	public: true,
 	handler(req, res) {
-		return core.array.create(+process.env.INSTANCES).map(function(i) {
+		return Promise.resolve(core.array.create(+process.env.INSTANCES).map(function(i) {
 			return `ws://${process.env.DOMAIN}/websocket/${i}`
-		})
+		}))
 	}
 })
 

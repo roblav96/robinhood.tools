@@ -32,7 +32,7 @@ export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest,
 			query?: FastestValidator.Schema
 			body?: FastestValidator.Schema
 		}
-		handler(req: PolkaRequest, res: PolkaResponse): any
+		handler(req: PolkaRequest, res: PolkaResponse): Promise<any>
 	}) {
 		if (opts.schema) {
 			this.validators[opts.url] = {}

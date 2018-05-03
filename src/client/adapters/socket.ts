@@ -8,84 +8,42 @@ import Emitter, { Event, Listener } from '@/common/emitter'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import clock from '@/common/clock'
-import qs from 'querystring'
+import jsonparse from 'fast-json-parse'
+import * as security from './security'
 import * as http from './http'
 
 
 
-class Client extends WebSocketClient {
+class Socket extends Emitter {
 
-	constructor(
-		private address: string,
-		private onmessage: (message: Socket.Message) => void,
-	) {
-		super(address, {
-
-		})
-		this.sockette = new Sockette(this.url, {
-			timeout: 1000,
-			maxAttempts: Infinity,
-			onopen: event => {
-				console.info('onopen ->', event)
-				this.ws = event.target as any
-				clock.on('10s', this.heartbeat)
-				socket.sync()
-			},
-			onclose: event => {
-				console.warn('onclose ->', event.code, event.reason)
-				clock.offListener(this.heartbeat)
-				this.ws = null
-			},
-			onmessage: event => {
-				let message = event.data as string
-				if (message == 'pong') return;
-				if (message == 'ping') return this.send('pong');
-				console.log('client message ->', message)
-				this.onmessage(JSON.parse(message))
-			},
-			onerror: event => {
-				console.error(this.address, 'onerror Error ->', event)
-			},
-		})
+	private static query() {
+		return security.headers()
 	}
 
-	json(data: any) {
-		if (!this.alive) return;
-		this.sockette.send(JSON.stringify(data))
-	}
-	send(message: string) {
-		if (!this.alive) return;
-		this.sockette.send(message)
-	}
-
-	close() {
-		if (!this.alive) return;
-		this.sockette.close()
-	}
-
-}
-
-
-
-const socket = new class extends Emitter {
-
-	clients = [] as Client[]
+	private clients = [] as WebSocketClient[]
 	discover() {
 		return http.get('/websocket/discover', {
 			retries: Infinity,
 		}).then((addresses: string[]) => {
-			this.clients.forEach(v => v.close())
-			this.clients.splice(0, Infinity, ...addresses.map((v, i) => new Client(v, this.onmessage)))
+			this.clients.forEach(v => v.destroy())
+			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
+				return new WebSocketClient(v, {
+					query: Socket.query,
+				}).on('open', this.onopen).on('message', this.onmessage)
+			}))
 		})
 	}
 
-	onmessage(message: Socket.Message) {
-		console.log('this ->', this)
+	private onopen = () => this.resync()
+
+	private onmessage = (message: Socket.Message) => {
+		message = JSON.parse(message as any)
 		console.log('message ->', message)
 	}
 
-	sync = _.throttle(this._sync, 100, { leading: false, trailing: true })
-	private _sync() {
+	resync = _.throttle(this.sync, 100, { leading: false, trailing: true })
+	private sync() {
+		console.log('this ->', this)
 		let message = JSON.stringify({
 			action: 'subs',
 			subs: this.eventNames(),
@@ -93,13 +51,19 @@ const socket = new class extends Emitter {
 		this.clients.forEach(v => v.send(message))
 	}
 
-	on(name: string, fn: Listener) {
-		this.sync()
-		return super.on(name, fn)
-	}
-	addListener(...args) { return this.on(...args) }
+	// on(name: string, fn: Listener) {
+	// 	this.resync()
+	// 	return super.on(name, fn)
+	// }
+	// addListener(name: string, fn: Listener) { return this.on(name, fn) }
+	// off(name: string, fn: Listener) {
+	// 	this.resync()
+	// 	return super.off(name, fn)
+	// }
+	// addListener(name: string, fn: Listener) { return this.on(name, fn) }
 
 }
+const socket = new Socket()
 export default socket
 
 

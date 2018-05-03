@@ -30,11 +30,18 @@ const wss = new uws.Server({
 
 })
 
-exithook(function onexit() { wss.close() })
+exithook(function onexit() {
+	wss.clients.forEach(v => v.close(1001))
+	wss.close()
+})
 
-wss.on('listening', function onlistening() { console.info('wss listening ->', wss.httpServer.address().port) })
+wss.on('listening', function onlistening() {
+	console.info('wss listening ->', process.env.HOST + ':' + wss.httpServer.address().port)
+})
 
-wss.on('error', function onerror(error) { console.error('wss Error ->', error) })
+wss.on('error', function onerror(error) {
+	console.error('wss Error ->', error)
+})
 
 wss.on('connection', function onconnection(client: uws.WebSocket, req: IncomingMessage) {
 	// console.log('req.headers ->', req.headers)
@@ -47,12 +54,12 @@ wss.on('connection', function onconnection(client: uws.WebSocket, req: IncomingM
 		// 	console.log('subs ->', subs)
 		// 	return
 		// }
-		// console.warn('client message ->', message)
+		console.log('client message ->', message)
 		// client.close(1003, 'Sending messages via the client not allowed!')
 	})
 
 	client.on('close', function onclose(code, reason) {
-		// console.warn('client close ->', code, reason)
+		console.warn('client close ->', code, reason)
 		client.terminate()
 		client.removeAllListeners()
 	})

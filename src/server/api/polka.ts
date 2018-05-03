@@ -59,7 +59,7 @@ polka.get('/api/blank', function blank(req, res) { res.end() })
 polka.route({
 	method: 'GET',
 	url: '/api/route',
-	handler(req, res) { res.end() },
+	handler(req, res) { return Promise.resolve() },
 })
 
 polka.route({
@@ -68,7 +68,7 @@ polka.route({
 	schema: {
 		params: { valid: 'string' }
 	},
-	handler(req, res) { res.end() },
+	handler(req, res) { return Promise.resolve() },
 })
 
 
