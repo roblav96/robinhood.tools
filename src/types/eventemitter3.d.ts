@@ -13,7 +13,8 @@ declare module 'eventemitter3' {
 
 	class EventEmitter3<Names extends string = string, Data = any> {
 		static prefixed: string | boolean
-		protected _events: { [name: string]: EventEmitter3.Event<Data> | EventEmitter3.Event<Data>[] }
+		_events: { [name: string]: EventEmitter3.Event<Data> | EventEmitter3.Event<Data>[] }
+		_eventsCount: number
 		eventNames<Name extends Names>(): Name[]
 		listeners<Name extends Names>(name: Name): EventEmitter3.Listener<Data>[]
 		listenerCount<Name extends Names>(name: Name): number

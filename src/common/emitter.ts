@@ -3,15 +3,21 @@
 export { Event, Listener } from 'eventemitter3'
 import * as EventEmitter3 from 'eventemitter3'
 import * as pEvent from 'p-event'
+import * as onchange from 'on-change'
 
 
 
 export default class Emitter<Names extends string = string, Data = any> extends EventEmitter3<Names, Data> {
+	
+	constructor(observe?: ) {
+		super()
+	}
 
-	events() { return this._events }
+	// events() { return this._events }
+	get events() { return this._events }
 
 	hasListener(listener: EventEmitter3.Listener<Data>, context?: any, once?: boolean): boolean {
-		let ee3s = this.events()
+		let ee3s = this._events
 		let names = Object.keys(ee3s)
 		let i: number, len = names.length
 		for (i = 0; i < len; i++) {

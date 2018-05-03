@@ -17,7 +17,11 @@ import Emitter from '../../common/emitter'
 
 
 
-const wss = new uws.Server({
+class WebSocketServer extends uws.Server {
+	subs = {} as Dict<Socket.Client[]>
+}
+
+const wss = new WebSocketServer({
 	host: process.env.HOST,
 	port: +process.env.IPORT + os.cpus().length,
 	path: `/websocket/${process.env.INSTANCE}`,
@@ -41,11 +45,11 @@ const wss = new uws.Server({
 				hostname: req.headers['hostname'],
 				useragent: req.headers['user-agent'],
 				bits: cparsed['x-bits'],
-				token: cparsed['x-token'],
+				token: cparsed['x-token']
 			} as Security.Doc
 
 			let failed = security.isDoc(doc)
-			if (failed) return next(false, 412, `Precondition Failed: "${failed}"`);
+			if (failed) return next(false, 412, `Precondition Failed: "${failed},"`);
 			req.doc = doc
 
 			if (!req.doc.token) return next(true);
@@ -58,7 +62,7 @@ const wss = new uws.Server({
 			console.error('verifyClient Error ->', error)
 			next(false, 500, 'Internal Server Error')
 		})
-	},
+	}
 
 })
 
@@ -79,13 +83,20 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 	client.authed = req.authed
 	client.doc = req.doc
 
-	client.on('message', function onmessage(message: Socket.Message) {
-		if (message == 'pong' as any) return;
-		if (message == 'ping' as any) return client.send('pong');
+	client.on('message', function onmessage(message: string) {
+		if (message == 'pong') return;
+		if (message == 'ping') return client.send('pong');
+
+		// if (message[0] == WS.HASH) {
+		// 	if (message.substr(1, WS.SUBS.length) == WS.SUBS) {
+		// 		client.subs = JSON.parse(message.substr(WS.SUBS.length + 1))
+		// 		return
+		// 	}
+		// }
 
 		let parsed = fastjsonparse(message)
 		if (parsed.err) return client.close(1007, parsed.err.message);
-		message = parsed.value
+		let payload = parsed.value as Socket.Payload
 
 		if (Array.isArray(message.subs)) {
 			client.subs = message.subs
@@ -93,17 +104,14 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 
 		console.log('client message ->', message)
 
-		// if (message[0] == '#') {
-		// 	if (message.substr(1, WS.SUBS.length) == WS.SUBS) {
-		// 		client.subs = JSON.parse(message.substr(WS.SUBS.length + 1))
-		// 		return
-		// 	}
-		// }
+
 		// client.close(1003, 'Sending messages via the client not allowed!')
 	})
 
 	client.on('close', function onclose(code, reason) {
 		console.warn('client close ->', code, reason)
+		client.doc = null
+		client.subs.splice(0)
 		client.terminate()
 		client.removeAllListeners()
 	})
@@ -116,9 +124,11 @@ export default wss
 
 
 
+const SUBS = {} as Dict<Socket.Client[]>
+
 export function emit() {
 
-}
+},
 
 
 
