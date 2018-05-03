@@ -3,7 +3,6 @@ export * from '../../common/socket'
 // 
 
 import { WS } from '../../common/socket'
-import { IncomingMessage } from 'http'
 import { PolkaRequest } from '../api/polka.request'
 import * as exithook from 'exit-hook'
 import * as qs from 'querystring'
@@ -12,7 +11,7 @@ import * as os from 'os'
 import * as uws from 'uws'
 import * as cookie from 'cookie'
 import * as jsonparse from 'fast-json-parse'
-import * as boom from 'boom'
+import * as redis from './redis'
 import * as security from './security'
 import Emitter from '../../common/emitter'
 
@@ -24,13 +23,15 @@ const wss = new uws.Server({
 	path: `/websocket/${process.env.INSTANCE}`,
 
 	verifyClient(incoming, next: Function) {
-		let req = (incoming as any).req as PolkaRequest
+		let req = (incoming.req as any) as PolkaRequest
 		return Promise.resolve().then(function() {
+			req.authed = false
+
 			let cookies = req.headers.cookie
 			if (!cookies) return next(false, 412, `Precondition Failed: "cookies"`);
 
-			let cparsed = cookie.parse(cookies) as Dict<string>
-			let qparsed = qs.parse(url.parse(req.url).query) as Dict<string>
+			let cparsed = cookie.parse(cookies)
+			let qparsed = qs.parse(url.parse(req.url).query)
 
 			let doc = {
 				ip: security.ip(req.headers),
@@ -46,7 +47,12 @@ const wss = new uws.Server({
 			let failed = security.isDoc(doc)
 			if (failed) return next(false, 412, `Precondition Failed: "${failed}"`);
 			req.doc = doc
-			next(true)
+
+			if (!req.doc.token) return next(true);
+			return redis.main.hget(`security:doc:${req.doc.uuid}`, 'prime').then(function(prime) {
+				if (prime) req.authed = req.doc.token == security.token(req.doc, prime);
+				next(true)
+			})
 
 		}).catch(function(error) {
 			console.error('verifyClient Error ->', error)
@@ -68,8 +74,9 @@ wss.on('error', function onerror(error) {
 	console.error('wss Error ->', error)
 })
 
-wss.on('connection', function onconnection(client: uws.WebSocket, req: IncomingMessage) {
+wss.on('connection', function onconnection(client: uws.WebSocket, req: PolkaRequest) {
 	// console.log('req.headers ->', req.headers)
+	console.log('req.authed ->', req.authed)
 	console.log('req.doc ->', req.doc)
 
 	client.on('message', function onmessage(message: string) {
@@ -106,8 +113,8 @@ export function emit() {
 
 declare module 'uws' {
 	interface WebSocket {
-		// alive: boolean
-		// uuid: string
+		authed: boolean
+		doc: Security.Doc
 	}
 }
 

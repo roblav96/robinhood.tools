@@ -11,8 +11,8 @@ import polka from './polka'
 
 
 polka.use(function(req, res, next) {
-
 	req.authed = false
+
 	let doc = {
 		ip: security.ip(req.headers),
 		id: req.headers['x-id'],
