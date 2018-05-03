@@ -17,11 +17,7 @@ import Emitter from '../../common/emitter'
 
 
 
-class WebSocketServer extends uws.Server {
-	subs = {} as Dict<Socket.Client[]>
-}
-
-const wss = new WebSocketServer({
+export const wss = new uws.Server({
 	host: process.env.HOST,
 	port: +process.env.IPORT + os.cpus().length,
 	path: `/websocket/${process.env.INSTANCE}`,
@@ -87,29 +83,26 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 		if (message == 'pong') return;
 		if (message == 'ping') return client.send('pong');
 
-		// if (message[0] == WS.HASH) {
-		// 	if (message.substr(1, WS.SUBS.length) == WS.SUBS) {
-		// 		client.subs = JSON.parse(message.substr(WS.SUBS.length + 1))
-		// 		return
-		// 	}
-		// }
+		if (message[0] == WS.ACT) {
+			if (message.substr(1, WS.SUBS.length) == WS.SUBS) {
+				client.subs = JSON.parse(message.substr(WS.SUBS.length + 1))
+				return
+			}
+		}
 
 		let parsed = fastjsonparse(message)
 		if (parsed.err) return client.close(1007, parsed.err.message);
-		let payload = parsed.value as Socket.Payload
+		let event = parsed.value as Socket.Event
 
-		if (Array.isArray(message.subs)) {
-			client.subs = message.subs
-		}
+		console.log('client event ->', event)
 
-		console.log('client message ->', message)
 
 
 		// client.close(1003, 'Sending messages via the client not allowed!')
 	})
 
 	client.on('close', function onclose(code, reason) {
-		console.warn('client close ->', code, reason)
+		if (process.env.PRIMARY) console.warn('client close ->', code, reason);
 		client.doc = null
 		client.subs.splice(0)
 		client.terminate()
@@ -120,15 +113,13 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 
 })
 
-export default wss
-
 
 
 const SUBS = {} as Dict<Socket.Client[]>
 
 export function emit() {
 
-},
+}
 
 
 

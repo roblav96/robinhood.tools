@@ -8,8 +8,6 @@ import * as Hub from 'pandora-hub'
 const hub = Pandora.getHub()
 const client = hub.getHubClient()
 
-
-
 client.on('gc', function() { global.gc() })
 
 

@@ -27,7 +27,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private static get options() {
 		return _.clone({
 			query: null as () => object,
-			heartbeat: '10s' as Clock.Tick,
+			heartbeat: '5s' as Clock.Tick,
 			timeout: '3s' as Clock.Tick,
 			connect: true,
 			retry: true,

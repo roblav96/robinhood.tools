@@ -30,7 +30,7 @@ interface ProcEnv extends Partial<NodeJS.ProcessEnv> { [key: string]: any }
 export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
 	Process(pandora.process('api').order(1), {
-		// INSTANCES: os.cpus().length,
+		INSTANCES: os.cpus().length,
 		DEBUGGER: !PROC_ENV.BENCHMARK,
 	})
 

@@ -49,7 +49,6 @@
 		"mqtt-connection": "latest",
 		"node-forge": "latest",
 		"nodent": "latest",
-		"on-change": "latest",
 		"p-all": "latest",
 		"p-event": "latest",
 		"p-forever": "latest",

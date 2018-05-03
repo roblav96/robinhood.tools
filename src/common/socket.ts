@@ -3,7 +3,7 @@
 
 
 export const WS = {
-	HASH: '#',
+	ACT: '#',
 	SUBS: 'subs',
 }
 
@@ -19,11 +19,9 @@ declare global {
 			authed: boolean
 			doc: Security.Doc
 		}
-		interface Payload<Data = any> {
+		interface Event<Data = any> {
 			name: string
 			data: Data
-			action: string
-			subs: string[]
 		}
 	}
 }
