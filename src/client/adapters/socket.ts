@@ -1,35 +1,27 @@
 // 
-export { WS } from '@/common/redis.keys'
+export * from '@/common/socket'
 // 
 
-import { WS } from '@/common/redis.keys'
+import { WS } from '@/common/socket'
+import WebSocketClient from '@/common/websocket.client'
+import Emitter, { Event, Listener } from '@/common/emitter'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import clock from '@/common/clock'
-import Emitter, { Event, Listener } from '@/common/emitter'
-import Sockette from 'sockette'
 import qs from 'querystring'
 import * as http from './http'
 
 
 
-class Client {
-
-	ws: WebSocket
-	sockette: Sockette
-
-	get alive() { return this.ws && this.ws.readyState == this.ws.OPEN }
-	get url() {
-		console.warn('get url')
-		return this.address
-	}
-
-	private heartbeat = () => this.send('ping')
+class Client extends WebSocketClient {
 
 	constructor(
 		private address: string,
 		private onmessage: (message: Socket.Message) => void,
 	) {
+		super(address, {
+
+		})
 		this.sockette = new Sockette(this.url, {
 			timeout: 1000,
 			maxAttempts: Infinity,
@@ -94,13 +86,18 @@ const socket = new class extends Emitter {
 
 	sync = _.throttle(this._sync, 100, { leading: false, trailing: true })
 	private _sync() {
-		this.clients.forEach(v => v.send(`${WS.SYNC}${JSON.stringify(this.eventNames())}`))
+		let message = JSON.stringify({
+			action: 'subs',
+			subs: this.eventNames(),
+		} as Socket.Message)
+		this.clients.forEach(v => v.send(message))
 	}
 
 	on(name: string, fn: Listener) {
 		this.sync()
 		return super.on(name, fn)
 	}
+	addListener(...args) { return this.on(...args) }
 
 }
 export default socket

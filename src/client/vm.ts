@@ -9,9 +9,8 @@ import App from '@/client/app/app'
 
 
 
-
-export default new App({ router, store }).$mount('#app')
-
-
+const vm = new App({ router, store })
+vm.$mount('#app')
+export default vm
 
 

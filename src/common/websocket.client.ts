@@ -1,5 +1,6 @@
 // 
 
+import { WS } from './socket'
 import * as _ from './lodash'
 import * as uws from 'uws'
 import * as url from 'url'
@@ -56,13 +57,16 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		if (!this.alive()) return;
 		this.socket.send(message)
 	}
-	json<T = object>(data: T) { this.send(JSON.stringify(data)) }
-	binary<T = object>(data: T) {
+	json(data: any) {
 		if (!this.alive()) return;
-		this.socket.send(Buffer.from(data as any), { binary: true })
+		this.socket.send(JSON.stringify(data))
+	}
+	binary(data: any) {
+		if (!this.alive()) return;
+		this.socket.send(Buffer.from(data), { binary: true })
 	}
 
-	close(code = 1000, reason?: string) {
+	close(code = 1000, reason = '') {
 		if (!this.alive()) return;
 		this.socket.close(code, reason)
 	}
@@ -76,7 +80,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		clock.offListener(this._connect)
 		clock.offListener(this._heartbeat)
 		if (!this.socket) return;
-		this.socket.close(1000)
+		this.socket.close()
 		if (process.env.SERVER) {
 			this.socket.terminate()
 			this.socket.removeAllListeners()
@@ -94,6 +98,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.terminate()
 		let address = this.options.query ? `${this.address}?${this.options.query()}` : this.address
 		this.socket = new WebSocket(address) as any
+		this.socket.binaryType = 'arraybuffer'
 		this.socket.onopen = this._onopen as any
 		this.socket.onclose = this._onclose as any
 		this.socket.onerror = this._onerror as any

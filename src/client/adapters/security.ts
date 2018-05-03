@@ -2,6 +2,7 @@
 export * from '@/common/security'
 // 
 
+import * as security from '@/common/security'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import lockr from 'lockr'
@@ -9,7 +10,6 @@ import Fingerprint2 from 'fingerprintjs2'
 import store from '@/client/store'
 import socket from '@/client/adapters/socket'
 import * as http from '@/client/adapters/http'
-import * as security from '@/common/security'
 import clock from '@/common/clock'
 
 
@@ -31,7 +31,7 @@ const doc = {
 
 export function headers() {
 	let headers = {
-		'x-uuid': doc.uuid, // + '.' + Date.now(),
+		'x-uuid': doc.uuid,
 		'x-finger': doc.finger,
 		'x-stamp': Date.now().toString(),
 	} as Dict<string>

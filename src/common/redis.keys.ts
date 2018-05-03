@@ -18,10 +18,6 @@ export const BENCHMARKS = {
 	},
 }
 
-export const WS = {
-	SYNC: '$sync',
-}
-
 
 
 // export const ITEMS = 'items'

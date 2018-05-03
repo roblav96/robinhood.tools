@@ -13,12 +13,18 @@ import clock from './clock'
 export function config(config: Partial<Http.Config>) {
 
 	_.defaults(config, {
-		silent: true,
+		headers: {},
+		verbose: false,
 		timeout: 10000,
 		retries: process.env.CLIENT ? 0 : 3,
 		retryTick: '5s',
-		headers: {},
+		maxRedirects: 10,
 	} as Http.Config)
+
+	if (config.verbose) {
+		let ending = (config.query || config.body) ? ' ➤ ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
+		console.log('➤ ' + config.method + ' ' + config.url + ending);
+	}
 
 	if (config.query) {
 		config.url += '?' + qs.stringify(config.query)
@@ -29,11 +35,6 @@ export function config(config: Partial<Http.Config>) {
 		config.headers['Accept'] = 'application/json'
 		config.headers['Content-Type'] = 'application/json'
 		config.body = JSON.stringify(config.body)
-	}
-
-	if (!config.silent) {
-		let ending = (config.query || config.body) ? ' ➤ ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
-		console.log('➤ ' + config.method + ' ' + config.url + ending);
 	}
 
 	return config
@@ -96,7 +97,7 @@ declare global {
 			hHost: boolean
 			hOrigin: boolean
 			hReferrer: boolean
-			silent: boolean
+			verbose: boolean
 			isProxy: boolean
 			robinhoodToken: string
 			webullAuth: boolean

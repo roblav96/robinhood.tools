@@ -1,14 +1,14 @@
 // 
-export { WS } from '../../common/redis.keys'
+export * from '../../common/socket'
 // 
 
-import { WS } from '../../common/redis.keys'
+import { IncomingMessage } from 'http'
+import { WS } from '../../common/socket'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as security from '../adapters/security'
 import * as exithook from 'exit-hook'
 import * as os from 'os'
-import * as http from 'http'
 import * as uws from 'uws'
 import * as Sockette from 'sockette'
 import Emitter from '../../common/emitter'
@@ -30,28 +30,29 @@ const wss = new uws.Server({
 
 })
 
+exithook(function onexit() { wss.close() })
+
 wss.on('listening', function onlistening() { console.info('wss listening ->', wss.httpServer.address().port) })
-exithook(function onexit() { wss.httpServer.close() })
 
 wss.on('error', function onerror(error) { console.error('wss Error ->', error) })
 
-wss.on('connection', function onconnection(client: uws.WebSocket, req: http.IncomingMessage) {
+wss.on('connection', function onconnection(client: uws.WebSocket, req: IncomingMessage) {
 	// console.log('req.headers ->', req.headers)
 
 	client.on('message', function onmessage(message: string) {
 		if (message == 'pong') return;
 		if (message == 'ping') return client.send('pong');
-		if (message.indexOf(WS.SYNC) == 0) {
-			let subs = JSON.parse(message.substr(WS.SYNC.length))
-			console.log('subs ->', subs)
-			return
-		}
-		console.warn('client message ->', message)
-		client.close(1003, 'Sending messages via the client not allowed!')
+		// if (message.indexOf(WS.SYNC) == 0) {
+		// 	let subs = JSON.parse(message.substr(WS.SYNC.length))
+		// 	console.log('subs ->', subs)
+		// 	return
+		// }
+		// console.warn('client message ->', message)
+		// client.close(1003, 'Sending messages via the client not allowed!')
 	})
 
 	client.on('close', function onclose(code, reason) {
-		console.warn('client close ->', code, reason)
+		// console.warn('client close ->', code, reason)
 		client.terminate()
 		client.removeAllListeners()
 	})
@@ -64,16 +65,11 @@ export default wss
 
 
 
+export function emit() {
 
-
-declare global {
-	namespace Socket {
-		interface Message {
-			name: string
-			data: any
-		}
-	}
 }
+
+
 
 declare module 'uws' {
 	interface WebSocket {
