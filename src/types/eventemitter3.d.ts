@@ -15,8 +15,8 @@ declare module 'eventemitter3' {
 		static prefixed: string | boolean
 		protected _events: { [name: string]: EventEmitter3.Event<Data> | EventEmitter3.Event<Data>[] }
 		eventNames<Name extends Names>(): Name[]
-		listeners<Name extends Names>(name?: Name): EventEmitter3.Listener<Data>[]
-		listenerCount<Name extends Names>(name?: Name): number
+		listeners<Name extends Names>(name: Name): EventEmitter3.Listener<Data>[]
+		listenerCount<Name extends Names>(name: Name): number
 		emit<Name extends Names>(name: Name, ...args: Data[]): any
 		on<Name extends Names>(name: Name, listener: EventEmitter3.Listener<Data>, context?: any): this
 		addListener<Name extends Names>(name: Name, listener: EventEmitter3.Listener<Data>, context?: any): this

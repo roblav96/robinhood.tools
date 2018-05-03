@@ -28,8 +28,8 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private static get options() {
 		return _.clone({
 			query: null as () => object,
-			timeout: '3s' as Clock.Tick,
 			heartbeat: '10s' as Clock.Tick,
+			timeout: '3s' as Clock.Tick,
 			connect: true,
 			retry: true,
 			verbose: false,
@@ -73,15 +73,15 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	destroy() {
+		clock.offListener(this._connect)
+		clock.offListener(this._heartbeat)
 		this.terminate()
 		this.offAll()
 	}
 
 	terminate() {
-		clock.offListener(this._connect)
-		clock.offListener(this._heartbeat)
-		if (!this.ws) return;
-		this.ws.close()
+		if (this.ws == null) return;
+		this.ws.close(1000)
 		if (process.env.SERVER) {
 			this.ws.terminate()
 			this.ws.removeAllListeners()
@@ -89,12 +89,12 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.ws = null
 	}
 
-	private _reconnect() {
-		clock.offListener(this._connect)
-		clock.once(this.options.timeout, this._connect)
+	private _heartbeat = () => this.send('ping')
+	private _connect = () => {
+		if (this.alive()) return;
+		this.connect()
 	}
 
-	private _connect = () => this.connect()
 	connect() {
 		this.terminate()
 		let address = this.options.query ? `${this.address}?${qs.stringify(this.options.query())}` : this.address
@@ -104,21 +104,27 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.ws.onclose = this._onclose as any
 		this.ws.onerror = this._onerror as any
 		this.ws.onmessage = this._onmessage as any
-		this._reconnect()
+		if (!clock.hasListener(this._connect)) {
+			clock.on(this.options.timeout, this._connect)
+		}
+		if (!clock.hasListener(this._heartbeat)) {
+			clock.on(this.options.heartbeat, this._heartbeat)
+		}
 	}
 
 	private _onopen = (event: Event) => {
 		if (this.options.verbose) console.info(this.name, 'onopen');
-		if (this.options.heartbeat) clock.on(this.options.heartbeat, this._heartbeat);
-		clock.offListener(this._connect)
 		this.emit('open', event)
 	}
 
 	private _onclose = (event: CloseEvent) => {
-		let code = WebSocketClient.CODES[event.code] || event.code
-		if (this.options.verbose) console.warn(this.name, 'onclose ->', code, '->', event.reason);
+		if (this.options.verbose) {
+			let code = (WebSocketClient.CODES[event.code]) || event.code
+			if (!Number.isFinite(code)) code += ` (${event.code})`;
+			console.warn(this.name, 'onclose ->', code, '->', event.reason);
+		}
 		this.emit('close', _.pick(event, ['code', 'reason']))
-		if (this.options.retry) return this._reconnect();
+		if (this.options.retry) return;
 		this.destroy()
 	}
 
@@ -134,11 +140,6 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		if (message == 'ping') return this.send('pong');
 		if (this.options.verbose) console.log(this.name, 'onmessage ->', message);
 		this.emit('message', message)
-	}
-
-	private _heartbeat = () => {
-		if (this.alive()) return this.send('ping');
-		clock.offListener(this._heartbeat)
 	}
 
 }

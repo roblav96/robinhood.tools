@@ -75,7 +75,7 @@ export function send(config: Http.Config) {
 		if (config.retries > 0 && retryable(error)) {
 			config.retries--
 			if (process.env.DEVELOPMENT) {
-				console.error('retry Error ->', error)
+				// console.error('retry Error ->', error)
 				console.warn('retry config.retries ->', config.retries)
 			}
 			return clock.toPromise(config.retryTick).then(() => send(config))

@@ -66,7 +66,7 @@ function finger(): Promise<void> {
 Promise.all([
 	uuid(), finger(),
 ]).then(function() {
-	return http.get('/security/token', { retries: Infinity })
+	return http.get('/security/token', { retryTick: '1s', retries: Infinity })
 }).then(function() {
 	return socket.discover()
 }).then(function() {

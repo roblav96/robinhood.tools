@@ -2,6 +2,7 @@
 
 export {
 	after,
+	Cancelable,
 	ceil,
 	clone,
 	compact,

@@ -14,7 +14,9 @@ polka.route({
 	public: true,
 	handler(req, res) {
 		let prime = security.randomBytes(32)
-		return redis.main.hset('security:doc:' + req.doc.uuid, 'prime', prime).then(function() {
+		return Promise.resolve().then(function() {
+			return redis.main.hset('security:doc:' + req.doc.uuid, 'prime', prime)
+		}).then(function() {
 			let cookie = {
 				domain: process.env.DOMAIN,
 				path: '/', sameSite: true, httpOnly: true,

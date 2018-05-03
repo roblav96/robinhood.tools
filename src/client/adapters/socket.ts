@@ -8,17 +8,12 @@ import Emitter, { Event, Listener } from '@/common/emitter'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import clock from '@/common/clock'
-import jsonparse from 'fast-json-parse'
 import * as security from './security'
 import * as http from './http'
 
 
 
 class Socket extends Emitter {
-
-	private static query() {
-		return security.headers()
-	}
 
 	private clients = [] as WebSocketClient[]
 	discover() {
@@ -28,7 +23,10 @@ class Socket extends Emitter {
 			this.clients.forEach(v => v.destroy())
 			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
 				return new WebSocketClient(v, {
-					query: Socket.query,
+					query: security.headers,
+					timeout: '1s',
+					heartbeat: '5s',
+					verbose: true,
 				}).on('open', this.onopen).on('message', this.onmessage)
 			}))
 		})
