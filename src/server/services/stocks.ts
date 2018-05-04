@@ -13,7 +13,7 @@ import * as rhinstruments from './robinhood.instruments'
 
 
 
-export const mqtt = new webull.WebullMqtt({
+export const mqtt = new webull.MqttWatcher({
 	connect: false,
 	// verbose: true,
 	// debug: process.PRIMARY,

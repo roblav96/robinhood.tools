@@ -41,21 +41,15 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv)
 export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
 	Process(pandora.process('api').order(1), {
-		INSTANCES: os.cpus().length,
-		// DEBUGGER: false, // !PROC_ENV.BENCHMARK,
+		// INSTANCES: os.cpus().length,
+		DEBUGGER: false,
 	})
 
-	// Process(pandora.process('api').order(1), {
-	// 	INSTANCES: os.cpus().length,
-	// 	// DEBUGGER: false, // !PROC_ENV.BENCHMARK,
-	// })
-
-	// if (PROC_ENV.BENCHMARK) {
-	// 	Process(pandora.process('benchmarks').order(2), {
-	// 		INSTANCES: 3,
-	// 		DEBUGGER: false,
-	// 	})
-	// }
+	if (PROC_ENV.BENCHMARK) {
+		Process(pandora.process('benchmarks').order(2), {
+			INSTANCES: 3, DEBUGGER: false,
+		})
+	}
 
 
 

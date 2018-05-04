@@ -24,7 +24,7 @@ export function isDoc(
 			return key
 		}
 	}
-	let split = doc.uuid.split('#')
+	let split = doc.uuid.split('.')
 	doc.uuid = split[0]
 	let stamp = split[1]
 	if (isNaN(stamp as any)) return 'stamp';
