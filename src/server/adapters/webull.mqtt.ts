@@ -34,9 +34,9 @@ export default class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disc
 	get name() { return 'mqtt://' + this.options.host + ':' + this.options.port }
 
 	constructor(
-		private fsymbols: Dict<number>,
-		private topics: keyof typeof WebullMqtt.topics,
-		private options = {} as Partial<typeof WebullMqtt.options>,
+		public fsymbols: Dict<number>,
+		public topics: keyof typeof WebullMqtt.topics,
+		public options = {} as Partial<typeof WebullMqtt.options>,
 	) {
 		super()
 		_.defaults(this.options, WebullMqtt.options)
@@ -44,9 +44,9 @@ export default class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disc
 	}
 
 	tdict: Dict<string>
-	socket: MqttConnection
+	client: MqttConnection
 
-	private _nextId() { return core.math.random(1, 999) }
+	private nextId() { return core.math.random(1, 999) }
 
 	destroy() {
 		this.terminate()
@@ -54,23 +54,21 @@ export default class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disc
 	}
 
 	terminate() {
-		if (this.socket) {
-			this.socket.destroy()
-			this.socket.removeAllListeners()
-			this.socket = null
+		if (this.client) {
+			this.client.destroy()
+			this.client.removeAllListeners()
+			this.client = null
 		}
 	}
 
-	private _reconnect() {
-		clock.offListener(this._connect)
-		clock.once(this.options.timeout, this._connect)
+	private reconnect() {
+		clock.offListener(this.connect, this)
+		clock.once(this.options.timeout, this.connect, this)
 	}
-
-	private _connect = () => this.connect()
 	connect() {
 		this.terminate()
-		this.socket = new MqttConnection(net.connect(this.options.port, this.options.host))
-		this.socket.connect({
+		this.client = new MqttConnection(net.connect(this.options.port, this.options.host))
+		this.client.connect({
 			username: process.env.WEBULL_DID,
 			password: process.env.WEBULL_TOKEN,
 			clientId: 'mqtt_' + Math.random().toString(),
@@ -79,16 +77,16 @@ export default class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disc
 			keepalive: 60,
 			clean: true,
 		})
-		this.socket.on('data', this._ondata)
-		this.socket.on('error', this._onerror)
-		this._reconnect()
+		this.client.on('data', this._ondata)
+		this.client.on('error', this._onerror)
+		this.reconnect()
 	}
 
 	private _ondata = (packet: Mqtt.Packet) => {
 
 		if (packet.cmd == 'connack') {
 			if (this.options.verbose) console.info(this.name, '-> connect');
-			clock.offListener(this._connect)
+			clock.offListener(this.connect, this)
 			this.emit('connect')
 
 			this.tdict = _.invert(this.fsymbols)
@@ -108,7 +106,7 @@ export default class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disc
 			let subscriptions = topics.map(type => ({
 				topic: JSON.stringify(Object.assign(topic, { type })), qos: 0,
 			}))
-			this.socket.subscribe({ subscriptions, messageId: this._nextId() })
+			this.client.subscribe({ subscriptions, messageId: this.nextId() })
 
 			return
 		}
@@ -121,7 +119,7 @@ export default class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disc
 
 		if (packet.cmd == 'disconnect') {
 			if (this.options.verbose) console.warn(this.name, '-> disconnect');
-			if (this.options.retry) this._reconnect();
+			if (this.options.retry) this.reconnect();
 			this.emit('disconnect')
 			return
 		}
