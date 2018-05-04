@@ -29,9 +29,9 @@ interface ProcEnv extends Partial<NodeJS.ProcessEnv> { [key: string]: any }
 
 function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv) {
 	_.defaults(env, PROC_ENV)
-	// let pname = chain.name()
+	let pname = chain.name()
 	return (chain
-		// .entry(`./${pname}/_${pname}.main`)
+		.entry(`./${pname}/${pname}`)
 		.nodeArgs(['--no-warnings', '--expose-gc', '--max_old_space_size=2048'])
 		.env(env).scale(env.INSTANCES)
 	)
