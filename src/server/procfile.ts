@@ -27,12 +27,14 @@ interface ProcEnv extends Partial<NodeJS.ProcessEnv> { [key: string]: any }
 
 
 
+let order = 1
 function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv) {
 	_.defaults(env, PROC_ENV)
 	return (chain
-		.entry(`./${chain.name()}/${chain.name()}`)
+		.entry(`./${chain.name()}`)
 		.nodeArgs(['--no-warnings', '--expose-gc', '--max_old_space_size=2048'])
 		.env(env).scale(env.INSTANCES)
+		.order(order++)
 	)
 }
 
@@ -40,16 +42,16 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as ProcEnv)
 
 export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
-	Process(pandora.process('api').order(1), {
-		// INSTANCES: os.cpus().length,
+	Process(pandora.process('app'), {
+		INSTANCES: os.cpus().length,
 		DEBUGGER: false,
 	})
 
-	if (PROC_ENV.BENCHMARK) {
-		Process(pandora.process('benchmarks').order(2), {
-			INSTANCES: 3, DEBUGGER: false,
-		})
-	}
+	// if (PROC_ENV.BENCHMARK) {
+	// 	Process(pandora.process('benchmarks'), {
+	// 		INSTANCES: 3, DEBUGGER: false,
+	// 	})
+	// }
 
 
 

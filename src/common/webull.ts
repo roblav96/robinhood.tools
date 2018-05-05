@@ -1,6 +1,5 @@
 // 
 
-import { DateTime } from 'luxon'
 import * as _ from './lodash'
 import * as core from './core'
 
@@ -79,31 +78,6 @@ export enum MQTT_TOPICS {
 	TICKER_BID_ASK = 14,
 	TICKER_DEAL_DETAILS = 15,
 	MARKET_ETFS = 16,
-}
-
-
-
-export function fixQuote(quote: Webull.Quote) {
-	if (quote.status) quote.status = TICKER_STATUS[quote.status];
-
-	if (quote.faTradeTime) quote.faTradeTime = DateTime.fromISO(quote.faTradeTime as any).valueOf();
-	if (quote.mktradeTime) quote.mktradeTime = DateTime.fromISO(quote.mktradeTime as any).valueOf();
-	if (quote.tradeTime) quote.tradeTime = DateTime.fromISO(quote.tradeTime as any).valueOf();
-	// if (quote.nextEarningDay) quote.nextEarningDay = DateTime.fromISO(quote.nextEarningDay as any).valueOf();
-
-	if (Array.isArray(quote.bidList) && quote.bidList.length > 0) {
-		quote.bidList.forEach(v => core.fix(v))
-		quote.bid = _.max(_.compact(quote.bidList.map(v => v.price)))
-		quote.bidSize = _.sum(quote.bidList.map(v => v.volume).concat(0))
-	}
-	delete quote.bidList
-	if (Array.isArray(quote.askList) && quote.askList.length > 0) {
-		quote.askList.forEach(v => core.fix(v))
-		quote.ask = _.min(_.compact(quote.askList.map(v => v.price)))
-		quote.askSize = _.sum(quote.askList.map(v => v.volume).concat(0))
-	}
-	delete quote.askList
-
 }
 
 

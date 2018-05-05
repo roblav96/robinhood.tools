@@ -1,26 +1,11 @@
 // 
 
-import * as net from 'net'
-import * as Mqtt from 'mqtt'
-import * as MqttConnection from 'mqtt-connection'
-import * as qs from 'querystring'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as http from '../adapters/http'
 import * as redis from '../adapters/redis'
 import * as webull from '../adapters/webull'
-import * as rhinstruments from './robinhood.instruments'
-
-
-
-export const mqtt = new webull.MqttWatcher({
-	connect: false,
-	// verbose: true,
-	// debug: process.PRIMARY,
-})
-mqtt.on('quote', function(quote) {
-	// console.log('quote ->', quote)
-})
+import * as rhinstruments from './symbols.service'
 
 
 
@@ -49,21 +34,7 @@ async function onLiveTickers() {
 
 
 
-	// let fsymbols = {} as Dict<number>
-	// // // let cryptos = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/8', {
-	// // // 	query: {}
-	// // // }) as Webull.API.TupleArrayList<Webull.Ticker>[]
-	// // // cryptos[0].tickerTupleArrayList.forEach(function(ticker) {
-	// let forex = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/3/foreignExchanges/1', {
-	// 	query: { regionIds: '1', hl: 'en', }
-	// }) as Webull.Ticker[]
-	// forex.forEach(function(ticker) {
-	// 	fsymbols[ticker.symbol] = ticker.tickerId
-	// })
-
 }
-
-
 
 
 

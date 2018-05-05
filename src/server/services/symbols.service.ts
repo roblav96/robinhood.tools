@@ -15,13 +15,16 @@ import clock from '../../common/clock'
 
 
 export const rxready = new Rx.ReadySubject()
-if (process.env.PRIMARY) {
-	
-}
+
+readySymbols().catch(function(error) {
+	console.error('readySymbols Error ->', error)
+}).finally(function() {
+	rxready.next()
+})
 
 
 
-async function readyInstruments() {
+async function readySymbols() {
 	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
 	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
 
@@ -39,7 +42,7 @@ async function readyInstruments() {
 
 	await chunkSymbols()
 
-	console.info('readyInstruments -> done')
+	console.info('readySymbols -> done')
 
 }
 
@@ -49,12 +52,12 @@ async function chunkSymbols() {
 
 	let tickerIds = await redis.main.hgetall(redis.WB.TICKER_IDS)
 	let tpairs = _.toPairs(tickerIds).sort()
-	let chunks = core.array.chunks(tpairs, process.env.INSTANCES)
+	let chunks = core.array.chunks(tpairs, process.env.CPUS)
 
 	let coms = chunks.map(function(chunk, i) {
 		chunk.forEach(v => v[1] = Number.parseInt(v[1] as any))
 		let fpairs = JSON.stringify(_.fromPairs(chunk))
-		return ['set', `${redis.SYMBOLS.STOCKS}:${process.env.INSTANCES}:${i}`, fpairs]
+		return ['set', `${redis.SYMBOLS}:${process.env.CPUS}:${i}`, fpairs]
 	})
 	await redis.main.coms(coms as any)
 
@@ -82,7 +85,6 @@ async function syncInstruments() {
 			coms.push(['hmset', `${redis.RH.INSTRUMENTS}:${v.symbol}`, v as any])
 		})
 		symbols.merge(coms)
-
 		await redis.main.coms(coms)
 		return response.next || pForever.end
 
@@ -92,7 +94,7 @@ async function syncInstruments() {
 
 	await chunkSymbols()
 
-	// console.info('syncInstruments -> done')
+	console.info('syncInstruments -> done')
 
 }
 
@@ -111,19 +113,19 @@ async function syncTickerIds() {
 		})
 	]
 
-	if (process.env.PRODUCTION) {
-		// funds
-		proms.push(http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/14', {
-			query: { pageSize: 999999 }
-		}))
-	}
+	// if (process.env.PRODUCTION) {
+	// 	// funds
+	// 	proms.push(http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/14', {
+	// 		query: { pageSize: 999999 }
+	// 	}))
+	// }
 
 	let tickers = _.flatten(await Promise.all(proms)) as Webull.Ticker[]
 	_.remove(tickers, v => Array.isArray(v.disSymbol.match(/[^A-Z-]/)))
 
 	// await radio.emitAll(onSyncTickerIds, tickers)
 
-	// console.info('syncTickerIds -> done')
+	console.info('syncTickerIds -> done')
 
 }
 
@@ -132,7 +134,7 @@ async function syncTickerIds() {
 // radio.onAll(onSyncTickerIds)
 async function onSyncTickerIds(done: string, tickers: Webull.Ticker[]) {
 
-	let symbols = core.array.chunks(await robinhood.getAllSymbols(), process.env.INSTANCES)[process.env.INSTANCE]
+	let symbols = core.array.chunks(await robinhood.getAllSymbols(), process.env.CPUS)[process.env.INSTANCE]
 	console.log('onSyncTickerIds symbols.length ->', symbols.length)
 
 	let disTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker) as Dict<Webull.Ticker[]>

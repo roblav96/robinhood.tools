@@ -7,10 +7,7 @@ export { WB } from './webull'
 
 
 
-export const SYMBOLS = {
-	SYMBOLS: 'symbols',
-	STOCKS: 'symbols:stocks',
-}
+export const SYMBOLS = 'symbols'
 
 export const BENCHMARKS = {
 	API: {

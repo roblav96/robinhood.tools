@@ -1,6 +1,4 @@
 // 
-export * from '../../common/webull'
-// 
 
 import * as net from 'net'
 import * as Mqtt from 'mqtt'
@@ -8,13 +6,13 @@ import * as MqttConnection from 'mqtt-connection'
 import * as qs from 'querystring'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
-import * as webull from '../../common/webull'
+import * as webull from './webull'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
 
 
 
-export default class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'data', Webull.Quote> {
+export class Watcher extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'data', Webull.Quote> {
 
 	private static topics = {
 		forex: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.MQTT_TOPICS>,
@@ -35,11 +33,11 @@ export default class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disc
 
 	constructor(
 		public fsymbols: Dict<number>,
-		public topics: keyof typeof WebullMqtt.topics,
-		public options = {} as Partial<typeof WebullMqtt.options>,
+		public topics: keyof typeof Watcher.topics,
+		public options = {} as Partial<typeof Watcher.options>,
 	) {
 		super()
-		_.defaults(this.options, WebullMqtt.options)
+		_.defaults(this.options, Watcher.options)
 		if (this.options.connect) this.connect();
 	}
 
@@ -100,7 +98,7 @@ export default class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disc
 			}
 			let topics = Object.keys(webull.MQTT_TOPICS).filter(v => !isNaN(v as any))
 			if (this.topics) {
-				topics = WebullMqtt.topics[this.topics].map(v => webull.MQTT_TOPICS[v].toString())
+				topics = Watcher.topics[this.topics].map(v => webull.MQTT_TOPICS[v].toString())
 			}
 
 			let subscriptions = topics.map(type => ({
@@ -153,7 +151,7 @@ export default class WebullMqtt extends Emitter<'connect' | 'subscribed' | 'disc
 
 	private _onerror = (error: Error) => {
 		console.error(this.name, 'onerror Error ->', error)
-		if (this.options.retry) this._reconnect();
+		if (this.options.retry) this.reconnect();
 	}
 
 }

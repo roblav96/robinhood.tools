@@ -1,9 +1,5 @@
 // 
 
-import '../main'
-
-import '../adapters/socket'
-
 import './polka'
 import './polka.request'
 import './polka.response'

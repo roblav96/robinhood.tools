@@ -1,31 +1,21 @@
 // 
 
-
-
-export const WS = {
-	ACT: '#',
-	SUBS: 'subs',
-}
+export { }
 
 
 
-
-
-import * as uws from 'uws'
 declare global {
 	namespace Socket {
-		interface Client extends uws.WebSocket {
-			subs: string[]
-			authed: boolean
-			doc: Security.Doc
-			onsub(message: string): void
-		}
 		interface Event<Data = any> {
 			name: string
 			data: Data
 			action: string
+			subs: string[]
 		}
 	}
 }
+
+
+
 
 

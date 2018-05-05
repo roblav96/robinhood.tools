@@ -1,32 +1,26 @@
 // 
-export * from '../../common/socket'
-// 
 
-import { WS } from '../../common/socket'
-import { PolkaRequest } from '../api/polka.request'
+export * from '../../common/socket'
 import * as exithook from 'exit-hook'
 import * as qs from 'querystring'
 import * as url from 'url'
-import * as os from 'os'
 import * as uws from 'uws'
 import * as cookie from 'cookie'
 import * as fastjsonparse from 'fast-json-parse'
 import * as redis from './redis'
 import * as security from './security'
+import { PolkaRequest } from '../api/polka.request'
 import Emitter from '../../common/emitter'
 
 
 
-class WebSocketServer extends uws.Server {
-	emitter = new Emitter()
-}
+const emitter = new Emitter()
 
-export const wss = new WebSocketServer({
+const wss = new uws.Server({
 	host: process.env.HOST,
-	port: +process.env.IPORT + os.cpus().length,
-	path: `/websocket/${process.env.INSTANCE}`,
+	port: +process.env.PORT + +process.env.CPUS + +process.env.INSTANCE,
 
-	verifyClient(incoming, next: Function) {
+	verifyClient(incoming, next: (allow: boolean, code?: number, message?: string) => void) {
 		let req = (incoming.req as any) as PolkaRequest
 		return Promise.resolve().then(function() {
 			req.authed = false
@@ -67,27 +61,22 @@ export const wss = new WebSocketServer({
 })
 
 wss.httpServer.timeout = 10000
-
-exithook(function onexit() { wss.close() })
-
-wss.on('listening', function onlistening() {
-	console.info('wss listening ->', process.env.HOST + ':' + wss.httpServer.address().port)
-})
-
-wss.on('error', function onerror(error) {
-	console.error('wss Error ->', error)
-})
+wss.on('error', error => console.error('wss Error ->', error))
+wss.on('listening', () => console.info('wss listening ->', process.env.HOST + ':' + wss.httpServer.address().port))
+wss.on('connection', onconnection)
+exithook(() => wss.close())
 
 
 
-wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequest) {
+interface Client extends uws.WebSocket {
+	subs: string[]
+	authed: boolean
+	doc: Security.Doc
+}
+function onconnection(client: Client, req: PolkaRequest) {
 	client.subs = []
 	client.authed = req.authed
 	client.doc = req.doc
-
-	client.onsub = function onsub(message) {
-		this.send(message)
-	}
 
 	client.on('message', function onmessage(message: string) {
 		if (message == 'pong') return;
@@ -101,30 +90,19 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 			let action = event.action
 
 			if (action == 'sync') {
-				this.subs.forEach(v => wss.emitter.off(v, this.onsub, this))
-				let subs = event.data as string[]
-				this.subs.splice(0, Infinity, ...subs)
-				this.subs.forEach(v => wss.emitter.on(v, this.onsub, this))
+				this.subs.forEach(v => emitter.off(v, this.send))
+				this.subs.splice(0, Infinity, ...event.subs)
+				this.subs.forEach(v => emitter.on(v, this.send))
 				return
 			}
 
 		}
-
-		// console.log('client event ->', event)
-
-		// if (message[0] == WS.ACT) {
-		// 	if (message.substr(1, WS.SUBS.length) == WS.SUBS) {
-		// 		client.subs = JSON.parse(message.substr(WS.SUBS.length + 1))
-		// 		return
-		// 	}
-		// }
-		// client.close(1003, 'Sending messages via the client not allowed!')
 	})
 
 	client.on('close', function onclose(code, reason) {
 		if (code != 1001) console.warn('client close ->', code, reason);
 		this.doc = null
-		this.subs.forEach(v => wss.emitter.off(v, this.onsub, this))
+		this.subs.forEach(v => emitter.off(v, this.send))
 		this.subs.splice(0)
 		this.terminate()
 		this.removeAllListeners()
@@ -132,10 +110,6 @@ wss.on('connection', function onconnection(client: Socket.Client, req: PolkaRequ
 
 	client.on('error', function onerror(error) { console.error('client Error ->', error) })
 
-})
-
-export function emit(name: string, data: any) {
-	wss.emitter.emit(name, data)
 }
 
 

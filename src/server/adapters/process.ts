@@ -16,9 +16,11 @@ if (process.env.PROJECT) {
 
 
 
+import * as os from 'os'
 import * as cluster from 'cluster'
 if (cluster.isMaster) process.env.MASTER = true;
 if (cluster.isWorker) process.env.WORKER = true;
+process.env.CPUS = process.env.CPUS || os.cpus().length
 process.env.INSTANCES = process.env.INSTANCES || 1
 process.env.INSTANCE = cluster.isWorker ? cluster.worker.id - 1 : 0;
 if (+process.env.INSTANCE == 0) process.env.PRIMARY = true;

@@ -1,8 +1,6 @@
 // 
-export * from '@/common/socket'
-// 
 
-import { WS } from '@/common/socket'
+export * from '@/common/socket'
 import WebSocketClient from '@/common/websocket.client'
 import Emitter, { Event, Listener } from '@/common/emitter'
 import * as _ from '@/common/lodash'
@@ -68,7 +66,7 @@ class Socket extends Emitter {
 	private resync = _.debounce(this.sync, 100, { leading: false, trailing: true })
 	private sync() {
 		let event = JSON.stringify({
-			action: 'sync', data: this.eventNames(),
+			action: 'sync', subs: this.eventNames(),
 		} as Socket.Event)
 		console.log('sync ->', event)
 		this.clients.forEach(v => v.send(event))
