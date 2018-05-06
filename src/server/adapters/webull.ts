@@ -4,7 +4,9 @@ export * from '../../common/webull'
 export * from './webull.mqtt'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
+import * as rkeys from '../../common/rkeys'
 import * as webull from '../../common/webull'
+import * as redis from './redis'
 import * as http from './http'
 
 
@@ -24,7 +26,7 @@ export function fixQuote(quote: Webull.Quote) {
 				price: Number.parseFloat(v.price as any),
 				volume: Number.parseInt(v.volume as any),
 			}))
-			quote.bid = _.max(bids.map(v => v.price).concat(quote.bid))
+			quote.bid = _.mean(bids.map(v => v.price))
 			quote.bidSize = _.sum(bids.map(v => v.volume).concat(0))
 		}
 		delete quote.bidList
@@ -36,7 +38,7 @@ export function fixQuote(quote: Webull.Quote) {
 				price: Number.parseFloat(v.price as any),
 				volume: Number.parseInt(v.volume as any),
 			}))
-			quote.ask = _.min(asks.map(v => v.price).concat(quote.ask))
+			quote.ask = _.mean(asks.map(v => v.price))
 			quote.askSize = _.sum(asks.map(v => v.volume).concat(0))
 		}
 		delete quote.askList
@@ -70,6 +72,21 @@ export async function getFullQuotes(fsymbols: Dict<number>) {
 
 export async function getTickers(fsymbols: Dict<number>) {
 	return await getChunked(fsymbols, 'https://securitiesapi.webull.com/api/securities/ticker/v2') as Webull.Ticker[]
+}
+
+export async function syncTickersQuotes(fsymbols: Dict<number>) {
+	let coms = [] as Redis.Coms
+	let wbquotes = await getFullQuotes(fsymbols)
+	wbquotes.forEach(function(v) {
+		let rkey = `${rkeys.WB.QUOTES}:${v.symbol}`
+		coms.push(['hmset', rkey, v as any])
+	})
+	let wbtickers = await getTickers(fsymbols)
+	wbtickers.forEach(function(v) {
+		let rkey = `${rkeys.WB.TICKERS}:${v.symbol}`
+		coms.push(['hmset', rkey, v as any])
+	})
+	await redis.main.coms(coms)
 }
 
 

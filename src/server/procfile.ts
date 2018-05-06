@@ -45,17 +45,17 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 		// DEBUGGER: false,
 	})
 
-	Process(pandora.process('stocks.watcher').entry('./watchers/stocks.watcher'), {
+	Process(pandora.process('stocks').entry('./stocks/stocks'), {
 		// SCALE: 2, // os.cpus().length,
 		// DEBUGGER: false,
 	})
 
-	Process(pandora.process('stocks.service').entry('./services/stocks.service'), {
+	Process(pandora.process('stocks.instruments').entry('./stocks/instruments'), {
 		SCALE: 1,
 		// DEBUGGER: false,
 	})
 
-	Process(pandora.fork('hours.service').entry('./services/hours.service'), {
+	Process(pandora.process('hours.service').entry('./services/hours.service'), {
 		SCALE: 1,
 		// DEBUGGER: false,
 	})

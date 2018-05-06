@@ -28,9 +28,10 @@ async function readyInstruments() {
 
 	let scard = await redis.main.scard(rkeys.RH.SYMBOLS)
 	let hlen = await redis.main.hlen(rkeys.WB.TICKER_IDS)
+	let exists = await redis.main.exists(`${rkeys.STOCKS.SYMBOLS}:${process.env.CPUS}:${process.env.INSTANCE}`) as number
 	if (scard < 10000 || hlen < 10000) {
 		await syncInstruments()
-	} else {
+	} else if (exists != 1) {
 		await chunkSymbols()
 	}
 
@@ -60,7 +61,7 @@ async function chunkSymbols() {
 	})
 	await redis.main.coms(coms as any)
 
-	pandora.broadcast({}, 'onsymbols')
+	pandora.broadcast({}, 'onSymbols')
 
 	// if (process.env.DEVELOPMENT) console.info('chunkSymbols -> done');
 
