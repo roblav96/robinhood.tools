@@ -11,6 +11,7 @@ import * as pAll from 'p-all'
 import * as Table from 'cli-table2'
 import * as Pandora from 'pandora'
 import * as core from '../../common/core'
+import * as rkeys from '../../common/rkeys'
 import * as pretty from '../../common/pretty'
 import * as security from '../../common/security'
 import * as wrk from './wrk'
@@ -73,12 +74,12 @@ async function start() {
 		])
 	})
 
-	let previous = await redis.main.get(redis.BENCHMARKS.API.PREVIOUS)
+	let previous = await redis.main.get(rkeys.BENCHMARKS.API.PREVIOUS)
 	if (previous) process.stdout.write('\r\n' + previous + '\r\n\r\n');
 	let output = table.toString()
 
 	process.stdout.write('\r\n' + output + '\r\n\r\n')
-	redis.main.set(redis.BENCHMARKS.API.PREVIOUS, output)
+	redis.main.set(rkeys.BENCHMARKS.API.PREVIOUS, output)
 
 }
 

@@ -1,12 +1,15 @@
 // 
 
 import '../main'
+import '../adapters/socket'
 import * as pAll from 'p-all'
 import * as pForever from 'p-forever'
 import * as path from 'path'
+import * as Pandora from 'pandora'
 import * as _ from '../../common/lodash'
 import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
+import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
@@ -20,22 +23,18 @@ readyInstruments().catch(function(error) {
 })
 
 async function readyInstruments() {
-	// if (DEVELOPMENT) await redis.main.purge(redis.RH.RH);
-	// if (DEVELOPMENT) await redis.main.purge(redis.WB.WB);
+	// if (DEVELOPMENT) await redis.main.purge(rkeys.RH.RH);
+	// if (DEVELOPMENT) await redis.main.purge(rkeys.WB.WB);
 
-	let scard = await redis.main.scard(redis.RH.SYMBOLS)
-	console.log(redis.RH.SYMBOLS, scard)
-
-	let hlen = await redis.main.hlen(redis.WB.TICKER_IDS)
-	console.log(redis.WB.TICKER_IDS, hlen)
-
+	let scard = await redis.main.scard(rkeys.RH.SYMBOLS)
+	let hlen = await redis.main.hlen(rkeys.WB.TICKER_IDS)
 	if (scard < 10000 || hlen < 10000) {
 		await syncInstruments()
 	} else {
 		await chunkSymbols()
 	}
 
-	console.info('readyInstruments -> done')
+	// if (process.env.DEVELOPMENT) console.info('readyInstruments -> done');
 
 }
 
@@ -43,27 +42,27 @@ async function readyInstruments() {
 
 async function chunkSymbols() {
 
-	let tickerIds = await redis.main.hgetall(redis.WB.TICKER_IDS) as Dict<number>
+	let tickerIds = await redis.main.hgetall(rkeys.WB.TICKER_IDS) as Dict<number>
 	tickerIds = _.mapValues(tickerIds, v => Number.parseInt(v as any))
 	let tpairs = _.toPairs(tickerIds).sort()
 
 	let coms = [
-		['set', redis.STOCKS.SYMBOLS, JSON.stringify(tpairs.map(v => v[0]))],
-		['set', redis.STOCKS.FSYMBOLS, JSON.stringify(_.fromPairs(tpairs))],
+		['set', rkeys.STOCKS.SYMBOLS, JSON.stringify(tpairs.map(v => v[0]))],
+		['set', rkeys.STOCKS.FSYMBOLS, JSON.stringify(_.fromPairs(tpairs))],
 	] as Redis.Coms
 
 	let chunks = core.array.chunks(tpairs, +process.env.CPUS)
 	chunks.forEach(function(chunk, i) {
 		let symbols = JSON.stringify(chunk.map(v => v[0]))
-		coms.push(['set', `${redis.STOCKS.SYMBOLS}:${process.env.CPUS}:${i}`, symbols])
+		coms.push(['set', `${rkeys.STOCKS.SYMBOLS}:${process.env.CPUS}:${i}`, symbols])
 		let fpairs = JSON.stringify(_.fromPairs(chunk))
-		coms.push(['set', `${redis.STOCKS.FSYMBOLS}:${process.env.CPUS}:${i}`, fpairs])
+		coms.push(['set', `${rkeys.STOCKS.FSYMBOLS}:${process.env.CPUS}:${i}`, fpairs])
 	})
 	await redis.main.coms(coms as any)
 
 	pandora.broadcast({}, 'chunkSymbols')
 
-	console.info('chunkSymbols -> done')
+	// if (process.env.DEVELOPMENT) console.info('chunkSymbols -> done');
 
 }
 
@@ -80,13 +79,13 @@ async function syncInstruments() {
 		}
 
 		let coms = [] as Redis.Coms
-		let symbols = new redis.SetsComs(redis.RH.SYMBOLS)
+		let symbols = new redis.SetsComs(rkeys.RH.SYMBOLS)
 		response.results.forEach(function(v) {
 			symbols.sadd(v.symbol)
 			v.mic = _.compact(v.market.split('/')).pop()
 			v.acronym = robinhood.MICS[v.mic]
 			v.alive = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
-			coms.push(['hmset', `${redis.RH.INSTRUMENTS}:${v.symbol}`, v as any])
+			coms.push(['hmset', `${rkeys.RH.INSTRUMENTS}:${v.symbol}`, v as any])
 		})
 		symbols.merge(coms)
 		await redis.main.coms(coms)
@@ -98,7 +97,7 @@ async function syncInstruments() {
 
 	await chunkSymbols()
 
-	console.info('syncInstruments -> done')
+	if (process.env.DEVELOPMENT) console.info('syncInstruments -> done');
 
 }
 
@@ -121,22 +120,21 @@ async function syncTickerIds() {
 		// }),
 	])) as Webull.Ticker[]
 	_.remove(tickers, v => Array.isArray(v.disSymbol.match(/[^A-Z-]/)))
-	console.log('tickers.length ->', tickers.length)
 
 	let disTickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker) as Dict<Webull.Ticker[]>
-	let symbols = (await redis.main.smembers(`${redis.RH.SYMBOLS}`) as string[]).sort()
+	let symbols = (await redis.main.smembers(`${rkeys.RH.SYMBOLS}`) as string[]).sort()
 	await pAll(symbols.map(symbol => {
 		return () => syncTickerId(symbol, disTickers[symbol])
 	}), { concurrency: 1 })
 
-	console.info('syncTickerIds -> done')
+	if (process.env.DEVELOPMENT) console.info('syncTickerIds -> done');
 
 }
 
 async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 	// if (DEVELOPMENT) console.log('syncTickerId ->', symbol);
 
-	let instrument = await redis.main.hgetall(`${redis.RH.INSTRUMENTS}:${symbol}`) as Robinhood.Instrument
+	let instrument = await redis.main.hgetall(`${rkeys.RH.INSTRUMENTS}:${symbol}`) as Robinhood.Instrument
 	core.fix(instrument)
 	// console.warn('instrument ->', _.pick(instrument, ['symbol', 'valid', 'name', 'simple_name', 'country', 'acronym'] as KeysOf<Robinhood.Instrument>))
 
@@ -190,9 +188,23 @@ async function syncTickerId(symbol: string, tickers = [] as Webull.Ticker[]) {
 
 	}
 
-	await redis.main.hset(redis.WB.TICKER_IDS, symbol, ticker.tickerId)
+	await redis.main.hset(rkeys.WB.TICKER_IDS, symbol, ticker.tickerId)
 
 }
+
+
+
+
+
+// export default class {
+// 	start() {
+// 		console.log('start')
+// 	}
+// 	stop() {
+// 		console.log('stop')
+// 		return true
+// 	}
+// }
 
 
 

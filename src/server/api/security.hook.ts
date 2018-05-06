@@ -2,6 +2,7 @@
 
 import { PolkaRequest } from './polka.request'
 import * as core from '../../common/core'
+import * as rkeys from '../../common/rkeys'
 import * as security from '../adapters/security'
 import * as redis from '../adapters/redis'
 import * as url from 'url'
@@ -29,7 +30,7 @@ polka.use(function(req, res, next) {
 	req.doc = doc
 
 	if (!req.doc.token) return next();
-	redis.main.hget(`security:doc:${req.doc.uuid}`, 'prime').then(function(prime) {
+	redis.main.hget(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, 'prime').then(function(prime) {
 		if (prime) req.authed = req.doc.token == security.token(req.doc, prime);
 		next()
 	}).catch(next)

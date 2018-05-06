@@ -8,6 +8,7 @@ import * as core from './core'
 export const WB = {
 	WB: 'wb',
 	TICKER_IDS: 'wb:tickerids',
+	QUOTES: 'wb:quotes',
 }
 
 
@@ -147,6 +148,14 @@ declare global {
 
 		interface Quote {
 			[key: string]: any
+			appNonETFData: {
+				change: number
+				changeRatio: number
+				cumulativeNetValue: number
+				netDate: string
+				netValue: number
+				threeMonthChangeRatio: number
+			}
 			ask: number
 			askList: Array<{ price: number, volume: number }>
 			askSize: number
@@ -170,7 +179,9 @@ declare global {
 			dividend: number
 			eps: number
 			exchangeId: number
+			extType: string[]
 			faceValue: number
+			faStatus: string
 			faTradeTime: number
 			fiftyTwoWkHigh: number
 			fiftyTwoWkHighCalc: number

@@ -2,7 +2,9 @@
 
 export { }
 
-Array.prototype.forEach = function(fn, arg) {
+
+
+Array.prototype.forEach = function forEach(fn, arg) {
 	let array = this
 	let len = array.length
 	let i: number
@@ -20,7 +22,7 @@ Array.prototype.forEach = function(fn, arg) {
 	}
 }
 
-Array.prototype.map = function(fn, arg) {
+Array.prototype.map = function map(fn, arg) {
 	let array = this
 	let len = array.length
 	let i: number
@@ -40,7 +42,7 @@ Array.prototype.map = function(fn, arg) {
 	return mapped
 }
 
-Array.prototype.filter = function(fn, arg) {
+Array.prototype.filter = function filter(fn, arg) {
 	let array = this
 	let len = array.length
 	let i: number
@@ -60,7 +62,7 @@ Array.prototype.filter = function(fn, arg) {
 	return filtered
 }
 
-Array.prototype.find = function(fn, arg) {
+Array.prototype.find = function find(fn, arg) {
 	let array = this
 	let len = array.length
 	let i: number
@@ -77,6 +79,30 @@ Array.prototype.find = function(fn, arg) {
 		}
 	}
 	return undefined
+}
+
+Array.prototype.remove = function remove(fn, arg) {
+	let array = this
+	let len = array.length
+	let i: number
+	if (!arg) {
+		for (i = len; i--;) {
+			let value = array[i]
+			if (fn(value, i, array)) array.splice(i, 1);
+		}
+	} else {
+		let ctx = arg
+		for (i = len; i--;) {
+			let value = array[i]
+			if (fn.call(ctx, value, i, array)) array.splice(i, 1);
+		}
+	}
+}
+
+declare global {
+	interface Array<T> {
+		remove(fn: (value: T, index: number, array: Array<T>) => boolean, thisArg?: any): void
+	}
 }
 
 

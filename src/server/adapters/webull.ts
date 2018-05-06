@@ -2,7 +2,6 @@
 
 export * from '../../common/webull'
 export * from './webull.mqtt'
-import { DateTime } from 'luxon'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as webull from '../../common/webull'
@@ -11,32 +10,46 @@ import * as http from './http'
 
 
 export function fixQuote(quote: Webull.Quote) {
+	if (quote.faStatus) quote.faStatus = webull.TICKER_STATUS[quote.faStatus];
 	if (quote.status) quote.status = webull.TICKER_STATUS[quote.status];
 
-	if (quote.faTradeTime) quote.faTradeTime = DateTime.fromISO(quote.faTradeTime as any).valueOf();
-	if (quote.mktradeTime) quote.mktradeTime = DateTime.fromISO(quote.mktradeTime as any).valueOf();
-	if (quote.tradeTime) quote.tradeTime = DateTime.fromISO(quote.tradeTime as any).valueOf();
-	// if (quote.nextEarningDay) quote.nextEarningDay = DateTime.fromISO(quote.nextEarningDay as any).valueOf();
+	if (quote.faTradeTime) quote.faTradeTime = new Date(quote.faTradeTime).valueOf();
+	if (quote.mktradeTime) quote.mktradeTime = new Date(quote.mktradeTime).valueOf();
+	if (quote.tradeTime) quote.tradeTime = new Date(quote.tradeTime).valueOf();
 
-	if (Array.isArray(quote.bidList) && quote.bidList.length > 0) {
-		quote.bidList.forEach(v => core.fix(v))
-		quote.bid = _.max(_.compact(quote.bidList.map(v => v.price)))
-		quote.bidSize = _.sum(quote.bidList.map(v => v.volume).concat(0))
+	if (quote.bid == 0) delete quote.bid;
+	if (Array.isArray(quote.bidList)) {
+		if (quote.bidList.length > 0) {
+			let bids = quote.bidList.map(v => ({
+				price: Number.parseFloat(v.price as any),
+				volume: Number.parseInt(v.volume as any),
+			}))
+			quote.bid = _.max(bids.map(v => v.price).concat(quote.bid))
+			quote.bidSize = _.sum(bids.map(v => v.volume).concat(0))
+		}
+		delete quote.bidList
 	}
-	delete quote.bidList
-	if (Array.isArray(quote.askList) && quote.askList.length > 0) {
-		quote.askList.forEach(v => core.fix(v))
-		quote.ask = _.min(_.compact(quote.askList.map(v => v.price)))
-		quote.askSize = _.sum(quote.askList.map(v => v.volume).concat(0))
+	if (quote.ask == 0) delete quote.ask;
+	if (Array.isArray(quote.askList)) {
+		if (quote.askList.length > 0) {
+			let asks = quote.askList.map(v => ({
+				price: Number.parseFloat(v.price as any),
+				volume: Number.parseInt(v.volume as any),
+			}))
+			quote.ask = _.min(asks.map(v => v.price).concat(quote.ask))
+			quote.askSize = _.sum(asks.map(v => v.volume).concat(0))
+		}
+		delete quote.askList
 	}
-	delete quote.askList
 
 }
 
 
 
-export async function getFullQuotes(tickerIds: number[]) {
-	let chunks = core.array.chunks(tickerIds, _.ceil(tickerIds.length / 512))
+export async function getFullQuotes(fsymbols: Dict<number>) {
+	let inverse = _.invert(fsymbols)
+	let tids = Object.values(fsymbols)
+	let chunks = core.array.chunks(tids, _.ceil(tids.length / 512))
 	let quotes = _.flatten(await Promise.all(chunks.map(function(chunk) {
 		return http.get('https://quoteapi.webull.com/api/quote/tickerRealTimes/full', {
 			query: { tickerIds: chunk.join(','), hl: 'en', },
@@ -46,6 +59,7 @@ export async function getFullQuotes(tickerIds: number[]) {
 	quotes.forEach(function(quote) {
 		core.fix(quote)
 		fixQuote(quote)
+		quote.symbol = inverse[quote.tickerId]
 	})
 	return quotes
 }

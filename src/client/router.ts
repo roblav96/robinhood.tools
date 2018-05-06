@@ -13,14 +13,19 @@ export const routes = [
 		component: () => import('@/client/routes/home/home'),
 	},
 
+	// {
+	// 	title: 'Portfolio', icon: 'chart-pie',
+	// 	name: 'portfolio', path: '/portfolio',
+	// },
+
 	{
-		title: 'Portfolio', icon: 'chart-pie',
-		name: 'portfolio', path: '/portfolio',
+		title: 'Watchlist', icon: 'wunderlist',
+		name: 'watchlist', path: '/watchlist',
 	},
 
 	{
-		title: 'Indexes', icon: 'earth',
-		name: 'indexes', path: '/indexes',
+		title: 'Markets', icon: 'earth',
+		name: 'markets', path: '/markets',
 	},
 
 	{
@@ -28,10 +33,10 @@ export const routes = [
 		name: 'screener', path: '/screener',
 	},
 
-	{
-		title: 'News', icon: 'newspaper',
-		name: 'news', path: '/news',
-	},
+	// {
+	// 	title: 'News', icon: 'newspaper',
+	// 	name: 'news', path: '/news',
+	// },
 
 	{
 		name: 'login', path: '/login',

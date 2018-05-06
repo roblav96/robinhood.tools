@@ -33,8 +33,7 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as Env) {
 	return (chain
 		// .entry(`./${chain.name()}/${chain.name()}.main`)
 		.nodeArgs(['--no-warnings', '--expose-gc', '--max_old_space_size=2048'])
-		.env(env).scale(env.SCALE)
-		.order(order++)
+		.env(env).scale(env.SCALE).order(order++)
 	)
 }
 
@@ -43,12 +42,12 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as Env) {
 export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
 	Process(pandora.process('api').entry('./api/api'), {
-		// SCALE: os.cpus().length,
+		// SCALE: 2, // os.cpus().length,
 		// DEBUGGER: false,
 	})
 
 	Process(pandora.process('stocks.watcher').entry('./watchers/stocks.watcher'), {
-		// SCALE: os.cpus().length,
+		// SCALE: 2, // os.cpus().length,
 		// DEBUGGER: false,
 	})
 
@@ -57,10 +56,16 @@ export default function procfile(pandora: ProcfileReconcilerAccessor) {
 		// DEBUGGER: false,
 	})
 
-	Process(pandora.process('hours.service').entry('./services/hours.service'), {
+	Process(pandora.fork('hours.service').entry('./services/hours.service'), {
 		SCALE: 1,
 		// DEBUGGER: false,
 	})
+
+	// Process(pandora.process('services'), {
+
+	// })
+	// pandora.service('hours.service', './services/hours.service').process('services').publish(true)
+	// pandora.service('stocks.service', './services/stocks.service').process('services').publish(true)
 
 	// if (ENV.BENCHMARK) {
 	// 	Process(pandora.process('benchmarks'), {
@@ -80,6 +85,11 @@ export default function procfile(pandora: ProcfileReconcilerAccessor) {
 
 
 // import * as exithook from 'exit-hook'
+// exithook(function(code) {
+// 	console.log('code ->', code)
+// 	// console.log('signal ->', signal)
+// 	// process.kill(process.pid, code || signal)
+// })
 // exithook(() => process.nextTick(() => process.kill(process.pid, 123)))
 // process.on('SIGTERM', () => process.kill(process.pid, 123))
 // process.on('SIGTERM', () => process.exit(1))

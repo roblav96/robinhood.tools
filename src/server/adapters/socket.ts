@@ -1,7 +1,7 @@
 // 
 
 export * from '../../common/socket'
-import { WS } from '../../common/socket'
+import * as rkeys from '../../common/rkeys'
 import * as exithook from 'exit-hook'
 import * as qs from 'querystring'
 import * as url from 'url'
@@ -19,7 +19,8 @@ import Emitter from '../../common/emitter'
 const wss = new uws.Server({
 	host: process.env.HOST,
 	// port: +process.env.IPORT,
-	port: +process.env.PORT + +process.env.CPUS + +process.env.INSTANCE,
+	// port: +process.env.PORT + +process.env.CPUS + +process.env.INSTANCE,
+	port: +process.env.PORT + +process.env.CPUS + +process.env.OFFSET + +process.env.INSTANCE,
 
 	verifyClient(incoming, next: (allow: boolean, code?: number, message?: string) => void) {
 		let req = (incoming.req as any) as PolkaRequest
@@ -48,7 +49,7 @@ const wss = new uws.Server({
 			req.doc = doc
 
 			if (!req.doc.token) return next(true);
-			return redis.main.hget(`security:doc:${req.doc.uuid}`, 'prime').then(function(prime) {
+			return redis.main.hget(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, 'prime').then(function(prime) {
 				if (prime) req.authed = req.doc.token == security.token(req.doc, prime);
 				next(true)
 			})
@@ -69,14 +70,14 @@ wss.on('error', function(error) {
 
 wss.on('listening', function() {
 	let address = wss.httpServer.address()
-	redis.main.sadd(WS.DISCOVER, address.port)
+	redis.main.sadd(rkeys.WS.DISCOVER, address.port)
 	console.info('wss listening ->', address.port)
 })
 
 wss.on('connection', onconnection)
 
 exithook(function() {
-	redis.main.srem(WS.DISCOVER, wss.httpServer.address().port)
+	redis.main.srem(rkeys.WS.DISCOVER, wss.httpServer.address().port)
 	wss.close()
 })
 
@@ -89,12 +90,16 @@ interface Client extends uws.WebSocket {
 	authed: boolean
 	id: string
 	uuid: string
+	// json(data: any): void
 }
 function onconnection(client: Client, req: PolkaRequest) {
 	client.subs = []
 	client.authed = req.authed
 	client.id = req.doc.id
 	client.uuid = req.doc.uuid
+	// client.json = function json(data) {
+	// 	this.send(JSON.stringify(data))
+	// }
 
 	client.on('message', function onmessage(message: string) {
 		if (message == 'pong') return;
@@ -128,8 +133,14 @@ function onconnection(client: Client, req: PolkaRequest) {
 
 }
 
-const { emit } = emitter
-export { emit }
+export function emit(name: string, data?: any) {
+	let count = emitter.listenerCount(name)
+	if (count == 0) return;
+	emitter.emit(name, JSON.stringify(data))
+}
+
+// const { emit } = emitter
+// export { emit }
 
 
 

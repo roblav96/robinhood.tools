@@ -91,7 +91,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private heartbeat() { this.send('ping') }
 	private reconnect() {
 		clock.offListener(this.connect, this)
-		clock.on(this.options.timeout, this.connect, this)
+		clock.once(this.options.timeout, this.connect, this)
 	}
 
 	connect() {
@@ -109,6 +109,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private onopen = (event: Event) => {
 		if (this.options.verbose) console.info(this.name, 'onopen');
 		this.emit('open', event)
+		clock.offListener(this.connect, this)
 		if (this.options.heartbeat) {
 			clock.offListener(this.heartbeat, this)
 			clock.on(this.options.heartbeat, this.heartbeat, this)

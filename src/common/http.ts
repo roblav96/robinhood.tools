@@ -50,7 +50,8 @@ export function send(config: Http.Config) {
 			if (error && !res) return reject(error);
 			if (data) {
 				data = data.toString()
-				if (res.headers['content-type'].includes('application/json')) {
+				let type = res.headers['content-type']
+				if (type && type.includes('application/json')) {
 					let parsed = fastjsonparse(data)
 					if (parsed.value) data = parsed.value;
 				}

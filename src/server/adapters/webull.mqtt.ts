@@ -3,7 +3,6 @@
 import * as net from 'net'
 import * as Mqtt from 'mqtt'
 import * as MqttConnection from 'mqtt-connection'
-import * as exithook from 'exit-hook'
 import * as qs from 'querystring'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
@@ -13,7 +12,7 @@ import clock from '../../common/clock'
 
 
 
-export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'data', Webull.Quote> {
+export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'quote', Webull.Quote> {
 
 	private static topics = {
 		forex: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.MQTT_TOPICS>,
@@ -40,7 +39,6 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 		super()
 		_.defaults(this.options, MqttClient.options)
 		if (this.options.connect) this.connect();
-		exithook(() => this.destroy())
 	}
 
 	tdict: Dict<string>
@@ -127,11 +125,20 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 
 		if (packet.cmd == 'publish') {
 			let topic = (qs.parse(packet.topic) as any) as Webull.Mqtt.Topic
-			let symbol = this.tdict[topic.tid]
-			let tid = Number.parseInt(topic.tid)
-
 			let payload = JSON.parse(packet.payload.toString()) as Webull.Mqtt.Payload<Webull.Quote>
-			if (!Array.isArray(payload.data) || payload.data.length == 0) return;
+
+			let type = Number.parseInt(topic.type)
+			if (type == webull.MQTT_TOPICS.TICKER_BID_ASK) {
+				payload.data.remove(quote => {
+					if (Array.isArray(quote.bidList) && quote.bidList.length == 0) return true;
+					if (Array.isArray(quote.askList) && quote.askList.length == 0) return true;
+					return Object.keys(quote).length == 0
+				})
+			}
+			if (payload.data.length == 0) return;
+
+			let tid = Number.parseInt(topic.tid)
+			let symbol = this.tdict[topic.tid]
 
 			let i: number, len = payload.data.length
 			for (i = 0; i < len; i++) {
@@ -141,8 +148,8 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 				quote.tickerId = tid
 				quote.symbol = symbol
 				quote.topic = webull.MQTT_TOPICS[topic.type]
-				// console.log('data ->', quote)
-				this.emit('data', quote)
+				if (this.options.verbose) console.log('data ->', quote);
+				this.emit('quote', quote)
 			}
 
 			return

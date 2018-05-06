@@ -46,8 +46,23 @@ process.on('unhandledRejection', function(error) {
 
 
 // import * as exithook from 'exit-hook'
-// exithook(() => process.nextTick(() => process.kill(process.pid, 123)))
-// process.on('SIGTERM', () => process.kill(process.pid, 123))
-// process.on('SIGTERM', () => process.exit(1))
+// exithook(function() {
+// 	// console.log('code ->', code)
+// 	// console.log('signal ->', signal)
+// 	// process.kill(process.pid, code || signal)
+// })
+// exithook(() => process.kill(process.pid))
+// process.on('SIGTERM', () => process.kill(process.pid, 143))
+// process.on('SIGTERM', () => process.exit(143))
+
+// const sigs = [
+// 	'SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
+// 	'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM',
+// ]
+// sigs.forEach(function(sig) {
+// 	process.on(sig, function() {
+// 		process.exit(123)
+// 	})
+// })
 
 

@@ -10,6 +10,10 @@ export { WB } from './webull'
 
 export const HOURS = 'hours'
 
+export const SECURITY = {
+	DOC: 'security:doc',
+}
+
 export const STOCKS = {
 	SYMBOLS: 'stocks:symbols',
 	FSYMBOLS: 'stocks:fsymbols',

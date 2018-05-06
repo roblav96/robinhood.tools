@@ -2,6 +2,7 @@
 
 import { CookieSerializeOptions } from 'cookie'
 import * as _ from '../../common/lodash'
+import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
 import * as security from '../adapters/security'
 import polka from './polka'
@@ -15,7 +16,7 @@ polka.route({
 	handler(req, res) {
 		let prime = security.randomBits(32)
 		return Promise.resolve().then(function() {
-			return redis.main.hset(`security:doc:${req.doc.uuid}`, 'prime', prime)
+			return redis.main.hset(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, 'prime', prime)
 		}).then(function() {
 			let cookie = {
 				domain: process.env.DOMAIN,

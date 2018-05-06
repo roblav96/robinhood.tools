@@ -3,6 +3,7 @@
 
 
 export const WS = {
+	SYMBOL: 'ws:symbol',
 	DISCOVER: 'ws:discover',
 }
 

@@ -3,7 +3,7 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
-import socket from '@/client/adapters/socket'
+import socket, { WS } from '@/client/adapters/socket'
 
 
 
@@ -14,7 +14,7 @@ export default class extends Vue {
 
 	mounted() {
 		console.log('this.$route ->', this.$route)
-		socket.on(`symbol:${this.symbol}:quote`, this.onquote, this)
+		socket.on(`${WS.SYMBOL}:${this.symbol}:quote`, this.onquote, this)
 	}
 
 	beforeDestroy() {

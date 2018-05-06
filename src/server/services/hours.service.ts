@@ -1,8 +1,10 @@
 // 
 
 import '../main'
+import '../adapters/socket'
 import * as Luxon from 'luxon'
 import * as schedule from 'node-schedule'
+import * as rkeys from '../../common/rkeys'
 import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
@@ -22,9 +24,10 @@ async function syncHours() {
 		hours.post = Luxon.DateTime.fromISO(rhmarket.extended_closes_at).valueOf()
 		hours.postpost = Luxon.DateTime.fromISO(rhmarket.closes_at).plus({ hours: 4 }).valueOf()
 	}
-	await redis.main.hmset(redis.HOURS, hours)
+	await redis.main.hmset(rkeys.HOURS, hours)
 	pandora.broadcast({}, 'syncHours')
 }
+
 schedule.scheduleJob('00 * * * *', syncHours).invoke()
 
 

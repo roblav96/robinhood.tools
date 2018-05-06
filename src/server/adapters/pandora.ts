@@ -1,25 +1,38 @@
 // 
 
-import * as exithook from 'exit-hook'
 import * as Pandora from 'pandora'
 import * as Hub from 'pandora-hub'
 
 
 
-export const hub = Pandora.getHub()
-export const client = hub.getHubClient()
+// export const hub = Pandora.getHub()
+// export const client = hub.getHubClient()
 
 export function broadcast(selector: Hub.Selector, action: string, data?: any) {
-	client.multipleSend(selector, action, { data })
+	Pandora.getHub().hubClient.multipleSend(selector, action, { data })
 }
 
 export function on(action: string, fn: (message: Hub.HubMessage) => void) {
-	client.on(action, fn)
+	Pandora.getHub().hubClient.on(action, fn)
 }
 
-exithook(function() {
-	Pandora.clearCliExit(1)
-})
+// Pandora.processContext.context.serviceReconciler.state = Pandora.State.complete
+// let cl = Pandora.consoleLogger.get('console')
+// cl.options.level = 0
+// cl.options.stderrLevel = 0
+// cl.options.json = true
+// console.log('cl ->', cl)
+
+
+
+
+
+// import * as exithook from 'exit-hook'
+// exithook(function() {
+// 	Pandora.clearCliExit(143)
+// })
+
+
 
 
 

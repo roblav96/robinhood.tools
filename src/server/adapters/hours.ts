@@ -2,6 +2,7 @@
 
 import * as core from '../../common/core'
 import * as Rx from '../../common/rxjs'
+import * as rkeys from '../../common/rkeys'
 import * as schedule from 'node-schedule'
 import * as Luxon from 'luxon'
 import * as pandora from './pandora'
@@ -13,7 +14,7 @@ export const rxhours = new Rx.BehaviorSubject(null as Hours)
 export const rxstate = new Rx.BehaviorSubject(null as Hours.State)
 
 async function onsyncHours() {
-	let hours = await redis.main.hgetall(redis.HOURS) as Hours
+	let hours = await redis.main.hgetall(rkeys.HOURS) as Hours
 	core.fix(hours)
 	rxhours.next(hours)
 	rxstate.next(getState())
