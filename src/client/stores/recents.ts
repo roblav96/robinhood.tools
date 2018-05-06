@@ -4,6 +4,7 @@ import Vuex, { Store } from 'vuex'
 import lockr from 'lockr'
 import * as _ from '@/common/lodash'
 import store from '@/client/store'
+import router from '@/client/router'
 
 
 
@@ -14,16 +15,19 @@ declare global {
 	interface Recent {
 		symbol: string
 		stamp: number
-		search: boolean
 	}
 }
 
-
-
-export function push(symbol: string, search = false) {
-	state.unshift({ symbol, search, stamp: Date.now() })
-	state = _.uniqBy(_.compact(state), 'symbol').splice(0, 50)
+export function push(symbol: string) {
+	state.remove(v => v.symbol == symbol)
+	state.unshift({ symbol, stamp: Date.now() })
 	lockr.set('recents', state)
 }
+
+router.afterEach(function(to, from) {
+	if (to.name == 'symbol' && to.params.symbol) {
+		push(to.params.symbol)
+	}
+})
 
 

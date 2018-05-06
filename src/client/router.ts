@@ -76,8 +76,6 @@ export default router
 
 
 
-
-
 declare module 'vue-router/types/router' {
 	export interface VueRouter {
 		options: RouterOptions

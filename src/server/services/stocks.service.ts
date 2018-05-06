@@ -1,11 +1,9 @@
 // 
 
 import '../main'
-import '../adapters/socket'
 import * as pAll from 'p-all'
 import * as pForever from 'p-forever'
-import * as path from 'path'
-import * as Pandora from 'pandora'
+import * as schedule from 'node-schedule'
 import * as _ from '../../common/lodash'
 import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
@@ -17,6 +15,8 @@ import * as pandora from '../adapters/pandora'
 import clock from '../../common/clock'
 
 
+
+schedule.scheduleJob('50 3 * * 1-5', syncInstruments)
 
 readyInstruments().catch(function(error) {
 	console.error('readyInstruments Error ->', error)
@@ -60,7 +60,7 @@ async function chunkSymbols() {
 	})
 	await redis.main.coms(coms as any)
 
-	pandora.broadcast({}, 'chunkSymbols')
+	pandora.broadcast({}, 'onsymbols')
 
 	// if (process.env.DEVELOPMENT) console.info('chunkSymbols -> done');
 

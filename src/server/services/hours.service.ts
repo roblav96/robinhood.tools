@@ -1,7 +1,6 @@
 // 
 
 import '../main'
-import '../adapters/socket'
 import * as Luxon from 'luxon'
 import * as schedule from 'node-schedule'
 import * as rkeys from '../../common/rkeys'
@@ -10,6 +9,8 @@ import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 
 
+
+schedule.scheduleJob('00 * * * *', syncHours).invoke()
 
 async function syncHours() {
 	let today = Luxon.DateTime.local().toISODate()
@@ -27,7 +28,5 @@ async function syncHours() {
 	await redis.main.hmset(rkeys.HOURS, hours)
 	pandora.broadcast({}, 'syncHours')
 }
-
-schedule.scheduleJob('00 * * * *', syncHours).invoke()
 
 

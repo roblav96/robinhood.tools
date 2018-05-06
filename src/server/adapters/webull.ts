@@ -46,22 +46,30 @@ export function fixQuote(quote: Webull.Quote) {
 
 
 
-export async function getFullQuotes(fsymbols: Dict<number>) {
+async function getChunked(fsymbols: Dict<number>, url: string, auth = false) {
 	let inverse = _.invert(fsymbols)
 	let tids = Object.values(fsymbols)
 	let chunks = core.array.chunks(tids, _.ceil(tids.length / 512))
-	let quotes = _.flatten(await Promise.all(chunks.map(function(chunk) {
-		return http.get('https://quoteapi.webull.com/api/quote/tickerRealTimes/full', {
+	let items = _.flatten(await Promise.all(chunks.map(function(chunk) {
+		return http.get(url, {
 			query: { tickerIds: chunk.join(','), hl: 'en', },
-			webullAuth: true,
+			webullAuth: auth,
 		})
-	}))) as Webull.Quote[]
-	quotes.forEach(function(quote) {
-		core.fix(quote)
-		fixQuote(quote)
-		quote.symbol = inverse[quote.tickerId]
+	}))) as any[]
+	items.forEach(function(item) {
+		core.fix(item)
+		fixQuote(item)
+		item.symbol = inverse[item.tickerId]
 	})
-	return quotes
+	return items
+}
+
+export async function getFullQuotes(fsymbols: Dict<number>) {
+	return await getChunked(fsymbols, 'https://quoteapi.webull.com/api/quote/tickerRealTimes/full', true) as Webull.Quote[]
+}
+
+export async function getTickers(fsymbols: Dict<number>) {
+	return await getChunked(fsymbols, 'https://securitiesapi.webull.com/api/securities/ticker/v2') as Webull.Ticker[]
 }
 
 

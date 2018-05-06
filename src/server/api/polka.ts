@@ -46,10 +46,7 @@ server.listen(+process.env.PORT + +process.env.INSTANCE, process.env.HOST, funct
 	console.info('api listening ->', address.port)
 })
 
-exithook(function() {
-	server.connections.forEach(v => v.close())
-	server.close()
-})
+exithook(function() { server.close() })
 
 export default polka
 

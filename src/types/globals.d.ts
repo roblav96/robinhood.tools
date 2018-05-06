@@ -16,6 +16,7 @@ declare namespace NodeJS {
 		HOST: any
 		PORT: any
 		OFFSET: any
+		FIRST: any
 		ORDER: any
 		MASTER: any
 		WORKER: any

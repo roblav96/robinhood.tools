@@ -3,7 +3,7 @@
 import { ServiceRepresentationChainModifier } from 'pandora/dist/application/ServiceRepresentationChainModifier'
 import { ProcessRepresentationChainModifier } from 'pandora/dist/application/ProcessRepresentationChainModifier'
 import { ProcessContextAccessor } from 'pandora/dist/application/ProcessContextAccessor'
-import { ProcfileReconcilerAccessor, ProcessRepresentation } from 'pandora'
+import * as Pandora from 'pandora'
 import * as _ from '../common/lodash'
 import * as os from 'os'
 import * as path from 'path'
@@ -31,7 +31,6 @@ let order = 1
 function Process(chain: ProcessRepresentationChainModifier, env = {} as Env) {
 	_.defaults(env, ENV)
 	return (chain
-		// .entry(`./${chain.name()}/${chain.name()}.main`)
 		.nodeArgs(['--no-warnings', '--expose-gc', '--max_old_space_size=2048'])
 		.env(env).scale(env.SCALE).order(order++)
 	)
@@ -39,7 +38,7 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as Env) {
 
 
 
-export default function procfile(pandora: ProcfileReconcilerAccessor) {
+export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 
 	Process(pandora.process('api').entry('./api/api'), {
 		// SCALE: 2, // os.cpus().length,
@@ -60,6 +59,8 @@ export default function procfile(pandora: ProcfileReconcilerAccessor) {
 		SCALE: 1,
 		// DEBUGGER: false,
 	})
+
+
 
 	// Process(pandora.process('services'), {
 

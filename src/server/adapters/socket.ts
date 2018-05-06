@@ -18,8 +18,6 @@ import Emitter from '../../common/emitter'
 
 const wss = new uws.Server({
 	host: process.env.HOST,
-	// port: +process.env.IPORT,
-	// port: +process.env.PORT + +process.env.CPUS + +process.env.INSTANCE,
 	port: +process.env.PORT + +process.env.CPUS + +process.env.OFFSET + +process.env.INSTANCE,
 
 	verifyClient(incoming, next: (allow: boolean, code?: number, message?: string) => void) {
@@ -76,10 +74,7 @@ wss.on('listening', function() {
 
 wss.on('connection', onconnection)
 
-exithook(function() {
-	redis.main.srem(rkeys.WS.DISCOVER, wss.httpServer.address().port)
-	wss.close()
-})
+exithook(function() { wss.close() })
 
 
 
@@ -90,16 +85,12 @@ interface Client extends uws.WebSocket {
 	authed: boolean
 	id: string
 	uuid: string
-	// json(data: any): void
 }
 function onconnection(client: Client, req: PolkaRequest) {
 	client.subs = []
 	client.authed = req.authed
 	client.id = req.doc.id
 	client.uuid = req.doc.uuid
-	// client.json = function json(data) {
-	// 	this.send(JSON.stringify(data))
-	// }
 
 	client.on('message', function onmessage(message: string) {
 		if (message == 'pong') return;
@@ -138,9 +129,6 @@ export function emit(name: string, data?: any) {
 	if (count == 0) return;
 	emitter.emit(name, JSON.stringify(data))
 }
-
-// const { emit } = emitter
-// export { emit }
 
 
 

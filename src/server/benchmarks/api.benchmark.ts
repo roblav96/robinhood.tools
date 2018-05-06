@@ -2,7 +2,6 @@
 
 import chalk from 'chalk'
 import * as execa from 'execa'
-import * as exithook from 'exit-hook'
 import * as url from 'url'
 import * as http from 'http'
 import * as turbo from 'turbo-http'

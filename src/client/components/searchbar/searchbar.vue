@@ -4,6 +4,10 @@
 <style>
 /**/
 
+div.searchbar div.autocomplete {
+	width: 215px;
+}
+
 div.searchbar div.dropdown-content {
 	max-width: 50vw;
 	max-height: 66vh;

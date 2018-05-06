@@ -30,6 +30,7 @@ if (+process.env.INSTANCE == 0) process.env.PRIMARY = true;
 import * as Pandora from 'pandora'
 process.env.OFFSET = Pandora.processContext ? Pandora.processContext.context.processRepresentation.offset : 0
 process.env.ORDER = Pandora.processContext ? Pandora.processContext.context.processRepresentation.order : 0
+if (!+process.env.OFFSET && process.env.PRIMARY) process.env.FIRST = true;
 // process.env.IPORT = +process.env.PORT + +process.env.OFFSET + +process.env.INSTANCE
 
 
@@ -42,27 +43,5 @@ process.on('unhandledRejection', function(error) {
 	console.error('UNHANDLED PROMISE REJECTION', '->', error)
 	if (process.env.PRODUCTION) process.exit(1);
 })
-
-
-
-// import * as exithook from 'exit-hook'
-// exithook(function() {
-// 	// console.log('code ->', code)
-// 	// console.log('signal ->', signal)
-// 	// process.kill(process.pid, code || signal)
-// })
-// exithook(() => process.kill(process.pid))
-// process.on('SIGTERM', () => process.kill(process.pid, 143))
-// process.on('SIGTERM', () => process.exit(143))
-
-// const sigs = [
-// 	'SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-// 	'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM',
-// ]
-// sigs.forEach(function(sig) {
-// 	process.on(sig, function() {
-// 		process.exit(123)
-// 	})
-// })
 
 

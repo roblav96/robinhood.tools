@@ -9,6 +9,7 @@ export const WB = {
 	WB: 'wb',
 	TICKER_IDS: 'wb:tickerids',
 	QUOTES: 'wb:quotes',
+	TICKERS: 'wb:tickers',
 }
 
 

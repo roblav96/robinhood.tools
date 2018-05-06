@@ -9,6 +9,7 @@ export { WB } from './webull'
 
 
 export const HOURS = 'hours'
+export const QUOTES = 'quotes'
 
 export const SECURITY = {
 	DOC: 'security:doc',

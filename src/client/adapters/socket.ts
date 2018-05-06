@@ -28,7 +28,7 @@ class Socket extends Emitter {
 		super()
 		return proxy.observe<Socket>(this, (method, property) => {
 			if (property == '_events' && this.ready()) {
-				console.log('_events ->', 'resync')
+				// console.log('_events ->', 'resync')
 				this.resync()
 			}
 		})
@@ -58,7 +58,7 @@ class Socket extends Emitter {
 
 	private opensync() {
 		if (this.ready()) {
-			console.log('opensync ->', 'resync')
+			// console.log('opensync ->', 'resync')
 			this.resync()
 		}
 	}
@@ -68,7 +68,7 @@ class Socket extends Emitter {
 		let event = JSON.stringify({
 			action: 'sync', subs: this.eventNames(),
 		} as Socket.Event)
-		console.log('sync ->', event)
+		// console.log('sync ->', event)
 		this.clients.forEach(v => v.send(event))
 	}
 

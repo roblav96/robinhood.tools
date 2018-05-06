@@ -51,14 +51,12 @@ import * as exithook from 'exit-hook'
 import * as clc from 'cli-color'
 if (process.env.DEBUGGER == 'true') {
 	inspector.open(process.debugPort + +process.env.OFFSET + +process.env.INSTANCE)
-	exithook(function() {
-		if (process.env.PRIMARY) {
-			let stdout = (console as any)._stdout
-			if (stdout.isTTY) { stdout.isTTY = false; process.nextTick(() => stdout.isTTY = true) }
-			console.clear()
-		}
-		inspector.close()
-	})
+	if (!+process.env.OFFSET && process.env.PRIMARY) {
+		let stdout = (console as any)._stdout
+		if (stdout.isTTY) { stdout.isTTY = false; process.nextTick(() => stdout.isTTY = true) }
+		console.clear()
+	}
+	exithook(function() { inspector.close() })
 }
 declare global { namespace NodeJS { export interface Process { debugPort: number } } }
 
