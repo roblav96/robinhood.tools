@@ -1,23 +1,39 @@
 // 
 
+import * as exithook from 'exit-hook'
 import * as Pandora from 'pandora'
 import * as Hub from 'pandora-hub'
 
 
 
-const hub = Pandora.getHub()
-const client = hub.getHubClient()
+export const hub = Pandora.getHub()
+export const client = hub.getHubClient()
 
-client.on('gc', function() { global.gc() })
+export function broadcast(selector: Hub.Selector, action: string, data?: any) {
+	client.multipleSend(selector, action, { data })
+}
 
+export function on(action: string, fn: (message: Hub.HubMessage) => void) {
+	client.on(action, fn)
+}
 
-
-import { memoryUsage } from 'process'
-hub.publish({ memoryUsage }, {
-	name: 'memory',
-}).catch(function(error) {
-	console.error('hub.publish Error ->', error)
+exithook(function() {
+	Pandora.clearCliExit(1)
 })
+
+
+
+// const hub = Pandora.getHub()
+// const client = hub.getHubClient()
+
+// client.on('gc', function() { global.gc() })
+
+// import { memoryUsage } from 'process'
+// hub.publish({ memoryUsage }, {
+// 	name: 'memory',
+// }).catch(function(error) {
+// 	console.error('hub.publish Error ->', error)
+// })
 
 
 

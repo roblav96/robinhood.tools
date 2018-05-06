@@ -23,6 +23,8 @@ export {
 	isPlainObject,
 	keys,
 	keysIn,
+	mapKeys,
+	mapValues,
 	max,
 	mean,
 	merge,

@@ -19,7 +19,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		let parsed = url.parse(config.url)
 		if (config.hHost) config.headers['Host'] = parsed.host;
 		if (config.hOrigin) config.headers['Origin'] = `${parsed.protocol}//${parsed.host}`;
-		if (config.hReferrer) config.headers['Referrer'] = `${parsed.protocol}//${parsed.host}`;
+		if (config.hReferer) config.headers['Referer'] = `${parsed.protocol}//${parsed.host}`;
 
 		if (config.isProxy) return config;
 

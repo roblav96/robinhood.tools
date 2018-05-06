@@ -3,6 +3,7 @@
 import * as net from 'net'
 import * as Mqtt from 'mqtt'
 import * as MqttConnection from 'mqtt-connection'
+import * as exithook from 'exit-hook'
 import * as qs from 'querystring'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
@@ -12,7 +13,7 @@ import clock from '../../common/clock'
 
 
 
-export class Watcher extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'data', Webull.Quote> {
+export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'data', Webull.Quote> {
 
 	private static topics = {
 		forex: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.MQTT_TOPICS>,
@@ -21,6 +22,8 @@ export class Watcher extends Emitter<'connect' | 'subscribed' | 'disconnect' | '
 
 	private static get options() {
 		return _.clone({
+			fsymbols: null as Dict<number>,
+			topics: null as keyof typeof MqttClient.topics,
 			host: 'push.webull.com', port: 9018,
 			timeout: '10s' as Clock.Tick,
 			connect: true,
@@ -32,13 +35,12 @@ export class Watcher extends Emitter<'connect' | 'subscribed' | 'disconnect' | '
 	get name() { return 'mqtt://' + this.options.host + ':' + this.options.port }
 
 	constructor(
-		public fsymbols: Dict<number>,
-		public topics: keyof typeof Watcher.topics,
-		public options = {} as Partial<typeof Watcher.options>,
+		public options = {} as Partial<typeof MqttClient.options>,
 	) {
 		super()
-		_.defaults(this.options, Watcher.options)
+		_.defaults(this.options, MqttClient.options)
 		if (this.options.connect) this.connect();
+		exithook(() => this.destroy())
 	}
 
 	tdict: Dict<string>
@@ -49,14 +51,15 @@ export class Watcher extends Emitter<'connect' | 'subscribed' | 'disconnect' | '
 	destroy() {
 		this.terminate()
 		this.offAll()
+		clock.offListener(this.connect, this)
 	}
 
 	terminate() {
-		if (this.client) {
-			this.client.destroy()
-			this.client.removeAllListeners()
-			this.client = null
-		}
+		if (this.client == null) return;
+		this.client.end()
+		this.client.destroy()
+		this.client.removeAllListeners()
+		this.client = null
 	}
 
 	private reconnect() {
@@ -72,24 +75,24 @@ export class Watcher extends Emitter<'connect' | 'subscribed' | 'disconnect' | '
 			clientId: 'mqtt_' + Math.random().toString(),
 			protocolId: 'MQTT',
 			protocolVersion: 4,
-			keepalive: 60,
+			keepalive: 10,
 			clean: true,
 		})
-		this.client.on('data', this._ondata)
-		this.client.on('error', this._onerror)
+		this.client.on('data', this.ondata)
+		this.client.on('error', this.onerror)
 		this.reconnect()
 	}
 
-	private _ondata = (packet: Mqtt.Packet) => {
+	private ondata = (packet: Mqtt.Packet) => {
 
 		if (packet.cmd == 'connack') {
 			if (this.options.verbose) console.info(this.name, '-> connect');
 			clock.offListener(this.connect, this)
 			this.emit('connect')
 
-			this.tdict = _.invert(this.fsymbols)
+			this.tdict = _.invert(_.mapValues(this.options.fsymbols, v => v.toString()))
 			let topic = {
-				tickerIds: Object.values(this.fsymbols),
+				tickerIds: Object.values(this.options.fsymbols),
 				header: {
 					app: 'stocks',
 					did: process.env.WEBULL_DID,
@@ -97,8 +100,8 @@ export class Watcher extends Emitter<'connect' | 'subscribed' | 'disconnect' | '
 				},
 			}
 			let topics = Object.keys(webull.MQTT_TOPICS).filter(v => !isNaN(v as any))
-			if (this.topics) {
-				topics = Watcher.topics[this.topics].map(v => webull.MQTT_TOPICS[v].toString())
+			if (this.options.topics) {
+				topics = MqttClient.topics[this.options.topics].map(v => webull.MQTT_TOPICS[v].toString())
 			}
 
 			let subscriptions = topics.map(type => ({
@@ -138,7 +141,7 @@ export class Watcher extends Emitter<'connect' | 'subscribed' | 'disconnect' | '
 				quote.tickerId = tid
 				quote.symbol = symbol
 				quote.topic = webull.MQTT_TOPICS[topic.type]
-				// console.log('data ->', data)
+				// console.log('data ->', quote)
 				this.emit('data', quote)
 			}
 
@@ -146,11 +149,10 @@ export class Watcher extends Emitter<'connect' | 'subscribed' | 'disconnect' | '
 		}
 
 		console.error('packet Error ->', packet)
-
 	}
 
-	private _onerror = (error: Error) => {
-		console.error(this.name, 'onerror Error ->', error)
+	private onerror = (error: Error) => {
+		if (this.options.verbose) console.error(this.name, 'onerror Error ->', error)
 		if (this.options.retry) this.reconnect();
 	}
 

@@ -8,7 +8,7 @@ import * as core from '../../common/core'
 
 
 // export function iMs(ms: number) {
-// 	return core.math.dispersed(ms, process.env.INSTANCE, process.env.INSTANCES)
+// 	return core.math.dispersed(ms, process.env.INSTANCE, process.env.SCALE)
 // }
 
 

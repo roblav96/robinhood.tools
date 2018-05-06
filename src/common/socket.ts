@@ -1,6 +1,10 @@
 // 
 
-export { }
+
+
+export const WS = {
+	DISCOVER: 'ws:discover',
+}
 
 
 
@@ -9,7 +13,7 @@ declare global {
 		interface Event<Data = any> {
 			name: string
 			data: Data
-			action: string
+			action: 'sync'
 			subs: string[]
 		}
 	}

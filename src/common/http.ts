@@ -50,7 +50,7 @@ export function send(config: Http.Config) {
 			if (error && !res) return reject(error);
 			if (data) {
 				data = data.toString()
-				if (res.headers['content-type'] == 'application/json') {
+				if (res.headers['content-type'].includes('application/json')) {
 					let parsed = fastjsonparse(data)
 					if (parsed.value) data = parsed.value;
 				}
@@ -75,7 +75,7 @@ export function send(config: Http.Config) {
 		if (config.retries > 0 && retryable(error)) {
 			config.retries--
 			if (process.env.DEVELOPMENT && process.env.SERVER) {
-				// console.error('retry Error ->', error)
+				console.error('retry Error ->', error)
 				console.warn('retry config.retries ->', config.retries)
 			}
 			return clock.toPromise(config.retryTick).then(() => send(config))
@@ -96,7 +96,7 @@ declare global {
 			retryTick: Clock.Tick
 			hHost: boolean
 			hOrigin: boolean
-			hReferrer: boolean
+			hReferer: boolean
 			verbose: boolean
 			isProxy: boolean
 			robinhoodToken: string

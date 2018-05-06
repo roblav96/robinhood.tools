@@ -2,12 +2,18 @@
 
 
 
+export { WS } from './socket'
 export { RH } from './robinhood'
 export { WB } from './webull'
 
 
 
-export const SYMBOLS = 'symbols'
+export const HOURS = 'hours'
+
+export const STOCKS = {
+	SYMBOLS: 'stocks:symbols',
+	FSYMBOLS: 'stocks:fsymbols',
+}
 
 export const BENCHMARKS = {
 	API: {

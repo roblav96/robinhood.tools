@@ -72,10 +72,10 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	destroy() {
+		this.terminate()
+		this.offAll()
 		clock.offListener(this.reconnect, this)
 		clock.offListener(this.heartbeat, this)
-		this.terminate()
-		this.removeAllListeners()
 	}
 
 	terminate() {
@@ -90,8 +90,8 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	private heartbeat() { this.send('ping') }
 	private reconnect() {
-		if (this.alive()) return;
-		this.connect()
+		clock.offListener(this.connect, this)
+		clock.on(this.options.timeout, this.connect, this)
 	}
 
 	connect() {
@@ -103,15 +103,16 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.ws.onclose = this.onclose as any
 		this.ws.onerror = this.onerror as any
 		this.ws.onmessage = this.onmessage as any
-		if (!clock.hasListener(this.reconnect, this)) {
-			clock.on(this.options.timeout, this.reconnect, this)
-		}
+		this.reconnect()
 	}
 
 	private onopen = (event: Event) => {
 		if (this.options.verbose) console.info(this.name, 'onopen');
 		this.emit('open', event)
-		clock.on(this.options.heartbeat, this.heartbeat, this)
+		if (this.options.heartbeat) {
+			clock.offListener(this.heartbeat, this)
+			clock.on(this.options.heartbeat, this.heartbeat, this)
+		}
 	}
 
 	private onclose = (event: CloseEvent) => {
@@ -121,14 +122,17 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 			console.warn(this.name, 'onclose ->', code, '->', event.reason);
 		}
 		this.emit('close', _.pick(event, ['code', 'reason']))
-		clock.offListener(this.heartbeat, this)
-		if (this.options.retry) return;
+		if (this.options.retry) {
+			return this.reconnect()
+		}
 		this.destroy()
 	}
 
 	private onerror = (error: Error) => {
-		let message = (error.message || error) as string
-		if (this.options.verbose) console.error(this.name, 'onerror Error ->', message);
+		if (this.options.verbose) {
+			let message = (error.message || error) as string
+			console.error(this.name, 'onerror Error ->', message);
+		}
 		this.emit('error', error)
 	}
 

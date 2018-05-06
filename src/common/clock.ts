@@ -49,7 +49,7 @@ function tickGenesis(tick: Clock.Tick) {
 	let now = Date.now()
 	let from = now - (now % ms)
 	let to = from + ms
-	let ims = process.env.CLIENT ? 0 : core.math.dispersed(ms, +process.env.INSTANCE, +process.env.INSTANCES)
+	let ims = process.env.CLIENT ? 0 : core.math.dispersed(ms, +process.env.INSTANCE, +process.env.SCALE)
 	let delay = (from + ims) - now
 	if (delay <= 0) delay = (to + ims) - now;
 	_.delay(startTicking, delay, tick, ms)

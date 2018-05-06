@@ -82,26 +82,28 @@ async function start() {
 
 }
 
+setImmediate(() => start().catch(error => console.error(`'${error.cmd}' ->`, error)))
 
 
-let server = turbo.createServer(function handler(req, res) { res.end() })
-if (+process.env.INSTANCE == 2) {
-	const polka = Polka()
-	polka.get('/polka', function get(req, res) { res.end() })
-	server = turbo.createServer(polka.handler as any)
-}
 
-server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
-	console.info('listening ->', process.env.HOST + ':' + process.env.IPORT)
-	if (process.env.PRIMARY) {
-		setImmediate(() => start().catch(error => console.error(`'${error.cmd}' ->`, error)))
-	}
-})
+// let server = turbo.createServer(function handler(req, res) { res.end() })
+// if (+process.env.INSTANCE == 2) {
+// 	const polka = Polka()
+// 	polka.get('/polka', function get(req, res) { res.end() })
+// 	server = turbo.createServer(polka.handler as any)
+// }
 
-exithook(function onexit() {
-	if (Array.isArray(server.connections)) server.connections.forEach(v => v.close());
-	server.close()
-})
+// server.listen(+process.env.IPORT, process.env.HOST, function onlisten() {
+// 	console.info('listening ->', process.env.HOST + ':' + process.env.IPORT)
+// 	if (process.env.PRIMARY) {
+// 		setImmediate(() => start().catch(error => console.error(`'${error.cmd}' ->`, error)))
+// 	}
+// })
+
+// exithook(function onexit() {
+// 	if (Array.isArray(server.connections)) server.connections.forEach(v => v.close());
+// 	server.close()
+// })
 
 
 

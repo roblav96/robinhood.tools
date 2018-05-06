@@ -21,15 +21,16 @@ import * as cluster from 'cluster'
 if (cluster.isMaster) process.env.MASTER = true;
 if (cluster.isWorker) process.env.WORKER = true;
 process.env.CPUS = process.env.CPUS || os.cpus().length
-process.env.INSTANCES = process.env.INSTANCES || 1
+process.env.SCALE = process.env.SCALE || 1
 process.env.INSTANCE = cluster.isWorker ? cluster.worker.id - 1 : 0;
 if (+process.env.INSTANCE == 0) process.env.PRIMARY = true;
 
 
 
-import * as pandora from 'pandora'
-process.env.OFFSET = pandora.processContext ? pandora.processContext.context.processRepresentation.offset : 0
-process.env.IPORT = +process.env.PORT + +process.env.OFFSET + +process.env.INSTANCE
+import * as Pandora from 'pandora'
+process.env.OFFSET = Pandora.processContext ? Pandora.processContext.context.processRepresentation.offset : 0
+process.env.ORDER = Pandora.processContext ? Pandora.processContext.context.processRepresentation.order : 0
+// process.env.IPORT = +process.env.PORT + +process.env.OFFSET + +process.env.INSTANCE
 
 
 

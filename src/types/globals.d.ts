@@ -15,16 +15,15 @@ declare namespace NodeJS {
 		PROJECT: any
 		HOST: any
 		PORT: any
-		IPORT: any
 		OFFSET: any
+		ORDER: any
 		MASTER: any
 		WORKER: any
 		PRIMARY: any
-		INSTANCES: any
+		SCALE: any
 		INSTANCE: any
 		DEBUGGER: any
 		PANDORA_DEV: any
-		BENCHMARK: any
 		CPUS: any
 	}
 }

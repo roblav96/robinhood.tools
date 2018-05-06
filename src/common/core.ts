@@ -1,8 +1,5 @@
 // 
 
-import { Settings, DateTime } from 'luxon'
-Settings.defaultZoneName = 'America/New_York'
-
 import * as _ from './lodash'
 import * as leven from 'leven'
 
@@ -28,8 +25,8 @@ export function fix(target: any, deep = false) {
 		let value = target[key]
 		if (value == null || !string.is(value)) return;
 		else if (deep && object.is(value)) fix(value);
-		else if (!isNaN(value as any)) target[key] = Number.parseFloat(value);
 		else if (value === '') delete target[key];
+		else if (!isNaN(value as any)) target[key] = Number.parseFloat(value);
 		else if (value === 'true') target[key] = true;
 		else if (value === 'false') target[key] = false;
 	})

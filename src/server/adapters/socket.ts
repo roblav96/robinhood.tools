@@ -1,11 +1,13 @@
 // 
 
 export * from '../../common/socket'
+import { WS } from '../../common/socket'
 import * as exithook from 'exit-hook'
 import * as qs from 'querystring'
 import * as url from 'url'
 import * as uws from 'uws'
 import * as cookie from 'cookie'
+import * as pandora from 'pandora'
 import * as fastjsonparse from 'fast-json-parse'
 import * as redis from './redis'
 import * as security from './security'
@@ -14,10 +16,9 @@ import Emitter from '../../common/emitter'
 
 
 
-const emitter = new Emitter()
-
 const wss = new uws.Server({
 	host: process.env.HOST,
+	// port: +process.env.IPORT,
 	port: +process.env.PORT + +process.env.CPUS + +process.env.INSTANCE,
 
 	verifyClient(incoming, next: (allow: boolean, code?: number, message?: string) => void) {
@@ -61,22 +62,39 @@ const wss = new uws.Server({
 })
 
 wss.httpServer.timeout = 10000
-wss.on('error', error => console.error('wss Error ->', error))
-wss.on('listening', () => console.info('wss listening ->', process.env.HOST + ':' + wss.httpServer.address().port))
+
+wss.on('error', function(error) {
+	console.error('wss Error ->', error)
+})
+
+wss.on('listening', function() {
+	let address = wss.httpServer.address()
+	redis.main.sadd(WS.DISCOVER, address.port)
+	console.info('wss listening ->', address.port)
+})
+
 wss.on('connection', onconnection)
-exithook(() => wss.close())
+
+exithook(function() {
+	redis.main.srem(WS.DISCOVER, wss.httpServer.address().port)
+	wss.close()
+})
 
 
+
+const emitter = new Emitter()
 
 interface Client extends uws.WebSocket {
 	subs: string[]
 	authed: boolean
-	doc: Security.Doc
+	id: string
+	uuid: string
 }
 function onconnection(client: Client, req: PolkaRequest) {
 	client.subs = []
 	client.authed = req.authed
-	client.doc = req.doc
+	client.id = req.doc.id
+	client.uuid = req.doc.uuid
 
 	client.on('message', function onmessage(message: string) {
 		if (message == 'pong') return;
@@ -88,22 +106,20 @@ function onconnection(client: Client, req: PolkaRequest) {
 
 		if (event.action) {
 			let action = event.action
-
 			if (action == 'sync') {
-				this.subs.forEach(v => emitter.off(v, this.send))
+				this.subs.forEach(v => emitter.off(v, this.send, this))
 				this.subs.splice(0, Infinity, ...event.subs)
-				this.subs.forEach(v => emitter.on(v, this.send))
+				this.subs.forEach(v => emitter.on(v, this.send, this))
 				return
 			}
-
 		}
+
+		this.close(1003, 'Invalid message')
 	})
 
 	client.on('close', function onclose(code, reason) {
 		if (code != 1001) console.warn('client close ->', code, reason);
-		this.doc = null
-		this.subs.forEach(v => emitter.off(v, this.send))
-		this.subs.splice(0)
+		this.subs.forEach(v => emitter.off(v, this.send, this))
 		this.terminate()
 		this.removeAllListeners()
 	})
@@ -111,6 +127,9 @@ function onconnection(client: Client, req: PolkaRequest) {
 	client.on('error', function onerror(error) { console.error('client Error ->', error) })
 
 }
+
+const { emit } = emitter
+export { emit }
 
 
 

@@ -17,11 +17,11 @@ const polka = new PolkaRouter({
 
 	onError(error: boom<any>, req, res, next) {
 		if (!error.isBoom) {
-			if (!process.env.BENCHMARK) console.error('polka onError ->', error);
+			console.error('polka onError ->', error);
 			error = new boom(error, { message: error.message })
 		} else {
 			if (error.data) Object.assign(error.output.payload, { attributes: error.data });
-			if (!process.env.BENCHMARK) console.warn('polka onError ->', error.output.payload);
+			console.warn('polka onError ->', error.output.payload);
 		}
 		if (res.headerSent) return;
 		res.statusCode = error.output.statusCode
@@ -42,11 +42,12 @@ const polka = new PolkaRouter({
 
 const server = turbo.createServer(polka.handler)
 server.listen(+process.env.PORT + +process.env.INSTANCE, process.env.HOST, function onlisten() {
-	console.info('turbo listening ->', process.env.HOST + ':' + process.env.IPORT)
+	let address = server.address()
+	console.info('api listening ->', address.port)
 })
 
 exithook(function onexit() {
-	if (Array.isArray(server.connections)) server.connections.forEach(v => v.close());
+	server.connections.forEach(v => v.close());
 	server.close()
 })
 
@@ -54,21 +55,21 @@ export default polka
 
 
 
-polka.get('/api/blank', function blank(req, res) { res.end() })
+// polka.get('/api/blank', function blank(req, res) { res.end() })
 
-polka.route({
-	method: 'GET',
-	url: '/api/route',
-	handler(req, res) { return Promise.resolve() },
-})
+// polka.route({
+// 	method: 'GET',
+// 	url: '/api/route',
+// 	handler(req, res) { return Promise.resolve() },
+// })
 
-polka.route({
-	method: 'GET',
-	url: '/api/validate/:valid',
-	schema: {
-		params: { valid: 'string' }
-	},
-	handler(req, res) { return Promise.resolve() },
-})
+// polka.route({
+// 	method: 'GET',
+// 	url: '/api/validate/:valid',
+// 	schema: {
+// 		params: { valid: 'string' }
+// 	},
+// 	handler(req, res) { return Promise.resolve() },
+// })
 
 

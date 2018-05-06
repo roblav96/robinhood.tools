@@ -1,5 +1,7 @@
 // 
 
+import '../main'
+
 import './polka'
 import './polka.request'
 import './polka.response'
