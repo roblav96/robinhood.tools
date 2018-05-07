@@ -12,11 +12,11 @@ import clock from '../../common/clock'
 
 
 
-export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'quote', Webull.Quote> {
+export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'> {
 
 	private static topics = {
-		forex: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.MQTT_TOPICS>,
-		stocks: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_DEAL_DETAILS', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.MQTT_TOPICS>,
+		forex: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.topics>,
+		stocks: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_DEAL_DETAILS', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.topics>,
 	}
 
 	private static get options() {
@@ -97,9 +97,9 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 					access_token: process.env.WEBULL_TOKEN,
 				},
 			}
-			let topics = Object.keys(webull.MQTT_TOPICS).filter(v => !isNaN(v as any))
+			let topics = Object.keys(webull.topics).filter(v => !isNaN(v as any))
 			if (this.options.topics) {
-				topics = MqttClient.topics[this.options.topics].map(v => webull.MQTT_TOPICS[v].toString())
+				topics = MqttClient.topics[this.options.topics].map(v => webull.topics[v].toString())
 			}
 
 			let subscriptions = topics.map(type => ({
@@ -128,11 +128,11 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 			let payload = JSON.parse(packet.payload.toString()) as Webull.Mqtt.Payload<Webull.Quote>
 
 			let type = Number.parseInt(topic.type)
-			if (type == webull.MQTT_TOPICS.TICKER_BID_ASK) {
-				payload.data.remove(quote => {
-					if (Array.isArray(quote.bidList) && quote.bidList.length == 0) return true;
-					if (Array.isArray(quote.askList) && quote.askList.length == 0) return true;
-					return Object.keys(quote).length == 0
+			if (type == webull.topics.TICKER_BID_ASK) {
+				payload.data.remove(v => {
+					if (Array.isArray(v.bidList) && v.bidList.length == 0) return true;
+					if (Array.isArray(v.askList) && v.askList.length == 0) return true;
+					return Object.keys(v).length == 0
 				})
 			}
 			if (payload.data.length == 0) return;
@@ -142,20 +142,19 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 
 			let i: number, len = payload.data.length
 			for (i = 0; i < len; i++) {
-				let quote = payload.data[i]
-				core.fix(quote)
-				webull.fixQuote(quote)
-				quote.tickerId = tid
-				quote.symbol = symbol
-				quote.topic = webull.MQTT_TOPICS[topic.type]
-				if (this.options.verbose) console.log('data ->', quote);
-				this.emit('quote', quote)
+				let wbquote = payload.data[i]
+				core.fix(wbquote)
+				webull.fixQuote(wbquote)
+				wbquote.tickerId = tid
+				wbquote.symbol = symbol
+				if (this.options.verbose) console.log('data ->', wbquote);
+				this.emit('data', type, wbquote)
 			}
 
 			return
 		}
 
-		console.error('packet Error ->', packet)
+		console.error('idk packet Error ->', packet)
 	}
 
 	private onerror = (error: Error) => {

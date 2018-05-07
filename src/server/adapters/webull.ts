@@ -16,6 +16,7 @@ export function fixQuote(quote: Webull.Quote) {
 	if (quote.status) quote.status = webull.TICKER_STATUS[quote.status];
 
 	if (quote.faTradeTime) quote.faTradeTime = new Date(quote.faTradeTime).valueOf();
+	if (quote.mkTradeTime) quote.mkTradeTime = new Date(quote.mkTradeTime).valueOf();
 	if (quote.mktradeTime) quote.mktradeTime = new Date(quote.mktradeTime).valueOf();
 	if (quote.tradeTime) quote.tradeTime = new Date(quote.tradeTime).valueOf();
 

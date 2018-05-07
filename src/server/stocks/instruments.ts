@@ -16,7 +16,7 @@ import clock from '../../common/clock'
 
 
 
-schedule.scheduleJob('50 3 * * 1-5', syncInstruments)
+schedule.scheduleJob('55 3 * * 1-5', syncInstruments)
 
 readyInstruments().catch(function(error) {
 	console.error('readyInstruments Error ->', error)
@@ -98,7 +98,7 @@ async function syncInstruments() {
 
 	await chunkSymbols()
 
-	if (process.env.DEVELOPMENT) console.info('syncInstruments -> done');
+	// if (process.env.DEVELOPMENT) console.info('syncInstruments -> done');
 
 }
 

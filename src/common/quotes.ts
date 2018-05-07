@@ -7,6 +7,7 @@ export { }
 
 
 declare global {
+
 	interface Quote {
 		symbol: string
 		tickerId: number
@@ -35,8 +36,8 @@ declare global {
 		bidSize: number
 		askSize: number
 		// 
-		tradeBuyVolume: number
-		tradeSellVolume: number
+		buyVolume: number
+		sellVolume: number
 		// 
 		dealCount: number
 		avgVolume: number
@@ -48,6 +49,17 @@ declare global {
 		sharesFloat: number
 		marketCap: number
 	}
+
+	namespace Quote {
+		interface Deal {
+			symbol: string
+			price: number
+			size: number
+			side: 'B' | 'S'
+			time: number
+		}
+	}
+
 }
 
 

@@ -64,7 +64,7 @@ export enum MARKET_TYPES {
 	FOREX = 5,
 }
 
-export enum MQTT_TOPICS {
+export enum topics {
 	MARKET_SECTOR = 1,
 	MARKET_POSITIVE = 2,
 	MARKET_DECLIE = 3,
@@ -199,6 +199,7 @@ declare global {
 			low: number
 			marketValue: number
 			mktradeTime: number
+			mkTradeTime: number
 			monthHigh: number
 			monthLow: number
 			negMarketValue: number
@@ -235,7 +236,6 @@ declare global {
 			targetPrice: number
 			tickerId: number
 			timeZone: string
-			topic: string
 			totalShares: number
 			tradeBsFlag: string
 			tradeTime: number
