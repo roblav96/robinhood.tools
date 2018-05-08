@@ -13,7 +13,6 @@ declare global {
 		status: string
 		// 
 		name: string
-		tradable: boolean
 		typeof: keyof typeof rkeys.SYMBOLS
 		rhtype: Robinhood.Instrument.Type
 		listDate: number

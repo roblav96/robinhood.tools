@@ -54,11 +54,19 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 	}
 
 	terminate() {
+		clock.offListener(this.heartbeat, this)
 		if (this.client == null) return;
 		this.client.end()
 		this.client.destroy()
 		this.client.removeAllListeners()
 		this.client = null
+	}
+
+	private heartbeat() {
+		if (!this.client) return clock.offListener(this.heartbeat, this);
+		// if (this.options.verbose) console.info(this.name, '-> ping');
+		this.reconnect()
+		this.client.pingreq()
 	}
 
 	private reconnect() {
@@ -83,6 +91,12 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 	}
 
 	private ondata = (packet: Mqtt.Packet) => {
+
+		if (packet.cmd == 'pingresp') {
+			// if (this.options.verbose) console.info(this.name, '-> pong');
+			clock.offListener(this.connect, this)
+			return
+		}
 
 		if (packet.cmd == 'connack') {
 			if (this.options.verbose) console.info(this.name, '-> connect');
@@ -113,15 +127,16 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 
 		if (packet.cmd == 'suback') {
 			if (this.options.verbose) console.info(this.name, '-> subscribed');
+			clock.on(this.options.timeout, this.heartbeat, this)
 			this.emit('subscribed')
 			return
 		}
 
 		if (packet.cmd == 'disconnect') {
 			if (this.options.verbose) console.warn(this.name, '-> disconnect');
-			if (this.options.retry) this.reconnect();
 			this.emit('disconnect')
-			return
+			if (this.options.retry) return this.reconnect();
+			this.destroy()
 		}
 
 		if (packet.cmd == 'publish') {
@@ -156,7 +171,8 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 			return
 		}
 
-		console.error('idk packet Error ->', packet)
+		console.warn('ondata packet ->', packet)
+
 	}
 
 	private onerror = (error: Error) => {

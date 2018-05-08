@@ -55,15 +55,16 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 	Process(pandora.process('symbols').entry('./watchers/symbols.watcher'), {
 		SCALE: 1,
 	})
-	Process(pandora.process('stocks').entry('./watchers/wb.mqtt.watcher'), {
+
+	Process(pandora.process('stocks').entry('./watchers/quotes.watcher'), {
 		SYMBOLS: 'STOCKS' as SymbolsTypes,
-		SCALE: 1,
+		SCALE: os.cpus().length,
 	})
-	// Process(pandora.process('forex').entry('./watchers/wb.mqtt.watcher'), {
+	// Process(pandora.process('forex').entry('./watchers/quotes.watcher'), {
 	// 	SYMBOLS: 'FOREX' as SymbolsTypes,
 	// 	SCALE: 1,
 	// })
-	// Process(pandora.process('indexes').entry('./watchers/wb.mqtt.watcher'), {
+	// Process(pandora.process('indexes').entry('./watchers/quotes.watcher'), {
 	// 	SYMBOLS: 'INDEXES' as SymbolsTypes,
 	// 	SCALE: 1,
 	// })

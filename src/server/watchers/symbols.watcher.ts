@@ -4,7 +4,6 @@ import '../main'
 import * as pAll from 'p-all'
 import * as pForever from 'p-forever'
 import * as schedule from 'node-schedule'
-import * as Pandora from 'pandora'
 import * as _ from '../../common/lodash'
 import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
@@ -19,7 +18,12 @@ import clock from '../../common/clock'
 
 
 
-async function readySymbols(type: keyof typeof rkeys.SYMBOLS) {
+const BUSY = {} as Dict<boolean>
+pandora.on('readySymbols', readySymbols)
+async function readySymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
+	let type = hubmsg.data.type
+	if (BUSY[type]) return;
+	BUSY[type] = true
 
 	if (type == 'STOCKS') {
 		// await redis.main.del(rkeys.WB.TICKER_IDS)
@@ -42,9 +46,12 @@ async function readySymbols(type: keyof typeof rkeys.SYMBOLS) {
 		if (indexes == 0) await syncIndexes(webull.indexes);
 	}
 
+	pandora.broadcast({
+		processName: type.toLowerCase(),
+	}, 'onSymbols', { type } as Symbols.OnSymbolsData)
+	delete BUSY[type]
+
 }
-pandora.publish(readySymbols)
-declare global { namespace Pandora { type readySymbols = typeof readySymbols } }
 
 
 
@@ -152,6 +159,7 @@ async function chunkStocks(reset = false) {
 		['set', rkeys.SYMBOLS.STOCKS, JSON.stringify(tpairs.map(v => v[0]))],
 		['set', rkeys.FSYMBOLS.STOCKS, JSON.stringify(_.fromPairs(tpairs))],
 	] as Redis.Coms
+	await webull.syncTickersQuotes(_.fromPairs(tpairs))
 	let chunks = core.array.chunks(tpairs, +process.env.CPUS)
 	chunks.forEach(function(chunk, i) {
 		let symbols = JSON.stringify(chunk.map(v => v[0]))
@@ -160,7 +168,11 @@ async function chunkStocks(reset = false) {
 		coms.push(['set', `${rkeys.FSYMBOLS.STOCKS}:${process.env.CPUS}:${i}`, fpairs])
 	})
 	await redis.main.coms(coms)
-	if (reset) pandora.broadcast({}, 'onSymbols', { reset, type: 'STOCKS' } as Symbols.OnSymbolsData);
+	if (reset) {
+		pandora.broadcast({
+			processName: 'stocks',
+		}, 'onSymbols', { reset, type: 'STOCKS' } as Symbols.OnSymbolsData);
+	}
 }
 
 
@@ -195,6 +207,7 @@ async function finishSync(type: keyof typeof rkeys.SYMBOLS, tickers: Webull.Tick
 	tickers = _.orderBy(tickers, 'disSymbol')
 	let fsymbols = {} as Dict<number>
 	tickers.forEach(v => fsymbols[v.disSymbol] = v.tickerId)
+	await webull.syncTickersQuotes(fsymbols)
 	await redis.main.coms([
 		['set', rkeys.SYMBOLS[type], JSON.stringify(Object.keys(fsymbols))],
 		['set', rkeys.FSYMBOLS[type], JSON.stringify(fsymbols)],

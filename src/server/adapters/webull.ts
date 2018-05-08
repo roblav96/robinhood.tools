@@ -44,10 +44,6 @@ export function fix(quote: Webull.Quote) {
 
 
 
-export function onData(topic: number, wbquote: Webull.Quote) {
-
-}
-
 export function onQuote({
 	quote, wbquote, toquote, filter,
 }: {
@@ -137,47 +133,6 @@ export function onQuote({
 	}
 
 	return toquote
-}
-
-
-
-export function parseStatus(quote: Quote, toquote: Quote, wbquote: Webull.Quote) {
-	if (wbquote.faStatus && hours.rxstate.value != 'REGULAR' && wbquote.faStatus != quote.status) {
-		toquote.status = wbquote.faStatus
-	} else if (wbquote.status && wbquote.status != quote.status) {
-		toquote.status = wbquote.status
-	}
-}
-
-export function parseTicker(quote: Quote, toquote: Quote, wbquote: Webull.Quote) {
-	if (wbquote.volume && wbquote.volume != quote.volume) toquote.volume = wbquote.volume;
-	if (wbquote.dealNum && wbquote.dealNum != quote.dealCount) toquote.dealCount = wbquote.dealNum;
-	if (wbquote.open && wbquote.open != quote.openPrice) toquote.openPrice = wbquote.open;
-	if (wbquote.close && wbquote.close != quote.closePrice) toquote.closePrice = wbquote.close;
-	if (wbquote.preClose && wbquote.preClose != quote.prevClose) toquote.prevClose = wbquote.preClose;
-	if (wbquote.high && wbquote.high != quote.dayHigh) toquote.dayHigh = wbquote.high;
-	if (wbquote.low && wbquote.low != quote.dayLow) toquote.dayLow = wbquote.low;
-	if (wbquote.fiftyTwoWkHigh && wbquote.fiftyTwoWkHigh != quote.yearHigh) toquote.yearHigh = wbquote.fiftyTwoWkHigh;
-	if (wbquote.fiftyTwoWkLow && wbquote.fiftyTwoWkLow != quote.yearLow) toquote.yearLow = wbquote.fiftyTwoWkLow;
-
-	if (wbquote.tradeTime && wbquote.tradeTime > quote.updated) {
-		toquote.updated = wbquote.tradeTime
-		if (wbquote.price && wbquote.price > 0) {
-			if (wbquote.tradeTime == wbquote.mkTradeTime) toquote.price = wbquote.price;
-			if (wbquote.tradeTime == wbquote.mktradeTime) toquote.price = wbquote.price;
-		}
-		if (wbquote.pPrice && wbquote.pPrice > 0) {
-			if (wbquote.tradeTime == wbquote.faTradeTime) toquote.price = wbquote.pPrice;
-		}
-		if (toquote.price) toquote.marketCap = Math.round(toquote.price * quote.sharesOutstanding);
-	}
-}
-
-export function parseBidAsk(quote: Quote, toquote: Quote, wbquote: Webull.Quote) {
-	if (wbquote.bid && wbquote.bid != quote.bidPrice) toquote.bidPrice = wbquote.bid;
-	if (wbquote.bidSize && wbquote.bidSize != quote.bidSize) toquote.bidSize = wbquote.bidSize;
-	if (wbquote.ask && wbquote.ask != quote.askPrice) toquote.askPrice = wbquote.ask;
-	if (wbquote.askSize && wbquote.askSize != quote.askSize) toquote.askSize = wbquote.askSize;
 }
 
 

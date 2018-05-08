@@ -18,42 +18,42 @@ import clock from '../../common/clock'
 
 
 declare global { namespace NodeJS { export interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
-let QUOTES = {} as Dict<Quote>
-let SAVES = {} as Dict<Quote>
+const WATCHERS = [] as webull.MqttClient[]
+const QUOTES = {} as Dict<Quote>
+const SAVES = {} as Dict<Quote>
 
-onSymbols()
 pandora.on('onSymbols', onSymbols)
-async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
-	if (hubmsg && hubmsg.data.type != process.env.SYMBOLS) return;
-	let resets = _.get(hubmsg, 'data.reset', false) as boolean
+pandora.broadcast({}, 'readySymbols', { type: process.env.SYMBOLS } as Symbols.OnSymbolsData)
+async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
+	if (hubmsg.data.type != process.env.SYMBOLS) return;
+	let resets = hubmsg.data.reset
 
-	let readySymbols = await pandora.proxy('readySymbols') as Pandora.readySymbols
-	await readySymbols(process.env.SYMBOLS)
+	console.log('hubmsg ->', hubmsg)
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
 		await utils.getFullSymbols(process.env.SYMBOLS)
 	)
-	// fsymbols = _.fromPairs(_.toPairs(fsymbols).splice(500))
-	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${SYMBOLS}`];
-	if (_.isEmpty(fsymbols)) return;
+	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 	let symbols = Object.keys(fsymbols)
-
-	let wbtickers = await webull.getTickers(fsymbols)
-	let wbquotes = await webull.getFullQuotes(fsymbols)
 
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => [
 		['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`],
+		['hgetall', `${rkeys.WB.TICKERS}:${v}`],
+		['hgetall', `${rkeys.WB.QUOTES}:${v}`],
 		['hgetall', `${rkeys.QUOTES}:${v}`],
 	])))
 	resolved.forEach(core.fix)
+
+	core.object.nullify(QUOTES)
+	core.object.nullify(SAVES)
 
 	let coms = [] as Redis.Coms
 	let ii = 0
 	symbols.forEach(function(symbol, i) {
 		let instrument = resolved[ii++] as Robinhood.Instrument
-		let wbticker = wbtickers.find(v => v.symbol == symbol)
-		let wbquote = wbquotes.find(v => v.symbol == symbol)
+		let wbticker = resolved[ii++] as Webull.Ticker
+		let wbquote = resolved[ii++] as Webull.Quote
 		let quote = resolved[ii++] as Quote
 
 		Object.assign(quote, {
@@ -62,12 +62,11 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 			typeof: process.env.SYMBOLS,
 			name: wbticker.name
 		} as Quote)
-		Object.assign(quote, webull.onQuote({ quote, wbquote }))
+		_.defaults(quote, webull.onQuote({ quote, wbquote }))
 
 		if (process.env.SYMBOLS == 'STOCKS') {
 			Object.assign(quote, {
 				name: instrument.name,
-				tradable: instrument.alive,
 				listDate: new Date(instrument.list_date).valueOf(),
 				mic: instrument.mic,
 				acronym: instrument.acronym,
@@ -80,8 +79,6 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 			_.defaults(quote, reset)
 			if (resets) Object.assign(quote, reset);
 		}
-		
-		console.log('quote ->', JSON.parse(JSON.stringify(quote)))
 
 		QUOTES[symbol] = quote
 		SAVES[symbol] = {} as any
@@ -94,24 +91,37 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 
 	await redis.main.coms(coms)
 
-	watcher.options.fsymbols = fsymbols
-	watcher.connect()
+	WATCHERS.forEach(v => v.destroy())
+	WATCHERS.splice(0)
+	core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 256)).forEach((chunk, i) => {
+		WATCHERS.push(new webull.MqttClient({
+			fsymbols: _.fromPairs(chunk),
+			topics: process.env.SYMBOLS,
+			connect: false,
+			verbose: true,
+		}).on('data', ondata))
+	})
+	connect.i = 0
+	clock.on(connect.tick, onconnect)
 
 }
 
-const watcher = new webull.MqttClient({
-	topics: process.env.SYMBOLS,
-	connect: false,
-	verbose: true,
-})
-watcher.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
-	// console.log(webull.mqtt_topics[topic], '->', wbquote)
+let connect = { tick: '3s' as Clock.Tick, i: 0 }
+function onconnect() {
+	console.log('connect.i ->', connect.i)
+	let watcher = WATCHERS[connect.i++]
+	if (watcher) {
+		// watcher.connect();
+	} else clock.off(connect.tick, onconnect)
+}
+
+function ondata(topic: number, wbquote: Webull.Quote) {
 	let symbol = wbquote.symbol
 	let quote = QUOTES[symbol]
 	let toquote = {} as Quote
 
+	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 	// webull.onQuote({ quote, wbquote, toquote })
-
 	if (topic == webull.mqtt_topics.TICKER_STATUS) {
 		webull.onQuote({ quote, wbquote, toquote, filter: 'status' })
 
@@ -141,12 +151,12 @@ watcher.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	}
 
 	if (Object.keys(toquote).length == 0) return;
-	console.log('toquote ->', webull.mqtt_topics[topic], JSON.parse(JSON.stringify(toquote)))
+	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
 	Object.assign(QUOTES[symbol], toquote)
 	Object.assign(SAVES[symbol], toquote)
 	socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
 
-})
+}
 
 clock.on('5s', function onsave() {
 	let coms = Object.keys(SAVES).filter(v => {
@@ -157,10 +167,4 @@ clock.on('5s', function onsave() {
 	Object.keys(SAVES).forEach(symbol => SAVES[symbol] = {} as any)
 })
 
-// const TOPICS = {} as any
-// TOPICS[topic] = true
-// clock.on('5s', function() {
-// 	let topics = Object.keys(TOPICS).map(v => webull.mqtt_topics[v])
-// 	console.log('topics ->', topics)
-// })
 
