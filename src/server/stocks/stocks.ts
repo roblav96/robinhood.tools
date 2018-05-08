@@ -97,11 +97,14 @@ const watcher = new webull.MqttClient({
 watcher.on('data', function(topic: number, wbquote: Webull.Quote) {
 	let symbol = wbquote.symbol
 	let quote = QUOTES[symbol]
-
-	let toquote = {} as Quote
+	let toquote: Quote
 
 	if (topic == webull.mqtt_topics.TICKER_STATUS) {
-		webull.parseStatus(quote, toquote, wbquote)
+		toquote = webull.onQuote({ quote, wbquote, filter: 'status' })
+
+	} else if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
+		toquote = webull.onQuote({ quote, wbquote })
+
 	}
 
 	if ([

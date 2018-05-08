@@ -28,8 +28,6 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 	if (_.isEmpty(fsymbols)) return;
 	let symbols = Object.keys(fsymbols)
 
-	await redis.main.purge(rkeys.QUOTES)
-
 	let wbtickers = await webull.getTickers(fsymbols)
 	let wbquotes = await webull.getFullQuotes(fsymbols)
 
@@ -67,9 +65,16 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 
 const watcher = new webull.MqttClient({
 	connect: false,
-	verbose: true,
+	topics: 'forex',
 })
 watcher.on('data', function(topic: number, wbquote: Webull.Quote) {
 	// console.log('wbquote ->', topic, wbquote)
 })
+
+// const TOPICS = {} as any
+// TOPICS[topic] = true
+// clock.on('5s', function() {
+// 	let topics = Object.keys(TOPICS).map(v => webull.mqtt_topics[v])
+// 	console.log('topics ->', topics)
+// })
 

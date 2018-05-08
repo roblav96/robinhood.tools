@@ -44,9 +44,19 @@ export function fix(quote: Webull.Quote) {
 
 
 
+export function onData(topic: number, wbquote: Webull.Quote) {
+
+}
+
 export function onQuote({
-	quote, wbquote, toquote, filter,
-}: { quote: Quote, wbquote: Webull.Quote, toquote?: Quote, filter?: 'all' | 'status' | 'bidask' | 'ticker' | 'deal' }) {
+	quote, wbquote, filter, toquote,
+}: {
+		quote: Quote,
+		wbquote: Webull.Quote,
+		filter?: 'all' | 'status' | 'bidask' | 'ticker' | 'deal'
+		toquote?: Quote,
+	}
+) {
 	toquote = toquote || {} as any
 	filter = filter || 'all'
 
@@ -79,6 +89,8 @@ export function onQuote({
 	}
 
 	if (filter == 'all' || filter == 'ticker') {
+		if (wbquote.quoteMaker && wbquote.quoteMaker != quote.maker) toquote.maker = wbquote.quoteMaker;
+		if (wbquote.quoteMakerAddress && wbquote.quoteMakerAddress != quote.makerAddress) toquote.makerAddress = wbquote.quoteMakerAddress;
 		if (wbquote.volume && wbquote.volume != quote.volume) toquote.volume = wbquote.volume;
 		if (wbquote.dealNum && wbquote.dealNum != quote.dealCount) toquote.dealCount = wbquote.dealNum;
 		if (wbquote.open && wbquote.open != quote.openPrice) toquote.openPrice = wbquote.open;
@@ -121,10 +133,6 @@ export function onQuote({
 	}
 
 	return toquote
-}
-
-export function onDeal(quote: Quote, toquote: Quote, wbdeal: Webull.Deal) {
-
 }
 
 
