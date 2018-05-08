@@ -93,18 +93,17 @@ watcher.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	}
 
 	if (Object.keys(toquote).length == 0) return;
-	console.log('toquote ->', webull.mqtt_topics[topic], JSON.parse(JSON.stringify(toquote)))
+	// console.log('toquote ->', webull.mqtt_topics[topic], JSON.parse(JSON.stringify(toquote)))
 	Object.assign(QUOTES[symbol], toquote)
 	Object.assign(SAVES[symbol], toquote)
 	socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
 
 })
 
-clock.on('3s', function onsave() {
+clock.on('5s', function onsave() {
 	let coms = Object.keys(SAVES).filter(symbol => {
 		return Object.keys(SAVES[symbol]).length > 0
 	}).map(symbol => {
-		console.log('SAVES[' + symbol + '] ->', SAVES[symbol])
 		return ['hmset', `${rkeys.QUOTES}:${symbol}`, SAVES[symbol]]
 	})
 	redis.main.coms(coms as any)
