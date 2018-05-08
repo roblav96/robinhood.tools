@@ -1,6 +1,7 @@
 // 
 
 export {
+	add,
 	after,
 	Cancelable,
 	ceil,

@@ -21,16 +21,11 @@ declare global { namespace NodeJS { export interface ProcessEnv { SYMBOLS: Symbo
 let QUOTES = {} as Dict<Quote>
 let SAVES = {} as Dict<Quote>
 
-// (async function start() {
-// 	let readySymbols = await pandora.proxy('readySymbols') as Pandora.readySymbols
-// 	await readySymbols(process.env.SYMBOLS)
-// })()
-
 onSymbols()
 pandora.on('onSymbols', onSymbols)
 async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 	if (hubmsg && hubmsg.data.type != process.env.SYMBOLS) return;
-	let reset = _.get(hubmsg, 'data.reset', false)
+	let resets = _.get(hubmsg, 'data.reset', false) as boolean
 
 	let readySymbols = await pandora.proxy('readySymbols') as Pandora.readySymbols
 	await readySymbols(process.env.SYMBOLS)
@@ -47,13 +42,20 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 	let wbtickers = await webull.getTickers(fsymbols)
 	let wbquotes = await webull.getFullQuotes(fsymbols)
 
-	let quotes = await redis.main.coms(symbols.map(v => ['hgetall', `${rkeys.QUOTES}:${v}`])) as Quote[]
+	let resolved = await redis.main.coms(_.flatten(symbols.map(v => [
+		['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`],
+		['hgetall', `${rkeys.QUOTES}:${v}`],
+	])))
+	resolved.forEach(core.fix)
+
 	let coms = [] as Redis.Coms
-	quotes.forEach(function(quote, i) {
-		core.fix(quote)
-		let symbol = symbols[i]
+	let ii = 0
+	symbols.forEach(function(symbol, i) {
+		let instrument = resolved[ii++] as Robinhood.Instrument
 		let wbticker = wbtickers.find(v => v.symbol == symbol)
 		let wbquote = wbquotes.find(v => v.symbol == symbol)
+		let quote = resolved[ii++] as Quote
+
 		Object.assign(quote, {
 			symbol,
 			tickerId: fsymbols[symbol],
@@ -61,6 +63,25 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 			name: wbticker.name
 		} as Quote)
 		Object.assign(quote, webull.onQuote({ quote, wbquote }))
+
+		if (process.env.SYMBOLS == 'STOCKS') {
+			Object.assign(quote, {
+				name: instrument.name,
+				tradable: instrument.alive,
+				listDate: new Date(instrument.list_date).valueOf(),
+				mic: instrument.mic,
+				acronym: instrument.acronym,
+				country: instrument.country,
+			} as Quote)
+			let reset = {
+				volume: 0, dealCount: 0,
+				buyVolume: 0, sellVolume: 0,
+			} as Quote
+			_.defaults(quote, reset)
+			if (resets) Object.assign(quote, reset);
+		}
+		
+		console.log('quote ->', JSON.parse(JSON.stringify(quote)))
 
 		QUOTES[symbol] = quote
 		SAVES[symbol] = {} as any
@@ -73,22 +94,23 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 
 	await redis.main.coms(coms)
 
-	console.warn('done')
-
-	// watcher.options.fsymbols = fsymbols
-	// watcher.connect()
+	watcher.options.fsymbols = fsymbols
+	watcher.connect()
 
 }
 
 const watcher = new webull.MqttClient({
 	topics: process.env.SYMBOLS,
-	connect: false
+	connect: false,
+	verbose: true,
 })
 watcher.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	// console.log(webull.mqtt_topics[topic], '->', wbquote)
 	let symbol = wbquote.symbol
 	let quote = QUOTES[symbol]
 	let toquote = {} as Quote
+
+	// webull.onQuote({ quote, wbquote, toquote })
 
 	if (topic == webull.mqtt_topics.TICKER_STATUS) {
 		webull.onQuote({ quote, wbquote, toquote, filter: 'status' })
@@ -106,10 +128,20 @@ watcher.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	} else if (topic == webull.mqtt_topics.TICKER_MARKET_INDEX) {
 		webull.onQuote({ quote, wbquote, toquote, filter: 'ticker' })
 
+	} else if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
+		webull.onQuote({ quote, wbquote, toquote, filter: 'deal' })
+		socket.emit(`${rkeys.DEALS}:${symbol}`, {
+			symbol,
+			price: wbquote.deal,
+			size: wbquote.volume,
+			side: wbquote.tradeBsFlag,
+			time: wbquote.tradeTime,
+		} as Quote.Deal)
+
 	}
 
 	if (Object.keys(toquote).length == 0) return;
-	// console.log('toquote ->', webull.mqtt_topics[topic], JSON.parse(JSON.stringify(toquote)))
+	console.log('toquote ->', webull.mqtt_topics[topic], JSON.parse(JSON.stringify(toquote)))
 	Object.assign(QUOTES[symbol], toquote)
 	Object.assign(SAVES[symbol], toquote)
 	socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
