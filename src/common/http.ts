@@ -53,6 +53,13 @@ export function send(config: Http.Config) {
 				let type = res.headers['content-type']
 				if (type && type.includes('application/json')) {
 					let parsed = fastjsonparse(data)
+					if (parsed.err) {
+						return reject(new boom(parsed.err, {
+							statusCode: res.statusCode,
+							message: parsed.err.message,
+							decorate: { data },
+						}))
+					}
 					if (parsed.value) data = parsed.value;
 				}
 			}
@@ -77,7 +84,8 @@ export function send(config: Http.Config) {
 			config.retries--
 			if (process.env.DEVELOPMENT && process.env.SERVER) {
 				console.error('retry Error ->', error)
-				console.warn('retry config.retries ->', config.retries)
+				console.warn('retry config ->', config)
+				// console.warn('retry config.retries ->', config.retries)
 			}
 			return clock.toPromise(config.retryTick).then(() => send(config))
 		}

@@ -19,16 +19,32 @@ import clock from '../../common/clock'
 
 async function readyIndexes() {
 	let exists = await redis.main.exists(rkeys.INDEXES.SYMBOLS) as number
-	if (exists == 0) await syncIndexes(core.clone(webull.indexes));
+	if (exists == 0) await syncIndexes(webull.indexes);
 }
 readyIndexes().catch(function(error) {
 	console.error('readyIndexes Error ->', error)
 })
 
-async function syncIndexes(symbols: string[]) {
+async function syncIndexes(indexes: string[]) {
+	let symbols = core.clone(indexes)
+	let tickers = await pAll(symbols.map(symbol => {
+		return () => getTicker(symbol)
+	}), { concurrency: 1 })
 	let url = 'https://securitiesapi.webull.com/api/securities/market/tabs/v2/globalIndices/1'
-	let list = await http.get(url, { query: { hl: 'en' } }) as Webull.Api.MarketIndexList
+	let response = await http.get(url, { query: { hl: 'en' } }) as Webull.Api.MarketIndex[]
+	response.forEach(v => v.marketIndexList.forEach(vv => tickers.push(vv)))
+	tickers = _.orderBy(tickers.filter(v => v), 'disSymbol')
+	let fsymbols = {} as Dict<number>
+	tickers.forEach(v => fsymbols[v.disSymbol] = v.tickerId)
+	console.log('fsymbols ->', fsymbols)
+}
 
+async function getTicker(symbol: string) {
+	let response = await http.get('https://infoapi.webull.com/api/search/tickers2', {
+		query: { keys: symbol, tickerType: 1 }
+	}) as Webull.Api.Paginated<Webull.Ticker>
+	if (!Array.isArray(response.list)) return;
+	return response.list.find(v => v.disSymbol == symbol)
 }
 
 

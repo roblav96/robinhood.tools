@@ -32,7 +32,7 @@ async function syncTickerIds(fiats: string[]) {
 		symbols.push(v + vv)
 	}))
 	let tickers = await pAll(symbols.map(symbol => {
-		return () => getTickerId(symbol)
+		return () => getTicker(symbol)
 	}), { concurrency: 1 })
 	tickers = _.orderBy(tickers.filter(v => v), 'tickerSymbol')
 	let fsymbols = {} as Dict<number>
@@ -44,7 +44,7 @@ async function syncTickerIds(fiats: string[]) {
 	])
 }
 
-async function getTickerId(symbol: string) {
+async function getTicker(symbol: string) {
 	let response = await http.get('https://infoapi.webull.com/api/search/tickers2', {
 		query: { keys: symbol, tickerType: 6 }
 	}) as Webull.Api.Paginated<Webull.Ticker>
