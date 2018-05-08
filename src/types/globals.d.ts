@@ -26,7 +26,6 @@ declare namespace NodeJS {
 		DEBUGGER: any
 		PANDORA_DEV: any
 		CPUS: any
-		SYMBOLS: any
 	}
 }
 

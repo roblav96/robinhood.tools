@@ -1,23 +1,34 @@
 // 
 
-import * as Pandora from 'pandora'
-import * as Hub from 'pandora-hub'
+import * as pandora from 'pandora'
 
 
 
-// export const hub = Pandora.getHub()
-// export const client = hub.getHubClient()
+export function publish(fn: Function) {
+	return pandora.getHub().publish({ [fn.name]: fn }, {
+		name: fn.name,
+	})
+}
+
+export async function proxy(name: string) {
+	return (await pandora.getHub().getProxy({ name }))[name]
+}
+
+
 
 export function broadcast(selector: Hub.Selector, action: string, data?: any) {
-	Pandora.getHub().hubClient.multipleSend(selector, action, { data })
+	pandora.getHub().hubClient.multipleSend(selector, action, { data })
 }
 
-export function on(action: string, fn: (message: Hub.HubMessage) => void) {
-	Pandora.getHub().hubClient.on(action, fn)
+export function on(action: string, fn: (message: Pandora.HubMessage) => void) {
+	pandora.getHub().hubClient.on(action, fn)
 }
 
 
 
+
+
+import * as Hub from 'pandora-hub'
 declare global {
 	namespace Pandora {
 		interface HubMessage<T = any> extends Hub.HubMessage {
@@ -25,6 +36,10 @@ declare global {
 		}
 	}
 }
+
+
+
+
 
 // Pandora.processContext.context.serviceReconciler.state = Pandora.State.complete
 // let cl = Pandora.consoleLogger.get('console')

@@ -4,6 +4,7 @@ import '../main'
 import * as pAll from 'p-all'
 import * as pForever from 'p-forever'
 import * as schedule from 'node-schedule'
+import * as Pandora from 'pandora'
 import * as _ from '../../common/lodash'
 import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
@@ -18,27 +19,32 @@ import clock from '../../common/clock'
 
 
 
-(async function readySymbols() {
+async function readySymbols(type: keyof typeof rkeys.SYMBOLS) {
 
-	// await redis.main.del(rkeys.WB.TICKER_IDS)
-	let tids = await redis.main.hlen(rkeys.WB.TICKER_IDS)
-	if (tids < 10000) await syncStocks();
+	if (type == 'STOCKS') {
+		// await redis.main.del(rkeys.WB.TICKER_IDS)
+		let tids = await redis.main.hlen(rkeys.WB.TICKER_IDS)
+		if (tids < 10000) await syncStocks();
+		// await redis.main.del(rkeys.SYMBOLS.STOCKS)
+		let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)
+		if (stocks == 0) await chunkStocks();
+	}
 
-	// await redis.main.del(rkeys.SYMBOLS.STOCKS)
-	let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)
-	if (stocks == 0) await chunkStocks();
+	if (type == 'FOREX') {
+		// await redis.main.del(rkeys.SYMBOLS.FOREX)
+		let forex = await redis.main.exists(rkeys.SYMBOLS.FOREX)
+		if (forex == 0) await syncForex();
+	}
 
-	// await redis.main.del(rkeys.SYMBOLS.FOREX)
-	let forex = await redis.main.exists(rkeys.SYMBOLS.FOREX)
-	if (forex == 0) await syncForex();
+	if (type == 'INDEXES') {
+		// await redis.main.del(rkeys.SYMBOLS.INDEXES)
+		let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
+		if (indexes == 0) await syncIndexes(webull.indexes);
+	}
 
-	// await redis.main.del(rkeys.SYMBOLS.INDEXES)
-	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
-	if (indexes == 0) await syncIndexes(webull.indexes);
-
-})().catch(function(error) {
-	console.error('readySymbols Error ->', error)
-})
+}
+pandora.publish(readySymbols)
+declare global { namespace Pandora { type readySymbols = typeof readySymbols } }
 
 
 
@@ -154,7 +160,7 @@ async function chunkStocks(reset = false) {
 		coms.push(['set', `${rkeys.FSYMBOLS.STOCKS}:${process.env.CPUS}:${i}`, fpairs])
 	})
 	await redis.main.coms(coms)
-	pandora.broadcast({}, 'onSymbols', { reset, type: 'STOCKS' as keyof typeof rkeys.SYMBOLS })
+	if (reset) pandora.broadcast({}, 'onSymbols', { reset, type: 'STOCKS' } as Symbols.OnSymbolsData);
 }
 
 
@@ -193,10 +199,7 @@ async function finishSync(type: keyof typeof rkeys.SYMBOLS, tickers: Webull.Tick
 		['set', rkeys.SYMBOLS[type], JSON.stringify(Object.keys(fsymbols))],
 		['set', rkeys.FSYMBOLS[type], JSON.stringify(fsymbols)],
 	])
-	pandora.broadcast({}, 'onSymbols', { type })
 }
-
-
 
 async function getTicker(symbol: string, tickerType: number) {
 	let response = await http.get('https://infoapi.webull.com/api/search/tickers2', {

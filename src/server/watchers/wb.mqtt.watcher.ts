@@ -17,17 +17,27 @@ import clock from '../../common/clock'
 
 
 
-const SYMBOLS = process.env.SYMBOLS as SymbolsTypes
+declare global { namespace NodeJS { export interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
 let QUOTES = {} as Dict<Quote>
 let SAVES = {} as Dict<Quote>
+
+// (async function start() {
+// 	let readySymbols = await pandora.proxy('readySymbols') as Pandora.readySymbols
+// 	await readySymbols(process.env.SYMBOLS)
+// })()
 
 onSymbols()
 pandora.on('onSymbols', onSymbols)
 async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
-	if (hubmsg && hubmsg.data.type != SYMBOLS) return;
-	let fsymbols = (SYMBOLS == 'STOCKS' ?
-		await utils.getInstanceFullSymbols(SYMBOLS) :
-		await utils.getFullSymbols(SYMBOLS)
+	if (hubmsg && hubmsg.data.type != process.env.SYMBOLS) return;
+	let reset = _.get(hubmsg, 'data.reset', false)
+
+	let readySymbols = await pandora.proxy('readySymbols') as Pandora.readySymbols
+	await readySymbols(process.env.SYMBOLS)
+
+	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
+		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
+		await utils.getFullSymbols(process.env.SYMBOLS)
 	)
 	// fsymbols = _.fromPairs(_.toPairs(fsymbols).splice(500))
 	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${SYMBOLS}`];
@@ -47,7 +57,7 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 		Object.assign(quote, {
 			symbol,
 			tickerId: fsymbols[symbol],
-			typeof: SYMBOLS,
+			typeof: process.env.SYMBOLS,
 			name: wbticker.name
 		} as Quote)
 		Object.assign(quote, webull.onQuote({ quote, wbquote }))
@@ -62,7 +72,7 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 	})
 
 	await redis.main.coms(coms)
-	
+
 	console.warn('done')
 
 	// watcher.options.fsymbols = fsymbols
@@ -71,7 +81,7 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 }
 
 const watcher = new webull.MqttClient({
-	topics: SYMBOLS,
+	topics: process.env.SYMBOLS,
 	connect: false
 })
 watcher.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
@@ -107,9 +117,10 @@ watcher.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 })
 
 clock.on('5s', function onsave() {
-	let coms = Object.keys(SAVES).filter(symbol => {
-		return Object.keys(SAVES[symbol]).length > 0
+	let coms = Object.keys(SAVES).filter(v => {
+		return Object.keys(SAVES[v]).length > 0
 	}).map(v => ['hmset', `${rkeys.QUOTES}:${v}`, SAVES[v]])
+	if (coms.length == 0) return;
 	redis.main.coms(coms as any)
 	Object.keys(SAVES).forEach(symbol => SAVES[symbol] = {} as any)
 })

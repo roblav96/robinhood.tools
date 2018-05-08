@@ -52,6 +52,9 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 	// 	SCALE: 1,
 	// })
 
+	Process(pandora.process('symbols').entry('./watchers/symbols.watcher'), {
+		SCALE: 1,
+	})
 	Process(pandora.process('stocks').entry('./watchers/wb.mqtt.watcher'), {
 		SYMBOLS: 'STOCKS' as SymbolsTypes,
 		SCALE: 1,
@@ -64,9 +67,6 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 	// 	SYMBOLS: 'INDEXES' as SymbolsTypes,
 	// 	SCALE: 1,
 	// })
-	Process(pandora.process('symbols').entry('./watchers/symbols.watcher'), {
-		SCALE: 1,
-	})
 
 	// Process(pandora.process('hours.service').entry('./services/hours.service'), {
 	// 	SCALE: 1,
