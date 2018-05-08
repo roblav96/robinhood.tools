@@ -103,9 +103,7 @@ watcher.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 clock.on('5s', function onsave() {
 	let coms = Object.keys(SAVES).filter(symbol => {
 		return Object.keys(SAVES[symbol]).length > 0
-	}).map(symbol => {
-		return ['hmset', `${rkeys.QUOTES}:${symbol}`, SAVES[symbol]]
-	})
+	}).map(v => ['hmset', `${rkeys.QUOTES}:${v}`, SAVES[v]])
 	redis.main.coms(coms as any)
 	Object.keys(SAVES).forEach(symbol => SAVES[symbol] = {} as any)
 })
