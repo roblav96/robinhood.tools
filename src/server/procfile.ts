@@ -60,8 +60,7 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 		SYMBOLS: 'FOREX' as SymbolsTypes,
 		SCALE: 1,
 	})
-
-	Process(pandora.process('symbols').entry('./symbols/symbols'), {
+	Process(pandora.process('symbols').entry('./watchers/symbols.watcher'), {
 		SCALE: 1,
 	})
 
