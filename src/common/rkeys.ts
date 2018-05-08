@@ -17,6 +17,7 @@ export const SYMBOLS = {
 	FOREX: 'symbols:forex',
 	INDEXES: 'symbols:indexes',
 }
+declare global { type SymbolsTypes = keyof typeof SYMBOLS }
 export const FSYMBOLS = {
 	STOCKS: 'fsymbols:stocks',
 	FOREX: 'fsymbols:forex',

@@ -23,7 +23,7 @@ let SAVES = {} as Dict<Quote>
 async function onStocks(hubmsg?: any) {
 	let reset = _.get(hubmsg, 'data.reset', false)
 	let fsymbols = await utils.getInstanceFullSymbols('STOCKS')
-	if (process.env.DEVELOPMENT) fsymbols = utils.devfsymbols;
+	if (process.env.DEVELOPMENT) fsymbols = utils.DEV_STOCKS;
 	let symbols = Object.keys(fsymbols)
 
 	await webull.syncTickersQuotes(fsymbols)

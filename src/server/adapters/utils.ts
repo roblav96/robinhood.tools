@@ -6,7 +6,7 @@ import * as redis from './redis'
 
 
 
-export const devfsymbols = {
+export const DEV_STOCKS = {
 	SPY: 913243251,
 	BABA: 913254558,
 	BAC: 913254999,
@@ -31,7 +31,21 @@ export const devfsymbols = {
 	// ISZE: 913247275,
 	// WEXP: 913246860,
 	// GMFL: 925348033,
-} as Dict<number>
+}
+export const DEV_FOREX = {
+	USDAUD: 913344380,
+	USDCAD: 913344262,
+	USDCHF: 913344337,
+	USDCNH: 913344247,
+	USDCNY: 913344246,
+	USDJPY: 913344317,
+	USDRUB: 913344253,
+}
+export const DEV_INDEXES = {
+	DJI: 913353822,
+	INX: 913354362,
+	IXIC: 913354090,
+}
 
 
 

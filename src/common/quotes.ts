@@ -23,6 +23,8 @@ declare global {
 		// 
 		maker: string
 		makerAddress: string
+		vibrate: number
+		yield: number
 		// 
 		price: number
 		openPrice: number

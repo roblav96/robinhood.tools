@@ -23,11 +23,9 @@ let SAVES = {} as Dict<Quote>
 onSymbols()
 pandora.on('onSymbols', onSymbols)
 async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
-	if (hubmsg && hubmsg.data.type != 'FOREX') return;
-	let fsymbols = await utils.getFullSymbols('FOREX')
-
-	if (process.env.DEVELOPMENT) fsymbols = utils.DEV_FOREX;
-
+	if (hubmsg && hubmsg.data.type != process.env.SYMBOLS) return;
+	let fsymbols = await utils.getFullSymbols(process.env.SYMBOLS)
+	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 	if (_.isEmpty(fsymbols)) return;
 	let symbols = Object.keys(fsymbols)
 
@@ -45,7 +43,7 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 		Object.assign(quote, {
 			symbol,
 			tickerId: fsymbols[symbol],
-			typeof: 'FOREX',
+			typeof: process.env.SYMBOLS,
 			name: wbticker.name
 		} as Quote)
 		Object.assign(quote, webull.onQuote({ quote, wbquote }))
@@ -67,7 +65,7 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 }
 
 const watcher = new webull.MqttClient({
-	topics: 'FOREX',
+	topics: process.env.SYMBOLS,
 	connect: false
 })
 watcher.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
@@ -89,10 +87,13 @@ watcher.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		webull.onQuote({ quote, wbquote, toquote, filter: 'bidask' })
 		webull.onQuote({ quote, wbquote, toquote, filter: 'ticker' })
 
+	} else if (topic == webull.mqtt_topics.TICKER_MARKET_INDEX) {
+		webull.onQuote({ quote, wbquote, toquote, filter: 'ticker' })
+
 	}
 
 	if (Object.keys(toquote).length == 0) return;
-	// console.log('toquote ->', webull.mqtt_topics[topic], JSON.parse(JSON.stringify(toquote)))
+	console.log('toquote ->', webull.mqtt_topics[topic], JSON.parse(JSON.stringify(toquote)))
 	Object.assign(QUOTES[symbol], toquote)
 	Object.assign(SAVES[symbol], toquote)
 	socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)

@@ -15,8 +15,9 @@ import clock from '../../common/clock'
 export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'> {
 
 	private static topics = {
-		forex: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
-		stocks: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_DEAL_DETAILS', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
+		STOCKS: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_DEAL_DETAILS', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
+		FOREX: ['FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
+		INDEXES: ['FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
 	}
 
 	private static get options() {
@@ -130,9 +131,11 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 			let type = Number.parseInt(topic.type)
 			if (type == webull.mqtt_topics.TICKER_BID_ASK) {
 				payload.data.remove(v => {
-					if (Array.isArray(v.bidList) && v.bidList.length == 0) return true;
-					if (Array.isArray(v.askList) && v.askList.length == 0) return true;
-					return Object.keys(v).length == 0
+					return !(
+						(Array.isArray(v.bidList) && v.bidList.length > 0)
+						||
+						(Array.isArray(v.askList) && v.askList.length > 0)
+					)
 				})
 			}
 			if (payload.data.length == 0) return;
@@ -147,7 +150,6 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 				webull.fix(wbquote)
 				wbquote.tickerId = tid
 				wbquote.symbol = symbol
-				// if (this.options.verbose) console.log('data ->', wbquote);
 				this.emit('data', type, wbquote)
 			}
 

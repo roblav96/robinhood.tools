@@ -49,12 +49,12 @@ export function onData(topic: number, wbquote: Webull.Quote) {
 }
 
 export function onQuote({
-	quote, wbquote, filter, toquote,
+	quote, wbquote, toquote, filter,
 }: {
 		quote: Quote,
 		wbquote: Webull.Quote,
-		filter?: 'all' | 'status' | 'bidask' | 'ticker' | 'deal'
 		toquote?: Quote,
+		filter?: 'all' | 'status' | 'bidask' | 'ticker' | 'deal'
 	}
 ) {
 	toquote = toquote || {} as any
@@ -89,10 +89,6 @@ export function onQuote({
 	}
 
 	if (filter == 'all' || filter == 'ticker') {
-		if (wbquote.quoteMaker && wbquote.quoteMaker != quote.maker) toquote.maker = wbquote.quoteMaker;
-		if (wbquote.quoteMakerAddress && wbquote.quoteMakerAddress != quote.makerAddress) toquote.makerAddress = wbquote.quoteMakerAddress;
-		if (wbquote.volume && wbquote.volume != quote.volume) toquote.volume = wbquote.volume;
-		if (wbquote.dealNum && wbquote.dealNum != quote.dealCount) toquote.dealCount = wbquote.dealNum;
 		if (wbquote.open && wbquote.open != quote.openPrice) toquote.openPrice = wbquote.open;
 		if (wbquote.close && wbquote.close != quote.closePrice) toquote.closePrice = wbquote.close;
 		if (wbquote.preClose && wbquote.preClose != quote.prevClose) toquote.prevClose = wbquote.preClose;
@@ -100,6 +96,14 @@ export function onQuote({
 		if (wbquote.low && wbquote.low != quote.dayLow) toquote.dayLow = wbquote.low;
 		if (wbquote.fiftyTwoWkHigh && wbquote.fiftyTwoWkHigh != quote.yearHigh) toquote.yearHigh = wbquote.fiftyTwoWkHigh;
 		if (wbquote.fiftyTwoWkLow && wbquote.fiftyTwoWkLow != quote.yearLow) toquote.yearLow = wbquote.fiftyTwoWkLow;
+		if (wbquote.quoteMaker && wbquote.quoteMaker != quote.maker) toquote.maker = wbquote.quoteMaker;
+		if (wbquote.quoteMakerAddress && wbquote.quoteMakerAddress != quote.makerAddress) toquote.makerAddress = wbquote.quoteMakerAddress;
+		if (wbquote.yield && wbquote.yield != quote.yield) toquote.yield = wbquote.yield;
+		if (wbquote.vibrateRatio && wbquote.vibrateRatio != quote.vibrate) toquote.vibrate = wbquote.vibrateRatio;
+
+		if (wbquote.volume && wbquote.volume != quote.volume) toquote.volume = wbquote.volume;
+		if (wbquote.dealNum && wbquote.dealNum != quote.dealCount) toquote.dealCount = wbquote.dealNum;
+
 		if (wbquote.tradeTime && wbquote.tradeTime > quote.updated) {
 			toquote.updated = wbquote.tradeTime
 			if (wbquote.price && wbquote.price > 0) {

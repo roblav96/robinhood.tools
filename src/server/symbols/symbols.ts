@@ -188,7 +188,7 @@ async function syncIndexes(indexes: string[]) {
 		query: { hl: 'en' },
 	}) as Webull.Api.MarketIndex[]
 	response.forEach(v => v.marketIndexList.forEach(vv => tickers.push(vv)))
-	tickers.remove(v => !v || (v.secType && v.secType.includes(52)))
+	tickers.remove(v => !v || (v.secType && v.secType.includes(52)) || v.disSymbol == 'IBEX')
 	tickers = _.orderBy(tickers, 'disSymbol')
 	let fsymbols = {} as Dict<number>
 	tickers.forEach(v => fsymbols[v.disSymbol] = v.tickerId)
