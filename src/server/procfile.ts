@@ -40,25 +40,29 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as Env) {
 
 export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 
-	Process(pandora.process('api').entry('./api/api'), {
-		// SCALE: 2, // os.cpus().length,
-		// DEBUGGER: false,
-	})
+	// Process(pandora.process('api').entry('./api/api'), {
+	// 	// SCALE: os.cpus().length,
+	// })
 
-	Process(pandora.process('stocks').entry('./stocks/stocks'), {
-		// SCALE: 2, // os.cpus().length,
-		// DEBUGGER: false,
-	})
+	// Process(pandora.process('stocks').entry('./stocks/stocks'), {
+	// 	// SCALE: os.cpus().length,
+	// })
 
-	Process(pandora.process('stocks.instruments').entry('./stocks/instruments'), {
+	Process(pandora.process('forex').entry('./forex/forex'), {
 		SCALE: 1,
-		// DEBUGGER: false,
 	})
 
-	Process(pandora.process('hours.service').entry('./services/hours.service'), {
-		SCALE: 1,
-		// DEBUGGER: false,
-	})
+	// Process(pandora.process('indexes').entry('./indexes/indexes'), {
+	// 	SCALE: 1,
+	// })
+
+	// Process(pandora.process('stocks.instruments').entry('./stocks/instruments'), {
+	// 	SCALE: 1,
+	// })
+
+	// Process(pandora.process('hours.service').entry('./services/hours.service'), {
+	// 	SCALE: 1,
+	// })
 
 
 

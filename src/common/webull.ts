@@ -5,6 +5,10 @@ import * as core from './core'
 
 
 
+export const fiats = ['USD', 'CNY', 'CHF', 'JPY', 'EUR', 'GBP', 'AUD', 'HDK', 'CAD', 'RUB']
+
+
+
 export const WB = {
 	WB: 'wb',
 	TICKER_IDS: 'wb:tickerids',
@@ -14,7 +18,7 @@ export const WB = {
 
 
 
-export enum TICKER_STATUS {
+export enum ticker_status {
 	CLOSED = 'B',
 	DELISTED = '3',
 	HAS_CLOSED = 'D',
@@ -27,9 +31,9 @@ export enum TICKER_STATUS {
 	SUSPENSION = 'P',
 	WILL_OPEN = 'W',
 }
-Object.assign(TICKER_STATUS, _.invert(TICKER_STATUS))
+Object.assign(ticker_status, _.invert(ticker_status))
 
-export enum TICKER_TYPES {
+export enum ticker_types {
 	INDICE = 1,
 	STOCK = 2,
 	FUND = 3,
@@ -50,12 +54,12 @@ export enum TICKER_TYPES {
 	INDEX_FUND = 53,
 }
 
-export enum FUND_TYPES {
+export enum fund_types {
 	ETF = 0,
 	COMMON = 1,
 }
 
-export enum MARKET_TYPES {
+export enum market_types {
 	FUND = 0,
 	ETF_FUND = 1,
 	COMMODITY = 2,
@@ -64,7 +68,7 @@ export enum MARKET_TYPES {
 	FOREX = 5,
 }
 
-export enum topics {
+export enum mqtt_topics {
 	MARKET_SECTOR = 1,
 	MARKET_POSITIVE = 2,
 	MARKET_DECLIE = 3,
@@ -174,7 +178,6 @@ declare global {
 			close: number
 			countryISOCode: string
 			currency: string
-			deal: number
 			dealAmount: number
 			dealNum: number
 			dividend: number
@@ -237,7 +240,6 @@ declare global {
 			tickerId: number
 			timeZone: string
 			totalShares: number
-			tradeBsFlag: string
 			tradeTime: number
 			turnoverRate: number
 			utcOffset: string
@@ -248,6 +250,15 @@ declare global {
 			yield: number
 			yrHigh: number
 			yrLow: number
+		}
+
+		interface Deal {
+			symbol: string
+			tickerId: number
+			deal: number
+			tradeBsFlag: 'N' | 'B' | 'S'
+			tradeTime: number
+			volume: number
 		}
 
 	}

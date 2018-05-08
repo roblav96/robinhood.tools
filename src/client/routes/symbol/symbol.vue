@@ -14,7 +14,7 @@
 					<v-symbol-logo class="column is-narrow p-0 image is-64x64 self-center mr-6" :symbol="symbol"></v-symbol-logo>
 					<div class="column">
 						<h1 class="title is-spaced my-0 is-2">{{symbol}}</h1>
-						<h2 class="subtitle my-0 is-6">Company Name</h2>
+						<h2 class="subtitle my-0 is-6">{{quote.name}}</h2>
 					</div>
 				</div>
 			</div>

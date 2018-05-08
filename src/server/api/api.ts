@@ -13,6 +13,7 @@ import './validator.hook'
 import './security.api'
 import './socket.api'
 import './search.api'
+import './quotes.api'
 import './symbols.api'
 
 

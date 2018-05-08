@@ -4,9 +4,9 @@
 <style>
 /**/
 
-div.searchbar div.autocomplete {
+/*div.searchbar div.autocomplete {
 	width: 215px;
-}
+}*/
 
 div.searchbar div.dropdown-content {
 	max-width: 50vw;
@@ -18,7 +18,7 @@ div.searchbar div.dropdown-content {
 <template>
 	<b-field class="searchbar navbar-item">
 		<b-autocomplete ref="searchbar_input" open-on-focus keep-first clear-on-select type="search" placeholder="Search anything..."
-		    icon="magnify" v-model="query" :data="results" :loading="busy" v-on:focus="onfocus" v-on:blur="onblur"
+		    icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur"
 		    v-on:input="oninput" v-on:select="onselect">
 			<template slot-scope="props">
 				<div class="columns is-mobile is-gapless">

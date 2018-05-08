@@ -16,7 +16,10 @@ import clock from '../../common/clock'
 
 
 
-schedule.scheduleJob('55 3 * * 1-5', syncInstruments)
+schedule.scheduleJob('55 3 * * 1-5', async function() {
+	await syncInstruments()
+	pandora.broadcast({}, 'onSymbols', { reset: true })
+})
 
 readyInstruments().catch(function(error) {
 	console.error('readyInstruments Error ->', error)
@@ -25,27 +28,22 @@ readyInstruments().catch(function(error) {
 async function readyInstruments() {
 	// if (DEVELOPMENT) await redis.main.purge(rkeys.RH.RH);
 	// if (DEVELOPMENT) await redis.main.purge(rkeys.WB.WB);
-
 	let scard = await redis.main.scard(rkeys.RH.SYMBOLS)
 	let hlen = await redis.main.hlen(rkeys.WB.TICKER_IDS)
 	let exists = await redis.main.exists(`${rkeys.STOCKS.SYMBOLS}:${process.env.CPUS}:${process.env.INSTANCE}`) as number
-	if (scard < 10000 || hlen < 10000) {
+	if (scard < 10000 || hlen < 10000 || exists != 1) {
 		await syncInstruments()
-	} else if (exists != 1) {
-		await chunkSymbols()
+		pandora.broadcast({}, 'onSymbols')
 	}
-
-	// if (process.env.DEVELOPMENT) console.info('readyInstruments -> done');
-
 }
 
 
 
 async function chunkSymbols() {
 
-	let tickerIds = await redis.main.hgetall(rkeys.WB.TICKER_IDS) as Dict<number>
-	tickerIds = _.mapValues(tickerIds, v => Number.parseInt(v as any))
-	let tpairs = _.toPairs(tickerIds).sort()
+	let tdict = await redis.main.hgetall(rkeys.WB.TICKER_IDS) as Dict<number>
+	tdict = _.mapValues(tdict, v => Number.parseInt(v as any))
+	let tpairs = _.toPairs(tdict).sort()
 
 	let coms = [
 		['set', rkeys.STOCKS.SYMBOLS, JSON.stringify(tpairs.map(v => v[0]))],
@@ -60,8 +58,6 @@ async function chunkSymbols() {
 		coms.push(['set', `${rkeys.STOCKS.FSYMBOLS}:${process.env.CPUS}:${i}`, fpairs])
 	})
 	await redis.main.coms(coms as any)
-
-	pandora.broadcast({}, 'onSymbols')
 
 	// if (process.env.DEVELOPMENT) console.info('chunkSymbols -> done');
 

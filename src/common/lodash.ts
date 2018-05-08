@@ -33,6 +33,7 @@ export {
 	noop,
 	omit,
 	once,
+	orderBy,
 	pick,
 	remove,
 	round,

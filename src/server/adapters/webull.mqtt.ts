@@ -15,8 +15,8 @@ import clock from '../../common/clock'
 export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'> {
 
 	private static topics = {
-		forex: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.topics>,
-		stocks: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_DEAL_DETAILS', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.topics>,
+		forex: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
+		stocks: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_DEAL_DETAILS', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
 	}
 
 	private static get options() {
@@ -97,9 +97,9 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 					access_token: process.env.WEBULL_TOKEN,
 				},
 			}
-			let topics = Object.keys(webull.topics).filter(v => !isNaN(v as any))
+			let topics = Object.keys(webull.mqtt_topics).filter(v => !isNaN(v as any))
 			if (this.options.topics) {
-				topics = MqttClient.topics[this.options.topics].map(v => webull.topics[v].toString())
+				topics = MqttClient.topics[this.options.topics].map(v => webull.mqtt_topics[v].toString())
 			}
 
 			let subscriptions = topics.map(type => ({
@@ -128,7 +128,7 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 			let payload = JSON.parse(packet.payload.toString()) as Webull.Mqtt.Payload<Webull.Quote>
 
 			let type = Number.parseInt(topic.type)
-			if (type == webull.topics.TICKER_BID_ASK) {
+			if (type == webull.mqtt_topics.TICKER_BID_ASK) {
 				payload.data.remove(v => {
 					if (Array.isArray(v.bidList) && v.bidList.length == 0) return true;
 					if (Array.isArray(v.askList) && v.askList.length == 0) return true;
@@ -144,10 +144,10 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 			for (i = 0; i < len; i++) {
 				let wbquote = payload.data[i]
 				core.fix(wbquote)
-				webull.fixQuote(wbquote)
+				webull.fix(wbquote)
 				wbquote.tickerId = tid
 				wbquote.symbol = symbol
-				if (this.options.verbose) console.log('data ->', wbquote);
+				// if (this.options.verbose) console.log('data ->', wbquote);
 				this.emit('data', type, wbquote)
 			}
 
@@ -158,7 +158,8 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 	}
 
 	private onerror = (error: Error) => {
-		if (this.options.verbose) console.error(this.name, 'onerror Error ->', error)
+		// if (this.options.verbose) console.error(this.name, 'onerror Error ->', error);
+		console.error(this.name, 'onerror Error ->', error)
 		if (this.options.retry) this.reconnect();
 	}
 

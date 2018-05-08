@@ -16,7 +16,8 @@ declare global {
 		// 
 		name: string
 		tradable: boolean
-		type: Robinhood.Instrument.Type
+		type: 'stock' | 'forex' | 'index'
+		// rhtype: Robinhood.Instrument.Type
 		listDate: number
 		mic: string
 		acronym: string
@@ -55,7 +56,7 @@ declare global {
 			symbol: string
 			price: number
 			size: number
-			side: 'B' | 'S'
+			side: 'N' | 'B' | 'S'
 			time: number
 		}
 	}

@@ -5,6 +5,8 @@ import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as schedule from 'node-schedule'
+import * as Pandora from 'pandora'
+import * as Hub from 'pandora-hub'
 import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
 import * as hours from '../adapters/hours'
@@ -19,24 +21,25 @@ let QUOTES = {} as Dict<Quote>
 let SAVES = {} as Dict<Quote>
 
 async function onSymbols(hubmsg?: any) {
-	let reset = !!hubmsg
+	let reset = _.get(hubmsg, 'data.reset', false)
+	console.log('reset ->', reset)
 	let fsymbols = await utils.getFullSymbols()
-	if (_.isEmpty(fsymbols)) return;
+	if (process.env.DEVELOPMENT) fsymbols = utils.devfsymbols;
 	let symbols = Object.keys(fsymbols)
 
 	await webull.syncTickersQuotes(fsymbols)
 
-	let gcoms = [] as Redis.Coms
+	let coms = [] as Redis.Coms
 	symbols.forEach(function(v) {
-		gcoms.push(['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`])
-		gcoms.push(['hgetall', `${rkeys.WB.TICKERS}:${v}`])
-		gcoms.push(['hgetall', `${rkeys.WB.QUOTES}:${v}`])
-		gcoms.push(['hgetall', `${rkeys.QUOTES}:${v}`])
+		coms.push(['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`])
+		coms.push(['hgetall', `${rkeys.WB.TICKERS}:${v}`])
+		coms.push(['hgetall', `${rkeys.WB.QUOTES}:${v}`])
+		coms.push(['hgetall', `${rkeys.QUOTES}:${v}`])
 	})
-	let resolved = await redis.main.coms(gcoms)
+	let resolved = await redis.main.coms(coms)
 	resolved.forEach(core.fix)
 
-	let scoms = []
+	coms = []
 	let ii = 0
 	symbols.forEach(function(symbol) {
 		let instrument = resolved[ii++] as Robinhood.Instrument
@@ -44,53 +47,39 @@ async function onSymbols(hubmsg?: any) {
 		let wbquote = resolved[ii++] as Webull.Quote
 		let quote = resolved[ii++] as Quote
 
-		quote.symbol = symbol
-		quote.tickerId = fsymbols[symbol]
-		quote.updated = wbquote.tradeTime
-		quote.status = wbquote.status
+		let toquote = {
+			symbol,
+			tickerId: fsymbols[symbol],
+			type: 'stock',
+			name: instrument.name,
+			tradable: instrument.alive,
+			listDate: new Date(instrument.list_date).valueOf(),
+			mic: instrument.mic,
+			acronym: instrument.acronym,
+			country: instrument.country,
+		} as Quote
+		webull.parseStatus(quote, toquote, wbquote)
+		webull.parseTicker(quote, toquote, wbquote)
+		webull.parseBidAsk(quote, toquote, wbquote)
+		Object.assign(quote, toquote)
 
-		quote.name = instrument.simple_name || instrument.name
-		quote.tradable = instrument.alive
-		quote.type = instrument.type
-		quote.listDate = new Date(instrument.list_date).valueOf()
-		quote.mic = instrument.mic
-		quote.acronym = instrument.acronym
-		quote.country = instrument.country
-
-		quote.price = wbquote.price
-		quote.openPrice = wbquote.open
-		quote.closePrice = wbquote.close
-		quote.prevClose = wbquote.preClose
-		quote.yearHigh = wbquote.fiftyTwoWkHigh
-		quote.yearLow = wbquote.fiftyTwoWkLow
-		quote.dayHigh = wbquote.high
-		quote.dayLow = wbquote.low
-
-		quote.bidPrice = wbquote.bid
-		quote.askPrice = wbquote.ask
-		quote.bidSize = wbquote.bidSize
-		quote.askSize = wbquote.askSize
-
-		quote.dealCount = wbquote.dealNum
-		quote.avgVolume = wbquote.avgVolume
-		quote.avgVolume10Day = wbquote.avgVol10D
-		quote.avgVolume3Month = wbquote.avgVol3M
-		quote.volume = wbquote.volume
-
-		quote.sharesOutstanding = wbquote.totalShares
-		quote.sharesFloat = wbquote.outstandingShares
-		quote.marketCap = Math.round(quote.price * quote.sharesOutstanding)
+		if (reset) {
+			Object.assign(quote, {
+				volume: 0, dealCount: 0,
+				buyVolume: 0, sellVolume: 0,
+			} as Quote)
+		}
 
 		QUOTES[symbol] = quote
 		SAVES[symbol] = {} as any
 
 		let rkey = `${rkeys.QUOTES}:${symbol}`
-		scoms.push(['hmset', rkey, quote])
+		coms.push(['hmset', rkey, quote as any])
 		socket.emit(rkey, quote)
 
 	})
 
-	await redis.main.coms(scoms)
+	await redis.main.coms(coms)
 
 	watcher.options.fsymbols = fsymbols
 	watcher.connect()
@@ -98,86 +87,45 @@ async function onSymbols(hubmsg?: any) {
 }
 onSymbols()
 pandora.on('onSymbols', onSymbols)
+schedule.scheduleJob('00 8 * * 1-5', onSymbols)
 
 
 
 const watcher = new webull.MqttClient({
 	connect: false,
+	// verbose: true,
 })
 watcher.on('data', function(topic: number, wbquote: Webull.Quote) {
 	let symbol = wbquote.symbol
 	let quote = QUOTES[symbol]
 
 	let toquote = {} as Quote
-	let fa = hours.rxstate.value != 'REGULAR'
 
-	if (topic == webull.topics.TICKER_STATUS) {
-		if (!fa && wbquote.status && wbquote.status != quote.status) {
-			toquote.status = wbquote.status
-		}
-		if (fa && wbquote.faStatus && wbquote.faStatus != quote.status) {
-			toquote.status = wbquote.faStatus
-		}
+	if (topic == webull.mqtt_topics.TICKER_STATUS) {
+		webull.parseStatus(quote, toquote, wbquote)
 	}
 
 	if ([
-		webull.topics.TICKER,
-		webull.topics.TICKER_DETAIL,
-		webull.topics.TICKER_HANDICAP,
+		webull.mqtt_topics.TICKER,
+		webull.mqtt_topics.TICKER_DETAIL,
+		webull.mqtt_topics.TICKER_HANDICAP,
 	].includes(topic)) {
-		if (wbquote.tradeTime && wbquote.tradeTime > quote.updated) {
-			toquote.updated = wbquote.tradeTime
-			if (Number.isFinite(wbquote.price) && wbquote.price > 0) {
-				if (wbquote.tradeTime == wbquote.mkTradeTime) toquote.price = wbquote.price;
-				if (wbquote.tradeTime == wbquote.mktradeTime) toquote.price = wbquote.price;
-			}
-			if (Number.isFinite(wbquote.pPrice) && wbquote.pPrice > 0) {
-				if (wbquote.tradeTime == wbquote.faTradeTime) toquote.price = wbquote.pPrice;
-			}
-			if (toquote.price) {
-				toquote.marketCap = Math.round(toquote.price * quote.sharesOutstanding)
-			}
-		}
-		if (wbquote.volume && wbquote.volume > quote.volume) toquote.volume = wbquote.volume;
-		if (wbquote.open && wbquote.open != quote.openPrice) toquote.openPrice = wbquote.open;
-		if (wbquote.close && wbquote.close != quote.closePrice) toquote.closePrice = wbquote.close;
-		if (wbquote.preClose && wbquote.preClose != quote.prevClose) toquote.prevClose = wbquote.preClose;
-		if (wbquote.high && wbquote.high != quote.dayHigh) toquote.dayHigh = wbquote.high;
-		if (wbquote.low && wbquote.low != quote.dayLow) toquote.dayLow = wbquote.low;
-		if (wbquote.fiftyTwoWkHigh && wbquote.fiftyTwoWkHigh != quote.yearHigh) toquote.yearHigh = wbquote.fiftyTwoWkHigh;
-		if (wbquote.fiftyTwoWkLow && wbquote.fiftyTwoWkLow != quote.yearLow) toquote.yearLow = wbquote.fiftyTwoWkLow;
-		if (wbquote.totalShares && wbquote.totalShares != quote.sharesOutstanding) toquote.sharesOutstanding = wbquote.totalShares;
-		if (wbquote.outstandingShares && wbquote.outstandingShares != quote.sharesFloat) toquote.sharesFloat = wbquote.outstandingShares;
-		if (wbquote.dealNum && wbquote.dealNum > quote.dealCount) toquote.dealCount = wbquote.dealNum;
+		webull.parseTicker(quote, toquote, wbquote)
 	}
 
-	if (topic == webull.topics.TICKER_BID_ASK) {
-		if (wbquote.bid && wbquote.bid != quote.bidPrice) toquote.bidPrice = wbquote.bid;
-		if (wbquote.bidSize && wbquote.bidSize != quote.bidSize) toquote.bidSize = wbquote.bidSize;
-		if (wbquote.ask && wbquote.ask != quote.askPrice) toquote.askPrice = wbquote.ask;
-		if (wbquote.askSize && wbquote.askSize != quote.askSize) toquote.askSize = wbquote.askSize;
+	if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
+		webull.parseBidAsk(quote, toquote, wbquote)
 	}
 
-	if (topic == webull.topics.TICKER_DEAL_DETAILS) {
-		if (wbquote.tradeTime && wbquote.tradeTime > quote.updated) {
-			toquote.updated = wbquote.tradeTime
-			toquote.price = wbquote.deal
-		}
-		if (wbquote.volume) {
-			if (wbquote.tradeBsFlag == 'B') {
-				toquote.buyVolume = quote.buyVolume + wbquote.volume
-			} else if (wbquote.tradeBsFlag == 'S') {
-				toquote.sellVolume = quote.sellVolume + wbquote.volume
-			} else {
-				toquote.volume = quote.volume + wbquote.volume
-			}
-		}
+	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
+		let wbdeal = (wbquote as any) as Webull.Deal
+		webull.parseDeal(quote, toquote, wbdeal)
 		socket.emit(`${rkeys.DEALS}:${symbol}`, {
 			symbol,
-			price: wbquote.deal,
-			size: wbquote.volume,
-			side: wbquote.tradeBsFlag,
-			time: wbquote.tradeTime,
+			price: wbdeal.deal,
+			size: wbdeal.volume,
+			side: wbdeal.tradeBsFlag,
+			time: wbdeal.tradeTime,
 		} as Quote.Deal)
 	}
 
@@ -190,7 +138,7 @@ watcher.on('data', function(topic: number, wbquote: Webull.Quote) {
 
 
 
-clock.on('3s', async function onsave() {
+clock.on('3s', function onsave() {
 	let coms = Object.keys(SAVES).filter(symbol => {
 		return Object.keys(SAVES[symbol]).length > 0
 	}).map(symbol => {

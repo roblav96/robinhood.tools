@@ -16,6 +16,11 @@ export const SECURITY = {
 	DOC: 'security:doc',
 }
 
+export const FOREX = {
+	SYMBOLS: 'forex:symbols',
+	FSYMBOLS: 'forex:fsymbols',
+}
+
 export const STOCKS = {
 	SYMBOLS: 'stocks:symbols',
 	FSYMBOLS: 'stocks:fsymbols',
