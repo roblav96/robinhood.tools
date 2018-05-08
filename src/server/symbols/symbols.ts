@@ -23,23 +23,15 @@ import clock from '../../common/clock'
 	// if (process.env.DEVELOPMENT) await redis.main.purge(rkeys.WB.WB);
 
 	let tids = await redis.main.hlen(rkeys.WB.TICKER_IDS)
-	if (tids < 10000) {
-		await syncStocks()
-	}
+	if (tids < 10000) await syncStocks();
 	let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)
-	if (stocks == 0) {
-		await chunkStocks()
-	}
+	if (stocks == 0) await chunkStocks();
 
 	let forex = await redis.main.exists(rkeys.SYMBOLS.FOREX)
-	if (forex == 0) {
-		await syncForex()
-	}
+	if (forex == 0) await syncForex();
 
 	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
-	if (indexes == 0) {
-		await syncIndexes(webull.indexes)
-	}
+	if (indexes == 0) await syncIndexes(webull.indexes);
 
 })().catch(function(error) {
 	console.error('readySymbols Error ->', error)

@@ -28,35 +28,26 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 	if (_.isEmpty(fsymbols)) return;
 	let symbols = Object.keys(fsymbols)
 
-	await webull.syncTickersQuotes(fsymbols)
+	await redis.main.purge(rkeys.QUOTES)
 
-	let resolved = await redis.main.coms(_.flatten(symbols.map(v => {
-		return [
-			['hgetall', `${rkeys.WB.TICKERS}:${v}`],
-			['hgetall', `${rkeys.WB.QUOTES}:${v}`],
-			['hgetall', `${rkeys.QUOTES}:${v}`],
-		]
-	})))
-	resolved.forEach(core.fix)
-	
-	console.log('resolved ->', resolved)
+	let wbtickers = await webull.getTickers(fsymbols)
+	let wbquotes = await webull.getFullQuotes(fsymbols)
 
-	let coms = []
-	let ii = 0
-	symbols.forEach(function(symbol) {
-		let wbticker = resolved[ii++] as Webull.Ticker
-		let wbquote = resolved[ii++] as Webull.Quote
-		let quote = resolved[ii++] as Quote
+	let quotes = await redis.main.coms(symbols.map(v => ['hgetall', `${rkeys.QUOTES}:${v}`])) as Quote[]
+	let coms = [] as Redis.Coms
+	quotes.forEach(function(quote, i) {
+		core.fix(quote)
+		let symbol = symbols[i]
+		let wbticker = wbtickers.find(v => v.symbol == symbol)
+		let wbquote = wbquotes.find(v => v.symbol == symbol)
 
-		let toquote = {
+		Object.assign(quote, {
 			symbol,
 			tickerId: fsymbols[symbol],
 			typeof: 'FOREX',
-		} as Quote
-		webull.parseStatus(quote, toquote, wbquote)
-		webull.parseTicker(quote, toquote, wbquote)
-		webull.parseBidAsk(quote, toquote, wbquote)
-		Object.assign(quote, toquote)
+			name: wbticker.name,
+		} as Quote)
+		Object.assign(quote, webull.onQuote({ quote, wbquote }))
 
 		QUOTES[symbol] = quote
 		SAVES[symbol] = {} as any
@@ -67,16 +58,16 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 
 	})
 
-	// await redis.main.coms(coms)
+	await redis.main.coms(coms)
 
-	// watcher.options.fsymbols = fsymbols
-	// watcher.connect()
+	watcher.options.fsymbols = fsymbols
+	watcher.connect()
 
 }
 
 const watcher = new webull.MqttClient({
 	connect: false,
-	// verbose: true,
+	verbose: true,
 })
 watcher.on('data', function(topic: number, wbquote: Webull.Quote) {
 	// console.log('wbquote ->', topic, wbquote)

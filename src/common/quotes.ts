@@ -21,6 +21,9 @@ declare global {
 		acronym: string
 		country: string
 		// 
+		maker: string
+		makerAddress: string
+		// 
 		price: number
 		openPrice: number
 		closePrice: number
@@ -47,6 +50,7 @@ declare global {
 		sharesOutstanding: number
 		sharesFloat: number
 		marketCap: number
+		// 
 	}
 
 	namespace Quote {

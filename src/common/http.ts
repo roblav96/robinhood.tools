@@ -32,8 +32,8 @@ export function config(config: Partial<Http.Config>) {
 	}
 
 	if (config.body) {
-		config.headers['Accept'] = 'application/json'
-		config.headers['Content-Type'] = 'application/json'
+		config.headers['accept'] = 'application/json'
+		config.headers['content-type'] = 'application/json'
 		config.body = JSON.stringify(config.body)
 	}
 
@@ -103,9 +103,14 @@ export function send(config: Http.Config) {
 
 
 
+import { IncomingHttpHeaders } from 'http'
 declare global {
 	namespace Http {
+		interface Headers extends IncomingHttpHeaders {
+			[key: string]: any
+		}
 		interface Config extends simple.RequestOptions {
+			headers: Headers
 			query: any
 			retries: number
 			retryTick: Clock.Tick

@@ -25,7 +25,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 		if (parsed.host.includes('robinhood.com')) {
 			if (config.robinhoodToken) {
-				config.headers['Authorization'] = 'Bearer ' + config.robinhoodToken
+				config.headers['authorization'] = 'Bearer ' + config.robinhoodToken
 			}
 		}
 
@@ -40,10 +40,10 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 				osv: 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)',
 				dnt: '1', hl: 'en', locale: 'eng', tz: 'America/New_York',
 			})
-			config.headers['User-Agent'] = config.headers['osv']
+			config.headers['user-agent'] = config.headers['osv']
 			if (config.webullAuth) {
-				config.headers['did'] = process.env.WEBULL_DID
-				config.headers['access_token'] = process.env.WEBULL_TOKEN
+				if (process.env.WEBULL_DID) config.headers['did'] = process.env.WEBULL_DID;
+				if (process.env.WEBULL_TOKEN) config.headers['access_token'] = process.env.WEBULL_TOKEN;
 			}
 		}
 

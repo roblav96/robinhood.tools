@@ -41,7 +41,7 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 		if (this.options.connect) this.connect();
 	}
 
-	tdict: Dict<string>
+	dsymbols: Dict<string>
 	client: MqttConnection
 
 	private nextId() { return core.math.random(1, 999) }
@@ -88,7 +88,7 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 			clock.offListener(this.connect, this)
 			this.emit('connect')
 
-			this.tdict = _.invert(_.mapValues(this.options.fsymbols, v => v.toString()))
+			this.dsymbols = _.invert(_.mapValues(this.options.fsymbols, v => v.toString()))
 			let topic = {
 				tickerIds: Object.values(this.options.fsymbols),
 				header: {
@@ -138,7 +138,7 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 			if (payload.data.length == 0) return;
 
 			let tid = Number.parseInt(topic.tid)
-			let symbol = this.tdict[topic.tid]
+			let symbol = this.dsymbols[topic.tid]
 
 			let i: number, len = payload.data.length
 			for (i = 0; i < len; i++) {

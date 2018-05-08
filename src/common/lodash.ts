@@ -48,6 +48,7 @@ export {
 	uniqBy,
 	unset,
 	values,
+	zipObject,
 } from 'lodash'
 
 

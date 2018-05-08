@@ -127,13 +127,7 @@ declare global {
 			}
 		}
 
-		// interface FullSymbol {
-		// 	0: string
-		// 	1: number
-		// }
-
 		interface Ticker {
-			[key: string]: any
 			currencyId: number
 			disExchangeCode: string
 			disSymbol: string
@@ -164,8 +158,16 @@ declare global {
 
 		interface BidAsk { price: number, volume: number }
 
-		interface Quote {
-			[key: string]: any
+		interface Deal {
+			symbol: string
+			tickerId: number
+			deal: number
+			tradeBsFlag: 'N' | 'B' | 'S'
+			tradeTime: number
+			volume: number
+		}
+
+		interface Quote extends Deal {
 			appNonETFData: {
 				change: number
 				changeRatio: number
@@ -263,15 +265,6 @@ declare global {
 			yield: number
 			yrHigh: number
 			yrLow: number
-		}
-
-		interface Deal {
-			symbol: string
-			tickerId: number
-			deal: number
-			tradeBsFlag: 'N' | 'B' | 'S'
-			tradeTime: number
-			volume: number
 		}
 
 	}
