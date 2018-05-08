@@ -17,15 +17,20 @@ import clock from '../../common/clock'
 
 
 
+const SYMBOLS = process.env.SYMBOLS as SymbolsTypes
 let QUOTES = {} as Dict<Quote>
 let SAVES = {} as Dict<Quote>
 
 onSymbols()
 pandora.on('onSymbols', onSymbols)
 async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
-	if (hubmsg && hubmsg.data.type != process.env.SYMBOLS) return;
-	let fsymbols = await utils.getFullSymbols(process.env.SYMBOLS)
-	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
+	if (hubmsg && hubmsg.data.type != SYMBOLS) return;
+	let fsymbols = (SYMBOLS == 'STOCKS' ?
+		await utils.getInstanceFullSymbols(SYMBOLS) :
+		await utils.getFullSymbols(SYMBOLS)
+	)
+	// fsymbols = _.fromPairs(_.toPairs(fsymbols).splice(500))
+	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${SYMBOLS}`];
 	if (_.isEmpty(fsymbols)) return;
 	let symbols = Object.keys(fsymbols)
 
@@ -39,11 +44,10 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 		let symbol = symbols[i]
 		let wbticker = wbtickers.find(v => v.symbol == symbol)
 		let wbquote = wbquotes.find(v => v.symbol == symbol)
-
 		Object.assign(quote, {
 			symbol,
 			tickerId: fsymbols[symbol],
-			typeof: process.env.SYMBOLS,
+			typeof: SYMBOLS,
 			name: wbticker.name
 		} as Quote)
 		Object.assign(quote, webull.onQuote({ quote, wbquote }))
@@ -58,14 +62,16 @@ async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 	})
 
 	await redis.main.coms(coms)
+	
+	console.warn('done')
 
-	watcher.options.fsymbols = fsymbols
-	watcher.connect()
+	// watcher.options.fsymbols = fsymbols
+	// watcher.connect()
 
 }
 
 const watcher = new webull.MqttClient({
-	topics: process.env.SYMBOLS,
+	topics: SYMBOLS,
 	connect: false
 })
 watcher.on('data', function ondata(topic: number, wbquote: Webull.Quote) {

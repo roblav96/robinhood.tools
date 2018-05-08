@@ -46,6 +46,7 @@ export {
 	truncate,
 	uniq,
 	uniqBy,
+	uniqWith,
 	unset,
 	values,
 	zipObject,

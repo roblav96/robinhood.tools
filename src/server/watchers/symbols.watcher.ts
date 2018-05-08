@@ -19,17 +19,20 @@ import clock from '../../common/clock'
 
 
 (async function readySymbols() {
-	// if (process.env.DEVELOPMENT) await redis.main.purge(rkeys.RH.RH);
-	// if (process.env.DEVELOPMENT) await redis.main.purge(rkeys.WB.WB);
 
+	// await redis.main.del(rkeys.WB.TICKER_IDS)
 	let tids = await redis.main.hlen(rkeys.WB.TICKER_IDS)
 	if (tids < 10000) await syncStocks();
+
+	// await redis.main.del(rkeys.SYMBOLS.STOCKS)
 	let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)
 	if (stocks == 0) await chunkStocks();
 
+	// await redis.main.del(rkeys.SYMBOLS.FOREX)
 	let forex = await redis.main.exists(rkeys.SYMBOLS.FOREX)
 	if (forex == 0) await syncForex();
 
+	// await redis.main.del(rkeys.SYMBOLS.INDEXES)
 	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
 	if (indexes == 0) await syncIndexes(webull.indexes);
 
@@ -138,7 +141,7 @@ schedule.scheduleJob('00 4 * * 1-5', () => chunkStocks(true))
 async function chunkStocks(reset = false) {
 	let tdict = await redis.main.hgetall(rkeys.WB.TICKER_IDS) as Dict<number>
 	tdict = _.mapValues(tdict, v => Number.parseInt(v as any))
-	let tpairs = _.toPairs(tdict).sort()
+	let tpairs = _.uniqWith(_.toPairs(tdict), (a, b) => a[1] == b[1]).sort()
 	let coms = [
 		['set', rkeys.SYMBOLS.STOCKS, JSON.stringify(tpairs.map(v => v[0]))],
 		['set', rkeys.FSYMBOLS.STOCKS, JSON.stringify(_.fromPairs(tpairs))],
@@ -166,18 +169,8 @@ async function syncForex() {
 		return () => getTicker(symbol, 6)
 	}), { concurrency: 2 })
 	tickers.remove(v => !v)
-	tickers = _.orderBy(tickers, 'disSymbol')
-	let fsymbols = {} as Dict<number>
-	tickers.forEach(v => fsymbols[v.disSymbol] = v.tickerId)
-	console.log('fsymbols ->', fsymbols)
-	await redis.main.coms([
-		['set', rkeys.SYMBOLS.FOREX, JSON.stringify(Object.keys(fsymbols))],
-		['set', rkeys.FSYMBOLS.FOREX, JSON.stringify(fsymbols)],
-	])
-	pandora.broadcast({}, 'onSymbols', { type: 'FOREX' as keyof typeof rkeys.SYMBOLS })
+	await finishSync('FOREX', tickers)
 }
-
-
 
 async function syncIndexes(indexes: string[]) {
 	let symbols = core.clone(indexes)
@@ -189,14 +182,18 @@ async function syncIndexes(indexes: string[]) {
 	}) as Webull.Api.MarketIndex[]
 	response.forEach(v => v.marketIndexList.forEach(vv => tickers.push(vv)))
 	tickers.remove(v => !v || (v.secType && v.secType.includes(52)) || v.disSymbol == 'IBEX')
+	await finishSync('INDEXES', tickers)
+}
+
+async function finishSync(type: keyof typeof rkeys.SYMBOLS, tickers: Webull.Ticker[]) {
 	tickers = _.orderBy(tickers, 'disSymbol')
 	let fsymbols = {} as Dict<number>
 	tickers.forEach(v => fsymbols[v.disSymbol] = v.tickerId)
 	await redis.main.coms([
-		['set', rkeys.SYMBOLS.INDEXES, JSON.stringify(Object.keys(fsymbols))],
-		['set', rkeys.FSYMBOLS.INDEXES, JSON.stringify(fsymbols)],
+		['set', rkeys.SYMBOLS[type], JSON.stringify(Object.keys(fsymbols))],
+		['set', rkeys.FSYMBOLS[type], JSON.stringify(fsymbols)],
 	])
-	pandora.broadcast({}, 'onSymbols', { type: 'INDEXES' as keyof typeof rkeys.SYMBOLS })
+	pandora.broadcast({}, 'onSymbols', { type })
 }
 
 
