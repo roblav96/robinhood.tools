@@ -17,9 +17,9 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		http.config(config)
 
 		let parsed = url.parse(config.url)
-		if (config.hHost) config.headers['Host'] = parsed.host;
-		if (config.hOrigin) config.headers['Origin'] = `${parsed.protocol}//${parsed.host}`;
-		if (config.hReferer) config.headers['Referer'] = `${parsed.protocol}//${parsed.host}`;
+		// if (config.hHost) config.headers['Host'] = parsed.host;
+		// if (config.hOrigin) config.headers['Origin'] = `${parsed.protocol}//${parsed.host}`;
+		// if (config.hReferer) config.headers['Referer'] = `${parsed.protocol}//${parsed.host}`;
 
 		if (config.isProxy) return config;
 
@@ -31,7 +31,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 		if (parsed.host.includes('webull.com') || parsed.host.includes('stocks666.com')) {
 			Object.assign(config.headers, {
-				pragma: 'no-cache',
+				pragma: 'no-cache', 'cache-control': 'no-cache',
 				origin: 'https://app.webull.com',
 				referer: 'https://app.webull.com',
 				ver: '1.8.4',

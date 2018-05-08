@@ -52,13 +52,13 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 	// 	SCALE: 1,
 	// })
 
-	Process(pandora.process('indexes').entry('./indexes/indexes'), {
-		SCALE: 1,
-	})
-
-	// Process(pandora.process('stocks.instruments').entry('./stocks/instruments'), {
+	// Process(pandora.process('indexes').entry('./indexes/indexes'), {
 	// 	SCALE: 1,
 	// })
+
+	Process(pandora.process('symbols').entry('./symbols/symbols'), {
+		SCALE: 1,
+	})
 
 	// Process(pandora.process('hours.service').entry('./services/hours.service'), {
 	// 	SCALE: 1,

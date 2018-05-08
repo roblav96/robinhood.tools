@@ -16,14 +16,14 @@ export function config(config: Partial<Http.Config>) {
 		headers: {},
 		verbose: false,
 		timeout: 10000,
-		retries: process.env.CLIENT ? 0 : 3,
-		retryTick: '5s',
+		retries: process.env.CLIENT ? 0 : 5,
+		retryTick: '3s',
 		maxRedirects: 10,
 	} as Http.Config)
 
 	if (config.verbose) {
-		let ending = (config.query || config.body) ? ' ➤ ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
-		console.log('➤ ' + config.method + ' ' + config.url + ending);
+		let ending = (config.query || config.body) ? ' -> ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
+		console.log('-> ' + config.method + ' ' + config.url + ending);
 	}
 
 	if (config.query) {
@@ -77,6 +77,12 @@ export function send(config: Http.Config) {
 				// console.dir(boomerror)
 				return reject(boomerror)
 			}
+
+			if (config.verbose) {
+				let ending = (config.query || config.body) ? ' <- ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
+				console.info('<- ' + config.method + ' ' + config.url + ending);
+			}
+
 			resolve(data)
 		})
 	}).catch(function(error) {
@@ -103,9 +109,6 @@ declare global {
 			query: any
 			retries: number
 			retryTick: Clock.Tick
-			hHost: boolean
-			hOrigin: boolean
-			hReferer: boolean
 			verbose: boolean
 			isProxy: boolean
 			robinhoodToken: string

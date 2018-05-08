@@ -12,21 +12,19 @@ export const HOURS = 'hours'
 export const QUOTES = 'quotes'
 export const DEALS = 'deals'
 
-export const SECURITY = {
-	DOC: 'security:doc',
+export const SYMBOLS = {
+	STOCKS: 'symbols:stocks',
+	FOREX: 'symbols:forex',
+	INDEXES: 'symbols:indexes',
+}
+export const FSYMBOLS = {
+	STOCKS: 'fsymbols:stocks',
+	FOREX: 'fsymbols:forex',
+	INDEXES: 'fsymbols:indexes',
 }
 
-export const STOCKS = {
-	SYMBOLS: 'stocks:symbols',
-	FSYMBOLS: 'stocks:fsymbols',
-}
-export const FOREX = {
-	SYMBOLS: 'forex:symbols',
-	FSYMBOLS: 'forex:fsymbols',
-}
-export const INDEXES = {
-	SYMBOLS: 'indexes:symbols',
-	FSYMBOLS: 'indexes:fsymbols',
+export const SECURITY = {
+	DOC: 'security:doc',
 }
 
 export const BENCHMARKS = {

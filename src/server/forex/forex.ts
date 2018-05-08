@@ -18,8 +18,8 @@ import clock from '../../common/clock'
 
 
 async function readyFiats() {
-	let exists = await redis.main.exists(rkeys.FOREX.SYMBOLS) as number
-	if (exists == 0) await syncTickerIds(webull.fiats);
+	// let exists = await redis.main.exists(rkeys.FOREX.SYMBOLS) as number
+	// if (exists == 0) await syncTickerIds(webull.fiats);
 }
 readyFiats().catch(function(error) {
 	console.error('readyFiats Error ->', error)
@@ -38,10 +38,10 @@ async function syncTickerIds(fiats: string[]) {
 	let fsymbols = {} as Dict<number>
 	tickers.forEach(v => fsymbols[v.tickerSymbol] = v.tickerId)
 	console.log('fsymbols ->', fsymbols)
-	await redis.main.coms([
-		['set', rkeys.FOREX.SYMBOLS, JSON.stringify(Object.keys(fsymbols))],
-		['set', rkeys.FOREX.FSYMBOLS, JSON.stringify(fsymbols)],
-	])
+	// await redis.main.coms([
+	// 	['set', rkeys.FOREX.SYMBOLS, JSON.stringify(Object.keys(fsymbols))],
+	// 	['set', rkeys.FOREX.FSYMBOLS, JSON.stringify(fsymbols)],
+	// ])
 }
 
 async function getTicker(symbol: string) {
@@ -60,7 +60,7 @@ let QUOTES = {} as Dict<Quote>
 let SAVES = {} as Dict<Quote>
 
 async function onSymbols() {
-	let fsymbols = await utils.getForexFullSymbols()
+	let fsymbols = await utils.getFullSymbols('FOREX')
 	let symbols = Object.keys(fsymbols)
 
 	await webull.syncTickersQuotes(fsymbols)

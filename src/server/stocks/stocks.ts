@@ -20,10 +20,9 @@ import clock from '../../common/clock'
 let QUOTES = {} as Dict<Quote>
 let SAVES = {} as Dict<Quote>
 
-async function onSymbols(hubmsg?: any) {
+async function onStocks(hubmsg?: any) {
 	let reset = _.get(hubmsg, 'data.reset', false)
-	console.log('reset ->', reset)
-	let fsymbols = await utils.getFullSymbols()
+	let fsymbols = await utils.getInstanceFullSymbols('STOCKS')
 	if (process.env.DEVELOPMENT) fsymbols = utils.devfsymbols;
 	let symbols = Object.keys(fsymbols)
 
@@ -85,9 +84,9 @@ async function onSymbols(hubmsg?: any) {
 	watcher.connect()
 
 }
-onSymbols()
-pandora.on('onSymbols', onSymbols)
-schedule.scheduleJob('00 8 * * 1-5', onSymbols)
+onStocks()
+pandora.on('onStocks', onStocks)
+schedule.scheduleJob('00 8 * * 1-5', onStocks)
 
 
 
