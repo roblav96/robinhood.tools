@@ -49,7 +49,7 @@ async function onStocks(hubmsg?: any) {
 		let toquote = {
 			symbol,
 			tickerId: fsymbols[symbol],
-			type: 'stock',
+			typeof: 'STOCKS',
 			name: instrument.name,
 			tradable: instrument.alive,
 			listDate: new Date(instrument.list_date).valueOf(),

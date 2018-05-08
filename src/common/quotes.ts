@@ -1,8 +1,6 @@
 // 
 
-export { }
-
-
+import * as rkeys from './rkeys'
 
 
 
@@ -16,8 +14,8 @@ declare global {
 		// 
 		name: string
 		tradable: boolean
-		type: 'stock' | 'forex' | 'index'
-		// rhtype: Robinhood.Instrument.Type
+		typeof: keyof typeof rkeys.SYMBOLS
+		rhtype: Robinhood.Instrument.Type
 		listDate: number
 		mic: string
 		acronym: string

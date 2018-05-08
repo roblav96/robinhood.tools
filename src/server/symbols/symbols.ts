@@ -33,7 +33,7 @@ import clock from '../../common/clock'
 
 	let forex = await redis.main.exists(rkeys.SYMBOLS.FOREX)
 	if (forex == 0) {
-		await syncForex(webull.fiats)
+		await syncForex()
 	}
 
 	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
@@ -164,19 +164,68 @@ async function chunkStocks(reset = false) {
 
 
 
-async function syncForex(fiats: string[]) {
-
+async function syncForex() {
+	let symbols = ['BTCUSD', 'XAUUSD', 'XAGUSD']
+	webull.fiats.forEach(v => webull.fiats.forEach(vv => {
+		if (v == vv) return;
+		symbols.push(v + vv)
+	}))
+	let tickers = await pAll(symbols.map(symbol => {
+		return () => getTicker(symbol, 6)
+	}), { concurrency: 2 })
+	tickers.remove(v => !v)
+	tickers = _.orderBy(tickers, 'disSymbol')
+	let fsymbols = {} as Dict<number>
+	tickers.forEach(v => fsymbols[v.disSymbol] = v.tickerId)
+	console.log('fsymbols ->', fsymbols)
+	await redis.main.coms([
+		['set', rkeys.SYMBOLS.FOREX, JSON.stringify(Object.keys(fsymbols))],
+		['set', rkeys.FSYMBOLS.FOREX, JSON.stringify(fsymbols)],
+	])
+	pandora.broadcast({}, 'onSymbols', { type: 'FOREX' as keyof typeof rkeys.SYMBOLS })
 }
 
 
 
 async function syncIndexes(indexes: string[]) {
-
+	let symbols = core.clone(indexes)
+	let tickers = await pAll(symbols.map(symbol => {
+		return () => getTicker(symbol, 1)
+	}), { concurrency: 2 })
+	let response = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/globalIndices/1', {
+		query: { hl: 'en' },
+	}) as Webull.Api.MarketIndex[]
+	response.forEach(v => v.marketIndexList.forEach(vv => tickers.push(vv)))
+	tickers.remove(v => !v || (v.secType && v.secType.includes(52)))
+	tickers = _.orderBy(tickers, 'disSymbol')
+	let fsymbols = {} as Dict<number>
+	tickers.forEach(v => fsymbols[v.disSymbol] = v.tickerId)
+	await redis.main.coms([
+		['set', rkeys.SYMBOLS.INDEXES, JSON.stringify(Object.keys(fsymbols))],
+		['set', rkeys.FSYMBOLS.INDEXES, JSON.stringify(fsymbols)],
+	])
+	pandora.broadcast({}, 'onSymbols', { type: 'INDEXES' as keyof typeof rkeys.SYMBOLS })
 }
 
 
 
+async function getTicker(symbol: string, tickerType: number) {
+	let response = await http.get('https://infoapi.webull.com/api/search/tickers2', {
+		query: { keys: symbol, tickerType },
+	}) as Webull.Api.Paginated<Webull.Ticker>
+	if (!Array.isArray(response.list)) return;
+	return response.list.find(v => v.disSymbol == symbol)
+}
 
 
+
+declare global {
+	namespace Symbols {
+		interface OnSymbolsData {
+			type: keyof typeof rkeys.SYMBOLS
+			reset: boolean
+		}
+	}
+}
 
 

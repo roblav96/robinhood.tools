@@ -20,14 +20,15 @@ export const isNodejs = !isBrowser
 
 
 
-export function fix(target: any, deep = false as any) {
-	Object.keys(target).forEach(function(key) {
+export function fix(target: any) {
+	Object.keys(target).forEach(key => {
 		let value = target[key]
-		if (value == null || !string.is(value)) return;
-		else if (deep === true && object.is(value)) fix(value);
+		if (value == null || typeof value != 'string') return;
 		else if (value === '') delete target[key];
 		else if (!isNaN(value as any)) target[key] = Number.parseFloat(value);
 		else if (value === 'NaN') target[key] = NaN;
+		else if (value === 'null') target[key] = null;
+		else if (value === 'undefined') target[key] = undefined;
 		else if (value === 'true') target[key] = true;
 		else if (value === 'false') target[key] = false;
 	})

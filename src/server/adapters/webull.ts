@@ -22,22 +22,24 @@ export function fix(quote: Webull.Quote) {
 	if (quote.mktradeTime) quote.mktradeTime = new Date(quote.mktradeTime).valueOf();
 	if (quote.tradeTime) quote.tradeTime = new Date(quote.tradeTime).valueOf();
 
-	if (!quote.bid) delete quote.bid;
-	if (Array.isArray(quote.bidList)) {
-		if (quote.bidList.length > 0) {
-			quote.bid = _.mean(quote.bidList.map(v => Number.parseFloat(v.price as any)))
-			quote.bidSize = _.sum(quote.bidList.map(v => Number.parseInt(v.volume as any) || 0))
+	['bid', 'ask'].forEach(key => {
+		if (!quote[key]) delete quote[key];
+		let lkey = `${key}List`
+		let list = quote[lkey] as Webull.BidAsk[]
+		if (Array.isArray(list)) {
+			if (list.length > 0) {
+				let prices = [] as number[]
+				let volumes = [] as number[]
+				list.forEach(v => {
+					if (v.price) prices.push(Number.parseFloat(v.price as any));
+					if (v.volume) volumes.push(Number.parseInt(v.volume as any));
+				})
+				quote[key] = _.mean(prices)
+				quote[`${key}Size`] = _.sum(volumes)
+			}
+			delete quote[lkey]
 		}
-		delete quote.bidList
-	}
-	if (!quote.ask) delete quote.ask;
-	if (Array.isArray(quote.askList)) {
-		if (quote.askList.length > 0) {
-			quote.ask = _.mean(quote.askList.map(v => Number.parseFloat(v.price as any)))
-			quote.askSize = _.sum(quote.askList.map(v => Number.parseInt(v.volume as any) || 0))
-		}
-		delete quote.askList
-	}
+	})
 }
 
 export function parseStatus(quote: Quote, toquote: Quote, wbquote: Webull.Quote) {
@@ -114,7 +116,9 @@ async function getChunked(fsymbols: Dict<number>, url: string, auth = false) {
 	items.forEach(function(item) {
 		core.fix(item)
 		fix(item)
-		item.symbol = inverse[item.tickerId]
+		let symbol = inverse[item.tickerId]
+		item.symbol = symbol
+		item.disSymbol = symbol
 	})
 	return items
 }

@@ -16,6 +16,16 @@ export function on(action: string, fn: (message: Hub.HubMessage) => void) {
 	Pandora.getHub().hubClient.on(action, fn)
 }
 
+
+
+declare global {
+	namespace Pandora {
+		interface HubMessage<T = any> extends Hub.HubMessage {
+			data: T
+		}
+	}
+}
+
 // Pandora.processContext.context.serviceReconciler.state = Pandora.State.complete
 // let cl = Pandora.consoleLogger.get('console')
 // cl.options.level = 0

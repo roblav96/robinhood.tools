@@ -17,65 +17,31 @@ import clock from '../../common/clock'
 
 
 
-async function readyFiats() {
-	// let exists = await redis.main.exists(rkeys.FOREX.SYMBOLS) as number
-	// if (exists == 0) await syncTickerIds(webull.fiats);
-}
-readyFiats().catch(function(error) {
-	console.error('readyFiats Error ->', error)
-}).then(onSymbols)
-
-async function syncTickerIds(fiats: string[]) {
-	let symbols = [] as string[]
-	fiats.forEach(v => fiats.forEach(vv => {
-		if (v == vv) return;
-		symbols.push(v + vv)
-	}))
-	let tickers = await pAll(symbols.map(symbol => {
-		return () => getTicker(symbol)
-	}), { concurrency: 1 })
-	tickers = _.orderBy(tickers.filter(v => v), 'tickerSymbol')
-	let fsymbols = {} as Dict<number>
-	tickers.forEach(v => fsymbols[v.tickerSymbol] = v.tickerId)
-	console.log('fsymbols ->', fsymbols)
-	// await redis.main.coms([
-	// 	['set', rkeys.FOREX.SYMBOLS, JSON.stringify(Object.keys(fsymbols))],
-	// 	['set', rkeys.FOREX.FSYMBOLS, JSON.stringify(fsymbols)],
-	// ])
-}
-
-async function getTicker(symbol: string) {
-	let response = await http.get('https://infoapi.webull.com/api/search/tickers2', {
-		query: { keys: symbol, tickerType: 6 }
-	}) as Webull.Api.Paginated<Webull.Ticker>
-	if (!Array.isArray(response.list)) return;
-	let ticker = response.list.find(v => v.tickerSymbol == symbol)
-	if (!ticker) return;
-	return ticker
-}
-
-
-
 let QUOTES = {} as Dict<Quote>
 let SAVES = {} as Dict<Quote>
 
-async function onSymbols() {
+onSymbols()
+pandora.on('onSymbols', onSymbols)
+async function onSymbols(hubmsg?: Pandora.HubMessage<Symbols.OnSymbolsData>) {
+	if (hubmsg && hubmsg.data.type != 'FOREX') return;
 	let fsymbols = await utils.getFullSymbols('FOREX')
+	if (_.isEmpty(fsymbols)) return;
 	let symbols = Object.keys(fsymbols)
 
 	await webull.syncTickersQuotes(fsymbols)
 
-	let coms = [] as Redis.Coms
-	symbols.forEach(function(v) {
-		coms.push(['hgetall', `${rkeys.WB.TICKERS}:${v}`])
-		coms.push(['hgetall', `${rkeys.WB.QUOTES}:${v}`])
-		coms.push(['hgetall', `${rkeys.QUOTES}:${v}`])
-	})
-	let resolved = await redis.main.coms(coms)
+	let resolved = await redis.main.coms(_.flatten(symbols.map(v => {
+		return [
+			['hgetall', `${rkeys.WB.TICKERS}:${v}`],
+			['hgetall', `${rkeys.WB.QUOTES}:${v}`],
+			['hgetall', `${rkeys.QUOTES}:${v}`],
+		]
+	})))
 	resolved.forEach(core.fix)
+	
 	console.log('resolved ->', resolved)
 
-	coms = []
+	let coms = []
 	let ii = 0
 	symbols.forEach(function(symbol) {
 		let wbticker = resolved[ii++] as Webull.Ticker
@@ -85,8 +51,7 @@ async function onSymbols() {
 		let toquote = {
 			symbol,
 			tickerId: fsymbols[symbol],
-			type: 'forex',
-			name: wbticker.name,
+			typeof: 'FOREX',
 		} as Quote
 		webull.parseStatus(quote, toquote, wbquote)
 		webull.parseTicker(quote, toquote, wbquote)
@@ -102,10 +67,10 @@ async function onSymbols() {
 
 	})
 
-	await redis.main.coms(coms)
+	// await redis.main.coms(coms)
 
-	watcher.options.fsymbols = fsymbols
-	watcher.connect()
+	// watcher.options.fsymbols = fsymbols
+	// watcher.connect()
 
 }
 

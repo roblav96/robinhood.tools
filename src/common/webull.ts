@@ -6,11 +6,11 @@ import * as core from './core'
 
 
 export const fiats = [
-	'AUD', 'BTC', 'CAD', 'CHF', 'CNH', 'CNY', 'EUR', 'GBP', 'HDK', 'JPY', 'NZD', 'RUB', 'USD', 'XAU',
+	'AUD', 'CAD', 'CHF', 'CNH', 'CNY', 'EUR', 'GBP', 'HDK', 'JPY', 'NZD', 'RUB', 'USD',
 ] as string[]
 
 export const indexes = [
-	'BTCUSD', 'RUI', 'RUT', 'TNX', 'TYX',
+	'RUI', 'RUT', 'TNX', 'TYX',
 ] as string[]
 
 
@@ -162,6 +162,8 @@ declare global {
 			type: number
 		}
 
+		interface BidAsk { price: number, volume: number }
+
 		interface Quote {
 			[key: string]: any
 			appNonETFData: {
@@ -173,7 +175,7 @@ declare global {
 				threeMonthChangeRatio: number
 			}
 			ask: number
-			askList: Array<{ price: number, volume: number }>
+			askList: BidAsk[]
 			askSize: number
 			avg: number
 			avgVol10D: number
@@ -182,7 +184,7 @@ declare global {
 			baNum: number
 			beta: number
 			bid: number
-			bidList: Array<{ price: number, volume: number }>
+			bidList: BidAsk[]
 			bidSize: number
 			change: number
 			changeRatio: number
