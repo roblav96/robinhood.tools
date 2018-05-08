@@ -17,7 +17,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		http.config(config)
 
 		if (config.isProxy) {
-			config.body = core.json.clone(config)
+			config.body = core.clone(config)
 			config.method = 'POST'
 			config.url = '/proxy'
 		}

@@ -5,7 +5,8 @@ import * as core from './core'
 
 
 
-export const fiats = ['USD', 'CNY', 'CHF', 'JPY', 'EUR', 'GBP', 'AUD', 'HDK', 'CAD', 'RUB']
+export const fiats = ['USD', 'CNY', 'CHF', 'JPY', 'EUR', 'GBP', 'AUD', 'HDK', 'CAD', 'RUB'] as string[]
+export const indexes = [] as string[]
 
 
 
@@ -113,6 +114,11 @@ declare global {
 				id: number
 				name: string
 				tickerTupleArrayList: T[]
+			}
+			interface MarketIndexList {
+				labelId: number
+				marketIndexList: Ticker[]
+				regionLabelName: string
 			}
 		}
 

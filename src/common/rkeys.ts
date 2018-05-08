@@ -16,14 +16,17 @@ export const SECURITY = {
 	DOC: 'security:doc',
 }
 
+export const STOCKS = {
+	SYMBOLS: 'stocks:symbols',
+	FSYMBOLS: 'stocks:fsymbols',
+}
 export const FOREX = {
 	SYMBOLS: 'forex:symbols',
 	FSYMBOLS: 'forex:fsymbols',
 }
-
-export const STOCKS = {
-	SYMBOLS: 'stocks:symbols',
-	FSYMBOLS: 'stocks:fsymbols',
+export const INDEXES = {
+	SYMBOLS: 'indexes:symbols',
+	FSYMBOLS: 'indexes:fsymbols',
 }
 
 export const BENCHMARKS = {

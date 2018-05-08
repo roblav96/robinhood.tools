@@ -33,6 +33,10 @@ export function fix(target: any, deep = false as any) {
 	})
 }
 
+export function clone<T extends object = object>(value: T): T {
+	return JSON.parse(JSON.stringify(value))
+}
+
 
 
 export const boolean = {
@@ -223,9 +227,6 @@ export const json = {
 			if (value.charAt(0) == '[') return true;
 		}
 		return false
-	},
-	clone<T = object>(value: T): T {
-		return JSON.parse(JSON.stringify(value))
 	},
 	parse<T = object>(value: T): T {
 		return json.is(value) ? JSON.parse(value as any) : value
