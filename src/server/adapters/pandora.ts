@@ -9,14 +9,12 @@ export function publish(fn: Function) {
 		name: fn.name,
 	})
 }
-// example:
-// pandora.publish(readySymbols)
-// declare global { namespace Pandora { type readySymbols = typeof readySymbols } }
-
 export async function proxy(name: string) {
 	return (await pandora.getHub().getProxy({ name }))[name]
 }
 // example:
+// pandora.publish(readySymbols)
+// declare global { namespace Pandora { type readySymbols = typeof readySymbols } }
 // let readySymbols = await pandora.proxy('readySymbols') as Pandora.readySymbols
 // await readySymbols(process.env.SYMBOLS)
 
@@ -25,12 +23,14 @@ export async function proxy(name: string) {
 export function send(selector: Hub.Selector, action: string, data?: any) {
 	pandora.getHub().hubClient.send(selector, action, { data })
 }
-
 export function broadcast(selector: Hub.Selector, action: string, data?: any) {
 	pandora.getHub().hubClient.multipleSend(selector, action, { data })
 }
 
-export function on(action: string, fn: (message: Pandora.HubMessage) => void) {
+export function once(action: string, fn: (hubmsg: Pandora.HubMessage) => void) {
+	pandora.getHub().hubClient.once(action, fn)
+}
+export function on(action: string, fn: (hubmsg: Pandora.HubMessage) => void) {
 	pandora.getHub().hubClient.on(action, fn)
 }
 

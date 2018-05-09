@@ -1,29 +1,34 @@
 // 
 
+import * as boom from 'boom'
+import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
+import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
-import * as os from 'os'
 import polka from './polka'
 
 
 
-if (process.env.FIRST) redis.main.del(rkeys.WS.DISCOVER);
+const PORTS = [] as number[]
+pandora.on('socket.listening', function onlistening(hubmsg) {
+	let port = hubmsg.data.port as number
+	if (PORTS.includes(port)) return;
+	PORTS.push(port)
+})
 
 polka.route({
 	method: 'GET',
 	url: '/api/websocket/discover',
-	public: true,
 	async handler(req, res) {
-		let scard = await redis.main.scard(rkeys.WS.DISCOVER)
-		return core.array.create(scard).map(function(i) {
-			return `ws://${process.env.DOMAIN}/websocket/${i}`
-			// return `ws://${process.env.HOST}:${+process.env.IPORT + os.cpus().length + i}/websocket/${i}`
+		pandora.broadcast({}, 'socket.listening')
+		await new Promise(r => setTimeout(r, 100))
+		if (PORTS.length == 0) throw boom.badGateway('socket.listening');
+		let start = +process.env.PORT
+		return PORTS.map((port, i) => {
+			return `ws://${process.env.DOMAIN}/websocket/${port - start}`
 		})
 	}
 })
-
-
-
 
 

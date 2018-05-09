@@ -40,34 +40,27 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as Env) {
 
 export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 
-	// Process(pandora.process('api').entry('./api/api'), {
-	// 	// SCALE: os.cpus().length,
-	// })
-
-	// Process(pandora.process('stocks').entry('./stocks/stocks'), {
-	// 	// SCALE: os.cpus().length,
-	// })
-
-	// Process(pandora.process('forex').entry('./forex/forex'), {
-	// 	SCALE: 1,
-	// })
+	Process(pandora.process('api').entry('./api/api'), {
+		SCALE: os.cpus().length,
+		// SCALE: 4,
+	})
 
 	Process(pandora.process('symbols').entry('./watchers/symbols.watcher'), {
-		SCALE: 1,
+		SCALE: 1
 	})
-
 	Process(pandora.process('stocks').entry('./watchers/quotes.watcher'), {
 		SYMBOLS: 'STOCKS' as SymbolsTypes,
-		SCALE: os.cpus().length,
+		// SCALE: os.cpus().length,
+		SCALE: 4,
 	})
-	// Process(pandora.process('forex').entry('./watchers/quotes.watcher'), {
-	// 	SYMBOLS: 'FOREX' as SymbolsTypes,
-	// 	SCALE: 1,
-	// })
-	// Process(pandora.process('indexes').entry('./watchers/quotes.watcher'), {
-	// 	SYMBOLS: 'INDEXES' as SymbolsTypes,
-	// 	SCALE: 1,
-	// })
+	Process(pandora.process('forex').entry('./watchers/quotes.watcher'), {
+		SYMBOLS: 'FOREX' as SymbolsTypes,
+		SCALE: 1,
+	})
+	Process(pandora.process('indexes').entry('./watchers/quotes.watcher'), {
+		SYMBOLS: 'INDEXES' as SymbolsTypes,
+		SCALE: 1,
+	})
 
 	// Process(pandora.process('hours.service').entry('./services/hours.service'), {
 	// 	SCALE: 1,

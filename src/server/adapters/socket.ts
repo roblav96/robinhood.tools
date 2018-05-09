@@ -7,8 +7,8 @@ import * as qs from 'querystring'
 import * as url from 'url'
 import * as uws from 'uws'
 import * as cookie from 'cookie'
-import * as pandora from 'pandora'
 import * as fastjsonparse from 'fast-json-parse'
+import * as pandora from './pandora'
 import * as redis from './redis'
 import * as security from './security'
 import { PolkaRequest } from '../api/polka.request'
@@ -16,9 +16,13 @@ import Emitter from '../../common/emitter'
 
 
 
+const port = +process.env.PORT + +process.env.OFFSET + +process.env.INSTANCE
+pandora.on('socket.listening', function(hubmsg) {
+	pandora.send({ clientId: hubmsg.host.clientId }, 'socket.listening', { port })
+})
+
 const wss = new uws.Server({
-	host: process.env.HOST,
-	port: +process.env.PORT + +process.env.CPUS + +process.env.OFFSET + +process.env.INSTANCE,
+	host: process.env.HOST, port,
 
 	verifyClient(incoming, next: (allow: boolean, code?: number, message?: string) => void) {
 		let req = (incoming.req as any) as PolkaRequest
@@ -62,19 +66,19 @@ const wss = new uws.Server({
 
 wss.httpServer.timeout = 10000
 
-wss.on('error', function(error) {
+wss.on('error', function onerror(error) {
 	console.error('wss Error ->', error)
 })
 
-wss.on('listening', function() {
+wss.on('listening', function onlistening() {
 	let address = wss.httpServer.address()
-	redis.main.sadd(rkeys.WS.DISCOVER, address.port)
 	console.info('wss listening ->', address.port)
+	pandora.broadcast({ processName: 'api' }, 'socket.onlistening', { port: address.port })
 })
 
 wss.on('connection', onconnection)
 
-exithook(function() { wss.close() })
+exithook(function onexit() { wss.close() })
 
 
 

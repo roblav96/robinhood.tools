@@ -6,7 +6,9 @@ import * as _ from './lodash'
 import * as core from './core'
 import Emitter from './emitter'
 
-
+// import * as Pandora from 'pandora'
+// console.log('Pandora.processContext ->', Pandora.processContext)
+// console.log('Pandora.getHub ->', Pandora.getHub())
 
 enum TICKS {
 	'100ms', '250ms', '500ms',

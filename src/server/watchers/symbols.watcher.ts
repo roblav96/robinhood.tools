@@ -18,40 +18,33 @@ import clock from '../../common/clock'
 
 
 
-const BUSY = {} as Dict<boolean>
-pandora.on('readySymbols', readySymbols)
-async function readySymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
-	let type = hubmsg.data.type
-	if (BUSY[type]) return;
-	BUSY[type] = true
+pandora.on('readySymbols', _.debounce(async function readySymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
+	// let type = hubmsg.data.type
 
-	if (type == 'STOCKS') {
-		// await redis.main.del(rkeys.WB.TICKER_IDS)
-		let tids = await redis.main.hlen(rkeys.WB.TICKER_IDS)
-		if (tids < 10000) await syncStocks();
-		// await redis.main.del(rkeys.SYMBOLS.STOCKS)
-		let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)
-		if (stocks == 0) await chunkStocks();
-	}
+	// if (type == 'STOCKS') {
+	// await redis.main.del(rkeys.WB.TICKER_IDS)
+	let tids = await redis.main.hlen(rkeys.WB.TICKER_IDS)
+	if (tids < 10000) await syncStocks();
+	// await redis.main.del(rkeys.SYMBOLS.STOCKS)
+	let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)
+	if (stocks == 0) await chunkStocks();
+	// }
 
-	if (type == 'FOREX') {
-		// await redis.main.del(rkeys.SYMBOLS.FOREX)
-		let forex = await redis.main.exists(rkeys.SYMBOLS.FOREX)
-		if (forex == 0) await syncForex();
-	}
+	// if (type == 'FOREX') {
+	// await redis.main.del(rkeys.SYMBOLS.FOREX)
+	let forex = await redis.main.exists(rkeys.SYMBOLS.FOREX)
+	if (forex == 0) await syncForex();
+	// }
 
-	if (type == 'INDEXES') {
-		// await redis.main.del(rkeys.SYMBOLS.INDEXES)
-		let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
-		if (indexes == 0) await syncIndexes(webull.indexes);
-	}
+	// if (type == 'INDEXES') {
+	// await redis.main.del(rkeys.SYMBOLS.INDEXES)
+	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
+	if (indexes == 0) await syncIndexes(webull.indexes);
+	// }
 
-	pandora.broadcast({
-		processName: type.toLowerCase(),
-	}, 'onSymbols', { type } as Symbols.OnSymbolsData)
-	delete BUSY[type]
+	pandora.broadcast({}, 'onSymbols', { ready: true } as Symbols.OnSymbolsData)
 
-}
+}, 1000, { leading: false, trailing: true }))
 
 
 
@@ -228,6 +221,7 @@ declare global {
 	namespace Symbols {
 		interface OnSymbolsData {
 			type: keyof typeof rkeys.SYMBOLS
+			ready: boolean
 			reset: boolean
 		}
 	}

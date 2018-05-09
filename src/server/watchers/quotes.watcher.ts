@@ -23,12 +23,13 @@ const QUOTES = {} as Dict<Quote>
 const SAVES = {} as Dict<Quote>
 
 pandora.on('onSymbols', onSymbols)
-pandora.broadcast({}, 'readySymbols', { type: process.env.SYMBOLS } as Symbols.OnSymbolsData)
+pandora.broadcast({}, 'readySymbols')
 async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
-	if (hubmsg.data.type != process.env.SYMBOLS) return;
+	if (hubmsg.data.ready && WATCHERS.length > 0) return;
+	if (hubmsg.data.type && hubmsg.data.type != process.env.SYMBOLS) return;
 	let resets = hubmsg.data.reset
 
-	console.log('hubmsg ->', hubmsg)
+	if (process.env.DEVELOPMENT) return;
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
@@ -98,21 +99,23 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 			fsymbols: _.fromPairs(chunk),
 			topics: process.env.SYMBOLS,
 			connect: false,
-			verbose: true,
+			// verbose: true,
 		}).on('data', ondata))
 	})
 	connect.i = 0
+	clock.off(connect.tick, onconnect)
 	clock.on(connect.tick, onconnect)
 
 }
 
 let connect = { tick: '3s' as Clock.Tick, i: 0 }
 function onconnect() {
-	console.log('connect.i ->', connect.i)
 	let watcher = WATCHERS[connect.i++]
 	if (watcher) {
-		// watcher.connect();
-	} else clock.off(connect.tick, onconnect)
+		console.log(connect.i, 'onconnect ->', Object.keys(watcher.options.fsymbols).length)
+		return watcher.connect()
+	}
+	clock.off(connect.tick, onconnect)
 }
 
 function ondata(topic: number, wbquote: Webull.Quote) {
