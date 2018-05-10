@@ -25,14 +25,15 @@ class Socket extends Emitter {
 		return alives == this.clients.length
 	}
 
-	async discover() {
-		let addresses = await http.get('/websocket/discover') as string[]
-		this.clients.forEach(v => v.destroy())
-		this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
-			return new WebSocketClient(v, {
-				query: security.headers,
-			}).on('open', this.onopen, this).on('close', this.onclose, this).on('message', this.onmessage, this)
-		}))
+	discover() {
+		http.get('/websocket/discover', { retries: Infinity }).then((addresses: string[]) => {
+			this.clients.forEach(v => v.destroy())
+			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
+				return new WebSocketClient(v, {
+					query: security.headers,
+				}).on('open', this.onopen, this).on('close', this.onclose, this).on('message', this.onmessage, this)
+			}))
+		}).catch(error => console.error('discover Error ->', error))
 	}
 
 	private onopen() {

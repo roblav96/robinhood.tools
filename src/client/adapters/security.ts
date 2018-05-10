@@ -15,7 +15,7 @@ import * as http from '@/client/adapters/http'
 
 const state = {
 	ready: false,
-	human: false,
+	human: lockr.get('security.human', false),
 }
 store.registerModule('security', { state })
 declare global { namespace Store { interface State { security: typeof state } } }
@@ -37,23 +37,22 @@ export function headers() {
 	return headers
 }
 
-function finger() {
-	return new Promise<string>(function(resolve) {
-		new Fingerprint2().get(resolve)
-	})
-}
-
-export async function init() {
-	if (!doc.uuid) {
-		doc.uuid = security.randomBits(32)
-		lockr.set('security.uuid', doc.uuid)
-	}
-	if (!doc.finger) {
-		doc.finger = await finger()
+export function token() {
+	return Promise.resolve().then(function() {
+		if (!doc.uuid) {
+			doc.uuid = security.randomBits(32)
+			lockr.set('security.uuid', doc.uuid)
+		}
+		return doc.finger ? doc.finger : new Promise<string>(function(resolve) {
+			new Fingerprint2().get(resolve)
+		})
+	}).then(function(finger) {
+		doc.finger = finger
 		lockr.set('security.finger', doc.finger)
-	}
-	await http.get('/security/token', { retryTick: '1s', retries: Infinity })
-	state.ready = true
+		return http.get('/security/token', { retryTick: '1s', retries: Infinity })
+	}).then(function() {
+		state.ready = true
+	})
 }
 
 

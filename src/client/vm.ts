@@ -7,15 +7,17 @@ import socket from '@/client/adapters/socket'
 import router from '@/client/router'
 import store from '@/client/store'
 import App from '@/client/app/app'
+import pAll from 'p-all'
 
 
 
-(async function start() {
-	await security.init()
-	await socket.discover()
-	await socket.toPromise('ready')
-	vm.$mount('#app')
-})()
+pAll([
+	() => security.token(),
+	() => socket.discover(),
+	() => socket.toPromise('ready'),
+], { concurrency: 1 }).catch(error => {
+	console.error('pAll init Error ->', error)
+}).finally(() => { vm.$mount('#app') })
 
 const vm = new App({ router, store })
 export default vm
