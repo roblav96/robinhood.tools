@@ -18,7 +18,8 @@ export const indexes = [
 
 export const WB = {
 	WB: 'wb',
-	TICKER_IDS: 'wb:tickerids',
+	SYMBOLS: 'wb:symbols',
+	TIDS: 'wb:tids',
 	QUOTES: 'wb:quotes',
 	TICKERS: 'wb:tickers',
 }
