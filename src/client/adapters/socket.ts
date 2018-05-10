@@ -73,6 +73,7 @@ class Socket extends Emitter {
 	}
 
 }
+
 const socket = new Socket()
 export default socket
 

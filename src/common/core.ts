@@ -246,10 +246,3 @@ export const math = {
 }
 
 
-
-import { DurationObjectUnits } from 'luxon'
-export const time = {
-	UNITS: { 'ms': 'milliseconds', 's': 'seconds', 'm': 'minutes', 'h': 'hours' } as Dict<keyof DurationObjectUnits>,
-}
-
-

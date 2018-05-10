@@ -3,12 +3,12 @@
 
 
 export { WS } from './socket'
+export { HR } from './hours'
 export { RH } from './robinhood'
 export { WB } from './webull'
 
 
 
-export const HOURS = 'hours'
 export const QUOTES = 'quotes'
 export const DEALS = 'deals'
 

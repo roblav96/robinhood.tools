@@ -1,6 +1,11 @@
 // 
 
-export { }
+
+
+export const HR = {
+	HOURS: 'hours:hours',
+	STATE: 'hours:state',
+}
 
 
 
@@ -11,7 +16,7 @@ declare global {
 		type State = 'PREPRE' | 'PRE' | 'REGULAR' | 'POST' | 'POSTPOST' | 'CLOSED'
 	}
 	interface Hours {
-		isOpenToday: boolean
+		openToday: boolean
 		date: string
 		prepre: number
 		pre: number

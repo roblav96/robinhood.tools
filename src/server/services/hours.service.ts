@@ -1,32 +1,42 @@
 // 
 
 import '../main'
-import * as Luxon from 'luxon'
+import dayjs from '../../common/dayjs'
 import * as schedule from 'node-schedule'
 import * as rkeys from '../../common/rkeys'
+import * as pretty from '../../common/pretty'
 import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
+import * as socket from '../adapters/socket'
+import * as hours from '../adapters/hours'
 
 
 
 schedule.scheduleJob('00 * * * *', syncHours).invoke()
 
 async function syncHours() {
-	let today = Luxon.DateTime.local().toISODate()
+	let today = dayjs().format('YYYY-MM-DD')
 	let url = 'https://api.robinhood.com/markets/XNYS/hours/' + today + '/'
-	let rhmarket = await http.get(url, { retries: Infinity }) as Robinhood.Market.Hours
-	let hours = { isOpenToday: rhmarket.is_open, date: rhmarket.date } as Hours
-	if (hours.isOpenToday) {
-		hours.prepre = Luxon.DateTime.fromISO(rhmarket.opens_at).minus({ hours: 5, minutes: 30 }).valueOf()
-		hours.pre = Luxon.DateTime.fromISO(rhmarket.extended_opens_at).valueOf()
-		hours.opens = Luxon.DateTime.fromISO(rhmarket.opens_at).valueOf()
-		hours.closes = Luxon.DateTime.fromISO(rhmarket.closes_at).valueOf()
-		hours.post = Luxon.DateTime.fromISO(rhmarket.extended_closes_at).valueOf()
-		hours.postpost = Luxon.DateTime.fromISO(rhmarket.closes_at).plus({ hours: 4 }).valueOf()
+	let rhours = await http.get(url) as Robinhood.Market.Hours
+	let hours = { openToday: rhours.is_open, date: rhours.date } as Hours
+	if (hours.openToday) {
+		hours.prepre = dayjs(new Date(rhours.opens_at)).subtract(5, 'hour').subtract(30, 'minute').valueOf()
+		hours.pre = dayjs(new Date(rhours.extended_opens_at)).valueOf()
+		hours.opens = dayjs(new Date(rhours.opens_at)).valueOf()
+		hours.closes = dayjs(new Date(rhours.closes_at)).valueOf()
+		hours.post = dayjs(new Date(rhours.extended_closes_at)).valueOf()
+		hours.postpost = dayjs(new Date(rhours.closes_at)).add(4, 'hour').valueOf()
 	}
-	await redis.main.hmset(rkeys.HOURS, hours)
+	await redis.main.hmset(rkeys.HR.HOURS, hours)
 	pandora.broadcast({}, 'syncHours')
 }
+
+hours.rxhours.subscribe(function(hours) {
+	if (hours) socket.emit(rkeys.HR.HOURS, hours);
+})
+hours.rxstate.subscribe(function(state) {
+	if (state) socket.emit(rkeys.HR.STATE, state);
+})
 
 

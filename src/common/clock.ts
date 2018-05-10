@@ -1,9 +1,8 @@
 // 
 
 import * as ci from 'correcting-interval'
-import * as dayjs from 'dayjs'
-import * as _ from './lodash'
-import * as core from './core'
+import { array, math } from './core'
+import dayjs from './dayjs'
 import Emitter from './emitter'
 
 
@@ -20,7 +19,7 @@ declare global { namespace Clock { type Tick = keyof typeof TICKS } }
 
 class Clock extends Emitter<Clock.Tick, number> {
 	ticks = Object.keys(TICKS).filter(isNaN as any) as Clock.Tick[]
-	tocks = core.array.dict(this.ticks, 0)
+	tocks = array.dict(this.ticks, 0)
 }
 
 const clock = new Clock()
@@ -49,10 +48,10 @@ function tickGenesis(tick: Clock.Tick) {
 	let now = Date.now()
 	let from = now - (now % ms)
 	let to = from + ms
-	let ims = process.env.CLIENT ? 0 : core.math.dispersed(ms, +process.env.INSTANCE, +process.env.SCALE)
+	let ims = process.env.CLIENT ? 0 : math.dispersed(ms, +process.env.INSTANCE, +process.env.SCALE)
 	let delay = (from + ims) - now
 	if (delay <= 0) delay = (to + ims) - now;
-	_.delay(startTicking, delay, tick, ms)
+	setTimeout(startTicking, delay, tick, ms)
 }
 
 function clockGenesis() {

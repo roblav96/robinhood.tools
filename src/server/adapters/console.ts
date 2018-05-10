@@ -10,7 +10,7 @@ Object.assign(util.inspect.styles, { string: 'green', regexp: 'green', date: 'gr
 
 const pandora = process.env.PANDORA_CWD ? require('pandora') : null;
 import chalk from 'chalk'
-import * as dayjs from 'dayjs'
+import dayjs from '../../common/dayjs'
 import * as StackTracey from 'stacktracey'
 const _console = {} as typeof console
 let methods = ['log', 'info', 'warn', 'error']

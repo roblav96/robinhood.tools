@@ -60,9 +60,9 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 	// 	SCALE: 1,
 	// })
 
-	// Process(pandora.process('hours.service').entry('./services/hours.service'), {
-	// 	SCALE: 1,
-	// })
+	Process(pandora.process('hours.service').entry('./services/hours.service'), {
+		SCALE: 1,
+	})
 
 
 

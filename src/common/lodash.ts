@@ -21,6 +21,7 @@ export {
 	intersection,
 	invert,
 	isEmpty,
+	isEqual,
 	isPlainObject,
 	keys,
 	keysIn,

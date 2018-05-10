@@ -19,8 +19,6 @@ export {
 	OperatorFunction,
 } from 'rxjs/internal/types'
 
-// 
-
 import * as Rx from './rxjs'
 
 
