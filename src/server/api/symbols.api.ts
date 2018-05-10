@@ -13,7 +13,7 @@ declare global {
 	namespace Api {
 		interface SymbolsBody {
 			symbols: string[]
-			wants: (keyof typeof WANTS)[]
+			wants?: (keyof typeof WANTS)[]
 		}
 		interface SymbolsResponse {
 			instruments: Robinhood.Instrument[]
@@ -22,12 +22,14 @@ declare global {
 		}
 	}
 }
+
 const WANTS = {
 	instruments: rkeys.RH.INSTRUMENTS,
 	tickers: rkeys.WB.TICKERS,
 	quotes: rkeys.WB.QUOTES,
 }
 const ALLOWED = Object.keys(WANTS)
+
 polka.route({
 	method: 'POST',
 	url: '/api/symbols',
@@ -61,7 +63,6 @@ polka.route({
 		symbols.forEach(() => {
 			wants.forEach(vv => response[vv].push(resolved[ii++]))
 		})
-		console.log('response ->', response)
 
 		return response
 	}

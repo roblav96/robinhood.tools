@@ -33,10 +33,12 @@ export default class extends Vue {
 		socket.on(`${rkeys.WB.QUOTES}:${this.symbol}`, this.onquote, this)
 		socket.offListener(this.ondeal, this)
 		socket.on(`${rkeys.WB.DEALS}:${this.symbol}`, this.ondeal, this)
-		http.post('/onsymbol', { symbols: [this.symbol] }).then(response => {
-			this.instrument = response[0].instrument
-			this.ticker = response[0].ticker
-			this.quote = response[0].quote
+		http.post('/symbols', {
+			symbols: [this.symbol],
+		} as Api.SymbolsBody).then((response: Api.SymbolsResponse) => {
+			this.instrument = response.instruments[0]
+			this.ticker = response.tickers[0]
+			this.quote = response.quotes[0]
 		}).catch(error => console.error('onsymbol Error ->', error))
 	}
 

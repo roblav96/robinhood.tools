@@ -49,6 +49,12 @@ export const main = new Redis('main', 0)
 
 
 
+export function fixHmget(hmget: any, keys: string[]) {
+	let fixed = {} as any
+	hmget.forEach((v, i) => fixed[keys[i]] = v)
+	return fixed
+}
+
 export function fixPipeline(resolved: any[]) {
 	if (Array.isArray(resolved)) {
 		let i: number, len = resolved.length

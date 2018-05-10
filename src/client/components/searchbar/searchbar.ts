@@ -29,7 +29,7 @@ export default class extends Vue {
 		this.busy = true
 		http.get('/search', {
 			query: { query: this.query },
-		}).then(response => {
+		}).then((response: Robinhood.Instrument[]) => {
 			this.results = response
 		}).catch(error => {
 			console.error('sync Error ->', error)
@@ -38,12 +38,10 @@ export default class extends Vue {
 
 	syncRecents() {
 		this.busy = true
-		let symbols = this.$store.state.recents.map(v => v.symbol)
-		http.post('/symbols', {
-			symbols, wants: ['instruments'],
-		} as Api.SymbolsBody).then((response: Api.SymbolsResponse) => {
-			console.log('response ->', response)
-			this.results = response.instruments
+		http.post('/search/recents', {
+			symbols: this.$store.state.recents.map(v => v.symbol),
+		}).then((response: Robinhood.Instrument[]) => {
+			this.results = response
 		}).catch(error => {
 			console.error('syncRecents Error ->', error)
 		}).finally(() => this.busy = false)
