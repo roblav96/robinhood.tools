@@ -52,11 +52,11 @@ async function syncStocks() {
 	let tickers = await Promise.all([
 		// stocks
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
-			query: { pageSize: 9999 }
+			query: { pageSize: 9999, sourceRegionId: 1, hl: 'en' }
 		}),
 		// etfs
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
-			query: { pageSize: 9999 }
+			query: { pageSize: 9999, sourceRegionId: 1, hl: 'en' }
 		}),
 	]) as Webull.Ticker[]
 	tickers = _.flatten(tickers)

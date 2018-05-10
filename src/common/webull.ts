@@ -10,7 +10,8 @@ export const fiats = [
 ] as string[]
 
 export const indexes = [
-	'RUI', 'RUT', 'TNX', 'TYX',
+	'RUI', 'RUT', // russell 2000
+	'FVX', 'TNX', 'TYX', // treasury bonds
 ] as string[]
 
 

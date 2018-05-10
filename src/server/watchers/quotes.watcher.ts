@@ -30,15 +30,16 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 	if (hubmsg.data.type && hubmsg.data.type != process.env.SYMBOLS) return;
 	let resets = hubmsg.data.reset
 
-	console.warn('hubmsg ->', hubmsg)
-	if (process.env.DEVELOPMENT) return;
-
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
 		await utils.getFullSymbols(process.env.SYMBOLS)
 	)
 	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 	let symbols = Object.keys(fsymbols)
+
+	console.log('fsymbols ->', fsymbols)
+	console.log('symbols ->', symbols)
+	if (process.env.DEVELOPMENT) return;
 
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => [
 		['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`],
