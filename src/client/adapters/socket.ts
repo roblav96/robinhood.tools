@@ -40,18 +40,17 @@ class Socket extends Emitter {
 		if (!this.ready()) return;
 		this.emit('ready')
 	}
-
-	private onmessage(message: string) {
-		let event = JSON.parse(message) as Socket.Event
-		console.log('event ->', event)
-		this.emit(event.name, event.data)
-	}
-
-	private strsubs = ''
 	private onclose() {
 		this.strsubs = ''
 	}
 
+	private onmessage(message: string) {
+		let event = JSON.parse(message) as Socket.Event
+		// console.log('event ->', event)
+		this.emit(event.name, event.data)
+	}
+
+	private strsubs = ''
 	private resync = _.debounce(this.sync, 100, { leading: false, trailing: true })
 	private sync() {
 		if (!this.ready()) return;

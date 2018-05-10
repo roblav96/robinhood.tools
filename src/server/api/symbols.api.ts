@@ -10,6 +10,39 @@ import polka from './polka'
 
 polka.route({
 	method: 'POST',
+	url: '/api/onsymbol',
+	public: true,
+	schema: {
+		body: { symbols: { type: 'array', items: 'string' } },
+	},
+	async handler(req, res) {
+		let symbols = req.body.symbols as string[]
+
+		let coms = [] as Redis.Coms
+		symbols.forEach(function(v) {
+			coms.push(['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`])
+			coms.push(['hgetall', `${rkeys.WB.TICKERS}:${v}`])
+			coms.push(['hgetall', `${rkeys.WB.QUOTES}:${v}`])
+		})
+		let resolved = await redis.main.coms(coms)
+		resolved.forEach(core.fix)
+
+		let ii = 0
+		return symbols.map(function() {
+			return {
+				instrument: resolved[ii++],
+				ticker: resolved[ii++],
+				quote: resolved[ii++],
+			}
+		})
+
+	}
+})
+
+
+
+polka.route({
+	method: 'POST',
 	url: '/api/symbols/instruments',
 	public: true,
 	schema: {
