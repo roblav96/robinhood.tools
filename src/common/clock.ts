@@ -1,17 +1,15 @@
 // 
 
-import { Duration } from 'luxon'
 import * as ci from 'correcting-interval'
+import * as dayjs from 'dayjs'
 import * as _ from './lodash'
 import * as core from './core'
 import Emitter from './emitter'
 
-// import * as Pandora from 'pandora'
-// console.log('Pandora.processContext ->', Pandora.processContext)
-// console.log('Pandora.getHub ->', Pandora.getHub())
+
 
 enum TICKS {
-	'100ms', '250ms', '500ms',
+	// '100ms', '250ms', '500ms',
 	'1s', '2s', '3s', '5s', '10s', '15s', '30s',
 	'1m', '5m', '10m', '15m', '30m',
 	'1h', '2h', '3h', '6h', '12h',
@@ -45,9 +43,9 @@ function startTicking(tick: Clock.Tick, ms: number) {
 
 function tickGenesis(tick: Clock.Tick) {
 	let qty = Number.parseInt(tick)
-	let unit = core.time.UNITS[tick.substr(qty.toString().length)]
-	let ms = Duration.fromObject({ [unit]: qty }).as('milliseconds')
-	// console.warn('tick ->', console.dump(tick), '\n', 'qty ->', console.dump(qty), '\n', 'unit ->', console.dump(unit), '\n', 'ms ->', console.dump(ms))
+	let unit = tick.substr(qty.toString().length)
+	let ms = unit == 'ms' ? qty : dayjs(0).add(qty, unit as any).valueOf()
+	// console.warn('tick ->', tick, '\n', 'qty ->', qty, '\n', 'unit ->', unit, '\n', 'ms ->', ms)
 	let now = Date.now()
 	let from = now - (now % ms)
 	let to = from + ms
@@ -57,8 +55,9 @@ function tickGenesis(tick: Clock.Tick) {
 	_.delay(startTicking, delay, tick, ms)
 }
 
-setImmediate(function clockGenesis() {
+function clockGenesis() {
 	clock.ticks.forEach(tickGenesis)
-})
+}
+setImmediate(clockGenesis)
 
 

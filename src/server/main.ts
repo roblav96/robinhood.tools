@@ -9,9 +9,6 @@ require('bluebird').config({ warnings: { wForgottenReturn: false } })
 import * as sourcemaps from 'source-map-support'
 sourcemaps.install()
 
-import { Settings } from 'luxon'
-Settings.defaultZoneName = 'America/New_York'
-
 import './adapters/process'
 import './adapters/console'
 import '../common/clock'

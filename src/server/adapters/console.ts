@@ -10,7 +10,7 @@ Object.assign(util.inspect.styles, { string: 'green', regexp: 'green', date: 'gr
 
 const pandora = process.env.PANDORA_CWD ? require('pandora') : null;
 import chalk from 'chalk'
-import * as luxon from 'luxon'
+import * as dayjs from 'dayjs'
 import * as StackTracey from 'stacktracey'
 const _console = {} as typeof console
 let methods = ['log', 'info', 'warn', 'error']
@@ -22,7 +22,7 @@ for (i = 0; i < len; i++) {
 		[method](...args: any[]) {
 			let stack = new StackTracey()
 			let site = stack[1]
-			let stamp = luxon.DateTime.local().toFormat('hh:mm:ss:SSS')
+			let stamp = dayjs().format('hh:mm:ss:SSS')
 			let colors = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' }
 			let color = (colors[method] || 'magenta') as string
 			let square = chalk[color + 'Bright']('█') as string

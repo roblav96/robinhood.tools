@@ -31,7 +31,6 @@ import * as Pandora from 'pandora'
 process.env.OFFSET = Pandora.processContext ? Pandora.processContext.context.processRepresentation.offset : 0
 process.env.ORDER = Pandora.processContext ? Pandora.processContext.context.processRepresentation.order : 0
 if (!+process.env.OFFSET && process.env.PRIMARY) process.env.FIRST = true;
-// process.env.IPORT = +process.env.PORT + +process.env.OFFSET + +process.env.INSTANCE
 
 
 
