@@ -22,7 +22,7 @@ div.searchbar div.dropdown-content {
 		    v-on:input="oninput" v-on:select="onselect">
 			<template slot-scope="props">
 				<div class="columns is-mobile is-gapless">
-					<v-symbol-logo class="column is-narrow image is-32x32 mr-4 self-center" :symbol="props.option.symbol"></v-symbol-logo>
+					<ui-symbol-logo class="column is-narrow image is-32x32 mr-4 self-center" :symbol="props.option.symbol"></ui-symbol-logo>
 					<div class="column content">
 						<p class="title is-5 is-spaced mb-0">{{ props.option.symbol }}</p>
 						<p class="subtitle is-6">{{ props.option.name }}</p>

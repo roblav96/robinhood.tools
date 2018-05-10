@@ -37,43 +37,40 @@ export function headers() {
 	return headers
 }
 
-
-
-function uuid(): Promise<void> {
-	if (doc.uuid) return;
-	return security.generateProbablePrime(32).then(function(uuid) {
-		lockr.set('security.uuid', uuid)
-		doc.uuid = uuid
+function finger() {
+	return new Promise<string>(function(resolve) {
+		new Fingerprint2().get(resolve)
 	})
 }
 
-function finger(): Promise<void> {
-	if (doc.finger) return;
-	return new Promise(function(resolve) {
-		new Fingerprint2().get(function(finger) {
-			finger = security.sha1(finger)
-			lockr.set('security.finger', finger)
-			doc.finger = finger
-			resolve()
-		})
-	})
-}
-
-
-
-Promise.all([
-	uuid(), finger(),
-]).then(function() {
-	return http.get('/security/token', { retryTick: '1s', retries: Infinity })
-}).then(function() {
-	return socket.discover()
-}).then(function() {
+export async function init() {
+	if (!doc.uuid) {
+		doc.uuid = security.randomBits(32)
+		lockr.set('security.uuid', doc.uuid)
+	}
+	if (!doc.finger) {
+		doc.finger = await finger()
+		lockr.set('security.finger', doc.finger)
+	}
+	await http.get('/security/token', { retryTick: '1s', retries: Infinity })
 	state.ready = true
-}).catch(function(error) {
-	console.error('init Error ->', error)
-})
+}
 
 
+
+
+
+// Promise.all([
+// 	uuid(), finger(),
+// ]).then(function() {
+// 	return http.get('/security/token', { retryTick: '1s', retries: Infinity })
+// }).then(function() {
+// 	return socket.discover()
+// }).then(function() {
+// 	state.ready = true
+// }).catch(function(error) {
+// 	console.error('init Error ->', error)
+// })
 
 // http.post('/search', {
 // 	query: 'nvda',

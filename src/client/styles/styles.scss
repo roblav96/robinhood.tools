@@ -71,6 +71,10 @@ $value in (('', $speed), ('-slow', $speed-slow), ('-slower', $speed-slower), ('-
 	}
 }
 
+.animated-loading {
+	animation-duration: 3s !important;
+}
+
 // .animated {
 // 	transform: translateZ(0);
 // 	transform-style: preserve-3d;

@@ -4,9 +4,9 @@
 <style>
 /**/
 
-.v-symbol-logo {}
+.ui-symbol-logo {}
 
-.v-symbol-logo > img {
+.ui-symbol-logo > img {
 	width: 100%;
 	vertical-align: center;
 }
@@ -14,7 +14,7 @@
 </style>
 
 <template>
-	<figure class="v-symbol-logo image flex">
+	<figure class="ui-symbol-logo image flex">
 		<img class="is-png self-center rounded" :src="src" v-on:error="onerror"></img>
 	</figure>
 </template>

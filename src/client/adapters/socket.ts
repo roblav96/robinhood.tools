@@ -26,15 +26,19 @@ class Socket extends Emitter {
 		return alives == this.clients.length
 	}
 
-	discover() {
-		return http.get('/websocket/discover').then((addresses: string[]) => {
-			this.clients.forEach(v => v.destroy())
-			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
-				return new WebSocketClient(v, {
-					query: security.headers,
-				}).on('open', this.resync, this).on('close', this.onclose, this).on('message', this.onmessage, this)
-			}))
-		})
+	async discover() {
+		let addresses = await http.get('/websocket/discover') as string[]
+		this.clients.forEach(v => v.destroy())
+		this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
+			return new WebSocketClient(v, {
+				query: security.headers,
+			}).on('open', this.onopen, this).on('close', this.onclose, this).on('message', this.onmessage, this)
+		}))
+	}
+
+	private onopen() {
+		if (!this.ready()) return;
+		this.emit('ready')
 	}
 
 	private onmessage(message: string) {
@@ -44,7 +48,9 @@ class Socket extends Emitter {
 	}
 
 	private strsubs = ''
-	private onclose() { this.strsubs = '' }
+	private onclose() {
+		this.strsubs = ''
+	}
 
 	private resync = _.debounce(this.sync, 100, { leading: false, trailing: true })
 	private sync() {
