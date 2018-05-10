@@ -20,12 +20,13 @@ import clock from '../../common/clock'
 
 (async function start() {
 
-	// await redis.main.del(rkeys.WB.TICKER_IDS)
-	let tids = await redis.main.hlen(rkeys.WB.TICKER_IDS)
-	if (tids < 10000) await syncStocks();
+	// await redis.main.del(rkeys.RH.SYMBOLS)
+	let instruments = await redis.main.exists(rkeys.RH.SYMBOLS)
+	if (instruments == 0) await syncInstruments();
+
 	// await redis.main.del(rkeys.SYMBOLS.STOCKS)
 	let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)
-	if (stocks == 0) await chunkStocks();
+	if (stocks == 0) await syncStocks();
 
 	// await redis.main.del(rkeys.SYMBOLS.FOREX)
 	let forex = await redis.main.exists(rkeys.SYMBOLS.FOREX)
@@ -45,6 +46,34 @@ pandora.on('readySymbols', function(hubmsg) {
 	if (ready) pandora.broadcast({}, 'symbolsReady');
 })
 
+
+
+async function syncInstruments() {
+	await pForever(async function getInstruments(url) {
+
+		let { results, next } = await http.get(url) as Robinhood.Api.Paginated<Robinhood.Instrument>
+		results.remove(v => Array.isArray(v.symbol.match(/[^A-Z-]/)))
+
+		if (process.env.DEVELOPMENT) {
+			console.log('getInstruments ->', results.length, next)
+		}
+
+		let coms = [] as Redis.Coms
+		let symbols = new redis.SetsComs(rkeys.RH.SYMBOLS)
+		results.forEach(function(v) {
+			symbols.sadd(v.symbol)
+			v.mic = _.compact(v.market.split('/')).pop()
+			v.acronym = robinhood.MICS[v.mic]
+			v.alive = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
+			coms.push(['hmset', `${rkeys.RH.INSTRUMENTS}:${v.symbol}`, v as any])
+		})
+		symbols.merge(coms)
+		await redis.main.coms(coms)
+
+		return next || pForever.end
+
+	}, 'https://api.robinhood.com/instruments/')
+}
 
 
 schedule.scheduleJob('50 3 * * 1-5', syncStocks)
