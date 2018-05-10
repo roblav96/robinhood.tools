@@ -27,4 +27,11 @@ export function stamp(stamp = Date.now(), format = 'dddd, MMM DD YYYY, hh:mm:ssa
 	return dayjs(stamp).format(format)
 }
 
+export function marketState(state: Hours.State) {
+	if (state == 'REGULAR') return 'Markets Open';
+	if (state.includes('PRE')) return 'Pre-Market';
+	if (state.includes('POST')) return 'After-Hours';
+	return 'Markets Closed'
+}
+
 

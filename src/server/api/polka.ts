@@ -35,7 +35,7 @@ const polka = new PolkaRouter({
 	onNoMatch(req, res) {
 		if (res.headerSent) return;
 		let { method, path } = req
-		this.onError(boom.notFound(method.concat(path), { method, path }), req, res, _.noop)
+		polka.onError(boom.notFound(`${method} ${path}`, { method, path }), req, res, _.noop)
 	},
 
 })

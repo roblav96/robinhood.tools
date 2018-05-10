@@ -92,12 +92,15 @@ clock.on('3s', function onconnect() {
 	if (WATCHERS.length == 0) return;
 	let watcher = WATCHERS.find(v => v.options.connect == false)
 	if (!watcher) return;
-	console.info('onconnect ->', Object.keys(watcher.options.fsymbols).length)
+	// console.info('onconnect ->', Object.keys(watcher.options.fsymbols).length)
 	watcher.options.connect = true
 	watcher.connect()
 })
 
 const GREATER_THANS = {
+	faTradeTime: null,
+	mkTradeTime: null,
+	mktradeTime: null,
 	tradeTime: null,
 	volume: null,
 } as Webull.Quote

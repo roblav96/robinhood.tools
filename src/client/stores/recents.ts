@@ -11,7 +11,7 @@ import router from '@/client/router'
 let state = lockr.get('recents', []) as Recent[]
 store.registerModule('recents', { state })
 declare global {
-	namespace Store { interface State { recents: Recent[] } }
+	namespace Store { interface State { recents: typeof state } }
 	interface Recent {
 		symbol: string
 		stamp: number
