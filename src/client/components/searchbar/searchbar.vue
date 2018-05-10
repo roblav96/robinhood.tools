@@ -9,10 +9,6 @@ div.searchbar div.dropdown-content {
 	max-height: 66vh;
 }
 
-div.searchbar a.dropdown-item {
-	padding-right: 1rem;
-}
-
 </style>
 
 <template>
