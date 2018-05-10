@@ -19,28 +19,21 @@ import clock from '../../common/clock'
 
 
 pandora.on('readySymbols', _.debounce(async function readySymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
-	// let type = hubmsg.data.type
 
-	// if (type == 'STOCKS') {
 	// await redis.main.del(rkeys.WB.TICKER_IDS)
 	let tids = await redis.main.hlen(rkeys.WB.TICKER_IDS)
 	if (tids < 10000) await syncStocks();
 	// await redis.main.del(rkeys.SYMBOLS.STOCKS)
 	let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)
 	if (stocks == 0) await chunkStocks();
-	// }
 
-	// if (type == 'FOREX') {
 	// await redis.main.del(rkeys.SYMBOLS.FOREX)
 	let forex = await redis.main.exists(rkeys.SYMBOLS.FOREX)
 	if (forex == 0) await syncForex();
-	// }
 
-	// if (type == 'INDEXES') {
 	// await redis.main.del(rkeys.SYMBOLS.INDEXES)
 	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
 	if (indexes == 0) await syncIndexes(webull.indexes);
-	// }
 
 	pandora.broadcast({}, 'onSymbols', { ready: true } as Symbols.OnSymbolsData)
 
@@ -143,16 +136,16 @@ async function syncTickerId(instrument: Robinhood.Instrument, tickers = [] as We
 
 }
 
-schedule.scheduleJob('00 4 * * 1-5', () => chunkStocks(true))
+schedule.scheduleJob('59 3 * * 1-5', () => chunkStocks(true))
 async function chunkStocks(reset = false) {
 	let tdict = await redis.main.hgetall(rkeys.WB.TICKER_IDS) as Dict<number>
 	tdict = _.mapValues(tdict, v => Number.parseInt(v as any))
 	let tpairs = _.uniqWith(_.toPairs(tdict), (a, b) => a[1] == b[1]).sort()
+	await webull.syncTickersQuotes(_.fromPairs(tpairs))
 	let coms = [
 		['set', rkeys.SYMBOLS.STOCKS, JSON.stringify(tpairs.map(v => v[0]))],
 		['set', rkeys.FSYMBOLS.STOCKS, JSON.stringify(_.fromPairs(tpairs))],
 	] as Redis.Coms
-	await webull.syncTickersQuotes(_.fromPairs(tpairs))
 	let chunks = core.array.chunks(tpairs, +process.env.CPUS)
 	chunks.forEach(function(chunk, i) {
 		let symbols = JSON.stringify(chunk.map(v => v[0]))
@@ -162,9 +155,7 @@ async function chunkStocks(reset = false) {
 	})
 	await redis.main.coms(coms)
 	if (reset) {
-		pandora.broadcast({
-			processName: 'stocks',
-		}, 'onSymbols', { reset, type: 'STOCKS' } as Symbols.OnSymbolsData);
+		pandora.broadcast({}, 'onSymbols', { reset, type: 'STOCKS' } as Symbols.OnSymbolsData);
 	}
 }
 

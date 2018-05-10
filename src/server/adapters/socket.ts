@@ -110,6 +110,7 @@ function onconnection(client: Client, req: PolkaRequest) {
 				this.subs.forEach(v => emitter.off(v, this.send, this))
 				this.subs.splice(0, Infinity, ...event.subs)
 				this.subs.forEach(v => emitter.on(v, this.send, this))
+				console.log('this.subs ->', this.subs)
 				return
 			}
 		}

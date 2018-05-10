@@ -16,7 +16,6 @@ export default class extends Vue {
 	onerror(event: Event) {
 		let el = event.target as HTMLImageElement
 		el.src = 'https://bulma.io/images/placeholders/256x256.png'
-		// 'https://logo.clearbit.com/www.nasdaq.com'
 	}
 
 }

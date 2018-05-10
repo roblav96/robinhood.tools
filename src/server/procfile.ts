@@ -27,12 +27,12 @@ interface Env extends Partial<NodeJS.ProcessEnv> { [key: string]: any }
 
 
 
-let order = 1
+let ORDER = 1
 function Process(chain: ProcessRepresentationChainModifier, env = {} as Env) {
 	_.defaults(env, ENV)
 	return (chain
 		.nodeArgs(['--no-warnings', '--expose-gc', '--max_old_space_size=2048'])
-		.env(env).scale(env.SCALE).order(order++)
+		.env(env).scale(env.SCALE).order(ORDER++)
 	)
 }
 
@@ -44,17 +44,17 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 		SCALE: 2, // os.cpus().length,
 	})
 
-	// Process(pandora.process('symbols').entry('./watchers/symbols.watcher'), {
-	// 	SCALE: 1
-	// })
+	Process(pandora.process('symbols').entry('./watchers/symbols.watcher'), {
+		SCALE: 1
+	})
 	// Process(pandora.process('stocks').entry('./watchers/quotes.watcher'), {
 	// 	SYMBOLS: 'STOCKS',
 	// 	SCALE: 2, // os.cpus().length,
 	// })
-	// Process(pandora.process('forex').entry('./watchers/quotes.watcher'), {
-	// 	SYMBOLS: 'FOREX',
-	// 	SCALE: 1,
-	// })
+	Process(pandora.process('forex').entry('./watchers/quotes.watcher'), {
+		SYMBOLS: 'FOREX',
+		SCALE: 1,
+	})
 	// Process(pandora.process('indexes').entry('./watchers/quotes.watcher'), {
 	// 	SYMBOLS: 'INDEXES',
 	// 	SCALE: 1,

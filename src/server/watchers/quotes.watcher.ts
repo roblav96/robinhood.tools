@@ -22,13 +22,14 @@ const WATCHERS = [] as webull.MqttClient[]
 const QUOTES = {} as Dict<Quote>
 const SAVES = {} as Dict<Quote>
 
-pandora.on('onSymbols', onSymbols)
 pandora.broadcast({}, 'readySymbols')
+pandora.on('onSymbols', onSymbols)
 async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 	if (hubmsg.data.ready && WATCHERS.length > 0) return;
 	if (hubmsg.data.type && hubmsg.data.type != process.env.SYMBOLS) return;
 	let resets = hubmsg.data.reset
 
+	console.log('hubmsg ->', hubmsg)
 	if (process.env.DEVELOPMENT) return;
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?

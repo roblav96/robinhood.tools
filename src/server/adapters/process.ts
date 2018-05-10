@@ -44,3 +44,11 @@ process.on('unhandledRejection', function(error) {
 })
 
 
+
+// import * as sigexit from 'signal-exit'
+// sigexit(function(code, signal) {
+// 	console.log('code ->', code)
+// 	console.log('signal ->', signal)
+// 	process.send('SIGKILL')
+// })
+
