@@ -20,10 +20,10 @@ export async function proxy(name: string) {
 
 
 
-export function send(selector: Hub.Selector, action: string, data?: any) {
+export function send(selector: Hub.Selector, action: string, data = {} as any) {
 	pandora.getHub().hubClient.send(selector, action, { data })
 }
-export function broadcast(selector: Hub.Selector, action: string, data?: any) {
+export function broadcast(selector: Hub.Selector, action: string, data = {} as any) {
 	pandora.getHub().hubClient.multipleSend(selector, action, { data })
 }
 
@@ -32,6 +32,9 @@ export function once(action: string, fn: (hubmsg: Pandora.HubMessage) => void) {
 }
 export function on(action: string, fn: (hubmsg: Pandora.HubMessage) => void) {
 	pandora.getHub().hubClient.on(action, fn)
+}
+export function off(action: string, fn: (hubmsg: Pandora.HubMessage) => void) {
+	pandora.getHub().hubClient.removeListener(action, fn)
 }
 
 

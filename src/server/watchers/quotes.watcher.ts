@@ -22,14 +22,15 @@ const WATCHERS = [] as webull.MqttClient[]
 const QUOTES = {} as Dict<Quote>
 const SAVES = {} as Dict<Quote>
 
+pandora.once('symbolsReady', onSymbols)
 pandora.broadcast({}, 'readySymbols')
+
 pandora.on('onSymbols', onSymbols)
 async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
-	if (hubmsg.data.ready && WATCHERS.length > 0) return;
 	if (hubmsg.data.type && hubmsg.data.type != process.env.SYMBOLS) return;
 	let resets = hubmsg.data.reset
 
-	console.log('hubmsg ->', hubmsg)
+	console.warn('hubmsg ->', hubmsg)
 	if (process.env.DEVELOPMENT) return;
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
@@ -103,20 +104,20 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 			// verbose: true,
 		}).on('data', ondata))
 	})
-	connect.i = 0
-	clock.off(connect.tick, onconnect)
-	clock.on(connect.tick, onconnect)
+	conn.i = 0
+	clock.off(conn.tick, onconnect)
+	clock.on(conn.tick, onconnect)
 
 }
 
-let connect = { tick: '3s' as Clock.Tick, i: 0 }
+let conn = { tick: '3s' as Clock.Tick, i: 0 }
 function onconnect() {
-	let watcher = WATCHERS[connect.i++]
+	let watcher = WATCHERS[conn.i++]
 	if (watcher) {
-		console.log(connect.i, 'onconnect ->', Object.keys(watcher.options.fsymbols).length)
+		console.log(conn.i, 'onconnect ->', Object.keys(watcher.options.fsymbols).length)
 		return watcher.connect()
 	}
-	clock.off(connect.tick, onconnect)
+	clock.off(conn.tick, onconnect)
 }
 
 function ondata(topic: number, wbquote: Webull.Quote) {

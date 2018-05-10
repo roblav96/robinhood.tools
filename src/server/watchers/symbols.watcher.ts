@@ -18,7 +18,7 @@ import clock from '../../common/clock'
 
 
 
-pandora.on('readySymbols', _.debounce(async function readySymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
+(async function start() {
 
 	// await redis.main.del(rkeys.WB.TICKER_IDS)
 	let tids = await redis.main.hlen(rkeys.WB.TICKER_IDS)
@@ -35,9 +35,15 @@ pandora.on('readySymbols', _.debounce(async function readySymbols(hubmsg: Pandor
 	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
 	if (indexes == 0) await syncIndexes(webull.indexes);
 
-	pandora.broadcast({}, 'onSymbols', { ready: true } as Symbols.OnSymbolsData)
+	ready = true
+	pandora.broadcast({}, 'symbolsReady')
 
-}, 1000, { leading: false, trailing: true }))
+})().catch(error => console.error('start Error ->', error))
+
+let ready = false
+pandora.on('readySymbols', function(hubmsg) {
+	if (ready) pandora.broadcast({}, 'symbolsReady');
+})
 
 
 
@@ -212,7 +218,6 @@ declare global {
 	namespace Symbols {
 		interface OnSymbolsData {
 			type: keyof typeof rkeys.SYMBOLS
-			ready: boolean
 			reset: boolean
 		}
 	}
