@@ -111,28 +111,29 @@ async function syncTickers() {
 
 	let coms = [] as Redis.Coms
 	let scoms = new redis.SetsComs(rkeys.WB.SYMBOLS)
-	let tids = {} as Dict<number>
+	let tickerids = {} as Dict<number>
 	let dtickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker) as Dict<Webull.Ticker[]>
 	Object.keys(dtickers).map(function(symbol) {
 		if (dtickers[symbol].length > 1) dtickers[symbol].sort((a, b) => b.exchangeId - a.exchangeId).splice(1);
-		let v = dtickers[symbol][0]
-		tids[v.disSymbol] = v.tickerId
-		coms.push(['hmset', `${rkeys.WB.TICKERS}:${v.symbol}`, v as any])
+		let ticker = dtickers[symbol][0]
+		tickerids[symbol] = ticker.tickerId
+		coms.push(['hmset', `${rkeys.WB.TICKERS}:${symbol}`, ticker as any])
 	})
-	coms.push(['hmset', rkeys.WB.TIDS, tids as any])
+	coms.push(['hmset', rkeys.WB.TICKER_IDS, tickerids as any])
 	scoms.merge(coms)
 	await redis.main.coms(coms)
 }
 
-schedule.scheduleJob('59 3 * * 1-5', () => chunkStocks(true))
-async function chunkStocks(reset = false) {
-	let tdict = await redis.main.hgetall(rkeys.WB.TIDS) as Dict<number>
-	tdict = _.mapValues(tdict, v => Number.parseInt(v as any))
-	let tpairs = _.uniqWith(_.toPairs(tdict), (a, b) => a[1] == b[1]).sort()
-	await webull.syncTickersQuotes(_.fromPairs(tpairs))
+
+
+async function syncStocks() {
+	let tids = await redis.main.hgetall(rkeys.WB.TICKER_IDS) as Dict<number>
+	tids = _.mapValues(tids, v => Number.parseInt(v as any))
+	let tpairs = _.toPairs(tids).sort()
+	let fsymbols = _.fromPairs(tpairs)
 	let coms = [
-		['set', rkeys.SYMBOLS.STOCKS, JSON.stringify(tpairs.map(v => v[0]))],
-		['set', rkeys.FSYMBOLS.STOCKS, JSON.stringify(_.fromPairs(tpairs))],
+		['set', rkeys.SYMBOLS.STOCKS, JSON.stringify(Object.keys(fsymbols))],
+		['set', rkeys.FSYMBOLS.STOCKS, JSON.stringify(fsymbols)],
 	] as Redis.Coms
 	let chunks = core.array.chunks(tpairs, +process.env.CPUS)
 	chunks.forEach(function(chunk, i) {
@@ -142,15 +143,7 @@ async function chunkStocks(reset = false) {
 		coms.push(['set', `${rkeys.FSYMBOLS.STOCKS}:${process.env.CPUS}:${i}`, fpairs])
 	})
 	await redis.main.coms(coms)
-	if (reset) {
-		pandora.broadcast({}, 'onSymbols', { reset, type: 'STOCKS' } as Symbols.OnSymbolsData);
-	}
-}
-
-
-
-async function syncStocks() {
-	
+	await webull.syncTickersQuotes(fsymbols)
 }
 
 async function syncForex() {
@@ -183,11 +176,11 @@ async function finishSync(type: keyof typeof rkeys.SYMBOLS, tickers: Webull.Tick
 	tickers = _.orderBy(tickers, 'disSymbol')
 	let fsymbols = {} as Dict<number>
 	tickers.forEach(v => fsymbols[v.disSymbol] = v.tickerId)
-	await webull.syncTickersQuotes(fsymbols)
 	await redis.main.coms([
 		['set', rkeys.SYMBOLS[type], JSON.stringify(Object.keys(fsymbols))],
 		['set', rkeys.FSYMBOLS[type], JSON.stringify(fsymbols)],
 	])
+	await webull.syncTickersQuotes(fsymbols)
 }
 
 async function getTicker(symbol: string, tickerType: number) {

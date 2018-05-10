@@ -164,16 +164,16 @@ export function getTickers(fsymbols: Dict<number>): Promise<Webull.Ticker[]> {
 }
 
 export async function syncTickersQuotes(fsymbols: Dict<number>) {
-	let coms = []
+	let coms = [] as Redis.Coms
 	let wbquotes = await getFullQuotes(fsymbols)
 	wbquotes.forEach(function(v) {
 		let rkey = `${rkeys.WB.QUOTES}:${v.symbol}`
-		coms.push(['hmset', rkey, v])
+		coms.push(['hmset', rkey, v as any])
 	})
 	let wbtickers = await getTickers(fsymbols)
 	wbtickers.forEach(function(v) {
 		let rkey = `${rkeys.WB.TICKERS}:${v.symbol}`
-		coms.push(['hmset', rkey, v])
+		coms.push(['hmset', rkey, v as any])
 	})
 	await redis.main.coms(coms)
 }
