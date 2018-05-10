@@ -130,9 +130,7 @@ function onconnection(client: Client, req: PolkaRequest) {
 }
 
 export function emit(name: string, data?: any) {
-	let count = emitter.listenerCount(name)
-	if (count == 0) return;
-	emitter.emit(name, JSON.stringify(data))
+	emitter.emit(name, JSON.stringify({ name, data } as Socket.Event))
 }
 
 

@@ -32,7 +32,7 @@ class Socket extends Emitter {
 			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
 				return new WebSocketClient(v, {
 					query: security.headers,
-				}).on('open', this.sync, this).on('close', this.onclose, this).on('message', this.onmessage, this)
+				}).on('open', this.resync, this).on('close', this.onclose, this).on('message', this.onmessage, this)
 			}))
 		})
 	}
@@ -40,17 +40,19 @@ class Socket extends Emitter {
 	private onmessage(message: string) {
 		let event = JSON.parse(message) as Socket.Event
 		console.log('event ->', event)
+		this.emit(event.name, event.data)
 	}
 
-	private subs = [] as string[]
-	private onclose() { this.subs = [] }
+	private strsubs = ''
+	private onclose() { this.strsubs = '' }
 
 	private resync = _.debounce(this.sync, 100, { leading: false, trailing: true })
 	private sync() {
 		if (!this.ready()) return;
 		let subs = this.eventNames()
-		if (_.isEqual(this.subs, subs)) return;
-		this.subs = subs
+		let strsubs = JSON.stringify(subs)
+		if (this.strsubs == strsubs) return;
+		this.strsubs = strsubs
 		this.send({ action: 'sync', subs })
 	}
 

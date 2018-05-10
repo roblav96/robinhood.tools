@@ -13,8 +13,7 @@ import polka from './polka'
 const PORTS = [] as number[]
 pandora.on('socket.listening', function onlistening(hubmsg) {
 	let port = hubmsg.data.port as number
-	if (PORTS.includes(port)) return;
-	PORTS.push(port)
+	if (!PORTS.includes(port)) PORTS.push(port);
 })
 
 polka.route({

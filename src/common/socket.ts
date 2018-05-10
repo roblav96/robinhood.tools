@@ -3,18 +3,18 @@
 
 
 export const WS = {
-	SYMBOL: 'ws:symbol',
-	DISCOVER: 'ws:discover',
+	
 }
 
 
 
 declare global {
 	namespace Socket {
+		type Actions = 'sync'
 		interface Event<Data = any> {
 			name: string
 			data: Data
-			action: 'sync'
+			action: Actions
 			subs: string[]
 		}
 	}
