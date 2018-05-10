@@ -1,6 +1,7 @@
 // 
 
 import * as _ from '../../common/lodash'
+import * as core from '../../common/core'
 import * as util from 'util'
 import * as TurboRequest from 'turbo-http/lib/request'
 import * as qs from 'querystring'
@@ -42,6 +43,16 @@ polka.use(function request(req, res, next) {
 
 	let cookies = req.headers['cookie']
 	req.cookies = cookies ? cookie.parse(cookies) : {}
+
+	// let keys = Object.keys(req.query)
+	// if (keys.length > 0) {
+	// 	let i: number, len = keys.length
+	// 	for (i = 0; i < len; i++) {
+	// 		let key = keys[i]
+	// 		let value = req.query[key]
+	// 		req.query[key] = JSON.parse(req.query[key])
+	// 	}
+	// }
 
 	req.body = {}
 	if (req.method == 'GET') return next();

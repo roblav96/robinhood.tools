@@ -21,6 +21,7 @@ declare global {
 export function push(symbol: string) {
 	state.remove(v => v.symbol == symbol)
 	state.unshift({ symbol, stamp: Date.now() })
+	state.splice(20)
 	lockr.set('recents', state)
 }
 

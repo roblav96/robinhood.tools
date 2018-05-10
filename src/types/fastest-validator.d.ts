@@ -55,6 +55,7 @@ declare module 'fastest-validator' {
 		interface SchemaValue {
 			type: Type
 			items?: Type
+			optional?: boolean
 			enum?: string[]
 			positive?: boolean
 			integer?: boolean

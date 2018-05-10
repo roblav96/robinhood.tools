@@ -27,6 +27,15 @@ export function config(config: Partial<Http.Config>) {
 	}
 
 	if (config.query) {
+		// Object.keys(config.query).forEach(key => {
+		// 	let value = config.query[key]
+		// 	if (typeof value != 'string') {
+
+		// 	}
+		// 	if (Array.isArray(value)) {
+		// 		config.query[key] = value.join(',')
+		// 	}
+		// })
 		config.url += '?' + qs.stringify(config.query)
 		delete config.query
 	}

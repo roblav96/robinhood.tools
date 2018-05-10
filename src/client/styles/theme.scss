@@ -65,6 +65,7 @@ $colors: map-merge($colors, ('rhred':($rhred, $white)));
 $link-visited: $pink;
 $link-focus-border: $link;
 // 
+// $navbar-item-hover-color: $grey-dark;
 $navbar-item-active-color: $link;
 $navbar-item-img-max-height: initial;
 $navbar-item-hover-background-color: $white-ter;

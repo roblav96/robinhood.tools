@@ -8,18 +8,30 @@ import polka from './polka'
 
 
 
+declare global {
+	namespace Api {
+		interface SymbolsBody {
+			symbols: string[]
+			rkeys: string[]
+		}
+	}
+}
 polka.route({
-	method: 'POST',
-	url: '/api/onsymbol',
+	method: 'GET',
+	url: '/api/symbols',
 	public: true,
 	schema: {
-		body: { symbols: { type: 'array', items: 'string' } },
+		body: {
+			symbols: { type: 'array', items: 'string' },
+			types: { type: 'array', items: 'string', optional: true },
+		},
 	},
 	async handler(req, res) {
-		let symbols = req.body.symbols as string[]
+		let body = req.body as Api.SymbolsBody
+		console.log('body ->', body)
 
 		let coms = [] as Redis.Coms
-		symbols.forEach(function(v) {
+		body.symbols.forEach(function(v) {
 			coms.push(['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`])
 			coms.push(['hgetall', `${rkeys.WB.TICKERS}:${v}`])
 			coms.push(['hgetall', `${rkeys.WB.QUOTES}:${v}`])
@@ -28,7 +40,7 @@ polka.route({
 		resolved.forEach(core.fix)
 
 		let ii = 0
-		return symbols.map(function() {
+		return body.symbols.map(function() {
 			return {
 				instrument: resolved[ii++],
 				ticker: resolved[ii++],

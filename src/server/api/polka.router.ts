@@ -12,32 +12,36 @@ import * as FastestValidator from 'fastest-validator'
 
 
 
+declare global {
+	namespace Api {
+		interface RouterSchemaMap<T> {
+			[key: string]: T
+			params?: T
+			query?: T
+			body?: T
+		}
+	}
+}
+
 { (Polka as any).Router = Polka().constructor }
 export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest, PolkaResponse> {
 
-	validators = {} as Dict<{
-		[key: string]: FastestValidator.CompiledValidator
-		params?: FastestValidator.CompiledValidator
-		query?: FastestValidator.CompiledValidator
-		body?: FastestValidator.CompiledValidator
-	}>
+	// schemas = {} as Dict<Api.RouterSchemaMap<FastestValidator.Schema>>
+	validators = {} as Dict<Api.RouterSchemaMap<FastestValidator.CompiledValidator>>
 
 	route(opts: {
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
 		url: string
 		public?: boolean
-		schema?: {
-			[key: string]: FastestValidator.Schema
-			params?: FastestValidator.Schema
-			query?: FastestValidator.Schema
-			body?: FastestValidator.Schema
-		}
+		schema?: Api.RouterSchemaMap<FastestValidator.Schema>
 		handler(req: PolkaRequest, res: PolkaResponse): any
 	}) {
 		if (opts.schema) {
+			// this.schemas[opts.url] = {}
 			this.validators[opts.url] = {}
 			Object.keys(opts.schema).forEach(key => {
 				let schema = opts.schema[key]
+				// this.schemas[opts.url][key] = schema
 				this.validators[opts.url][key] = new FastestValidator().compile(schema)
 			})
 		}

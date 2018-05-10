@@ -4,6 +4,7 @@ import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import * as _ from '@/common/lodash'
+import * as rkeys from '@/common/rkeys'
 import * as http from '@/client/adapters/http'
 import * as recents from '@/client/stores/recents'
 
@@ -13,7 +14,7 @@ import * as recents from '@/client/stores/recents'
 export default class extends Vue {
 
 	mounted() {
-		
+
 	}
 
 	get searchbar() { return this.$refs.searchbar_input as Vue }
@@ -36,7 +37,10 @@ export default class extends Vue {
 	syncRecents() {
 		this.busy = true
 		let symbols = this.$store.state.recents.map(v => v.symbol)
-		http.post('/symbols/instruments', { symbols }).then(response => {
+		http.get('/symbols', {
+			body: { symbols, rkeys: [rkeys.RH.INSTRUMENTS, rkeys.WB.QUOTES] } as Api.SymbolsBody
+		}).then(response => {
+			console.log('response ->', response)
 			this.results = response
 		}).catch(error => {
 			console.error('syncRecents Error ->', error)

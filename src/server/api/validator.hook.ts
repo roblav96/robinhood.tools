@@ -14,6 +14,7 @@ polka.use(function validator(req, res, next) {
 	let match = matchit.match(req.path, polka.routes[req.method])[0]
 	if (!match || !match.old) return next();
 
+	// let schemas = polka.schemas[match.old]
 	let validators = polka.validators[match.old]
 	if (!validators) return next();
 
@@ -22,12 +23,23 @@ polka.use(function validator(req, res, next) {
 	for (i = 0; i < len; i++) {
 		let key = keys[i]
 		let value = req[key]
-		let validator = validators[key]
 
 		if (Object.keys(value).length == 0) {
 			return next(boom.preconditionFailed(key, value))
 		}
 
+		// if (key == 'query') {
+		// 	let schema = schemas[key]
+		// 	Object.keys(schema).forEach(key => {
+		// 		let rule = schema[key] as FastestValidator.SchemaValue
+		// 		let v = value[key]
+		// 		if (v && rule.type == 'array') {
+		// 			value[key] = v.split(',')
+		// 		}
+		// 	})
+		// }
+
+		let validator = validators[key]
 		let results = validator(value)
 		if (Array.isArray(results)) {
 			return next(boom.preconditionFailed(results[0].message, results[0]))
