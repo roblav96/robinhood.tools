@@ -1,5 +1,6 @@
 // 
 
+import * as rkeys from './rkeys'
 import * as _ from './lodash'
 import * as core from './core'
 
@@ -17,11 +18,11 @@ export const indexes = [
 
 
 export const WB = {
-	WB: 'wb',
 	SYMBOLS: 'wb:symbols',
 	TICKERIDS: 'wb:tickerids',
-	QUOTES: 'wb:quotes',
 	TICKERS: 'wb:tickers',
+	QUOTES: 'wb:quotes',
+	DEALS: 'wb:deals',
 }
 
 
@@ -267,6 +268,9 @@ declare global {
 			yield: number
 			yrHigh: number
 			yrLow: number
+			// 
+			typeof: keyof typeof rkeys.SYMBOLS
+			name: string
 		}
 
 	}

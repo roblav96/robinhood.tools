@@ -15,7 +15,8 @@ import clock from '../../common/clock'
 export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'> {
 
 	private static topics = {
-		STOCKS: ['TICKER_DEAL_DETAILS', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
+		// STOCKS: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_DEAL_DETAILS', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
+		STOCKS: ['TICKER', 'TICKER_DEAL_DETAILS', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
 		FOREX: ['FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
 		INDEXES: ['TICKER_MARKET_INDEX', 'FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
 	}

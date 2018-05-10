@@ -18,7 +18,7 @@ import clock from '../../common/clock'
 
 
 (async function start() {
-
+	
 	// await redis.main.del(rkeys.RH.SYMBOLS)
 	let instruments = await redis.main.exists(rkeys.RH.SYMBOLS)
 	if (instruments == 0) await syncInstruments();
@@ -107,6 +107,7 @@ async function syncTickers() {
 	let fsymbols = {} as Dict<number>
 	let dtickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker) as Dict<Webull.Ticker[]>
 	Object.keys(dtickers).map(function(symbol) {
+		scoms.sadd(symbol)
 		if (dtickers[symbol].length > 1) dtickers[symbol].sort((a, b) => b.exchangeId - a.exchangeId).splice(1);
 		let ticker = dtickers[symbol][0]
 		fsymbols[symbol] = ticker.tickerId
