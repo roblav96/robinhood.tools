@@ -3,6 +3,7 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
+import VMixin from '@/client/mixins/v.mixin'
 import * as _ from '@/common/lodash'
 import * as rkeys from '@/common/rkeys'
 import * as http from '@/client/adapters/http'
@@ -11,13 +12,16 @@ import * as recents from '@/client/stores/recents'
 
 
 @Vts.Component
-export default class extends Vue {
+export default class extends Mixins(VMixin) {
 
 	mounted() {
 
 	}
 
 	get searchbar() { return this.$refs.searchbar_input as Vue }
+	vstate(state: Robinhood.Instrument.State) {
+		return _.startCase(state)
+	}
 
 	busy = false
 	query = ''
@@ -27,7 +31,7 @@ export default class extends Vue {
 	sync() {
 		if (!this.query) return this.syncRecents();
 		this.busy = true
-		http.get('/search', {
+		return http.get('/search', {
 			query: { query: this.query },
 		}).then((response: Robinhood.Instrument[]) => {
 			this.results = response
@@ -38,7 +42,7 @@ export default class extends Vue {
 
 	syncRecents() {
 		this.busy = true
-		http.post('/search/recents', {
+		return http.post('/search/recents', {
 			symbols: this.$store.state.recents.map(v => v.symbol),
 		}).then((response: Robinhood.Instrument[]) => {
 			this.results = response

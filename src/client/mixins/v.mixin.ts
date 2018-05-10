@@ -14,7 +14,8 @@ export default class extends Vue {
 	development = process.env.DEVELOPMENT
 	production = process.env.PRODUCTION
 
-	truncate(input: string, length = 64) { return _.truncate(input, { length }) }
+	vtruncate(input: string, length = 64) { return _.truncate(input, { length }) }
+	vstartcase(input: string) { return _.startCase(input) }
 
 
 

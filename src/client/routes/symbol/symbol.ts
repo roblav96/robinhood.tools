@@ -4,6 +4,7 @@ import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import { Route } from 'vue-router'
 import Vue from 'vue'
+import VMixin from '@/client/mixins/v.mixin'
 import * as rkeys from '@/common/rkeys'
 import * as http from '@/client/adapters/http'
 import socket from '@/client/adapters/socket'
@@ -11,7 +12,7 @@ import socket from '@/client/adapters/socket'
 
 
 @Vts.Component
-export default class extends Vue {
+export default class extends Mixins(VMixin) {
 
 	get symbol() { return this.$route.params.symbol }
 
@@ -30,16 +31,16 @@ export default class extends Vue {
 
 	@Vts.Watch('symbol', { immediate: true }) w_symbol(to: string, from: string) {
 		socket.offListener(this.onquote, this)
-		socket.on(`${rkeys.WB.QUOTES}:${this.symbol}`, this.onquote, this)
 		socket.offListener(this.ondeal, this)
+		socket.on(`${rkeys.WB.QUOTES}:${this.symbol}`, this.onquote, this)
 		socket.on(`${rkeys.WB.DEALS}:${this.symbol}`, this.ondeal, this)
 		http.post('/symbols', {
 			symbols: [this.symbol],
-		} as Api.SymbolsBody).then((response: Api.SymbolsResponse) => {
+		}).then((response: Dict<any[]>) => {
 			this.instrument = response.instruments[0]
 			this.ticker = response.tickers[0]
 			this.quote = response.quotes[0]
-		}).catch(error => console.error('onsymbol Error ->', error))
+		}).catch(error => console.error('symbols Error ->', error))
 	}
 
 	onquote(quote: Webull.Quote) {

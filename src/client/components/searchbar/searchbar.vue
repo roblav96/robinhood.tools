@@ -4,10 +4,6 @@
 <style>
 /**/
 
-/*div.searchbar div.autocomplete {
-	width: 215px;
-}*/
-
 div.searchbar div.dropdown-content {
 	max-width: 50vw;
 	max-height: 66vh;
@@ -28,11 +24,7 @@ div.searchbar a.dropdown-item {
 				<div class="columns is-mobile is-gapless">
 					<ui-symbol-logo class="column is-narrow image is-32x32 mr-4 self-center" :symbol="props.option.symbol"></ui-symbol-logo>
 					<div class="column content">
-						<div class="flex">
-							<p class="flex-initial title is-5 mb-0">{{ props.option.symbol }}</p>
-							<div class="flex-grow"></div>
-							<p  class="flex-initial subtitle is-7 mb-0">{{ props.option.symbol }}</p>
-						</div>
+						<p class="title is-5">{{ props.option.symbol }}</p>
 						<p class="subtitle is-6">{{ props.option.name }}</p>
 					</div>
 				</div>

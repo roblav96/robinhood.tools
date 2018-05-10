@@ -26,7 +26,7 @@ class Socket extends Emitter {
 	}
 
 	discover() {
-		http.get('/websocket/discover', { retries: Infinity }).then((addresses: string[]) => {
+		return http.get('/websocket/discover', { retries: Infinity }).then((addresses: string[]) => {
 			this.clients.forEach(v => v.destroy())
 			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
 				return new WebSocketClient(v, {

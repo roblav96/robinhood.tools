@@ -20,7 +20,7 @@ setImmediate(function() {
 	store.watch(function(state) { return state.security.ready }, function(ready) {
 		http.get('/hours', { retries: Infinity }).then(function(response: typeof state) {
 			Object.assign(state, response)
-		})
+		}).catch(error => console.error('watch security.ready Error ->', error))
 	})
 	store.watch(function(state) { return state.hours }, function(state) {
 		lockr.set('hours', state)

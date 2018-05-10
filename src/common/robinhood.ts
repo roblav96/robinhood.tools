@@ -61,9 +61,9 @@ declare global {
 			type: Instrument.Type
 			url: string
 			// 
+			alive: boolean
 			acronym: string
 			mic: string
-			alive: boolean
 		}
 
 		namespace Market {
