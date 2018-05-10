@@ -37,6 +37,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 		await utils.getFullSymbols(process.env.SYMBOLS)
 	)
 	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
+	// socket.setFilter(_.mapValues(fsymbols, v => true))
 	let symbols = Object.keys(fsymbols)
 
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => [
@@ -47,7 +48,6 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 	resolved.forEach(core.fix)
 
 	WATCHERS.forEach(v => v.destroy())
-	WATCHERS.splice(0)
 	core.object.nullify(QUOTES)
 	core.object.nullify(SAVES)
 
@@ -64,7 +64,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 			name: ticker.name,
 		} as Webull.Quote)
 		if (process.env.SYMBOLS == 'STOCKS') {
-			if (instrument.name) quote.name = instrument.name;
+			if (instrument.name) quote.name = instrument.simple_name || instrument.name;
 		}
 
 		QUOTES[symbol] = quote
@@ -76,51 +76,52 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 
 	})
 
-	core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 256)).forEach((chunk, i) => {
-		WATCHERS.push(new webull.MqttClient({
-			fsymbols: _.fromPairs(chunk),
-			topics: process.env.SYMBOLS,
-			connect: false,
-			// verbose: true,
-		}).on('data', ondata))
-	})
-	conn.i = 0
-	clock.off(conn.tick, onconnect)
-	clock.on(conn.tick, onconnect)
-
 	await redis.main.coms(coms)
 
+	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 256))
+	WATCHERS.splice(0, Infinity, ...chunks.map((chunk, i) => new webull.MqttClient({
+		fsymbols: _.fromPairs(chunk),
+		topics: process.env.SYMBOLS,
+		connect: i == 0,
+		// verbose: true,
+	}).on('data', ondata)))
+
 }
 
-let conn = { tick: '3s' as Clock.Tick, i: 0 }
-function onconnect() {
-	let watcher = WATCHERS[conn.i++]
-	if (!watcher) return clock.off(conn.tick, onconnect);
-	console.info('onconnect ->', conn.i, Object.keys(watcher.options.fsymbols).length)
+clock.on('3s', function onconnect() {
+	if (WATCHERS.length == 0) return;
+	let watcher = WATCHERS.find(v => v.options.connect == false)
+	if (!watcher) return;
+	console.info('onconnect ->', Object.keys(watcher.options.fsymbols).length)
+	watcher.options.connect = true
 	watcher.connect()
-}
+})
 
-// const TOPICS = {} as any
-// clock.on('5s', () => console.log('topics ->', Object.keys(TOPICS)))
+const GREATER_THANS = {
+	tradeTime: null,
+	volume: null,
+} as Webull.Quote
 
 function ondata(topic: number, wbquote: Webull.Quote) {
-	// TOPICS[webull.mqtt_topics[topic]] = true
 	let symbol = wbquote.symbol
 	let quote = QUOTES[symbol]
 	let toquote = {} as Webull.Quote
 
 	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
-		if (wbquote.tradeTime && wbquote.tradeTime > quote.tradeTime) {
+		if (wbquote.tradeTime > quote.tradeTime) {
 			toquote.tradeTime = wbquote.tradeTime
-			if (wbquote.tradeBsFlag == 'N') toquote.pPrice = wbquote.deal;
-			else toquote.price = wbquote.deal;
+			if (wbquote.tradeBsFlag == 'N') {
+				if (wbquote.deal != toquote.pPrice) toquote.pPrice = wbquote.deal;
+			} else {
+				if (wbquote.deal != toquote.price) toquote.price = wbquote.deal;
+			}
 		}
 		socket.emit(`${rkeys.WB.DEALS}:${symbol}`, wbquote)
 	} else {
 		Object.keys(wbquote).forEach((key: keyof Webull.Quote) => {
 			let value = wbquote[key] as any
-			if (key == 'tradeTime') {
+			if (GREATER_THANS[key] === null) {
 				if (value > quote[key]) toquote[key] = value;
 				return
 			}
@@ -146,6 +147,12 @@ clock.on('3s', function onsave() {
 })
 
 
+
+
+
+// const TOPICS = {} as any
+// clock.on('5s', () => console.log('topics ->', Object.keys(TOPICS)))
+// TOPICS[webull.mqtt_topics[topic]] = true
 
 
 

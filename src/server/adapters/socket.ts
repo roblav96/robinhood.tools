@@ -82,6 +82,11 @@ exithook(function onexit() { wss.close() })
 
 
 
+// let FILTER = null as Dict<boolean>
+// export function setFilter(filter: typeof FILTER) {
+// 	FILTER = filter
+// }
+
 const emitter = new Emitter()
 
 interface Client extends uws.WebSocket {
@@ -107,10 +112,11 @@ function onconnection(client: Client, req: PolkaRequest) {
 		if (event.action) {
 			let action = event.action
 			if (action == 'sync') {
+				// if (FILTER) event.subs = event.subs.filter(v => FILTER[v.split(':').pop()]);
 				this.subs.forEach(v => emitter.off(v, this.send, this))
 				this.subs.splice(0, Infinity, ...event.subs)
 				this.subs.forEach(v => emitter.on(v, this.send, this))
-				console.log('this.subs ->', this.subs)
+				// console.log('this.subs ->', this.subs)
 				return
 			}
 		}

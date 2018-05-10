@@ -3,6 +3,7 @@
 export * from '@/common/socket'
 import WebSocketClient from '@/common/websocket.client'
 import Emitter from '@/common/emitter'
+import clock from '@/common/clock'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as proxy from '@/common/proxy'
@@ -15,9 +16,7 @@ class Socket extends Emitter {
 
 	constructor() {
 		super()
-		return proxy.observe<Socket>(this, (method, property) => {
-			if (property == '_events') this.resync();
-		})
+		clock.on('1s', this.sync, this)
 	}
 
 	private clients = [] as WebSocketClient[]
@@ -37,6 +36,7 @@ class Socket extends Emitter {
 	}
 
 	private onopen() {
+		this.strsubs = ''
 		if (!this.ready()) return;
 		this.emit('ready')
 	}
@@ -44,14 +44,7 @@ class Socket extends Emitter {
 		this.strsubs = ''
 	}
 
-	private onmessage(message: string) {
-		let event = JSON.parse(message) as Socket.Event
-		// console.log('event ->', event)
-		this.emit(event.name, event.data)
-	}
-
 	private strsubs = ''
-	private resync = _.debounce(this.sync, 100, { leading: false, trailing: true })
 	private sync() {
 		if (!this.ready()) return;
 		let subs = this.eventNames()
@@ -61,8 +54,14 @@ class Socket extends Emitter {
 		this.send({ action: 'sync', subs })
 	}
 
+	private onmessage(message: string) {
+		let event = JSON.parse(message) as Socket.Event
+		// console.log('event ->', event)
+		this.emit(event.name, event.data)
+	}
+
 	send(event: Partial<Socket.Event>) {
-		console.log('send ->', event)
+		// console.log('send ->', event)
 		let message = JSON.stringify(event)
 		this.clients.forEach(v => v.send(message))
 	}
