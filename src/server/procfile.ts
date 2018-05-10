@@ -8,7 +8,6 @@ import * as _ from '../common/lodash'
 import * as os from 'os'
 import * as path from 'path'
 import * as pkgup from 'pkg-up'
-import * as dotenv from 'dotenv'
 
 
 
@@ -66,17 +65,9 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 
 
 
-	// Process(pandora.process('services'), {
-
+	// Process(pandora.process('benchmark').entry('./benchmarks/api.benchmark'), {
+	// 	SCALE: 1,
 	// })
-	// pandora.service('hours.service', './services/hours.service').process('services').publish(true)
-	// pandora.service('stocks.service', './services/stocks.service').process('services').publish(true)
-
-	// if (ENV.BENCHMARK) {
-	// 	Process(pandora.process('benchmarks'), {
-	// 		SCALE: 3, DEBUGGER: false,
-	// 	})
-	// }
 
 
 
@@ -92,8 +83,9 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 // import * as exithook from 'exit-hook'
 // exithook(function(code) {
 // 	console.log('code ->', code)
+// 	process.kill(process.pid, 'SIGKILL')
+// 	console.log('code ->', code)
 // 	// console.log('signal ->', signal)
-// 	// process.kill(process.pid, code || signal)
 // })
 // exithook(() => process.nextTick(() => process.kill(process.pid, 123)))
 // process.on('SIGTERM', () => process.kill(process.pid, 123))

@@ -9,17 +9,6 @@ import polka from './polka'
 
 
 
-// const IKEYS = ['symbol', 'name', 'alive', 'acronym', 'mic', 'type', 'country'] as KeysOf<Robinhood.Instrument>
-async function getInstruments(symbols: string[]) {
-	// let coms = symbols.map(v => ['hmget', `${rkeys.RH.INSTRUMENTS}:${v}`].concat(IKEYS))
-	// let results = await redis.main.coms(coms) as Robinhood.Instrument[]
-	// results = results.map(v => redis.fixHmget(v as any, IKEYS))
-	let coms = symbols.map(v => ['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`])
-	let results = await redis.main.coms(coms) as Robinhood.Instrument[]
-	results.forEach(core.fix)
-	return results
-}
-
 polka.route({
 	method: 'GET',
 	url: '/api/search',
@@ -38,7 +27,7 @@ polka.route({
 
 polka.route({
 	method: 'POST',
-	url: '/api/search/recents',
+	url: '/api/recents',
 	schema: {
 		body: {
 			symbols: { type: 'array', items: 'string' },
@@ -49,5 +38,24 @@ polka.route({
 		return await getInstruments(symbols)
 	}
 })
+
+
+
+// const IKEYS = ['symbol', 'name', 'alive', 'acronym', 'mic', 'type', 'country'] as KeysOf<Robinhood.Instrument>
+const IKEYS = ['symbol', 'name'] as KeysOf<Robinhood.Instrument>
+async function getInstruments(symbols: string[]) {
+	let coms = symbols.map(v => ['hmget', `${rkeys.RH.INSTRUMENTS}:${v}`].concat(IKEYS))
+	let results = await redis.main.coms(coms) as Robinhood.Instrument[]
+	results = results.map(v => redis.fixHmget(v as any, IKEYS))
+	results.forEach(core.fix)
+	return results
+}
+
+// async function getInstruments(symbols: string[]) {
+// 	let coms = symbols.map(v => ['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`])
+// 	let results = await redis.main.coms(coms) as Robinhood.Instrument[]
+// 	results.forEach(core.fix)
+// 	return results
+// }
 
 

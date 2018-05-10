@@ -1,5 +1,6 @@
 // 
 
+import '../main'
 import chalk from 'chalk'
 import * as execa from 'execa'
 import * as url from 'url'
@@ -20,11 +21,11 @@ import * as redis from '../adapters/redis'
 
 async function run(url: string) {
 	console.log('run ->', url)
-	let hub = Pandora.getHub()
-	await hub.getHubClient().invoke({ processName: 'api' }, 'gc', 'clear')
-	await new Promise(r => setTimeout(r, 300))
-	let proxy = await hub.getProxy({ name: 'memory' })
-	let fromheap = await (proxy as any).memoryUsage() as NodeJS.MemoryUsage
+	// let hub = Pandora.getHub()
+	// await hub.hubClient.invoke({ processName: 'api' }, 'gc', 'clear')
+	// await new Promise(r => setTimeout(r, 300))
+	// let proxy = await hub.getProxy({ name: 'memory' })
+	// let fromheap = await (proxy as any).memoryUsage() as NodeJS.MemoryUsage
 	let cli = await execa('wrk', [
 		'-t1', '-c100', '-d1s',
 		'-H', 'x-uuid: ' + security.randomBytes(32),
@@ -32,10 +33,11 @@ async function run(url: string) {
 		'-H', 'user-agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)',
 		url,
 	])
-	let toheap = await (proxy as any).memoryUsage() as NodeJS.MemoryUsage
+	return wrk.parse(cli.stdout)
+	// let toheap = await (proxy as any).memoryUsage() as NodeJS.MemoryUsage
 	// console.log(cli.stdout)
-	let parsed = wrk.parse(cli.stdout)
-	return Object.assign(parsed, { fromheap, toheap })
+	// let parsed = wrk.parse(cli.stdout)
+	// return Object.assign(parsed, { fromheap, toheap })
 }
 
 async function start() {
@@ -46,15 +48,15 @@ async function start() {
 	// urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/blank`)
 	// urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/route`)
 	// urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/security/token`)
-	// urls.push(`http://${process.env.DOMAIN}/api/blank`)
-	urls.push(`http://${process.env.DOMAIN}/api/route`)
-	urls.push(`http://${process.env.DOMAIN}/api/security/token`)
+	urls.push(`http://${process.env.DOMAIN}/api/blank`)
+	urls.push(`http://${process.env.DOMAIN}/api/promise`)
+	urls.push(`http://${process.env.DOMAIN}/api/async`)
 
 	let results = await pAll(urls.map(v => () => run(v)), { concurrency: 1 })
 
 	let table = new Table({
-		head: ['Address', 'Req/sec', 'Data/sec', 'Heap Used', 'Latency', 'Stdev', '+/- Stdev', 'Dropped'],
-		colAligns: ['left', 'right', 'right', 'right', 'right', 'right', 'right', 'right'],
+		head: ['Address', 'Req/sec', 'Data/sec', 'Latency', 'Stdev', '+/- Stdev', 'Dropped'],
+		colAligns: ['left', 'right', 'right', 'right', 'right', 'right', 'right'],
 		style: { head: ['bold', 'blue'] },
 	}) as string[][]
 
@@ -65,7 +67,7 @@ async function start() {
 			parsed.host.concat(parsed.path),
 			pretty.formatNumber(v.requests.rate),
 			pretty.formatNumber(v.transfer.rate, 2),
-			pretty.formatNumber(pretty.bytes(v.toheap.heapUsed - v.fromheap.heapUsed)),
+			// pretty.formatNumber(pretty.bytes(v.toheap.heapUsed - v.fromheap.heapUsed)),
 			pretty.formatNumber(v.latency.avg, 2),
 			pretty.formatNumber(v.latency.stdev, 2),
 			pretty.formatNumber(v.latency.pStdev, 2) + '%',

@@ -26,7 +26,7 @@ polka.use(function(req, res, next) {
 	} as Security.Doc
 
 	let failed = security.isDoc(doc)
-	if (failed) return next(boom.preconditionFailed(failed));
+	if (failed) return next(boom.preconditionFailed(failed, { hook: 'security' }));
 	req.doc = doc
 
 	if (!req.doc.token) return next();

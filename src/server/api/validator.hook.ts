@@ -25,7 +25,7 @@ polka.use(function validator(req, res, next) {
 		let value = req[key]
 
 		if (Object.keys(value).length == 0) {
-			return next(boom.preconditionFailed(key, value))
+			return next(boom.preconditionFailed(key, { hook: 'validator' }))
 		}
 
 		// if (key == 'query') {
@@ -42,7 +42,7 @@ polka.use(function validator(req, res, next) {
 		let validator = validators[key]
 		let invalids = validator(value)
 		if (Array.isArray(invalids)) {
-			return next(boom.preconditionFailed(invalids[0].message, invalids[0]))
+			return next(boom.preconditionFailed(invalids[0].message, { hook: 'validator' }))
 		}
 
 	}

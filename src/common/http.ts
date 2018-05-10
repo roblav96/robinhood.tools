@@ -27,16 +27,7 @@ export function config(config: Partial<Http.Config>) {
 	}
 
 	if (config.query) {
-		// Object.keys(config.query).forEach(key => {
-		// 	let value = config.query[key]
-		// 	if (typeof value != 'string') {
-
-		// 	}
-		// 	if (Array.isArray(value)) {
-		// 		config.query[key] = value.join(',')
-		// 	}
-		// })
-		config.url += '?' + qs.stringify(config.query)
+		config.url += `?${qs.stringify(config.query)}`
 		delete config.query
 	}
 
@@ -47,7 +38,6 @@ export function config(config: Partial<Http.Config>) {
 	}
 
 	return config
-
 }
 
 
@@ -61,15 +51,7 @@ export function send(config: Http.Config) {
 				data = data.toString()
 				let type = res.headers['content-type']
 				if (type && type.includes('application/json')) {
-					let parsed = fastjsonparse(data)
-					if (parsed.err) {
-						return reject(new boom(parsed.err, {
-							statusCode: res.statusCode,
-							message: parsed.err.message,
-							decorate: { data },
-						}))
-					}
-					if (parsed.value) data = parsed.value;
+					data = JSON.parse(data)
 				}
 			}
 			// console.info('error ->')
@@ -77,14 +59,11 @@ export function send(config: Http.Config) {
 			// console.log('res ->', res)
 			// console.log('data ->', data)
 			if (error || res.statusCode >= 400) {
-				let boomerror = new boom(error, {
+				return reject(new boom(error, {
 					statusCode: res.statusCode,
 					message: res.statusMessage || error.message,
 					decorate: { data },
-				})
-				// console.info('boomerror ->', boomerror)
-				// console.dir(boomerror)
-				return reject(boomerror)
+				}))
 			}
 
 			if (config.verbose) {
@@ -95,7 +74,7 @@ export function send(config: Http.Config) {
 			resolve(data)
 		})
 	}).catch(function(error) {
-		if (config.retries > 0 && retryable(error)) {
+		if (config.retries > 0) {
 			config.retries--
 			if (process.env.DEVELOPMENT && process.env.SERVER) {
 				console.error('retry Error ->', error)

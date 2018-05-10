@@ -42,7 +42,7 @@ export default class extends Mixins(VMixin) {
 
 	syncRecents() {
 		this.busy = true
-		return http.post('/search/recents', {
+		return http.post('/recents', {
 			symbols: this.$store.state.recents.map(v => v.symbol),
 		}).then((response: Robinhood.Instrument[]) => {
 			this.results = response

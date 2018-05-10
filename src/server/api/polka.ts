@@ -24,8 +24,8 @@ const polka = new PolkaRouter({
 		error.data = error.data || {}
 		error.data.method = req.method
 		error.data.path = req.path
-		Object.assign(error.output.payload, { attributes: error.data });
-		console.warn('polka onError ->', error.output.payload);
+		Object.assign(error.output.payload, { attributes: error.data })
+		console.warn('polka onError ->', error.output.payload)
 		res.statusCode = error.output.statusCode
 		let keys = Object.keys(error.output.headers)
 		if (keys.length > 0) {
@@ -48,27 +48,27 @@ server.listen(+process.env.PORT + +process.env.INSTANCE, process.env.HOST, funct
 	console.info('api listening ->', address.port)
 })
 
-exithook(function() { server.close() })
+exithook(function() {
+	server.connections.forEach(v => v.close())
+	server.close()
+})
 
 export default polka
 
 
 
-// polka.get('/api/blank', function blank(req, res) { res.end() })
-
+// polka.get('/api/blank', function blank(req, res) { res.end('') })
 // polka.route({
 // 	method: 'GET',
-// 	url: '/api/route',
-// 	handler(req, res) { return Promise.resolve() },
+// 	url: '/api/promise',
+// 	public: true,
+// 	handler(req, res) { return '' },
 // })
-
 // polka.route({
 // 	method: 'GET',
-// 	url: '/api/validate/:valid',
-// 	schema: {
-// 		params: { valid: 'string' }
-// 	},
-// 	handler(req, res) { return Promise.resolve() },
+// 	url: '/api/async',
+// 	public: true,
+// 	async handler(req, res) { return '' },
 // })
 
 

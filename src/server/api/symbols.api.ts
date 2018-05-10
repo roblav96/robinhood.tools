@@ -9,21 +9,6 @@ import polka from './polka'
 
 
 
-declare global {
-	namespace Api {
-		interface SymbolsBody {
-			symbols: string[]
-			wants?: string[]
-		}
-		interface SymbolsResponse {
-			[key: string]: any[]
-			instruments: Robinhood.Instrument[]
-			tickers: Webull.Ticker[]
-			quotes: Webull.Quote[]
-		}
-	}
-}
-
 const WANTS = {
 	instruments: rkeys.RH.INSTRUMENTS,
 	tickers: rkeys.WB.TICKERS,
@@ -42,15 +27,16 @@ polka.route({
 		},
 	},
 	async handler(req, res) {
-		let body = req.body as Api.SymbolsBody
-		if (!Array.isArray(body.wants)) body.wants = ALLOWED as any;
+		let symbols = req.body.symbols as string[]
+		let wants = req.body.wants as string[]
+		if (!Array.isArray(wants)) wants = ALLOWED as any;
 
-		let invalids = _.difference(body.wants, ALLOWED)
+		let invalids = _.difference(wants, ALLOWED)
 		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids });
 
 		let coms = [] as Redis.Coms
-		body.symbols.forEach(function(symbol) {
-			body.wants.forEach(function(want) {
+		symbols.forEach(function(symbol) {
+			wants.forEach(function(want) {
 				coms.push(['hgetall', `${WANTS[want]}:${symbol}`])
 			})
 		})
@@ -58,9 +44,9 @@ polka.route({
 		resolved.forEach(core.fix)
 
 		let ii = 0
-		let response = core.array.dict<any>(body.wants, []) as Api.SymbolsResponse
-		body.symbols.forEach(() => {
-			body.wants.forEach(vv => response[vv].push(resolved[ii++]))
+		let response = core.array.dict(wants, [])
+		symbols.forEach(() => {
+			wants.forEach(vv => response[vv].push(resolved[ii++]))
 		})
 
 		return response
