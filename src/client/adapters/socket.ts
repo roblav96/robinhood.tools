@@ -2,7 +2,7 @@
 
 export * from '@/common/socket'
 import WebSocketClient from '@/common/websocket.client'
-import Emitter, { Event, Listener } from '@/common/emitter'
+import Emitter from '@/common/emitter'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as proxy from '@/common/proxy'
@@ -13,24 +13,10 @@ import * as http from './http'
 
 class Socket extends Emitter {
 
-	// private eventsCount = 0
-	// constructor() {
-	// 	super()
-	// 	return proxy.observe<Socket>(this, (method, property) => {
-	// 		if (property == '_eventsCount' && this._eventsCount != this.eventsCount) {
-	// 			this.eventsCount = this._eventsCount
-	// 			if (this.ready()) this.resync();
-	// 		}
-	// 	})
-	// }
-
 	constructor() {
 		super()
 		return proxy.observe<Socket>(this, (method, property) => {
-			if (property == '_events' && this.ready()) {
-				// console.log('_events ->', 'resync')
-				this.resync()
-			}
+			if (property == '_events') this.resync();
 		})
 	}
 
@@ -46,7 +32,7 @@ class Socket extends Emitter {
 			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
 				return new WebSocketClient(v, {
 					query: security.headers,
-				}).on('open', this.opensync, this).on('message', this.onmessage, this)
+				}).on('open', this.sync, this).on('close', this.onclose, this).on('message', this.onmessage, this)
 			}))
 		})
 	}
@@ -56,20 +42,22 @@ class Socket extends Emitter {
 		console.log('event ->', event)
 	}
 
-	private opensync() {
-		if (this.ready()) {
-			// console.log('opensync ->', 'resync')
-			this.resync()
-		}
-	}
+	private subs = [] as string[]
+	private onclose() { this.subs = [] }
 
 	private resync = _.debounce(this.sync, 100, { leading: false, trailing: true })
 	private sync() {
-		let event = JSON.stringify({
-			action: 'sync', subs: this.eventNames(),
-		} as Socket.Event)
-		// console.log('sync ->', event)
-		this.clients.forEach(v => v.send(event))
+		if (!this.ready()) return;
+		let subs = this.eventNames()
+		if (_.isEqual(this.subs, subs)) return;
+		this.subs = subs
+		this.send({ action: 'sync', subs })
+	}
+
+	send(event: Partial<Socket.Event>) {
+		console.log('send ->', event)
+		let message = JSON.stringify(event)
+		this.clients.forEach(v => v.send(message))
 	}
 
 }

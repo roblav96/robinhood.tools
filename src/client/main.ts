@@ -1,15 +1,15 @@
 // 
 
 require('@/common/polyfills')
-global.Promise = require('zousan/src/zousan'); { (global as any).Zousan.suppressUncaughtRejectionError = true }
 
-import { Settings } from 'luxon'
-Settings.defaultZoneName = 'America/New_York'
+global.Promise = require('zousan/src/zousan')
+// { (global as any).Zousan.suppressUncaughtRejectionError = true }
 
-import * as _ from '@/common/lodash'
-Object.assign(console, { dtsgen: _.noop, dump: _.noop })
-// if (process.env.DEVELOPMENT) console.dtsgen = require('@/common/dtsgen').default;
-if (process.env.DEVELOPMENT) Object.assign(window, require('@/common/core'));
+Object.assign(console, { dtsgen: function() { } })
+if (process.env.DEVELOPMENT) {
+	// console.dtsgen = require('@/common/dtsgen').default
+	Object.assign(window, require('@/common/core'))
+}
 
 import 'animate.css'
 import '@/client/styles/tailwind.css'

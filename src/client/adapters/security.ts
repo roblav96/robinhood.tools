@@ -1,16 +1,15 @@
 // 
-export * from '@/common/security'
-// 
 
+export * from '@/common/security'
 import * as security from '@/common/security'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import lockr from 'lockr'
 import Fingerprint2 from 'fingerprintjs2'
+import clock from '@/common/clock'
 import store from '@/client/store'
 import socket from '@/client/adapters/socket'
 import * as http from '@/client/adapters/http'
-import clock from '@/common/clock'
 
 
 
