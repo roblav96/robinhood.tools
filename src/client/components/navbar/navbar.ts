@@ -33,7 +33,7 @@ export default class extends Vue {
 		if (state.includes('PRE') || state.includes('POST')) return 'is-warning';
 		return 'is-danger'
 	}
-	onsecond() { this.time = dayjs().format('hh:mm:ssa') }
+	onsecond() { this.time = dayjs().format('h:mm:ssa') }
 
 	get routes() {
 		return this.$router.options.routes.filter(function(route) {

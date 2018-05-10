@@ -27,7 +27,6 @@ span.navbar-burger.burger > span {
 				<div class="is-hidden-mobile navbar-item py-0 flex flex-col self-center mb-1">
 					<p class="font-medium text-sm">{{time}}</p>
 					<span class="tag h-initial px-2" :class="scolor">{{state}}</span>
-					<!-- <p class="text-xs">{{state}}</p> -->
 				</div>
 
 				<v-searchbar></v-searchbar>
