@@ -18,7 +18,7 @@ declare global { namespace Store { interface State { hours: typeof state } } }
 
 setImmediate(function() {
 	store.watch(function(state) { return state.security.ready }, async function(ready) {
-		let response = await http.get('/hours') as typeof state
+		let response = await http.get('/hours', { retries: Infinity }) as typeof state
 		Object.assign(state, response)
 	})
 })

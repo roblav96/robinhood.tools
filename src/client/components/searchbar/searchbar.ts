@@ -21,13 +21,15 @@ export default class extends Vue {
 
 	busy = false
 	query = ''
-	results = []
+	results = [] as Robinhood.Instrument[]
 
 	oninput = _.debounce(this.sync, 300)
 	sync() {
 		if (!this.query) return this.syncRecents();
 		this.busy = true
-		http.post('/search', { query: this.query }).then(response => {
+		http.get('/search', {
+			query: { query: this.query },
+		}).then(response => {
 			this.results = response
 		}).catch(error => {
 			console.error('sync Error ->', error)
@@ -37,11 +39,11 @@ export default class extends Vue {
 	syncRecents() {
 		this.busy = true
 		let symbols = this.$store.state.recents.map(v => v.symbol)
-		http.get('/symbols', {
-			body: { symbols, rkeys: [rkeys.RH.INSTRUMENTS, rkeys.WB.QUOTES] } as Api.SymbolsBody
-		}).then(response => {
+		http.post('/symbols', {
+			symbols, wants: ['instruments'],
+		} as Api.SymbolsBody).then((response: Api.SymbolsResponse) => {
 			console.log('response ->', response)
-			this.results = response
+			this.results = response.instruments
 		}).catch(error => {
 			console.error('syncRecents Error ->', error)
 		}).finally(() => this.busy = false)

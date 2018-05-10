@@ -19,11 +19,13 @@ const polka = new PolkaRouter({
 		if (!error.isBoom) {
 			console.error('polka onError ->', error);
 			error = new boom(error, { message: error.message })
-		} else {
-			if (error.data) Object.assign(error.output.payload, { attributes: error.data });
-			console.warn('polka onError ->', error.output.payload);
 		}
 		if (res.headerSent) return;
+		error.data = error.data || {}
+		error.data.method = req.method
+		error.data.path = req.path
+		Object.assign(error.output.payload, { attributes: error.data });
+		console.warn('polka onError ->', error.output.payload);
 		res.statusCode = error.output.statusCode
 		let keys = Object.keys(error.output.headers)
 		if (keys.length > 0) {

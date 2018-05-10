@@ -8,19 +8,18 @@ import polka from './polka'
 
 
 polka.route({
-	method: 'POST',
+	method: 'GET',
 	url: '/api/search',
 	schema: {
-		body: { query: 'string' },
+		query: { query: 'string' },
 	},
-	handler(req, res) {
-		let query = core.string.clean(req.body.query).toLowerCase()
-		return http.get('https://api.robinhood.com/instruments/', {
+	async handler(req, res) {
+		let query = core.string.clean(req.query.query).toLowerCase()
+		let { results } = await http.get('https://api.robinhood.com/instruments/', {
 			query: { query },
-		}).then(function(response: Robinhood.Api.Paginated<Robinhood.Instrument>) {
-			return response.results.map(function(v) {
-				return _.pick(v, ['symbol', 'name', 'type'] as KeysOf<Robinhood.Instrument>)
-			})
+		}) as Robinhood.Api.Paginated<Robinhood.Instrument>
+		return results.map(function(v) {
+			return _.pick(v, ['symbol', 'name', 'type'] as KeysOf<Robinhood.Instrument>)
 		})
 	}
 })

@@ -40,9 +40,9 @@ polka.use(function validator(req, res, next) {
 		// }
 
 		let validator = validators[key]
-		let results = validator(value)
-		if (Array.isArray(results)) {
-			return next(boom.preconditionFailed(results[0].message, results[0]))
+		let invalids = validator(value)
+		if (Array.isArray(invalids)) {
+			return next(boom.preconditionFailed(invalids[0].message, invalids[0]))
 		}
 
 	}
