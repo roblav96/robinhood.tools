@@ -12,8 +12,6 @@ import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
 import * as pandora from '../adapters/pandora'
-import * as utils from '../adapters/utils'
-import * as hours from '../adapters/hours'
 import * as webull from '../adapters/webull'
 import clock from '../../common/clock'
 
@@ -53,25 +51,24 @@ pandora.on('readySymbols', function(hubmsg) {
 
 
 
-// schedule.scheduleJob('00 20 * * 1-5', () => resyncStocks())
-schedule.scheduleJob('59 3 * * 1-5', () => resyncStocks(true))
-async function resyncStocks(reset = false) {
+schedule.scheduleJob('55 3 * * 1-5', async function sync() {
 	await syncInstruments()
 	await syncTickers()
-	pandora.broadcast({}, 'onSymbols', { reset, type: 'STOCKS' } as Symbols.OnSymbolsData)
-}
+})
+
+schedule.scheduleJob('00 4 * * 1-5', async function reset() {
+	await syncStocks()
+	pandora.broadcast({}, 'onSymbols', { reset: true, type: 'STOCKS' } as Symbols.OnSymbolsData)
+})
 
 
 
 async function syncInstruments() {
 	await pForever(async function getInstruments(url) {
-
 		let { results, next } = await http.get(url) as Robinhood.Api.Paginated<Robinhood.Instrument>
 		results.remove(v => Array.isArray(v.symbol.match(/[^A-Z-]/)))
 
-		if (process.env.DEVELOPMENT) {
-			console.log('getInstruments ->', results.length, next)
-		}
+		if (process.env.DEVELOPMENT) console.log('getInstruments ->', results.length, next);
 
 		let coms = [] as Redis.Coms
 		let scoms = new redis.SetsComs(rkeys.RH.SYMBOLS)
@@ -84,10 +81,6 @@ async function syncInstruments() {
 		})
 		scoms.merge(coms)
 		await redis.main.coms(coms)
-
-		// await pAll(results.map(v => {
-		// 	return () => syncTickerId(v, dtickers[v.symbol])
-		// }), { concurrency: 2 })
 
 		return next || pForever.end
 
@@ -111,31 +104,32 @@ async function syncTickers() {
 
 	let coms = [] as Redis.Coms
 	let scoms = new redis.SetsComs(rkeys.WB.SYMBOLS)
-	let tickerids = {} as Dict<number>
+	let fsymbols = {} as Dict<number>
 	let dtickers = _.groupBy(tickers, 'disSymbol' as keyof Webull.Ticker) as Dict<Webull.Ticker[]>
 	Object.keys(dtickers).map(function(symbol) {
 		if (dtickers[symbol].length > 1) dtickers[symbol].sort((a, b) => b.exchangeId - a.exchangeId).splice(1);
 		let ticker = dtickers[symbol][0]
-		tickerids[symbol] = ticker.tickerId
+		fsymbols[symbol] = ticker.tickerId
 		coms.push(['hmset', `${rkeys.WB.TICKERS}:${symbol}`, ticker as any])
 	})
-	coms.push(['hmset', rkeys.WB.TICKER_IDS, tickerids as any])
+	coms.push(['hmset', rkeys.WB.TICKERIDS, fsymbols as any])
 	scoms.merge(coms)
 	await redis.main.coms(coms)
+	await webull.syncTickersQuotes(fsymbols)
 }
 
 
 
 async function syncStocks() {
-	let tids = await redis.main.hgetall(rkeys.WB.TICKER_IDS) as Dict<number>
-	tids = _.mapValues(tids, v => Number.parseInt(v as any))
-	let tpairs = _.toPairs(tids).sort()
-	let fsymbols = _.fromPairs(tpairs)
+	let tickerids = await redis.main.hgetall(rkeys.WB.TICKERIDS) as Dict<number>
+	tickerids = _.mapValues(tickerids, v => Number.parseInt(v as any))
+	let pairs = _.toPairs(tickerids).sort()
+	let fsymbols = _.fromPairs(pairs)
 	let coms = [
 		['set', rkeys.SYMBOLS.STOCKS, JSON.stringify(Object.keys(fsymbols))],
 		['set', rkeys.FSYMBOLS.STOCKS, JSON.stringify(fsymbols)],
 	] as Redis.Coms
-	let chunks = core.array.chunks(tpairs, +process.env.CPUS)
+	let chunks = core.array.chunks(pairs, +process.env.CPUS)
 	chunks.forEach(function(chunk, i) {
 		let symbols = JSON.stringify(chunk.map(v => v[0]))
 		coms.push(['set', `${rkeys.SYMBOLS.STOCKS}:${process.env.CPUS}:${i}`, symbols])
@@ -143,7 +137,6 @@ async function syncStocks() {
 		coms.push(['set', `${rkeys.FSYMBOLS.STOCKS}:${process.env.CPUS}:${i}`, fpairs])
 	})
 	await redis.main.coms(coms)
-	await webull.syncTickersQuotes(fsymbols)
 }
 
 async function syncForex() {
