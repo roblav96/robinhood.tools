@@ -15,7 +15,7 @@
 		"client:tailwind": "tailwind build node_modules/tailwindcss/utilities.css --config src/client/styles/tailwind.js --output src/client/styles/tailwind.css",
 		"rs": "npm run server:dev",
 		"rw": "tsc --project .server.tsconfig.json --watch --noEmit",
-		"server:dev": "rimraf dist/common dist/server && run-p server:watch server:onchange cli:focus",
+		"server:dev": "rimraf dist/common dist/server && run-p server:onchange server:watch cli:focus",
 		"server:watch": "tsc --project .server.tsconfig.json --watch",
 		"server:onchange": "onchange 'dist/**/*.js' --killSignal SIGKILL --delay 300 -- pandora dev dist/server",
 		"server:build": "tsc --project .server.tsconfig.json",
