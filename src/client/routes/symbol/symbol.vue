@@ -14,10 +14,16 @@
 					<div class="columns is-multiline">
 						<div class="column is-half is-one-quarter-widescreen">
 							<div class="columns is-mobile">
-								<ui-symbol-logo class="column is-narrow is-96x96" :symbol="symbol"></ui-symbol-logo>
+								<ui-symbol-logo class="column is-narrow mt-1 is-96x96" :symbol="symbol"></ui-symbol-logo>
 								<div class="column">
-									<h1 class="title is-spaced my-0 is-2">{{symbol}}</h1>
+									<h1 class="title my-0 is-3">{{symbol}}</h1>
 									<h2 class="subtitle my-0 is-6">{{instrument.simple_name || instrument.name}}</h2>
+									<h2 class="subtitle my-0 is-6">
+										<b-tooltip label="stock exchange" position="is-bottom">{{ticker.disExchangeCode}}</b-tooltip>
+										<!-- <b-tooltip label="country" position="is-bottom">{{ticker.regionIsoCode}}</b-tooltip> -->
+									</h2>
+									<!-- <span class="tag is-small is-success">{{vcapitalize(quote.status)}}</span> -->
+									<!-- ({{vcapitalize(quote.status)}}) -->
 								</div>
 							</div>
 						</div>
@@ -29,15 +35,15 @@
 						</div>
 						<div class="column is-half is-one-quarter-widescreen">
 							<table class="table is-narrow is-fullwidth content is-small">
-								<thead>
+								<!-- <thead>
 									<tr>
 										<th>Price</th>
 										<th>Volume</th>
 										<th>Time</th>
 									</tr>
-								</thead>
+								</thead> -->
 								<tbody>
-									<tr v-for="deal in deals">
+									<tr v-for="deal in vdeals">
 										<td>{{deal.deal}}</td>
 										<td>{{deal.volume}}</td>
 										<td>{{deal.tradeTime}}</td>

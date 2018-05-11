@@ -11,12 +11,12 @@ import polka from './polka'
 
 
 
-const WANTS = {
+const RKEYS = {
 	instruments: rkeys.RH.INSTRUMENTS,
 	tickers: rkeys.WB.TICKERS,
 	quotes: rkeys.WB.QUOTES,
 }
-const ALLOWED = Object.keys(WANTS)
+const ALLOWED = Object.keys(RKEYS)
 
 polka.route({
 	method: 'POST',
@@ -25,33 +25,33 @@ polka.route({
 	schema: {
 		body: {
 			symbols: { type: 'array', items: 'string' },
-			wants: { type: 'array', items: 'string', optional: true },
+			dockeys: { type: 'array', items: 'string', optional: true },
 		},
 	},
 	async handler(req, res) {
 		let symbols = req.body.symbols as string[]
-		let wants = req.body.wants as string[]
-		if (!Array.isArray(wants)) wants = ALLOWED as any;
+		let dockeys = req.body.dockeys as string[]
+		if (!Array.isArray(dockeys)) dockeys = ALLOWED as any;
 
-		let invalids = _.difference(wants, ALLOWED)
+		let invalids = _.difference(dockeys, ALLOWED)
 		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids });
 
 		let coms = [] as Redis.Coms
 		symbols.forEach(function(symbol) {
-			wants.forEach(function(want) {
-				coms.push(['hgetall', `${WANTS[want]}:${symbol}`])
+			dockeys.forEach(function(dockey) {
+				coms.push(['hgetall', `${RKEYS[dockey]}:${symbol}`])
 			})
 		})
 		let resolved = await redis.main.coms(coms)
 		resolved.forEach(core.fix)
+		return resolved
 
-		let ii = 0
-		let response = core.array.dict(wants, [])
-		symbols.forEach(() => {
-			wants.forEach(vv => response[vv].push(resolved[ii++]))
-		})
-
-		return response
+		// let ii = 0
+		// let response = core.array.dict(dockeys, [])
+		// symbols.forEach(() => {
+		// 	dockeys.forEach(v => response[v].push(resolved[ii++]))
+		// })
+		// return response
 	}
 })
 

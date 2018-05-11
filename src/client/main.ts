@@ -3,7 +3,7 @@
 require('@/common/polyfills')
 
 global.Promise = require('zousan/src/zousan')
-// { (global as any).Zousan.suppressUncaughtRejectionError = true }
+{ (global as any).Zousan.suppressUncaughtRejectionError = true }
 
 Object.assign(console, { dtsgen: function() { } })
 if (process.env.DEVELOPMENT) {

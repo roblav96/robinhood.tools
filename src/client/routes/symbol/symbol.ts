@@ -69,6 +69,7 @@ export default class extends Mixins(VMixin) {
 	ticker = {} as Webull.Ticker
 	quote = {} as Webull.Quote
 	deals = [] as Webull.Deal[]
+	get vdeals() { return this.deals.filter((v, i) => i < 3) }
 
 	@Vts.Watch('symbol', { immediate: true }) w_symbol(to: string, from: string) {
 		socket.offListener(this.onquote, this)
@@ -77,10 +78,11 @@ export default class extends Mixins(VMixin) {
 		socket.on(`${rkeys.WB.DEALS}:${this.symbol}`, this.ondeal, this)
 		http.post('/symbols', {
 			symbols: [this.symbol],
-		}).then((response: Dict<any[]>) => {
-			this.instrument = response.instruments[0]
-			this.ticker = response.tickers[0]
-			this.quote = response.quotes[0]
+		}).then((response: any[]) => {
+			console.log('response ->', JSON.parse(JSON.stringify(response)))
+			this.instrument = response[0]
+			this.ticker = response[1]
+			this.quote = response[2]
 		}).catch(error => console.error('symbols Error ->', error))
 
 		http.post('/symbols/deals', {
