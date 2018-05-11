@@ -31,10 +31,11 @@
 
 						<div class="column is-half is-one-quarter-widescreen">
 							<h1 class="title my-0 is-3">{{vnfixed(quote.price)}}</h1>
+							<h2 class="subtitle my-0 is-6">{{vnfixed(quote.change, {plusminus:true})}}%</h2>
+							<h2 class="subtitle my-0 is-6">{{vnfixed(quote.changeRatio*100, {plusminus:true})}}%</h2>
 							<!-- <span class="font-normal">({{vplusminus(vpercent(quote.price, quote.open))}}%)</span> -->
 							<!-- <ui-number :value="quote.open" plus-minus></ui-number> -->
-							{{vnfixed(quote.changeRatio, {plusminus:true})}}%
-							<br> {{vnfixed(quote.changeRatio, {plusminus:true})}}%
+							<!-- <br> {{vnfixed(quote.changeRatio, {plusminus:true})}}% -->
 							<!-- ({{vpercent(quote.price, quote.open)}}%) -->
 							<!-- <h2 class="subtitle my-0 is-6">{{vcapitalize(quote.status)}}</h2> -->
 						</div>
