@@ -85,6 +85,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 256))
 	CLIENTS.splice(0, Infinity, ...chunks.map((chunk, i) => new webull.MqttClient(emitter, {
+		chunks: chunks.length,
 		index: i,
 		fsymbols: _.fromPairs(chunk),
 		topics: process.env.SYMBOLS,
@@ -96,7 +97,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 
 emitter.on('connect', i => console.log('connect ->', i))
 
-clock.on('3s', function onconnect() {
+clock.on('5s', function onconnect() {
 	if (CLIENTS.length == 0) return;
 	let client = CLIENTS.find(v => v.started == false)
 	if (!client) return;

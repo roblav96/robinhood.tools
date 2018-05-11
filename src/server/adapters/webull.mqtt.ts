@@ -12,7 +12,6 @@ import clock from '../../common/clock'
 
 
 
-// export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'> {
 export class MqttClient {
 
 	private static topics = {
@@ -24,6 +23,7 @@ export class MqttClient {
 
 	private static get options() {
 		return _.clone({
+			chunks: 1,
 			index: 0,
 			fsymbols: null as Dict<number>,
 			topics: null as keyof typeof MqttClient.topics,
@@ -46,6 +46,7 @@ export class MqttClient {
 	}
 
 	started = false
+	connected = false
 	dsymbols: Dict<string>
 	client: MqttConnection
 
@@ -53,12 +54,11 @@ export class MqttClient {
 
 	destroy() {
 		this.terminate()
-		clock.offListener(this.connect, this)
-		clock.offListener(this.heartbeat, this)
+		clock.offListener(this.reconnect, this)
 	}
 
 	terminate() {
-		clock.offListener(this.heartbeat, this)
+		this.connected = false
 		if (this.client) {
 			this.client.end()
 			this.client.destroy()
@@ -67,18 +67,18 @@ export class MqttClient {
 		}
 	}
 
-	private heartbeat() {
-		if (!this.client) return clock.offListener(this.heartbeat, this);
-		// if (this.options.verbose) console.info(this.name, '-> ping');
-		this.reconnect()
-		this.client.pingreq()
-	}
-
+	private ontimeout = () => this.connect()
 	private reconnect() {
-		clock.offListener(this.connect, this)
-		clock.once(this.options.timeout, this.connect, this)
+		if (this.connected == true) {
+			this.connected = false
+			this.client.pingreq()
+		}
+		let multiplier = this.options.chunks == 1 ? core.math.random(1000, 3000) : 1000
+		let ms = core.math.dispersed(this.options.chunks * multiplier, this.options.index + 1, this.options.chunks)
+		setTimeout(this.ontimeout, ms)
 	}
 	connect() {
+		if (this.connected == true) return;
 		this.terminate()
 		this.client = new MqttConnection(net.connect(this.options.port, this.options.host))
 		this.client.connect({
@@ -92,21 +92,24 @@ export class MqttClient {
 		})
 		this.client.on('data', this.ondata)
 		this.client.on('error', this.onerror)
-		this.started = true
-		this.reconnect()
+		if (this.started == false) {
+			this.started = true
+			if (this.options.retry) {
+				clock.on(this.options.timeout, this.reconnect, this)
+			}
+		}
 	}
 
 	private ondata = (packet: Mqtt.Packet) => {
 
 		if (packet.cmd == 'pingresp') {
-			// if (this.options.verbose) console.info(this.name, '-> pong');
-			clock.offListener(this.connect, this)
+			this.connected = true
 			return
 		}
 
 		if (packet.cmd == 'connack') {
 			if (this.options.verbose) console.info(this.name, '-> connect');
-			clock.offListener(this.connect, this)
+			this.connected = true
 			this.emitter.emit('connect', this.options.index)
 
 			this.dsymbols = _.invert(_.mapValues(this.options.fsymbols, v => v.toString()))
@@ -132,16 +135,14 @@ export class MqttClient {
 		}
 
 		if (packet.cmd == 'suback') {
-			if (this.options.verbose) console.info(this.name, '-> subscribed');
-			clock.on(this.options.timeout, this.heartbeat, this)
 			this.emitter.emit('subscribed', this.options.index)
 			return
 		}
 
 		if (packet.cmd == 'disconnect') {
 			if (this.options.verbose) console.warn(this.name, '-> disconnect');
+			this.connected = false
 			this.emitter.emit('disconnect', this.options.index)
-			if (this.options.retry) return this.reconnect();
 			this.destroy()
 		}
 
@@ -184,7 +185,7 @@ export class MqttClient {
 	private onerror = (error: Error) => {
 		// if (this.options.verbose) console.error(this.name, 'onerror Error ->', error);
 		console.error(this.name, 'onerror Error ->', error)
-		if (this.options.retry) this.reconnect();
+		this.connected = false
 	}
 
 }
