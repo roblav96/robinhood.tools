@@ -32,7 +32,7 @@ export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest,
 	route(opts: {
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
 		url: string
-		public?: boolean
+		auth?: boolean
 		schema?: Api.RouterSchemaMap<FastestValidator.Schema>
 		handler(req: PolkaRequest, res: PolkaResponse): any
 	}) {
@@ -46,7 +46,7 @@ export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest,
 			})
 		}
 		this.add(opts.method, opts.url, (req, res) => {
-			if (!req.authed && !opts.public) {
+			if (opts.auth && !req.authed) {
 				let error = boom.unauthorized(req.path)
 				return this.onError(error, req, res, _.noop)
 			}

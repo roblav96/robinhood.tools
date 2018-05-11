@@ -12,6 +12,7 @@
 			<div class="hero-body">
 				<div class="container">
 					<div class="columns is-multiline">
+
 						<div class="column is-half is-one-quarter-widescreen">
 							<div class="columns is-mobile">
 								<ui-symbol-logo class="column is-narrow my-1 is-96x96" :symbol="symbol"></ui-symbol-logo>
@@ -27,26 +28,25 @@
 								</div>
 							</div>
 						</div>
+
 						<div class="column is-half is-one-quarter-widescreen">
-							<p class="content">price bid ask goes here</p>
+							<h1 class="title my-0 is-3">{{vnumber(quote.price)}}</h1>
+							<span class="font-normal">({{vplusminus(vpercent(quote.price, quote.open))}}%)</span>
+							<!-- ({{vpercent(quote.price, quote.open)}}%) -->
+							<h2 class="subtitle my-0 is-6">{{vcapitalize(quote.status)}}</h2>
 						</div>
+
 						<div class="column is-half is-one-quarter-widescreen">
 							<p class="content">sparkline goes here</p>
 						</div>
+
 						<div class="column is-half is-one-quarter-widescreen">
 							<table class="table is-narrow is-fullwidth content is-small">
-								<!-- <thead>
-									<tr>
-										<th>Price</th>
-										<th>Volume</th>
-										<th>Time</th>
-									</tr>
-								</thead> -->
 								<tbody>
 									<tr v-for="deal in vdeals">
-										<td class="font-medium" :class="dealcolor(deal)">{{vnumber(deal.deal)}}</td>
+										<td class="pl-2 font-medium" :class="dealcolor(deal)">{{vnumber(deal.deal)}}</td>
 										<td>{{vnumber(deal.volume, 0)}}</td>
-										<td class="has-text-right">{{vfromnow(deal.tradeTime)}}</td>
+										<td class="pr-2 has-text-right">{{vfromnow(deal.tradeTime)}}</td>
 									</tr>
 								</tbody>
 							</table>

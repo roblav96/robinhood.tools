@@ -40,6 +40,15 @@ export function clone<T extends object = object>(value: T): T {
 
 
 
+export const calc = {
+	percent(to: number, from: number) {
+		if (from == 0) return 0;
+		return ((to - from) / from) * 100
+	},
+}
+
+
+
 export const boolean = {
 	is(value: any): value is boolean { return typeof value == 'boolean' },
 }

@@ -56,8 +56,8 @@ class Socket extends Emitter {
 	}
 
 	private onmessage(message: string) {
+		// console.log('message ->', message)
 		let event = JSON.parse(message) as Socket.Event
-		// console.log('event ->', event)
 		this.emit(event.name, event.data)
 	}
 

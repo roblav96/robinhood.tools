@@ -21,9 +21,11 @@ export default class extends Vue {
 	vcapitalize(value = '') { return core.string.capitalize(_.startCase(value)) }
 	vstamp(stamp: number) { return pretty.stamp(stamp) }
 	vfromnow(stamp: number) { return pretty.fromNow(stamp) }
-	vnumber(value: number, precision?: number) { return pretty.toFixed(value, precision) }
 
-
+	vpercent(to: number, from: number) { return core.calc.percent(to, from) }
+	vnumber(value: number, precision?: number) { return pretty.nfixed(value, { precision }) }
+	vplusminus(value: number) { return pretty.nfixed(value, { plusminus: true }) }
+	vcompact(value: number) { return pretty.nfixed(value, { compact: true }) }
 
 }
 

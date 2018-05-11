@@ -21,7 +21,6 @@ const ALLOWED = Object.keys(RKEYS)
 polka.route({
 	method: 'POST',
 	url: '/api/symbols',
-	public: true,
 	schema: {
 		body: {
 			symbols: { type: 'array', items: 'string' },
@@ -60,7 +59,6 @@ polka.route({
 polka.route({
 	method: 'POST',
 	url: '/api/symbols/deals',
-	public: true,
 	schema: {
 		body: { symbols: { type: 'array', items: 'string' } },
 	},

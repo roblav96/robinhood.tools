@@ -12,7 +12,6 @@ import polka from './polka'
 polka.route({
 	method: 'GET',
 	url: '/api/security/token',
-	public: true,
 	handler(req, res) {
 		let prime = security.randomBits(32)
 		return Promise.resolve().then(function() {

@@ -58,6 +58,7 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 	terminate() {
 		clock.offListener(this.heartbeat, this)
 		if (this.client) {
+			this.client.end()
 			this.client.destroy()
 			this.client.removeAllListeners()
 			this.client = null
