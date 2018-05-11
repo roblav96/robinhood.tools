@@ -45,6 +45,7 @@ export class MqttClient {
 		if (this.options.connect) this.connect();
 	}
 
+	started = false
 	dsymbols: Dict<string>
 	client: MqttConnection
 
@@ -91,6 +92,7 @@ export class MqttClient {
 		})
 		this.client.on('data', this.ondata)
 		this.client.on('error', this.onerror)
+		this.started = true
 		this.reconnect()
 	}
 
