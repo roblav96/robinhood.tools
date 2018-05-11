@@ -47,7 +47,6 @@ export default class extends Mixins(VMixin) {
 	tabindex = 0
 
 	created() {
-		console.log('this.tabs ->', this.tabs)
 		// Object.keys(this.$options.components).forEach(key => {
 		// 	let starts = 'v-symbol-tab-'
 		// 	if (!key.startsWith(starts)) return;
@@ -69,6 +68,7 @@ export default class extends Mixins(VMixin) {
 	instrument = {} as Robinhood.Instrument
 	ticker = {} as Webull.Ticker
 	quote = {} as Webull.Quote
+	deals = [] as Webull.Deal[]
 
 	@Vts.Watch('symbol', { immediate: true }) w_symbol(to: string, from: string) {
 		socket.offListener(this.onquote, this)
@@ -82,6 +82,13 @@ export default class extends Mixins(VMixin) {
 			this.ticker = response.tickers[0]
 			this.quote = response.quotes[0]
 		}).catch(error => console.error('symbols Error ->', error))
+
+		http.post('/symbols/deals', {
+			symbols: [this.symbol],
+		}).then((response: Webull.Deal[][]) => {
+			this.deals = response[0]
+		}).catch(error => console.error('deals Error ->', error))
+
 	}
 
 	onquote(quote: Webull.Quote) {

@@ -28,7 +28,22 @@
 							<p class="content">sparkline goes here</p>
 						</div>
 						<div class="column is-half is-one-quarter-widescreen">
-							<p class="content">deals feed goes here</p>
+							<table class="table is-narrow is-fullwidth content is-small">
+								<thead>
+									<tr>
+										<th>Price</th>
+										<th>Volume</th>
+										<th>Time</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="deal in deals">
+										<td>{{deal.deal}}</td>
+										<td>{{deal.volume}}</td>
+										<td>{{deal.tradeTime}}</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 
 						<!-- <article class="message column is-dark">

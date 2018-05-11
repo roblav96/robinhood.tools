@@ -18,7 +18,7 @@ import clock from '../../common/clock'
 
 
 (async function start() {
-	
+
 	// await redis.main.del(rkeys.RH.SYMBOLS)
 	let instruments = await redis.main.exists(rkeys.RH.SYMBOLS)
 	if (instruments == 0) await syncInstruments();
@@ -113,7 +113,7 @@ async function syncTickers() {
 		fsymbols[symbol] = ticker.tickerId
 		coms.push(['hmset', `${rkeys.WB.TICKERS}:${symbol}`, ticker as any])
 	})
-	coms.push(['hmset', rkeys.WB.TICKERIDS, fsymbols as any])
+	coms.push(['hmset', rkeys.WB.TIDS, fsymbols as any])
 	scoms.merge(coms)
 	await redis.main.coms(coms)
 	await webull.syncTickersQuotes(fsymbols)
@@ -122,9 +122,10 @@ async function syncTickers() {
 
 
 async function syncStocks() {
-	let tickerids = await redis.main.hgetall(rkeys.WB.TICKERIDS) as Dict<number>
-	tickerids = _.mapValues(tickerids, v => Number.parseInt(v as any))
-	let pairs = _.toPairs(tickerids).sort()
+	let symbols = await redis.main.smembers(rkeys.WB.SYMBOLS) as string[]
+	let tids = await redis.main.hgetall(rkeys.WB.TIDS) as Dict<number>
+	tids = _.mapValues(tids, v => Number.parseInt(v as any))
+	let pairs = _.toPairs(tids).filter(v => symbols.includes(v[0])).sort()
 	let fsymbols = _.fromPairs(pairs)
 	let coms = [
 		['set', rkeys.SYMBOLS.STOCKS, JSON.stringify(Object.keys(fsymbols))],
@@ -171,6 +172,7 @@ async function finishSync(type: keyof typeof rkeys.SYMBOLS, tickers: Webull.Tick
 	let fsymbols = {} as Dict<number>
 	tickers.forEach(v => fsymbols[v.disSymbol] = v.tickerId)
 	await redis.main.coms([
+		['hmset', rkeys.WB.TIDS, fsymbols as any],
 		['set', rkeys.SYMBOLS[type], JSON.stringify(Object.keys(fsymbols))],
 		['set', rkeys.FSYMBOLS[type], JSON.stringify(fsymbols)],
 	])

@@ -1,10 +1,12 @@
 // 
 
 import * as boom from 'boom'
+import * as pAll from 'p-all'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
+import * as http from '../adapters/http'
 import polka from './polka'
 
 
@@ -50,6 +52,36 @@ polka.route({
 		})
 
 		return response
+	}
+})
+
+
+
+polka.route({
+	method: 'POST',
+	url: '/api/symbols/deals',
+	public: true,
+	schema: {
+		body: { symbols: { type: 'array', items: 'string' } },
+	},
+	async handler(req, res) {
+		let symbols = req.body.symbols as string[]
+		let fsymbols = await redis.main.hmget(rkeys.WB.TIDS, ...symbols) as Dict<number>
+		fsymbols = redis.fixHmget(fsymbols, symbols)
+		fsymbols = _.mapValues(fsymbols, v => Number.parseInt(v as any))
+		let response = await pAll(symbols.map(symbol => {
+			let tid = fsymbols[symbol]
+			let url = 'https://quoteapi.webull.com/api/quote/tickerDeals/' + tid
+			return () => http.get(url, { query: { count: 50 }, wbauth: true }) as Promise<Webull.Deal[]>
+		}), { concurrency: 1 })
+		return response.map(v => {
+			return v.map(vv => {
+				core.fix(vv)
+				vv.tradeTime = new Date(vv.tradeTime).valueOf()
+				delete vv.tickerId
+				return vv
+			})
+		})
 	}
 })
 

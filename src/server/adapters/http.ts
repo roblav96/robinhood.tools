@@ -41,7 +41,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 				dnt: '1', hl: 'en', locale: 'eng', tz: 'America/New_York',
 			})
 			config.headers['user-agent'] = config.headers['osv']
-			if (config.webullAuth) {
+			if (config.wbauth) {
 				if (process.env.WEBULL_DID) config.headers['did'] = process.env.WEBULL_DID;
 				if (process.env.WEBULL_TOKEN) config.headers['access_token'] = process.env.WEBULL_TOKEN;
 			}

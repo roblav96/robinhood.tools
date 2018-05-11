@@ -105,7 +105,7 @@ declare global {
 			verbose: boolean
 			isProxy: boolean
 			robinhoodToken: string
-			webullAuth: boolean
+			wbauth: boolean
 		}
 	}
 }

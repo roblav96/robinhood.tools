@@ -143,7 +143,7 @@ async function getChunked(fsymbols: Dict<number>, url: string, auth = false) {
 	let chunks = core.array.chunks(tids, _.ceil(tids.length / 128)).map(v => v.join(','))
 	let items = await pAll(chunks.map(chunk => {
 		return () => http.get(url, {
-			query: { tickerIds: chunk }, webullAuth: auth,
+			query: { tickerIds: chunk }, wbauth: auth,
 		})
 	}), { concurrency: 1 })
 	items = _.flatten(items)
