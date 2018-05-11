@@ -1,13 +1,36 @@
 // 
 
+import * as Vts from 'vue-property-decorator'
+import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
+import * as pretty from '@/common/pretty'
 
 
 
 import SymbolLogo from '@/client/ui/symbol.logo/symbol.logo'
 Vue.component('ui-symbol-logo', SymbolLogo)
+
+
+
+// @Vts.Component({
+// 	template: `<span>{{fixed}}</span>`,
+// })
+// class UINumber extends Vue {
+// 	@Vts.Prop() value: number
+// 	@Vts.Prop() precision: number
+// 	@Vts.Prop() compact: boolean
+// 	@Vts.Prop() plusMinus: boolean
+// 	get fixed() {
+// 		return pretty.nfixed(this.value, {
+// 			precision: this.precision,
+// 			compact: this.compact,
+// 			plusminus: this.plusMinus,
+// 		})
+// 	}
+// }
+// Vue.component('ui-number', UINumber)
 
 
 

@@ -29,9 +29,8 @@ export function fromNow(stamp: number) {
 
 
 
-export function nfixed(value: number, { precision, compact, plusminus }: Partial<{
-	precision: number, compact: boolean, plusminus: boolean
-}>) {
+declare global { interface NFixedOpts { precision: number, compact: boolean, plusminus: boolean } }
+export function nfixed(value: number, { precision, compact, plusminus } = {} as Partial<NFixedOpts>) {
 	if (!value) return value;
 	if (!Number.isFinite(precision)) {
 		precision = 2
@@ -54,7 +53,7 @@ export function nfixed(value: number, { precision, compact, plusminus }: Partial
 		fixed = value.toFixed(0) + units[ii]
 	}
 	if (plusminus && value > 0) fixed = '+' + fixed;
-	if (plusminus && value < 0) fixed = '–' + fixed;
+	if (plusminus && value < 0) fixed = fixed.replace('-', '–');
 	return fixed
 }
 

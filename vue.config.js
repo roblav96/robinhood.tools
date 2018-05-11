@@ -18,6 +18,7 @@ module.exports = {
 	dll: DEVELOPMENT,
 	css: { sourceMap: DEVELOPMENT },
 	vueLoader: { hotReload: false },
+	compiler: true,
 
 	configureWebpack: function(config) {
 
