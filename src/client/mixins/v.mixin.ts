@@ -17,13 +17,13 @@ export default class extends Vue {
 	development = !!process.env.DEVELOPMENT
 	production = !!process.env.PRODUCTION
 
-	vtruncate(value = '', length = 64) { return _.truncate(value, { length }) }
-	vcapitalize(value = '') { return core.string.capitalize(_.startCase(value)) }
-	vstamp(stamp: number) { return pretty.stamp(stamp) }
-	vfromnow(stamp: number) { return pretty.fromNow(stamp) }
-	vnfixed(value: number, opts: Partial<NFixedOpts>) { return pretty.nfixed(value, opts) }
-	vpercent(to: number, from: number) { return core.calc.percent(to, from) }
-	vslider(value: number, min: number, max: number) { return core.calc.slider(value, min, max) }
+	vtruncate(value: string, length = 64) { if (!value) return ''; return _.truncate(value, { length }) }
+	vcapitalize(value: string) { if (!value) return ''; return core.string.capitalize(_.startCase(value)) }
+	vstamp(stamp: number) { if (!stamp) return ''; return pretty.stamp(stamp) }
+	vfromnow(stamp: number) { if (!stamp) return ''; return pretty.fromNow(stamp) }
+	vnfixed(value: number, opts: Partial<NFixedOpts>) { if (!value) return ''; return pretty.nfixed(value, opts) }
+	vpercent(to: number, from: number) { if (!to || !from) return ''; return core.calc.percent(to, from) }
+	vslider(value: number, min: number, max: number) { if (!value) return ''; return core.calc.slider(value, min, max) }
 
 }
 

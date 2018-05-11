@@ -8,7 +8,7 @@
 
 <template>
 	<section>
-		<section class="hero is-small has-background-white-bis">
+		<section v-show="!busy" class="hero is-small has-background-white-bis">
 			<div class="hero-body">
 				<div class="container">
 					<div class="columns is-multiline">
@@ -31,10 +31,11 @@
 
 						<div class="column is-half is-one-quarter-widescreen">
 							<h1 class="title my-0 is-3">{{vnfixed(quote.price)}}</h1>
-							<h2 class="subtitle my-0 is-6">
+							<h2 class="subtitle my-0 is-6 font-semibold" v-ui-green-red="quote.change">
 								{{vnfixed(quote.change,{plusminus:true})}} ({{vnfixed(quote.changeRatio*100,{plusminus:true,percent:true})}})
 							</h2>
-							<h2 class="subtitle my-0 is-6">{{vcapitalize(quote.status)}}</h2>
+							<h2 class="subtitle my-0 is-6">{{vfromnow(quote.tradeTime)}}</h2>
+							<!-- <h2 class="subtitle my-0 is-6">{{vcapitalize(quote.status)}}</h2> -->
 							<!-- <span class="font-normal">({{vplusminus(vpercent(quote.price, quote.open))}}%)</span> -->
 							<!-- <ui-number :value="quote.open" plus-minus></ui-number> -->
 							<!-- <br> {{vnfixed(quote.changeRatio, {plusminus:true})}}% -->

@@ -14,23 +14,51 @@ Vue.component('ui-symbol-logo', SymbolLogo)
 
 
 
-@Vts.Component({
-	template: `<span>{{fixed}}</span>`,
-})
-class UIPlusMinus extends Vue {
-	@Vts.Prop() value: number
-	@Vts.Prop() precision: number
-	@Vts.Prop() compact: boolean
-	@Vts.Prop() plusMinus: boolean
-	get fixed() {
-		return pretty.nfixed(this.value, {
-			precision: this.precision,
-			compact: this.compact,
-			plusminus: this.plusMinus,
-		})
+// @Vts.Component({
+// 	// template: `<span :class="color">{{value}}</span>`,
+// 	template: `<span :class="color"><slot></slot></span>`,
+// })
+// class UIGreenRed extends Vue {
+// 	// @Vts.Prop() value: number
+// 	get color() {
+// 		console.log('this.$el.textContent ->', this.$el.textContent)
+// 		console.log('this.$el.innerText ->', this.$el.innerText)
+// 		console.log('this.$el.outerText ->', this.$el.outerText)
+// 		let value = Number.parseFloat(this.$el.innerText)
+// 		if (value > 0) return 'has-text-success';
+// 		if (value < 0) return 'has-text-danger';
+// 	}
+// }
+// Vue.component('ui-green-red', UIGreenRed)
+
+
+
+Vue.directive('ui-green-red', function(el, binding) {
+	let value = binding.value as number
+	if (!binding.value) return;
+	if (value == 0) return el.classList.remove('has-text-danger', 'has-text-success');
+	if (value > 0) {
+		if (el.classList.contains('has-text-success')) return;
+		if (el.classList.contains('has-text-danger')) {
+			return el.classList.replace('has-text-danger', 'has-text-success')
+		}
+		return el.classList.add('has-text-success')
 	}
-}
-Vue.component('ui-plus-minus', UIPlusMinus)
+	if (value < 0) {
+		if (el.classList.contains('has-text-danger')) return;
+		if (el.classList.contains('has-text-success')) {
+			return el.classList.replace('has-text-success', 'has-text-danger')
+		}
+		return el.classList.add('has-text-danger')
+	}
+})
+
+// Vue.directive('ui-green-red', {
+// 	bind(el, binding, vnode) { },
+// 	inserted(el, binding, vnode) { },
+// 	update(el, binding, vnode) { },
+// 	unbind(el, binding, vnode) { },
+// })
 
 
 

@@ -10,6 +10,7 @@ import * as core from '@/common/core'
 import * as rkeys from '@/common/rkeys'
 import * as http from '@/client/adapters/http'
 import * as ui from '@/client/ui/ui'
+import clock from '@/common/clock'
 import socket from '@/client/adapters/socket'
 
 
@@ -57,15 +58,17 @@ export default class extends Mixins(VMixin) {
 	}
 
 	mounted() {
-
+		clock.on('1s', this.$forceUpdate, this)
 	}
 
 	beforeDestroy() {
+		clock.offListener(this.$forceUpdate, this)
 		socket.offListener(this.onquote, this)
 		socket.offListener(this.ondeal, this)
 		this.reset()
 	}
 
+	busy = true
 	instrument = {} as Robinhood.Instrument
 	ticker = {} as Webull.Ticker
 	quote = {} as Webull.Quote
@@ -73,6 +76,7 @@ export default class extends Mixins(VMixin) {
 	get vdeals() { return this.deals.filter((v, i) => i < 3) }
 
 	reset() {
+		this.busy = true
 		this.instrument = {} as any
 		this.ticker = {} as any
 		this.quote = {} as any
@@ -96,6 +100,7 @@ export default class extends Mixins(VMixin) {
 			this.ticker = resolved[0][1]
 			this.quote = resolved[0][2]
 			this.deals = resolved[1][0]
+			this.busy = false
 		}).catch(error => console.error('w_symbol Error ->', error))
 	}
 
