@@ -11,9 +11,9 @@
 		<section class="hero is-small has-background-white-bis">
 			<div class="hero-body">
 				<div class="container">
-					<div class="columns">
-						<div class="column">
-							<div class="columns">
+					<div class="columns is-multiline">
+						<div class="column is-half is-one-quarter-widescreen">
+							<div class="columns is-mobile">
 								<ui-symbol-logo class="column is-narrow is-96x96" :symbol="symbol"></ui-symbol-logo>
 								<div class="column">
 									<h1 class="title is-spaced my-0 is-2">{{symbol}}</h1>
@@ -21,8 +21,14 @@
 								</div>
 							</div>
 						</div>
-						<div class="column content is-small">
-							
+						<div class="column is-half is-one-quarter-widescreen">
+							<p class="content">price bid ask goes here</p>
+						</div>
+						<div class="column is-half is-one-quarter-widescreen">
+							<p class="content">sparkline goes here</p>
+						</div>
+						<div class="column is-half is-one-quarter-widescreen">
+							<p class="content">deals feed goes here</p>
 						</div>
 
 						<!-- <article class="message column is-dark">

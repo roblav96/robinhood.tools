@@ -5,8 +5,8 @@
 /**/
 
 div.searchbar div.dropdown-content {
-	max-width: 50vw;
-	max-height: 66vh;
+	max-width: 75vw;
+	max-height: 75vh;
 }
 
 </style>
