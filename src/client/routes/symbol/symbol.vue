@@ -24,27 +24,19 @@
 			<nav class="tabs is-boxed">
 				<div class="container">
 					<ul>
-						<li class="is-active">
-							<a>Overview</a>
-						</li>
-						<li>
-							<a>Modifiers</a>
-						</li>
-						<li>
-							<a>Grid</a>
-						</li>
-						<li>
-							<a>Elements</a>
-						</li>
-						<li>
-							<a>Components</a>
-						</li>
-						<li>
-							<a>Layout</a>
+						<li :class="{ 'is-active': tabindex == i }" v-on:click="tabindex = i" v-for="(tab, i) in tabs">
+							<a>{{tab.title}}</a>
 						</li>
 					</ul>
 				</div>
 			</nav>
 		</div>
+
+		<hr class="my-0 has-background-light">
+
+		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+			<component :is="tabs[tabindex].vcomponent" class="has-background-white-bis"></component>
+		</transition>
+
 	</section>
 </template>

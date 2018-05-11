@@ -49,7 +49,7 @@ export function token() {
 	}).then(function(finger) {
 		doc.finger = finger
 		lockr.set('security.finger', doc.finger)
-		return http.get('/security/token', { retryTick: '1s', retries: Infinity })
+		return http.get('/security/token', { retries: Infinity })
 	}).catch(function(error) {
 		console.error('token Error ->', error)
 	}).finally(function() {

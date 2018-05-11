@@ -50,6 +50,18 @@ export const routes = [
 	{
 		name: 'symbol', path: '/symbol/:symbol',
 		component: () => import('@/client/routes/symbol/symbol'),
+		// children: [
+		// 	{
+		// 		name: 'symbol.summary', path: 'summary',
+		// 		component: () => import('@/client/routes/symbol/symbol.summary'),
+		// 	},
+		// 	{
+		// 		name: 'symbol', path: '', redirect: { name: 'symbol.summary' }
+		// 	},
+		// 	{
+		// 		path: '*', redirect: { name: 'symbol.summary' }
+		// 	},
+		// ],
 	},
 
 	{
