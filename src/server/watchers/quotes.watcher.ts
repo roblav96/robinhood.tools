@@ -97,7 +97,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 
 emitter.on('connect', i => console.log('connect ->', i))
 
-clock.on('5s', function onconnect() {
+clock.on('3s', function onconnect() {
 	if (CLIENTS.length == 0) return;
 	let client = CLIENTS.find(v => v.started == false)
 	if (!client) return;
