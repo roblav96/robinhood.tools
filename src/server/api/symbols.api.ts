@@ -69,19 +69,19 @@ polka.route({
 		let fsymbols = await redis.main.hmget(rkeys.WB.TIDS, ...symbols) as Dict<number>
 		fsymbols = redis.fixHmget(fsymbols, symbols)
 		fsymbols = _.mapValues(fsymbols, v => Number.parseInt(v as any))
-		let response = await pAll(symbols.map(symbol => {
+		let resolved = await pAll(symbols.map(symbol => {
 			let tid = fsymbols[symbol]
 			let url = 'https://quoteapi.webull.com/api/quote/tickerDeals/' + tid
-			return () => http.get(url, { query: { count: 50 }, wbauth: true }) as Promise<Webull.Deal[]>
+			return () => http.get(url, { query: { count: 20 }, wbauth: true }) as Promise<Webull.Deal[]>
 		}), { concurrency: 1 })
-		return response.map(v => {
-			return v.map(vv => {
-				core.fix(vv)
-				vv.tradeTime = new Date(vv.tradeTime).valueOf()
-				delete vv.tickerId
-				return vv
-			})
-		})
+		let response = resolved.map(v => v.map(vv => {
+			core.fix(vv)
+			vv.tradeTime = new Date(vv.tradeTime).valueOf()
+			delete vv.tickerId
+			return vv
+		}))
+		response.forEach(v => v.sort((a, b) => b.tradeTime - a.tradeTime))
+		return response
 	}
 })
 

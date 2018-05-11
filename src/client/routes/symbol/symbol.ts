@@ -63,6 +63,7 @@ export default class extends Mixins(VMixin) {
 	beforeDestroy() {
 		socket.offListener(this.onquote, this)
 		socket.offListener(this.ondeal, this)
+		this.reset()
 	}
 
 	instrument = {} as Robinhood.Instrument
@@ -71,33 +72,42 @@ export default class extends Mixins(VMixin) {
 	deals = [] as Webull.Deal[]
 	get vdeals() { return this.deals.filter((v, i) => i < 3) }
 
+	reset() {
+		this.instrument = {} as any
+		this.ticker = {} as any
+		this.quote = {} as any
+		this.deals.splice(0)
+	}
+
 	@Vts.Watch('symbol', { immediate: true }) w_symbol(to: string, from: string) {
 		socket.offListener(this.onquote, this)
 		socket.offListener(this.ondeal, this)
 		socket.on(`${rkeys.WB.QUOTES}:${this.symbol}`, this.onquote, this)
 		socket.on(`${rkeys.WB.DEALS}:${this.symbol}`, this.ondeal, this)
-		http.post('/symbols', {
-			symbols: [this.symbol],
-		}).then((response: any[]) => {
-			console.log('response ->', JSON.parse(JSON.stringify(response)))
-			this.instrument = response[0]
-			this.ticker = response[1]
-			this.quote = response[2]
-		}).catch(error => console.error('symbols Error ->', error))
+		this.reset()
 
-		http.post('/symbols/deals', {
-			symbols: [this.symbol],
-		}).then((response: Webull.Deal[][]) => {
-			this.deals = response[0]
-		}).catch(error => console.error('deals Error ->', error))
-
+		let symbols = [this.symbol]
+		return Promise.all([
+			http.post('/symbols', { symbols }),
+			http.post('/symbols/deals', { symbols }),
+		]).then(resolved => {
+			console.log('resolved ->', JSON.parse(JSON.stringify(resolved)))
+			this.instrument = resolved[0][0]
+			this.ticker = resolved[0][1]
+			this.quote = resolved[0][2]
+			this.deals = resolved[1][0]
+		}).catch(error => console.error('w_symbol Error ->', error))
 	}
 
 	onquote(quote: Webull.Quote) {
-		console.log('quote ->', quote)
+		Object.assign(this.quote, quote)
+	}
+	dealcolor(deal: Webull.Deal) {
+		return { 'has-text-success': deal.tradeBsFlag == 'B', 'has-text-danger': deal.tradeBsFlag == 'S' }
 	}
 	ondeal(deal: Webull.Deal) {
-		console.log('deal ->', deal)
+		this.deals.unshift(deal)
+		this.deals.splice(20)
 	}
 
 }

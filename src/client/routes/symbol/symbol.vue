@@ -14,7 +14,7 @@
 					<div class="columns is-multiline">
 						<div class="column is-half is-one-quarter-widescreen">
 							<div class="columns is-mobile">
-								<ui-symbol-logo class="column is-narrow mt-1 is-96x96" :symbol="symbol"></ui-symbol-logo>
+								<ui-symbol-logo class="column is-narrow my-1 is-96x96" :symbol="symbol"></ui-symbol-logo>
 								<div class="column">
 									<h1 class="title my-0 is-3">{{symbol}}</h1>
 									<h2 class="subtitle my-0 is-6">{{instrument.simple_name || instrument.name}}</h2>
@@ -44,9 +44,9 @@
 								</thead> -->
 								<tbody>
 									<tr v-for="deal in vdeals">
-										<td>{{deal.deal}}</td>
-										<td>{{deal.volume}}</td>
-										<td>{{deal.tradeTime}}</td>
+										<td class="font-medium" :class="dealcolor(deal)">{{vnumber(deal.deal)}}</td>
+										<td>{{vnumber(deal.volume, 0)}}</td>
+										<td class="has-text-right">{{vfromnow(deal.tradeTime)}}</td>
 									</tr>
 								</tbody>
 							</table>

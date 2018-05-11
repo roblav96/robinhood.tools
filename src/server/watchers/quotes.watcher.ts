@@ -36,7 +36,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
 		await utils.getFullSymbols(process.env.SYMBOLS)
 	)
-	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
+	if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 	// socket.setFilter(_.mapValues(fsymbols, v => true))
 	let symbols = Object.keys(fsymbols)
 
@@ -120,7 +120,10 @@ function ondata(topic: number, wbquote: Webull.Quote) {
 				if (wbquote.deal != toquote.price) toquote.price = wbquote.deal;
 			}
 		}
+		delete wbquote.symbol
+		delete wbquote.tickerId
 		socket.emit(`${rkeys.WB.DEALS}:${symbol}`, wbquote)
+
 	} else {
 		Object.keys(wbquote).forEach((key: keyof Webull.Quote) => {
 			let value = wbquote[key] as any

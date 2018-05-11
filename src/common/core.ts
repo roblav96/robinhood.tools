@@ -113,8 +113,7 @@ export const number = {
 		return Number.parseFloat(value.replace(/[^0-9\.]/g, ''))
 	},
 	round(value: number, precision = 0) {
-		value = +(Math.round(value + 'e+' + precision as any) + 'e-' + precision)
-		return Number.isFinite(value) ? value : 0
+		return +(Math.round(value + 'e+' + precision as any) + 'e-' + precision)
 	},
 	WORDS: {
 		0: 'zero', 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine',

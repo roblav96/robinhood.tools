@@ -36,6 +36,7 @@
 		"fast-json-parse": "latest",
 		"fastest-validator": "latest",
 		"fingerprintjs2": "latest",
+		"fromnow": "latest",
 		"humanize-plus": "latest",
 		"ioredis": "latest",
 		"is-retry-allowed": "latest",
