@@ -18,7 +18,7 @@ import clock from '../../common/clock'
 
 
 
-const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data' | 'toquote' | 'fsymbols'>()
+const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data' | 'onSymbols' | 'toquote'>()
 export default emitter
 
 declare global { namespace NodeJS { export interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
@@ -42,7 +42,6 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 	// socket.setFilter(_.mapValues(fsymbols, v => true))
 
-	emitter.emit('fsymbols', fsymbols, hubmsg.data)
 	let symbols = Object.keys(fsymbols)
 
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => [
@@ -81,23 +80,23 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 
 	})
 
+	emitter.emit('onSymbols', hubmsg.data, QUOTES)
 	await redis.main.coms(coms)
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 256))
 	CLIENTS.splice(0, Infinity, ...chunks.map((chunk, i) => new webull.MqttClient(emitter, {
-		chunks: chunks.length,
-		index: i,
 		fsymbols: _.fromPairs(chunk),
 		topics: process.env.SYMBOLS,
+		index: i, chunks: chunks.length,
 		connect: chunks.length == 1 && i == 0,
 		// verbose: true,
 	})))
 
 }
 
-emitter.on('connect', i => console.log('connect ->', i))
+// emitter.on('connect', i => console.log('connect ->', i))
 
-clock.on('3s', function onconnect() {
+clock.on('5s', function onconnect() {
 	if (CLIENTS.length == 0) return;
 	let client = CLIENTS.find(v => v.started == false)
 	if (!client) return;
@@ -113,12 +112,11 @@ clock.on('3s', function onsave() {
 	Object.keys(SAVES).forEach(symbol => SAVES[symbol] = {} as any)
 })
 
-const GREATER_THANS = {
+const TIME_KEYS = {
 	faTradeTime: null,
 	mkTradeTime: null,
 	mktradeTime: null,
 	tradeTime: null,
-	volume: null,
 } as Webull.Quote
 
 emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
@@ -136,18 +134,25 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 				if (wbquote.deal != toquote.price) toquote.price = wbquote.deal;
 			}
 		}
-		// delete wbquote.symbol
-		// delete wbquote.tickerId
-		// socket.emit(`${rkeys.WB.DEALS}:${symbol}`, wbquote)
 
 	} else {
 		Object.keys(wbquote).forEach((key: keyof Webull.Quote) => {
 			let value = wbquote[key] as any
-			if (GREATER_THANS[key] === null) {
+
+			if (TIME_KEYS[key] === null) {
 				if (value > quote[key]) toquote[key] = value;
-				return
+
+			} else if (key == 'volume') {
+				let volume = quote.volume
+				if (value == volume) return;
+				if (value > volume || Math.abs(core.calc.percent(value, volume)) > 5) {
+					toquote.volume = value
+				}
+
+			} else if (quote[key] != value) {
+				toquote[key] = value
+
 			}
-			if (quote[key] != value) toquote[key] = value;
 		})
 	}
 
@@ -160,7 +165,7 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 })
 
-import './calcs.watcher'
+import './calcs.service'
 
 
 

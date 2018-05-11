@@ -23,10 +23,9 @@ export class MqttClient {
 
 	private static get options() {
 		return _.clone({
-			chunks: 1,
-			index: 0,
 			fsymbols: null as Dict<number>,
 			topics: null as keyof typeof MqttClient.topics,
+			index: 0, chunks: 1,
 			host: 'push.webull.com', port: 9018,
 			timeout: '10s' as Clock.Tick,
 			connect: true,
