@@ -31,8 +31,10 @@
 
 						<div class="column is-half is-one-quarter-widescreen">
 							<h1 class="title my-0 is-3">{{vnfixed(quote.price)}}</h1>
-							<h2 class="subtitle my-0 is-6">{{vnfixed(quote.change, {plusminus:true})}}%</h2>
-							<h2 class="subtitle my-0 is-6">{{vnfixed(quote.changeRatio*100, {plusminus:true})}}%</h2>
+							<h2 class="subtitle my-0 is-6">
+								{{vnfixed(quote.change,{plusminus:true})}} ({{vnfixed(quote.changeRatio*100,{plusminus:true,percent:true})}})
+							</h2>
+							<h2 class="subtitle my-0 is-6">{{vcapitalize(quote.status)}}</h2>
 							<!-- <span class="font-normal">({{vplusminus(vpercent(quote.price, quote.open))}}%)</span> -->
 							<!-- <ui-number :value="quote.open" plus-minus></ui-number> -->
 							<!-- <br> {{vnfixed(quote.changeRatio, {plusminus:true})}}% -->
@@ -48,9 +50,9 @@
 							<table class="table is-narrow is-fullwidth content is-small">
 								<tbody>
 									<tr v-for="deal in vdeals">
-										<td class="pl-2 font-medium" :class="dealcolor(deal)">{{vnfixed(deal.deal)}}</td>
-										<td>{{vnfixed(deal.volume, 0)}}</td>
-										<td class="pr-2 has-text-right">{{vfromnow(deal.tradeTime)}}</td>
+										<td width="33%" class="px-2">{{vfromnow(deal.tradeTime)}}</td>
+										<td width="33%" class="has-text-right font-medium" :class="dealcolor(deal)">{{vnfixed(deal.deal)}}</td>
+										<td width="33%" class="px-2 has-text-right">{{vnfixed(deal.volume,{precision:0})}}</td>
 									</tr>
 								</tbody>
 							</table>

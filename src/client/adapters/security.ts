@@ -58,27 +58,3 @@ export function token() {
 }
 
 
-
-
-
-// Promise.all([
-// 	uuid(), finger(),
-// ]).then(function() {
-// 	return http.get('/security/token', { retryTick: '1s', retries: Infinity })
-// }).then(function() {
-// 	return socket.discover()
-// }).then(function() {
-// 	state.ready = true
-// }).catch(function(error) {
-// 	console.error('init Error ->', error)
-// })
-
-// http.post('/search', {
-// 	query: 'nvda',
-// }).then(function(response) {
-// 	// console.log('response ->', response)
-// }).catch(function(error) {
-// 	console.error('polka Error ->', error)
-// })
-
-

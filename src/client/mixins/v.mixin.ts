@@ -21,9 +21,9 @@ export default class extends Vue {
 	vcapitalize(value = '') { return core.string.capitalize(_.startCase(value)) }
 	vstamp(stamp: number) { return pretty.stamp(stamp) }
 	vfromnow(stamp: number) { return pretty.fromNow(stamp) }
-
-	vpercent(to: number, from: number) { return core.calc.percent(to, from) }
 	vnfixed(value: number, opts: Partial<NFixedOpts>) { return pretty.nfixed(value, opts) }
+	vpercent(to: number, from: number) { return core.calc.percent(to, from) }
+	vslider(value: number, min: number, max: number) { return core.calc.slider(value, min, max) }
 
 }
 

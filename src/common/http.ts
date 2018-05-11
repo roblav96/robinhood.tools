@@ -21,6 +21,8 @@ export function config(config: Partial<Http.Config>) {
 		maxRedirects: 10,
 	} as Http.Config)
 
+	if (process.env.CLIENT && config.retries == Infinity) config.retryTick = '1s';
+
 	if (config.verbose) {
 		let ending = (config.query || config.body) ? ' -> ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
 		console.log('-> ' + config.method + ' ' + config.url + ending);

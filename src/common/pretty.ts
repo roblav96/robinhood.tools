@@ -23,14 +23,14 @@ export function stamp(stamp = Date.now(), format = 'dddd, MMM DD YYYY, hh:mm:ssa
 }
 
 export function fromNow(stamp: number) {
-	return prettyms(Math.max(Date.now() - stamp, 1000), { compact: true }) + ' ago'
+	return prettyms(Math.max(Date.now() - stamp, 1000), { secDecimalDigits: 0 }) + ' ago'
 	// return fromnow(stamp, { ago: true, max: 1 })
 }
 
 
 
-declare global { interface NFixedOpts { precision: number, compact: boolean, plusminus: boolean } }
-export function nfixed(value: number, { precision, compact, plusminus } = {} as Partial<NFixedOpts>) {
+declare global { interface NFixedOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean } }
+export function nfixed(value: number, { precision, compact, plusminus, percent } = {} as Partial<NFixedOpts>) {
 	if (!value) return value;
 	if (!Number.isFinite(precision)) {
 		precision = 2
@@ -39,6 +39,7 @@ export function nfixed(value: number, { precision, compact, plusminus } = {} as 
 		if (abs >= 1000) precision = 1;
 		if (abs >= 10000) precision = 0;
 	}
+	if (percent) precision = Math.min(precision, 2)
 	let fixed = value.toFixed(precision)
 	if (compact && precision == 0) {
 		let units = ['', 'k', 'M', 'T']
@@ -54,6 +55,7 @@ export function nfixed(value: number, { precision, compact, plusminus } = {} as 
 	}
 	if (plusminus && value > 0) fixed = '+' + fixed;
 	if (plusminus && value < 0) fixed = fixed.replace('-', '–');
+	if (percent) fixed += '%';
 	return fixed
 }
 
