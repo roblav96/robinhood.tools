@@ -17,7 +17,12 @@ import clock from '../../common/clock'
 
 
 
-(async function start() {
+let ready = false
+pandora.on('readySymbols', function(hubmsg) {
+	if (ready) pandora.broadcast({}, 'symbolsReady');
+})
+
+async function start() {
 
 	// await redis.main.del(rkeys.RH.SYMBOLS)
 	let instruments = await redis.main.exists(rkeys.RH.SYMBOLS)
@@ -42,12 +47,7 @@ import clock from '../../common/clock'
 	ready = true
 	pandora.broadcast({}, 'symbolsReady')
 
-})().catch(error => console.error('start Error ->', error))
-
-let ready = false
-pandora.on('readySymbols', function(hubmsg) {
-	if (ready) pandora.broadcast({}, 'symbolsReady');
-})
+} start().catch(error => console.error('start Error ->', error))
 
 
 
@@ -117,6 +117,7 @@ async function syncTickers() {
 	scoms.merge(coms)
 	await redis.main.coms(coms)
 	await webull.syncTickersQuotes(fsymbols)
+	if (process.env.DEVELOPMENT) console.info('syncTickers done ->', Object.keys(fsymbols).length);
 }
 
 
@@ -139,6 +140,7 @@ async function syncStocks() {
 		coms.push(['set', `${rkeys.FSYMBOLS.STOCKS}:${process.env.CPUS}:${i}`, fpairs])
 	})
 	await redis.main.coms(coms)
+	if (process.env.DEVELOPMENT) console.info('syncStocks done ->', Object.keys(fsymbols).length);
 }
 
 async function syncForex() {
@@ -152,6 +154,7 @@ async function syncForex() {
 	}), { concurrency: 2 })
 	tickers.remove(v => !v)
 	await finishSync('FOREX', tickers)
+	if (process.env.DEVELOPMENT) console.info('syncForex done ->', tickers.length);
 }
 
 async function syncIndexes(indexes: string[]) {
@@ -165,6 +168,7 @@ async function syncIndexes(indexes: string[]) {
 	response.forEach(v => v.marketIndexList.forEach(vv => tickers.push(vv)))
 	tickers.remove(v => !v || (v.secType && v.secType.includes(52)) || v.disSymbol == 'IBEX')
 	await finishSync('INDEXES', tickers)
+	if (process.env.DEVELOPMENT) console.info('syncIndexes done ->', tickers.length);
 }
 
 async function finishSync(type: keyof typeof rkeys.SYMBOLS, tickers: Webull.Ticker[]) {

@@ -13,12 +13,16 @@ import * as socket from '../adapters/socket'
 import * as utils from '../adapters/utils'
 import * as webull from '../adapters/webull'
 import * as http from '../adapters/http'
+import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
 
 
 
+const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data' | 'toquote' | 'fsymbols'>()
+export default emitter
+
 declare global { namespace NodeJS { export interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
-const WATCHERS = [] as webull.MqttClient[]
+const CLIENTS = [] as webull.MqttClient[]
 const QUOTES = {} as Dict<Webull.Quote>
 const SAVES = {} as Dict<Webull.Quote>
 
@@ -30,24 +34,25 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 	if (hubmsg.data.type && hubmsg.data.type != process.env.SYMBOLS) return;
 	let resets = hubmsg.data.reset
 
-	// if (process.env.DEVELOPMENT) return;
-
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
 		await utils.getFullSymbols(process.env.SYMBOLS)
 	)
-	if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
+	// if (process.env.DEVELOPMENT) return;
+	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 	// socket.setFilter(_.mapValues(fsymbols, v => true))
+
+	emitter.emit('fsymbols', fsymbols, hubmsg.data)
 	let symbols = Object.keys(fsymbols)
 
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => [
-		['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`],
+		process.env.SYMBOLS == 'STOCKS' ? ['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`] : ['ping'],
 		['hgetall', `${rkeys.WB.TICKERS}:${v}`],
 		['hgetall', `${rkeys.WB.QUOTES}:${v}`],
 	])))
 	resolved.forEach(core.fix)
 
-	WATCHERS.forEach(v => v.destroy())
+	CLIENTS.forEach(v => v.destroy())
 	core.object.nullify(QUOTES)
 	core.object.nullify(SAVES)
 
@@ -63,8 +68,8 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 			typeof: process.env.SYMBOLS,
 			name: ticker.name,
 		} as Webull.Quote)
-		if (process.env.SYMBOLS == 'STOCKS') {
-			if (instrument.name) quote.name = instrument.simple_name || instrument.name;
+		if (instrument && instrument.name) {
+			quote.name = instrument.simple_name || instrument.name
 		}
 
 		QUOTES[symbol] = quote
@@ -79,22 +84,33 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 	await redis.main.coms(coms)
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 256))
-	WATCHERS.splice(0, Infinity, ...chunks.map((chunk, i) => new webull.MqttClient({
+	CLIENTS.splice(0, Infinity, ...chunks.map((chunk, i) => new webull.MqttClient(emitter, {
+		index: i,
 		fsymbols: _.fromPairs(chunk),
 		topics: process.env.SYMBOLS,
-		connect: i == 0,
+		connect: chunks.length == 1 && i == 0,
 		// verbose: true,
-	}).on('data', ondata)))
+	})))
 
 }
 
+emitter.on('connect', i => console.log('connect ->', i))
+
 clock.on('3s', function onconnect() {
-	if (WATCHERS.length == 0) return;
-	let watcher = WATCHERS.find(v => v.options.connect == false)
-	if (!watcher) return;
-	// console.info('onconnect ->', Object.keys(watcher.options.fsymbols).length)
-	watcher.options.connect = true
-	watcher.connect()
+	if (CLIENTS.length == 0) return;
+	let client = CLIENTS.find(v => v.options.connect == false)
+	if (!client) return;
+	client.options.connect = true
+	client.connect()
+})
+
+clock.on('3s', function onsave() {
+	let coms = Object.keys(SAVES).filter(key => {
+		return Object.keys(SAVES[key]).length > 0
+	}).map(v => ['hmset', `${rkeys.WB.QUOTES}:${v}`, SAVES[v]])
+	if (coms.length == 0) return;
+	redis.main.coms(coms as any)
+	Object.keys(SAVES).forEach(symbol => SAVES[symbol] = {} as any)
 })
 
 const GREATER_THANS = {
@@ -105,7 +121,7 @@ const GREATER_THANS = {
 	volume: null,
 } as Webull.Quote
 
-function ondata(topic: number, wbquote: Webull.Quote) {
+emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let symbol = wbquote.symbol
 	let quote = QUOTES[symbol]
 	let toquote = {} as Webull.Quote
@@ -120,9 +136,9 @@ function ondata(topic: number, wbquote: Webull.Quote) {
 				if (wbquote.deal != toquote.price) toquote.price = wbquote.deal;
 			}
 		}
-		delete wbquote.symbol
-		delete wbquote.tickerId
-		socket.emit(`${rkeys.WB.DEALS}:${symbol}`, wbquote)
+		// delete wbquote.symbol
+		// delete wbquote.tickerId
+		// socket.emit(`${rkeys.WB.DEALS}:${symbol}`, wbquote)
 
 	} else {
 		Object.keys(wbquote).forEach((key: keyof Webull.Quote) => {
@@ -136,21 +152,15 @@ function ondata(topic: number, wbquote: Webull.Quote) {
 	}
 
 	if (Object.keys(toquote).length == 0) return;
+	emitter.emit('toquote', topic, toquote)
 	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
 	Object.assign(QUOTES[symbol], toquote)
 	Object.assign(SAVES[symbol], toquote)
 	socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, toquote)
 
-}
-
-clock.on('3s', function onsave() {
-	let coms = Object.keys(SAVES).filter(v => {
-		return Object.keys(SAVES[v]).length > 0
-	}).map(v => ['hmset', `${rkeys.WB.QUOTES}:${v}`, SAVES[v]])
-	if (coms.length == 0) return;
-	redis.main.coms(coms as any)
-	Object.keys(SAVES).forEach(symbol => SAVES[symbol] = {} as any)
 })
+
+import './calcs.watcher'
 
 
 

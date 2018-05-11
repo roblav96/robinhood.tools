@@ -12,7 +12,8 @@ import clock from '../../common/clock'
 
 
 
-export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'> {
+// export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'> {
+export class MqttClient {
 
 	private static topics = {
 		// STOCKS: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_DEAL_DETAILS', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
@@ -23,6 +24,7 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 
 	private static get options() {
 		return _.clone({
+			index: 0,
 			fsymbols: null as Dict<number>,
 			topics: null as keyof typeof MqttClient.topics,
 			host: 'push.webull.com', port: 9018,
@@ -36,9 +38,9 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 	get name() { return 'mqtt://' + this.options.host + ':' + this.options.port }
 
 	constructor(
+		private emitter: Emitter,
 		public options = {} as Partial<typeof MqttClient.options>,
 	) {
-		super()
 		_.defaults(this.options, MqttClient.options)
 		if (this.options.connect) this.connect();
 	}
@@ -50,7 +52,6 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 
 	destroy() {
 		this.terminate()
-		this.offAll()
 		clock.offListener(this.connect, this)
 		clock.offListener(this.heartbeat, this)
 	}
@@ -104,7 +105,7 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 		if (packet.cmd == 'connack') {
 			if (this.options.verbose) console.info(this.name, '-> connect');
 			clock.offListener(this.connect, this)
-			this.emit('connect')
+			this.emitter.emit('connect', this.options.index)
 
 			this.dsymbols = _.invert(_.mapValues(this.options.fsymbols, v => v.toString()))
 			let topic = {
@@ -131,13 +132,13 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 		if (packet.cmd == 'suback') {
 			if (this.options.verbose) console.info(this.name, '-> subscribed');
 			clock.on(this.options.timeout, this.heartbeat, this)
-			this.emit('subscribed')
+			this.emitter.emit('subscribed', this.options.index)
 			return
 		}
 
 		if (packet.cmd == 'disconnect') {
 			if (this.options.verbose) console.warn(this.name, '-> disconnect');
-			this.emit('disconnect')
+			this.emitter.emit('disconnect', this.options.index)
 			if (this.options.retry) return this.reconnect();
 			this.destroy()
 		}
@@ -168,7 +169,7 @@ export class MqttClient extends Emitter<'connect' | 'subscribed' | 'disconnect' 
 				webull.fix(wbquote)
 				wbquote.tickerId = tid
 				wbquote.symbol = symbol
-				this.emit('data', type, wbquote)
+				this.emitter.emit('data', type, wbquote)
 			}
 
 			return
