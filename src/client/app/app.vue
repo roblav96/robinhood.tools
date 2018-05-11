@@ -15,17 +15,20 @@
 			<router-view></router-view>
 		</transition>
 
-		<footer class="footer py-12">
-			<div class="container">
-				<div class="content has-text-centered">
-					<a class="button" href="https://github.com/roblav96/robinhood.tools" target="_blank">
-						<b-icon icon="github-circle" />
-						<span>Open Source</span>
-					</a>
+		<section class="hero is-small has-background-white-bis">
+			<div class="hero-body">
+				<div class="container">
+					<div class="content has-text-centered">
+						<a class="button" href="https://github.com/roblav96/robinhood.tools" target="_blank">
+							<b-icon icon="github-circle" />
+							<span>Open Source</span>
+						</a>
+					</div>
 				</div>
-
-				<template v-show="development">
-					<div class="tabs is-toggle is-centered">
+			</div>
+			<div class="hero-foot">
+				<nav class="tabs is-boxed is-centered">
+					<div class="container">
 						<ul>
 							<router-link tag="li" v-for="route in routes" :key="route.name" :to="{ name: route.name }">
 								<a>
@@ -34,9 +37,9 @@
 							</router-link>
 						</ul>
 					</div>
-				</template>
+				</nav>
 			</div>
-		</footer>
+		</section>
 
 	</div>
 </template>

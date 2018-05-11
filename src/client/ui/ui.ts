@@ -13,10 +13,13 @@ Vue.component('ui-symbol-logo', SymbolLogo)
 
 export class Tabs {
 	components = {} as Dict<any>
-	constructor(public tabs: Partial<Tab>[]) {
+	constructor(
+		public root: string,
+		public tabs: Partial<Tab>[],
+	) {
 		tabs.forEach(v => {
 			v.title = _.startCase(v.id)
-			v.vcomponent = `v-${v.id}`
+			v.vcomponent = `v-${this.root}-${v.id}`
 			this.components[v.vcomponent] = v.component
 		})
 		this.tabs = core.clone(tabs)

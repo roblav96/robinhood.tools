@@ -1,5 +1,5 @@
 <!--  -->
-<script lang="ts" src="./symbol.summary.ts"></script>
+<script lang="ts" src="./symbol.news.ts"></script>
 
 <style>
 /**/
@@ -9,7 +9,7 @@
 <template>
 	<section>
 		<div class="container content">
-			<h1>im a summary</h1>
+			<h1>im a news</h1>
 		</div>
 	</section>
 </template>

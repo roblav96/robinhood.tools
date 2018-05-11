@@ -14,15 +14,18 @@ import socket from '@/client/adapters/socket'
 
 
 
-const TABS = new ui.Tabs([{
+const TABS = new ui.Tabs('symbol', [{
 	id: 'summary',
+	icon: 'cash-100',
 	component: () => import('@/client/routes/symbol/symbol.summary'),
 }, {
 	id: 'chart',
+	icon: 'chart-line',
 	component: () => import('@/client/routes/symbol/symbol.chart'),
-	// }, {
-	// 	id: 'news',
-	// 	component: () => import('@/client/routes/symbol/symbol.news'),
+}, {
+	id: 'news',
+	icon: 'newspaper',
+	component: () => import('@/client/routes/symbol/symbol.news'),
 }])
 
 @Vts.Component({
