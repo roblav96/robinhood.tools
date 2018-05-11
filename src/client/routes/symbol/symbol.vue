@@ -31,8 +31,8 @@
 
 						<div class="column is-half is-one-quarter-widescreen">
 							<h1 class="title my-0 is-3">{{vnfixed(quote.price)}}</h1>
-							<h2 class="subtitle my-0 is-6 font-semibold" v-ui-green-red="quote.change">
-								{{vnfixed(quote.change,{plusminus:true})}} ({{vnfixed(quote.changeRatio*100,{plusminus:true,percent:true})}})
+							<h2 class="subtitle my-0 is-6 font-semibold" v-ui-green-red="change.c">
+								{{vnfixed(change.c,{plusminus:true})}} ({{vnfixed(change.r*100,{plusminus:true,percent:true})}})
 							</h2>
 							<h2 class="subtitle my-0 is-6">{{vfromnow(quote.tradeTime)}}</h2>
 							<!-- <h2 class="subtitle my-0 is-6">{{vcapitalize(quote.status)}}</h2> -->

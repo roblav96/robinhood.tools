@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<div id="app" :class="{ 'opacity-0': initing == true, 'animated-slower fadeIn': initing == false }">
+	<div id="app" :class="{ 'opacity-0': initing == true, 'animated-slow fadeIn': initing == false }">
 
 		<v-navbar></v-navbar>
 

@@ -22,7 +22,7 @@ export default class extends Mixins(VMixin) {
 
 	initing = true
 	mounted() {
-		setTimeout(() => this.initing = false, 100)
+		setTimeout(() => this.initing = false, 300)
 		setTimeout(() => this.initing = null, 1000)
 	}
 
