@@ -4,7 +4,6 @@ import * as _ from './lodash'
 import * as qs from 'querystring'
 import * as fastjsonparse from 'fast-json-parse'
 import * as simple from 'simple-get'
-import * as retryable from 'is-retry-allowed'
 import * as boom from 'boom'
 import clock from './clock'
 
@@ -64,7 +63,8 @@ export function send(config: Http.Config) {
 				return reject(new boom(error, {
 					statusCode: res.statusCode,
 					message: res.statusMessage || error.message,
-					decorate: { data },
+					data: { data },
+					// decorate: { data },
 				}))
 			}
 

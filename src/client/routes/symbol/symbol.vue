@@ -7,9 +7,9 @@
 </style>
 
 <template>
-	<section>
-		<section v-show="!busy" class="hero is-small has-background-white-bis">
-			<div class="hero-body">
+	<section class="symbol-route">
+		<section class="hero is-small has-background-white-bis">
+			<div v-busy="busy" class="hero-body">
 				<div class="container">
 					<div class="columns is-multiline">
 
@@ -64,6 +64,7 @@
 								haiii
 							</div>
 						</article> -->
+
 					</div>
 				</div>
 			</div>

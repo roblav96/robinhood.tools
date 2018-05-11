@@ -58,8 +58,15 @@ schedule.scheduleJob('55 3 * * 1-5', async function sync() {
 
 schedule.scheduleJob('00 4 * * 1-5', async function reset() {
 	await syncStocks()
-	pandora.broadcast({}, 'onSymbols', { reset: true, type: 'STOCKS' } as Symbols.OnSymbolsData)
+	pandora.broadcast({}, 'symbols', { reset: true, type: 'STOCKS' } as SymbolsHubData)
 })
+
+declare global {
+	interface SymbolsHubData {
+		type: keyof typeof rkeys.SYMBOLS
+		reset: boolean
+	}
+}
 
 
 
@@ -195,14 +202,7 @@ async function getTicker(symbol: string, tickerType: number) {
 
 
 
-declare global {
-	namespace Symbols {
-		interface OnSymbolsData {
-			type: keyof typeof rkeys.SYMBOLS
-			reset: boolean
-		}
-	}
-}
+
 
 
 

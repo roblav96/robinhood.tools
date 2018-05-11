@@ -1,7 +1,7 @@
 // 
-export * from '@/common/http'
-// 
 
+export * from '@/common/http'
+import * as boom from 'boom'
 import * as http from '@/common/http'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
@@ -29,20 +29,21 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 		return config
 
-	}).then(http.send).catch(function(error) {
-
+	}).then(http.send).catch(function(error: boom) {
+		// console.info('error ->', error)
+		// console.dir(error)
+		// console.log('error ->', JSON.stringify(error, null, 4))
 		// console.error('http error.message Error ->', error.message)
-		let message = _.get(error, 'statusMessage', error.message) as string
-		let payload = _.get(error, 'data')
-		if (payload && payload.message) {
-			let extra = payload.attributes ? JSON.stringify(payload.attributes) : payload.message
-			message += `: "${extra}"`
-		}
-
-		let method = _.get(error, 'method', config.method)
-		let url = _.get(error, 'url', config.url).replace(process.env.DOMAIN, '')
-		console.log('%c◀ ' + '[' + method + '] ' + url, 'color: red; font-weight: bolder;', message)
-		vm.$toast.open({ message: '[' + method + '] ' + url + ' ➤ ' + message, type: 'is-danger' })
+		// let message = _.get(error, 'statusMessage', error.message) as string
+		// let payload = _.get(error, 'data')
+		// if (payload && payload.message) {
+		// 	let extra = payload.attributes ? JSON.stringify(payload.attributes) : payload.message
+		// 	message += `: "${extra}"`
+		// }
+		let message = _.get(error, 'output.payload') ? JSON.stringify(error.output.payload) : error.message
+		let endpoint = `[${config.method}] ${config.url.replace(process.env.DOMAIN, '')}`
+		console.log('%c◀ ' + endpoint, 'color: red; font-weight: bolder;', message)
+		vm.$toast.open({ message: endpoint + ' ➤ ' + message, type: 'is-danger' })
 
 		return Promise.reject(error)
 

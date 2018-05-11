@@ -15,7 +15,7 @@ import socket from '@/client/adapters/socket'
 
 
 
-const TABS = new ui.Tabs('symbol', [{
+const { components, tabs } = new ui.Tabs('symbol', [{
 	id: 'summary',
 	icon: 'cash-100',
 	component: () => import('@/client/routes/symbol/symbol.summary'),
@@ -30,7 +30,7 @@ const TABS = new ui.Tabs('symbol', [{
 }])
 
 @Vts.Component({
-	components: TABS.components,
+	components,
 	// beforeRouteEnter(to, from, next) {
 	// 	if (!to.params.symbol) return next(false);
 	// 	if (to.query.tab && TABS.tabs.find(v => v.id == to.query.tab)) return next();
@@ -44,7 +44,7 @@ export default class extends Mixins(VMixin) {
 
 	get symbol() { return this.$route.params.symbol }
 
-	tabs = TABS.tabs
+	tabs = tabs
 	tabindex = 0
 
 	created() {

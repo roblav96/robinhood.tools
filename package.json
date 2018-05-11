@@ -39,7 +39,6 @@
 		"fromnow": "latest",
 		"humanize-plus": "latest",
 		"ioredis": "latest",
-		"is-retry-allowed": "latest",
 		"leven": "latest",
 		"lockr": "latest",
 		"lodash": "latest",

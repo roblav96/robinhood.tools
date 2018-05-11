@@ -2,10 +2,10 @@
 
 import '../main'
 import * as pAll from 'p-all'
+import * as schedule from 'node-schedule'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
-import * as schedule from 'node-schedule'
 import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
 import * as hours from '../adapters/hours'
@@ -18,19 +18,18 @@ import clock from '../../common/clock'
 
 
 
-const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data' | 'onSymbols' | 'toquote'>()
-export default emitter
+export const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data' | 'symbols' | 'toquote'>()
 
 declare global { namespace NodeJS { export interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
-const CLIENTS = [] as webull.MqttClient[]
-const QUOTES = {} as Dict<Webull.Quote>
+export const QUOTES = {} as Dict<Webull.Quote>
 const SAVES = {} as Dict<Webull.Quote>
+const CLIENTS = [] as webull.MqttClient[]
 
 pandora.once('symbolsReady', onSymbols)
 pandora.broadcast({}, 'readySymbols')
 
-pandora.on('onSymbols', onSymbols)
-async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
+pandora.on('symbols', onSymbols)
+async function onSymbols(hubmsg: Pandora.HubMessage<SymbolsHubData>) {
 	if (hubmsg.data.type && hubmsg.data.type != process.env.SYMBOLS) return;
 	let resets = hubmsg.data.reset
 
@@ -80,7 +79,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage<Symbols.OnSymbolsData>) {
 
 	})
 
-	emitter.emit('onSymbols', hubmsg.data, QUOTES)
+	emitter.emit('symbols', hubmsg.data, QUOTES)
 	await redis.main.coms(coms)
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 256))

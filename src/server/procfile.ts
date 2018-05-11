@@ -54,7 +54,7 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 	})
 	Process(pandora.process('stocks').entry('./services/wb.quotes.service'), {
 		SYMBOLS: 'STOCKS',
-		SCALE: os.cpus().length,
+		SCALE: 1, // os.cpus().length,
 	})
 	// Process(pandora.process('forex').entry('./services/wb.quotes.service'), {
 	// 	SYMBOLS: 'FOREX',

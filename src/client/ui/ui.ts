@@ -1,5 +1,7 @@
 // 
 
+import * as util from 'util'
+
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
@@ -11,6 +13,64 @@ import * as pretty from '@/common/pretty'
 
 import SymbolLogo from '@/client/ui/symbol.logo/symbol.logo'
 Vue.component('ui-symbol-logo', SymbolLogo)
+
+
+
+Vue.directive('ui-green-red', function(el, { value, oldValue }) {
+	if (value === oldValue) return;
+	if (!core.number.isFinite(value)) return;
+	if (value == 0) return el.classList.remove('has-text-danger', 'has-text-success');
+	if (value > 0) {
+		if (el.className.includes('has-text-success')) return;
+		if (el.className.includes('has-text-danger')) {
+			return el.classList.replace('has-text-danger', 'has-text-success')
+		}
+		return el.classList.add('has-text-success')
+	}
+	if (value < 0) {
+		if (el.className.includes('has-text-danger')) return;
+		if (el.className.includes('has-text-success')) {
+			return el.classList.replace('has-text-success', 'has-text-danger')
+		}
+		return el.classList.add('has-text-danger')
+	}
+})
+
+
+
+Vue.directive('busy', function(el, { value, oldValue }) {
+	if (value === oldValue) return;
+	el.style.visibility = value === true ? 'hidden' : ''
+})
+
+
+
+export class Tabs {
+	components = {} as Dict<any>
+	constructor(
+		prefix: string,
+		public tabs: Partial<Tab>[],
+	) {
+		tabs.forEach(v => {
+			v.title = _.startCase(v.id)
+			v.vcomponent = `v-${prefix}-${v.id}`
+			this.components[v.vcomponent] = v.component
+		})
+		this.tabs = core.clone(tabs)
+	}
+}
+
+declare global {
+	interface Tab {
+		id: string
+		title: string
+		icon: string
+		vcomponent: string
+		component: () => any
+	}
+}
+
+
 
 
 
@@ -31,70 +91,11 @@ Vue.component('ui-symbol-logo', SymbolLogo)
 // }
 // Vue.component('ui-green-red', UIGreenRed)
 
-
-
-Vue.directive('ui-green-red', function(el, binding) {
-	let value = binding.value as number
-	if (!binding.value) return;
-	if (value == 0) return el.classList.remove('has-text-danger', 'has-text-success');
-	if (value > 0) {
-		if (el.classList.contains('has-text-success')) return;
-		if (el.classList.contains('has-text-danger')) {
-			return el.classList.replace('has-text-danger', 'has-text-success')
-		}
-		return el.classList.add('has-text-success')
-	}
-	if (value < 0) {
-		if (el.classList.contains('has-text-danger')) return;
-		if (el.classList.contains('has-text-success')) {
-			return el.classList.replace('has-text-success', 'has-text-danger')
-		}
-		return el.classList.add('has-text-danger')
-	}
-})
-
 // Vue.directive('ui-green-red', {
 // 	bind(el, binding, vnode) { },
 // 	inserted(el, binding, vnode) { },
 // 	update(el, binding, vnode) { },
 // 	unbind(el, binding, vnode) { },
 // })
-
-
-
-export class Tabs {
-	components = {} as Dict<any>
-	constructor(
-		public root: string,
-		public tabs: Partial<Tab>[],
-	) {
-		tabs.forEach(v => {
-			v.title = _.startCase(v.id)
-			v.vcomponent = `v-${this.root}-${v.id}`
-			this.components[v.vcomponent] = v.component
-		})
-		this.tabs = core.clone(tabs)
-	}
-	// clone() { return this.tabs.map(v => _.omit(v, 'component')) }
-}
-
-// export function buildTabs(tabs: Partial<Tab>[]) {
-// 	return tabs.map(v => {
-// 		v.name = v.title.toLowerCase()
-// 		return v
-// 	})
-// }
-
-
-
-declare global {
-	interface Tab {
-		id: string
-		title: string
-		icon: string
-		vcomponent: string
-		component: () => any
-	}
-}
 
 

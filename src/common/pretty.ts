@@ -23,7 +23,8 @@ export function stamp(stamp = Date.now(), format = 'dddd, MMM DD YYYY, hh:mm:ssa
 }
 
 export function fromNow(stamp: number) {
-	return prettyms(Math.max(Date.now() - stamp, 1000), { secDecimalDigits: 0 }) + ' ago'
+	let ms = prettyms(Math.max(Date.now() - stamp, 1000), { secDecimalDigits: 0, compact: true })
+	return ms.replace('~', '') + ' ago'
 	// return fromnow(stamp, { ago: true, max: 1 })
 }
 

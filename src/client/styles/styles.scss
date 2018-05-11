@@ -32,6 +32,16 @@ nav.navbar div.field.navbar-item {
 }
 
 // 
+// ████  BORDERS  ████
+// 
+.border-color {
+	border-color: $border !important;
+}
+
+// .border:hover {
+// 	border-color: $border-hover !important;
+// }
+// 
 // ████  ICONS  ████
 // 
 span.icon.is-bold > i.mdi::before {

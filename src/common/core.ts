@@ -119,6 +119,7 @@ export const string = {
 
 export const number = {
 	is(value: any): value is number { return typeof value == 'number' },
+	isFinite(value: any): value is number { return Number.isFinite(value) },
 	integer(value: string) {
 		return Number.parseInt(value.replace(/[^0-9\.]/g, ''))
 	},
