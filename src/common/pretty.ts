@@ -44,7 +44,7 @@ export function nfixed(value: number, { precision, compact, plusminus, percent }
 		if (abs >= 1000) precision = 1;
 		if (abs >= 10000) precision = 0;
 	}
-	if (percent) precision = Math.min(precision, 2)
+	if (percent || plusminus) precision = Math.min(precision, 2)
 	let fixed = value.toFixed(precision)
 	if (compact && precision == 0) {
 		let units = ['', 'k', 'M', 'T']

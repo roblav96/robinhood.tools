@@ -75,6 +75,11 @@ export default class extends Mixins(VMixin) {
 	deals = [] as Webull.Deal[]
 
 	get vdeals() { return this.deals.filter((v, i) => i < 3) }
+	get prices() {
+		let prices = { ah: false, p: this.quote.price, c: this.quote.change, r: this.quote.changeRatio }
+		
+		return prices
+	}
 
 	reset() {
 		this.busy = true

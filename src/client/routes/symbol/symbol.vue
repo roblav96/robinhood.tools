@@ -13,13 +13,14 @@
 				<div class="container">
 					<div class="columns is-multiline">
 
+						<!-- is-half is-one-quarter-widescreen -->
 						<div class="column is-half is-one-quarter-widescreen">
 							<div class="columns is-mobile">
 								<ui-symbol-logo class="column is-narrow my-1 is-96x96" :symbol="symbol"></ui-symbol-logo>
 								<div class="column">
 									<h1 class="title my-0 is-3">{{symbol}}</h1>
-									<h2 class="subtitle my-0 is-6">{{instrument.simple_name || instrument.name}}</h2>
-									<h2 class="subtitle my-0 is-6">
+									<h2 class="subtitle my-0 is-5">{{instrument.simple_name || instrument.name}}</h2>
+									<h2 class="subtitle my-0 is-7">
 										<b-tooltip label="stock exchange" position="is-bottom">{{ticker.disExchangeCode}}</b-tooltip>
 										<!-- <b-tooltip label="country" position="is-bottom">{{ticker.regionIsoCode}}</b-tooltip> -->
 									</h2>
@@ -30,11 +31,13 @@
 						</div>
 
 						<div class="column is-half is-one-quarter-widescreen">
-							<h1 class="title my-0 is-3">{{vnfixed(quote.price)}}</h1>
-							<h2 class="subtitle my-0 is-6 font-semibold" v-ui-green-red="quote.change">
-								{{vnfixed(quote.change, {plusminus: true})}} ({{vnfixed(quote.changeRatio*100, {plusminus: true, percent: true})}})
+							<h1 class="title my-0 is-3">{{vnfixed(prices.p)}}</h1>
+							<h2 class="subtitle my-0 is-5 font-semibold" v-ui-green-red="prices.c">
+								{{vnfixed(prices.c, {plusminus: true})}} ({{vnfixed(prices.r*100, {plusminus: true, percent: true})}})
 							</h2>
-							<h2 class="subtitle my-0 is-6">{{vfromnow(quote.tradeTime, {verbose: true})}}</h2>
+							<h2 class="subtitle my-0 is-7">
+								{{vfromnow(quote.tradeTime, {verbose: true})}}
+							</h2>
 							<!-- <h2 class="subtitle my-0 is-6">{{vcapitalize(quote.status)}}</h2> -->
 							<!-- <span class="font-normal">({{vplusminus(vpercent(quote.price, quote.open))}}%)</span> -->
 							<!-- <ui-number :value="quote.open" plus-minus></ui-number> -->
