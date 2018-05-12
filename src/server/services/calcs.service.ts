@@ -18,7 +18,7 @@ import * as Wbquotes from './wb.quotes.service'
 
 Wbquotes.emitter.on('symbols', onSymbols)
 async function onSymbols(hubdata: SymbolsHubData, dwbquotes: Dict<Webull.Quote>) {
-	
+	let wbquotes = Object.keys(dwbquotes).map(k => dwbquotes[k])
 }
 
 

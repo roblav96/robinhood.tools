@@ -37,8 +37,8 @@ export class MqttClient {
 	get name() { return 'mqtt://' + this.options.host + ':' + this.options.port }
 
 	constructor(
-		private emitter: Emitter,
 		public options = {} as Partial<typeof MqttClient.options>,
+		private emitter: Emitter,
 	) {
 		_.defaults(this.options, MqttClient.options)
 		if (this.options.connect) this.connect();

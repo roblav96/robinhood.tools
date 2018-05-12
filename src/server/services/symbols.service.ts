@@ -60,13 +60,7 @@ schedule.scheduleJob('00 4 * * 1-5', async function reset() {
 	await syncStocks()
 	pandora.broadcast({}, 'symbols', { reset: true, type: 'STOCKS' } as SymbolsHubData)
 })
-
-declare global {
-	interface SymbolsHubData {
-		type: keyof typeof rkeys.SYMBOLS
-		reset: boolean
-	}
-}
+declare global { interface SymbolsHubData { type: keyof typeof rkeys.SYMBOLS, reset: boolean } }
 
 
 

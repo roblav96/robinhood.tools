@@ -51,7 +51,7 @@
 							<table class="table is-narrow is-fullwidth content is-small">
 								<tbody>
 									<tr v-for="deal in vdeals">
-										<td width="25%" class="has-text-right">{{vfromnow(deal.tradeTime)}}</td>
+										<td width="33%" class="has-text-right">{{vfromnow(deal.tradeTime)}}</td>
 										<td width="25%" class="has-text-right font-medium" :class="dealcolor(deal)">{{vnfixed(deal.deal)}}</td>
 										<td width="25%">x {{vnfixed(deal.volume,{precision:0})}}</td>
 									</tr>

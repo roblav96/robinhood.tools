@@ -37,7 +37,7 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as Env) {
 
 
 
-ENV.DEBUGGER = false
+// ENV.DEBUGGER = false
 
 export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 

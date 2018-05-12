@@ -83,13 +83,13 @@ async function onSymbols(hubmsg: Pandora.HubMessage<SymbolsHubData>) {
 	await redis.main.coms(coms)
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 256))
-	CLIENTS.splice(0, Infinity, ...chunks.map((chunk, i) => new webull.MqttClient(emitter, {
+	CLIENTS.splice(0, Infinity, ...chunks.map((chunk, i) => new webull.MqttClient({
 		fsymbols: _.fromPairs(chunk),
 		topics: process.env.SYMBOLS,
 		index: i, chunks: chunks.length,
 		connect: chunks.length == 1 && i == 0,
 		// verbose: true,
-	})))
+	}, emitter)))
 
 }
 
@@ -133,6 +133,9 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 				if (wbquote.deal != toquote.price) toquote.price = wbquote.deal;
 			}
 		}
+		if (wbquote.tradeBsFlag == 'N') {
+			toquote.volume = quote.volume + wbquote.volume
+		}
 
 	} else {
 		Object.keys(wbquote).forEach((key: keyof Webull.Quote) => {
@@ -147,6 +150,9 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 				if (value > volume || Math.abs(core.calc.percent(value, volume)) > 5) {
 					toquote.volume = value
 				}
+				// let percent = core.calc.percent(value, volume)
+				// if (percent > 95) return;
+				// if (value > volume || percent < -95) return toquote.volume = value;
 
 			} else if (quote[key] != value) {
 				toquote[key] = value

@@ -41,16 +41,10 @@ polka.route({
 				coms.push(['hgetall', `${RKEYS[dockey]}:${symbol}`])
 			})
 		})
-		let resolved = await redis.main.coms(coms)
-		resolved.forEach(core.fix)
-		return resolved
+		let response = await redis.main.coms(coms)
+		response.forEach(core.fix)
 
-		// let ii = 0
-		// let response = core.array.dict(dockeys, [])
-		// symbols.forEach(() => {
-		// 	dockeys.forEach(v => response[v].push(resolved[ii++]))
-		// })
-		// return response
+		return response
 	}
 })
 
@@ -64,14 +58,18 @@ polka.route({
 	},
 	async handler(req, res) {
 		let symbols = req.body.symbols as string[]
+
 		let fsymbols = await redis.main.hmget(rkeys.WB.TIDS, ...symbols) as Dict<number>
 		fsymbols = redis.fixHmget(fsymbols, symbols)
 		fsymbols = _.mapValues(fsymbols, v => Number.parseInt(v as any))
+
 		let resolved = await pAll(symbols.map(symbol => {
 			let tid = fsymbols[symbol]
+			if (!Number.isFinite(tid)) return () => Promise.resolve([]);
 			let url = 'https://quoteapi.webull.com/api/quote/tickerDeals/' + tid
 			return () => http.get(url, { query: { count: 20 }, wbauth: true }) as Promise<Webull.Deal[]>
 		}), { concurrency: 1 })
+
 		let response = resolved.map(v => v.map(vv => {
 			core.fix(vv)
 			vv.tradeTime = new Date(vv.tradeTime).valueOf()
@@ -79,6 +77,7 @@ polka.route({
 			return vv
 		}))
 		response.forEach(v => v.sort((a, b) => b.tradeTime - a.tradeTime))
+
 		return response
 	}
 })
