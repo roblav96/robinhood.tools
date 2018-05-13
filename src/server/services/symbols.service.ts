@@ -60,16 +60,6 @@ schedule.scheduleJob('00 3 * * 1-5', async function sync() {
 schedule.scheduleJob('00 4 * * 1-5', async function reset() {
 	await syncStocks()
 	pandora.broadcast({}, 'symbols.reset')
-	// let symbols = await utils.getSymbols()
-	// let wbquotes = await redis.main.coms(symbols.map(v => {
-	// 	return ['hgetall', `${rkeys.WB.QUOTES}:${v}`]
-	// })) as Webull.Quote[]
-	// wbquotes.forEach(core.fix)
-	// await redis.main.coms(wbquotes.map(function(wbquote) {
-	// 	wbquote.volume = 0
-	// 	return ['hmset', `${rkeys.WB.QUOTES}:${wbquote.symbol}`, wbquote as any]
-	// }))
-	// pandora.broadcast({}, 'symbols.reset')
 })
 
 

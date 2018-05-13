@@ -17,14 +17,11 @@ import * as wbservice from './wb.quotes.service'
 
 
 wbservice.emitter.on('onSymbols', onSymbols)
-async function onSymbols(hubmsg: Pandora.HubMessage, dwbquotes: Dict<Webull.Quote>) {
+async function onSymbols(hubmsg: Pandora.HubMessage, symbols: string[]) {
+	console.log('hubmsg ->', hubmsg)
 	let reset = hubmsg.action == 'symbols.reset'
-	let wbquotes = Object.keys(dwbquotes).map(k => dwbquotes[k])
-	
-	
+
 }
-
-
 
 wbservice.emitter.on('data', function(topic: number, wbquote: Webull.Quote) {
 

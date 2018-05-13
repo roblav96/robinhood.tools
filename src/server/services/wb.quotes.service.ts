@@ -18,7 +18,6 @@ import clock from '../../common/clock'
 
 
 
-declare global { namespace NodeJS { export interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
 export const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data' | 'onSymbols' | 'toquote'>()
 export let QUOTES = {} as Dict<Webull.Quote>
 let SAVES = {} as Dict<Webull.Quote>
@@ -27,9 +26,6 @@ const CLIENTS = [] as webull.MqttClient[]
 pandora.once('symbols.ready', onSymbols)
 pandora.broadcast({}, 'symbols.start')
 
-if (process.env.SYMBOLS == 'STOCKS') {
-	pandora.on('symbols.reset', onSymbols)
-}
 async function onSymbols(hubmsg: Pandora.HubMessage) {
 	let reset = hubmsg.action == 'symbols.reset'
 
@@ -39,7 +35,6 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 	)
 	// if (process.env.DEVELOPMENT) return;
 	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
-	// socket.setFilter(_.mapValues(fsymbols, v => true))
 
 	CLIENTS.forEach(v => v.destroy())
 	core.object.nullify(QUOTES); QUOTES = {}
@@ -84,7 +79,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		// verbose: true,
 	}, emitter)))
 
-	emitter.emit('onSymbols', hubmsg, QUOTES)
+	emitter.emit('onSymbols', hubmsg, symbols)
 
 }
 
@@ -170,39 +165,12 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 })
 
-import './calcs.service'
 
 
-
-
-
-// const TOPICS = {} as any
-// clock.on('5s', () => console.log('topics ->', Object.keys(TOPICS)))
-// TOPICS[webull.mqtt_topics[topic]] = true
-
-
-
-// webull.onQuote({ quote, wbquote, toquote })
-// if (topic == webull.mqtt_topics.TICKER_STATUS) {
-// 	webull.onQuote({ quote, wbquote, toquote, filter: 'status' })
-
-// } else if (topic == webull.mqtt_topics.TICKER_HANDICAP) {
-// 	webull.onQuote({ quote, wbquote, toquote, filter: 'ticker' })
-
-// } else if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
-// 	webull.onQuote({ quote, wbquote, toquote, filter: 'bidask' })
-
-// } else if (topic == webull.mqtt_topics.FOREIGN_EXCHANGE) {
-// 	webull.onQuote({ quote, wbquote, toquote, filter: 'bidask' })
-// 	webull.onQuote({ quote, wbquote, toquote, filter: 'ticker' })
-
-// } else if (topic == webull.mqtt_topics.TICKER_MARKET_INDEX) {
-// 	webull.onQuote({ quote, wbquote, toquote, filter: 'ticker' })
-
-// } else if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
-// 	webull.onQuote({ quote, wbquote, toquote, filter: 'deal' })
-// 	socket.emit(`${rkeys.WB.DEALS}:${symbol}`, wbquote)
-
-// }
+if (process.env.SYMBOLS == 'STOCKS') {
+	require('./calcs.service')
+	pandora.on('symbols.reset', onSymbols)
+}
+declare global { namespace NodeJS { export interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
 
 
