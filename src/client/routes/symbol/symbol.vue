@@ -13,40 +13,38 @@
 				<div class="container">
 					<div class="columns is-multiline">
 
-						<!-- is-half is-one-quarter-widescreen -->
 						<div class="column is-half is-one-quarter-widescreen">
 							<div class="columns is-mobile">
 								<ui-symbol-logo class="column is-narrow my-1 is-96x96" :symbol="symbol"></ui-symbol-logo>
 								<div class="column">
 									<h1 class="title my-0 is-3">{{symbol}}</h1>
 									<h2 class="subtitle my-0 is-5">{{instrument.simple_name || instrument.name}}</h2>
-									<h2 class="subtitle my-0 is-7">
-										<b-tooltip label="stock exchange" position="is-bottom">{{ticker.disExchangeCode}}</b-tooltip>
-										<!-- <b-tooltip label="country" position="is-bottom">{{ticker.regionIsoCode}}</b-tooltip> -->
-									</h2>
-									<!-- <span class="tag is-small is-success">{{vcapitalize(quote.status)}}</span> -->
-									<!-- ({{vcapitalize(quote.status)}}) -->
+									<p class="subtitle my-0 is-7">{{ticker.disExchangeCode}}</p>
 								</div>
 							</div>
 						</div>
 
-						<div class="column is-half is-one-quarter-widescreen">
-							<h1 class="title my-0 is-3">{{vnfixed(prices.p)}}</h1>
-							<h2 class="subtitle my-0 is-5 font-semibold" v-ui-green-red="prices.c">
-								{{vnfixed(prices.c, {plusminus: true})}} ({{vnfixed(prices.r*100, {plusminus: true, percent: true})}})
-							</h2>
-							<h2 class="subtitle my-0 is-7">
-								{{vfromnow(quote.tradeTime, {verbose: true})}}
-							</h2>
-							<!-- <h2 class="subtitle my-0 is-6">{{vcapitalize(quote.status)}}</h2> -->
-							<!-- <span class="font-normal">({{vplusminus(vpercent(quote.price, quote.open))}}%)</span> -->
-							<!-- <ui-number :value="quote.open" plus-minus></ui-number> -->
-							<!-- <br> {{vnfixed(quote.changeRatio, {plusminus:true})}}% -->
-							<!-- ({{vpercent(quote.price, quote.open)}}%) -->
-							<!-- <h2 class="subtitle my-0 is-6">{{vcapitalize(quote.status)}}</h2> -->
+						<div class="column is-half is-one-third-widescreen">
+							<div class="columns is-mobile">
+								<div class="column is-narrow">
+									<p class="title my-0 is-3">{{vnfixed(quote.price)}}</p>
+									<p class="subtitle my-0 is-5 font-semibold" v-ui-green-red="quote.change">
+										{{vnfixed(quote.change, {plusminus: true})}} ({{vnfixed(quote.changeRatio*100, {plusminus: true, percent: true})}})
+									</p>
+									<p class="subtitle my-0 is-7">{{vfromnow(quote.tradeTime, {verbose: true})}}</p>
+								</div>
+								<div class="column">
+									<p class="subtitle my-0 is-7">After Hours</p>
+									<p class="title my-0 is-4 font-medium">{{vnfixed(quote.pPrice)}}</p>
+									<p class="subtitle my-0 is-6 font-medium" v-ui-green-red="quote.pChange">
+										{{vnfixed(quote.pChange, {plusminus: true})}} ({{vnfixed(quote.pChRatio*100, {plusminus: true, percent: true})}})
+									</p>
+									<p class="subtitle my-0 is-7">{{vfromnow(quote.faTradeTime, {verbose: true})}}</p>
+								</div>
+							</div>
 						</div>
 
-						<div class="column is-half is-one-quarter-widescreen border-debug">
+						<div class="column is-half is-one-third-widescreen border-debug">
 							<div class="columns is-mobile">
 								<div class="column is-half">
 									<progress class="progress is-small rounded-none" value="15" max="100">15%</progress>

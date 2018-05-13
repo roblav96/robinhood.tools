@@ -76,7 +76,7 @@ export default class extends Mixins(VMixin) {
 
 	get vdeals() { return this.deals.filter((v, i) => i < 3) }
 	get prices() {
-		let prices = { ah: false, p: this.quote.price, c: this.quote.change, r: this.quote.changeRatio }
+		let prices = { ah: false, p: this.quote.price, c: this.quote.change, r: this.quote.pChRatio }
 		
 		return prices
 	}
