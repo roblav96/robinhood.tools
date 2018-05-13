@@ -8,18 +8,19 @@ import * as _ from '../../common/lodash'
 import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
+import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
-import * as pandora from '../adapters/pandora'
+import * as utils from '../adapters/utils'
 import * as webull from '../adapters/webull'
 import clock from '../../common/clock'
 
 
 
 let ready = false
-pandora.on('readySymbols', function(hubmsg) {
-	if (ready) pandora.broadcast({}, 'symbolsReady');
+pandora.on('symbols.start', function(hubmsg) {
+	if (ready) pandora.broadcast({}, 'symbols.ready');
 })
 
 async function start() {
@@ -45,22 +46,31 @@ async function start() {
 	if (indexes == 0) await syncIndexes(webull.indexes);
 
 	ready = true
-	pandora.broadcast({}, 'symbolsReady')
+	pandora.broadcast({}, 'symbols.ready')
 
 } start().catch(error => console.error('start Error ->', error))
 
 
 
-schedule.scheduleJob('55 3 * * 1-5', async function sync() {
+schedule.scheduleJob('00 3 * * 1-5', async function sync() {
 	await syncInstruments()
 	await syncTickers()
 })
 
 schedule.scheduleJob('00 4 * * 1-5', async function reset() {
 	await syncStocks()
-	pandora.broadcast({}, 'symbols', { reset: true, type: 'STOCKS' } as SymbolsHubData)
+	pandora.broadcast({}, 'symbols.reset')
+	// let symbols = await utils.getSymbols()
+	// let wbquotes = await redis.main.coms(symbols.map(v => {
+	// 	return ['hgetall', `${rkeys.WB.QUOTES}:${v}`]
+	// })) as Webull.Quote[]
+	// wbquotes.forEach(core.fix)
+	// await redis.main.coms(wbquotes.map(function(wbquote) {
+	// 	wbquote.volume = 0
+	// 	return ['hmset', `${rkeys.WB.QUOTES}:${wbquote.symbol}`, wbquote as any]
+	// }))
+	// pandora.broadcast({}, 'symbols.reset')
 })
-declare global { interface SymbolsHubData { type: keyof typeof rkeys.SYMBOLS, reset: boolean } }
 
 
 
@@ -191,67 +201,5 @@ async function getTicker(symbol: string, tickerType: number) {
 	if (!Array.isArray(response.list)) return;
 	return response.list.find(v => v.disSymbol == symbol)
 }
-
-
-
-
-
-
-
-
-
-
-
-// async function syncTickerId(instrument: Robinhood.Instrument, tickers = [] as Webull.Ticker[]) {
-// 	// console.log('tickers ->', tickers)
-// 	let ticker = tickers.find(v => v.disExchangeCode.indexOf(instrument.acronym) == 0 || v.regionIsoCode.indexOf(instrument.country) == 0)
-// 	if (process.env.DEVELOPMENT && ticker) console.info('ticker ->', instrument.symbol);
-// 	// if (ticker) console.info('ticker ->', console.inspect(_.pick(ticker, ['tickerId', 'disSymbol', 'tickerName', 'tinyName', 'disExchangeCode', 'regionIsoCode'] as KeysOf<Webull.Ticker>)));
-
-// 	if (!ticker) {
-// 		if (process.env.DEVELOPMENT) console.log('ticker ->', instrument.symbol);
-
-// 		let tickerType: number
-// 		if (instrument.type == 'stock') tickerType = 2;
-// 		if (instrument.type == 'etp') tickerType = 3;
-
-// 		let response = await http.get('https://infoapi.webull.com/api/search/tickers2', {
-// 			query: { keys: instrument.symbol, tickerType }
-// 		}) as Webull.Api.Paginated<Webull.Ticker>
-
-// 		if (!Array.isArray(response.list)) return;
-
-// 		let tags = core.string.tags(instrument.simple_name || instrument.name)
-// 		let results = response.list.filter(function(v) {
-// 			return v && v.disSymbol.indexOf(instrument.symbol) == 0 && Number.isFinite(v.tickerId) && (v.tinyName || v.tickerName)
-// 		}).map(function(v) {
-// 			let match = _.intersection(tags, core.string.tags(v.tinyName || v.tickerName)).length
-// 			return Object.assign(v, { match })
-// 		})
-
-// 		let result = results.find(v => v.match > 0 && v.disExchangeCode.indexOf(instrument.acronym) == 0 && v.regionAlias.indexOf(instrument.country) == 0)
-// 		if (!result) result = results.find(v => v.match > 0 && v.disExchangeCode.indexOf(instrument.acronym) == 0);
-// 		if (!result) result = results.find(v => v.disExchangeCode.indexOf(instrument.acronym) == 0);
-// 		if (!result) result = results.find(v => v.match > 0);
-// 		if (!result) result = results.find(v => results.length == 1);
-// 		if (!result) result = results.find(v => v.tickerName.includes(instrument.symbol));
-
-// 		if (result) {
-// 			ticker = result
-// 			// console.log('ticker ->', console.inspect(_.pick(ticker, ['tickerId', 'disSymbol', 'tickerName', 'tinyName', 'disExchangeCode', 'regionAlias'] as KeysOf<Webull.Ticker>)))
-// 		} else {
-// 			ticker = tickers[0] || response.list[0]
-// 		}
-
-// 		if (!ticker) {
-// 			console.error('!ticker ->', instrument, 'tickers ->', tickers, 'response.list ->', response.list)
-// 			return
-// 		}
-
-// 	}
-
-// 	await redis.main.hset(rkeys.WB.TICKER_IDS, instrument.symbol, ticker.tickerId)
-
-// }
 
 

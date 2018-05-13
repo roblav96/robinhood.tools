@@ -18,20 +18,20 @@ import clock from '../../common/clock'
 
 
 
-export const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data' | 'symbols' | 'toquote'>()
-
 declare global { namespace NodeJS { export interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
-export const QUOTES = {} as Dict<Webull.Quote>
-const SAVES = {} as Dict<Webull.Quote>
+export const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data' | 'onSymbols' | 'toquote'>()
+export let QUOTES = {} as Dict<Webull.Quote>
+let SAVES = {} as Dict<Webull.Quote>
 const CLIENTS = [] as webull.MqttClient[]
 
-pandora.once('symbolsReady', onSymbols)
-pandora.broadcast({}, 'readySymbols')
+pandora.once('symbols.ready', onSymbols)
+pandora.broadcast({}, 'symbols.start')
 
-pandora.on('symbols', onSymbols)
-async function onSymbols(hubmsg: Pandora.HubMessage<SymbolsHubData>) {
-	if (hubmsg.data.type && hubmsg.data.type != process.env.SYMBOLS) return;
-	let resets = hubmsg.data.reset
+if (process.env.SYMBOLS == 'STOCKS') {
+	pandora.on('symbols.reset', onSymbols)
+}
+async function onSymbols(hubmsg: Pandora.HubMessage) {
+	let reset = hubmsg.action == 'symbols.reset'
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
@@ -41,23 +41,20 @@ async function onSymbols(hubmsg: Pandora.HubMessage<SymbolsHubData>) {
 	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 	// socket.setFilter(_.mapValues(fsymbols, v => true))
 
-	let symbols = Object.keys(fsymbols)
+	CLIENTS.forEach(v => v.destroy())
+	core.object.nullify(QUOTES); QUOTES = {}
+	core.object.nullify(SAVES); SAVES = {}
 
+	let symbols = Object.keys(fsymbols)
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => [
-		process.env.SYMBOLS == 'STOCKS' ? ['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`] : ['ping'],
 		['hgetall', `${rkeys.WB.TICKERS}:${v}`],
 		['hgetall', `${rkeys.WB.QUOTES}:${v}`],
 	])))
 	resolved.forEach(core.fix)
 
-	CLIENTS.forEach(v => v.destroy())
-	core.object.nullify(QUOTES)
-	core.object.nullify(SAVES)
-
 	let coms = [] as Redis.Coms
 	let ii = 0
 	symbols.forEach(function(symbol, i) {
-		let instrument = resolved[ii++] as Robinhood.Instrument
 		let ticker = resolved[ii++] as Webull.Ticker
 		let quote = resolved[ii++] as Webull.Quote
 
@@ -66,9 +63,6 @@ async function onSymbols(hubmsg: Pandora.HubMessage<SymbolsHubData>) {
 			typeof: process.env.SYMBOLS,
 			name: ticker.name,
 		} as Webull.Quote)
-		if (instrument && instrument.name) {
-			quote.name = instrument.simple_name || instrument.name
-		}
 
 		QUOTES[symbol] = quote
 		SAVES[symbol] = {} as any
@@ -79,7 +73,6 @@ async function onSymbols(hubmsg: Pandora.HubMessage<SymbolsHubData>) {
 
 	})
 
-	emitter.emit('symbols', hubmsg.data, QUOTES)
 	await redis.main.coms(coms)
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 256))
@@ -90,6 +83,8 @@ async function onSymbols(hubmsg: Pandora.HubMessage<SymbolsHubData>) {
 		connect: chunks.length == 1 && i == 0,
 		// verbose: true,
 	}, emitter)))
+
+	emitter.emit('onSymbols', hubmsg, QUOTES)
 
 }
 
@@ -133,9 +128,6 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 				if (wbquote.deal != toquote.price) toquote.price = wbquote.deal;
 			}
 		}
-		if (wbquote.tradeBsFlag == 'N') {
-			toquote.volume = quote.volume + wbquote.volume
-		}
 
 	} else {
 		Object.keys(wbquote).forEach((key: keyof Webull.Quote) => {
@@ -146,10 +138,18 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 			} else if (key == 'volume') {
 				let volume = quote.volume
-				if (value == volume) return;
 				if (value > volume || Math.abs(core.calc.percent(value, volume)) > 5) {
 					toquote.volume = value
 				}
+				// if (value > quote.volume && hours.rxstate.value == 'REGULAR') {
+				// if (value > quote.volume) {
+				// 	toquote.volume = value
+				// }
+				// let volume = quote.volume
+				// if (value == volume) return;
+				// if (value > volume || Math.abs(core.calc.percent(value, volume)) > 5) {
+				// 	toquote.volume = value
+				// }
 				// let percent = core.calc.percent(value, volume)
 				// if (percent > 95) return;
 				// if (value > volume || percent < -95) return toquote.volume = value;
@@ -162,8 +162,8 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	}
 
 	if (Object.keys(toquote).length == 0) return;
-	emitter.emit('toquote', topic, toquote)
 	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
+	emitter.emit('toquote', topic, toquote)
 	Object.assign(QUOTES[symbol], toquote)
 	Object.assign(SAVES[symbol], toquote)
 	socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, toquote)

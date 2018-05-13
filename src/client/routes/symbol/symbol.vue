@@ -46,8 +46,15 @@
 							<!-- <h2 class="subtitle my-0 is-6">{{vcapitalize(quote.status)}}</h2> -->
 						</div>
 
-						<div class="column is-half is-one-quarter-widescreen">
-							<p class="content">sparkline goes here</p>
+						<div class="column is-half is-one-quarter-widescreen border-debug">
+							<div class="columns is-mobile">
+								<div class="column is-half">
+									<progress class="progress is-small rounded-none" value="15" max="100">15%</progress>
+								</div>
+								<div class="column is-half">
+									<progress class="progress is-small rounded-none" value="15" max="100">15%</progress>
+								</div>
+							</div>
 						</div>
 
 						<div class="column is-half is-one-quarter-widescreen">

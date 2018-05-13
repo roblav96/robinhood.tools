@@ -27,15 +27,11 @@ const polka = new PolkaRouter({
 		Object.assign(error.output.payload, { attributes: error.data })
 		console.warn('polka onError ->', error.output.payload)
 		res.statusCode = error.output.statusCode
-		let keys = Object.keys(error.output.headers)
-		if (keys.length > 0) {
-			keys.forEach(k => res.setHeader(k, error.output.headers[k]))
-		}
+		Object.keys(error.output.headers).forEach(k => res.setHeader(k, error.output.headers[k]))
 		res.send(error.output.payload)
 	},
 
 	onNoMatch(req, res) {
-		if (res.headerSent) return;
 		let { method, path } = req
 		polka.onError(boom.notFound(`${method} ${path}`, { method, path }), req, res, _.noop)
 	},
