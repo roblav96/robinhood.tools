@@ -40,6 +40,7 @@ export const routes = [
 
 	{
 		name: 'login', path: '/login',
+		component: () => import('@/client/routes/login/login'),
 	},
 
 	// {
