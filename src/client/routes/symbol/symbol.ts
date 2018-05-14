@@ -75,10 +75,16 @@ export default class extends Mixins(VMixin) {
 	deals = [] as Webull.Deal[]
 
 	get vdeals() { return this.deals.filter((v, i) => i < 3) }
-	get prices() {
-		let prices = { ah: false, p: this.quote.price, c: this.quote.change, r: this.quote.pChRatio }
-		
-		return prices
+	dealcolor(deal: Webull.Deal) {
+		return { 'has-text-success': deal.tradeBsFlag == 'B', 'has-text-danger': deal.tradeBsFlag == 'S' }
+	}
+
+	get basize() {
+		if (Object.keys(this.quote).length == 0) return { bid: 0, ask: 0 };
+		let max = this.quote.bidSize + this.quote.askSize
+		let bid = core.calc.slider(this.quote.bidSize, 0, max)
+		let ask = core.calc.slider(this.quote.askSize, 0, max)
+		return { bid, ask }
 	}
 
 	reset() {
@@ -97,24 +103,22 @@ export default class extends Mixins(VMixin) {
 		this.reset()
 
 		let symbols = [this.symbol]
-		return Promise.all([
-			http.post('/symbols', { symbols }),
-			http.post('/symbols/deals', { symbols }),
-		]).then(resolved => {
-			console.log('resolved ->', JSON.parse(JSON.stringify(resolved)))
-			this.instrument = resolved[0][0]
-			this.ticker = resolved[0][1]
-			this.quote = resolved[0][2]
-			this.deals = resolved[1][0]
-			this.busy = false
-		}).catch(error => console.error('w_symbol Error ->', error))
+		Promise.all([
+			http.post('/symbols', { symbols }).then(response => {
+				console.log('response ->', JSON.parse(JSON.stringify(response)))
+				this.instrument = response[0]
+				this.ticker = response[1]
+				this.quote = response[2]
+				this.busy = false
+			}),
+			http.post('/symbols/deals', { symbols }).then(response => {
+				this.deals = response[0]
+			}),
+		]).catch(error => console.error('w_symbol Error ->', error))
 	}
 
 	onquote(quote: Webull.Quote) {
 		Object.assign(this.quote, quote)
-	}
-	dealcolor(deal: Webull.Deal) {
-		return { 'has-text-success': deal.tradeBsFlag == 'B', 'has-text-danger': deal.tradeBsFlag == 'S' }
 	}
 	ondeal(deal: Webull.Deal) {
 		this.deals.unshift(deal)

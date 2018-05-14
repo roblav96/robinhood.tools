@@ -9,6 +9,8 @@ import polka from './polka'
 
 
 
+let IKEYS = ['symbol', 'name', 'simple_name'] as KeysOf<Robinhood.Instrument>
+
 polka.route({
 	method: 'GET',
 	url: '/api/search',
@@ -20,8 +22,13 @@ polka.route({
 		let { results } = await http.get('https://api.robinhood.com/instruments/', {
 			query: { query }, retries: 0,
 		}) as Robinhood.Api.Paginated<Robinhood.Instrument>
-		if (!results || results.length == 0) return [];
-		return await getInstruments(results.map(v => v.symbol))
+		results.remove(v => !v || !v.symbol || Array.isArray(v.symbol.match(/[^A-Z-.]/)))
+		results.forEach(core.fix)
+		// console.log('results ->', results)
+		return results.map(v => _.pick(v, IKEYS))
+		// let instruments = await getInstruments(results.map(v => v.symbol))
+		// console.log('instruments ->', instruments)
+		// return instruments
 	}
 })
 
@@ -35,21 +42,25 @@ polka.route({
 	},
 	async handler(req, res) {
 		let symbols = req.body.symbols as string[]
-		return await getInstruments(symbols)
+		let coms = symbols.map(v => ['hmget', `${rkeys.RH.INSTRUMENTS}:${v}`].concat(IKEYS))
+		let results = await redis.main.coms(coms) as Robinhood.Instrument[]
+		results = results.map(v => redis.fixHmget(v as any, IKEYS))
+		results.forEach(core.fix)
+		return results
+		// return await getInstruments(symbols)
 	}
 })
 
 
 
 // const IKEYS = ['symbol', 'name', 'alive', 'acronym', 'mic', 'type', 'country'] as KeysOf<Robinhood.Instrument>
-const IKEYS = ['symbol', 'name'] as KeysOf<Robinhood.Instrument>
-async function getInstruments(symbols: string[]) {
-	let coms = symbols.map(v => ['hmget', `${rkeys.RH.INSTRUMENTS}:${v}`].concat(IKEYS))
-	let results = await redis.main.coms(coms) as Robinhood.Instrument[]
-	results = results.map(v => redis.fixHmget(v as any, IKEYS))
-	results.forEach(core.fix)
-	return results
-}
+// async function getInstruments(symbols: string[]) {
+// 	let coms = symbols.map(v => ['hmget', `${rkeys.RH.INSTRUMENTS}:${v}`].concat(IKEYS))
+// 	let results = await redis.main.coms(coms) as Robinhood.Instrument[]
+// 	results = results.map(v => redis.fixHmget(v as any, IKEYS))
+// 	results.forEach(core.fix)
+// 	return results
+// }
 
 // async function getInstruments(symbols: string[]) {
 // 	let coms = symbols.map(v => ['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`])

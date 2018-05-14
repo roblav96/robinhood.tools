@@ -97,6 +97,17 @@ $value in (('', $speed), ('-slow', $speed-slow), ('-slower', $speed-slower), ('-
 // 
 // ████  TEXT  ████
 // 
+p.title,
+p.subtitle {
+	margin-top: 0px !important;
+	margin-bottom: 0px !important;
+}
+
+p.content,
+.content p {
+	margin-bottom: 0px !important;
+}
+
 .text-inherit {
 	color: inherit !important;
 }

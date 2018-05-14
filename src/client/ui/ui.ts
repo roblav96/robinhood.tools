@@ -20,27 +20,22 @@ Vue.directive('ui-green-red', function(el, { value, oldValue }) {
 	if (value === oldValue) return;
 	if (!core.number.isFinite(value)) return;
 	if (value == 0) return el.classList.remove('has-text-danger', 'has-text-success');
-	if (value > 0) {
-		if (el.className.includes('has-text-success')) return;
-		if (el.className.includes('has-text-danger')) {
-			return el.classList.replace('has-text-danger', 'has-text-success')
-		}
-		return el.classList.add('has-text-success')
-	}
-	if (value < 0) {
-		if (el.className.includes('has-text-danger')) return;
-		if (el.className.includes('has-text-success')) {
-			return el.classList.replace('has-text-success', 'has-text-danger')
-		}
-		return el.classList.add('has-text-danger')
-	}
+	el.classList.toggle('has-text-success', value > 0)
+	el.classList.toggle('has-text-danger', value < 0)
 })
 
 
 
-Vue.directive('busy', function(el, { value, oldValue }) {
+Vue.directive('invisible', function(el, { value, oldValue }) {
 	if (value === oldValue) return;
-	el.style.visibility = value === true ? 'hidden' : ''
+	el.classList.toggle('is-invisible', !!value)
+})
+
+
+
+Vue.directive('is', function(el, binding, { context }) {
+	console.log('binding ->', binding)
+	// console.log('breakpoint ->', JSON.parse(JSON.stringify(context.$store.state.breakpoint)))
 })
 
 

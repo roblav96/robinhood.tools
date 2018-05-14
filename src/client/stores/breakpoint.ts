@@ -20,8 +20,6 @@ const state = {
 	mobileOnly: false, fullhdOnly: false,
 }
 
-update()
-
 function update() {
 	let width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
 	let height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
@@ -58,17 +56,15 @@ function update() {
 		widescreenOnly, widescreenAndDown, widescreenAndUp,
 		mobileOnly, fullhdOnly,
 	})
-	// console.log('state >', state)
+	// console.log('state ->', JSON.parse(JSON.stringify(state)))
 
 }
-
-const onresize = _.throttle(update, 300, { leading: false })
-window.addEventListener('resize', onresize, { passive: true })
+update()
+window.addEventListener('resize', _.throttle(update, 300, { leading: false, trailing: true }), { passive: true })
 
 store.registerModule('breakpoint', { state })
 declare global {
-	type Breakpoint = typeof state
-	namespace Store { interface State { breakpoint: Breakpoint } }
+	namespace Store { interface State { breakpoint: typeof state } }
 }
 
 

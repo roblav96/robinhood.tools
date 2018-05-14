@@ -34,9 +34,9 @@ export function fromNow(stamp: number, opts = {} as Partial<FromNowOpts>) {
 
 
 
-declare global { interface NFixedOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean } }
-export function nfixed(value: number, { precision, compact, plusminus, percent } = {} as Partial<NFixedOpts>) {
-	if (!value) return value;
+declare global { interface FormatNumberOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean } }
+export function number(value: number, { precision, compact, plusminus, percent, dollar } = {} as Partial<FormatNumberOpts>) {
+	if (!Number.isFinite(value)) return value;
 	if (!Number.isFinite(precision)) {
 		precision = 2
 		let abs = Math.abs(value)
@@ -44,8 +44,10 @@ export function nfixed(value: number, { precision, compact, plusminus, percent }
 		if (abs >= 1000) precision = 1;
 		if (abs >= 10000) precision = 0;
 	}
-	if (percent || plusminus) precision = Math.min(precision, 2)
-	let fixed = value.toFixed(precision)
+	if (percent || plusminus) precision = Math.min(precision, 2);
+	let localeopts = { maximumFractionDigits: precision } as Intl.NumberFormatOptions
+	if (!percent) localeopts.minimumFractionDigits = precision;
+	let fixed = value.toLocaleString(undefined, localeopts)
 	if (compact && precision == 0) {
 		let units = ['', 'k', 'M', 'T']
 		let ii = 0
@@ -58,6 +60,7 @@ export function nfixed(value: number, { precision, compact, plusminus, percent }
 		}
 		fixed = value.toFixed(0) + units[ii]
 	}
+	if (dollar) fixed = '$' + fixed;
 	if (plusminus && value > 0) fixed = '+' + fixed;
 	if (plusminus && value < 0) fixed = fixed.replace('-', '–');
 	if (percent) fixed += '%';

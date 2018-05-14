@@ -46,7 +46,7 @@ export const calc = {
 		return ((to - from) / from) * 100
 	},
 	slider(value: number, min: number, max: number) {
-		if (max - min == 0) return 0;
+		if ((max - min) == 0) return 0;
 		return ((value - min) / (max - min)) * 100
 	},
 }

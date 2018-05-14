@@ -67,7 +67,7 @@ schedule.scheduleJob('00 4 * * 1-5', async function reset() {
 async function syncInstruments() {
 	await pForever(async function getInstruments(url) {
 		let { results, next } = await http.get(url) as Robinhood.Api.Paginated<Robinhood.Instrument>
-		results.remove(v => Array.isArray(v.symbol.match(/[^A-Z-]/)))
+		results.remove(v => Array.isArray(v.symbol.match(/[^A-Z-.]/)))
 
 		if (process.env.DEVELOPMENT) console.log('getInstruments ->', results.length, next);
 
@@ -100,8 +100,16 @@ async function syncTickers() {
 		}),
 	]) as Webull.Ticker[]
 	tickers = _.flatten(tickers)
-	tickers.remove(v => Array.isArray(v.disSymbol.match(/[^A-Z-]/)))
+	tickers.remove(v => Array.isArray(v.disSymbol.match(/[^A-Z-.]/)))
 	tickers.forEach(core.fix)
+	tickers.forEach(v => {
+		if (!v.disSymbol.includes('-')) return;
+		let split = v.disSymbol.split('-')
+		let start = split.shift()
+		let end = split.pop()
+		let middle = end.length == 1 ? '.' : '-'
+		v.disSymbol = start + middle + end.slice(-1)
+	})
 
 	let coms = [] as Redis.Coms
 	let scoms = new redis.SetsComs(rkeys.WB.SYMBOLS)

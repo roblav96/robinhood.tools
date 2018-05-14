@@ -169,10 +169,10 @@ module.exports = {
 	*/
 
 	screens: {
-		'sm': '768px',
-		'md': '992px',
-		'lg': '1200px',
-		'xl': '1408px',
+		'tablet': '768px',
+		'desktop': '992px',
+		'widescreen': '1200px',
+		'fullhd': '1408px',
 	},
 
 
@@ -196,6 +196,7 @@ module.exports = {
 
 	fonts: {
 		'sans': [
+			'IBM Plex Sans',
 			'system-ui',
 			'BlinkMacSystemFont',
 			'-apple-system',
@@ -210,6 +211,7 @@ module.exports = {
 			'sans-serif',
 		],
 		'serif': [
+			'IBM Plex Serif',
 			'Constantia',
 			'Lucida Bright',
 			'Lucidabright',
@@ -222,6 +224,7 @@ module.exports = {
 			'serif',
 		],
 		'mono': [
+			'IBM Plex Mono',
 			'Menlo',
 			'Monaco',
 			'Consolas',
@@ -402,7 +405,7 @@ module.exports = {
 
 	borderWidths: {
 		'initial': 'initial',
-		default: '1px',
+		'default': '1px',
 		'0': '0',
 		'2': '2px',
 		'4': '4px',
@@ -427,7 +430,7 @@ module.exports = {
 	|
 	*/
 
-	borderColors: global.Object.assign({ default: colors['grey-light'] }, colors),
+	borderColors: Object.assign({ default: colors['grey-light'] }, colors),
 
 
 	/*
@@ -450,7 +453,7 @@ module.exports = {
 		'initial': 'initial',
 		'none': '0',
 		'sm': '.125rem',
-		default: '.25rem',
+		'default': '.25rem',
 		'lg': '.5rem',
 		'full': '9999px',
 	},
@@ -756,7 +759,7 @@ module.exports = {
 
 	shadows: {
 		'initial': 'initial',
-		default: '0 2px 4px 0 rgba(0,0,0,0.10)',
+		'default': '0 2px 4px 0 rgba(0,0,0,0.10)',
 		'md': '0 4px 8px 0 rgba(0,0,0,0.12), 0 2px 4px 0 rgba(0,0,0,0.08)',
 		'lg': '0 15px 30px 0 rgba(0,0,0,0.11), 0 5px 15px 0 rgba(0,0,0,0.08)',
 		'inner': 'inset 0 2px 4px 0 rgba(0,0,0,0.06)',
