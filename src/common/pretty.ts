@@ -50,16 +50,11 @@ export function number(value: number, { precision, compact, plusminus, percent, 
 	if (!percent) localeopts.minimumFractionDigits = precision;
 	let fixed = value.toLocaleString(undefined, localeopts)
 	if (compact && precision == 0) {
-		let units = ['', 'k', 'M', 'T']
-		let ii = 0
-		let i: number, len = units.length
-		for (i = 0; i < len; i++) {
-			if (value / 1000 >= 1) {
-				value = value / 1000
-				ii++
-			}
+		let units = ['k', 'M', 'T']
+		let split = fixed.split(',')
+		if (split.length > 1) {
+			fixed = `${split[0]}.${split[1].substring(0, 1)}${units[split.length - 2]}`
 		}
-		fixed = value.toFixed(0) + units[ii]
 	}
 	if (dollar) fixed = '$' + fixed;
 	if (plusminus && value > 0) fixed = '+' + fixed;

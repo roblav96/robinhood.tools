@@ -134,20 +134,21 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		if (wbquote.tradeBsFlag == 'N') {
 			if (wbquote.tradeTime > quote.faTradeTime) toquote.faTradeTime = wbquote.tradeTime;
 			if (wbquote.deal != toquote.pPrice) toquote.pPrice = wbquote.deal;
+			toquote.volume = quote.volume + wbquote.volume
 		} else {
 			if (wbquote.tradeTime > quote.mktradeTime) toquote.mktradeTime = wbquote.tradeTime;
 			if (wbquote.deal != toquote.price) toquote.price = wbquote.deal;
 		}
 		toquote.dealNum = quote.dealNum + 1
-		toquote.volume = quote.volume + wbquote.volume
 
 	} else {
 		Object.keys(wbquote).forEach((key: keyof Webull.Quote) => {
-			let value = wbquote[key] as any
+			let from = quote[key] as any
+			let to = wbquote[key] as any
 			if (GREATER_KEYS[key]) {
-				if (value > quote[key]) toquote[key] = value;
-			} else if (quote[key] != value) {
-				toquote[key] = value
+				if (to > from) toquote[key] = to;
+			} else if (to != from) {
+				toquote[key] = to
 			}
 		})
 

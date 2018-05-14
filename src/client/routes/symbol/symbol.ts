@@ -75,7 +75,7 @@ export default class extends Mixins(VMixin) {
 	yhquote = {} as Yahoo.Quote
 	deals = [] as Webull.Deal[]
 
-	get vdeals() { return this.deals.filter((v, i) => i < 3) }
+	get vdeals() { return this.deals.filter((v, i) => i < 4) }
 	dealcolor(deal: Webull.Deal) { return { 'has-text-success': deal.tradeBsFlag == 'B', 'has-text-danger': deal.tradeBsFlag == 'S' } }
 
 	get delisted() { return webull.ticker_status[this.wbquote.status] == webull.ticker_status.DELISTED }
