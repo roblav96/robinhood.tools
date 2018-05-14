@@ -13,9 +13,8 @@ div.searchbar div.dropdown-content {
 
 <template>
 	<b-field class="searchbar navbar-item">
-		<b-autocomplete ref="searchbar_input" open-on-focus keep-first clear-on-select type="search" placeholder="Search anything..."
-		    icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur" v-on:input="oninput"
-		    v-on:select="onselect">
+		<b-autocomplete ref="searchbar_input" open-on-focus keep-first type="search" placeholder="Search anything..." icon="magnify"
+		    v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur" v-on:input="oninput" v-on:select="onselect">
 			<template slot-scope="props">
 				<div class="columns is-mobile is-gapless">
 					<ui-symbol-logo class="column is-narrow image is-32x32 mr-4 self-center" :symbol="props.option.symbol"></ui-symbol-logo>

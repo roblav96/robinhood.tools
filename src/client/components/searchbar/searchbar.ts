@@ -64,7 +64,6 @@ export default class extends Mixins(VMixin) {
 		this.$router.push({ name: 'symbol', params: { symbol: result.symbol } })
 		setTimeout(() => {
 			this.searchbar.$el.querySelector('input').blur()
-			// this.searchbar.$el.blur()
 			this.results.splice(0)
 		}, 100)
 	}

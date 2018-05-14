@@ -46,7 +46,7 @@
 									</p>
 									<p class="subtitle is-size-7">{{vfromnow(wbquote.mktradeTime,{max:1,verbose:true})}}</p>
 								</div>
-								<div v-hidden="extstate=='CLOSED'" class="column">
+								<div v-hidden="$store.state.hours.state=='REGULAR'" class="column">
 									<p class="subtitle is-size-7">{{exthours}}</p>
 									<p class="title is-size-4 font-medium">{{vnumber(wbquote.pPrice)}}</p>
 									<p class="subtitle is-size-6 whitespace-no-wrap font-medium" v-ui-green-red="wbquote.pChange">

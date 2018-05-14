@@ -80,9 +80,8 @@ export default class extends Mixins(VMixin) {
 
 	get delisted() { return webull.ticker_status[this.wbquote.status] == webull.ticker_status.DELISTED }
 	get suspended() { return webull.ticker_status[this.wbquote.status] == webull.ticker_status.SUSPENSION }
-	get extstate() { return hours.getState(this.$store.state.hours.hours, this.wbquote.faTradeTime) }
 	get exthours() {
-		let state = this.extstate
+		let state = hours.getState(this.$store.state.hours.hours, this.wbquote.faTradeTime)
 		if (state.includes('PRE')) return 'Pre Market';
 		if (state.includes('POST')) return 'After Hours';
 		return state
