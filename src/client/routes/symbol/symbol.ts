@@ -11,13 +11,13 @@ import * as rkeys from '@/common/rkeys'
 import * as webull from '@/common/webull'
 import * as hours from '@/common/hours'
 import * as http from '@/client/adapters/http'
-import * as ui from '@/client/ui/ui'
+import * as utils from '@/client/adapters/utils'
 import clock from '@/common/clock'
 import socket from '@/client/adapters/socket'
 
 
 
-const { components, tabs } = new ui.Tabs('symbol', [{
+const { components, tabs } = new utils.Tabs('symbol', [{
 	id: 'summary',
 	icon: 'cash-100',
 	component: () => import('@/client/routes/symbol/symbol.summary'),
@@ -29,6 +29,10 @@ const { components, tabs } = new ui.Tabs('symbol', [{
 	id: 'news',
 	icon: 'newspaper',
 	component: () => import('@/client/routes/symbol/symbol.news'),
+}, {
+	id: 'calcs',
+	icon: 'calculator',
+	component: () => import('@/client/routes/symbol/symbol.calcs'),
 }])
 
 @Vts.Component({

@@ -30,8 +30,9 @@ polka.use(function(req, res, next) {
 	req.doc = doc
 
 	if (!req.doc.token) return next();
-	redis.main.hget(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, 'prime').then(function(prime) {
-		if (prime) req.authed = req.doc.token == security.token(req.doc, prime);
+	redis.main.hgetall(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`).then(function(rdoc: Security.Doc) {
+		if (rdoc.prime) req.authed = req.doc.token == security.token(req.doc, rdoc.prime);
+		req.ishuman = !!rdoc.ishuman
 		next()
 	}).catch(next)
 

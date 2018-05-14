@@ -1,13 +1,18 @@
 // 
 
 import * as Vts from 'vue-property-decorator'
-import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 
 
 
-@Vts.Component
-export default class extends Vue {
+@Vts.Component({
+	template: `
+		<figure class="image flex">
+			<img class="is-png self-center rounded" :src="src" v-on:error="onerror"></img>
+		</figure>
+	`,
+})
+class SymbolLogo extends Vue {
 
 	@Vts.Prop() symbol: string
 
@@ -19,5 +24,6 @@ export default class extends Vue {
 	}
 
 }
+Vue.component('ui-symbol-logo', SymbolLogo)
 
 

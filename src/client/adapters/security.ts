@@ -15,7 +15,7 @@ import * as http from '@/client/adapters/http'
 
 const state = {
 	ready: false,
-	human: lockr.get('security.human', false),
+	ishuman: false,
 }
 store.registerModule('security', { state })
 declare global { namespace Store { interface State { security: typeof state } } }
@@ -50,10 +50,11 @@ export function token() {
 		doc.finger = finger
 		lockr.set('security.finger', doc.finger)
 		return http.get('/security/token', { retries: Infinity })
+	}).then(function(response) {
+		state.ishuman = !!response.ishuman
+		state.ready = true
 	}).catch(function(error) {
 		console.error('token Error ->', error)
-	}).finally(function() {
-		state.ready = true
 	})
 }
 

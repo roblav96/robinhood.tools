@@ -17,7 +17,7 @@ module.exports = {
 	outputDir: 'dist/client',
 	dll: DEVELOPMENT,
 	css: { sourceMap: DEVELOPMENT },
-	vueLoader: { hotReload: true },
+	vueLoader: { hotReload: false },
 	compiler: true,
 
 	configureWebpack: function(config) {

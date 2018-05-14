@@ -1,7 +1,8 @@
 // 
 
 import '@/common/clock'
-import '@/client/ui/ui'
+import '@/client/ui/directives'
+import '@/client/ui/components'
 import * as security from '@/client/adapters/security'
 import socket from '@/client/adapters/socket'
 import router from '@/client/router'

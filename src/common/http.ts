@@ -14,15 +14,16 @@ export function config(config: Partial<Http.Config>) {
 	_.defaults(config, {
 		headers: {},
 		verbose: false,
+		debug: false,
 		timeout: 10000,
-		retries: process.env.CLIENT ? 1 : 5,
+		retries: process.env.CLIENT ? 0 : 5,
 		retryTick: '3s',
 		maxRedirects: 10,
 	} as Http.Config)
 
 	if (process.env.CLIENT && config.retries == Infinity) config.retryTick = '1s';
 
-	if (config.verbose) {
+	if (config.verbose || config.debug) {
 		let ending = (config.query || config.body) ? ' -> ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
 		console.log('-> ' + config.method + ' ' + config.url + ending);
 	}
@@ -44,7 +45,7 @@ export function config(config: Partial<Http.Config>) {
 
 
 export function send(config: Http.Config) {
-	// console.log('config ->', config)
+	if (config.debug) console.log('config ->', config);
 	return new Promise(function(resolve, reject) {
 		simple.concat(config, function(error, res, data) {
 			if (error && !res) return reject(error);
@@ -68,7 +69,7 @@ export function send(config: Http.Config) {
 				}))
 			}
 
-			if (config.verbose) {
+			if (config.verbose || config.debug) {
 				let ending = (config.query || config.body) ? ' <- ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
 				console.info('<- ' + config.method + ' ' + config.url + ending);
 			}
@@ -105,8 +106,9 @@ declare global {
 			retries: number
 			retryTick: Clock.Tick
 			verbose: boolean
+			debug: boolean
 			isProxy: boolean
-			robinhoodToken: string
+			rhtoken: string
 			wbauth: boolean
 		}
 	}

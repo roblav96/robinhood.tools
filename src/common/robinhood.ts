@@ -26,11 +26,25 @@ declare global {
 	namespace Robinhood {
 
 		namespace Api {
+
 			interface Paginated<T = any> {
 				next: string
 				previous: string
 				results: T[]
 			}
+
+			interface Login {
+				mfa_type: string
+				mfa_required: boolean
+				mfa_code: string
+				backup_code: string
+				access_token: string
+				expires_in: number
+				token_type: string
+				scope: string
+				refresh_token: string
+			}
+
 		}
 
 		namespace Instrument {
@@ -215,6 +229,34 @@ declare global {
 			adjusted_previous_close_equity: number
 			previous_close_equity: number
 			open_equity: number
+		}
+
+		interface Application {
+			account_type: string
+			url: string
+			last_error: string
+			state: string
+			customer_type: string
+			cip_questions: any
+			user: string
+			ready: boolean
+		}
+
+		interface User {
+			username: string
+			first_name: string
+			last_name: string
+			id_info: string
+			url: string
+			email_verified: boolean
+			created_at: string
+			basic_info: string
+			email: string
+			investment_profile: string
+			id: string
+			international_info: string
+			employment: string
+			additional_info: string
 		}
 
 	}

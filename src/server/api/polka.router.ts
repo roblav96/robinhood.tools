@@ -26,29 +26,29 @@ declare global {
 { (Polka as any).Router = Polka().constructor }
 export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest, PolkaResponse> {
 
-	// schemas = {} as Dict<Api.RouterSchemaMap<FastestValidator.Schema>>
 	validators = {} as Dict<Api.RouterSchemaMap<FastestValidator.CompiledValidator>>
 
 	route(opts: {
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
 		url: string
-		auth?: boolean
+		authed?: boolean
+		ishuman?: boolean
 		schema?: Api.RouterSchemaMap<FastestValidator.Schema>
 		handler(req: PolkaRequest, res: PolkaResponse): any
 	}) {
 		if (opts.schema) {
-			// this.schemas[opts.url] = {}
 			this.validators[opts.url] = {}
 			Object.keys(opts.schema).forEach(key => {
 				let schema = opts.schema[key]
-				// this.schemas[opts.url][key] = schema
 				this.validators[opts.url][key] = new FastestValidator().compile(schema)
 			})
 		}
 		this.add(opts.method, opts.url, (req, res) => {
-			if (opts.auth && !req.authed) {
-				let error = boom.unauthorized(req.path)
-				return this.onError(error, req, res, _.noop)
+			if (opts.authed && !req.authed) {
+				return this.onError(boom.unauthorized('auth'), req, res, _.noop)
+			}
+			if (opts.ishuman && !req.ishuman) {
+				return this.onError(boom.unauthorized('ishuman'), req, res, _.noop)
 			}
 			Promise.resolve().then(() => {
 				return opts.handler(req, res)

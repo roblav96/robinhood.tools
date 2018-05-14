@@ -18,7 +18,7 @@
 
 <template>
 	<section class="symbol-route">
-		<section class="hero is-small has-background-white-bis">
+		<section class="hero is-small">
 			<div v-invisible="busy" class="hero-body">
 				<div class="container">
 					<div class="columns tablet-only:flex-wrap">
@@ -63,14 +63,12 @@
 									</p>
 									<p class="subtitle is-size-7">{{vfromnow(wbquote.faTradeTime,{max:1,verbose:true})}}</p>
 								</div>
-								<div class="column is-narrow">
-									<!-- <p class="subtitle is-size-7">Avg Volume</p> -->
-									<!-- <p class="subtitle is-size-7 font-medium">{{vnumber(wbquote.avgVolume,{compact:true})}}</p> -->
+								<!-- <div class="column is-narrow">
 									<p class="subtitle is-size-7">10day Volume</p>
 									<p class="subtitle is-size-5 font-medium">{{vnumber(wbquote.avgVol10D,{compact:true})}}</p>
 									<p class="subtitle is-size-7">3mo Volume</p>
 									<p class="subtitle is-size-5 font-medium">{{vnumber(wbquote.avgVol3M,{compact:true})}}</p>
-								</div>
+								</div> -->
 							</div>
 						</div>
 
@@ -92,9 +90,9 @@
 								</div>
 							</div>
 							<div class="columns is-mobile is-gapless mb-0">
-								<p class="column is-narrow is-size-7 has-text-danger">{{vnumber(wbquote.bid)}}</p>
-								<p class="column is-size-7 has-text-centered">({{vnumber(vpercent(wbquote.ask, wbquote.bid),{percent:true})}})</p>
-								<p class="column is-narrow is-size-7 has-text-success">{{vnumber(wbquote.ask)}}</p>
+								<p class="column is-narrow is-size-7 has-text-danger font-medium">{{vnumber(wbquote.bid)}}</p>
+								<p class="column is-size-7 has-text-centered font-medium">{{vnumber(vpercent(wbquote.ask, wbquote.bid),{percent:true})}}</p>
+								<p class="column is-narrow is-size-7 has-text-success font-medium">{{vnumber(wbquote.ask)}}</p>
 							</div>
 							<div class="columns is-mobile is-gapless mb-0">
 								<div class="column is-6">
@@ -106,9 +104,9 @@
 								</div>
 							</div>
 							<div class="columns is-mobile is-gapless mb-0">
-								<p class="column is-size-7 has-text-success">{{vnumber(wbquote.bidSize,{precision:0})}}</p>
-								<p class="column is-size-7 has-text-centered"></p>
-								<p class="column is-size-7 has-text-danger has-text-right">{{vnumber(wbquote.askSize,{precision:0})}}</p>
+								<p class="column is-size-7 has-text-success font-medium">{{vnumber(wbquote.bidSize,{precision:0})}}</p>
+								<p class="column is-size-7 has-text-centered font-medium"></p>
+								<p class="column is-size-7 has-text-danger has-text-right font-medium">{{vnumber(wbquote.askSize,{precision:0})}}</p>
 							</div>
 						</div>
 
@@ -150,7 +148,7 @@
 		</section>
 
 		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-			<component :is="tabs[tabindex].vcomponent" class=""></component>
+			<component :is="tabs[tabindex].vcomponent" class="has-background-white"></component>
 		</transition>
 
 	</section>

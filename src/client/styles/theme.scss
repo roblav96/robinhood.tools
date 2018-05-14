@@ -62,7 +62,6 @@ $colors: map-merge($colors, ('rhred':($rhred, $white)));
 // 
 // $body-background-color: $white-bis;
 // $footer-background-color: $white;
-// $hr-background-color: $grey-lighter;
 // $button-disabled-opacity: 0.33;
 // 
 $link-visited: $pink;
@@ -77,6 +76,10 @@ $dropdown-item-hover-color: $link;
 // 
 $modal-content-width: 480px;
 $modal-background-background-color: rgba($black, 0.66);
+// 
+$hr-background-color: $border;
+$hr-height: 1px;
+$hr-margin: 0.1rem 0px;
 // 
 // $progress-bar-background-color: $white-ter;
 // 

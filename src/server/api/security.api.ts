@@ -12,20 +12,22 @@ import polka from './polka'
 polka.route({
 	method: 'GET',
 	url: '/api/security/token',
-	handler(req, res) {
+	async handler(req, res) {
 		let prime = security.randomBits(32)
-		return Promise.resolve().then(function() {
-			return redis.main.hset(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, 'prime', prime)
-		}).then(function() {
-			let cookie = {
-				domain: process.env.DOMAIN,
-				path: '/', sameSite: true, httpOnly: true,
-				secure: !!process.env.PRODUCTION,
-			} as CookieSerializeOptions
-			req.doc.bits = security.randomBits(32)
-			res.setCookie('x-bits', req.doc.bits, cookie)
-			let token = security.token(req.doc, prime)
-			res.setCookie('x-token', token, cookie)
-		})
+		let rkey = `${rkeys.SECURITY.DOC}:${req.doc.uuid}`
+		let resolved = await redis.main.coms([
+			['hget', rkey, 'ishuman'],
+			['hset', rkey, 'prime', prime],
+		])
+		let cookie = {
+			domain: process.env.DOMAIN,
+			path: '/', sameSite: true, httpOnly: true,
+			secure: !!process.env.PRODUCTION,
+		} as CookieSerializeOptions
+		req.doc.bits = security.randomBits(32)
+		res.setCookie('x-bits', req.doc.bits, cookie)
+		let token = security.token(req.doc, prime)
+		res.setCookie('x-token', token, cookie)
+		return { ishuman: !!resolved[0] }
 	}
 })

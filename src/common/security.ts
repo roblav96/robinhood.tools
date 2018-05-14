@@ -97,11 +97,19 @@ declare global {
 			hostname: string
 			useragent: string
 			stamp: number
+			prime: string
+			ishuman: boolean
 		}
 		interface PemKeyPair {
 			publicPem: string
 			privatePem: string
 		}
+	}
+	interface RecaptchaResponse {
+		'error-codes': string[]
+		success: boolean
+		challenge_ts: string
+		hostname: string
 	}
 }
 
