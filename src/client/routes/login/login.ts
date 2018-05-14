@@ -32,9 +32,17 @@ export default class extends Vue {
 		if (!this.ready || this.busy) return;
 		this.busy = true
 		http.post('/robinhood/login', {
-			username: this.username, password: this.password,
+			username: this.username,
+			password: this.password,
+			mfa: this.mfa,
 		}).then(response => {
 			console.log('response', response)
+			if (response.mfa) {
+				this.ismfa = true
+				this.$nextTick(() => this.mfa_input.focus())
+				return
+			}
+			this.$router.push({ name: 'account' })
 		}).catch(error => {
 			console.error('submit Error ->', error)
 		}).finally(() => this.busy = false)

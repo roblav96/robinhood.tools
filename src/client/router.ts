@@ -43,6 +43,11 @@ export const routes = [
 		component: () => import('@/client/routes/login/login'),
 	},
 
+	{
+		name: 'account', path: '/account',
+		// component: () => import('@/client/routes/account/account'),
+	},
+
 	// {
 	// 	title: 'Crypto', icon: 'bitcoin',
 	// 	name: 'crypto', path: '/crypto',

@@ -3,6 +3,7 @@
 import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
+import * as robinhood from '../adapters/robinhood'
 import * as boom from 'boom'
 import polka from './polka'
 
@@ -21,28 +22,23 @@ polka.route({
 		},
 	},
 	async handler(req, res) {
-		let response = await http.post('https://www.google.com/recaptcha/api/siteverify', {}, {
-			query: { response: req.body.gresponse, secret: process.env.RECAPTCHA_SECRET, remoteip: req.doc.ip },
-		}) as RecaptchaResponse
-
-		let errors = response['error-codes']
-		if (Array.isArray(errors)) {
-			throw boom.badRequest(JSON.stringify(errors))
+		let username = req.body.username as string
+		let response = await robinhood.login(req.body)
+		if (response.mfa_required) {
+			return { mfa: true }
 		}
-
-		let stamp = new Date(response.challenge_ts).valueOf()
-		let drift = Math.abs(Date.now() - stamp)
-		if (drift > 60000) {
-			throw boom.clientTimeout(`${drift}ms`)
+		if (!(response.access_token && response.refresh_token)) {
+			throw boom.illegal('!response.access_token')
 		}
-
-		if (!response.hostname.includes(process.env.DOMAIN)) {
-			throw boom.internal('!response.hostname')
-		}
-
-		let doc = { ishuman: response.success } as Security.Doc
+		await robinhood.validate(username, response.access_token)
+		let doc = {
+			rhusername: username,
+			rhtoken: response.access_token,
+			rhrefresh: response.refresh_token,
+			rhexpires: response.expires_in,
+		} as Security.Doc
+		console.log('login doc ->', doc)
 		await redis.main.hmset(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, doc)
-		return doc
 	}
 })
 

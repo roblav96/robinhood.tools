@@ -99,6 +99,10 @@ declare global {
 			stamp: number
 			prime: string
 			ishuman: boolean
+			rhusername: string
+			rhtoken: string
+			rhrefresh: string
+			rhexpires: number
 		}
 		interface PemKeyPair {
 			publicPem: string

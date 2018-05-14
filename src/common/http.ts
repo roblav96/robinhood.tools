@@ -16,7 +16,7 @@ export function config(config: Partial<Http.Config>) {
 		verbose: false,
 		debug: false,
 		timeout: 10000,
-		retries: process.env.CLIENT ? 0 : 5,
+		retries: process.env.CLIENT ? 0 : 3,
 		retryTick: '3s',
 		maxRedirects: 10,
 	} as Http.Config)
@@ -81,8 +81,8 @@ export function send(config: Http.Config) {
 			config.retries--
 			if (process.env.DEVELOPMENT && process.env.SERVER) {
 				console.error('retry Error ->', error)
-				console.warn('retry config ->', config)
-				// console.warn('retry config.retries ->', config.retries)
+				// console.warn('retry config ->', config)
+				console.warn('retry config.retries ->', config.retries)
 			}
 			return clock.toPromise(config.retryTick).then(() => send(config))
 		}

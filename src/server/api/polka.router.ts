@@ -47,7 +47,7 @@ export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest,
 			if (opts.authed && !req.authed) {
 				return this.onError(boom.unauthorized('auth'), req, res, _.noop)
 			}
-			if (opts.ishuman && !req.ishuman) {
+			if (opts.ishuman && !req.doc.ishuman) {
 				return this.onError(boom.unauthorized('ishuman'), req, res, _.noop)
 			}
 			Promise.resolve().then(() => {

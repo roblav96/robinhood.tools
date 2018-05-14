@@ -5,6 +5,17 @@ import * as core from '@/common/core'
 
 
 
+export function marketcapCategory(marketcap: number) {
+	if (marketcap > (100 * 1000 * 1000 * 1000)) return 'mega';
+	if (marketcap > (10 * 1000 * 1000 * 1000)) return 'large';
+	if (marketcap > (2 * 1000 * 1000 * 1000)) return 'mid';
+	if (marketcap > (300 * 1000 * 1000)) return 'small';
+	if (marketcap > (50 * 1000 * 1000)) return 'micro';
+	return 'nano'
+}
+
+
+
 export class Tabs {
 	components = {} as Dict<any>
 	constructor(

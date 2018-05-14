@@ -46,9 +46,9 @@ span.navbar-burger.burger > span {
 					</router-link>
 				</div>
 				<div class="navbar-end">
-					<router-link class="navbar-item flex items-center" :to="{ name: 'login' }">
+					<router-link class="navbar-item flex items-center" :to="{ name: rhusername ? 'account' : 'login' }">
 						<img class="image is-24x24 mr-2" src="@/assets/robinhood-logo.svg" alt="Robinhood"></img>
-						<span class="has-text-rhgreen">Login</span>
+						<span class="">{{rhusername ? rhusername : 'Login'}}</span>
 					</router-link>
 				</div>
 			</div>

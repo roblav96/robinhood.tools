@@ -19,7 +19,6 @@ export class PolkaRequest {
 	headers: Dict<string>
 	cookies: Dict<string>
 	authed: boolean
-	ishuman: boolean
 	doc: Security.Doc
 }
 util.inherits(TurboRequest, PolkaRequest)

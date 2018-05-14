@@ -44,7 +44,7 @@ polka.route({
 		let symbols = req.body.symbols as string[]
 		let coms = symbols.map(v => ['hmget', `${rkeys.RH.INSTRUMENTS}:${v}`].concat(IKEYS))
 		let results = await redis.main.coms(coms) as Robinhood.Instrument[]
-		results = results.map(v => redis.fixHmget(v as any, IKEYS))
+		results = results.map(v => redis.fixHmget(v, IKEYS))
 		results.forEach(core.fix)
 		return results
 		// return await getInstruments(symbols)

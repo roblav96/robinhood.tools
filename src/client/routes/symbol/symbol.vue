@@ -1,24 +1,25 @@
 <!--  -->
 <script lang="ts" src="./symbol.ts"></script>
 
-<style lang="scss">
+<!-- <style lang="scss">
 @import '@/client/styles/theme.scss';
 //
-.symbol-route .hero-body .progress::-webkit-progress-bar {
-	background-color: $white;
-	border: 1px solid $border;
-}
 
-</style>
+</style> -->
 
 <style>
 /**/
+
+.symbol-route .hero-body .progress::-webkit-progress-bar {
+	background-color: white;
+	border: 1px solid var(--grey-lighter);
+}
 
 </style>
 
 <template>
 	<section class="symbol-route">
-		<section class="hero is-small">
+		<section class="hero is-small has-background-white-bis">
 			<div v-invisible="busy" class="hero-body">
 				<div class="container">
 					<div class="columns tablet-only:flex-wrap">
@@ -63,18 +64,18 @@
 									</p>
 									<p class="subtitle is-size-7">{{vfromnow(wbquote.faTradeTime,{max:1,verbose:true})}}</p>
 								</div>
-								<!-- <div class="column is-narrow">
+								<div class="column is-narrow">
 									<p class="subtitle is-size-7">10day Volume</p>
 									<p class="subtitle is-size-5 font-medium">{{vnumber(wbquote.avgVol10D,{compact:true})}}</p>
 									<p class="subtitle is-size-7">3mo Volume</p>
 									<p class="subtitle is-size-5 font-medium">{{vnumber(wbquote.avgVol3M,{compact:true})}}</p>
-								</div> -->
+								</div>
 							</div>
 						</div>
 
-						<div class="tablet-only:block hidden column is-4-tablet"></div>
+						<!-- <div class="tablet-only:block hidden column is-4-tablet"></div> -->
 
-						<div class="column is-4-tablet is-2-desktop">
+						<!-- <div class="column is-4-tablet is-2-desktop">
 							<div class="columns is-mobile is-gapless mb-0">
 								<p class="column is-narrow is-size-7">Bid</p>
 								<p class="column is-size-7 has-text-centered">Spread</p>
@@ -108,9 +109,9 @@
 								<p class="column is-size-7 has-text-centered font-medium"></p>
 								<p class="column is-size-7 has-text-danger has-text-right font-medium">{{vnumber(wbquote.askSize,{precision:0})}}</p>
 							</div>
-						</div>
+						</div> -->
 
-						<div class="column is-4-tablet is-3-desktop is-2-widescreen">
+						<!-- <div class="column is-4-tablet is-3-desktop is-2-fullhd">
 							<table class="table is-narrowest is-fullwidth content is-small bg-transparent">
 								<tbody>
 									<tr v-for="deal in vdeals">
@@ -120,7 +121,7 @@
 									</tr>
 								</tbody>
 							</table>
-						</div>
+						</div> -->
 
 						<!-- <article class="message column is-dark">
 							<div class="message-body">

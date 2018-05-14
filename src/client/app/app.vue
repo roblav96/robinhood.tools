@@ -12,7 +12,7 @@
 		<v-navbar></v-navbar>
 
 		<transition :enter-active-class="initing == null ? 'animated-slower fadeIn' : ''" leave-active-class="opacity-0">
-			<router-view class="has-background-white-bis"></router-view>
+			<router-view class=""></router-view>
 		</transition>
 
 		<section class="footer hero is-small py-0">
