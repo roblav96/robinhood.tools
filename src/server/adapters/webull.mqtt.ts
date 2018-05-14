@@ -16,7 +16,7 @@ export class MqttClient {
 
 	private static topics = {
 		// STOCKS: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_DEAL_DETAILS', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
-		STOCKS: ['TICKER', 'TICKER_DEAL_DETAILS', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
+		STOCKS: ['TICKER', 'TICKER_DETAIL', 'TICKER_DEAL_DETAILS', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
 		FOREX: ['FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
 		INDEXES: ['TICKER_MARKET_INDEX', 'FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
 	}
@@ -152,6 +152,7 @@ export class MqttClient {
 			let type = Number.parseInt(topic.type)
 			if (type == webull.mqtt_topics.TICKER_BID_ASK) {
 				payload.data.remove(v => {
+					delete v.tradeTime
 					return !(
 						(Array.isArray(v.bidList) && v.bidList.length > 0)
 						||
@@ -167,11 +168,13 @@ export class MqttClient {
 			let i: number, len = payload.data.length
 			for (i = 0; i < len; i++) {
 				let wbquote = payload.data[i]
-				core.fix(wbquote)
-				webull.fix(wbquote)
-				wbquote.tickerId = tid
-				wbquote.symbol = symbol
-				this.emitter.emit('data', type, wbquote)
+				if (wbquote) {
+					core.fix(wbquote)
+					webull.fix(wbquote)
+					wbquote.tickerId = tid
+					wbquote.symbol = symbol
+					this.emitter.emit('data', type, wbquote)
+				}
 			}
 
 			return

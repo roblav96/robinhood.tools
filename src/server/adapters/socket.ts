@@ -136,6 +136,7 @@ function onconnection(client: Client, req: PolkaRequest) {
 }
 
 export function emit(name: string, data?: any) {
+	if (emitter.listenerCount(name) == 0) return;
 	emitter.emit(name, JSON.stringify({ name, data } as Socket.Event))
 }
 

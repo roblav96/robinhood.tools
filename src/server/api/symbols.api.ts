@@ -14,7 +14,8 @@ import polka from './polka'
 const RKEYS = {
 	instruments: rkeys.RH.INSTRUMENTS,
 	tickers: rkeys.WB.TICKERS,
-	quotes: rkeys.WB.QUOTES,
+	wbquotes: rkeys.WB.QUOTES,
+	yhquotes: rkeys.YH.QUOTES,
 }
 const ALLOWED = Object.keys(RKEYS)
 

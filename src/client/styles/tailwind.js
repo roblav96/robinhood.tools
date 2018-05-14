@@ -169,9 +169,14 @@ module.exports = {
 	*/
 
 	screens: {
+		// 'mobile': '576px',
+		// 'mobile-only': { 'min': '576px', 'max': '767px' },
 		'tablet': '768px',
+		'tablet-only': { 'min': '768px', 'max': '991px' },
 		'desktop': '992px',
+		'desktop-only': { 'min': '992px', 'max': '1199px' },
 		'widescreen': '1200px',
+		'widescreen-only': { 'min': '1200px', 'max': '1407px' },
 		'fullhd': '1408px',
 	},
 
@@ -407,6 +412,7 @@ module.exports = {
 		'initial': 'initial',
 		'default': '1px',
 		'0': '0',
+		'1': '1px',
 		'2': '2px',
 		'4': '4px',
 		'8': '8px',

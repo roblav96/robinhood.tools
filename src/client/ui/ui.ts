@@ -26,17 +26,21 @@ Vue.directive('ui-green-red', function(el, { value, oldValue }) {
 
 
 
+Vue.directive('hidden', function(el, { value, oldValue }) {
+	if (value === oldValue) return;
+	el.classList.toggle('hidden', !!value)
+})
 Vue.directive('invisible', function(el, { value, oldValue }) {
 	if (value === oldValue) return;
-	el.classList.toggle('is-invisible', !!value)
+	el.classList.toggle('invisible', !!value)
 })
 
 
 
-Vue.directive('is', function(el, binding, { context }) {
-	console.log('binding ->', binding)
-	// console.log('breakpoint ->', JSON.parse(JSON.stringify(context.$store.state.breakpoint)))
-})
+// Vue.directive('is', function(el, binding, { context }) {
+// 	console.log('binding ->', binding)
+// 	// console.log('breakpoint ->', JSON.parse(JSON.stringify(context.$store.state.breakpoint)))
+// })
 
 
 

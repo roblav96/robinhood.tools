@@ -8,6 +8,8 @@ import VMixin from '@/client/mixins/v.mixin'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as rkeys from '@/common/rkeys'
+import * as webull from '@/common/webull'
+import * as hours from '@/common/hours'
 import * as http from '@/client/adapters/http'
 import * as ui from '@/client/ui/ui'
 import clock from '@/common/clock'
@@ -63,62 +65,80 @@ export default class extends Mixins(VMixin) {
 
 	beforeDestroy() {
 		clock.offListener(this.$forceUpdate, this)
-		socket.offListener(this.onquote, this)
-		socket.offListener(this.ondeal, this)
 		this.reset()
 	}
 
 	busy = true
 	instrument = {} as Robinhood.Instrument
 	ticker = {} as Webull.Ticker
-	quote = {} as Webull.Quote
+	wbquote = {} as Webull.Quote
+	yhquote = {} as Yahoo.Quote
 	deals = [] as Webull.Deal[]
 
 	get vdeals() { return this.deals.filter((v, i) => i < 3) }
-	dealcolor(deal: Webull.Deal) {
-		return { 'has-text-success': deal.tradeBsFlag == 'B', 'has-text-danger': deal.tradeBsFlag == 'S' }
+	dealcolor(deal: Webull.Deal) { return { 'has-text-success': deal.tradeBsFlag == 'B', 'has-text-danger': deal.tradeBsFlag == 'S' } }
+
+	get delisted() { return webull.ticker_status[this.wbquote.status] == webull.ticker_status.DELISTED }
+	get suspended() { return webull.ticker_status[this.wbquote.status] == webull.ticker_status.SUSPENSION }
+	get extstate() { return hours.getState(this.$store.state.hours.hours, this.wbquote.faTradeTime) }
+	get exthours() {
+		let state = this.extstate
+		if (state.includes('PRE')) return 'Pre Market';
+		if (state.includes('POST')) return 'After Hours';
+		return state
 	}
 
+	get price() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pPrice : this.wbquote.price }
+	get baprice() {
+		if (Object.keys(this.wbquote).length == 0) return { bid: 0, ask: 0 };
+		let max = this.wbquote.ask - this.wbquote.bid
+		let price = this.price
+		let bid = core.calc.slider(price - this.wbquote.bid, 0, max)
+		let ask = core.calc.slider(this.wbquote.ask - price, 0, max)
+		return { bid, ask }
+	}
 	get basize() {
-		if (Object.keys(this.quote).length == 0) return { bid: 0, ask: 0 };
-		let max = this.quote.bidSize + this.quote.askSize
-		let bid = core.calc.slider(this.quote.bidSize, 0, max)
-		let ask = core.calc.slider(this.quote.askSize, 0, max)
+		if (Object.keys(this.wbquote).length == 0) return { bid: 0, ask: 0 };
+		let max = this.wbquote.bidSize + this.wbquote.askSize
+		let bid = core.calc.slider(this.wbquote.bidSize, 0, max)
+		let ask = core.calc.slider(this.wbquote.askSize, 0, max)
 		return { bid, ask }
 	}
 
 	reset() {
+		socket.offListener(this.onwbquote, this)
+		socket.offListener(this.ondeal, this)
 		this.busy = true
 		this.instrument = {} as any
 		this.ticker = {} as any
-		this.quote = {} as any
+		this.wbquote = {} as any
+		this.yhquote = {} as any
 		this.deals.splice(0)
 	}
 
 	@Vts.Watch('symbol', { immediate: true }) w_symbol(to: string, from: string) {
-		socket.offListener(this.onquote, this)
-		socket.offListener(this.ondeal, this)
-		socket.on(`${rkeys.WB.QUOTES}:${this.symbol}`, this.onquote, this)
-		socket.on(`${rkeys.WB.DEALS}:${this.symbol}`, this.ondeal, this)
 		this.reset()
-
 		let symbols = [this.symbol]
 		Promise.all([
 			http.post('/symbols', { symbols }).then(response => {
 				console.log('response ->', JSON.parse(JSON.stringify(response)))
 				this.instrument = response[0]
 				this.ticker = response[1]
-				this.quote = response[2]
+				this.wbquote = response[2]
+				this.yhquote = response[3]
 				this.busy = false
 			}),
 			http.post('/symbols/deals', { symbols }).then(response => {
 				this.deals = response[0]
 			}),
-		]).catch(error => console.error('w_symbol Error ->', error))
+		]).catch(error => console.error('w_symbol Error ->', error)).finally(() => {
+			socket.on(`${rkeys.WB.QUOTES}:${this.symbol}`, this.onwbquote, this)
+			socket.on(`${rkeys.WB.DEALS}:${this.symbol}`, this.ondeal, this)
+		})
 	}
 
-	onquote(quote: Webull.Quote) {
-		Object.assign(this.quote, quote)
+	onwbquote(wbquote: Webull.Quote) {
+		Object.assign(this.wbquote, wbquote)
 	}
 	ondeal(deal: Webull.Deal) {
 		this.deals.unshift(deal)

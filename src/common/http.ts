@@ -15,7 +15,7 @@ export function config(config: Partial<Http.Config>) {
 		headers: {},
 		verbose: false,
 		timeout: 10000,
-		retries: process.env.CLIENT ? 0 : 5,
+		retries: process.env.CLIENT ? 1 : 5,
 		retryTick: '3s',
 		maxRedirects: 10,
 	} as Http.Config)

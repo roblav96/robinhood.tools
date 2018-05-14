@@ -1,5 +1,5 @@
 // 
-// ████  COLORS  ████
+// ████  COLOR  ████
 // 
 :root {
 	@for $i from 1 through length($colors) {
@@ -32,7 +32,7 @@ nav.navbar div.field.navbar-item {
 }
 
 // 
-// ████  BORDERS  ████
+// ████  BORDER  ████
 // 
 .border-color {
 	border-color: $border !important;
@@ -46,7 +46,7 @@ nav.navbar div.field.navbar-item {
 // 	border-color: $border-hover !important;
 // }
 // 
-// ████  ICONS  ████
+// ████  ICON  ████
 // 
 span.icon.is-bold > i.mdi::before {
 	font-weight: bold;
@@ -75,7 +75,7 @@ span.icon.is-xxlarge > i.mdi::before {
 }
 
 // 
-// ████  ANIMATIONS  ████
+// ████  ANIMATION  ████
 // 
 @each $key,
 $value in (('', $speed), ('-slow', $speed-slow), ('-slower', $speed-slower), ('-slowest', 500ms), ('-debug', 1s)) {
@@ -118,6 +118,14 @@ p.content,
 img.is-png {
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
+}
+
+// 
+// ████  TABLE  ████
+// 
+th[width="1"],
+td[width="1"] {
+	white-space: nowrap !important;
 }
 
 // 

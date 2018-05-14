@@ -25,6 +25,7 @@ declare global { interface FromNowOpts extends prettyms.PrettyMsOptions { max: n
 export function fromNow(stamp: number, opts = {} as Partial<FromNowOpts>) {
 	opts.secDecimalDigits = opts.secDecimalDigits || 0
 	opts.max = opts.max || 2
+	// let ms = prettyms(Date.now() - stamp, opts)
 	let ms = prettyms(Math.max(Date.now() - stamp, 1000), opts)
 	if (Number.isFinite(opts.max)) {
 		ms = ms.split(' ').splice(0, opts.verbose ? opts.max * 2 : opts.max).join(' ')

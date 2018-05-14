@@ -221,7 +221,7 @@ declare global {
 			low: number
 			marketValue: number
 			mktradeTime: number
-			mkTradeTime: number
+			// mkTradeTime: number
 			monthHigh: number
 			monthLow: number
 			negMarketValue: number

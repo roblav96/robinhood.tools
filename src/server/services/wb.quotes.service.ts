@@ -18,13 +18,16 @@ import clock from '../../common/clock'
 
 
 
-export const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data' | 'onSymbols' | 'toquote'>()
+export const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data' | 'onSymbols' | 'toquote' | 'deal'>()
 export let QUOTES = {} as Dict<Webull.Quote>
 let SAVES = {} as Dict<Webull.Quote>
 const CLIENTS = [] as webull.MqttClient[]
 
 pandora.once('symbols.ready', onSymbols)
 pandora.broadcast({}, 'symbols.start')
+if (process.env.SYMBOLS == 'STOCKS') {
+	pandora.on('symbols.reset', onSymbols)
+}
 
 async function onSymbols(hubmsg: Pandora.HubMessage) {
 	let reset = hubmsg.action == 'symbols.reset'
@@ -34,7 +37,9 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		await utils.getFullSymbols(process.env.SYMBOLS)
 	)
 	// if (process.env.DEVELOPMENT) return;
-	// if (process.env.DEVELOPMENT) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
+	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) {
+		fsymbols = utils[`DEV_${process.env.SYMBOLS}`]
+	}
 
 	CLIENTS.forEach(v => v.destroy())
 	core.object.nullify(QUOTES); QUOTES = {}
@@ -59,6 +64,13 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 			name: ticker.name,
 		} as Webull.Quote)
 
+		if (reset) {
+			Object.assign(quote, {
+				dealNum: 0,
+				volume: 0,
+			} as Webull.Quote)
+		}
+
 		QUOTES[symbol] = quote
 		SAVES[symbol] = {} as any
 
@@ -79,7 +91,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		// verbose: true,
 	}, emitter)))
 
-	emitter.emit('onSymbols', hubmsg, symbols)
+	emitter.emit('onSymbols', hubmsg, fsymbols)
 
 }
 
@@ -101,11 +113,12 @@ clock.on('3s', function onsave() {
 	Object.keys(SAVES).forEach(symbol => SAVES[symbol] = {} as any)
 })
 
-const TIME_KEYS = {
-	faTradeTime: null,
-	mkTradeTime: null,
-	mktradeTime: null,
-	tradeTime: null,
+const GREATER_KEYS = {
+	dealNum: 1,
+	faTradeTime: 1,
+	mktradeTime: 1,
+	tradeTime: 1,
+	volume: 1,
 } as Webull.Quote
 
 emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
@@ -115,62 +128,68 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
-		if (wbquote.tradeTime > quote.tradeTime) {
-			toquote.tradeTime = wbquote.tradeTime
-			if (wbquote.tradeBsFlag == 'N') {
-				if (wbquote.deal != toquote.pPrice) toquote.pPrice = wbquote.deal;
-			} else {
-				if (wbquote.deal != toquote.price) toquote.price = wbquote.deal;
-			}
+		emitter.emit('deal', wbquote)
+		socket.emit(`${rkeys.WB.DEALS}:${symbol}`, wbquote)
+		if (wbquote.tradeTime > quote.tradeTime) toquote.tradeTime = wbquote.tradeTime;
+		if (wbquote.tradeBsFlag == 'N') {
+			if (wbquote.tradeTime > quote.faTradeTime) toquote.faTradeTime = wbquote.tradeTime;
+			if (wbquote.deal != toquote.pPrice) toquote.pPrice = wbquote.deal;
+		} else {
+			if (wbquote.tradeTime > quote.mktradeTime) toquote.mktradeTime = wbquote.tradeTime;
+			if (wbquote.deal != toquote.price) toquote.price = wbquote.deal;
 		}
+		toquote.dealNum = quote.dealNum + 1
+		toquote.volume = quote.volume + wbquote.volume
 
 	} else {
 		Object.keys(wbquote).forEach((key: keyof Webull.Quote) => {
 			let value = wbquote[key] as any
-
-			if (TIME_KEYS[key] === null) {
+			if (GREATER_KEYS[key]) {
 				if (value > quote[key]) toquote[key] = value;
-
-			} else if (key == 'volume') {
-				let volume = quote.volume
-				if (value > volume || Math.abs(core.calc.percent(value, volume)) > 5) {
-					toquote.volume = value
-				}
-				// if (value > quote.volume && hours.rxstate.value == 'REGULAR') {
-				// if (value > quote.volume) {
-				// 	toquote.volume = value
-				// }
-				// let volume = quote.volume
-				// if (value == volume) return;
-				// if (value > volume || Math.abs(core.calc.percent(value, volume)) > 5) {
-				// 	toquote.volume = value
-				// }
-				// let percent = core.calc.percent(value, volume)
-				// if (percent > 95) return;
-				// if (value > volume || percent < -95) return toquote.volume = value;
-
 			} else if (quote[key] != value) {
 				toquote[key] = value
-
 			}
 		})
+
 	}
 
 	if (Object.keys(toquote).length == 0) return;
 	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
-	emitter.emit('toquote', topic, toquote)
 	Object.assign(QUOTES[symbol], toquote)
 	Object.assign(SAVES[symbol], toquote)
+	emitter.emit('toquote', topic, toquote)
 	socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, toquote)
 
 })
 
 
 
-if (process.env.SYMBOLS == 'STOCKS') {
-	require('./calcs.service')
-	pandora.on('symbols.reset', onSymbols)
-}
+if (process.env.SYMBOLS == 'STOCKS') require('./calcs.service');
 declare global { namespace NodeJS { export interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
+
+
+
+
+
+// } else if (key == 'volume') {
+// 	let volume = quote.volume
+// 	console.log('symbol ->', symbol)
+// 	console.log('volume ->', volume)
+// 	console.log('value ->', value)
+// 	if (value > volume || Math.abs(core.calc.percent(value, volume)) > 5) {
+// 		toquote.volume = value
+// 	}
+// 	// if (value > quote.volume && hours.rxstate.value == 'REGULAR') {
+// 	// if (value > quote.volume) {
+// 	// 	toquote.volume = value
+// 	// }
+// 	// let volume = quote.volume
+// 	// if (value == volume) return;
+// 	// if (value > volume || Math.abs(core.calc.percent(value, volume)) > 5) {
+// 	// 	toquote.volume = value
+// 	// }
+// 	// let percent = core.calc.percent(value, volume)
+// 	// if (percent > 95) return;
+// 	// if (value > volume || percent < -95) return toquote.volume = value;
 
 
