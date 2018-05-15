@@ -10,6 +10,16 @@
 <style>
 /**/
 
+.symbol-route .hero-body .progress::-webkit-progress-bar {
+	background-color: white;
+	border: 1px solid var(--border);
+}
+
+.symbol-route .hero-body p.title {
+	/*line-height: 1;*/
+}
+
+/*
 .symbol-route .hero-body p {
 	margin-top: 0px !important;
 	margin-bottom: 0px !important;
@@ -24,10 +34,15 @@
 	line-height: 1.5;
 }
 
-.symbol-route .hero-body .progress::-webkit-progress-bar {
-	background-color: white;
-	border: 1px solid var(--border);
+.symbol-route .hero-body td,
+.symbol-route .hero-body td p {
+	line-height: 1.5;
 }
+
+.symbol-route .hero-body td.title,
+.symbol-route .hero-body td p.title {
+	line-height: 1.25;
+}*/
 
 </style>
 
@@ -36,44 +51,47 @@
 		<section class="hero is-small has-background-white-bis">
 			<div v-visible="!busy" class="hero-body">
 				<div class="container">
-					<div v-is:widescreenAndUp.is-variable.is-4 class="columns">
+					<!-- <div v-is:widescreenAndUp.is-variable v-is:widescreenOnly.is-4 v-is:fullhdOnly.is-8 class="columns"> -->
+					<div class="columns">
 
-						<div class="column">
-							<div class="flex">
-								<div class="mr-4 mt-1">
-									<ui-symbol-logo class="is-64x64 shadow-md" :symbol="symbol"></ui-symbol-logo>
-								</div>
-								<div>
-									<p class="title is-size-3">
-										{{symbol}}
-										<span v-show="delisted||suspended" class="tag is-danger font-medium">{{vcapitalize(wbquote.status)}}</span>
-									</p>
-									<p class="is-size-5">{{name}}</p>
-									<p class="is-size-7">{{ticker.disExchangeCode}}</p>
-								</div>
+
+
+						<div class="column flex">
+							<div class="mr-8">
+								<symbol-logo class="is-88x88 shadow-md" :symbol="symbol"></symbol-logo>
+							</div>
+							<div>
+								<p class="title">
+									{{symbol}}
+									<span v-show="delisted||suspended" class="tag is-danger font-medium">{{vcapitalize(wbquote.status)}}</span>
+								</p>
+								<p class="is-size-5">{{name}}</p>
+								<p class="is-size-7">{{ticker.disExchangeCode}}</p>
 							</div>
 						</div>
+
+
 
 						<div class="column is-narrow">
 							<div class="columns is-mobile">
 								<div class="column is-narrow">
-									<p class="title is-size-3">{{vnumber(wbquote.price)}}</p>
-									<p class="is-size-5 font-medium" v-ui-green-red="wbquote.change">
+									<p class="title">{{vnumber(wbquote.price)}}</p>
+									<p class="is-size-5 font-medium" v-green-red="wbquote.change">
 										{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true})}})
 									</p>
 									<p class="is-size-7">{{vfromnow(wbquote.mktradeTime,{max:1,verbose:true})}}</p>
 								</div>
 								<div v-show="isexthours" class="column is-narrow">
 									<p class="is-size-7">{{exthours}}</p>
-									<p class="is-size-5 leading-tighter font-medium">{{vnumber(wbquote.pPrice)}}</p>
-									<p class="is-size-7 font-medium" v-ui-green-red="wbquote.pChange">
+									<p class="is-size-5 font-medium">{{vnumber(wbquote.pPrice)}}</p>
+									<p class="is-size-7 font-medium" v-green-red="wbquote.pChange">
 										{{vnumber(wbquote.pChange,{plusminus:true})}} ({{vnumber(wbquote.pChRatio*100,{plusminus:true,percent:true})}})
 									</p>
 									<p class="is-size-7">{{vfromnow(wbquote.faTradeTime,{max:1,verbose:true})}}</p>
 								</div>
 								<div class="column is-narrow">
 									<p class="is-size-7">Volume</p>
-									<p class="is-size-5 leading-none font-medium">{{vnumber(wbquote.volume,{compact:true})}}</p>
+									<p class="is-size-5 leading-none font-medium mb-2">{{vnumber(wbquote.volume,{compact:true})}}</p>
 									<p class="is-size-7">Market Cap</p>
 									<p class="is-size-5 leading-none font-medium">{{vnumber(marketcap,{compact:true})}}</p>
 								</div>
@@ -82,8 +100,8 @@
 
 
 
-						<div class="column is-3 is-2-widescreen">
-							<div class="columns is-mobile is-gapless mb-0">
+						<div class="column is-3 is-2-fullhd">
+							<div class="columns is-mobile is-gapless mb-1">
 								<p class="column is-narrow is-size-7">Bid</p>
 								<p class="column is-size-7 has-text-centered">Spread</p>
 								<p class="column is-narrow is-size-7">Ask</p>
@@ -97,7 +115,7 @@
 									<progress class="progress is-success is-small rounded-none mb-0" :value="baprice.ask" :min="0" :max="100"></progress>
 								</div>
 							</div>
-							<div class="columns is-mobile is-gapless mb-0">
+							<div class="columns is-mobile is-gapless mb-1">
 								<p class="column is-narrow is-size-7 has-text-danger font-medium">{{vnumber(wbquote.bid)}}</p>
 								<p class="column is-size-7 has-text-centered font-medium">{{vnumber(vpercent(wbquote.ask, wbquote.bid),{percent:true})}}</p>
 								<p class="column is-narrow is-size-7 has-text-success font-medium">{{vnumber(wbquote.ask)}}</p>
@@ -129,6 +147,30 @@
 
 
 
+						<!-- <div class="column is-narrow">
+							<table class="table is-narrower is-fullwidth bg-transparent align-bottom">
+								<tbody>
+									<tr>
+										<td class="title is-size-3">{{vnumber(wbquote.price)}}</td>
+										<td class="is-size-5 font-medium" v-green-red="wbquote.change">
+											{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true})}})
+										</td>
+									</tr>
+									<tr>
+										<td class="is-size-5 font-medium">{{vnumber(wbquote.pPrice)}}</td>
+										<td class="">
+											<p class="is-size-6 font-medium" v-green-red="wbquote.pChange">
+												{{vnumber(wbquote.pChange,{plusminus:true})}} ({{vnumber(wbquote.pChRatio*100,{plusminus:true,percent:true})}})
+											</p>
+										</td>
+									</tr>
+									<tr>
+										<td>{{exthours}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div> -->
+
 						<!-- <div class="column">
 							<div class="columns is-mobile">
 								<div class="column is-narrow">
@@ -139,7 +181,7 @@
 											{{vnumber(wbquote.volume,{compact:true})}}
 										</span>
 									</p>
-									<p class="subtitle is-size-5 whitespace-no-wrap font-medium" v-ui-green-red="wbquote.change">
+									<p class="subtitle is-size-5 whitespace-no-wrap font-medium" v-green-red="wbquote.change">
 										{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true})}})
 									</p>
 									<p class="subtitle is-size-7">{{vfromnow(wbquote.mktradeTime,{max:1,verbose:true})}}</p>
@@ -147,7 +189,7 @@
 								<div v-show="$store.state.hours.state!='REGULAR'" class="column is-narrow">
 									<p class="subtitle is-size-7">{{exthours}}</p>
 									<p class="title is-size-4 font-medium">{{vnumber(wbquote.pPrice)}}</p>
-									<p class="subtitle is-size-6 whitespace-no-wrap font-medium" v-ui-green-red="wbquote.pChange">
+									<p class="subtitle is-size-6 whitespace-no-wrap font-medium" v-green-red="wbquote.pChange">
 										{{vnumber(wbquote.pChange,{plusminus:true})}} ({{vnumber(wbquote.pChRatio*100,{plusminus:true,percent:true})}})
 									</p>
 									<p class="subtitle is-size-7">{{vfromnow(wbquote.faTradeTime,{max:1,verbose:true})}}</p>

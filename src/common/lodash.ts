@@ -18,6 +18,7 @@ export {
 	functionsIn,
 	get,
 	groupBy,
+	inRange,
 	intersection,
 	invert,
 	isEmpty,

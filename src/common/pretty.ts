@@ -38,6 +38,7 @@ export function fromNow(stamp: number, opts = {} as Partial<FromNowOpts>) {
 declare global { interface FormatNumberOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean } }
 export function number(value: number, { precision, compact, plusminus, percent, dollar } = {} as Partial<FormatNumberOpts>) {
 	if (!Number.isFinite(value)) return value;
+	if (compact) precision = 0;
 	if (!Number.isFinite(precision)) {
 		precision = 2
 		let abs = Math.abs(value)
@@ -48,12 +49,13 @@ export function number(value: number, { precision, compact, plusminus, percent, 
 	if (percent || plusminus) precision = Math.min(precision, 2);
 	let localeopts = { maximumFractionDigits: precision } as Intl.NumberFormatOptions
 	if (!percent) localeopts.minimumFractionDigits = precision;
-	let fixed = value.toLocaleString(undefined, localeopts)
+	let fixed = value.toLocaleString('en', localeopts)
 	if (compact && precision == 0) {
 		let units = ['k', 'M', 'T']
 		let split = fixed.split(',')
 		if (split.length > 1) {
-			fixed = `${split[0]}.${split[1].substring(0, 1)}${units[split.length - 2]}`
+			let float = Number.parseFloat(`${split[0]}.${split[1].substring(0, 1)}`)
+			fixed = `${float}${units[split.length - 2]}`
 		}
 	}
 	if (dollar) fixed = '$' + fixed;

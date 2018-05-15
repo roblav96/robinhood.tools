@@ -4,6 +4,14 @@ import * as forge from 'node-forge'
 
 
 
+export const LENGTHS = (({
+	uuid: 32 as any,
+	finger: 32 as any,
+	prime: 32 as any,
+	bits: 32 as any,
+	token: 64 as any,
+} as Security.Doc) as any) as { [key: string]: number }
+
 export function sha1(value: string): string {
 	let hash = forge.md.sha1.create()
 	hash.update(value)
@@ -89,7 +97,6 @@ declare global {
 	namespace Security {
 		interface Doc {
 			ip: string
-			id: string
 			uuid: string
 			finger: string
 			bits: string
@@ -100,6 +107,7 @@ declare global {
 			prime: string
 			ishuman: boolean
 			rhusername: string
+			rhaccount: string
 			rhtoken: string
 			rhrefresh: string
 			rhexpires: number

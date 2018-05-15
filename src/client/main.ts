@@ -9,12 +9,14 @@ Object.assign(console, { dtsgen: function() { } })
 if (process.env.DEVELOPMENT) {
 	// console.dtsgen = require('@/common/dtsgen').default
 	Object.assign(window, require('@/common/core'))
+	Object.assign(window, require('@/common/pretty'))
 }
 
 import 'animate.css'
 import '@/client/styles/tailwind.css'
 import '@/client/styles/vendors.scss'
 import '@/client/styles/theme.scss'
+import '@/client/styles/styles.css'
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'

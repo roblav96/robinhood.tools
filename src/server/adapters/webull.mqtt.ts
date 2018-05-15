@@ -96,6 +96,8 @@ export class MqttClient {
 			if (this.options.retry) {
 				clock.on(this.options.timeout, this.reconnect, this)
 			}
+		} else {
+			console.log('started connect ->', this.options.index)
 		}
 	}
 

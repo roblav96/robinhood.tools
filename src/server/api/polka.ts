@@ -25,7 +25,7 @@ const polka = new PolkaRouter({
 		error.data.method = req.method
 		error.data.path = req.path
 		Object.assign(error.output.payload, { attributes: error.data })
-		console.warn('polka onError ->', error.output.payload, '\r\nattributes ->', error.output.payload.attributes)
+		console.warn('polka onError ->', error.output.payload) //, '\r\nattributes ->', error.output.payload.attributes)
 		res.statusCode = error.output.statusCode
 		Object.keys(error.output.headers).forEach(k => res.setHeader(k, error.output.headers[k]))
 		res.send(error.output.payload)

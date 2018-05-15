@@ -2,6 +2,7 @@
 
 import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
+import * as security from '@/client/adapters/security'
 import * as http from '@/client/adapters/http'
 
 
@@ -15,6 +16,9 @@ export default class extends Vue {
 
 	mounted() {
 		this.username_input.focus()
+		http.get('/recaptcha/ishuman').then((ishuman: boolean) => {
+			this.$store.state.security.ishuman = ishuman
+		})
 	}
 
 	get username_input() { return this.$refs.username_input as HTMLInputElement }
@@ -36,7 +40,6 @@ export default class extends Vue {
 			password: this.password,
 			mfa: this.mfa,
 		}).then(response => {
-			console.log('response', response)
 			if (response.mfa) {
 				this.ismfa = true
 				this.$nextTick(() => this.mfa_input.focus())

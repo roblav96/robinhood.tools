@@ -1,0 +1,93 @@
+/**/
+
+nav.navbar div.field.navbar-item {
+	margin-bottom: 0px;
+}
+
+/**/
+
+.border-debug {
+	border: 1px solid red !important;
+}
+
+/**/
+
+img.is-png {
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+}
+
+/**/
+
+th[width="1"],
+td[width="1"] {
+	white-space: nowrap !important;
+}
+
+.table.is-narrower th,
+.table.is-narrower td {
+	padding: 0.1rem 0.5rem;
+}
+
+.table.is-narrowest th,
+.table.is-narrowest td {
+	padding: 0rem 0.5rem;
+}
+
+.table.align-bottom th,
+.table.align-bottom td {
+	vertical-align: bottom !important;
+}
+
+/**/
+
+p.title,
+p.subtitle {
+	margin-top: 0px !important;
+	margin-bottom: 0px !important;
+}
+
+p.content,
+.content p {
+	margin-bottom: 0px !important;
+}
+
+.text-inherit {
+	color: inherit !important;
+}
+
+/**/
+
+span.icon.is-bold > i.mdi::before {
+	font-weight: bold;
+}
+
+span.icon.is-xlarge {
+	width: 4rem;
+	height: 4rem;
+}
+
+span.icon.is-xlarge,
+span.icon.is-xlarge > i.mdi,
+span.icon.is-xlarge > i.mdi::before {
+	font-size: 4rem;
+}
+
+span.icon.is-xxlarge {
+	width: 5rem;
+	height: 5rem;
+}
+
+span.icon.is-xxlarge,
+span.icon.is-xxlarge > i.mdi,
+span.icon.is-xxlarge > i.mdi::before {
+	font-size: 5rem;
+}
+
+/**/
+
+.animated-loading {
+	animation-duration: 3s !important;
+}
+
+/**/

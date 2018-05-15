@@ -1,6 +1,8 @@
 // 
 
 import * as _ from '../../common/lodash'
+import * as rkeys from '../../common/rkeys'
+import * as redis from '../adapters/redis'
 import * as Polka from 'polka'
 import * as boom from 'boom'
 import * as FastestValidator from 'fastest-validator'
@@ -14,39 +16,43 @@ polka.use(function validator(req, res, next) {
 	let match = matchit.match(req.path, polka.routes[req.method])[0]
 	if (!match || !match.old) return next();
 
-	// let schemas = polka.schemas[match.old]
 	let validators = polka.validators[match.old]
-	if (!validators) return next();
-
-	let keys = Object.keys(validators)
-	let i: number, len = keys.length
-	for (i = 0; i < len; i++) {
-		let key = keys[i]
-		let value = req[key]
-
-		if (Object.keys(value).length == 0) {
-			return next(boom.preconditionFailed(key, { hook: 'validator' }))
+	if (validators) {
+		let keys = Object.keys(validators)
+		let i: number, len = keys.length
+		for (i = 0; i < len; i++) {
+			let key = keys[i]
+			let value = req[key]
+			if (Object.keys(value).length == 0) {
+				return next(boom.preconditionFailed(key, { hook: 'validator validators' }))
+			}
+			let validator = validators[key]
+			let invalids = validator(value)
+			if (Array.isArray(invalids)) {
+				return next(boom.preconditionFailed(invalids[0].message, { hook: 'validator validators' }))
+			}
 		}
-
-		// if (key == 'query') {
-		// 	let schema = schemas[key]
-		// 	Object.keys(schema).forEach(key => {
-		// 		let rule = schema[key] as FastestValidator.SchemaValue
-		// 		let v = value[key]
-		// 		if (v && rule.type == 'array') {
-		// 			value[key] = v.split(',')
-		// 		}
-		// 	})
-		// }
-
-		let validator = validators[key]
-		let invalids = validator(value)
-		if (Array.isArray(invalids)) {
-			return next(boom.preconditionFailed(invalids[0].message, { hook: 'validator' }))
-		}
-
 	}
+
+	let rhdocurl = polka.rhdocurls[match.old]
+	if (rhdocurl) {
+		if (!req.authed) {
+			return next(boom.unauthorized('!req.authed', null, { hook: 'validator rhauthurl' }))
+		}
+		let rkey = `${rkeys.SECURITY.DOC}:${req.doc.uuid}`
+		let ikeys = ['rhusername', 'rhaccount', 'rhtoken', 'rhrefresh'] as KeysOf<Security.Doc>
+		return redis.main.hmget(rkey, ...ikeys).catch(next).then(function(rdoc: Security.Doc) {
+			rdoc = redis.fixHmget(rdoc, ikeys)
+			if (Object.keys(rdoc).length != ikeys.length) {
+				return next(boom.unauthorized('rdoc != ikeys', null, { hook: 'validator rhauthurl' }))
+			}
+			Object.assign(req.doc, rdoc)
+			next()
+		})
+	}
+
 	next()
+
 })
 
 

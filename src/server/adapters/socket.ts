@@ -41,7 +41,6 @@ const wss = new uws.Server({
 
 			let doc = {
 				ip: security.ip(req.headers),
-				id: qparsed['x-id'],
 				uuid: qparsed['x-uuid'],
 				finger: qparsed['x-finger'],
 				hostname: req.headers['hostname'],
@@ -93,13 +92,11 @@ const emitter = new Emitter()
 interface Client extends uws.WebSocket {
 	subs: string[]
 	authed: boolean
-	id: string
 	uuid: string
 }
 function onconnection(client: Client, req: PolkaRequest) {
 	client.subs = []
 	client.authed = req.authed
-	client.id = req.doc.id
 	client.uuid = req.doc.uuid
 
 	client.on('message', function onmessage(message: string) {

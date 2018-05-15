@@ -25,25 +25,31 @@ export function isDoc(
 			return key
 		}
 	}
+
+	if (security.LENGTHS.finger != doc.finger.length) return 'finger.length';
+	if (doc.token && security.LENGTHS.token != doc.token.length) return 'token.length';
+	if (doc.bits && security.LENGTHS.bits != doc.bits.length) return 'bits.length';
+
 	let split = doc.uuid.split('.')
 	doc.uuid = split[0]
+	if (security.LENGTHS.uuid != doc.uuid.length) return 'uuid.length';
+
 	let stamp = split[1]
 	if (isNaN(stamp as any)) return 'stamp';
 	doc.stamp = Number.parseInt(stamp)
 	if (Math.abs(Date.now() - doc.stamp) > 60000) {
 		return 'stamp'
 	}
+
 }
 
-export function reqDoc(req: PolkaRequest) {
-	let ikeys = ['prime', 'ishuman', 'rhusername', 'rhtoken'] as KeysOf<Security.Doc>
-	return redis.main.hmget(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, ...ikeys).then(function(rdoc: Security.Doc) {
-		rdoc = redis.fixHmget(rdoc, ikeys)
-		if (rdoc.prime) req.authed = req.doc.token == token(req.doc, rdoc.prime);
-		if (rdoc.rhusername) req.doc.rhusername = rdoc.rhusername;
-		if (rdoc.rhtoken) req.doc.rhtoken = rdoc.rhtoken;
-		req.doc.ishuman = !!rdoc.ishuman
-	}) as Promise<any>
+export async function reqDoc(req: PolkaRequest): Promise<any> {
+	let rkey = `${rkeys.SECURITY.DOC}:${req.doc.uuid}`
+	let prime = await redis.main.hget(rkey, 'prime')
+	if (prime) {
+		req.authed = req.doc.token == token(req.doc, prime)
+		if (!req.authed) throw boom.unauthorized('token mismatch');
+	}
 }
 
 export function token(doc: Security.Doc, prime: string) {

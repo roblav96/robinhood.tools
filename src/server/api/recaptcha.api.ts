@@ -9,8 +9,20 @@ import polka from './polka'
 
 
 polka.route({
+	method: 'GET',
+	url: '/api/recaptcha/ishuman',
+	authed: true,
+	async handler(req, res) {
+		let ishuman = await redis.main.hget(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, 'ishuman')
+		return !!ishuman
+	}
+})
+
+
+
+polka.route({
 	method: 'POST',
-	url: '/api/recaptcha',
+	url: '/api/recaptcha/verify',
 	authed: true,
 	schema: {
 		body: { gresponse: 'string' },

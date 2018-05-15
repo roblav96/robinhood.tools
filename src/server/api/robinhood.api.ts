@@ -13,7 +13,6 @@ polka.route({
 	method: 'POST',
 	url: '/api/robinhood/login',
 	authed: true,
-	ishuman: true,
 	schema: {
 		body: {
 			username: 'string',
@@ -22,25 +21,70 @@ polka.route({
 		},
 	},
 	async handler(req, res) {
-		let username = req.body.username as string
-		let response = await robinhood.login(req.body)
-		if (response.mfa_required) {
-			return { mfa: true }
+		let rkey = `${rkeys.SECURITY.DOC}:${req.doc.uuid}`
+
+		let ishuman = await redis.main.hget(rkey, 'ishuman')
+		if (!ishuman) throw boom.unauthorized('!ishuman');
+
+		let oauth = await robinhood.login(req.body)
+		if (oauth.mfa_required) return { mfa: true };
+		if (!oauth.access_token || !oauth.refresh_token) {
+			throw boom.illegal('!oauth.access_token')
 		}
-		if (!(response.access_token && response.refresh_token)) {
-			throw boom.illegal('!response.access_token')
-		}
-		let invalid = await robinhood.validate(username, response.access_token)
-		if (invalid) throw boom.illegal(invalid);
-		let doc = {
-			rhusername: username,
-			rhtoken: response.access_token,
-			rhrefresh: response.refresh_token,
-			rhexpires: response.expires_in,
-		} as Security.Doc
-		console.log('login doc ->', doc)
-		await redis.main.hmset(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, doc)
+
+		await redis.main.hmset(rkey, {
+			rhusername: req.body.username,
+			rhtoken: oauth.access_token,
+			rhrefresh: oauth.refresh_token,
+			rhexpires: oauth.expires_in,
+		} as Security.Doc)
+
+		// let invalid = await robinhood.validate(username, login.access_token)
+		// if (invalid) throw boom.illegal(invalid);
+
 	}
 })
+
+
+
+polka.route({
+	method: 'GET',
+	url: '/api/robinhood/sync',
+	rhdoc: true,
+	async handler(req, res) {
+		console.log('req.doc ->', req.doc)
+	}
+})
+
+
+
+
+
+// if (!req.authed) return;
+
+// let ikeys = ['rhusername', 'rhrefresh'] as KeysOf<Security.Doc>
+// let rdoc = await redis.main.hmget(rkey, ...ikeys) as Security.Doc
+// rdoc = redis.fixHmget(rdoc, ikeys)
+// // console.log('rdoc ->', rdoc)
+// if (Object.keys(rdoc).length != ikeys.length) return;
+
+// let response = { rhusername: rdoc.rhusername } as Security.Doc
+// let oauth = await robinhood.refresh(rdoc.rhrefresh).catch(function(error) {
+// 	console.error('robinhood.refresh Error ->', error)
+// }) as Robinhood.Api.Login
+
+// if (!oauth) {
+// 	ikeys = ikeys.concat(['rhaccount', 'rhtoken', 'rhexpires'])
+// 	await redis.main.hdel(rkey, ...ikeys)
+// 	response.rhusername = ''
+// 	return response
+// }
+
+// await redis.main.hmset(rkey, {
+// 	rhtoken: oauth.access_token,
+// 	rhrefresh: oauth.refresh_token,
+// 	rhexpires: oauth.expires_in,
+// } as Security.Doc)
+// return response
 
 

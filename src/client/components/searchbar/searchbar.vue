@@ -19,7 +19,7 @@ div.searchbar div.dropdown-content {
 			<template slot-scope="props">
 				<div class="columns is-mobile is-gapless">
 					<div class="column is-narrow">
-						<ui-symbol-logo class="is-32x32 shadow mr-4 self-center" :symbol="props.option.symbol"></ui-symbol-logo>
+						<symbol-logo class="is-32x32 shadow mr-4 self-center" :symbol="props.option.symbol"></symbol-logo>
 					</div>
 					<div class="column content">
 						<p class="title is-5">{{ props.option.symbol }}</p>

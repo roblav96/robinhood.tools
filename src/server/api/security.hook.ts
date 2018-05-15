@@ -16,7 +16,6 @@ polka.use(function(req, res, next) {
 
 	let doc = {
 		ip: security.ip(req.headers),
-		id: req.headers['x-id'],
 		uuid: req.headers['x-uuid'],
 		finger: req.headers['x-finger'],
 		hostname: req.headers['hostname'],

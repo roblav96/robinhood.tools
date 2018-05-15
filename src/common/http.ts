@@ -76,8 +76,9 @@ export function send(config: Http.Config) {
 
 			resolve(data)
 		})
-	}).catch(function(error) {
-		if (config.retries > 0) {
+	}).catch(function(error: boom) {
+		let reject = boom.isBoom(error) && error.output.statusCode == 401 // [401].includes(error.output.statusCode)
+		if (!reject && config.retries > 0) {
 			config.retries--
 			if (process.env.DEVELOPMENT && process.env.SERVER) {
 				console.error('retry Error ->', error)

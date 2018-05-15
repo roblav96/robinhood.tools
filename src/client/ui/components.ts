@@ -26,6 +26,6 @@ class SymbolLogo extends Vue {
 	}
 
 }
-Vue.component('ui-symbol-logo', SymbolLogo)
+Vue.component('symbol-logo', SymbolLogo)
 
 

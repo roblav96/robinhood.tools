@@ -34,15 +34,15 @@ declare global {
 			}
 
 			interface Login {
-				mfa_type: string
-				mfa_required: boolean
-				mfa_code: string
-				backup_code: string
 				access_token: string
+				backup_code: string
 				expires_in: number
-				token_type: string
-				scope: string
+				mfa_code: string
+				mfa_required: boolean
+				mfa_type: string
 				refresh_token: string
+				scope: string
+				token_type: string
 			}
 
 		}

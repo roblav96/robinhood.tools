@@ -16,21 +16,22 @@ declare global { interface Window { grecaptcha: any, gonload: any } }
 })
 export default class extends Vue {
 
-	_uid?: string
 	get gid() { return 'g_recaptcha_' + this._uid }
 
-	mounted() { this.grender() }
-
-	gcallback(gresponse: string) {
-		console.log('gcallback gresponse ->', gresponse)
-		http.post('/recaptcha', { gresponse }).then(response => {
-			this.$store.state.security.ishuman = response.success
-		}).catch(error => {
-			console.error('recaptcha > error', error)
-		})
+	mounted() {
+		this.grender()
 	}
 
-	greset() { window.grecaptcha.reset(this._uid) }
+	gcallback(gresponse: string) {
+		http.post('/recaptcha/verify', { gresponse }).then((response: Security.Doc) => {
+			this.$store.state.security.ishuman = response.ishuman
+			this.$toast.open({ message: 'Captcha challenge complete!' })
+		}).catch(error => console.error('gcallback > error', error))
+	}
+
+	greset() {
+		window.grecaptcha.reset(this._uid)
+	}
 
 	grender() {
 		// if (process.env.DEVELOPMENT) return this.gsuccess(true);

@@ -315,6 +315,7 @@ module.exports = {
 
 	leading: {
 		'initial': 'initial',
+		'normal': 'normal',
 		'none': 1,
 		'tighter': 1.125,
 		'tight': 1.25,
@@ -437,7 +438,7 @@ module.exports = {
 	|
 	*/
 
-	borderColors: Object.assign({ default: colors['grey-light'] }, colors),
+	borderColors: Object.assign({ 'default': colors['grey-light'] }, colors),
 
 
 	/*

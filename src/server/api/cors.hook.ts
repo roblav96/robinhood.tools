@@ -22,19 +22,16 @@ polka.use(function cors(req, res, next) {
 	}
 	res.setHeader('access-control-allow-origin', origin)
 
-	if (req.method == 'OPTIONS') {
-		// let acmethod = req.getHeader('access-control-request-method')
-		// if (!ALLOW_METHODS.includes(acmethod)) return next();
-		res.setHeader('access-control-allow-methods', ALLOW_METHODS)
-		// let acheaders = req.getHeader('access-control-request-headers')
-		// if (!ALLOW_HEADERS.includes(acheaders)) return next();
-		res.setHeader('access-control-allow-headers', ALLOW_HEADERS)
-		// res.setHeader('access-control-allow-credentials', 'true')
-		res.setHeader('vary', 'origin')
-		res.end()
-	}
-
-	next()
+	if (req.method != 'OPTIONS') return next();
+	// let acmethod = req.getHeader('access-control-request-method')
+	// if (!ALLOW_METHODS.includes(acmethod)) return next();
+	res.setHeader('access-control-allow-methods', ALLOW_METHODS)
+	// let acheaders = req.getHeader('access-control-request-headers')
+	// if (!ALLOW_HEADERS.includes(acheaders)) return next();
+	res.setHeader('access-control-allow-headers', ALLOW_HEADERS)
+	// res.setHeader('access-control-allow-credentials', 'true')
+	res.setHeader('vary', 'origin')
+	res.end()
 
 })
 

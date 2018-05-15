@@ -14,36 +14,19 @@ polka.route({
 	method: 'GET',
 	url: '/api/security/token',
 	async handler(req, res) {
-		let prime = security.randomBits(32)
-
-		let ikeys = ['ishuman', 'rhusername', 'rhtoken'] as KeysOf<Security.Doc>
+		let prime = security.randomBits(security.LENGTHS.prime)
 		let rkey = `${rkeys.SECURITY.DOC}:${req.doc.uuid}`
-		let resolved = await redis.main.coms([
-			['hmget', rkey].concat(ikeys),
-			['hset', rkey, 'prime', prime],
-		])
-		let rdoc = redis.fixHmget(resolved[0], ikeys) as Security.Doc
+		await redis.main.hset(rkey, 'prime', prime)
 
 		let cookie = {
 			domain: process.env.DOMAIN,
 			path: '/', sameSite: true, httpOnly: true,
 			secure: !!process.env.PRODUCTION,
 		} as CookieSerializeOptions
-		req.doc.bits = security.randomBits(32)
+		req.doc.bits = security.randomBits(security.LENGTHS.bits)
 		res.setCookie('x-bits', req.doc.bits, cookie)
 		let token = security.token(req.doc, prime)
 		res.setCookie('x-token', token, cookie)
-
-		let response = { ishuman: !!rdoc.ishuman } as Security.Doc
-		if (!rdoc.rhusername) return response;
-
-		let invalid = await robinhood.validate(rdoc.rhusername, rdoc.rhtoken)
-		if (invalid) {
-			await redis.main.hdel(rkey, ...ikeys)
-			return response
-		}
-		response.rhusername = rdoc.rhusername
-		return response
 
 	}
 })

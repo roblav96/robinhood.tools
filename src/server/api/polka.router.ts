@@ -27,15 +27,19 @@ declare global {
 export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest, PolkaResponse> {
 
 	validators = {} as Dict<Api.RouterSchemaMap<FastestValidator.CompiledValidator>>
+	rhdocurls = {} as Dict<boolean>
 
 	route(opts: {
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS'
 		url: string
 		authed?: boolean
-		ishuman?: boolean
+		rhdoc?: boolean
 		schema?: Api.RouterSchemaMap<FastestValidator.Schema>
 		handler(req: PolkaRequest, res: PolkaResponse): any
 	}) {
+		if (opts.rhdoc) {
+			this.rhdocurls[opts.url] = true
+		}
 		if (opts.schema) {
 			this.validators[opts.url] = {}
 			Object.keys(opts.schema).forEach(key => {
@@ -45,10 +49,7 @@ export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest,
 		}
 		this.add(opts.method, opts.url, (req, res) => {
 			if (opts.authed && !req.authed) {
-				return this.onError(boom.unauthorized('auth'), req, res, _.noop)
-			}
-			if (opts.ishuman && !req.doc.ishuman) {
-				return this.onError(boom.unauthorized('ishuman'), req, res, _.noop)
+				return this.onError(boom.unauthorized('!req.authed'), req, res, _.noop)
 			}
 			Promise.resolve().then(() => {
 				return opts.handler(req, res)
@@ -58,9 +59,9 @@ export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest,
 		})
 	}
 
-	hook(handler: (req: PolkaRequest, res: PolkaResponse) => any) {
+	hook(fn: (req: PolkaRequest, res: PolkaResponse) => any) {
 		this.use((req, res, next) => {
-			Promise.resolve().then(() => handler(req, res)).then(next).catch(next)
+			Promise.resolve().then(() => fn(req, res)).then(next).catch(next)
 		})
 	}
 

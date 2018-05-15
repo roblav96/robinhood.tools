@@ -24,6 +24,7 @@ export function fix(target: any) {
 	Object.keys(target).forEach(key => {
 		let value = target[key]
 		if (value == null || typeof value != 'string') return;
+		// else if (['user', 'username'].includes(key)) return;
 		else if (value === '') delete target[key];
 		else if (!isNaN(value as any)) target[key] = Number.parseFloat(value);
 		else if (value === 'NaN') target[key] = NaN;

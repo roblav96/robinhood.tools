@@ -28,10 +28,6 @@ html.has-navbar-fixed-top section.hero.is-fullheight {
 	background-color: $navbar-item-hover-background-color;
 }
 
-nav.navbar div.field.navbar-item {
-	margin-bottom: 0px;
-}
-
 // 
 // ████  BORDER  ████
 // 
@@ -39,104 +35,15 @@ nav.navbar div.field.navbar-item {
 	border-color: $border !important;
 }
 
-.border-debug {
-	border: 1px solid red !important;
-}
-
-// .border:hover {
-// 	border-color: $border-hover !important;
-// }
-// 
-// ████  ICON  ████
-// 
-span.icon.is-bold > i.mdi::before {
-	font-weight: bold;
-}
-
-span.icon.is-xlarge {
-	width: 4rem;
-	height: 4rem;
-}
-
-span.icon.is-xlarge,
-span.icon.is-xlarge > i.mdi,
-span.icon.is-xlarge > i.mdi::before {
-	font-size: 4rem;
-}
-
-span.icon.is-xxlarge {
-	width: 5rem;
-	height: 5rem;
-}
-
-span.icon.is-xxlarge,
-span.icon.is-xxlarge > i.mdi,
-span.icon.is-xxlarge > i.mdi::before {
-	font-size: 5rem;
-}
-
 // 
 // ████  ANIMATION  ████
 // 
 @each $key,
-$value in (('', $speed), ('-slow', $speed-slow), ('-slower', $speed-slower), ('-slowest', 500ms), ('-debug', 1s)) {
+$value in (('', $speed), ('-slow', $speed-slow), ('-slower', $speed-slower), ('-slowest', 500ms), ('-1s', 1s), ('-2s', 2s), ('-3s', 3s)) {
 	.animated#{$key} {
 		animation-duration: $value !important;
 		animation-fill-mode: both;
 	}
-}
-
-.animated-loading {
-	animation-duration: 3s !important;
-}
-
-// .animated {
-// 	transform: translateZ(0);
-// 	transform-style: preserve-3d;
-// 	backface-visibility: hidden;
-// }
-// 
-// ████  TEXT  ████
-// 
-p.title,
-p.subtitle {
-	margin-top: 0px !important;
-	margin-bottom: 0px !important;
-}
-
-p.content,
-.content p {
-	margin-bottom: 0px !important;
-}
-
-.text-inherit {
-	color: inherit !important;
-}
-
-// 
-// ████  IMAGE  ████
-// 
-img.is-png {
-	-webkit-backface-visibility: hidden;
-	backface-visibility: hidden;
-}
-
-// 
-// ████  TABLE  ████
-// 
-th[width="1"],
-td[width="1"] {
-	white-space: nowrap !important;
-}
-
-.table.is-narrower th,
-.table.is-narrower td {
-	padding: 0.1rem 0.5rem;
-}
-
-.table.is-narrowest th,
-.table.is-narrowest td {
-	padding: 0rem 0.5rem;
 }
 
 // 

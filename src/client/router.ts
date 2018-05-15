@@ -93,7 +93,8 @@ const router = new VueRouter({
 })
 
 router.afterEach(function(to, from) {
-	document.title = core.string.capitalize(_.startCase(to.name))
+	let route = routes.find(v => v.name == to.name)
+	document.title = route.title || core.string.capitalize(_.startCase(route.name))
 })
 
 

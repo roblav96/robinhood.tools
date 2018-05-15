@@ -84,7 +84,7 @@ export default class extends Mixins(VMixin) {
 		document.title = `${this.symbol} ${price} (${pretty.number(this.percent, { plusminus: true, percent: true })})`
 	}
 
-	get name() { return this.yhquote.shortName || this.instrument.simple_name || this.instrument.name }
+	get name() { return this.instrument.simple_name || this.instrument.name }
 	// get name() { return core.string.capitalize(core.string.minify(this.yhquote.shortName || this.instrument.simple_name || this.instrument.name)) }
 	// get name() {
 	// 	let names = _.uniq(_.compact([this.instrument.simple_name, this.yhquote.shortName, this.instrument.name, this.yhquote.longName]))

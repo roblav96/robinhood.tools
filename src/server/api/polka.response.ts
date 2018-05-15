@@ -22,7 +22,7 @@ export class PolkaResponse {
 	}
 	send(data?: any) {
 		if (data == null) return this.end();
-		if (typeof data == 'object') {
+		if (typeof data != 'string') {
 			data = JSON.stringify(data)
 			this.setHeader('content-type', 'application/json')
 		}
