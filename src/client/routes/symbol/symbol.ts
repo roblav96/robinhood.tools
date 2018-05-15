@@ -79,6 +79,7 @@ export default class extends Mixins(VMixin) {
 	yhquote = {} as Yahoo.Quote
 	deals = [] as Webull.Deal[]
 
+	get name() { return this.instrument.simple_name || this.instrument.name }
 	get vdeals() { return this.deals.filter((v, i) => i < 4) }
 	dealcolor(deal: Webull.Deal) { return { 'has-text-success': deal.tradeBsFlag == 'B', 'has-text-danger': deal.tradeBsFlag == 'S' } }
 

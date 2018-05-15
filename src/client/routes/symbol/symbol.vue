@@ -20,29 +20,37 @@
 <template>
 	<section class="symbol-route">
 		<section class="hero is-small has-background-white-bis">
-			<div v-invisible="busy" class="hero-body">
+			<div v-show="!busy" class="hero-body">
 				<div class="container">
 					<div class="columns tablet-only:flex-wrap">
 
 						<div class="column">
 							<div class="columns is-mobile">
-								<ui-symbol-logo class="column is-narrow my-1 is-96x96" :symbol="symbol"></ui-symbol-logo>
+								<div class="column is-narrow">
+									<ui-symbol-logo class="is-64x64 shadow-md" :symbol="symbol"></ui-symbol-logo>
+								</div>
 								<div class="column">
-									<h1 class="title my-0 is-size-3 whitespace-no-wrap">
-										{{symbol}}
-										<span v-hidden="!(suspended||delisted)" class="tag is-danger h-initial align-middle">{{vcapitalize(wbquote.status)}}</span>
+									<h1 class="title my-0 is-size-3">{{symbol}}
+										<span v-show="suspended||delisted" class="tag is-danger">{{vcapitalize(wbquote.status)}}</span>
 									</h1>
-									<h2 class="subtitle my-0 is-size-5">{{instrument.simple_name||instrument.name}}</h2>
-									<p class="subtitle is-size-7">{{ticker.disExchangeCode}}</p>
-									<!-- <p class="subtitle is-size-6">{{yhquote.fullExchangeName}}</p> -->
-									<!-- <p class="subtitle is-size-7">{{vfromnow(wbquote.mktradeTime,{max:1,verbose:true})}}</p> -->
+									<h2 class="subtitle my-0 is-size-5">{{name}}</h2>
+									<p class="is-size-7">{{ticker.disExchangeCode}}</p>
 								</div>
 							</div>
 						</div>
 
-						<div class="column is-6-tablet is-narrow-desktop desktop:w-initial">
+						<div class="column">
+							<p class="title is-size-3">{{vnumber(wbquote.price)}}</p>
+							<p class="subtitle is-size-6 font-medium" v-ui-green-red="wbquote.change">
+								{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true})}})
+							</p>
+							<p class="is-size-7">{{vfromnow(wbquote.mktradeTime,{max:1,verbose:true})}}</p>
+						</div>
+
+
+
+						<div class="column">
 							<div class="columns is-mobile">
-								<div class="column tablet-only:block hidden"></div>
 								<div class="column is-narrow">
 									<p class="title is-size-3">
 										<span class="">{{vnumber(wbquote.price)}}</span>
@@ -56,7 +64,7 @@
 									</p>
 									<p class="subtitle is-size-7">{{vfromnow(wbquote.mktradeTime,{max:1,verbose:true})}}</p>
 								</div>
-								<div v-hidden="$store.state.hours.state=='REGULAR'" class="column is-narrow">
+								<div v-show="$store.state.hours.state!='REGULAR'" class="column is-narrow">
 									<p class="subtitle is-size-7">{{exthours}}</p>
 									<p class="title is-size-4 font-medium">{{vnumber(wbquote.pPrice)}}</p>
 									<p class="subtitle is-size-6 whitespace-no-wrap font-medium" v-ui-green-red="wbquote.pChange">
