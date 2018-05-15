@@ -7,6 +7,7 @@ import lockr from 'lockr'
 import VMixin from '@/client/mixins/v.mixin'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
+import * as pretty from '@/common/pretty'
 import * as rkeys from '@/common/rkeys'
 import * as webull from '@/common/webull'
 import * as hours from '@/common/hours'
@@ -79,12 +80,23 @@ export default class extends Mixins(VMixin) {
 	yhquote = {} as Yahoo.Quote
 	deals = [] as Webull.Deal[]
 
-	get name() { return this.instrument.simple_name || this.instrument.name }
+	@Vts.Watch('price', { immediate: true }) w_price(price: number) {
+		document.title = `${this.symbol} ${price} (${pretty.number(this.percent, { plusminus: true, percent: true })})`
+	}
+
+	get name() { return this.yhquote.shortName || this.instrument.simple_name || this.instrument.name }
+	// get name() { return core.string.capitalize(core.string.minify(this.yhquote.shortName || this.instrument.simple_name || this.instrument.name)) }
+	// get name() {
+	// 	let names = _.uniq(_.compact([this.instrument.simple_name, this.yhquote.shortName, this.instrument.name, this.yhquote.longName]))
+	// 	let min = _.min(names.map(v => v.length))
+	// 	return names.find(v => v.length == min) || names[0]
+	// }
 	get vdeals() { return this.deals.filter((v, i) => i < 4) }
 	dealcolor(deal: Webull.Deal) { return { 'has-text-success': deal.tradeBsFlag == 'B', 'has-text-danger': deal.tradeBsFlag == 'S' } }
 
 	get delisted() { return webull.ticker_status[this.wbquote.status] == webull.ticker_status.DELISTED }
 	get suspended() { return webull.ticker_status[this.wbquote.status] == webull.ticker_status.SUSPENSION }
+	get isexthours() { return this.$store.state.hours.state != 'REGULAR' }
 	get exthours() {
 		let state = hours.getState(this.$store.state.hours.hours, this.wbquote.faTradeTime)
 		if (state.includes('PRE')) return 'Pre Market';
@@ -93,6 +105,10 @@ export default class extends Mixins(VMixin) {
 	}
 
 	get price() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pPrice : this.wbquote.price }
+	get change() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pChange : this.wbquote.change }
+	get percent() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pChRatio * 100 : this.wbquote.changeRatio * 100 }
+	get marketcap() { return this.wbquote.totalShares * this.price }
+
 	get baprice() {
 		if (Object.keys(this.wbquote).length == 0) return { bid: 0, ask: 0 };
 		let max = this.wbquote.ask - this.wbquote.bid

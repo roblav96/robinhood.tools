@@ -19,7 +19,7 @@ export default class extends Vue {
 	isMobileMenu = false
 
 	created() {
-		this.$router.afterEach(to => this.isMobileMenu = false)
+		this.$router.afterEach(() => this.isMobileMenu = false)
 		document.documentElement.classList.add('has-navbar-fixed-top')
 		clock.on('1s', this.onsecond)
 		this.onsecond()

@@ -26,7 +26,11 @@ const wss = new uws.Server({
 
 	verifyClient(incoming, next: (allow: boolean, code?: number, message?: string) => void) {
 		let req = (incoming.req as any) as PolkaRequest
-		return Promise.resolve().then(function() {
+		// if (process.env.DEVELOPMENT) {
+		// 	req.doc = {} as any
+		// 	return next(true)
+		// }
+		Promise.resolve().then(function() {
 			req.authed = false
 
 			let cookies = req.headers.cookie
@@ -51,10 +55,7 @@ const wss = new uws.Server({
 			req.doc = doc
 
 			if (!req.doc.token) return next(true);
-			return redis.main.hget(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, 'prime').then(function(prime) {
-				if (prime) req.authed = req.doc.token == security.token(req.doc, prime);
-				next(true)
-			})
+			return security.reqDoc(req).then(() => next(true))
 
 		}).catch(function(error) {
 			console.error('verifyClient Error ->', error)

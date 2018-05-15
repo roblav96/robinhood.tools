@@ -1,14 +1,15 @@
 // 
-export * from '../../common/security'
-// 
 
+export * from '../../common/security'
 import * as http from 'http'
 import * as url from 'url'
 import * as boom from 'boom'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
+import * as rkeys from '../../common/rkeys'
 import * as security from '../../common/security'
 import * as redis from '../adapters/redis'
+import { PolkaRequest } from '../api/polka.request'
 
 
 
@@ -32,6 +33,17 @@ export function isDoc(
 	if (Math.abs(Date.now() - doc.stamp) > 60000) {
 		return 'stamp'
 	}
+}
+
+export function reqDoc(req: PolkaRequest) {
+	let ikeys = ['prime', 'ishuman', 'rhusername', 'rhtoken'] as KeysOf<Security.Doc>
+	return redis.main.hmget(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, ...ikeys).then(function(rdoc: Security.Doc) {
+		rdoc = redis.fixHmget(rdoc, ikeys)
+		if (rdoc.prime) req.authed = req.doc.token == token(req.doc, rdoc.prime);
+		if (rdoc.rhusername) req.doc.rhusername = rdoc.rhusername;
+		if (rdoc.rhtoken) req.doc.rhtoken = rdoc.rhtoken;
+		req.doc.ishuman = !!rdoc.ishuman
+	}) as Promise<any>
 }
 
 export function token(doc: Security.Doc, prime: string) {

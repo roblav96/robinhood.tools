@@ -39,19 +39,21 @@ export async function validate(username: string, rhtoken: string) {
 	let { results } = await http.get('https://api.robinhood.com/applications/', {
 		rhtoken, retries: 0,
 	}) as Robinhood.Api.Paginated<Robinhood.Application>
-	if (!Array.isArray(results)) throw boom.badRequest('!results');
-	if (results.length == 0) throw boom.notFound('Application not found.');
+	if (!Array.isArray(results)) return '!results'; // throw boom.badRequest('!results');
+	if (results.length == 0) return 'Application not found.'; // throw boom.notFound('Application not found.');
 	results.forEach(core.fix)
 	// console.log('validate results ->', results)
 	let application = results[0]
 	if (application.last_error || application.ready != true || application.state != 'approved') {
-		throw boom.illegal(`Unapproved account. "${application.last_error}"`)
+		return `Unapproved account. "${application.last_error}"`
+		// throw boom.illegal(`Unapproved account. "${application.last_error}"`)
 	}
 	let user = await http.get(application.user, { rhtoken, retries: 0 }) as Robinhood.User
 	core.fix(user)
 	// console.log('validate user ->', user)
 	if (user.username != username) {
-		throw boom.unauthorized('Provided username does not match username on file.')
+		return 'Provided username does not match username on file.'
+		// throw boom.unauthorized('Provided username does not match username on file.')
 	}
 }
 

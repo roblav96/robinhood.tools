@@ -1,4 +1,5 @@
 // 
+process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const DEVELOPMENT = process.env.NODE_ENV == 'development'
 const PRODUCTION = process.env.NODE_ENV == 'production'
 // 
@@ -16,9 +17,9 @@ module.exports = {
 
 	outputDir: 'dist/client',
 	dll: DEVELOPMENT,
-	css: { sourceMap: DEVELOPMENT },
-	vueLoader: { hotReload: false },
 	compiler: true,
+	// css: { sourceMap: DEVELOPMENT },
+	vueLoader: { hotReload: true },
 
 	configureWebpack: function(config) {
 
@@ -29,7 +30,8 @@ module.exports = {
 		delete config.node.setImmediate
 
 		if (DEVELOPMENT) {
-			config.devtool = 'source-map'
+			// config.devtool = 'source-map'
+			config.devtool = 'cheap-module-eval-source-map'
 			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/, /env/]))
 			config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
 				rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {

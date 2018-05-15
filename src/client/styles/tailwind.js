@@ -316,6 +316,7 @@ module.exports = {
 	leading: {
 		'initial': 'initial',
 		'none': 1,
+		'tighter': 1.125,
 		'tight': 1.25,
 		'normal': 1.5,
 		'loose': 2,

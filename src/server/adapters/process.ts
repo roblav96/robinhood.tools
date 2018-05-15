@@ -1,7 +1,7 @@
 // 
 
 process.env.SERVER = true
-if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development';
+process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 if (process.env.NODE_ENV == 'development') process.env.DEVELOPMENT = true;
 if (process.env.NODE_ENV == 'production') process.env.PRODUCTION = true;
 

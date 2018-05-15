@@ -2,7 +2,8 @@
 
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import store from '@/client/store'
+import * as _ from '@/common/lodash'
+import * as core from '@/common/core'
 
 
 
@@ -91,7 +92,15 @@ const router = new VueRouter({
 	},
 })
 
+router.afterEach(function(to, from) {
+	document.title = core.string.capitalize(_.startCase(to.name))
+})
+
+
+
 export default router
+
+
 
 
 
@@ -104,24 +113,5 @@ declare module 'vue-router/types/router' {
 		icon: string
 	}
 }
-
-
-
-
-
-// store.registerModule('routes', {
-// 	state: routes.filter(function(route) {
-// 		if (route.dev && PRODUCTION) return false;
-// 		return !!route.title
-// 	}).map(v => _.omit(v, ['component']))
-// })
-
-// declare global {
-// 	namespace Store {
-// 		interface State {
-// 			routes: typeof routes
-// 		}
-// 	}
-// }
 
 

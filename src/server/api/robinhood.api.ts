@@ -30,7 +30,8 @@ polka.route({
 		if (!(response.access_token && response.refresh_token)) {
 			throw boom.illegal('!response.access_token')
 		}
-		await robinhood.validate(username, response.access_token)
+		let invalid = await robinhood.validate(username, response.access_token)
+		if (invalid) throw boom.illegal(invalid);
 		let doc = {
 			rhusername: username,
 			rhtoken: response.access_token,

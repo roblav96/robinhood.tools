@@ -20,7 +20,9 @@ class SymbolLogo extends Vue {
 
 	onerror(event: Event) {
 		let el = event.target as HTMLImageElement
-		el.src = 'https://bulma.io/images/placeholders/256x256.png'
+		let src = 'https://bulma.io/images/placeholders/256x256.png'
+		if (el.src == src) return;
+		el.src = src
 	}
 
 }
