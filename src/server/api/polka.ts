@@ -28,6 +28,7 @@ const polka = new PolkaRouter({
 		console.warn('polka onError ->', error.output.payload) //, '\r\nattributes ->', error.output.payload.attributes)
 		res.statusCode = error.output.statusCode
 		Object.keys(error.output.headers).forEach(k => res.setHeader(k, error.output.headers[k]))
+		error.output.payload.isBoom = true
 		res.send(error.output.payload)
 	},
 

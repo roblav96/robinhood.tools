@@ -14,11 +14,13 @@ import * as http from '@/client/adapters/http'
 
 
 
-const state = {
+const state = Object.assign({
 	ready: false,
+}, {
 	ishuman: lockr.get('security.ishuman', false),
 	rhusername: '',
-}
+	rhaccount: '',
+} as Security.Doc)
 store.registerModule('security', { state })
 declare global { namespace Store { interface State { security: typeof state } } }
 
@@ -26,7 +28,7 @@ store.watch(state => state.security.ishuman, ishuman => lockr.set('security.ishu
 
 
 
-const doc = {
+export const doc = {
 	uuid: lockr.get('security.uuid'),
 	finger: lockr.get('security.finger'),
 } as Security.Doc

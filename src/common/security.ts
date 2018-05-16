@@ -110,7 +110,6 @@ declare global {
 			rhaccount: string
 			rhtoken: string
 			rhrefresh: string
-			rhexpires: number
 		}
 		interface PemKeyPair {
 			publicPem: string

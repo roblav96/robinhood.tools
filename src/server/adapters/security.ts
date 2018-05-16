@@ -43,12 +43,19 @@ export function isDoc(
 
 }
 
-export async function reqDoc(req: PolkaRequest): Promise<any> {
+export async function reqDoc(req: PolkaRequest, rhdoc = false): Promise<any> {
 	let rkey = `${rkeys.SECURITY.DOC}:${req.doc.uuid}`
 	let prime = await redis.main.hget(rkey, 'prime')
 	if (prime) {
 		req.authed = req.doc.token == token(req.doc, prime)
-		if (!req.authed) throw boom.unauthorized('token mismatch');
+		if (!req.authed) throw boom.unauthorized('doc.token != req.token');
+	}
+	if (rhdoc) {
+		let ikeys = ['rhusername', 'rhaccount', 'rhtoken'] as KeysOf<Security.Doc>
+		let rdoc = await redis.main.hmget(rkey, ...ikeys) as Security.Doc
+		rdoc = redis.fixHmget(rdoc, ikeys)
+		if (Object.keys(rdoc).length != ikeys.length) return;
+		Object.assign(req.doc, rdoc)
 	}
 }
 

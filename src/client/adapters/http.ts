@@ -40,6 +40,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		// 	let extra = payload.attributes ? JSON.stringify(payload.attributes) : payload.message
 		// 	message += `: "${extra}"`
 		// }
+		// console.log('error ->', JSON.stringify(error, null, 4))
 		let message = _.get(error, 'output.payload') ? JSON.stringify(error.output.payload) : error.message
 		let endpoint = `[${config.method}] ${config.url.replace(process.env.DOMAIN, '')}`
 		console.log('%c◀ ' + endpoint, 'color: red; font-weight: bolder;', message)

@@ -3,7 +3,7 @@
 
 
 export const WS = {
-	
+	UUID: 'ws:uuid',
 }
 
 

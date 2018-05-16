@@ -17,7 +17,9 @@ polka.use(function cors(req, res, next) {
 
 	let origin = req.headers['origin']
 	if (!origin || !origin.includes(ORIGIN)) {
-		if (req.method == 'OPTIONS') res.end();
+		if (req.method == 'OPTIONS') {
+			return res.end()
+		}
 		return next()
 	}
 	res.setHeader('access-control-allow-origin', origin)

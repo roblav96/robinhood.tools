@@ -3,8 +3,13 @@
 
 
 export const RH = {
+	IDS: 'rh:ids',
 	SYMBOLS: 'rh:symbols',
 	INSTRUMENTS: 'rh:instruments',
+}
+
+export const SYNCS = {
+	
 }
 
 
@@ -26,25 +31,11 @@ declare global {
 	namespace Robinhood {
 
 		namespace Api {
-
 			interface Paginated<T = any> {
 				next: string
 				previous: string
 				results: T[]
 			}
-
-			interface Login {
-				access_token: string
-				backup_code: string
-				expires_in: number
-				mfa_code: string
-				mfa_required: boolean
-				mfa_type: string
-				refresh_token: string
-				scope: string
-				token_type: string
-			}
-
 		}
 
 		namespace Instrument {
@@ -54,6 +45,8 @@ declare global {
 		}
 
 		interface Instrument {
+			acronym: string
+			alive: boolean
 			bloomberg_unique: string
 			country: string
 			day_trade_ratio: number
@@ -63,6 +56,7 @@ declare global {
 			maintenance_ratio: number
 			margin_initial_ratio: number
 			market: string
+			mic: string
 			min_tick_size: number
 			name: string
 			quote: string
@@ -74,189 +68,294 @@ declare global {
 			tradeable: boolean
 			type: Instrument.Type
 			url: string
-			// 
-			alive: boolean
-			acronym: string
-			mic: string
 		}
 
-		namespace Market {
-			interface Hours {
-				closes_at: string
-				extended_opens_at: string
-				next_open_hours: string
-				previous_open_hours: string
-				is_open: boolean
-				extended_closes_at: string
-				date: string
-				opens_at: string
-			}
-		}
 		interface Market {
-			website: string
+			acronym: string
 			city: string
-			name: string
-			url: string
 			country: string
-			todays_hours: string
+			mic: string
+			name: string
 			operating_mic: string
 			timezone: string
-			acronym: string
-			mic: string
+			todays_hours: string
+			url: string
+			website: string
+		}
+
+		interface Hours {
+			closes_at: string
+			date: string
+			extended_closes_at: string
+			extended_opens_at: string
+			is_open: boolean
+			next_open_hours: string
+			opens_at: string
+			previous_open_hours: string
 		}
 
 		interface Account {
-			deactivated: boolean
-			updated_at: string
-			margin_balances: {
-				day_trade_buying_power: number
-				start_of_day_overnight_buying_power: number
-				overnight_buying_power_held_for_orders: number
-				cash_held_for_orders: number
-				created_at: string
-				start_of_day_dtbp: number
-				day_trade_buying_power_held_for_orders: number
-				overnight_buying_power: number
-				marked_pattern_day_trader_date: string
-				cash: number
-				unallocated_margin_cash: number
-				updated_at: string
-				cash_available_for_withdrawal: number
-				margin_limit: number
-				outstanding_interest: number
-				uncleared_deposits: number
-				unsettled_funds: number
-				day_trade_ratio: number
-				overnight_ratio: number
-			}
-			portfolio: string
-			cash_balances: string
-			withdrawal_halted: boolean
-			cash_available_for_withdrawal: number
-			type: string
-			sma: number
-			sweep_enabled: boolean
-			deposit_halted: boolean
+			account_number: string
 			buying_power: number
-			user: string
+			can_downgrade_to_cash: string
+			cash: number
+			cash_available_for_withdrawal: number
+			cash_balances: string
+			cash_held_for_orders: number
+			created_at: string
+			deactivated: boolean
+			deposit_halted: boolean
+			instant_eligibility: Account.InstantEligibility
+			margin_balances: Account.MarginBalances
 			max_ach_early_access_amount: number
-			instant_eligibility: {
-				updated_at: string
+			only_position_closing_trades: boolean
+			option_level: string
+			portfolio: string
+			positions: string
+			sma: number
+			sma_held_for_orders: number
+			sweep_enabled: boolean
+			type: string
+			uncleared_deposits: number
+			unsettled_debit: number
+			unsettled_funds: number
+			updated_at: string
+			url: string
+			user: string
+			withdrawal_halted: boolean
+		}
+		namespace Account {
+			interface InstantEligibility {
 				reason: string
 				reinstatement_date: string
 				reversal: string
 				state: string
+				updated_at: string
 			}
-			cash_held_for_orders: number
-			only_position_closing_trades: boolean
-			url: string
-			positions: string
-			created_at: string
-			cash: number
-			sma_held_for_orders: number
-			account_number: string
-			uncleared_deposits: number
-			unsettled_funds: number
+			interface MarginBalances {
+				cash: number
+				cash_available_for_withdrawal: number
+				cash_held_for_options_collateral: number
+				cash_held_for_orders: number
+				created_at: string
+				day_trade_buying_power: number
+				day_trade_buying_power_held_for_orders: number
+				day_trade_ratio: number
+				gold_equity_requirement: number
+				margin_limit: number
+				marked_pattern_day_trader_date: string
+				outstanding_interest: number
+				overnight_buying_power: number
+				overnight_buying_power_held_for_orders: number
+				overnight_ratio: number
+				sma: number
+				start_of_day_dtbp: number
+				start_of_day_overnight_buying_power: number
+				unallocated_margin_cash: number
+				uncleared_deposits: number
+				unsettled_debit: number
+				unsettled_funds: number
+				updated_at: string
+			}
 		}
 
 		interface Portfolio {
-			unwithdrawable_grants: number
 			account: string
-			excess_maintenance_with_uncleared_deposits: number
-			url: string
+			adjusted_equity_previous_close: number
+			equity: number
+			equity_previous_close: number
 			excess_maintenance: number
-			market_value: number
-			withdrawable_amount: number
-			last_core_market_value: number
-			unwithdrawable_deposits: number
-			extended_hours_equity: number
+			excess_maintenance_with_uncleared_deposits: number
 			excess_margin: number
 			excess_margin_with_uncleared_deposits: number
-			equity: number
-			last_core_equity: number
-			adjusted_equity_previous_close: number
-			equity_previous_close: number
-			start_date: number
+			extended_hours_equity: number
 			extended_hours_market_value: number
+			last_core_equity: number
+			last_core_market_value: number
+			market_value: number
+			start_date: number
+			unwithdrawable_deposits: number
+			unwithdrawable_grants: number
+			url: string
+			withdrawable_amount: number
 		}
 
 		interface Position {
 			account: string
-			intraday_quantity: number
-			intraday_average_buy_price: number
-			url: string
-			created_at: string
-			updated_at: string
-			shares_held_for_buys: number
 			average_buy_price: number
-			symbol: string
+			created_at: string
 			instrument: string
-			shares_held_for_sells: number
+			intraday_average_buy_price: number
+			intraday_quantity: number
+			pending_average_buy_price: number
 			quantity: number
+			shares_held_for_buys: number
+			shares_held_for_options_collateral: number
+			shares_held_for_options_events: number
+			shares_held_for_sells: number
+			shares_held_for_stock_grants: number
+			shares_pending_from_options_events: number
+			symbol: string
+			updated_at: string
+			url: string
 		}
 
 		interface PortfolioHistorical {
 			adjusted_close_equity: number
-			begins_at: string
-			open_market_value: number
-			session: string
 			adjusted_open_equity: number
+			begins_at: string
+			close_equity: number
 			close_market_value: number
 			net_return: number
 			open_equity: number
-			close_equity: number
+			open_market_value: number
+			session: string
 		}
 
 		interface News {
-			url: string
-			title: string
-			source: string
-			published_at: string
-			author: string
-			summary: string
 			api_source: string
-			updated_at: string
+			author: string
 			instrument: string
+			published_at: string
+			source: string
+			summary: string
+			title: string
+			updated_at: string
+			url: string
 		}
 
 		interface PortfolioHistoricalStats {
-			total_return: number
-			span: string
-			open_time: string
-			interval: string
-			bounds: string
 			adjusted_open_equity: number
 			adjusted_previous_close_equity: number
-			previous_close_equity: number
+			bounds: string
+			interval: string
 			open_equity: number
+			open_time: string
+			previous_close_equity: number
+			span: string
+			total_return: number
 		}
 
 		interface Application {
 			account_type: string
-			url: string
-			last_error: string
-			state: string
-			customer_type: string
 			cip_questions: any
-			user: string
+			customer_type: string
+			last_error: string
 			ready: boolean
+			state: string
+			url: string
+			user: string
 		}
 
 		interface User {
-			username: string
-			first_name: string
-			last_name: string
-			id_info: string
-			url: string
-			email_verified: boolean
-			created_at: string
-			basic_info: string
-			email: string
-			investment_profile: string
-			id: string
-			international_info: string
-			employment: string
 			additional_info: string
+			basic_info: string
+			created_at: string
+			email: string
+			email_verified: boolean
+			employment: string
+			first_name: string
+			id: string
+			id_info: string
+			international_info: string
+			investment_profile: string
+			last_name: string
+			url: string
+			username: string
+		}
+
+		interface Oauth {
+			access_token: string
+			backup_code: string
+			expires_in: number
+			mfa_code: string
+			mfa_required: boolean
+			mfa_type: string
+			refresh_token: string
+			scope: string
+			token_type: string
+		}
+
+		interface Order {
+			account: string
+			average_price: number
+			cancel: any
+			created_at: string
+			cumulative_quantity: number
+			executions: Order.Execution[]
+			extended_hours: boolean
+			fees: number
+			id: string
+			instrument: string
+			last_transaction_at: string
+			override_day_trade_checks: boolean
+			override_dtbp_checks: boolean
+			position: string
+			price: any
+			quantity: number
+			ref_id: string
+			reject_reason: any
+			response_category: any
+			side: string
+			state: string
+			stop_price: any
+			time_in_force: string
+			trigger: string
+			type: string
+			updated_at: string
+			url: string
+		}
+		namespace Order {
+			interface Execution {
+				id: string
+				price: number
+				quantity: number
+				settlement_date: string
+				timestamp: string
+			}
+		}
+
+		interface Subscription {
+			account: string
+			created_at: string
+			credit: number
+			ended_at: string
+			id: string
+			plan: Subscription.Plan
+			renewal_date: any
+			unsubscribe: any
+			url: string
+		}
+		namespace Subscription {
+			interface Plan {
+				id: string
+				instant_deposit_limit: string
+				margin_interest: any
+				monthly_cost: string
+				subscription_margin_limit: string
+			}
+		}
+
+		interface WatchlistMeta {
+			created_at: string
+			currency_pair_ids: string[]
+			id: string
+			name: string
+			updated_at: string
+			url: string
+			user: string
+		}
+		interface WatchlistResult {
+			created_at: string
+			instrument: string
+			url: string
+			watchlist: string
+		}
+		interface Watchlist {
+			created_at: number
+			instrument: string
+			symbol: string
+			watchlist: string
 		}
 
 	}

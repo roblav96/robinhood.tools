@@ -25,7 +25,7 @@ export default class extends Vue {
 		this.onsecond()
 	}
 
-	get rhusername() { return undefined } // this.$store.state.security.rhusername }
+	get rhusername() { return this.$store.state.security.rhusername }
 
 	time = ''
 	get state() { return pretty.marketState(this.$store.state.hours.state) }

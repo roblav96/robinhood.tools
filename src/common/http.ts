@@ -47,7 +47,7 @@ export function config(config: Partial<Http.Config>) {
 export function send(config: Http.Config) {
 	if (config.debug) console.log('config ->', config);
 	return new Promise(function(resolve, reject) {
-		simple.concat(config, function(error, res, data) {
+		simple.concat(config, function(error, res, data: any) {
 			if (error && !res) return reject(error);
 			if (data) {
 				data = data.toString()
@@ -56,16 +56,19 @@ export function send(config: Http.Config) {
 					data = JSON.parse(data)
 				}
 			}
-			// console.info('error ->')
+			// console.log('error ->', JSON.stringify(error, null, 4))
+			// console.info('error ->', error)
 			// console.dir(error)
 			// console.log('res ->', res)
 			// console.log('data ->', data)
 			if (error || res.statusCode >= 400) {
+				if (data && data.isBoom) {
+					return reject(data)
+				}
 				return reject(new boom(error, {
 					statusCode: res.statusCode,
 					message: res.statusMessage || error.message,
-					data: { data },
-					// decorate: { data },
+					data, // decorate: { data },
 				}))
 			}
 
@@ -114,6 +117,6 @@ declare global {
 		}
 	}
 }
-
+declare module 'boom' { interface Payload { isBoom: boolean } }
 
 

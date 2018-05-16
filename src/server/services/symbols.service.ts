@@ -73,14 +73,17 @@ async function syncInstruments() {
 		if (process.env.DEVELOPMENT) console.log('getInstruments ->', results.length, next);
 
 		let coms = [] as Redis.Coms
+		let dids = {} as Dict<string>
 		let scoms = new redis.SetsComs(rkeys.RH.SYMBOLS)
 		results.forEach(function(v) {
+			dids[v.id] = v.symbol
 			scoms.sadd(v.symbol)
 			v.mic = _.compact(v.market.split('/')).pop()
 			v.acronym = robinhood.MICS[v.mic]
 			v.alive = v.state == 'active' && v.tradability == 'tradable' && v.tradeable == true
 			coms.push(['hmset', `${rkeys.RH.INSTRUMENTS}:${v.symbol}`, v as any])
 		})
+		coms.push(['hmset', rkeys.RH.IDS, dids as any])
 		scoms.merge(coms)
 		await redis.main.coms(coms)
 

@@ -23,13 +23,15 @@ polka.use(function validator(req, res, next) {
 		for (i = 0; i < len; i++) {
 			let key = keys[i]
 			let value = req[key]
-			if (Object.keys(value).length == 0) {
-				return next(boom.preconditionFailed(key, { hook: 'validator validators' }))
-			}
+			// if (Object.keys(value).length == 0) {
+			// 	return next(boom.preconditionFailed(key, { hook: 'validator validators' }))
+			// }
 			let validator = validators[key]
 			let invalids = validator(value)
 			if (Array.isArray(invalids)) {
-				return next(boom.preconditionFailed(invalids[0].message, { hook: 'validator validators' }))
+				let invalid = invalids[0]
+				Object.assign(invalid, { key, value: value[invalid.field] })
+				return next(boom.preconditionFailed(JSON.stringify(invalid), { hook: 'validator' }))
 			}
 		}
 	}
@@ -40,7 +42,7 @@ polka.use(function validator(req, res, next) {
 			return next(boom.unauthorized('!req.authed', null, { hook: 'validator rhauthurl' }))
 		}
 		let rkey = `${rkeys.SECURITY.DOC}:${req.doc.uuid}`
-		let ikeys = ['rhusername', 'rhaccount', 'rhtoken', 'rhrefresh'] as KeysOf<Security.Doc>
+		let ikeys = ['rhusername', 'rhaccount', 'rhtoken'] as KeysOf<Security.Doc>
 		return redis.main.hmget(rkey, ...ikeys).catch(next).then(function(rdoc: Security.Doc) {
 			rdoc = redis.fixHmget(rdoc, ikeys)
 			if (Object.keys(rdoc).length != ikeys.length) {

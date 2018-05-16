@@ -2,8 +2,9 @@
 
 import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
-import * as security from '@/client/adapters/security'
+import * as robinhood from '@/client/adapters/robinhood'
 import * as http from '@/client/adapters/http'
+import socket from '@/client/adapters/socket'
 
 
 
@@ -45,7 +46,13 @@ export default class extends Vue {
 				this.$nextTick(() => this.mfa_input.focus())
 				return
 			}
-			this.$router.push({ name: 'account' })
+
+			Object.assign(this.$store.state.security, response)
+			return Promise.all([
+				socket.discover(),
+				socket.toPromise('ready'),
+			]).then(() => this.$router.push({ name: 'account' }))
+
 		}).catch(error => {
 			console.error('submit Error ->', error)
 		}).finally(() => this.busy = false)

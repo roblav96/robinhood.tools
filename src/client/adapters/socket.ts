@@ -6,6 +6,7 @@ import Emitter from '@/common/emitter'
 import clock from '@/common/clock'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
+import * as rkeys from '@/common/rkeys'
 import * as proxy from '@/common/proxy'
 import * as security from './security'
 import * as http from './http'
@@ -36,10 +37,16 @@ class Socket extends Emitter {
 		}).catch(error => console.error('discover Error ->', error))
 	}
 
+	// private onuuid(data: any) {
+	// 	console.log('onuuid ->', data)
+	// }
+
 	private onopen() {
 		this.strsubs = ''
 		if (!this.ready()) return;
 		this.emit('ready')
+		// this.offListener(this.onuuid)
+		// this.on(`${rkeys.WS.UUID}:${security.doc.uuid}`, this.onuuid, this)
 	}
 	private onclose() {
 		this.strsubs = ''

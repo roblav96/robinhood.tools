@@ -1,6 +1,7 @@
 // 
 
 export * from '../../common/socket'
+import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as exithook from 'exit-hook'
 import * as qs from 'querystring'
@@ -21,15 +22,12 @@ pandora.on('socket.listening', function(hubmsg) {
 	pandora.send({ clientId: hubmsg.host.clientId }, 'socket.listening', { port })
 })
 
-const wss = new uws.Server({
+export const wss = new uws.Server({
 	host: process.env.HOST, port,
 
 	verifyClient(incoming, next: (allow: boolean, code?: number, message?: string) => void) {
 		let req = (incoming.req as any) as PolkaRequest
-		// if (process.env.DEVELOPMENT) {
-		// 	req.doc = {} as any
-		// 	return next(true)
-		// }
+		// if (process.env.DEVELOPMENT) return next(true);
 		Promise.resolve().then(function() {
 			req.authed = false
 
@@ -50,11 +48,11 @@ const wss = new uws.Server({
 			} as Security.Doc
 
 			let failed = security.isDoc(doc)
-			if (failed) return next(false, 412, `Precondition Failed: "${failed},"`);
+			if (failed) return next(false, 412, `Precondition Failed: "${failed}"`);
 			req.doc = doc
 
 			if (!req.doc.token) return next(true);
-			return security.reqDoc(req).then(() => next(true))
+			return security.reqDoc(req, true).then(() => next(true))
 
 		}).catch(function(error) {
 			console.error('verifyClient Error ->', error)
@@ -82,22 +80,17 @@ exithook(function onexit() { wss.close() })
 
 
 
-// let FILTER = null as Dict<boolean>
-// export function setFilter(filter: typeof FILTER) {
-// 	FILTER = filter
-// }
-
 const emitter = new Emitter()
 
 interface Client extends uws.WebSocket {
 	subs: string[]
 	authed: boolean
-	uuid: string
+	doc: Security.Doc
 }
 function onconnection(client: Client, req: PolkaRequest) {
 	client.subs = []
 	client.authed = req.authed
-	client.uuid = req.doc.uuid
+	client.doc = req.doc
 
 	client.on('message', function onmessage(message: string) {
 		if (message == 'pong') return;
@@ -110,7 +103,14 @@ function onconnection(client: Client, req: PolkaRequest) {
 		if (event.action) {
 			let action = event.action
 			if (action == 'sync') {
-				// if (FILTER) event.subs = event.subs.filter(v => FILTER[v.split(':').pop()]);
+				event.subs.remove(v => {
+					if (v.indexOf(rkeys.WS.UUID) == 0) {
+						let uuid = v.split(':').pop()
+						return uuid != this.doc.uuid
+					}
+					return false
+				})
+				// console.log('event.subs ->', event.subs)
 				this.subs.forEach(v => emitter.off(v, this.send, this))
 				this.subs.splice(0, Infinity, ...event.subs)
 				this.subs.forEach(v => emitter.on(v, this.send, this))
@@ -124,6 +124,7 @@ function onconnection(client: Client, req: PolkaRequest) {
 
 	client.on('close', function onclose(code, reason) {
 		if (code != 1001) console.warn('client close ->', code, reason);
+		core.object.nullify(this.doc)
 		this.subs.forEach(v => emitter.off(v, this.send, this))
 		this.terminate()
 		this.removeAllListeners()
