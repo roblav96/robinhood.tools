@@ -8,6 +8,6 @@
 
 <template>
 	<section class="account-route">
-		<h1>haii</h1>
+		<h1>haiidwdw</h1>
 	</section>
 </template>

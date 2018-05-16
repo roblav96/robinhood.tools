@@ -99,7 +99,6 @@ polka.route({
 			return () => {
 				let args = [req.doc]
 				if (req.body[key]) args.push(req.body[key]);
-				console.log('args ->', args)
 				return robinhood.sync[key](...args)
 			}
 		}), { concurrency: 1 })

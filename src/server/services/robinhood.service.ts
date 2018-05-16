@@ -13,9 +13,11 @@ import clock from '../../common/clock'
 
 
 
-clock.on('1s', function ontick(i) {
+clock.on('5s', function ontick(i) {
 	let subs = [] as string[]
-	
+	socket.clients.forEach(client => {
+		console.log('client.subs ->', client.subs)
+	})
 })
 
 

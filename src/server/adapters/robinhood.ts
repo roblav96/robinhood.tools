@@ -65,6 +65,17 @@ export const sync = {
 		return result
 	},
 
+	async orders({ rhtoken, rhaccount }: Security.Doc) {
+		let { results } = await http.get('https://api.robinhood.com/orders/', {
+			rhtoken,
+		}) as Robinhood.Api.Paginated<Robinhood.Order>
+		results.forEach(v => {
+			core.fix(v)
+			v.executions.forEach(core.fix)
+		})
+		return results
+	},
+
 	async portfolio({ rhtoken, rhaccount }: Security.Doc) {
 		let response = await http.get(`https://api.robinhood.com/portfolios/${rhaccount}/`, {
 			rhtoken,
@@ -75,20 +86,9 @@ export const sync = {
 
 	async positions({ rhtoken, rhaccount }: Security.Doc, query = { nonzero: true }) {
 		let { results } = await http.get(`https://api.robinhood.com/accounts/${rhaccount}/positions/`, {
-			query, rhtoken, debug: true,
+			query, rhtoken,
 		}) as Robinhood.Api.Paginated<Robinhood.Position>
 		results.forEach(core.fix)
-		return results
-	},
-
-	async orders({ rhtoken, rhaccount }: Security.Doc) {
-		let { results } = await http.get('https://api.robinhood.com/orders/', {
-			rhtoken,
-		}) as Robinhood.Api.Paginated<Robinhood.Order>
-		results.forEach(v => {
-			core.fix(v)
-			v.executions.forEach(core.fix)
-		})
 		return results
 	},
 

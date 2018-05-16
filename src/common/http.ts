@@ -117,6 +117,5 @@ declare global {
 		}
 	}
 }
-declare module 'boom' { interface Payload { isBoom: boolean } }
 
 

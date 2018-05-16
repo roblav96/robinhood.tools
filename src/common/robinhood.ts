@@ -6,10 +6,14 @@ export const RH = {
 	IDS: 'rh:ids',
 	SYMBOLS: 'rh:symbols',
 	INSTRUMENTS: 'rh:instruments',
-}
-
-export const SYNCS = {
-	
+	WS: {
+		WS: 'rh:ws',
+		ACCOUNT: 'rh:ws:account',
+		ORDERS: 'rh:ws:orders',
+		PORTFOLIO: 'rh:ws:portfolio',
+		POSITIONS: 'rh:ws:positions',
+		WATCHLIST: 'rh:ws:watchlist',
+	},
 }
 
 

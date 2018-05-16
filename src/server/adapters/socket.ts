@@ -22,7 +22,7 @@ pandora.on('socket.listening', function(hubmsg) {
 	pandora.send({ clientId: hubmsg.host.clientId }, 'socket.listening', { port })
 })
 
-export const wss = new uws.Server({
+const wss = new uws.Server({
 	host: process.env.HOST, port,
 
 	verifyClient(incoming, next: (allow: boolean, code?: number, message?: string) => void) {
@@ -103,14 +103,14 @@ function onconnection(client: Client, req: PolkaRequest) {
 		if (event.action) {
 			let action = event.action
 			if (action == 'sync') {
-				event.subs.remove(v => {
-					if (v.indexOf(rkeys.WS.UUID) == 0) {
-						let uuid = v.split(':').pop()
-						return uuid != this.doc.uuid
-					}
-					return false
-				})
 				// console.log('event.subs ->', event.subs)
+				// event.subs.remove(v => {
+				// 	if (v.indexOf(rkeys.WS.UUID) == 0) {
+				// 		let uuid = v.split(':').pop()
+				// 		return uuid != this.doc.uuid
+				// 	}
+				// 	return false
+				// })
 				this.subs.forEach(v => emitter.off(v, this.send, this))
 				this.subs.splice(0, Infinity, ...event.subs)
 				this.subs.forEach(v => emitter.on(v, this.send, this))
@@ -138,6 +138,9 @@ export function emit(name: string, data?: any) {
 	if (emitter.listenerCount(name) == 0) return;
 	emitter.emit(name, JSON.stringify({ name, data } as Socket.Event))
 }
+
+const clients = wss.clients as Client[]
+export { clients }
 
 
 
