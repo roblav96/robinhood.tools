@@ -16,33 +16,29 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 module.exports = {
 
 	outputDir: 'dist/client',
-	dll: DEVELOPMENT,
 	compiler: true,
-	// css: { sourceMap: DEVELOPMENT },
-	vueLoader: { hotReload: true },
 
 	configureWebpack: function(config) {
 
-		config.entry.app = './src/client/main.ts'
-		config.output.filename = '[name].bundle.js'
-		config.output.chunkFilename = '[name].chunk.js'
-		delete config.node.process
-		delete config.node.setImmediate
+		config.entry.app = ['./src/client/main.ts']
+		// config.output.filename = '[name].bundle.js'
+		// config.output.chunkFilename = '[name].chunk.js'
+		// delete config.node.process
+		// delete config.node.setImmediate
 
-		if (DEVELOPMENT) {
-			// config.devtool = 'source-map'
-			config.devtool = 'cheap-module-eval-source-map'
-			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/, /env/]))
-			config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
-				rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
-					use.loader = 'file-loader'
-					delete use.options.limit
-				})
-			})
-			config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-				name: 'vendor', minChunks: module => module.context && module.context.includes('node_modules'),
-			}))
-		}
+		// if (DEVELOPMENT) {
+		// 	config.devtool = 'cheap-module-eval-source-map'
+		// 	config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/, /env/]))
+		// 	config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
+		// 		rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
+		// 			use.loader = 'file-loader'
+		// 			delete use.options.limit
+		// 		})
+		// 	})
+		// 	// config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
+		// 	// 	name: 'vendor', minChunks: module => module.context && module.context.includes('node_modules'),
+		// 	// }))
+		// }
 
 		// config.plugins.push(new BundleAnalyzerPlugin())
 
@@ -68,6 +64,10 @@ module.exports = {
 		})
 
 		config.plugins.delete('no-emit-on-errors')
+
+		config.plugins.delete('prefetch')
+		config.plugins.delete('preload')
+		config.plugins.delete('html')
 
 		// config.plugin('friendly-errors').tap(function(args) {
 		// 	args[0].clearConsole = false

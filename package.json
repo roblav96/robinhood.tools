@@ -4,9 +4,8 @@
 	"version": "0.0.1",
 	"domain": "robinhood.tools",
 	"scripts": {
-		"postinstall": "run-p patch:types patch:polka client:tailwind",
+		"postinstall": "run-p patch:types client:tailwind",
 		"patch:types": "tsc-wtf && rimraf node_modules/vuex/types/vue.d.ts",
-		"patch:polka": "curl --output node_modules/polka/index.js 'https://raw.githubusercontent.com/lukeed/polka/master/packages/polka/index.js'",
 		"purge": "rimraf dist node_modules",
 		"rc": "npm run client:dev",
 		"client:dev": "onchange 'vue.config.js' --initial --killSignal SIGKILL --delay 300 -- run-p client:tailwind client:watch cli:focus",
