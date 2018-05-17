@@ -14,7 +14,7 @@ import NavBar from '@/client/components/navbar/navbar'
 		'v-navbar': NavBar,
 	},
 })
-export default class extends Mixins(VMixin) {
+export default class extends Vue {
 
 	created() {
 

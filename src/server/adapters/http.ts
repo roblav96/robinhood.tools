@@ -6,7 +6,6 @@ import * as _ from '../../common/lodash'
 import * as url from 'url'
 import * as qs from 'querystring'
 import * as simple from 'simple-get'
-import * as got from 'got'
 import * as http from '../../common/http'
 
 

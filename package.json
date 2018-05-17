@@ -4,8 +4,9 @@
 	"version": "0.0.1",
 	"domain": "robinhood.tools",
 	"scripts": {
-		"postinstall": "run-p patch:types client:tailwind",
+		"postinstall": "run-p patch:types patch:toposort client:tailwind",
 		"patch:types": "tsc-wtf && rimraf node_modules/vuex/types/vue.d.ts",
+		"patch:toposort": "replace-x 'throw' '//' node_modules/toposort/index.js",
 		"purge": "rimraf dist node_modules",
 		"rc": "npm run client:dev",
 		"client:dev": "onchange 'vue.config.js' --initial --killSignal SIGKILL --delay 300 -- run-p client:tailwind client:watch cli:focus",
@@ -106,6 +107,7 @@
 		"npm-run-all": "latest",
 		"onchange": "latest",
 		"pandora": "latest",
+		"replace-x": "latest",
 		"rimraf": "latest",
 		"sass-loader": "latest",
 		"source-map-support": "latest",

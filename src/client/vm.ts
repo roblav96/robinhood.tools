@@ -1,5 +1,6 @@
 // 
 
+import Vue from 'vue'
 import '@/common/clock'
 import '@/client/ui/directives'
 import '@/client/ui/components'
@@ -29,7 +30,8 @@ router.beforeEach(function(to, from, next) {
 	})
 })
 
-const vm = new App({ router, store })
+// const vm = new App({ router, store })
+const vm = new Vue({ router, store, render: h => h(App) })
 export default vm
 
 
