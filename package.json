@@ -81,7 +81,7 @@
 		"@types/lockr": "latest",
 		"@types/lodash": "latest",
 		"@types/lunr": "latest",
-		"@types/node": "9.6.7",
+		"@types/node": "9.6.17",
 		"@types/node-forge": "latest",
 		"@types/node-schedule": "latest",
 		"@types/p-all": "latest",
@@ -118,6 +118,8 @@
 		"webpack-bundle-analyzer": "latest"
 	},
 	"babel": {
-		"presets": ["@vue/app"]
+		"presets": [
+			"@vue/app"
+		]
 	}
 }

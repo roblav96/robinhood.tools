@@ -20,7 +20,8 @@ module.exports = {
 
 	configureWebpack: function(config) {
 
-		config.entry.app = ['./src/client/main.ts']
+		// console.log('configureWebpack config ->', config)
+
 		// config.output.filename = '[name].bundle.js'
 		// config.output.chunkFilename = '[name].chunk.js'
 		// delete config.node.process
@@ -46,14 +47,18 @@ module.exports = {
 
 	chainWebpack: function(config) {
 
+		// console.log('chainWebpack config ->', config)
+
+		config.entry('app').clear().add(path.resolve(__dirname, 'src/client/main.ts'))
+
 		config.plugin('define').tap(function(args) {
 			args[0]['process.env'].CLIENT = `"${true}"`
 			args[0]['process.env'][process.env.NODE_ENV.toUpperCase()] = `"${true}"`
 			args[0]['process.env'].NAME = `"${package.name}"`
 			args[0]['process.env'].VERSION = `"${package.version}"`
 			args[0]['process.env'].DOMAIN = `"${(DEVELOPMENT ? 'http://dev.' : 'https://') + package.domain}"`
-			let env = dotenv.config({ path: path.join(__dirname, 'env/client.env') }).parsed || {}
-			Object.assign(env, dotenv.config({ path: path.join(__dirname, 'env/client.' + process.env.NODE_ENV + '.env') }).parsed || {})
+			let env = dotenv.config({ path: path.resolve(__dirname, 'env/client.env') }).parsed || {}
+			Object.assign(env, dotenv.config({ path: path.resolve(__dirname, 'env/client.' + process.env.NODE_ENV + '.env') }).parsed || {})
 			Object.keys(env).forEach(k => args[0]['process.env'][k] = `"${env[k]}"`)
 			return args
 		})
@@ -65,17 +70,20 @@ module.exports = {
 
 		config.plugins.delete('no-emit-on-errors')
 
-		config.plugins.delete('prefetch')
-		config.plugins.delete('preload')
-		config.plugins.delete('html')
-
-		// config.plugin('friendly-errors').tap(function(args) {
-		// 	args[0].clearConsole = false
-		// 	return args
-		// })
+		config.plugin('friendly-errors').tap(function(args) {
+			args[0].clearConsole = false
+			return args
+		})
 
 	},
 
 }
+
+
+
+// const inspector = require('inspector')
+// inspector.open(+process.debugPort - 1)
+// console.clear()
+// require('exit-hook')(inspector.close)
 
 

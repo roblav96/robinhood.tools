@@ -48,7 +48,6 @@ for (i = 0; i < len; i++) {
 
 import * as inspector from 'inspector'
 import * as exithook from 'exit-hook'
-import * as clc from 'cli-color'
 if (process.env.DEBUGGER == 'true') {
 	inspector.open(process.debugPort + +process.env.OFFSET + +process.env.INSTANCE)
 	if (!+process.env.OFFSET && process.env.PRIMARY) {

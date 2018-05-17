@@ -4,11 +4,10 @@
 		"module": "esnext",
 		"lib": ["dom", "esnext"],
 		"moduleResolution": "node",
-		"noImplicitThis": true,
-		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"inlineSourceMap": true,
+		"allowSyntheticDefaultImports": true,
+		"sourceMap": true,
 		"removeComments": true,
 		"pretty": true,
 		"outDir": "dist",
@@ -17,6 +16,6 @@
 			"@/*": ["src/*"]
 		}
 	},
-	"include": ["src/**/*.ts", "src/**/*.vue"],
+	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules"]
 }
