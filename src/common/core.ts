@@ -104,6 +104,7 @@ export const string = {
 		return value.replace(/[^a-zA-Z0-9-_. ]/g, ' ').replace(/\s\s+/g, ' ').trim()
 	},
 	capitalize(value: string) {
+		if (!value) return value;
 		return _.startCase(value).toLowerCase().split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ').trim()
 	},
 	leven(a: string, b: string) {

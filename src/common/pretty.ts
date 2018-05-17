@@ -39,7 +39,7 @@ declare global { interface FormatNumberOpts { precision: number, compact: boolea
 export function number(value: number, { precision, compact, plusminus, percent, dollar } = {} as Partial<FormatNumberOpts>) {
 	if (!Number.isFinite(value)) return value;
 
-	if (compact) precision = 0;
+	if (!Number.isFinite(precision) && compact) precision = 0;
 	if (!Number.isFinite(precision)) {
 		precision = 2
 		let abs = Math.abs(value)
@@ -49,9 +49,20 @@ export function number(value: number, { precision, compact, plusminus, percent, 
 	}
 
 	if (percent || plusminus) precision = Math.min(precision, 2);
-	let localeopts = { maximumFractionDigits: precision } as Intl.NumberFormatOptions
-	if (!percent) localeopts.minimumFractionDigits = precision;
-	let fixed = value.toLocaleString('en', localeopts)
+	let fixed = value.toLocaleString('en', {
+		maximumFractionDigits: precision,
+		minimumFractionDigits: precision,
+	})
+
+	if (compact) {
+		let units = ['k', 'M', 'T']
+		let split = fixed.split(',')
+		if (split.length > 1) {
+			let end = Math.max(precision, 0)
+			let float = Number.parseFloat(`${split[0]}.${split[1].substring(0, end)}`)
+			fixed = `${float}${units[split.length - 2]}`
+		}
+	}
 
 	if (precision > 0) {
 		let iend = fixed.indexOf('.')
@@ -59,15 +70,6 @@ export function number(value: number, { precision, compact, plusminus, percent, 
 			let ending = fixed.substring(iend + 1)
 			let zeros = '0'.repeat(Math.max(precision - ending.length, 0))
 			fixed += zeros
-		}
-	}
-
-	if (compact && precision == 0) {
-		let units = ['k', 'M', 'T']
-		let split = fixed.split(',')
-		if (split.length > 1) {
-			let float = Number.parseFloat(`${split[0]}.${split[1].substring(0, 1)}`)
-			fixed = `${float}${units[split.length - 2]}`
 		}
 	}
 

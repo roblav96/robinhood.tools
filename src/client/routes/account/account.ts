@@ -5,7 +5,7 @@ import Vue from 'vue'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as rkeys from '@/common/rkeys'
-import * as robinhood from '@/common/robinhood'
+import * as robinhood from '@/client/adapters/robinhood'
 import * as security from '@/client/adapters/security'
 import * as http from '@/client/adapters/http'
 import store from '@/client/store'
@@ -22,16 +22,19 @@ import socket from '@/client/adapters/socket'
 export default class extends Vue {
 
 	mounted() {
-		socket.on(rkeys.RH.SYNC.ACCOUNT, this.onaccount, this)
-		console.log('this.$store.state.rh ->', JSON.parse(JSON.stringify(this.$store.state.rh)))
+		robinhood.sync()
+		// socket.on(rkeys.RH.SYNC.ACCOUNT, this.onaccount, this)
+		// socket.on(rkeys.RH.SYNC.ORDERS, this.onaccount, this)
+		// socket.on(rkeys.RH.SYNC.PORTFOLIO, this.onaccount, this)
+		// socket.on(rkeys.RH.SYNC.POSITIONS, this.onaccount, this)
 	}
 
 	beforeDestroy() {
-		socket.offListener(this.onaccount, this)
+		// socket.offListener(this.onaccount, this)
 	}
 
 	onaccount(account: Robinhood.Account) {
-		console.log('onaccount account ->', account)
+		// console.log('onaccount account ->', account)
 	}
 
 }

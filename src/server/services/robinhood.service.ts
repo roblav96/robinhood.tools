@@ -17,7 +17,7 @@ import clock from '../../common/clock'
 
 const queue = new pQueue({ concurrency: 1 })
 
-clock.on('1s', function ontick(i) {
+clock.on('5s', function ontick(i) {
 	if (queue.pending > 0) return;
 
 	socket.clients.forEach(client => {
@@ -26,10 +26,11 @@ clock.on('1s', function ontick(i) {
 		client.subs.forEach(name => {
 			if (name.indexOf(rkeys.RH.SYNC.SYNC) != 0) return;
 
-			let fn = robinhood.sync[name.split(':').pop()]
+			let fn = robinhood.sync[name.split(':').pop()] as (doc: Security.Doc) => Promise<any>
 			if (!fn) return;
 
 			queue.add(() => fn(client.doc)).then(data => {
+				// console.log('name ->', name, 'data ->', data)
 				socket.send(client, name, data)
 			})
 

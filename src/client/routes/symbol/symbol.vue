@@ -91,9 +91,9 @@
 								</div>
 								<div class="column is-narrow">
 									<p class="is-size-7">Volume</p>
-									<p class="is-size-5 leading-none font-medium mb-2">{{vnumber(wbquote.volume,{compact:true})}}</p>
+									<p class="is-size-5 leading-none font-medium mb-2">{{vnumber(wbquote.volume,{compact:true,precision:1})}}</p>
 									<p class="is-size-7">Market Cap</p>
-									<p class="is-size-5 leading-none font-medium">{{vnumber(marketcap,{compact:true})}}</p>
+									<p class="is-size-5 leading-none font-medium">{{vnumber(marketcap,{compact:true,precision:0})}}</p>
 								</div>
 							</div>
 						</div>

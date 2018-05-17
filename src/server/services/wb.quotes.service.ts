@@ -126,6 +126,11 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let quote = QUOTES[symbol]
 	let toquote = {} as Webull.Quote
 
+	if (!quote) {
+		console.warn('ondata !quote symbol ->', symbol)
+		return
+	}
+
 	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
 		emitter.emit('deal', wbquote)
@@ -143,8 +148,8 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 	} else {
 		Object.keys(wbquote).forEach((key: keyof Webull.Quote) => {
-			let from = quote[key] as any
-			let to = wbquote[key] as any
+			let from = quote[key] as number
+			let to = wbquote[key] as number
 			if (GREATER_KEYS[key]) {
 				if (to > from) toquote[key] = to;
 			} else if (to != from) {

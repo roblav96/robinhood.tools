@@ -26,14 +26,14 @@ declare global {
 	namespace Robinhood { type State = typeof state }
 }
 
+
+
 store.watch(state => state.security.rhusername, rhusername => {
 	if (!rhusername) return;
 	let synckeys = Object.keys(state).filter(k => _.isEmpty(state[k]))
 	if (_.isEmpty(synckeys)) return;
 	sync(synckeys as any)
 })
-
-
 
 export function sync(synckeys?: KeysOf<Robinhood.State>) {
 	return Promise.resolve().then(function() {
