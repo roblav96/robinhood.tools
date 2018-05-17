@@ -9,7 +9,7 @@ import router from '@/client/router'
 
 
 let state = lockr.get('recents', []) as Recent[]
-store.registerModule('recents', { state })
+store.register('recents', state)
 declare global {
 	namespace Store { interface State { recents: typeof state } }
 	interface Recent {

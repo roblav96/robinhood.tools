@@ -12,33 +12,24 @@ import App from '@/client/app/app'
 
 
 
-const vm = new App({ router, store })
-export default vm
-
-
-
-Promise.resolve().then(function() {
-	return security.token()
-}).then(function() {
-	return Promise.all([
-		socket.discover(),
-		socket.toPromise('ready'),
-	])
-}).catch(function(error) {
-	console.error('vm Error ->', error)
-}).finally(function() {
-	vm.$mount('#app')
+router.beforeEach(function(to, from, next) {
+	if (store.state.security.ready) return next();
+	Promise.resolve().then(function() {
+		return security.token()
+	}).then(function() {
+		return Promise.all([
+			socket.discover(),
+			socket.toPromise('ready'),
+		])
+	}).catch(function(error) {
+		console.error('vm Error ->', error)
+	}).finally(function() {
+		vm.$mount('#app')
+		next()
+	})
 })
 
-
-
-// import pAll from 'p-all'
-// pAll([
-// 	() => security.token(),
-// 	() => socket.discover(),
-// 	() => socket.toPromise('ready'),
-// ], { concurrency: 1 }).catch(error => {
-// 	console.error('pAll init Error ->', error)
-// }).finally(() => { vm.$mount('#app') })
+const vm = new App({ router, store })
+export default vm
 
 

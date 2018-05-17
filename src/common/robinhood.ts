@@ -6,17 +6,15 @@ export const RH = {
 	IDS: 'rh:ids',
 	SYMBOLS: 'rh:symbols',
 	INSTRUMENTS: 'rh:instruments',
-	WS: {
-		WS: 'rh:ws',
-		ACCOUNT: 'rh:ws:account',
-		ORDERS: 'rh:ws:orders',
-		PORTFOLIO: 'rh:ws:portfolio',
-		POSITIONS: 'rh:ws:positions',
-		WATCHLIST: 'rh:ws:watchlist',
+	SYNC: {
+		SYNC: 'rh:sync',
+		ACCOUNT: 'rh:sync:account',
+		ORDERS: 'rh:sync:orders',
+		PORTFOLIO: 'rh:sync:portfolio',
+		POSITIONS: 'rh:sync:positions',
+		WATCHLIST: 'rh:sync:watchlist',
 	},
 }
-
-
 
 export const MICS = {
 	ARCX: 'NYSE',

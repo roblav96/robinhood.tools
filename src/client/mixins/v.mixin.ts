@@ -17,7 +17,7 @@ export default class extends Vue {
 	production = !!process.env.PRODUCTION
 
 	vtruncate(value: string, length = 64) { if (!value) return value; return _.truncate(value, { length }) }
-	vcapitalize(value: string) { if (!value) return value; return core.string.capitalize(_.startCase(value)) }
+	vcapitalize(value: string) { if (!value) return value; return core.string.capitalize(value) }
 	vstamp(stamp: number) { if (!stamp) return stamp; return pretty.stamp(stamp) }
 	vfromnow(stamp: number, opts: Partial<FromNowOpts>) { if (!stamp) return stamp; return pretty.fromNow(stamp, opts) }
 	vnumber(value: number, opts: Partial<FormatNumberOpts>) { if (!Number.isFinite(value)) return value; return pretty.number(value, opts) }

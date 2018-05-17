@@ -22,6 +22,12 @@ pandora.on('socket.listening', function(hubmsg) {
 	pandora.send({ clientId: hubmsg.host.clientId }, 'socket.listening', { port })
 })
 
+// class WebSocketServer extends uws.Server {
+// 	subsFilter() {
+
+// 	}
+// }
+
 const wss = new uws.Server({
 	host: process.env.HOST, port,
 
@@ -104,13 +110,11 @@ function onconnection(client: Client, req: PolkaRequest) {
 			let action = event.action
 			if (action == 'sync') {
 				// console.log('event.subs ->', event.subs)
-				// event.subs.remove(v => {
-				// 	if (v.indexOf(rkeys.WS.UUID) == 0) {
-				// 		let uuid = v.split(':').pop()
-				// 		return uuid != this.doc.uuid
-				// 	}
-				// 	return false
-				// })
+				event.subs.remove(v => {
+					if (v.indexOf(rkeys.WS.UUID) != 0) return false;
+					let uuid = v.split(':').pop()
+					return uuid != this.doc.uuid
+				})
 				this.subs.forEach(v => emitter.off(v, this.send, this))
 				this.subs.splice(0, Infinity, ...event.subs)
 				this.subs.forEach(v => emitter.on(v, this.send, this))
@@ -124,7 +128,7 @@ function onconnection(client: Client, req: PolkaRequest) {
 
 	client.on('close', function onclose(code, reason) {
 		if (code != 1001) console.warn('client close ->', code, reason);
-		core.object.nullify(this.doc)
+		core.nullify(this.doc)
 		this.subs.forEach(v => emitter.off(v, this.send, this))
 		this.terminate()
 		this.removeAllListeners()
@@ -134,13 +138,20 @@ function onconnection(client: Client, req: PolkaRequest) {
 
 }
 
+export const clients = wss.clients as Client[]
+
 export function emit(name: string, data?: any) {
 	if (emitter.listenerCount(name) == 0) return;
 	emitter.emit(name, JSON.stringify({ name, data } as Socket.Event))
 }
 
-const clients = wss.clients as Client[]
-export { clients }
+export function broadcast(name: string, data?: any) {
+	wss.broadcast(JSON.stringify({ name, data } as Socket.Event))
+}
+
+export function send(client: Client, name: string, data?: any) {
+	client.send(JSON.stringify({ name, data } as Socket.Event))
+}
 
 
 

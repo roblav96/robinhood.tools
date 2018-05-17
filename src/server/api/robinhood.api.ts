@@ -67,9 +67,7 @@ polka.route({
 	url: '/api/robinhood/logout',
 	rhdoc: true,
 	handler: async function apilogout(req, res) {
-		console.log('revoke req.doc ->', req.doc)
 		let revoked = await robinhood.revoke(req.doc.rhtoken)
-		console.log('revoked ->', revoked)
 		let rkey = `${rkeys.SECURITY.DOC}:${req.doc.uuid}`
 		let ikeys = ['rhusername', 'rhaccount', 'rhtoken', 'rhrefresh'] as KeysOf<Security.Doc>
 		await redis.main.hdel(rkey, ...ikeys)

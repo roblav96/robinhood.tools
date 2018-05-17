@@ -24,9 +24,7 @@ export function fix(target: any, deep?: any) {
 	Object.keys(target).forEach(key => {
 		let value = target[key]
 		if (value == null) return;
-		else if (deep === true && typeof value == 'object' && value.constructor == Object) {
-			return fix(value)
-		}
+		else if (deep === true && object.is(value)) return fix(value);
 		else if (typeof value != 'string') return;
 		else if (value === '') delete target[key];
 		else if (!isNaN(value as any)) target[key] = Number.parseFloat(value);
@@ -38,8 +36,17 @@ export function fix(target: any, deep?: any) {
 	})
 }
 
-export function clone<T extends object = object>(value: T): T {
-	return JSON.parse(JSON.stringify(value))
+export function clone<T extends object = object>(target: T): T {
+	return JSON.parse(JSON.stringify(target))
+}
+
+export function nullify(target: any) {
+	if (Array.isArray(target)) {
+		target.forEach(v => v = null)
+		target.splice(0)
+	} else if (object.is(target)) {
+		Object.keys(target).forEach(k => target[k] = null)
+	}
 }
 
 
@@ -97,8 +104,7 @@ export const string = {
 		return value.replace(/[^a-zA-Z0-9-_. ]/g, ' ').replace(/\s\s+/g, ' ').trim()
 	},
 	capitalize(value: string) {
-		if (!value) return value;
-		return value.toLowerCase().split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ').trim()
+		return _.startCase(value).toLowerCase().split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ').trim()
 	},
 	leven(a: string, b: string) {
 		return leven(a, b) as number
@@ -197,7 +203,8 @@ export const sort = {
 
 
 export const object = {
-	is<T = object>(value: T): value is T { return _.isPlainObject(value) },
+	// is<T = object>(value: T): value is T { return _.isPlainObject(value) },
+	is<T = object>(value: T): value is T { return typeof value == 'object' && value.constructor == Object },
 	assign<T = object>(target: T, source: T, deep = false) {
 		Object.keys(source).forEach(function(key) {
 			let tvalue = target[key]

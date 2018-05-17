@@ -4,6 +4,7 @@ import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
+import store from '@/client/store'
 
 
 
@@ -94,10 +95,8 @@ const router = new VueRouter({
 
 router.afterEach(function(to, from) {
 	let route = routes.find(v => v.name == to.name)
-	document.title = route.title || core.string.capitalize(_.startCase(route.name))
+	document.title = route.title || core.string.capitalize(route.name)
 })
-
-
 
 export default router
 

@@ -33,7 +33,7 @@ if (document.readyState == 'loading') {
 
 
 
-store.registerModule('colors', { state })
+store.register('colors', state)
 declare global {
 	namespace Store { interface State { colors: Colors } }
 	interface Colors {

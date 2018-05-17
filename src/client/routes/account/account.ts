@@ -8,15 +8,22 @@ import * as rkeys from '@/common/rkeys'
 import * as robinhood from '@/common/robinhood'
 import * as security from '@/client/adapters/security'
 import * as http from '@/client/adapters/http'
+import store from '@/client/store'
 import socket from '@/client/adapters/socket'
 
 
 
-@Vts.Component
+@Vts.Component({
+	beforeRouteEnter(to, from, next) {
+		// if (process.env.DEVELOPMENT) return next();
+		_.get(store, 'state.security.rhusername') ? next() : next({ name: 'login' })
+	},
+})
 export default class extends Vue {
 
 	mounted() {
-		socket.on(`${rkeys.RH.WS.ACCOUNT}:${security.doc.uuid}`, this.onaccount, this)
+		socket.on(rkeys.RH.SYNC.ACCOUNT, this.onaccount, this)
+		console.log('this.$store.state.rh ->', JSON.parse(JSON.stringify(this.$store.state.rh)))
 	}
 
 	beforeDestroy() {

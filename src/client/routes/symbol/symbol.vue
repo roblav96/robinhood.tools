@@ -77,7 +77,7 @@
 								<div class="column is-narrow">
 									<p class="title">{{vnumber(wbquote.price)}}</p>
 									<p class="is-size-5 font-medium" v-green-red="wbquote.change">
-										{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true})}})
+										{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true,precision:2})}})
 									</p>
 									<p class="is-size-7">{{vfromnow(wbquote.mktradeTime,{max:1,verbose:true})}}</p>
 								</div>
@@ -85,7 +85,7 @@
 									<p class="is-size-7">{{exthours}}</p>
 									<p class="is-size-5 font-medium">{{vnumber(wbquote.pPrice)}}</p>
 									<p class="is-size-7 font-medium" v-green-red="wbquote.pChange">
-										{{vnumber(wbquote.pChange,{plusminus:true})}} ({{vnumber(wbquote.pChRatio*100,{plusminus:true,percent:true})}})
+										{{vnumber(wbquote.pChange,{plusminus:true})}} ({{vnumber(wbquote.pChRatio*100,{plusminus:true,percent:true,precision:2})}})
 									</p>
 									<p class="is-size-7">{{vfromnow(wbquote.faTradeTime,{max:1,verbose:true})}}</p>
 								</div>

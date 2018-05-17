@@ -13,7 +13,7 @@ let state = {
 	state: null as Hours.State,
 }
 Object.assign(state, lockr.get('hours', state))
-store.registerModule('hours', { state })
+store.register('hours', state)
 declare global { namespace Store { interface State { hours: typeof state } } }
 
 setImmediate(function() {

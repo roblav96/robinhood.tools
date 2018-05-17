@@ -20,23 +20,27 @@ const state = {
 	user: lockr.get('rh.user', {} as Robinhood.User),
 	watchlist: lockr.get('rh.watchlist', [] as Robinhood.Watchlist[]),
 }
-store.registerModule('rh', { state })
+store.register('rh', state)
 declare global {
 	namespace Store { interface State { rh: typeof state } }
 	namespace Robinhood { type State = typeof state }
 }
 
-store.watch(state => state.security.rhusername, () => sync())
+store.watch(state => state.security.rhusername, rhusername => {
+	if (!rhusername) return;
+	let synckeys = Object.keys(state).filter(k => _.isEmpty(state[k]))
+	if (_.isEmpty(synckeys)) return;
+	sync(synckeys as any)
+})
 
 
 
-export function sync() {
-	let needs = Object.keys(state).filter(k => _.isEmpty(state[k]))
-	if (_.isEmpty(needs)) return;
+export function sync(synckeys?: KeysOf<Robinhood.State>) {
 	return Promise.resolve().then(function() {
 		return http.post('/robinhood/sync', {
-			// synckeys: ['positions'] as KeysOf<Robinhood.State>,
+			synckeys,
 			positions: { nonzero: false },
+			// synckeys: ['positions'] as KeysOf<Robinhood.State>,
 		})
 	}).then(function(response: Robinhood.State) {
 		// console.log('response ->', JSON.parse(JSON.stringify(response)))

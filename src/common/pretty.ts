@@ -38,6 +38,7 @@ export function fromNow(stamp: number, opts = {} as Partial<FromNowOpts>) {
 declare global { interface FormatNumberOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean } }
 export function number(value: number, { precision, compact, plusminus, percent, dollar } = {} as Partial<FormatNumberOpts>) {
 	if (!Number.isFinite(value)) return value;
+
 	if (compact) precision = 0;
 	if (!Number.isFinite(precision)) {
 		precision = 2
@@ -46,10 +47,21 @@ export function number(value: number, { precision, compact, plusminus, percent, 
 		if (abs >= 1000) precision = 1;
 		if (abs >= 10000) precision = 0;
 	}
+
 	if (percent || plusminus) precision = Math.min(precision, 2);
 	let localeopts = { maximumFractionDigits: precision } as Intl.NumberFormatOptions
 	if (!percent) localeopts.minimumFractionDigits = precision;
 	let fixed = value.toLocaleString('en', localeopts)
+
+	if (precision > 0) {
+		let iend = fixed.indexOf('.')
+		if (iend > 0) {
+			let ending = fixed.substring(iend + 1)
+			let zeros = '0'.repeat(Math.max(precision - ending.length, 0))
+			fixed += zeros
+		}
+	}
+
 	if (compact && precision == 0) {
 		let units = ['k', 'M', 'T']
 		let split = fixed.split(',')
@@ -58,10 +70,12 @@ export function number(value: number, { precision, compact, plusminus, percent, 
 			fixed = `${float}${units[split.length - 2]}`
 		}
 	}
+
 	if (dollar) fixed = '$' + fixed;
 	if (plusminus && value > 0) fixed = '+' + fixed;
 	if (plusminus && value < 0) fixed = fixed.replace('-', '–');
 	if (percent) fixed += '%';
+
 	return fixed
 }
 

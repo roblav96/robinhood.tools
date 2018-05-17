@@ -14,14 +14,13 @@ import * as http from '@/client/adapters/http'
 
 
 
-const state = Object.assign({
+const state = {
 	ready: false,
-}, {
 	ishuman: lockr.get('security.ishuman', false),
 	rhusername: '',
 	rhaccount: '',
-} as Security.Doc)
-store.registerModule('security', { state })
+}
+store.register('security', state)
 declare global { namespace Store { interface State { security: typeof state } } }
 
 store.watch(state => state.security.ishuman, ishuman => lockr.set('security.ishuman', ishuman))
@@ -41,7 +40,7 @@ export function headers() {
 	return headers
 }
 
-export function token() {
+export function token(): Promise<void> {
 	return Promise.resolve().then(function() {
 		if (!doc.uuid) {
 			doc.uuid = security.randomBits(security.LENGTHS.uuid)

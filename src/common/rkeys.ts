@@ -10,9 +10,6 @@ export { YH } from './yahoo'
 
 
 
-export const QUOTES = 'quotes'
-export const DEALS = 'deals'
-
 export const SYMBOLS = {
 	STOCKS: 'symbols:stocks',
 	FOREX: 'symbols:forex',
@@ -36,6 +33,9 @@ export const BENCHMARKS = {
 }
 
 
+
+// export const QUOTES = 'quotes'
+// export const DEALS = 'deals'
 
 // export const ITEMS = 'items'
 // export const PRODUCTS = 'products'

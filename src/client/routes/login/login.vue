@@ -12,12 +12,12 @@ section.login-route form {
 
 <template>
 	<section class="login-route">
-		<section class="hero is-fullheight">
+		<section class="hero is-fullheight has-background-white-bis">
 			<div class="hero-body">
 				<div class="container self-start">
 					<div class="columns is-mobile justify-center">
-						<form class="column is-narrow" v-on:submit.prevent="submit">
-							<figure class="image mb-4">
+						<form class="column is-narrow box" v-on:submit.prevent="submit">
+							<figure class="image mb-4" style="width: 66%;">
 								<img class="is-png robinhood-banner" src="@/assets/robinhood-banner.png">
 							</figure>
 							<b-field class="mb-2" label="Email or Username">
@@ -30,7 +30,9 @@ section.login-route form {
 							<b-field v-show="ismfa" class="mb-4" label="Two-Factor Authentication">
 								<b-input ref="mfa_input" type="number" icon="phone-locked" v-model="mfa" :disabled="busy"></b-input>
 							</b-field>
-							<input class="button w-full is-rhgreen" type="submit" value="Login" :disabled="!ready || busy" :class="{ 'is-loading': busy }">
+							<button class="button w-full is-rhgreen" type="submit" :disabled="!ready || busy" :class="{ 'is-loading': busy }">
+								Login
+							</button>
 						</form>
 					</div>
 				</div>
