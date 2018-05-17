@@ -92,6 +92,7 @@
 		"@types/source-map-support": "latest",
 		"@types/uws": "latest",
 		"@types/webpack": "latest",
+		"@vue/cli-plugin-babel": "latest",
 		"@vue/cli-plugin-typescript": "latest",
 		"@vue/cli-service": "latest",
 		"chalk": "latest",
@@ -115,5 +116,8 @@
 		"typescript": "latest",
 		"vue-template-compiler": "latest",
 		"webpack-bundle-analyzer": "latest"
+	},
+	"babel": {
+		"presets": ["@vue/app"]
 	}
 }
