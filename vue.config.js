@@ -19,37 +19,31 @@ module.exports = {
 	compiler: true,
 
 	configureWebpack: function(config) {
-
 		// console.log('configureWebpack config ->', config)
 
-		// config.output.filename = '[name].bundle.js'
-		// config.output.chunkFilename = '[name].chunk.js'
-		// delete config.node.process
-		// delete config.node.setImmediate
+		config.output.filename = '[name].bundle.js'
+		config.output.chunkFilename = '[name].chunk.js'
 
-		// if (DEVELOPMENT) {
-		// 	config.devtool = 'cheap-module-eval-source-map'
-		// 	config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/, /env/]))
-		// 	config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
-		// 		rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
-		// 			use.loader = 'file-loader'
-		// 			delete use.options.limit
-		// 		})
-		// 	})
-		// 	// config.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-		// 	// 	name: 'vendor', minChunks: module => module.context && module.context.includes('node_modules'),
-		// 	// }))
-		// }
+		if (DEVELOPMENT) {
+			// config.devtool = 'source-map'
+			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/, /env/]))
+			config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
+				rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
+					use.loader = 'file-loader'
+					delete use.options.limit
+				})
+			})
+		}
 
 		// config.plugins.push(new BundleAnalyzerPlugin())
 
 	},
 
 	chainWebpack: function(config) {
-
 		// console.log('chainWebpack config ->', config)
 
-		config.entry('app').clear().add(path.resolve(__dirname, 'src/client/main.ts'))
+		let main = path.resolve(__dirname, 'src/client/main.ts')
+		config.entry('app').clear().add(main)
 
 		config.plugin('define').tap(function(args) {
 			args[0]['process.env'].CLIENT = `"${true}"`
@@ -70,10 +64,10 @@ module.exports = {
 
 		config.plugins.delete('no-emit-on-errors')
 
-		config.plugin('friendly-errors').tap(function(args) {
-			args[0].clearConsole = false
-			return args
-		})
+		// config.plugin('friendly-errors').tap(function(args) {
+		// 	args[0].clearConsole = false
+		// 	return args
+		// })
 
 	},
 

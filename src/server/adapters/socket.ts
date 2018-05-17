@@ -1,5 +1,6 @@
 // 
 
+import { AddressInfo } from 'net'
 export * from '../../common/socket'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
@@ -75,7 +76,7 @@ wss.on('error', function onerror(error) {
 })
 
 wss.on('listening', function onlistening() {
-	let address = wss.httpServer.address()
+	let address = wss.httpServer.address() as AddressInfo
 	console.info('wss listening ->', address.port)
 	pandora.broadcast({ processName: 'api' }, 'socket.onlistening', { port: address.port })
 })

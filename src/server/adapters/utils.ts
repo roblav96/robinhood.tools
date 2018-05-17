@@ -73,13 +73,15 @@ import * as path from 'path'
 import * as sourcemaps from 'source-map-support'
 /**▶ utils.requireDir(__dirname, __filename) */
 export function requireDir(dirName: string, fileName: string, filter?: (file: string) => boolean) {
-	fs.readdirSync(dirName).filter(v => v != fileName).forEach(function(file) {
+	fs.readdirSync(dirName).filter(v => {
+		return v != fileName && !v.endsWith('.map')
+	}).forEach(function(file) {
 		let full = path.join(dirName, file)
 		let src = sourcemaps.retrieveSourceMap(full).url
+		if (src.endsWith('.map')) src = src.slice(0, -4);
 		src = src.replace('/dist/', '/src/').replace('.js', '.ts')
 		if (!fs.existsSync(src)) return;
-		src = src.split('/').pop()
-		if (!filter || filter(src)) require(full);
+		if (!filter || filter(path.basename(src))) require(full);
 	})
 }
 

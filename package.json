@@ -75,7 +75,6 @@
 		"@types/dotenv": "latest",
 		"@types/execa": "latest",
 		"@types/fingerprintjs2": "latest",
-		"@types/got": "latest",
 		"@types/humanize-plus": "latest",
 		"@types/ioredis": "latest",
 		"@types/lockr": "latest",
