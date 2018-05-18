@@ -8,11 +8,12 @@ import * as core from '@/common/core'
 
 const state = {} as Store.State
 
-class VuexStore<T extends Store.State> extends Vuex.Store<T> {
-	register<K extends keyof T>(path: K, state: T[K]) {
-		super.registerModule(path, { state })
+interface VuexStore { getters: Store.Getters }
+class VuexStore extends Vuex.Store<Store.State> {
+	register<K extends keyof Store.State>(path: K, state: Store.State[K], getters?: any) {
+		super.registerModule(path, { state, getters })
 	}
-	unregister<K extends keyof T>(path: K) {
+	unregister<K extends keyof Store.State>(path: K) {
 		Vue.delete(this.state, path)
 		core.nullify(this.state[path])
 		super.unregisterModule(path)
@@ -26,6 +27,8 @@ const store = new VuexStore({
 })
 export default store
 
+// setImmediate(() => console.log('store.getters ->', store.getters))
+
 
 
 let load = require.context('./stores/', true, /\.ts$/)
@@ -38,18 +41,19 @@ load.keys().forEach(file => load(file))
 declare global {
 	namespace Store {
 		interface State { }
+		interface Getters { }
 	}
 }
 
 declare module 'vue/types/options' {
 	export interface ComponentOptions<V extends Vue> {
-		store?: Store<Store.State>
+		store?: VuexStore
 	}
 }
 
 declare module 'vue/types/vue' {
 	export interface Vue {
-		$store: Store<Store.State>
+		$store: VuexStore
 	}
 }
 

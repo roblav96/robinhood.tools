@@ -32,6 +32,8 @@ declare global {
 	namespace Robinhood { type State = typeof state }
 }
 
+
+
 const primaries = (({
 	accounts: 'account_number' as any,
 	achrelationships: 'id' as any,
@@ -92,7 +94,7 @@ export function sync(body: {
 // 	return core.promise.delay(1000).then(function() {
 // 		if (!store.state.security.rhusername) return;
 // 		return sync({ synckeys: ['accounts', 'orders', 'portfolios', 'positions'] }).then(function(response) {
-			
+
 // 		})
 // 	})
 // })
