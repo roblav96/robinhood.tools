@@ -16,13 +16,13 @@ import socket from '@/client/adapters/socket'
 @Vts.Component({
 	beforeRouteEnter(to, from, next) {
 		// if (process.env.DEVELOPMENT) return next();
-		_.get(store, 'state.security.rhusername') ? next() : next({ name: 'login' })
+		store.state.security.rhusername ? next() : next({ name: 'login' })
 	},
 })
 export default class extends Vue {
 
 	mounted() {
-		robinhood.sync()
+		// robinhood.sync()
 		// socket.on(rkeys.RH.SYNC.ACCOUNT, this.onaccount, this)
 		// socket.on(rkeys.RH.SYNC.ORDERS, this.onaccount, this)
 		// socket.on(rkeys.RH.SYNC.PORTFOLIO, this.onaccount, this)

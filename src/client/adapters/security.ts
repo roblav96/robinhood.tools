@@ -16,20 +16,20 @@ import * as http from '@/client/adapters/http'
 
 const state = {
 	ready: false,
-	ishuman: lockr.get('security.ishuman', false),
+	ishuman: false,
 	rhusername: '',
 	rhaccount: '',
 }
 store.register('security', state)
 declare global { namespace Store { interface State { security: typeof state } } }
 
-store.watch(state => state.security.ishuman, ishuman => lockr.set('security.ishuman', ishuman))
-
 
 
 export const doc = {
 	uuid: lockr.get('security.uuid'),
 	finger: lockr.get('security.finger'),
+	get rhusername() { return state.rhusername },
+	get rhaccount() { return state.rhaccount },
 } as Security.Doc
 
 export function headers() {
@@ -39,6 +39,8 @@ export function headers() {
 	} as Dict<string>
 	return headers
 }
+
+
 
 export function token(): Promise<void> {
 	return Promise.resolve().then(function() {
@@ -56,7 +58,7 @@ export function token(): Promise<void> {
 		return http.get('/security/token', { retries: Infinity })
 
 	}).then(function(response: Security.Doc) {
-		if (response) Object.assign(state, response);
+		Object.assign(state, response);
 		state.ready = true
 
 	}).catch(function(error) {

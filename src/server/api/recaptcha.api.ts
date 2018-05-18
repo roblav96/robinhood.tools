@@ -13,8 +13,8 @@ polka.route({
 	url: '/api/recaptcha/ishuman',
 	authed: true,
 	async handler(req, res) {
-		let ishuman = await redis.main.hget(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, 'ishuman')
-		return !!ishuman
+		let ishuman = await redis.main.hget(req.doc.rkey, 'ishuman')
+		return ishuman == 'true'
 	}
 })
 
@@ -44,13 +44,24 @@ polka.route({
 		}
 
 		if (!response.hostname.includes(process.env.DOMAIN)) {
-			throw boom.internal('!response.hostname')
+			throw boom.notFound('!response.hostname')
 		}
 
 		let doc = { ishuman: response.success } as Security.Doc
-		await redis.main.hmset(`${rkeys.SECURITY.DOC}:${req.doc.uuid}`, doc)
+		await redis.main.hset(req.doc.rkey, 'ishuman', doc.ishuman)
 		return doc
 	}
 })
+
+
+
+declare global {
+	interface RecaptchaResponse {
+		'error-codes': string[]
+		success: boolean
+		challenge_ts: string
+		hostname: string
+	}
+}
 
 

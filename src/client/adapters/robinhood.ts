@@ -4,6 +4,7 @@ export * from '@/common/robinhood'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as robinhood from '@/common/robinhood'
+import * as security from '@/client/adapters/security'
 import * as http from '@/client/adapters/http'
 import store from '@/client/store'
 import lockr from 'lockr'
@@ -11,15 +12,16 @@ import lockr from 'lockr'
 
 
 const state = {
-	account: lockr.get('rh.account', {} as Robinhood.Account),
-	application: lockr.get('rh.application', {} as Robinhood.Application),
-	orders: lockr.get('rh.orders', [] as Robinhood.Order[]),
-	portfolio: lockr.get('rh.portfolio', {} as Robinhood.Portfolio),
-	positions: lockr.get('rh.positions', [] as Robinhood.Position[]),
-	subscriptions: lockr.get('rh.subscriptions', [] as Robinhood.Subscription[]),
-	user: lockr.get('rh.user', {} as Robinhood.User),
-	watchlist: lockr.get('rh.watchlist', [] as Robinhood.Watchlist[]),
+	account: {} as Robinhood.Account,
+	application: {} as Robinhood.Application,
+	orders: [] as Robinhood.Order[],
+	portfolio: {} as Robinhood.Portfolio,
+	positions: [] as Robinhood.Position[],
+	subscriptions: [] as Robinhood.Subscription[],
+	user: {} as Robinhood.User,
+	watchlist: [] as Robinhood.Watchlist[],
 }
+Object.keys(state).forEach(k => state[k] = lockr.get(`rh.${k}`, state[k]))
 store.register('rh', state)
 declare global {
 	namespace Store { interface State { rh: typeof state } }
@@ -30,20 +32,22 @@ declare global {
 
 store.watch(state => state.security.rhusername, rhusername => {
 	if (!rhusername) return;
-	let synckeys = Object.keys(state).filter(k => _.isEmpty(state[k]))
-	if (_.isEmpty(synckeys)) return;
-	sync(synckeys as any)
+	sync()
+	// let synckeys = Object.keys(state).filter(k => _.isEmpty(state[k])) as KeysOf<Robinhood.State>
+	// if (_.isEmpty(synckeys)) return;
+	// sync({ synckeys, positions: { all: true } })
 })
 
-export function sync(synckeys?: KeysOf<Robinhood.State>) {
+export function sync(body?: {
+	synckeys?: KeysOf<Robinhood.State>,
+	positions?: { all: boolean },
+}) {
+	body = body || { synckeys: Object.keys(state) as any, positions: { all: false } }
+	console.log('body ->', JSON.stringify(body, null, 4))
 	return Promise.resolve().then(function() {
-		return http.post('/robinhood/sync', {
-			synckeys,
-			positions: { nonzero: false },
-			// synckeys: ['positions'] as KeysOf<Robinhood.State>,
-		})
+		return http.post('/robinhood/sync', body)
 	}).then(function(response: Robinhood.State) {
-		// console.log('response ->', JSON.parse(JSON.stringify(response)))
+		console.log('response ->', JSON.parse(JSON.stringify(response)))
 		Object.keys(response).forEach(key => {
 			let value = response[key]
 			lockr.set(`rh.${key}`, value)

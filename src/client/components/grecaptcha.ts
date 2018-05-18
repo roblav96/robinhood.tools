@@ -24,7 +24,7 @@ export default class extends Vue {
 
 	gcallback(gresponse: string) {
 		http.post('/recaptcha/verify', { gresponse }).then((response: Security.Doc) => {
-			this.$store.state.security.ishuman = response.ishuman
+			Object.assign(this.$store.state.security, response)
 			this.$toast.open({ message: 'Captcha challenge complete!' })
 		}).catch(error => console.error('gcallback > error', error))
 	}

@@ -24,10 +24,8 @@ polka.route({
 		},
 	},
 	handler: async function apilogin(req, res) {
-		let rkey = `${rkeys.SECURITY.DOC}:${req.doc.uuid}`
-
-		let ishuman = await redis.main.hget(rkey, 'ishuman')
-		if (!ishuman) throw boom.unauthorized('!ishuman');
+		let ishuman = await redis.main.hget(req.doc.rkey, 'ishuman')
+		if (ishuman != 'true') throw boom.unauthorized('ishuman != true');
 
 		let oauth = await robinhood.login(req.body)
 		if (oauth.mfa_required) return { mfa: true };
@@ -44,18 +42,20 @@ polka.route({
 			rhtoken: rdoc.rhtoken, retries: 0,
 		}) as Robinhood.Api.Paginated<Robinhood.Account>
 		let account = _.get(accounts, 'results[0]') as Robinhood.Account
-		console.log('account ->', account)
 		if (!account) throw boom.notFound('account');
 		rdoc.rhaccount = account.account_number
-		console.log('rdoc.rhaccount ->', rdoc.rhaccount)
 
-		let user = await http.get(account.user, { rhtoken: rdoc.rhtoken, retries: 0 }) as Robinhood.User
-		console.log('user ->', user)
+		let user = await robinhood.sync.user(rdoc)
 		rdoc.rhusername = user.username
 
-		await redis.main.hmset(rkey, rdoc)
+		console.log('login rdoc ->', rdoc)
 
-		return _.pick(rdoc, ['rhusername', 'rhaccount'] as KeysOf<Security.Doc>)
+		await redis.main.hmset(req.doc.rkey, rdoc)
+
+		return {
+			rhusername: rdoc.rhusername,
+			rhaccount: rdoc.rhaccount,
+		} as Security.Doc
 
 	}
 })
@@ -68,9 +68,8 @@ polka.route({
 	rhdoc: true,
 	handler: async function apilogout(req, res) {
 		let revoked = await robinhood.revoke(req.doc.rhtoken)
-		let rkey = `${rkeys.SECURITY.DOC}:${req.doc.uuid}`
 		let ikeys = ['rhusername', 'rhaccount', 'rhtoken', 'rhrefresh'] as KeysOf<Security.Doc>
-		await redis.main.hdel(rkey, ...ikeys)
+		await redis.main.hdel(req.doc.rkey, ...ikeys)
 	}
 })
 
@@ -94,11 +93,7 @@ polka.route({
 		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids });
 
 		let resolved = await pAll(synckeys.map(key => {
-			return () => {
-				let args = [req.doc]
-				if (req.body[key]) args.push(req.body[key]);
-				return robinhood.sync[key](...args)
-			}
+			return () => robinhood.sync[key](req.doc, req.body[key])
 		}), { concurrency: 1 })
 
 		let response = {} as any

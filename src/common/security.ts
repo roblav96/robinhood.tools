@@ -96,6 +96,7 @@ export function decryptObjectValues<T = any>(encrypted: T, privatePem: string): 
 declare global {
 	namespace Security {
 		interface Doc {
+			rkey: string
 			ip: string
 			uuid: string
 			finger: string
@@ -115,12 +116,6 @@ declare global {
 			publicPem: string
 			privatePem: string
 		}
-	}
-	interface RecaptchaResponse {
-		'error-codes': string[]
-		success: boolean
-		challenge_ts: string
-		hostname: string
 	}
 }
 

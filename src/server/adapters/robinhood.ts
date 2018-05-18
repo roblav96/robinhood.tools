@@ -50,7 +50,7 @@ export const sync = {
 
 	async account({ rhtoken, rhaccount }: Security.Doc) {
 		let response = await http.get(`https://api.robinhood.com/accounts/${rhaccount}/`, {
-			rhtoken,
+			rhtoken, retries: 0,
 		}) as Robinhood.Account
 		core.fix(response, true)
 		return response
@@ -58,7 +58,7 @@ export const sync = {
 
 	async application({ rhtoken }: Security.Doc) {
 		let { results } = await http.get('https://api.robinhood.com/applications/', {
-			rhtoken,
+			rhtoken, retries: 0,
 		}) as Robinhood.Api.Paginated<Robinhood.Application>
 		let result = results[0]
 		core.fix(result)
@@ -67,7 +67,7 @@ export const sync = {
 
 	async orders({ rhtoken, rhaccount }: Security.Doc) {
 		let { results } = await http.get('https://api.robinhood.com/orders/', {
-			rhtoken,
+			rhtoken, retries: 0,
 		}) as Robinhood.Api.Paginated<Robinhood.Order>
 		results.forEach(v => {
 			core.fix(v)
@@ -78,15 +78,15 @@ export const sync = {
 
 	async portfolio({ rhtoken, rhaccount }: Security.Doc) {
 		let response = await http.get(`https://api.robinhood.com/portfolios/${rhaccount}/`, {
-			rhtoken,
+			rhtoken, retries: 0,
 		}) as Robinhood.Portfolio
 		core.fix(response)
 		return response
 	},
 
-	async positions({ rhtoken, rhaccount }: Security.Doc, query = { nonzero: true }) {
+	async positions({ rhtoken, rhaccount }: Security.Doc, opts = { all: false }) {
 		let { results } = await http.get(`https://api.robinhood.com/accounts/${rhaccount}/positions/`, {
-			query, rhtoken,
+			query: { nonzero: !opts.all }, rhtoken, retries: 0,
 		}) as Robinhood.Api.Paginated<Robinhood.Position>
 		results.forEach(core.fix)
 		return results
@@ -94,7 +94,7 @@ export const sync = {
 
 	async subscriptions({ rhtoken }: Security.Doc) {
 		let { results } = await http.get('https://api.robinhood.com/subscription/subscriptions/', {
-			rhtoken,
+			rhtoken, retries: 0,
 		}) as Robinhood.Api.Paginated<Robinhood.Subscription>
 		results.forEach(core.fix)
 		return results
@@ -102,7 +102,7 @@ export const sync = {
 
 	async user({ rhtoken }: Security.Doc) {
 		let response = await http.get('https://api.robinhood.com/user/', {
-			rhtoken,
+			rhtoken, retries: 0,
 		}) as Robinhood.User
 		core.fix(response)
 		return response
@@ -110,7 +110,7 @@ export const sync = {
 
 	async watchlist({ rhtoken }: Security.Doc) {
 		let { results } = await http.get('https://api.robinhood.com/watchlists/Default/', {
-			rhtoken,
+			rhtoken, retries: 0,
 		}) as Robinhood.Api.Paginated<Robinhood.WatchlistResult>
 		results.forEach(core.fix)
 		let wlists = results.map(v => ({

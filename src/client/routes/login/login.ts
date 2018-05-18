@@ -16,16 +16,13 @@ import socket from '@/client/adapters/socket'
 	},
 	beforeRouteEnter(to, from, next) {
 		// if (process.env.DEVELOPMENT) return next();
-		!_.get(store, 'state.security.rhusername') ? next() : next({ name: 'account' })
+		store.state.security.rhusername ? next({ name: 'account' }) : next()
 	},
 })
 export default class extends Vue {
 
 	mounted() {
 		this.username_input.focus()
-		http.get('/recaptcha/ishuman').then((ishuman: boolean) => {
-			this.$store.state.security.ishuman = ishuman
-		})
 	}
 
 	get username_input() { return this.$refs.username_input as HTMLInputElement }
