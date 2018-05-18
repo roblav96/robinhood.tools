@@ -5,7 +5,7 @@
 /**/
 
 section.login-route form {
-	max-width: 326px;
+	max-width: 334px;
 }
 
 </style>
@@ -17,8 +17,8 @@ section.login-route form {
 				<div class="container self-start">
 					<div class="columns is-mobile justify-center">
 						<form class="column is-narrow box" v-on:submit.prevent="submit">
-							<figure class="image mb-4" style="width: 66%;">
-								<img class="is-png robinhood-banner" src="@/assets/robinhood-banner.png">
+							<figure class="image mb-4 w-2/3">
+								<img src="@/assets/robinhood-banner.png">
 							</figure>
 							<b-field class="mb-2" label="Email or Username">
 								<b-input ref="username_input" type="text" icon="account" v-model="username" required :disabled="busy || ismfa"></b-input>

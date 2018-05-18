@@ -12,8 +12,8 @@ import lockr from 'lockr'
 
 
 const state = {
-	account: {} as Robinhood.Account,
-	application: {} as Robinhood.Application,
+	accounts: [] as Robinhood.Account[],
+	applications: [] as Robinhood.Application[],
 	orders: [] as Robinhood.Order[],
 	portfolio: {} as Robinhood.Portfolio,
 	positions: [] as Robinhood.Position[],
@@ -32,18 +32,24 @@ declare global {
 
 store.watch(state => state.security.rhusername, rhusername => {
 	if (!rhusername) return;
-	sync()
+	sync({ synckeys: ['applications', 'accounts'] })
+	// sync({ positions: { all: true } })
 	// let synckeys = Object.keys(state).filter(k => _.isEmpty(state[k])) as KeysOf<Robinhood.State>
 	// if (_.isEmpty(synckeys)) return;
 	// sync({ synckeys, positions: { all: true } })
 })
 
-export function sync(body?: {
+export function sync(body: {
 	synckeys?: KeysOf<Robinhood.State>,
 	positions?: { all: boolean },
-}) {
-	body = body || { synckeys: Object.keys(state) as any, positions: { all: false } }
-	console.log('body ->', JSON.stringify(body, null, 4))
+	orders?: { all: boolean },
+} = {}) {
+	// _.defaults(body, {
+	// 	synckeys: Object.keys(state),
+	// 	positions: { all: false },
+	// 	orders: { all: false },
+	// } as typeof body)
+	console.log('body ->', body)
 	return Promise.resolve().then(function() {
 		return http.post('/robinhood/sync', body)
 	}).then(function(response: Robinhood.State) {

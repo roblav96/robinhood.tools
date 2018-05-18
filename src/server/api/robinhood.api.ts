@@ -48,8 +48,6 @@ polka.route({
 		let user = await robinhood.sync.user(rdoc)
 		rdoc.rhusername = user.username
 
-		console.log('login rdoc ->', rdoc)
-
 		await redis.main.hmset(req.doc.rkey, rdoc)
 
 		return {
@@ -83,6 +81,7 @@ polka.route({
 		body: {
 			synckeys: { type: 'array', items: 'string', optional: true },
 			positions: { type: 'object', optional: true },
+			orders: { type: 'object', optional: true },
 		},
 	},
 	handler: async function apisync(req, res) {

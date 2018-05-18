@@ -8,6 +8,8 @@ import * as robinhood from '../../common/robinhood'
 import * as redis from './redis'
 import * as http from './http'
 import * as boom from 'boom'
+import * as pForever from 'p-forever'
+import dayjs from '../../common/dayjs'
 
 
 
@@ -46,6 +48,21 @@ export async function revoke(rhtoken: string) {
 
 
 
+export async function paginated(config: Partial<Http.Config>) {
+	_.defaults(config, { method: 'GET', retries: 0 } as Http.Config)
+	let items = []
+	await pForever(async url => {
+		config.url = url
+		let { results, next } = await http.request(config) as Robinhood.Api.Paginated
+		results.forEach(v => {
+			core.fix(v, true)
+			items.push(v)
+		})
+		return next || pForever.end
+	}, config.url)
+	return items
+}
+
 export const sync = {
 
 	async account({ rhtoken, rhaccount }: Security.Doc) {
@@ -56,24 +73,29 @@ export const sync = {
 		return response
 	},
 
-	async application({ rhtoken }: Security.Doc) {
-		let { results } = await http.get('https://api.robinhood.com/applications/', {
-			rhtoken, retries: 0,
-		}) as Robinhood.Api.Paginated<Robinhood.Application>
-		let result = results[0]
-		core.fix(result)
-		return result
+	async accounts({ rhtoken }: Security.Doc) {
+		return paginated({ url: 'https://api.robinhood.com/accounts/', rhtoken }) as Promise<Robinhood.Account[]>
 	},
 
-	async orders({ rhtoken, rhaccount }: Security.Doc) {
-		let { results } = await http.get('https://api.robinhood.com/orders/', {
-			rhtoken, retries: 0,
-		}) as Robinhood.Api.Paginated<Robinhood.Order>
-		results.forEach(v => {
-			core.fix(v)
-			v.executions.forEach(core.fix)
-		})
-		return results
+	async applications({ rhtoken }: Security.Doc) {
+		return paginated({ url: 'https://api.robinhood.com/applications/', rhtoken }) as Promise<Robinhood.Application[]>
+	},
+
+	async orders({ rhtoken }: Security.Doc, opts = { all: false }) {
+		let query = !opts.all ? { 'updated_at[gte]': dayjs().subtract(1, 'week').format('YYYY-MM-DD') } : {}
+		let orders = [] as Robinhood.Order[]
+		await pForever(async url => {
+			let { results, next } = await http.get(url, {
+				query, rhtoken, retries: 0,
+			}) as Robinhood.Api.Paginated<Robinhood.Order>
+			results.forEach(v => {
+				core.fix(v)
+				v.executions.forEach(core.fix)
+				orders.push(v)
+			})
+			return next || pForever.end
+		}, 'https://api.robinhood.com/orders/')
+		return orders
 	},
 
 	async portfolio({ rhtoken, rhaccount }: Security.Doc) {
@@ -98,6 +120,23 @@ export const sync = {
 		}) as Robinhood.Api.Paginated<Robinhood.Subscription>
 		results.forEach(core.fix)
 		return results
+	},
+
+	async transfers({ rhtoken }: Security.Doc, opts = { all: false }) {
+		let query = !opts.all ? { 'updated_at[gte]': dayjs().subtract(1, 'week').format('YYYY-MM-DD') } : {}
+		let transfers = [] as Robinhood.Order[]
+		await pForever(async url => {
+			let { results, next } = await http.get(url, {
+				query, rhtoken, retries: 0,
+			}) as Robinhood.Api.Paginated<Robinhood.Order>
+			results.forEach(v => {
+				core.fix(v)
+				v.executions.forEach(core.fix)
+				transfers.push(v)
+			})
+			return next || pForever.end
+		}, 'https://api.robinhood.com/ach/transfers/')
+		return transfers
 	},
 
 	async user({ rhtoken }: Security.Doc) {

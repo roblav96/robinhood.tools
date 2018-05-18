@@ -39,7 +39,7 @@ polka.route({
 
 		let stamp = new Date(response.challenge_ts).valueOf()
 		let drift = Math.abs(Date.now() - stamp)
-		if (drift > 60000) {
+		if (drift > 600000) {
 			throw boom.clientTimeout(`${drift}ms`)
 		}
 
