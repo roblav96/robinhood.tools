@@ -8,6 +8,7 @@ import * as exithook from 'exit-hook'
 import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
 import * as boom from 'boom'
+import * as fkill from 'fkill'
 import * as pandora from 'pandora'
 import PolkaRouter from './polka.router'
 
@@ -39,11 +40,22 @@ const polka = new PolkaRouter({
 
 })
 
+
+
 const server = turbo.createServer(polka.handler)
-server.listen(+process.env.PORT + +process.env.INSTANCE, process.env.HOST, function onlisten() {
+const port = +process.env.PORT + +process.env.INSTANCE
+server.listen(port, process.env.HOST, function onlisten() {
 	let address = server.address()
 	console.info('api listening ->', address.port)
 })
+// fkill(`:${port}`).finally(function() {
+// 	return new Promise(function(resolve) {
+// 		server.listen(port, process.env.HOST, resolve)
+// 	})
+// }).then(function() {
+// 	let address = server.address()
+// 	console.info('api listening ->', address.port)
+// })
 
 exithook(function() {
 	server.connections.forEach(v => v.close())

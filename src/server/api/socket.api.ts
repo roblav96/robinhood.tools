@@ -13,8 +13,9 @@ import polka from './polka'
 const PORTS = [] as number[]
 pandora.on('socket.listening', function onlistening(hubmsg) {
 	let port = hubmsg.data.port as number
-	if (!Number.isFinite(port)) return;
-	if (!PORTS.includes(port)) PORTS.push(port);
+	if (Number.isFinite(port) && !PORTS.includes(port)) {
+		PORTS.push(port)
+	}
 })
 
 polka.route({
@@ -23,11 +24,9 @@ polka.route({
 	async handler(req, res) {
 		pandora.broadcast({}, 'socket.listening')
 		await new Promise(r => setTimeout(r, 100))
-		if (PORTS.length == 0) throw boom.badGateway('socket.listening');
+		// if (PORTS.length == 0) throw boom.badGateway('socket.listening');
 		let start = +process.env.PORT
-		return PORTS.map((port, i) => {
-			return `ws://${process.env.DOMAIN}/websocket/${port - start}`
-		})
+		return PORTS.map(port => `ws://${process.env.DOMAIN}/websocket/${port - start}`)
 	}
 })
 

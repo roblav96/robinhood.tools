@@ -23,12 +23,6 @@ pandora.on('socket.listening', function(hubmsg) {
 	pandora.send({ clientId: hubmsg.host.clientId }, 'socket.listening', { port })
 })
 
-// class WebSocketServer extends uws.Server {
-// 	subsFilter() {
-
-// 	}
-// }
-
 const wss = new uws.Server({
 	host: process.env.HOST, port,
 

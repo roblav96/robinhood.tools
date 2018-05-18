@@ -9,7 +9,7 @@
 		"patch:toposort": "replace-x 'throw' '//' node_modules/toposort/index.js",
 		"purge": "rimraf dist node_modules",
 		"rc": "npm run client:dev",
-		"client:dev": "onchange 'vue.config.js' --initial --killSignal SIGKILL --delay 300 -- run-p client:tailwind client:watch cli:focus",
+		"client:dev": "onchange 'vue.config.js' --initial --killSignal SIGKILL --delay 500 -- run-p client:tailwind client:watch cli:focus",
 		"client:watch": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
 		"client:build": "rimraf dist/client && cross-env NODE_ENV=production vue-cli-service build --mode production",
 		"client:tailwind": "tailwind build node_modules/tailwindcss/utilities.css --config src/client/styles/tailwind.js --output src/client/styles/tailwind.css",
@@ -17,9 +17,9 @@
 		"rw": "tsc --project .server.tsconfig.json --watch --noEmit",
 		"server:dev": "rimraf dist && npm run server:build || true && run-p server:onchange server:watch cli:focus",
 		"server:watch": "tsc --project .server.tsconfig.json --watch",
-		"server:onchange": "onchange 'dist/**/*.js' --killSignal SIGKILL --delay 300 -- pandora dev dist/server",
+		"server:onchange": "onchange 'dist/server/**/*.js' 'dist/common/**/*.js' --killSignal SIGKILL --delay 500 -- pandora dev dist/server",
 		"server:build": "tsc --project .server.tsconfig.json",
-		"cli:focus": "node -e 'setInterval(() => process.stdout.write(require(\"cli-color\").erase.lineRight), 300)'",
+		"cli:focus": "node -e 'setInterval(() => process.stdout.write(require(\"cli-color\").erase.lineRight), 500)'",
 		"cli:clear": "clear && printf \"\\e[3J\""
 	},
 	"dependencies": {
@@ -36,6 +36,7 @@
 		"fast-json-parse": "latest",
 		"fastest-validator": "latest",
 		"fingerprintjs2": "latest",
+		"fkill": "latest",
 		"humanize-plus": "latest",
 		"ioredis": "latest",
 		"leven": "latest",

@@ -46,13 +46,13 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 	})
 
 	Process(pandora.process('hours.service').entry('./services/hours.service'), { SCALE: 1 })
-	Process(pandora.process('robinhood.service').entry('./services/robinhood.service'), { SCALE: 1 })
-	Process(pandora.process('symbols.service').entry('./services/symbols.service'), { SCALE: 1 })
+	// Process(pandora.process('robinhood.service').entry('./services/robinhood.service'), { SCALE: 1 })
+	// Process(pandora.process('symbols.service').entry('./services/symbols.service'), { SCALE: 1 })
 
-	Process(pandora.process('stocks').entry('./services/wb.quotes.service'), {
-		SYMBOLS: 'STOCKS',
-		SCALE: 1, // os.cpus().length,
-	})
+	// Process(pandora.process('stocks').entry('./services/wb.quotes.service'), {
+	// 	SYMBOLS: 'STOCKS',
+	// 	SCALE: 1, // os.cpus().length,
+	// })
 	// Process(pandora.process('forex').entry('./services/wb.quotes.service'), {
 	// 	SYMBOLS: 'FOREX',
 	// 	SCALE: 1,
@@ -79,15 +79,23 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 
 
 
-// import * as exithook from 'exit-hook'
-// exithook(function(code) {
-// 	console.log('code ->', code)
-// 	process.kill(process.pid, 'SIGKILL')
-// 	console.log('code ->', code)
-// 	// console.log('signal ->', signal)
+// import * as fkill from 'fkill'
+// process.on('SIGTERM', function(signal) {
+// 	console.log('process.on SIGTERM ->', process.pid)
+// 	console.log('process.on SIGTERM signal ->', signal)
+// 	fkill(process.pid, { force: true, tree: true })
 // })
-// exithook(() => process.nextTick(() => process.kill(process.pid, 123)))
-// process.on('SIGTERM', () => process.kill(process.pid, 123))
-// process.on('SIGTERM', () => process.exit(1))
+// import * as exithook from 'exit-hook'
+// exithook(function() {
+// 	console.log('exithook ->', process.pid)
+// 	fkill(process.pid, { force: true, tree: true })
+// })
+// import * as sigexit from 'signal-exit'
+// sigexit(function(code, signal) {
+// 	console.log('sigexit ->', process.pid)
+// 	console.log('sigexit code ->', code)
+// 	console.log('sigexit signal ->', signal)
+// 	fkill(process.pid, { force: true, tree: true })
+// })
 
 

@@ -45,10 +45,22 @@ process.on('unhandledRejection', function(error) {
 
 
 
+// import * as fkill from 'fkill'
+// process.on('SIGTERM', function(signal) {
+// 	console.log('process.on SIGTERM ->', process.pid)
+// 	console.log('process.on SIGTERM signal ->', signal)
+// 	fkill(process.pid, { force: true, tree: true })
+// })
+// import * as exithook from 'exit-hook'
+// exithook(function() {
+// 	console.log('exithook ->', process.pid)
+// 	fkill(process.pid, { force: true, tree: true })
+// })
 // import * as sigexit from 'signal-exit'
 // sigexit(function(code, signal) {
-// 	console.log('code ->', code)
-// 	console.log('signal ->', signal)
-// 	process.send('SIGKILL')
+// 	console.log('sigexit ->', process.pid)
+// 	console.log('sigexit code ->', code)
+// 	console.log('sigexit signal ->', signal)
+// 	fkill(process.pid, { force: true, tree: true })
 // })
 
