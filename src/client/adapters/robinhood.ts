@@ -8,10 +8,13 @@ import * as security from '@/client/adapters/security'
 import * as http from '@/client/adapters/http'
 import * as lockr from 'lockr'
 import * as pForever from 'p-forever'
-import clock from '@/common/clock'
+import socket from '@/client/adapters/socket'
 import store from '@/client/store'
+import clock from '@/common/clock'
 
 
+
+const LIVES = ['accounts', 'orders', 'portfolios', 'positions'] as KeysOf<Robinhood.State>
 
 const state = {
 	accounts: [] as Robinhood.Account[],
@@ -34,69 +37,67 @@ declare global {
 
 
 
-const primaries = (({
-	accounts: 'account_number' as any,
-	achrelationships: 'id' as any,
-	achtransfers: 'id' as any,
-	applications: 'url' as any,
-	orders: 'id' as any,
-	portfolios: 'account' as any,
-	positions: 'url' as any,
-	subscriptions: 'id' as any,
-	watchlists: 'url' as any,
-} as typeof state) as any) as Dict<string>
-
-
-
-// store.watch(state => state.security.rhusername, rhusername => {
-// 	if (!rhusername) return;
-// 	let all = !_.isEmpty(Object.keys(state).filter(k => _.isEmpty(state[k])))
-// 	sync({ all })
-// 	// let synckeys = Object.keys(state) as KeysOf<Robinhood.State>
-// 	// if (!all) synckeys.remove(k => (['achrelationships'] as KeysOf<Robinhood.State>).includes(k));
-// 	// sync({ synckeys, all })
-// 	// sync({ synckeys: _.uniq(synckeys.concat('accounts', 'applications', 'portfolios', 'user')), all })
-// })
-
-// let didsync = false
 export function sync(body: {
 	synckeys?: KeysOf<Robinhood.State>
 	all?: boolean
 } = {}) {
-	return Promise.resolve().then(function() {
-		return http.post('/robinhood/sync', body)
-	}).then(function(response: Robinhood.State) {
-		// console.log('robinhood sync response ->', JSON.parse(JSON.stringify(response)))
-		Object.keys(response).forEach(key => {
-			let target = state[key]
-			let source = response[key]
-			if (core.object.is(target) && core.object.is(source)) {
-				core.object.assign(target, source, true)
-			} else if (Array.isArray(target) && Array.isArray(source)) {
-				core.array.merge(target, source, primaries[key], true)
-			} else {
-				state[key] = source
-			}
-			// if (!didsync) lockr.set(`rh.${key}`, state[key]);
-			// console.log('state[' + key + '] ->', JSON.stringify(state[key], null, 4))
-		})
-		// didsync = true
-		// console.log('state ->', JSON.stringify(state, null, 4))
-	}).catch(function(error) {
+	return http.post('/robinhood/sync', body).catch(function(error) {
 		console.error('sync Error ->', error)
-
-	})
+		return {}
+	}) as Promise<Robinhood.State>
 }
 
 
 
-// pForever(function onsync() {
-// 	return core.promise.delay(1000).then(function() {
-// 		if (!store.state.security.rhusername) return;
-// 		return sync({ synckeys: ['accounts', 'orders', 'portfolios', 'positions'] }).then(function(response) {
+pForever(function onsync() {
+	return core.promise.delay(1000).then(function() {
+		if (!store.state.security.rhusername) return;
+		return sync({ synckeys: LIVES }).then(function(response) {
+			Object.keys(response).forEach(k => state[k] = response[k])
+		})
+	})
+})
 
+
+
+
+
+// const primaries = (({
+// 	accounts: 'account_number' as any,
+// 	achrelationships: 'id' as any,
+// 	achtransfers: 'id' as any,
+// 	applications: 'url' as any,
+// 	orders: 'id' as any,
+// 	portfolios: 'account' as any,
+// 	positions: 'url' as any,
+// 	subscriptions: 'id' as any,
+// 	watchlists: 'url' as any,
+// } as typeof state) as any) as Dict<string>
+
+// let didsync = false
+// store.watch(state => state.security.rhusername, rhusername => {
+// 	if (!rhusername) return;
+// 	let keys = lockr.keys()
+// 	let all = Object.keys(state).filter(k => !keys.includes(`rh.${k}`)).length > 0
+// 	sync({ all }).then(function(response) {
+// 		Object.keys(response).forEach(function(key) {
+// 			let target = lockr.get(`rh.${key}`, Array.isArray(state[key]) ? [] : {})
+// 			let source = response[key]
+// 			if (core.object.is(target) && core.object.is(source)) {
+// 				core.object.assign(target, source, true)
+// 			} else if (Array.isArray(target) && Array.isArray(source)) {
+// 				core.array.merge(target, source, primaries[key], true)
+// 			} else {
+// 				target = source
+// 			}
+// 			lockr.set(`rh.${key}`, target)
+// 			if (LIVES.includes(key as any)) {
+// 				state[key] = target
+// 			}
 // 		})
+// 		didsync = true
 // 	})
+// 	console.log('state ->', state)
 // })
 
 
