@@ -14,7 +14,7 @@ section.login-route form {
 	<section class="login-route">
 		<section class="hero is-fullheight has-background-white-bis">
 			<div class="hero-body">
-				<div class="container self-start">
+				<section class="section container self-start">
 					<div class="columns is-mobile justify-center">
 						<form class="column is-narrow box" v-on:submit.prevent="submit">
 							<figure class="image mb-4 w-2/3">
@@ -35,7 +35,7 @@ section.login-route form {
 							</button>
 						</form>
 					</div>
-				</div>
+				</section>
 			</div>
 		</section>
 	</section>

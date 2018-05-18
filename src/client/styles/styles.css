@@ -4,11 +4,18 @@ nav.navbar div.field.navbar-item {
 	margin-bottom: 0px;
 }
 
+nav.navbar .navbar-item .tag,
+nav.navbar .navbar-item .tags {
+	margin-bottom: initial;
+}
+
+
 /**/
 
 .border-debug {
 	border: 1px solid red !important;
 }
+
 
 /**/
 
@@ -17,11 +24,17 @@ img.is-png {
 	backface-visibility: hidden;
 }
 
+
 /**/
 
 th[width="1"],
 td[width="1"] {
 	white-space: nowrap !important;
+}
+
+.table.is-borderless th,
+.table.is-borderless td {
+	border-width: 0px;
 }
 
 .table.is-narrower th,
@@ -34,10 +47,6 @@ td[width="1"] {
 	padding: 0rem 0.5rem;
 }
 
-.table.align-bottom th,
-.table.align-bottom td {
-	vertical-align: bottom !important;
-}
 
 /**/
 
@@ -55,6 +64,16 @@ p.content,
 .text-inherit {
 	color: inherit !important;
 }
+
+
+/**/
+
+span.tag.is-small {
+	height: 1.125rem;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+}
+
 
 /**/
 
@@ -84,10 +103,12 @@ span.icon.is-xxlarge > i.mdi::before {
 	font-size: 5rem;
 }
 
+
 /**/
 
 .animated-loading {
 	animation-duration: 3s !important;
 }
+
 
 /**/

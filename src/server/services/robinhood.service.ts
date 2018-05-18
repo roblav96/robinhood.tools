@@ -15,21 +15,21 @@ import clock from '../../common/clock'
 
 
 
-const queue = new pQueue({ concurrency: 1 })
+const queue5s = new pQueue({ concurrency: 1 })
 
 clock.on('5s', function ontick(i) {
-	if (queue.pending > 0) return;
+	if (queue5s.pending > 0) return;
 
 	socket.clients.forEach(client => {
 		if (!client.doc.rhtoken) return;
 
 		client.subs.forEach(name => {
-			if (name.indexOf(rkeys.RH.SYNC.SYNC) != 0) return;
+			if (name.indexOf(rkeys.RH.SYNC) != 0) return;
 
 			let fn = robinhood.sync[name.split(':').pop()] as (doc: Security.Doc) => Promise<any>
 			if (!fn) return;
 
-			queue.add(() => fn(client.doc)).then(data => {
+			queue5s.add(() => fn(client.doc)).then(data => {
 				// console.log('name ->', name, 'data ->', data)
 				socket.send(client, name, data)
 			})

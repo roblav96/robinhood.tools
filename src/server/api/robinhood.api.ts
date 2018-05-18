@@ -54,8 +54,6 @@ polka.route({
 	}
 })
 
-
-
 polka.route({
 	method: 'GET',
 	url: '/api/robinhood/logout',
@@ -93,6 +91,7 @@ polka.route({
 
 		let response = {} as any
 		synckeys.forEach((k, i) => response[k] = resolved[i])
+		// console.warn('robinhood sync response ->', console.dtsgen(response))
 		return response
 
 	}

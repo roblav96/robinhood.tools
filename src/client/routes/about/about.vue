@@ -38,7 +38,7 @@ div.about-boxes span.icon > i.mdi:before {
 					<div v-for="box in boxes" class="column is-4">
 						<div class="box h-100">
 							<div class="has-text-centered">
-								<b-icon :icon="box.icon" type="is-primary" class="mb-3" />
+								<b-icon :icon="box.icon" type="is-primary" class="mb-3"></b-icon>
 								<p class="is-size-5 font-500">{{ box.title }}</p>
 							</div>
 							<hr class="my-3">

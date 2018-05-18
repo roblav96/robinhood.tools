@@ -125,11 +125,7 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let symbol = wbquote.symbol
 	let quote = QUOTES[symbol]
 	let toquote = {} as Webull.Quote
-
-	if (!quote) {
-		console.warn('ondata !quote symbol ->', symbol)
-		return
-	}
+	if (!quote) return console.warn('ondata !quote symbol ->', symbol);
 
 	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {

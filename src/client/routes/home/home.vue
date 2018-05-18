@@ -26,7 +26,7 @@
 						<div v-for="box in boxes" class="column is-half-tablet is-one-quarter-widescreen">
 							<div class="box content">
 								<div class="has-text-centered">
-									<b-icon :icon="box.icon" size="is-xxlarge" type="is-primary" class="mb-4" />
+									<b-icon :icon="box.icon" size="is-xxlarge" type="is-primary" class="mb-4"></b-icon>
 									<p class="text-inherit title is-4">{{ box.title }}</p>
 								</div>
 								<hr class="has-background-primary my-5">

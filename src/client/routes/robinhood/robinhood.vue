@@ -1,5 +1,5 @@
 <!--  -->
-<script lang="ts" src="./robinhood.index.ts"></script>
+<script lang="ts" src="./robinhood.ts"></script>
 
 <style>
 /**/

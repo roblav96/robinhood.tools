@@ -20,7 +20,7 @@
 				<div class="container">
 					<div class="content has-text-centered">
 						<a class="button" href="https://github.com/roblav96/robinhood.tools" target="_blank">
-							<b-icon icon="github-circle" />
+							<b-icon icon="github-circle"></b-icon>
 							<span>Open Source</span>
 						</a>
 					</div>

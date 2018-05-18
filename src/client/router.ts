@@ -35,14 +35,14 @@ export const routes = [
 		component: () => import('@/client/routes/login/login'),
 	},
 
-	// {
-	// 	name: 'accounts', path: '/accounts',
-	// 	component: () => import('@/client/routes/accounts/accounts'),
-	// },
+	{
+		name: 'accounts', path: '/accounts',
+		component: () => import('@/client/routes/accounts/accounts'),
+	},
 
 	{
 		name: 'robinhood', path: '/robinhood',
-		component: () => import('@/client/routes/robinhood/robinhood.index'),
+		component: () => import('@/client/routes/robinhood/robinhood'),
 		children: [
 			{
 				title: 'Accounts', icon: 'earth',

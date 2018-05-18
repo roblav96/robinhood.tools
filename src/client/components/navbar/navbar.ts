@@ -3,9 +3,11 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
+import VMixin from '@/client/mixins/v.mixin'
+import * as _ from '@/common/lodash'
+import * as pretty from '@/common/pretty'
 import dayjs from '@/common/dayjs'
 import clock from '@/common/clock'
-import * as pretty from '@/common/pretty'
 
 
 
@@ -14,7 +16,7 @@ import * as pretty from '@/common/pretty'
 		'v-searchbar': () => import('@/client/components/searchbar/searchbar'),
 	},
 })
-export default class extends Vue {
+export default class extends Mixins(VMixin) {
 
 	isMobileMenu = false
 
@@ -26,6 +28,8 @@ export default class extends Vue {
 	}
 
 	get rhusername() { return this.$store.state.security.rhusername }
+	get portfolio() { return _.sum(this.$store.state.rh.accounts.map(v => v.buying_power)) }
+	get buying() { return _.sum(this.$store.state.rh.accounts.map(v => v.buying_power)) }
 
 	time = ''
 	get state() { return pretty.marketState(this.$store.state.hours.state) }
