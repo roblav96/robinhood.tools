@@ -7,6 +7,8 @@ import * as robinhood from '@/common/robinhood'
 import * as security from '@/client/adapters/security'
 import * as http from '@/client/adapters/http'
 import * as lockr from 'lockr'
+import * as pForever from 'p-forever'
+import clock from '@/common/clock'
 import store from '@/client/store'
 
 
@@ -23,7 +25,7 @@ const state = {
 	user: {} as Robinhood.User,
 	watchlists: [] as Robinhood.Watchlist[],
 }
-Object.keys(state).forEach(k => state[k] = lockr.get(`rh.${k}`, state[k]))
+// Object.keys(state).forEach(k => state[k] = lockr.get(`rh.${k}`, state[k]))
 store.register('rh', state)
 declare global {
 	namespace Store { interface State { rh: typeof state } }
@@ -44,14 +46,17 @@ const primaries = (({
 
 
 
-store.watch(state => state.security.rhusername, rhusername => {
-	if (!rhusername) return;
-	let exists = lockr.keys()
-	let synckeys = Object.keys(state).filter(k => !exists.includes(`rh.${k}`)) as KeysOf<Robinhood.State>
-	sync({ synckeys: _.uniq(synckeys.concat('accounts', 'applications', 'portfolios', 'user')), all: true })
-	// sync({ all: true })
-})
+// store.watch(state => state.security.rhusername, rhusername => {
+// 	if (!rhusername) return;
+// 	let all = !_.isEmpty(Object.keys(state).filter(k => _.isEmpty(state[k])))
+// 	sync({ all })
+// 	// let synckeys = Object.keys(state) as KeysOf<Robinhood.State>
+// 	// if (!all) synckeys.remove(k => (['achrelationships'] as KeysOf<Robinhood.State>).includes(k));
+// 	// sync({ synckeys, all })
+// 	// sync({ synckeys: _.uniq(synckeys.concat('accounts', 'applications', 'portfolios', 'user')), all })
+// })
 
+// let didsync = false
 export function sync(body: {
 	synckeys?: KeysOf<Robinhood.State>
 	all?: boolean
@@ -59,7 +64,7 @@ export function sync(body: {
 	return Promise.resolve().then(function() {
 		return http.post('/robinhood/sync', body)
 	}).then(function(response: Robinhood.State) {
-		console.log('robinhood sync response ->', JSON.parse(JSON.stringify(response)))
+		// console.log('robinhood sync response ->', JSON.parse(JSON.stringify(response)))
 		Object.keys(response).forEach(key => {
 			let target = state[key]
 			let source = response[key]
@@ -70,11 +75,26 @@ export function sync(body: {
 			} else {
 				state[key] = source
 			}
-			lockr.set(`rh.${key}`, state[key])
+			// if (!didsync) lockr.set(`rh.${key}`, state[key]);
 			// console.log('state[' + key + '] ->', JSON.stringify(state[key], null, 4))
 		})
+		// didsync = true
 		// console.log('state ->', JSON.stringify(state, null, 4))
-	}).catch(error => console.error('sync Error ->', error))
+	}).catch(function(error) {
+		console.error('sync Error ->', error)
+
+	})
 }
+
+
+
+// pForever(function onsync() {
+// 	return core.promise.delay(1000).then(function() {
+// 		if (!store.state.security.rhusername) return;
+// 		return sync({ synckeys: ['accounts', 'orders', 'portfolios', 'positions'] }).then(function(response) {
+			
+// 		})
+// 	})
+// })
 
 

@@ -38,13 +38,7 @@ polka.route({
 			rhrefresh: oauth.refresh_token,
 		} as Security.Doc
 
-		// let accounts = await http.get('https://api.robinhood.com/accounts/', {
-		// 	rhtoken: rdoc.rhtoken, retries: 0,
-		// }) as Robinhood.Api.Paginated<Robinhood.Account>
-		// let account = _.get(accounts, 'results[0]') as Robinhood.Account
-		// if (!account) throw boom.notFound('account');
-
-		let user = await robinhood.sync.user(rdoc.rhtoken)
+		let user = await robinhood.sync.user(rdoc)
 		rdoc.rhusername = user.username
 
 		await redis.main.hmset(req.doc.rkey, rdoc)
@@ -86,7 +80,7 @@ polka.route({
 
 		let opts = { all: req.body.all == true }
 		let resolved = await pAll(synckeys.map(key => {
-			return () => robinhood.sync[key](req.doc.rhtoken, opts)
+			return () => robinhood.sync[key](req.doc, opts)
 		}), { concurrency: 1 })
 
 		let response = {} as any

@@ -25,6 +25,7 @@ export default class extends Mixins(VMixin) {
 		document.documentElement.classList.add('has-navbar-fixed-top')
 		clock.on('1s', this.onsecond)
 		this.onsecond()
+		console.log('this.$store.state.rh ->', JSON.parse(JSON.stringify(this.$store.state.rh)))
 	}
 
 	get rhusername() { return this.$store.state.security.rhusername }

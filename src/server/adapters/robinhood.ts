@@ -66,49 +66,49 @@ export async function paginated(config: Partial<Http.Config>) {
 
 export const sync = {
 
-	accounts(rhtoken: string) {
+	accounts({ rhtoken }: Security.Doc) {
 		return paginated({ url: 'https://api.robinhood.com/accounts/', rhtoken }) as Promise<Robinhood.Account[]>
 	},
 
-	achrelationships(rhtoken: string) {
+	achrelationships({ rhtoken }: Security.Doc) {
 		return paginated({ url: 'https://api.robinhood.com/ach/relationships/', rhtoken }) as Promise<Robinhood.AchRelationship[]>
 	},
 
-	achtransfers(rhtoken: string, opts = { all: false }) {
+	achtransfers({ rhtoken }: Security.Doc, opts = { all: false }) {
 		let query = opts.all ? {} : { 'updated_at[gte]': dayjs().subtract(1, 'day').format('YYYY-MM-DD') }
 		return paginated({ url: 'https://api.robinhood.com/ach/transfers/', query, rhtoken }) as Promise<Robinhood.AchTransfer[]>
 	},
 
-	applications(rhtoken: string) {
+	applications({ rhtoken }: Security.Doc) {
 		return paginated({ url: 'https://api.robinhood.com/applications/', rhtoken }) as Promise<Robinhood.Application[]>
 	},
 
-	orders(rhtoken: string, opts = { all: false }) {
+	orders({ rhtoken }: Security.Doc, opts = { all: false }) {
 		let query = opts.all ? {} : { 'updated_at[gte]': dayjs().subtract(1, 'day').format('YYYY-MM-DD') }
 		return paginated({ url: 'https://api.robinhood.com/orders/', query, rhtoken }) as Promise<Robinhood.Order[]>
 	},
 
-	portfolios(rhtoken: string) {
+	portfolios({ rhtoken }: Security.Doc) {
 		return paginated({ url: 'https://api.robinhood.com/portfolios/', rhtoken }) as Promise<Robinhood.Portfolio[]>
 	},
 
-	positions(rhtoken: string, opts = { all: false }) {
+	positions({ rhtoken }: Security.Doc, opts = { all: false }) {
 		let query = { nonzero: !opts.all }
 		return paginated({ url: 'https://api.robinhood.com/positions/', query, rhtoken }) as Promise<Robinhood.Position[]>
 	},
 
-	subscriptions(rhtoken: string, opts = { all: false }) {
+	subscriptions({ rhtoken }: Security.Doc, opts = { all: false }) {
 		let query = { active: !opts.all }
 		return paginated({ url: 'https://api.robinhood.com/subscription/subscriptions/', query, rhtoken }) as Promise<Robinhood.Subscription[]>
 	},
 
-	async user(rhtoken: string) {
+	async user({ rhtoken }: Security.Doc) {
 		let user = await http.get('https://api.robinhood.com/user/', { rhtoken, retries: 0 }) as Robinhood.User
 		core.fix(user)
 		return user
 	},
 
-	async watchlists(rhtoken: string) {
+	async watchlists({ rhtoken }: Security.Doc) {
 		let lists = await paginated({ url: 'https://api.robinhood.com/watchlists/', rhtoken }) as Robinhood.WatchlistMeta[]
 		let results = _.flatten(await pAll(lists.map(list => {
 			return () => paginated({ url: list.url, rhtoken }) as Promise<Robinhood.Watchlist[]>

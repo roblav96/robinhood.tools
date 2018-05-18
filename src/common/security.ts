@@ -114,6 +114,7 @@ declare global {
 			prime: string
 			ishuman: boolean
 			rhusername: string
+			rhaccount: string
 			rhtoken: string
 			rhrefresh: string
 		}
