@@ -173,11 +173,11 @@ export const array = {
 		value.forEach((v, i) => chunks[i % chunks.length].push(v))
 		return chunks
 	},
-	merge<T = any>(value: T[], source: T[], key: string) {
+	merge<T = any>(target: T[], source: T[], primary: string, deep = false) {
 		source.forEach(function(item, i) {
-			let found = value.find(v => v && v[key] == item[key])
-			if (found) object.merge(found, item);
-			else value.push(item);
+			let found = target.find(v => v && v[primary] == item[primary])
+			if (found) object.assign(found, item, deep);
+			else target.push(item);
 		})
 	},
 	dict<T = string>(value: any[], filled?: T): Dict<T> {
@@ -210,13 +210,13 @@ export const sort = {
 
 export const object = {
 	// is<T = object>(value: T): value is T { return _.isPlainObject(value) },
-	is<T = object>(value: T): value is T { return typeof value == 'object' && value.constructor == Object },
+	is<T = object>(value: T): value is T { return value && typeof value == 'object' && value.constructor == Object },
 	assign<T = object>(target: T, source: T, deep = false) {
 		Object.keys(source).forEach(function(key) {
 			let tvalue = target[key]
 			let svalue = source[key]
 			if (deep && object.is(tvalue) && object.is(svalue)) {
-				return object.assign(tvalue, svalue, true)
+				return object.assign(tvalue, svalue, deep)
 			}
 			target[key] = svalue;
 		})

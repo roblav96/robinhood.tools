@@ -70,13 +70,13 @@ export const sync = {
 		return paginated({ url: 'https://api.robinhood.com/accounts/', rhtoken }) as Promise<Robinhood.Account[]>
 	},
 
+	achrelationships(rhtoken: string) {
+		return paginated({ url: 'https://api.robinhood.com/ach/relationships/', rhtoken }) as Promise<Robinhood.AchRelationship[]>
+	},
+
 	achtransfers(rhtoken: string, opts = { all: false }) {
 		let query = opts.all ? {} : { 'updated_at[gte]': dayjs().subtract(1, 'day').format('YYYY-MM-DD') }
 		return paginated({ url: 'https://api.robinhood.com/ach/transfers/', query, rhtoken }) as Promise<Robinhood.AchTransfer[]>
-	},
-
-	achrelationships(rhtoken: string) {
-		return paginated({ url: 'https://api.robinhood.com/ach/relationships/', rhtoken }) as Promise<Robinhood.AchRelationship[]>
 	},
 
 	applications(rhtoken: string) {
