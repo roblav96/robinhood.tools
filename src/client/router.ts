@@ -15,11 +15,6 @@ export const routes = [
 		component: () => import('@/client/routes/home/home'),
 	},
 
-	// {
-	// 	title: 'Portfolio', icon: 'chart-pie',
-	// 	name: 'portfolio', path: '/portfolio',
-	// },
-
 	{
 		title: 'Watchlist', icon: 'wunderlist',
 		name: 'watchlist', path: '/watchlist',
@@ -35,25 +30,33 @@ export const routes = [
 		name: 'screener', path: '/screener',
 	},
 
-	// {
-	// 	title: 'News', icon: 'newspaper',
-	// 	name: 'news', path: '/news',
-	// },
-
 	{
 		name: 'login', path: '/login',
 		component: () => import('@/client/routes/login/login'),
 	},
 
-	{
-		name: 'accounts', path: '/accounts',
-		component: () => import('@/client/routes/accounts/accounts'),
-	},
-
 	// {
-	// 	title: 'Crypto', icon: 'bitcoin',
-	// 	name: 'crypto', path: '/crypto',
+	// 	name: 'accounts', path: '/accounts',
+	// 	component: () => import('@/client/routes/accounts/accounts'),
 	// },
+
+	{
+		name: 'robinhood', path: '/robinhood',
+		component: () => import('@/client/routes/robinhood/robinhood.index'),
+		children: [
+			{
+				title: 'Accounts', icon: 'earth',
+				name: 'robinhood.accounts', path: 'accounts',
+				component: () => import('@/client/routes/robinhood/robinhood.accounts'),
+			},
+			// {
+			// 	name: 'symbol', path: '', redirect: { name: 'robinhood.index' }
+			// },
+			// {
+			// 	path: '*', redirect: { name: 'robinhood.index' }
+			// },
+		],
+	},
 
 	{
 		name: 'symbol', path: '/symbol/:symbol',
@@ -71,6 +74,16 @@ export const routes = [
 		// 	},
 		// ],
 	},
+
+	// {
+	// 	title: 'Portfolio', icon: 'chart-pie',
+	// 	name: 'portfolio', path: '/portfolio',
+	// },
+
+	// {
+	// 	title: 'News', icon: 'newspaper',
+	// 	name: 'news', path: '/news',
+	// },
 
 	{
 		name: 'styleguide', path: '/styleguide',
@@ -95,7 +108,7 @@ const router = new VueRouter({
 
 router.afterEach(function(to, from) {
 	let route = routes.find(v => v.name == to.name)
-	document.title = route.title || core.string.capitalize(route.name)
+	document.title = route ? route.title || core.string.capitalize(route.name) : core.string.capitalize(to.name)
 })
 
 export default router

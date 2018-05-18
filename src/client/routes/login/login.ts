@@ -16,7 +16,7 @@ import socket from '@/client/adapters/socket'
 	},
 	beforeRouteEnter(to, from, next) {
 		// if (process.env.DEVELOPMENT) return next();
-		store.state.security.rhusername ? next({ name: 'accounts' }) : next()
+		store.state.security.rhusername ? next({ name: 'robinhood' }) : next()
 	},
 })
 export default class extends Vue {
@@ -54,7 +54,7 @@ export default class extends Vue {
 			return Promise.all([
 				socket.discover(),
 				socket.toPromise('ready'),
-			]).then(() => this.$router.push({ name: 'accounts' }))
+			]).then(() => this.$router.push({ name: 'robinhood' }))
 
 		}).catch(error => {
 			console.error('submit Error ->', error)

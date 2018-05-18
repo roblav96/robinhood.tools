@@ -12,6 +12,12 @@ export const LENGTHS = (({
 	token: 64 as any,
 } as Security.Doc) as any) as { [key: string]: number }
 
+export function md5(value: string): string {
+	let hash = forge.md.md5.create()
+	hash.update(value)
+	return hash.digest().toHex()
+}
+
 export function sha1(value: string): string {
 	let hash = forge.md.sha1.create()
 	hash.update(value)
