@@ -65,40 +65,20 @@ export async function paginated(config: Partial<Http.Config>) {
 
 export const sync = {
 
-	async account({ rhtoken, rhaccount }: Security.Doc) {
-		let response = await http.get(`https://api.robinhood.com/accounts/${rhaccount}/`, {
-			rhtoken, retries: 0,
-		}) as Robinhood.Account
-		core.fix(response, true)
-		return response
-	},
-
-	async accounts({ rhtoken }: Security.Doc) {
+	accounts(rhtoken: string) {
 		return paginated({ url: 'https://api.robinhood.com/accounts/', rhtoken }) as Promise<Robinhood.Account[]>
 	},
 
-	async applications({ rhtoken }: Security.Doc) {
+	applications(rhtoken: string) {
 		return paginated({ url: 'https://api.robinhood.com/applications/', rhtoken }) as Promise<Robinhood.Application[]>
 	},
 
-	async orders({ rhtoken }: Security.Doc, opts = { all: false }) {
-		let query = !opts.all ? { 'updated_at[gte]': dayjs().subtract(1, 'week').format('YYYY-MM-DD') } : {}
-		let orders = [] as Robinhood.Order[]
-		await pForever(async url => {
-			let { results, next } = await http.get(url, {
-				query, rhtoken, retries: 0,
-			}) as Robinhood.Api.Paginated<Robinhood.Order>
-			results.forEach(v => {
-				core.fix(v)
-				v.executions.forEach(core.fix)
-				orders.push(v)
-			})
-			return next || pForever.end
-		}, 'https://api.robinhood.com/orders/')
-		return orders
+	orders(rhtoken: string, opts = { all: false }) {
+		let query = opts.all ? {} : { 'updated_at[gte]': dayjs().subtract(1, 'day').format('YYYY-MM-DD') }
+		return paginated({ url: 'https://api.robinhood.com/orders/', query, rhtoken }) as Promise<Robinhood.Order[]>
 	},
 
-	async portfolio({ rhtoken, rhaccount }: Security.Doc) {
+	portfolios(rhtoken: string) {
 		let response = await http.get(`https://api.robinhood.com/portfolios/${rhaccount}/`, {
 			rhtoken, retries: 0,
 		}) as Robinhood.Portfolio
