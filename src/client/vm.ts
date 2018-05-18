@@ -15,18 +15,10 @@ import App from '@/client/app/app'
 
 router.beforeEach(function(to, from, next) {
 	if (store.state.security.ready) return next();
-	Promise.resolve().then(function() {
-		return security.token()
-	}).then(function() {
-		return Promise.all([
-			socket.discover(),
-			socket.toPromise('ready'),
-		])
-	}).catch(function(error) {
-		console.error('vm Error ->', error)
-	}).finally(function() {
+	security.token().catch(console.error).finally(function() {
 		vm.$mount('#app')
 		next()
+		return socket.discover()
 	})
 })
 

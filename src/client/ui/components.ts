@@ -8,7 +8,7 @@ import Vue from 'vue'
 @Vts.Component({
 	template: `
 		<figure class="image flex bg-white rounded">
-			<img class="is-png self-center rounded" :src="src" v-on:error="onerror"></img>
+			<img class="is-png self-center rounded" :src="src" v-on:error="onerror">
 		</figure>
 	`,
 })

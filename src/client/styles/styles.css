@@ -9,13 +9,11 @@ nav.navbar .navbar-item .tags {
 	margin-bottom: initial;
 }
 
-
 /**/
 
 .border-debug {
 	border: 1px solid red !important;
 }
-
 
 /**/
 
@@ -23,7 +21,6 @@ img.is-png {
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
 }
-
 
 /**/
 
@@ -39,14 +36,13 @@ td[width="1"] {
 
 .table.is-narrower th,
 .table.is-narrower td {
-	padding: 0.1rem 0.5rem;
+	padding: 0rem 0.5rem;
 }
 
 .table.is-narrowest th,
 .table.is-narrowest td {
-	padding: 0rem 0.5rem;
+	padding: 0rem 0.25rem;
 }
-
 
 /**/
 
@@ -65,7 +61,6 @@ p.content,
 	color: inherit !important;
 }
 
-
 /**/
 
 span.tag.is-small {
@@ -73,7 +68,6 @@ span.tag.is-small {
 	padding-left: 0.5rem;
 	padding-right: 0.5rem;
 }
-
 
 /**/
 
@@ -103,12 +97,10 @@ span.icon.is-xxlarge > i.mdi::before {
 	font-size: 5rem;
 }
 
-
 /**/
 
 .animated-loading {
 	animation-duration: 3s !important;
 }
-
 
 /**/

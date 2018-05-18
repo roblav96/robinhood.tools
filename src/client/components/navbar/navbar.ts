@@ -28,8 +28,6 @@ export default class extends Mixins(VMixin) {
 	}
 
 	get rhusername() { return this.$store.state.security.rhusername }
-	get portfolio() { return _.sum(this.$store.state.rh.accounts.map(v => v.buying_power)) }
-	get buying() { return _.sum(this.$store.state.rh.accounts.map(v => v.buying_power)) }
 
 	time = ''
 	get state() { return pretty.marketState(this.$store.state.hours.state) }
@@ -46,6 +44,12 @@ export default class extends Mixins(VMixin) {
 			return route.title && route.icon
 		})
 	}
+
+	get equity() { return _.sum(this.$store.state.rh.portfolios.map(v => v.extended_hours_equity || v.equity)) }
+	get equitychange() { return _.sum(this.$store.state.rh.portfolios.map(v => v.extended_hours_equity || v.equity)) }
+	get equitypercent() { return _.sum(this.$store.state.rh.portfolios.map(v => v.extended_hours_equity || v.equity)) }
+	// get market() { return _.sum(this.$store.state.rh.portfolios.map(v => v.extended_hours_market_value || v.market_value)) }
+	// get funds() { return _.sum(this.$store.state.rh.accounts.map(v => v.buying_power)) }
 
 }
 

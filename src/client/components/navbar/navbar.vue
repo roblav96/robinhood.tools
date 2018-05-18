@@ -55,30 +55,12 @@ nav.navbar a.navbar-robinhood.is-active {
 					</router-link>
 				</div>
 				<div class="navbar-end">
-					<router-link class="navbar-item navbar-robinhood flex items-center py-0" :to="{ name: rhusername ? 'robinhood' : 'login' }">
-						<img class="image is-24x24 mr-1" src="@/assets/robinhood-logo.svg" alt="Robinhood"></img>
-						<table v-if="rhusername" class="table is-borderless is-narrowest bg-transparent content text-sm">
-							<tbody>
-								<tr>
-									<td class="leading-tight font-medium font-mono">{{vnumber(portfolio,{dollar:true,precision:2})}}</td>
-									<td class="leading-tight font-medium font-mono">{{vnumber(buying,{dollar:true,precision:2})}}</td>
-								</tr>
-								<tr>
-									<td class="leading-tight">Portfolio Value</td>
-									<td class="leading-tight">Buying Power</td>
-								</tr>
-							</tbody>
-						</table>
-						<!-- <div v-if="rhusername" class="navbar-item p-0 flex flex-col items-end">
-							<div class="tags has-addons mb-1">
-								<span class="tag is-small">Portfolio</span>
-								<span class="tag is-small is-rhgreen font-medium">Bulma</span>
-							</div>
-							<div class="tags has-addons">
-								<span class="tag is-small">Buying</span>
-								<span class="tag is-small is-rhgreen font-medium">Bulma</span>
-							</div>
-						</div> -->
+					<router-link class="navbar-item flex items-center navbar-robinhood" :to="{ name: rhusername ? 'robinhood' : 'login' }">
+						<img class="image is-24x24 mr-2" src="@/assets/robinhood-logo.svg" alt="Robinhood">
+						<div v-if="rhusername" class="navbar-item items-start p-0 flex flex-col">
+							<span class="leading-tighter font-medium">{{vnumber(equity,{dollar:true,precision:2})}}</span>
+							<span class="leading-tighter text-sm">{{vnumber(equity,{dollar:true,precision:2})}}</span>
+						</div>
 						<span v-else>Login</span>
 					</router-link>
 				</div>
