@@ -6,6 +6,7 @@
 	"scripts": {
 		"postinstall": "run-p patch:types patch:toposort client:tailwind",
 		"patch:types": "tsc-wtf && rimraf node_modules/vuex/types/vue.d.ts",
+		"patch:lockr": "curl --output node_modules/lockr/lockr.js 'https://raw.githubusercontent.com/tsironis/lockr/master/lockr.js'",
 		"patch:toposort": "replace-x 'throw' '//' node_modules/toposort/index.js",
 		"purge": "rimraf dist node_modules",
 		"rc": "npm run client:dev",

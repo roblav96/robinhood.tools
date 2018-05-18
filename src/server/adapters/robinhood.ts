@@ -8,6 +8,7 @@ import * as robinhood from '../../common/robinhood'
 import * as redis from './redis'
 import * as http from './http'
 import * as boom from 'boom'
+import * as pAll from 'p-all'
 import * as pForever from 'p-forever'
 import dayjs from '../../common/dayjs'
 
@@ -69,6 +70,15 @@ export const sync = {
 		return paginated({ url: 'https://api.robinhood.com/accounts/', rhtoken }) as Promise<Robinhood.Account[]>
 	},
 
+	achtransfers(rhtoken: string, opts = { all: false }) {
+		let query = opts.all ? {} : { 'updated_at[gte]': dayjs().subtract(1, 'day').format('YYYY-MM-DD') }
+		return paginated({ url: 'https://api.robinhood.com/ach/transfers/', query, rhtoken }) as Promise<Robinhood.AchTransfer[]>
+	},
+
+	achrelationships(rhtoken: string) {
+		return paginated({ url: 'https://api.robinhood.com/ach/relationships/', rhtoken }) as Promise<Robinhood.AchRelationship[]>
+	},
+
 	applications(rhtoken: string) {
 		return paginated({ url: 'https://api.robinhood.com/applications/', rhtoken }) as Promise<Robinhood.Application[]>
 	},
@@ -79,69 +89,35 @@ export const sync = {
 	},
 
 	portfolios(rhtoken: string) {
-		let response = await http.get(`https://api.robinhood.com/portfolios/${rhaccount}/`, {
-			rhtoken, retries: 0,
-		}) as Robinhood.Portfolio
-		core.fix(response)
-		return response
+		return paginated({ url: 'https://api.robinhood.com/portfolios/', rhtoken }) as Promise<Robinhood.Portfolio[]>
 	},
 
-	async positions({ rhtoken, rhaccount }: Security.Doc, opts = { all: false }) {
-		let { results } = await http.get(`https://api.robinhood.com/accounts/${rhaccount}/positions/`, {
-			query: { nonzero: !opts.all }, rhtoken, retries: 0,
-		}) as Robinhood.Api.Paginated<Robinhood.Position>
-		results.forEach(core.fix)
-		return results
+	positions(rhtoken: string, opts = { all: false }) {
+		let query = { nonzero: !opts.all }
+		return paginated({ url: 'https://api.robinhood.com/positions/', query, rhtoken }) as Promise<Robinhood.Position[]>
 	},
 
-	async subscriptions({ rhtoken }: Security.Doc) {
-		let { results } = await http.get('https://api.robinhood.com/subscription/subscriptions/', {
-			rhtoken, retries: 0,
-		}) as Robinhood.Api.Paginated<Robinhood.Subscription>
-		results.forEach(core.fix)
-		return results
+	subscriptions(rhtoken: string, opts = { all: false }) {
+		let query = { active: !opts.all }
+		return paginated({ url: 'https://api.robinhood.com/subscription/subscriptions/', query, rhtoken }) as Promise<Robinhood.Subscription[]>
 	},
 
-	async transfers({ rhtoken }: Security.Doc, opts = { all: false }) {
-		let query = !opts.all ? { 'updated_at[gte]': dayjs().subtract(1, 'week').format('YYYY-MM-DD') } : {}
-		let transfers = [] as Robinhood.Order[]
-		await pForever(async url => {
-			let { results, next } = await http.get(url, {
-				query, rhtoken, retries: 0,
-			}) as Robinhood.Api.Paginated<Robinhood.Order>
-			results.forEach(v => {
-				core.fix(v)
-				v.executions.forEach(core.fix)
-				transfers.push(v)
-			})
-			return next || pForever.end
-		}, 'https://api.robinhood.com/ach/transfers/')
-		return transfers
+	async user(rhtoken: string) {
+		let user = await http.get('https://api.robinhood.com/user/', { rhtoken, retries: 0 }) as Robinhood.User
+		core.fix(user)
+		return user
 	},
 
-	async user({ rhtoken }: Security.Doc) {
-		let response = await http.get('https://api.robinhood.com/user/', {
-			rhtoken, retries: 0,
-		}) as Robinhood.User
-		core.fix(response)
-		return response
-	},
-
-	async watchlist({ rhtoken }: Security.Doc) {
-		let { results } = await http.get('https://api.robinhood.com/watchlists/Default/', {
-			rhtoken, retries: 0,
-		}) as Robinhood.Api.Paginated<Robinhood.WatchlistResult>
-		results.forEach(core.fix)
-		let wlists = results.map(v => ({
-			watchlist: v.watchlist.split('/').splice(-2, 1)[0],
-			instrument: v.instrument.split('/').splice(-2, 1)[0],
-			created_at: new Date(v.created_at).valueOf(),
-		} as Robinhood.Watchlist))
-		let ids = wlists.map(v => v.instrument)
+	async watchlists(rhtoken: string) {
+		let lists = await paginated({ url: 'https://api.robinhood.com/watchlists/', rhtoken }) as Robinhood.WatchlistMeta[]
+		let results = _.flatten(await pAll(lists.map(list => {
+			return () => paginated({ url: list.url, rhtoken }) as Promise<Robinhood.Watchlist[]>
+		})))
+		let ids = results.map(v => v.instrument)
 		let dsymbols = await redis.main.hmget(rkeys.RH.IDS, ...ids)
 		dsymbols = redis.fixHmget(dsymbols, ids)
-		wlists.forEach(v => v.symbol = dsymbols[v.instrument])
-		return wlists
+		results.forEach(v => v.symbol = dsymbols[v.instrument])
+		return results
 	},
 
 }

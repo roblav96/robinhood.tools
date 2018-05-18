@@ -53,7 +53,15 @@ export function send(config: Http.Config) {
 				data = data.toString()
 				let type = res.headers['content-type']
 				if (type && type.includes('application/json')) {
-					data = JSON.parse(data)
+					let parsed = fastjsonparse(data)
+					if (parsed.err) {
+						return reject(new boom(parsed.err, {
+							statusCode: 422,
+							message: parsed.err.message,
+							data: { data },
+						}))
+					}
+					data = parsed.value
 				}
 			}
 			// console.log('error ->', JSON.stringify(error, null, 4))
@@ -62,13 +70,11 @@ export function send(config: Http.Config) {
 			// console.log('res ->', res)
 			// console.log('data ->', data)
 			if (error || res.statusCode >= 400) {
-				if (data && data.isBoom) {
-					return reject(data)
-				}
-				return reject(new boom(error, {
+				// console.log('error ->', error)
+				return reject(new boom(error || res.statusMessage, {
 					statusCode: res.statusCode,
-					message: res.statusMessage || error.message,
-					data, // decorate: { data },
+					message: error ? error.message : res.statusMessage,
+					data: { data },
 				}))
 			}
 
@@ -79,7 +85,7 @@ export function send(config: Http.Config) {
 
 			resolve(data)
 		})
-	}).catch(function(error: boom) {
+	}).catch(function(error) {
 		let reject = boom.isBoom(error) && error.output.statusCode == 401 // [401].includes(error.output.statusCode)
 		if (!reject && config.retries > 0) {
 			config.retries--

@@ -53,7 +53,7 @@ export function token(): Promise<void> {
 	}).then(function(finger) {
 		doc.finger = finger
 		lockr.set('security.finger', doc.finger)
-		return http.get('/security/token', { retries: 0 })
+		return http.get('/security/token', { retries: Infinity })
 
 	}).then(function(response: Security.Doc) {
 		Object.assign(state, response)

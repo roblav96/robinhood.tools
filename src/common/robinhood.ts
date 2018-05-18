@@ -190,7 +190,6 @@ declare global {
 			shares_held_for_sells: number
 			shares_held_for_stock_grants: number
 			shares_pending_from_options_events: number
-			symbol: string
 			updated_at: string
 			url: string
 		}
@@ -340,17 +339,47 @@ declare global {
 			url: string
 			user: string
 		}
-		interface WatchlistResult {
+		interface Watchlist {
 			created_at: string
 			instrument: string
+			symbol: string
 			url: string
 			watchlist: string
 		}
-		interface Watchlist {
-			created_at: number
-			instrument: string
-			symbol: string
-			watchlist: string
+
+		interface AchTransfer {
+			ach_relationship: string
+			amount: number
+			cancel: any
+			created_at: string
+			direction: string
+			early_access_amount: number
+			expected_landing_date: string
+			fees: number
+			id: string
+			scheduled: boolean
+			state: string
+			updated_at: string
+			url: string
+		}
+
+		interface AchRelationship {
+			account: string
+			bank_account_holder_name: string
+			bank_account_nickname: string
+			bank_account_number: number
+			bank_account_type: string
+			bank_routing_number: number
+			created_at: string
+			id: string
+			initial_deposit: number
+			unlink: string
+			unlinked_at: any
+			url: string
+			verification_method: string
+			verified: boolean
+			verify_micro_deposits: any
+			withdrawal_limit: number
 		}
 
 	}

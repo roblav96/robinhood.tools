@@ -38,13 +38,13 @@ polka.route({
 			rhrefresh: oauth.refresh_token,
 		} as Security.Doc
 
-		let accounts = await http.get('https://api.robinhood.com/accounts/', {
-			rhtoken: rdoc.rhtoken, retries: 0,
-		}) as Robinhood.Api.Paginated<Robinhood.Account>
-		let account = _.get(accounts, 'results[0]') as Robinhood.Account
-		if (!account) throw boom.notFound('account');
+		// let accounts = await http.get('https://api.robinhood.com/accounts/', {
+		// 	rhtoken: rdoc.rhtoken, retries: 0,
+		// }) as Robinhood.Api.Paginated<Robinhood.Account>
+		// let account = _.get(accounts, 'results[0]') as Robinhood.Account
+		// if (!account) throw boom.notFound('account');
 
-		let user = await robinhood.sync.user(rdoc)
+		let user = await robinhood.sync.user(rdoc.rhtoken)
 		rdoc.rhusername = user.username
 
 		await redis.main.hmset(req.doc.rkey, rdoc)
@@ -76,8 +76,7 @@ polka.route({
 	schema: {
 		body: {
 			synckeys: { type: 'array', items: 'string', optional: true },
-			positions: { type: 'object', optional: true },
-			orders: { type: 'object', optional: true },
+			all: { type: 'boolean', optional: true },
 		},
 	},
 	handler: async function apisync(req, res) {
@@ -87,8 +86,9 @@ polka.route({
 		let invalids = _.difference(synckeys, allsyncs)
 		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids });
 
+		let opts = { all: req.body.all == true }
 		let resolved = await pAll(synckeys.map(key => {
-			return () => robinhood.sync[key](req.doc, req.body[key])
+			return () => robinhood.sync[key](req.doc.rhtoken, opts)
 		}), { concurrency: 1 })
 
 		let response = {} as any

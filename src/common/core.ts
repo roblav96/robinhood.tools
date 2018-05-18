@@ -21,6 +21,7 @@ export const isNodejs = !isBrowser
 
 
 export function fix(target: any, deep?: any) {
+	let fixurl = ['account', 'ach_relationship', 'instrument', 'watchlist']
 	Object.keys(target).forEach(key => {
 		let value = target[key]
 		if (value == null) return;
@@ -34,6 +35,9 @@ export function fix(target: any, deep?: any) {
 		else if (value === 'undefined') target[key] = undefined;
 		else if (value === 'true') target[key] = true;
 		else if (value === 'false') target[key] = false;
+		else if (value.includes('.robinhood.com') && fixurl.includes(key)) {
+			target[key] = value.split('/').splice(-2, 1)[0]
+		}
 	})
 }
 
@@ -226,9 +230,9 @@ export const object = {
 	},
 	merge<T = object>(target: T, source: T) {
 		Object.keys(source).forEach(function(key) {
-			let svalue = source[key]
-			if (svalue == null) return;
-			target[key] = svalue
+			let value = source[key]
+			if (value == null) return;
+			target[key] = value
 		})
 	},
 	repair<T = object>(target: T, source: T) {
