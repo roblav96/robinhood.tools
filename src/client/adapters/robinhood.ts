@@ -15,7 +15,7 @@ const state = {
 	accounts: [] as Robinhood.Account[],
 	applications: [] as Robinhood.Application[],
 	orders: [] as Robinhood.Order[],
-	portfolio: {} as Robinhood.Portfolio,
+	portfolios: [] as Robinhood.Portfolio[],
 	positions: [] as Robinhood.Position[],
 	subscriptions: [] as Robinhood.Subscription[],
 	user: {} as Robinhood.User,

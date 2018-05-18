@@ -1,12 +1,6 @@
 <!--  -->
 <script lang="ts" src="./symbol.ts"></script>
 
-<!-- <style lang="scss">
-@import '@/client/styles/theme.scss';
-//
-
-</style> -->
-
 <style>
 /**/
 
@@ -14,35 +8,6 @@
 	background-color: white;
 	border: 1px solid var(--border);
 }
-
-.symbol-route .hero-body p.title {
-	/*line-height: 1;*/
-}
-
-/*
-.symbol-route .hero-body p {
-	margin-top: 0px !important;
-	margin-bottom: 0px !important;
-	line-height: 1.25;
-}
-
-.symbol-route .hero-body p.title {
-	line-height: 1;
-}
-
-.symbol-route .hero-body p.is-size-7 {
-	line-height: 1.5;
-}
-
-.symbol-route .hero-body td,
-.symbol-route .hero-body td p {
-	line-height: 1.5;
-}
-
-.symbol-route .hero-body td.title,
-.symbol-route .hero-body td p.title {
-	line-height: 1.25;
-}*/
 
 </style>
 

@@ -6,6 +6,7 @@ import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
 import * as security from '../adapters/security'
 import * as robinhood from '../adapters/robinhood'
+import * as boom from 'boom'
 import polka from './polka'
 
 
@@ -33,13 +34,12 @@ polka.route({
 
 		if (!req.authed) return response;
 
-		let ikeys = ['rhusername', 'rhaccount', 'rhtoken', 'rhrefresh'] as KeysOf<Security.Doc>
+		let ikeys = ['rhusername', 'rhtoken', 'rhrefresh'] as KeysOf<Security.Doc>
 		let rdoc = await redis.main.hmget(req.doc.rkey, ...ikeys) as Security.Doc
 		rdoc = redis.fixHmget(rdoc, ikeys)
 		if (Object.keys(rdoc).length != ikeys.length) return response;
 
 		response.rhusername = rdoc.rhusername
-		response.rhaccount = rdoc.rhaccount
 
 		let oauth = await robinhood.refresh(rdoc.rhrefresh).catch(function(error) {
 			console.error('oauth refresh Error ->', error)
@@ -51,7 +51,7 @@ polka.route({
 				console.error('oauth revoke Error ->', error)
 			})
 			await redis.main.hdel(req.doc.rkey, ...ikeys)
-			Object.assign(response, { rhusername: '', rhaccount: '' } as Security.Doc)
+			Object.assign(response, { rhusername: '' } as Security.Doc)
 			return response
 		}
 

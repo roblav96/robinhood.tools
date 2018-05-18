@@ -38,7 +38,7 @@ polka.use(function validator(req, res, next) {
 		if (!req.authed) {
 			return next(boom.unauthorized('!req.authed', null, { hook: 'validator rhauthurl' }))
 		}
-		let ikeys = ['rhusername', 'rhaccount', 'rhtoken'] as KeysOf<Security.Doc>
+		let ikeys = ['rhusername', 'rhtoken'] as KeysOf<Security.Doc>
 		return redis.main.hmget(req.doc.rkey, ...ikeys).catch(next).then(function(rdoc: Security.Doc) {
 			rdoc = redis.fixHmget(rdoc, ikeys)
 			if (Object.keys(rdoc).length != ikeys.length) {

@@ -43,17 +43,13 @@ polka.route({
 		}) as Robinhood.Api.Paginated<Robinhood.Account>
 		let account = _.get(accounts, 'results[0]') as Robinhood.Account
 		if (!account) throw boom.notFound('account');
-		rdoc.rhaccount = account.account_number
 
 		let user = await robinhood.sync.user(rdoc)
 		rdoc.rhusername = user.username
 
 		await redis.main.hmset(req.doc.rkey, rdoc)
 
-		return {
-			rhusername: rdoc.rhusername,
-			rhaccount: rdoc.rhaccount,
-		} as Security.Doc
+		return { rhusername: rdoc.rhusername } as Security.Doc
 
 	}
 })
@@ -66,7 +62,7 @@ polka.route({
 	rhdoc: true,
 	handler: async function apilogout(req, res) {
 		let revoked = await robinhood.revoke(req.doc.rhtoken)
-		let ikeys = ['rhusername', 'rhaccount', 'rhtoken', 'rhrefresh'] as KeysOf<Security.Doc>
+		let ikeys = ['rhusername', 'rhtoken', 'rhrefresh'] as KeysOf<Security.Doc>
 		await redis.main.hdel(req.doc.rkey, ...ikeys)
 	}
 })
@@ -101,23 +97,5 @@ polka.route({
 
 	}
 })
-
-
-
-// polka.route({
-// 	method: 'GET',
-// 	url: '/api/robinhood/init',
-// 	authed: true,
-// 	handler: async function apiinit(req, res) {
-// 		let rkey = `${rkeys.SECURITY.DOC}:${req.doc.uuid}`
-// 		let ikeys = ['rhusername', 'rhaccount'] as KeysOf<Security.Doc>
-// 		let rdoc = await redis.main.hmget(rkey, ...ikeys) as Security.Doc
-// 		rdoc = redis.fixHmget(rdoc, ikeys)
-// 		return {
-// 			rhusername: rdoc.rhusername,
-// 			rhaccount: rdoc.rhaccount,
-// 		} as Security.Doc
-// 	}
-// })
 
 

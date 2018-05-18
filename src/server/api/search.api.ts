@@ -5,6 +5,7 @@ import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
+import * as utils from '../adapters/utils'
 import polka from './polka'
 
 
@@ -22,8 +23,7 @@ polka.route({
 		let { results } = await http.get('https://api.robinhood.com/instruments/', {
 			query: { query }, retries: 0,
 		}) as Robinhood.Api.Paginated<Robinhood.Instrument>
-		results.remove(v => !v || !v.symbol || Array.isArray(v.symbol.match(/[^A-Z-.]/)))
-		results.forEach(core.fix)
+		results.remove(v => !v || !v.symbol || Array.isArray(v.symbol.match(utils.symbolFilter)))
 		// console.log('results ->', results)
 		return results.map(v => _.pick(v, IKEYS))
 		// let instruments = await getInstruments(results.map(v => v.symbol))
@@ -45,7 +45,6 @@ polka.route({
 		let coms = symbols.map(v => ['hmget', `${rkeys.RH.INSTRUMENTS}:${v}`].concat(IKEYS))
 		let results = await redis.main.coms(coms) as Robinhood.Instrument[]
 		results = results.map(v => redis.fixHmget(v, IKEYS))
-		results.forEach(core.fix)
 		return results
 		// return await getInstruments(symbols)
 	}

@@ -46,8 +46,8 @@ export const routes = [
 	},
 
 	{
-		name: 'account', path: '/account',
-		component: () => import('@/client/routes/account/account'),
+		name: 'accounts', path: '/accounts',
+		component: () => import('@/client/routes/accounts/accounts'),
 	},
 
 	// {

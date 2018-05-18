@@ -18,7 +18,6 @@ const state = {
 	ready: false,
 	ishuman: false,
 	rhusername: '',
-	rhaccount: '',
 }
 store.register('security', state)
 declare global { namespace Store { interface State { security: typeof state } } }
@@ -29,7 +28,6 @@ export const doc = {
 	uuid: lockr.get('security.uuid'),
 	finger: lockr.get('security.finger'),
 	get rhusername() { return state.rhusername },
-	get rhaccount() { return state.rhaccount },
 } as Security.Doc
 
 export function headers() {
@@ -55,15 +53,15 @@ export function token(): Promise<void> {
 	}).then(function(finger) {
 		doc.finger = finger
 		lockr.set('security.finger', doc.finger)
-		return http.get('/security/token', { retries: Infinity })
+		return http.get('/security/token', { retries: 0 })
 
 	}).then(function(response: Security.Doc) {
-		Object.assign(state, response);
+		Object.assign(state, response)
 		state.ready = true
 
-	}).catch(function(error) {
+	}).catch(function(error: boom.Payload) {
 		console.error('token Error ->', error)
-		if (boom.isBoom(error) && error.output.statusCode == 401) {
+		if (error.isBoom && error.statusCode == 401) {
 			core.object.nullify(doc)
 		}
 		return new Promise(r => setTimeout(r, 3000)).then(token)

@@ -47,7 +47,7 @@ export async function reqDoc(req: PolkaRequest, rhdoc = false): Promise<any> {
 		if (!req.authed) throw boom.unauthorized('doc.token != req.token');
 	}
 	if (rhdoc) {
-		let ikeys = ['rhusername', 'rhaccount', 'rhtoken'] as KeysOf<Security.Doc>
+		let ikeys = ['rhusername', 'rhtoken'] as KeysOf<Security.Doc>
 		let rdoc = await redis.main.hmget(req.doc.rkey, ...ikeys) as Security.Doc
 		rdoc = redis.fixHmget(rdoc, ikeys)
 		if (Object.keys(rdoc).length != ikeys.length) return;

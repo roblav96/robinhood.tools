@@ -6,14 +6,7 @@ export const RH = {
 	IDS: 'rh:ids',
 	SYMBOLS: 'rh:symbols',
 	INSTRUMENTS: 'rh:instruments',
-	SYNC: {
-		SYNC: 'rh:sync',
-		ACCOUNT: 'rh:sync:account',
-		ORDERS: 'rh:sync:orders',
-		PORTFOLIO: 'rh:sync:portfolio',
-		POSITIONS: 'rh:sync:positions',
-		WATCHLIST: 'rh:sync:watchlist',
-	},
+	SYNC: 'rh:sync',
 }
 
 export const MICS = {

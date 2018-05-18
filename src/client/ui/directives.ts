@@ -6,8 +6,9 @@ import * as utils from '@/client/adapters/utils'
 
 
 
-Vue.directive('visible', function(el, { value }) {
-	el.classList.toggle('invisible', !value)
+Vue.directive('visible', function(el, { value, oldValue }) {
+	if (value === oldValue || !core.boolean.is(value)) return;
+	el.classList.toggle('opacity-0', !value)
 })
 
 
@@ -20,8 +21,8 @@ Vue.directive('is', function(el, { arg, modifiers }, { context }) {
 
 
 
-Vue.directive('green-red', function(el, { value }) {
-	if (!core.number.isFinite(value)) return;
+Vue.directive('green-red', function(el, { value, oldValue }) {
+	if (value === oldValue || !core.number.isFinite(value)) return;
 	if (value == 0) return el.classList.remove('has-text-danger', 'has-text-success');
 	el.classList.toggle('has-text-success', value > 0)
 	el.classList.toggle('has-text-danger', value < 0)

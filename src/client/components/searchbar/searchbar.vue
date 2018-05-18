@@ -23,7 +23,7 @@ div.searchbar div.dropdown-content {
 					</div>
 					<div class="column content">
 						<p class="title is-5">{{ props.option.symbol }}</p>
-						<p class="subtitle is-6">{{ props.option.name }}</p>
+						<p class="subtitle is-6">{{ props.option.simple_name || props.option.name }}</p>
 					</div>
 				</div>
 			</template>

@@ -16,7 +16,7 @@ import socket from '@/client/adapters/socket'
 	},
 	beforeRouteEnter(to, from, next) {
 		// if (process.env.DEVELOPMENT) return next();
-		store.state.security.rhusername ? next({ name: 'account' }) : next()
+		store.state.security.rhusername ? next({ name: 'accounts' }) : next()
 	},
 })
 export default class extends Vue {
@@ -39,11 +39,11 @@ export default class extends Vue {
 	submit() {
 		if (!this.ready || this.busy) return;
 		this.busy = true
-		http.post('/robinhood/login', {
+		return http.post('/robinhood/login', {
 			username: this.username,
 			password: this.password,
 			mfa: this.mfa,
-		}).then(response => {
+		}).then((response: Security.Doc & { mfa: boolean }) => {
 			if (response.mfa) {
 				this.ismfa = true
 				this.$nextTick(() => this.mfa_input.focus())
@@ -54,7 +54,7 @@ export default class extends Vue {
 			return Promise.all([
 				socket.discover(),
 				socket.toPromise('ready'),
-			]).then(() => this.$router.push({ name: 'account' }))
+			]).then(() => this.$router.push({ name: 'accounts' }))
 
 		}).catch(error => {
 			console.error('submit Error ->', error)

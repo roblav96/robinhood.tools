@@ -14,14 +14,7 @@ import * as recents from '@/client/stores/recents'
 @Vts.Component
 export default class extends Mixins(VMixin) {
 
-	mounted() {
-
-	}
-
 	get searchbar() { return this.$refs.searchbar_input as Vue }
-	vstate(state: Robinhood.Instrument.State) {
-		return _.startCase(state)
-	}
 
 	busy = false
 	query = ''
@@ -29,7 +22,7 @@ export default class extends Mixins(VMixin) {
 
 	oninput = _.debounce(this.sync, 300)
 	sync() {
-		if (!this.query) return this.syncRecents();
+		if (!this.query) return this.recents();
 		this.busy = true
 		return http.get('/search', {
 			query: { query: this.query },
@@ -40,14 +33,14 @@ export default class extends Mixins(VMixin) {
 		}).finally(() => this.busy = false)
 	}
 
-	syncRecents() {
+	recents() {
 		this.busy = true
 		return http.post('/recents', {
 			symbols: this.$store.state.recents.map(v => v.symbol),
 		}).then((response: Robinhood.Instrument[]) => {
 			this.results = response
 		}).catch(error => {
-			console.error('syncRecents Error ->', error)
+			console.error('recents Error ->', error)
 		}).finally(() => this.busy = false)
 	}
 

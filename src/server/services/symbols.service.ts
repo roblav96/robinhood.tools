@@ -68,7 +68,7 @@ schedule.scheduleJob('00 4 * * 1-5', async function reset() {
 async function syncInstruments() {
 	await pForever(async function getInstruments(url) {
 		let { results, next } = await http.get(url) as Robinhood.Api.Paginated<Robinhood.Instrument>
-		results.remove(v => Array.isArray(v.symbol.match(/[^A-Z-.]/)))
+		results.remove(v => Array.isArray(v.symbol.match(utils.symbolFilter)))
 
 		if (process.env.DEVELOPMENT) console.log('getInstruments ->', results.length, next);
 
@@ -104,7 +104,7 @@ async function syncTickers() {
 		}),
 	]) as Webull.Ticker[]
 	tickers = _.flatten(tickers)
-	tickers.remove(v => Array.isArray(v.disSymbol.match(/[^A-Z-.]/)))
+	tickers.remove(v => Array.isArray(v.disSymbol.match(utils.symbolFilter)))
 	tickers.forEach(core.fix)
 	tickers.forEach(v => {
 		if (!v.disSymbol.includes('-')) return;

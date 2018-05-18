@@ -24,6 +24,7 @@ export function fix(target: any, deep?: any) {
 	Object.keys(target).forEach(key => {
 		let value = target[key]
 		if (value == null) return;
+		else if (deep === true && Array.isArray(value)) return value.forEach(fix);
 		else if (deep === true && object.is(value)) return fix(value);
 		else if (typeof value != 'string') return;
 		else if (value === '') delete target[key];
