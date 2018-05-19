@@ -36,6 +36,11 @@ export const routes = [
 	},
 
 	// {
+	// 	title: 'Order Book', icon: 'book-open-variant',
+	// 	name: 'orders', redirect: { name: 'robinhood.orders' },
+	// },
+
+	// {
 	// 	title: 'Explore', icon: 'compass',
 	// 	name: 'explore', path: '/explore',
 	// },
@@ -62,6 +67,11 @@ export const routes = [
 			{
 				title: 'Banking', icon: 'bank',
 				name: 'robinhood.banking', path: 'banking',
+				// component: () => import('@/client/routes/robinhood/robinhood.banking'),
+			},
+			{
+				title: 'Order Book', icon: 'book-open-variant',
+				name: 'robinhood.orders', path: 'orders',
 				// component: () => import('@/client/routes/robinhood/robinhood.banking'),
 			},
 			// {
@@ -106,12 +116,15 @@ export const routes = [
 
 
 
+// let fixscroll = false
 const router = new VueRouter({
 	routes, mode: 'history',
 	linkExactActiveClass: 'is-active',
 	scrollBehavior: function(to, from, saved) {
+		// fixscroll = false
 		if (to.name == from.name) return;
 		if (!from.name || saved) return;
+		// fixscroll = true
 		return { x: 0, y: 0 }
 	},
 })
@@ -119,6 +132,10 @@ const router = new VueRouter({
 router.afterEach(function(to, from) {
 	let route = routes.find(v => v.name == to.name)
 	document.title = route ? route.title || core.string.capitalize(route.name) : core.string.capitalize(to.name)
+	// if (fixscroll) {
+	// 	fixscroll = false
+	// 	setTimeout(() => document.documentElement.scrollTo({ top: 0, behavior: 'instant' }), 100)
+	// }
 })
 
 export default router
@@ -136,5 +153,6 @@ declare module 'vue-router/types/router' {
 		icon: string
 	}
 }
+declare global { type VueRouteConfig = RouteConfig }
 
 

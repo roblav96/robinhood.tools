@@ -5,6 +5,11 @@ img.is-png {
 	backface-visibility: hidden;
 }
 
+span.tooltip:after {
+	font-size: 1rem;
+	font-weight: 500;
+}
+
 /**/
 
 .border {

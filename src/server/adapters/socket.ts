@@ -110,11 +110,11 @@ function onconnection(client: Socket.Client, req: PolkaRequest) {
 			let action = event.action
 			if (action == 'sync') {
 				// console.log('event.subs ->', event.subs)
-				event.subs.remove(v => {
-					if (v.indexOf(rkeys.WS.UUID) != 0) return false;
-					let uuid = v.split(':').pop()
-					return uuid != this.doc.uuid
-				})
+				// event.subs.remove(v => {
+				// 	if (v.indexOf(rkeys.WS.UUID) != 0) return false;
+				// 	let uuid = v.split(':').pop()
+				// 	return uuid != this.doc.uuid
+				// })
 				this.subs.forEach(v => emitter.off(v, this.send, this))
 				this.subs.splice(0, Infinity, ...event.subs)
 				this.subs.forEach(v => emitter.on(v, this.send, this))

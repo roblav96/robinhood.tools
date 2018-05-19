@@ -19,18 +19,29 @@ import clock from '@/common/clock'
 })
 export default class extends Mixins(VMixin, RHMixin) {
 
-	isMobileMenu = false
-
 	created() {
 		this.$router.afterEach(() => this.isMobileMenu = false)
 		document.documentElement.classList.add('has-navbar-fixed-top')
-		clock.on('1s', this.onsecond)
-		this.onsecond()
+		clock.on('1s', this.onsec)
+		this.onsec()
+	}
+	beforeDestroy() {
+		clock.offListener(this.onsec)
+		document.removeEventListener('pointerdown', this.onpointer)
 	}
 
-	get rhusername() { return this.$store.state.security.rhusername }
+	isMobileMenu = false
+	@Vts.Watch('isMobileMenu') w_isMobileMenu(to: boolean) {
+		document.removeEventListener('pointerdown', this.onpointer)
+		if (to == true) document.addEventListener('pointerdown', this.onpointer);
+	}
+	onpointer(event: MouseEvent) {
+		let path = (event as any).path as HTMLElement[]
+		if (!path.find(v => v.id == 'navbar')) this.isMobileMenu = false;
+	}
 
 	time = ''
+	onsec() { this.time = dayjs().format('h:mm:ssa') }
 	get state() { return pretty.marketState(this.$store.state.hours.state) }
 	get scolor() {
 		let state = this.$store.state.hours.state
@@ -38,12 +49,22 @@ export default class extends Mixins(VMixin, RHMixin) {
 		if (state.includes('PRE') || state.includes('POST')) return 'has-text-warning';
 		return 'has-text-danger'
 	}
-	onsecond() { this.time = dayjs().format('h:mm:ssa') }
 
 	get routes() {
 		return this.$router.options.routes.filter(function(route) {
 			return route.title && route.icon
 		})
+		// let routes = [] as VueRouteConfig[]
+		// this.$router.options.routes.forEach(function(route) {
+		// 	if (Array.isArray(route.children)) {
+		// 		if (route.name == 'robinhood') {
+		// 			routes.push(route.children.find(v => v.name == 'robinhood.orders'))
+		// 		}
+		// 	}
+		// 	if (route.title && route.icon) routes.push(route);
+		// })
+		// // routes.push({ title: 'Order Book', icon: 'book-open-variant', name: 'robinhood.orders' } as VueRouteConfig)
+		// return routes
 	}
 
 }

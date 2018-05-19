@@ -21,26 +21,26 @@ nav.navbar {
 	/*border-bottom: 1px solid var(--grey-lighter);*/
 }
 
-nav.navbar a.navbar-robinhood:hover,
-nav.navbar a.navbar-robinhood.is-active {
+/*nav.navbar a.hover-rhgreen.is-active {*/
+
+nav.navbar a.navbar-rhgreen:hover {
 	color: var(--rhgreen);
 }
 
 </style>
 
 <template>
-	<nav class="navbar is-fixed-top shadow" role="navigation" aria-label="main navigation">
+	<nav id="navbar" class="navbar is-fixed-top shadow is-unselectable" role="navigation" aria-label="main navigation">
 		<div class="container">
 
 			<div class="navbar-brand">
-				<router-link class="navbar-item" :to="{ name: 'home' }" active-class exact-active-class>
+				<!-- <router-link class="navbar-item" :to="{ name: 'home' }" active-class exact-active-class>
 					<img src="@/assets/logo-primary.svg" alt="Robinhood Tools">
-				</router-link>
+				</router-link> -->
 
 				<div class="is-hidden-mobile navbar-item py-0 flex flex-col self-center">
-					<p class="leading-tight font-medium">{{time}}</p>
-					<p class="leading-tight" :class="scolor">{{state}}</p>
-					<!-- <span class="tag is-small" :class="scolor">{{state}}</span> -->
+					<p class="leading-tight font-medium font-mono">{{time}}</p>
+					<p class="text-sm" :class="scolor">{{state}}</p>
 				</div>
 
 				<v-searchbar></v-searchbar>
@@ -54,26 +54,76 @@ nav.navbar a.navbar-robinhood.is-active {
 
 			<div class="navbar-menu" :class="{ 'is-active animated-slow fadeIn': isMobileMenu }">
 				<div class="navbar-start">
-					<router-link class="navbar-item flex items-center" v-for="route in routes" :key="route.name" :to="{ name: route.name }">
-						<b-icon class="mx-1" :icon="route.icon" size="is-28x28"></b-icon>
-						<!-- <span class="ml-2">{{ route.title }}</span> -->
-					</router-link>
+					<b-tooltip :active="brkpt.desktopAndUp" animated :label="route.title" position="is-bottom" v-for="route in routes"
+					    :key="route.name">
+						<router-link class="navbar-item flex items-center h-full" :to="{ name: route.name }">
+							<b-icon class="mx-1" :icon="route.icon" size="is-28x28"></b-icon>
+							<span class="is-hidden-desktop ml-2">{{ route.title }}</span>
+						</router-link>
+					</b-tooltip>
+					<b-tooltip v-if="!rhusername" label="Robinhood Login" :active="brkpt.desktopAndUp" animated position="is-bottom">
+						<router-link class="navbar-item flex items-center navbar-rhgreen" :to="{ name: 'login' }" active-class
+						    exact-active-class>
+							<img class="image is-28x28 mx-1" src="@/assets/robinhood-logo.svg" alt="Robinhood Login">
+							<span class="is-hidden-desktop ml-2">Login</span>
+						</router-link>
+					</b-tooltip>
 				</div>
+
 				<div class="navbar-end">
-					<router-link class="navbar-item flex items-center navbar-robinhood" :to="{ name: rhusername ? 'robinhood' : 'login' }"
-					    active-class exact-active-class>
-						<img class="image is-24x24 mr-2" src="@/assets/robinhood-logo.svg" alt="Robinhood">
-						<!-- <div v-if="rhusername" class="navbar-item items-start p-0 flex flex-col">
-							<span class="leading-tight font-medium">{{vnumber(equityvalue,{dollar:true,precision:2})}}</span>
-							<span class="leading-tight text-xs" v-green-red="equitychange">
-								{{vnumber(equitychange,{dollar:true,precision:2,plusminus:true})}}
-								({{vnumber(equitypercent,{plusminus:true,percent:true})}})
+
+					<b-dropdown v-if="rhusername && brkpt.desktopAndUp" position="is-bottom-left" hoverable>
+						<router-link class="navbar-item flex items-center navbar-rhgreen" :to="{ name: 'robinhood' }" slot="trigger"
+						    active-class exact-active-class>
+							<img class="image is-28x28 mr-2 touch:ml-1 touch:mr-3" src="@/assets/robinhood-logo.svg" alt="Robinhood">
+							<span class="leading-tight font-medium font-mono">
+								{{vnumber(equityvalue,{dollar:true,precision:2})}}
 							</span>
-						</div> -->
-						<span v-if="rhusername" class="">{{vnumber(equityvalue,{dollar:true,precision:2})}}</span>
-						<span v-else>Login</span>
+						</router-link>
+
+						<b-dropdown-item custom>
+							Logged as <b>Rafael Beraldo</b>
+						</b-dropdown-item>
+						<hr class="dropdown-divider">
+						<b-dropdown-item has-link>
+							<a href="https://google.com" target="_blank">
+								<b-icon icon="link"></b-icon>
+								Google (link)
+							</a>
+						</b-dropdown-item>
+						<b-dropdown-item value="home">
+							<b-icon icon="home"></b-icon>
+							Home
+						</b-dropdown-item>
+						<b-dropdown-item value="products">
+							<b-icon icon="cart"></b-icon>
+							Products
+						</b-dropdown-item>
+						<b-dropdown-item value="blog" disabled>
+							<b-icon icon="book-open"></b-icon>
+							Blog
+						</b-dropdown-item>
+						<hr class="dropdown-divider">
+						<b-dropdown-item value="settings">
+							<b-icon icon="settings"></b-icon>
+							Settings
+						</b-dropdown-item>
+						<b-dropdown-item value="logout">
+							<b-icon icon="logout"></b-icon>
+							Logout
+						</b-dropdown-item>
+					</b-dropdown>
+
+					<router-link v-else-if="rhusername" class="navbar-item flex items-center navbar-rhgreen" :to="{ name: 'robinhood' }"
+					    slot="trigger" active-class exact-active-class>
+						<img class="image is-28x28 mr-2 touch:ml-1 touch:mr-3" src="@/assets/robinhood-logo.svg" alt="Robinhood">
+						<span class="leading-tight font-medium font-mono">
+							{{vnumber(equityvalue,{dollar:true,precision:2})}}
+						</span>
 					</router-link>
+
 				</div>
+
 			</div>
 
 		</div>

@@ -169,10 +169,11 @@ module.exports = {
 	*/
 
 	screens: {
-		// 'mobile': '576px',
-		// 'mobile-only': { 'min': '576px', 'max': '767px' },
+		'mobile': '0px',
+		'mobile-only': { 'min': '0px', 'max': '767px' },
 		'tablet': '768px',
 		'tablet-only': { 'min': '768px', 'max': '991px' },
+		'touch': { 'min': '0px', 'max': '991px' },
 		'desktop': '992px',
 		'desktop-only': { 'min': '992px', 'max': '1199px' },
 		'widescreen': '1200px',

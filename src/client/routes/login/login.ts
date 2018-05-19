@@ -54,7 +54,10 @@ export default class extends Vue {
 			return Promise.all([
 				socket.discover(),
 				socket.toPromise('ready'),
-			]).then(() => this.$router.push({ name: 'robinhood' }))
+			]).then(() => {
+				this.$toast.open(`Robinhood login success! Hello ${response.rhusername}...`)
+				this.$router.push({ name: 'robinhood' })
+			})
 
 		}).catch(error => {
 			console.error('submit Error ->', error)
