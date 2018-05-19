@@ -47,13 +47,13 @@ td[width="1"] {
 
 p.title,
 p.subtitle {
-	margin-top: 0px !important;
-	margin-bottom: 0px !important;
+	margin-top: 0px;
+	margin-bottom: 0px;
 }
 
 p.content,
 .content p {
-	margin-bottom: 0px !important;
+	margin-bottom: 0px;
 }
 
 .text-inherit {

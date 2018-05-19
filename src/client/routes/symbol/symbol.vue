@@ -23,15 +23,15 @@
 
 						<div class="column is-4 flex">
 							<div class="mr-6">
-								<symbol-logo class="is-64x64 shadow-md" :symbol="symbol"></symbol-logo>
+								<symbol-logo class="is-72x72 shadow-md" :symbol="symbol"></symbol-logo>
 							</div>
-							<div>
-								<p class="title bg-white">
+							<div class="flex flex-col">
+								<p class="title bg-white border-color border rounded-r-lg self-start leading-tight px-3 py-0 mb-2">
 									<span>{{symbol}}</span>
 									<span v-show="!instrument.alive" class="tag is-medium is-danger align-top">Untradable</span>
 									<span v-show="delisted||suspended" class="tag is-medium is-danger align-top">{{vcapitalize(wbquote.status)}}</span>
 								</p>
-								<p class="is-size-5">{{name}}</p>
+								<p class="is-size-6 bg-white border-color border rounded-r-lg self-start px-3 py-0">{{name}}</p>
 							</div>
 						</div>
 
