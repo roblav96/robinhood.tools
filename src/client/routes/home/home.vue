@@ -12,14 +12,14 @@
 <template>
 	<section>
 
-		<section class="hero is-bold is-primary is-fullheight">
+		<section class="hero is-fullheight has-background-white-bis">
 			<div class="hero-body">
 				<div class="container self-start">
 
 					<section class="section has-text-centered">
-						<img class="max-w-ns mb-12" width="25%" src="@/assets/logo-white.svg" alt="Robinhood Tools">
-						<h1 class="title is-2">Robinhood Tools</h1>
-						<h2 class="subtitle is-4">Advanced trading tools and resources for Robinhood Web.</h2>
+						<img class="max-w-ns mb-12" width="25%" src="@/assets/logo-primary.svg" alt="Robinhood Tools">
+						<h1 class="is-size-2 font-semibold">Robinhood Tools</h1>
+						<h2 class="is-size-4">Advanced trading tools and resources for Robinhood Web.</h2>
 					</section>
 
 					<section class="section columns is-multiline">
