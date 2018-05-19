@@ -27,7 +27,6 @@ declare global { namespace Store { interface State { security: typeof state } } 
 export const doc = {
 	uuid: lockr.get('security.uuid'),
 	finger: lockr.get('security.finger'),
-	get rhusername() { return state.rhusername },
 } as Security.Doc
 
 export function headers() {
@@ -59,10 +58,12 @@ export function token(): Promise<void> {
 		Object.assign(state, response)
 		state.ready = true
 
-	}).catch(function(error: boom.Payload) {
+	}).catch(function(error: boom) {
 		console.error('token Error ->', error)
-		if (error.isBoom && error.statusCode == 401) {
+		console.dir(error)
+		if (error.isBoom && error.output.statusCode == 401) {
 			core.object.nullify(doc)
+			// Object.assign(doc, { uuid: null, finger: null } as typeof doc)
 		}
 		return new Promise(r => setTimeout(r, 3000)).then(token)
 	})

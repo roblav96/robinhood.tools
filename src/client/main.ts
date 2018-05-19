@@ -3,7 +3,7 @@
 require('@/common/polyfills')
 
 global.Promise = require('zousan/src/zousan')
-{ (global as any).Zousan.suppressUncaughtRejectionError = true }
+global.Zousan.suppressUncaughtRejectionError = true
 
 Object.assign(console, { dtsgen: function() { } })
 if (process.env.DEVELOPMENT) {
@@ -31,8 +31,8 @@ Vue.config.devtools = false
 Vue.use(VueRouter)
 Vue.use(Vuex)
 Vue.use(Buefy, {
-	defaultSnackbarDuration: 5000,
-	defaultToastDuration: 5000,
+	defaultSnackbarDuration: 10000,
+	defaultToastDuration: 10000,
 	defaultInputAutocomplete: 'off',
 	defaultNoticeQueue: false,
 	defaultTooltipType: 'is-primary',

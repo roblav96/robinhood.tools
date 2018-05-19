@@ -1,5 +1,8 @@
 // 
 
+global.Promise = require('zousan/src/zousan')
+global.Zousan.suppressUncaughtRejectionError = true
+
 import Vue from 'vue'
 import '@/common/clock'
 import '@/client/ui/directives'
@@ -15,14 +18,15 @@ import App from '@/client/app/app'
 
 router.beforeEach(function(to, from, next) {
 	if (store.state.security.ready) return next();
-	security.token().catch(console.error).finally(function() {
+	security.token().catch(function(error) {
+		console.error(`vm Error ->`, error)
+	}).finally(function() {
 		vm.$mount('#app')
 		next()
 		return socket.discover()
 	})
 })
 
-// const vm = new App({ router, store })
 const vm = new Vue({ router, store, render: h => h(App) })
 export default vm
 

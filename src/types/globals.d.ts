@@ -3,6 +3,7 @@
 
 
 declare namespace NodeJS {
+	export interface Global { Zousan: any }
 	export interface ProcessEnv {
 		NODE_ENV: 'development' | 'production'
 		DEVELOPMENT: any

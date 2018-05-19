@@ -37,9 +37,9 @@ nav.navbar a.navbar-robinhood.is-active {
 					<img src="@/assets/logo-primary.svg" alt="Robinhood Tools">
 				</router-link>
 
-				<div class="is-hidden-mobile navbar-item py-0 flex flex-col self-center text-sm">
-					<p class="font-medium">{{time}}</p>
-					<p :class="scolor">{{state}}</p>
+				<div class="is-hidden-mobile navbar-item py-0 flex flex-col self-center">
+					<p class="leading-tight font-medium">{{time}}</p>
+					<p class="leading-tight" :class="scolor">{{state}}</p>
 					<!-- <span class="tag is-small" :class="scolor">{{state}}</span> -->
 				</div>
 
