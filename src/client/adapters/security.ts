@@ -61,9 +61,8 @@ export function token(): Promise<void> {
 	}).catch(function(error: boom) {
 		console.error('token Error ->', error)
 		console.dir(error)
-		if (error.isBoom && error.output.statusCode == 401) {
+		if (error && error.isBoom && error.output.statusCode == 401) {
 			core.object.nullify(doc)
-			// Object.assign(doc, { uuid: null, finger: null } as typeof doc)
 		}
 		return new Promise(r => setTimeout(r, 3000)).then(token)
 	})

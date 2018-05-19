@@ -5,9 +5,9 @@ import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as http from '@/common/http'
 import * as security from '@/client/adapters/security'
+import * as alert from '@/client/adapters/alert'
 import * as boom from 'boom'
 import url from 'url'
-import vm from '@/client/vm'
 
 
 
@@ -30,24 +30,18 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		return config
 
 	}).then(http.send).catch(function(error: boom) {
-		// console.info('error ->', error)
-		// console.dir(error)
-		// console.log('error ->', JSON.stringify(error, null, 4))
-		// console.error('http error.message Error ->', error.message)
-		// let message = _.get(error, 'statusMessage', error.message) as string
-		// let payload = _.get(error, 'data')
-		// if (payload && payload.message) {
-		// 	let extra = payload.attributes ? JSON.stringify(payload.attributes) : payload.message
-		// 	message += `: "${extra}"`
-		// }
-		// console.log('error ->', JSON.stringify(error, null, 4))
-		let message = _.get(error, 'output.payload') ? JSON.stringify(error.output.payload) : error.message
+		let message = error.message
+		let payload = _.get(error, 'output.payload') as boom.Payload
+		if (payload) {
+			message = JSON.stringify(payload.error == payload.message ? _.omit(payload, 'error') : payload)
+		}
 		let endpoint = `[${config.method}] ${config.url.replace(process.env.DOMAIN, '')}`
 		console.log('%c◀ ' + endpoint, 'color: red; font-weight: bolder;', message)
-		vm.$toast.open({ message: endpoint + ' ➤ ' + message, type: 'is-danger' })
-
+		if (payload && payload.statusCode == 401) {
+			return security.token().then(() => Promise.reject(error))
+		}
+		alert.snackbar({ message: endpoint + ' ➤ ' + message, type: 'is-danger' })
 		return Promise.reject(error)
-
 	})
 
 }

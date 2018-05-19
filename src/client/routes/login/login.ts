@@ -5,6 +5,7 @@ import Vue from 'vue'
 import * as _ from '@/common/lodash'
 import * as robinhood from '@/client/adapters/robinhood'
 import * as http from '@/client/adapters/http'
+import * as alert from '@/client/adapters/alert'
 import store from '@/client/store'
 import socket from '@/client/adapters/socket'
 
@@ -16,7 +17,9 @@ import socket from '@/client/adapters/socket'
 	},
 	beforeRouteEnter(to, from, next) {
 		// if (process.env.DEVELOPMENT) return next();
-		store.state.security.rhusername ? next({ name: 'robinhood' }) : next()
+		if (!store.state.security.rhusername) return next();
+		alert.toast('Redirecting to account page...')
+		next({ name: 'robinhood' })
 	},
 })
 export default class extends Vue {
@@ -55,7 +58,7 @@ export default class extends Vue {
 				socket.discover(),
 				socket.toPromise('ready'),
 			]).then(() => {
-				this.$toast.open(`Robinhood login success! Hello ${response.rhusername}...`)
+				alert.toast(`Robinhood login success! Hello ${response.rhusername}...`)
 				this.$router.push({ name: 'robinhood' })
 			})
 

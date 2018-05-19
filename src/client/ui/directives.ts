@@ -15,7 +15,7 @@ Vue.directive('visible', function(el, { value }) {
 
 Vue.directive('is', function(el, { arg, modifiers }, { context }) {
 	let classes = Object.keys(modifiers)
-	let value = context.$store.state.breakpoint[arg]
+	let value = context.$store.state.breakpoints[arg]
 	value ? el.classList.add(...classes) : el.classList.remove(...classes)
 })
 
@@ -55,7 +55,7 @@ declare module 'vue/types/vnode' {
 
 // Vue.directive('is', function(el, binding, { context }) {
 // 	console.log('binding ->', binding)
-// 	// console.log('breakpoint ->', JSON.parse(JSON.stringify(context.$store.state.breakpoint)))
+// 	// console.log('breakpoints ->', JSON.parse(JSON.stringify(context.$store.state.breakpoints)))
 // })
 
 

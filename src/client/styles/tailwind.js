@@ -460,10 +460,13 @@ module.exports = {
 
 	borderRadius: {
 		'initial': 'initial',
+		'default': '.25rem',
 		'none': '0',
 		'sm': '.125rem',
-		'default': '.25rem',
+		'md': '.25rem',
 		'lg': '.5rem',
+		'xl': '1rem',
+		'half': '50%',
 		'full': '9999px',
 	},
 

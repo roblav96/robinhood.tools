@@ -31,11 +31,13 @@ Vue.config.devtools = false
 Vue.use(VueRouter)
 Vue.use(Vuex)
 Vue.use(Buefy, {
-	defaultSnackbarDuration: 10000,
-	defaultToastDuration: 10000,
-	defaultInputAutocomplete: 'off',
 	defaultNoticeQueue: false,
-	defaultTooltipType: 'is-primary',
+	defaultSnackbarDuration: 5000,
+	defaultToastDuration: 5000,
+	defaultInputAutocomplete: 'off',
+	defaultTooltipType: 'is-dark',
+	defaultDialogConfirmText: 'Confirm',
+	defaultDialogCancelText: 'Cancel',
 } as BuefyConfig)
 
 require('@/client/vm')

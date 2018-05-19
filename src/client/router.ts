@@ -16,23 +16,28 @@ export const routes = [
 	},
 
 	{
-		title: 'Watchlist', icon: 'wunderlist',
-		name: 'watchlist', path: '/watchlist',
+		title: 'My Lists', icon: 'format-list-bulleted',
+		name: 'lists', path: '/lists',
 	},
 
 	{
-		title: 'Markets', icon: 'earth',
+		title: 'Global Markets', icon: 'earth',
 		name: 'markets', path: '/markets',
 	},
 
 	{
-		title: 'News', icon: 'newspaper',
+		title: 'News Stream', icon: 'newspaper',
 		name: 'news', path: '/news',
 	},
 
 	{
-		title: 'Screener', icon: 'radar',
+		title: 'Stock Screener', icon: 'radar',
 		name: 'screener', path: '/screener',
+	},
+
+	{
+		title: 'Cryptocurrencies', icon: 'bitcoin',
+		name: 'crypto', path: '/crypto',
 	},
 
 	// {

@@ -20,7 +20,7 @@ import clock from '@/common/clock'
 export default class extends Mixins(VMixin, RHMixin) {
 
 	created() {
-		this.$router.afterEach(() => this.isMobileMenu = false)
+		this.$router.afterEach(() => this.showmenu = false)
 		document.documentElement.classList.add('has-navbar-fixed-top')
 		clock.on('1s', this.onsec)
 		this.onsec()
@@ -30,14 +30,17 @@ export default class extends Mixins(VMixin, RHMixin) {
 		document.removeEventListener('pointerdown', this.onpointer)
 	}
 
-	isMobileMenu = false
-	@Vts.Watch('isMobileMenu') w_isMobileMenu(to: boolean) {
+	showmenu = false
+	@Vts.Watch('showmenu') w_showmenu(to: boolean) {
 		document.removeEventListener('pointerdown', this.onpointer)
 		if (to == true) document.addEventListener('pointerdown', this.onpointer);
 	}
 	onpointer(event: MouseEvent) {
 		let path = (event as any).path as HTMLElement[]
-		if (!path.find(v => v.id == 'navbar')) this.isMobileMenu = false;
+		if (!path.find(v => v.id == 'navbar')) this.showmenu = false;
+	}
+	@Vts.Watch('breakpoints.name') w_breakpointsname(to: string) {
+		if (this.showmenu && this.breakpoints.desktopAndUp) this.showmenu = false;
 	}
 
 	time = ''
@@ -47,7 +50,7 @@ export default class extends Mixins(VMixin, RHMixin) {
 		let state = this.$store.state.hours.state
 		if (state == 'REGULAR') return 'has-text-success';
 		if (state.includes('PRE') || state.includes('POST')) return 'has-text-warning';
-		return 'has-text-danger'
+		return 'has-text-grey'
 	}
 
 	get routes() {

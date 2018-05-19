@@ -24,7 +24,7 @@ export default class extends Vue {
 	vpercent(to: number, from: number) { if (!to || !from) return NaN; return core.calc.percent(to, from) }
 	vslider(value: number, min: number, max: number) { if (!value) return NaN; return core.calc.slider(value, min, max) }
 
-	get brkpt() { return this.$store.state.breakpoint }
+	get breakpoints() { return this.$store.state.breakpoints }
 	get rhusername() { return this.$store.state.security.rhusername }
 
 }

@@ -19,8 +19,12 @@
 
 @each $name,
 $pair in $colors {
+	$color: nth($pair, 1);
 	.border-#{$name} {
-		border-color: nth($pair, 1) !important;
+		border-color: $color !important;
+	}
+	.hover-#{$name}:hover {
+		color: $color !important;
 	}
 }
 

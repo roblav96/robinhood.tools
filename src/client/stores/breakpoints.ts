@@ -60,11 +60,11 @@ function update() {
 
 }
 update()
-window.addEventListener('resize', _.throttle(update, 300, { leading: false, trailing: true }), { passive: true })
 
-store.register('breakpoint', state)
-declare global {
-	namespace Store { interface State { breakpoint: typeof state } }
-}
+const handler = _.debounce(update, 1000, { leading: false, trailing: true })
+window.addEventListener('resize', handler, { passive: true })
+
+store.register('breakpoints', state)
+declare global { namespace Store { interface State { breakpoints: typeof state } } }
 
 
