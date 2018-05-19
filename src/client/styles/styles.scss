@@ -32,6 +32,19 @@ $shade in $shades {
 }
 
 // 
+// ████  ICON  ████
+// 
+@each $dim in $dimensions {
+	.icon.is-#{$dim}x#{$dim} {
+		width: $dim + px !important;
+		height: $dim + px !important;
+	}
+	.icon.is-#{$dim}x#{$dim} i.mdi:before {
+		font-size: $dim + px !important;
+	}
+}
+
+// 
 // ████  NAVBAR  ████
 // 
 html.has-navbar-fixed-top section.hero.is-fullheight {

@@ -55,7 +55,7 @@ nav.navbar a.navbar-robinhood.is-active {
 			<div class="navbar-menu" :class="{ 'is-active animated-slow fadeIn': isMobileMenu }">
 				<div class="navbar-start">
 					<router-link class="navbar-item flex items-center" v-for="route in routes" :key="route.name" :to="{ name: route.name }">
-						<b-icon class="mx-1" :icon="route.icon"></b-icon>
+						<b-icon class="mx-1" :icon="route.icon" size="is-28x28"></b-icon>
 						<!-- <span class="ml-2">{{ route.title }}</span> -->
 					</router-link>
 				</div>

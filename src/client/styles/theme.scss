@@ -9,6 +9,7 @@ $grey-dark: #3D4852;
 $grey: #606F7B;
 $grey-light: #8795A1;
 $grey-lighter: #B8C2CC;
+$grey-lightest: #DAE1E7;
 $white-ter: #F1F5F8;
 $white-bis: #F8FAFC;
 $white: #FFFFFF;
@@ -53,11 +54,12 @@ $widescreen: 1200px;
 $fullhd: 1408px;
 // 
 $column-gap: 1rem;
-$dimensions: 16 24 32 40 48 64 72 80 88 96 112 128;
+$dimensions: 16 20 24 28 32 40 48 56 64 72 80 88 96 104 112 120;
 // 
 @import '~bulma/sass/utilities/all';
 @import '~buefy/src/scss/utils/all';
 // 
+$shades: map-merge($shades, ('grey-lightest':$grey-lightest));
 $colors: map-merge($colors, ('secondary':($secondary, $white)));
 $colors: map-merge($colors, ('accent':($accent, $white)));
 $colors: map-merge($colors, ('rhgreen':($rhgreen, $white)));
@@ -70,10 +72,11 @@ $colors: map-merge($colors, ('rhred':($rhred, $white)));
 $link-visited: $pink;
 $link-focus-border: $link;
 // 
-// $navbar-item-hover-color: $grey-dark;
 $navbar-item-active-color: $link;
 $navbar-item-img-max-height: initial;
 $navbar-item-hover-background-color: $white-ter;
+// $navbar-item-color: $grey-dark;
+// $navbar-item-hover-color: $grey-dark;
 // 
 $dropdown-item-hover-color: $link;
 // 

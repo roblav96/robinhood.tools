@@ -36,13 +36,13 @@
 							<div class="mr-6">
 								<symbol-logo class="is-80x80 shadow-md" :symbol="symbol"></symbol-logo>
 							</div>
-							<div class="has-text-left self-start bg-white border-white-ter border-solid border-2 rounded-r-lg px-4 py-2">
+							<div class="has-text-left self-start bg-white border-grey-lightest border-solid border-1 rounded-r-lg px-4 py-2">
 								<p class="title leading-tight">
 									<span>{{symbol}}</span>
 									<span v-show="!instrument.alive" class="tag is-medium is-danger align-top">Untradable</span>
 									<span v-show="delisted||suspended" class="tag is-medium is-danger align-top">{{vcapitalize(wbquote.status)}}</span>
 								</p>
-								<p class="is-size-6">{{name}}</p>
+								<p class="is-size-5">{{name}}</p>
 							</div>
 						</div>
 
@@ -50,7 +50,7 @@
 
 						<div class="column flex justify-center">
 							<!-- <div class="has-text-centered self-start bg-white border-solid border-1 rounded-lg px-4 py-2" v-green-red:border="wbquote.change"> -->
-							<div class="has-text-centered self-start bg-white border-white-ter border-solid border-2 rounded-lg px-4 py-2">
+							<div class="has-text-centered self-start bg-white border-grey-lightest border-solid border-1 rounded-lg px-4 py-2">
 								<p class="title">{{vnumber(wbquote.price)}}</p>
 								<p class="is-size-5 font-medium" v-green-red="wbquote.change">
 									<span>{{vnumber(wbquote.change,{plusminus:true})}}</span>
@@ -62,11 +62,11 @@
 
 
 						<div class="column flex justify-end">
-							<div class="has-text-right self-start bg-white border-white-ter border-solid border-2 rounded-l-lg px-4 py-2 mr-6">
+							<div class="has-text-right self-start bg-white border-grey-lightest border-solid border-1 rounded-l-lg px-4 py-2 mr-6">
 								<p class="is-size-4 font-medium">{{vnumber(wbquote.volume,{compact:true,precision:2})}}</p>
 								<p class="is-size-6">Volume</p>
 							</div>
-							<div class="has-text-right self-start bg-white border-white-ter border-solid border-2 rounded-l-lg px-4 py-2">
+							<div class="has-text-right self-start bg-white border-grey-lightest border-solid border-1 rounded-l-lg px-4 py-2">
 								<p class="is-size-4 font-medium">{{vnumber(marketcap,{compact:true,precision:2})}}</p>
 								<p class="is-size-6">Market Cap</p>
 							</div>
