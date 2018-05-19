@@ -46,7 +46,10 @@ td[width="1"] {
 /**/
 
 p.title,
-p.subtitle {
+p.subtitle,
+p.title:not(:last-child),
+p.subtitle:not(:last-child),
+p.title:not(.is-spaced) + .subtitle {
 	margin-top: 0px;
 	margin-bottom: 0px;
 }

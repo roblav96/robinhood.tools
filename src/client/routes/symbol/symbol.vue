@@ -9,31 +9,81 @@
 	border: 1px solid var(--border);
 }
 
+/*.symbol-route .message.is-success li.is-active a {
+	border-color: var(--success) !important;
+	background-color: var(--success) !important;
+}
+
+.symbol-route .message.is-danger li.is-active a {
+	border-color: var(--danger) !important;
+	background-color: var(--danger) !important;
+}*/
+
 </style>
 
 <template>
 	<section class="symbol-route">
 		<section class="hero is-small">
-			<div v-visible="!busy" class="hero-body message mb-0" v-green-red:is="wbquote.change">
+			<!-- <div v-visible="!busy" class="hero-body message" v-green-red:is="wbquote.change"> -->
+			<div v-visible="!busy" class="hero-body message has-background-white-bis">
 				<div class="container">
 					<!-- <div v-is:widescreenAndUp.is-variable v-is:widescreenOnly.is-4 v-is:fullhdOnly.is-8 class="columns"> -->
-					<div class="columns is-desktop">
+					<div class="columns">
 
 
 
-						<div class="column is-4 flex">
+						<div class="column flex justify-start">
 							<div class="mr-6">
-								<symbol-logo class="is-72x72 shadow-md" :symbol="symbol"></symbol-logo>
+								<symbol-logo class="is-80x80 shadow-md" :symbol="symbol"></symbol-logo>
 							</div>
-							<div class="flex flex-col">
-								<p class="title bg-white border-color border rounded-r-lg self-start leading-tight px-3 py-0 mb-2">
+							<div class="has-text-left self-start bg-white border-white-ter border-solid border-2 rounded-r-lg px-4 py-2">
+								<p class="title leading-tight">
 									<span>{{symbol}}</span>
 									<span v-show="!instrument.alive" class="tag is-medium is-danger align-top">Untradable</span>
 									<span v-show="delisted||suspended" class="tag is-medium is-danger align-top">{{vcapitalize(wbquote.status)}}</span>
 								</p>
-								<p class="is-size-6 bg-white border-color border rounded-r-lg self-start px-3 py-0">{{name}}</p>
+								<p class="is-size-6">{{name}}</p>
 							</div>
 						</div>
+
+
+
+						<div class="column flex justify-center">
+							<!-- <div class="has-text-centered self-start bg-white border-solid border-1 rounded-lg px-4 py-2" v-green-red:border="wbquote.change"> -->
+							<div class="has-text-centered self-start bg-white border-white-ter border-solid border-2 rounded-lg px-4 py-2">
+								<p class="title">{{vnumber(wbquote.price)}}</p>
+								<p class="is-size-5 font-medium" v-green-red="wbquote.change">
+									<span>{{vnumber(wbquote.change,{plusminus:true})}}</span>
+									<span>({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true,precision:2})}})</span>
+								</p>
+							</div>
+						</div>
+
+
+
+						<div class="column flex justify-end">
+							<div class="has-text-right self-start bg-white border-white-ter border-solid border-2 rounded-l-lg px-4 py-2 mr-6">
+								<p class="is-size-4 font-medium">{{vnumber(wbquote.volume,{compact:true,precision:2})}}</p>
+								<p class="is-size-6">Volume</p>
+							</div>
+							<div class="has-text-right self-start bg-white border-white-ter border-solid border-2 rounded-l-lg px-4 py-2">
+								<p class="is-size-4 font-medium">{{vnumber(marketcap,{compact:true,precision:2})}}</p>
+								<p class="is-size-6">Market Cap</p>
+							</div>
+						</div>
+
+
+
+						<!-- <div class="column">
+							<div class="tags has-addons">
+								<span class="tag title is-size-4 h-initial py-1 leading-tight is-white border-success border">
+									{{vnumber(wbquote.price)}}
+								</span>
+								<span class="tag is-large font-medium bg-transparent border-color border" v-green-red="wbquote.change">
+									{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true,precision:2})}})
+								</span>
+							</div>
+						</div> -->
 
 
 
@@ -54,40 +104,32 @@
 							</div>
 						</div> -->
 
-
-
-						<div class="column">
-							<div class="tags has-addons">
-								<span class="tag title is-size-4 h-initial py-1 leading-tight is-white border-success border">
-									{{vnumber(wbquote.price)}}
-								</span>
-								<span class="tag is-large font-medium bg-transparent border-color border" v-green-red="wbquote.change">
-									{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true,precision:2})}})
-								</span>
-							</div>
-						</div>
-
-
+						<!-- <div class="column"></div> -->
 
 					</div>
-
-					<nav class="tabs is-toggle is-centered is-fullwidth rounded">
-						<div class="container">
-							<ul class="has-background-white">
-								<li :class="{ 'is-active': tabindex == i }" v-on:click="tabindex = i" v-for="(tab, i) in tabs">
-									<a class="no-underline">
-										<b-icon :icon="tab.icon"></b-icon>
-										<span>{{tab.title}}</span>
-									</a>
-								</li>
-							</ul>
-						</div>
-					</nav>
-
 				</div>
+
+
+
+				<nav class="tabs is-toggle is-centered is-fullwidth rounded mt-6">
+					<div class="container">
+						<ul class="has-background-white">
+							<li :class="{ 'is-active': tabindex == i }" v-on:click="tabindex = i" v-for="(tab, i) in tabs">
+								<a class="no-underline">
+									<b-icon :icon="tab.icon"></b-icon>
+									<span>{{tab.title}}</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</nav>
+
+
+
 			</div>
-			<hr class="h-px my-0">
 		</section>
+
+		<hr class="h-px my-0">
 
 		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
 			<component :is="tabs[tabindex].vcomponent" class="has-background-white"></component>

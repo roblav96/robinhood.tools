@@ -18,7 +18,7 @@ span.navbar-burger.burger > span {
 }
 
 nav.navbar {
-	border-bottom: 1px solid var(--grey-lighter);
+	/*border-bottom: 1px solid var(--grey-lighter);*/
 }
 
 nav.navbar a.navbar-robinhood:hover,
@@ -29,7 +29,7 @@ nav.navbar a.navbar-robinhood.is-active {
 </style>
 
 <template>
-	<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+	<nav class="navbar is-fixed-top shadow" role="navigation" aria-label="main navigation">
 		<div class="container">
 
 			<div class="navbar-brand">
@@ -55,8 +55,8 @@ nav.navbar a.navbar-robinhood.is-active {
 			<div class="navbar-menu" :class="{ 'is-active animated-slow fadeIn': isMobileMenu }">
 				<div class="navbar-start">
 					<router-link class="navbar-item flex items-center" v-for="route in routes" :key="route.name" :to="{ name: route.name }">
-						<b-icon class="" :icon="route.icon"></b-icon>
-						<span class="ml-2">{{ route.title }}</span>
+						<b-icon class="mx-1" :icon="route.icon"></b-icon>
+						<!-- <span class="ml-2">{{ route.title }}</span> -->
 					</router-link>
 				</div>
 				<div class="navbar-end">

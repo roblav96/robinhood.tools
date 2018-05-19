@@ -17,10 +17,17 @@
 	--border: #{$border};
 }
 
-@each $color,
+@each $name,
 $pair in $colors {
-	.border-#{$color} {
+	.border-#{$name} {
 		border-color: nth($pair, 1) !important;
+	}
+}
+
+@each $name,
+$shade in $shades {
+	.border-#{$name} {
+		border-color: #{$shade} !important;
 	}
 }
 
@@ -39,7 +46,7 @@ html.has-navbar-fixed-top section.hero.is-fullheight {
 // ████  BORDER  ████
 // 
 .border-color {
-	border-color: $border !important;
+	border-color: $border;
 }
 
 // 
