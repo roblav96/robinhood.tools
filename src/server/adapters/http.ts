@@ -1,8 +1,6 @@
 // 
-export * from '../../common/http'
-// 
 
-import * as _ from '../../common/lodash'
+export * from '../../common/http'
 import * as url from 'url'
 import * as qs from 'querystring'
 import * as simple from 'simple-get'
@@ -23,9 +21,9 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		// if (config.hReferer) config.headers['Referer'] = `${protocol}//${host}`;
 
 		if (host.includes('robinhood.com')) {
-			// config.headers['x-robinhood-api-version'] = '1.212.3'
-			// config.headers['origin'] = 'https://robinhood.com'
-			// config.headers['referer'] = 'https://robinhood.com/'
+			config.headers['x-robinhood-api-version'] = '1.212.3'
+			config.headers['origin'] = 'https://robinhood.com'
+			config.headers['referer'] = 'https://robinhood.com/'
 			if (config.rhtoken) {
 				config.headers['authorization'] = `Bearer ${config.rhtoken}`
 			}

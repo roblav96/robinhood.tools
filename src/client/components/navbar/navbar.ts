@@ -4,6 +4,7 @@ import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import VMixin from '@/client/mixins/v.mixin'
+import RHMixin from '@/client/mixins/robinhood.mixin'
 import * as _ from '@/common/lodash'
 import * as pretty from '@/common/pretty'
 import dayjs from '@/common/dayjs'
@@ -16,7 +17,7 @@ import clock from '@/common/clock'
 		'v-searchbar': () => import('@/client/components/searchbar/searchbar'),
 	},
 })
-export default class extends Mixins(VMixin) {
+export default class extends Mixins(VMixin, RHMixin) {
 
 	isMobileMenu = false
 
@@ -25,8 +26,6 @@ export default class extends Mixins(VMixin) {
 		document.documentElement.classList.add('has-navbar-fixed-top')
 		clock.on('1s', this.onsecond)
 		this.onsecond()
-		// console.log('this.$store.state.rh ->', JSON.parse(JSON.stringify(this.$store.state.rh)))
-		console.log('this.$store.getters ->', this.$store.getters)
 	}
 
 	get rhusername() { return this.$store.state.security.rhusername }
@@ -35,9 +34,9 @@ export default class extends Mixins(VMixin) {
 	get state() { return pretty.marketState(this.$store.state.hours.state) }
 	get scolor() {
 		let state = this.$store.state.hours.state
-		if (state == 'REGULAR') return 'is-success';
-		if (state.includes('PRE') || state.includes('POST')) return 'is-warning';
-		return 'is-danger'
+		if (state == 'REGULAR') return 'has-text-success';
+		if (state.includes('PRE') || state.includes('POST')) return 'has-text-warning';
+		return 'has-text-danger'
 	}
 	onsecond() { this.time = dayjs().format('h:mm:ssa') }
 
@@ -46,12 +45,6 @@ export default class extends Mixins(VMixin) {
 			return route.title && route.icon
 		})
 	}
-
-	get equity() { return _.sum(this.$store.state.rh.portfolios.map(v => v.extended_hours_equity || v.equity)) }
-	get equitychange() { return _.sum(this.$store.state.rh.portfolios.map(v => v.extended_hours_equity || v.equity)) }
-	get equitypercent() { return _.sum(this.$store.state.rh.portfolios.map(v => v.extended_hours_equity || v.equity)) }
-	// get market() { return _.sum(this.$store.state.rh.portfolios.map(v => v.extended_hours_market_value || v.market_value)) }
-	// get funds() { return _.sum(this.$store.state.rh.accounts.map(v => v.buying_power)) }
 
 }
 

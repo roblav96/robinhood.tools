@@ -12,6 +12,7 @@ if (process.env.DEVELOPMENT) {
 	Object.assign(window, require('@/common/pretty'))
 }
 
+import 'modern-normalize'
 import 'animate.css'
 import '@/client/styles/tailwind.css'
 import '@/client/styles/vendors.scss'

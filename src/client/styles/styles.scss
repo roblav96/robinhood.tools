@@ -17,6 +17,13 @@
 	--border: #{$border};
 }
 
+@each $color,
+$pair in $colors {
+	.border-#{$color} {
+		border-color: nth($pair, 1) !important;
+	}
+}
+
 // 
 // ████  NAVBAR  ████
 // 

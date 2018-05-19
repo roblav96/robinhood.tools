@@ -11,28 +11,38 @@ import * as security from '../adapters/security'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as socket from '../adapters/socket'
+import * as hours from '../adapters/hours'
 import clock from '../../common/clock'
 
 
 
-const queue5s = new pQueue({ concurrency: 1 })
+const queue = new pQueue({ concurrency: 1 })
 
-clock.on('5s', function ontick(i) {
-	if (queue5s.pending > 0) return;
+clock.on('1s', function ontick(i) {
+	if (queue.pending > 0) return;
 
-	socket.clients.forEach(client => {
-		if (!client.doc.rhtoken) return;
+	let mod = 5
+	let state = hours.rxstate.value
+	if (state == 'CLOSED') mod = 10;
+	if (state == 'REGULAR') mod = 1;
+	if (i % mod > 0) return;
+
+	let ii = -1
+	let chunked = core.array.create(socket.wss.clients.length)
+	let chunk = core.array.chunks(chunked, +process.env.SCALE)[+process.env.INSTANCE]
+	socket.wss.clients.forEach((client: Socket.Client) => {
+		ii++; if (!client.doc.rhtoken || !chunk.includes(ii)) return;
 
 		client.subs.forEach(name => {
 			if (name.indexOf(rkeys.RH.SYNC) != 0) return;
 
-			let fn = robinhood.sync[name.split(':').pop()] as (doc: Security.Doc) => Promise<any>
+			let key = name.split(':').pop()
+			let fn = robinhood.sync[key] as (doc: Security.Doc) => Promise<any>
 			if (!fn) return;
 
-			queue5s.add(() => fn(client.doc)).then(data => {
-				// console.log('name ->', name, 'data ->', data)
-				socket.send(client, name, data)
-			})
+			queue.add(() => fn(client.doc).then(data => {
+				socket.send(client, name, { [key]: data })
+			}).catch(console.error))
 
 		})
 	})

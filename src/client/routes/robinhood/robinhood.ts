@@ -1,7 +1,10 @@
 // 
 
 import * as Vts from 'vue-property-decorator'
+import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
+import VMixin from '@/client/mixins/v.mixin'
+import RHMixin from '@/client/mixins/robinhood.mixin'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as pretty from '@/common/pretty'
@@ -20,7 +23,7 @@ import socket from '@/client/adapters/socket'
 		store.state.security.rhusername ? next() : next({ name: 'login' })
 	},
 })
-export default class extends Vue {
+export default class extends Mixins(VMixin, RHMixin) {
 
 	get routes() { return this.$router.options.routes.find(v => v.name == 'robinhood').children }
 

@@ -1,25 +1,24 @@
 /**/
 
-nav.navbar div.field.navbar-item {
-	margin-bottom: 0px;
-}
-
-nav.navbar .navbar-item .tag,
-nav.navbar .navbar-item .tags {
-	margin-bottom: initial;
-}
-
-/**/
-
-.border-debug {
-	border: 1px solid red !important;
-}
-
-/**/
-
 img.is-png {
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
+}
+
+/**/
+
+.border {
+	border-width: 1px;
+	border-style: solid;
+}
+
+.border-color {
+	border-width: 0px;
+	border-style: solid;
+}
+
+.border-debug {
+	border: 1px solid red !important;
 }
 
 /**/

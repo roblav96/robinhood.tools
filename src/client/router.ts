@@ -26,9 +26,19 @@ export const routes = [
 	},
 
 	{
+		title: 'News', icon: 'newspaper',
+		name: 'news', path: '/news',
+	},
+
+	{
 		title: 'Screener', icon: 'radar',
 		name: 'screener', path: '/screener',
 	},
+
+	// {
+	// 	title: 'Explore', icon: 'compass',
+	// 	name: 'explore', path: '/explore',
+	// },
 
 	{
 		name: 'login', path: '/login',
@@ -48,6 +58,11 @@ export const routes = [
 				title: 'Accounts', icon: 'earth',
 				name: 'robinhood.accounts', path: 'accounts',
 				component: () => import('@/client/routes/robinhood/robinhood.accounts'),
+			},
+			{
+				title: 'Banking', icon: 'bank',
+				name: 'robinhood.banking', path: 'banking',
+				// component: () => import('@/client/routes/robinhood/robinhood.banking'),
 			},
 			// {
 			// 	name: 'symbol', path: '', redirect: { name: 'robinhood.index' }
@@ -78,11 +93,6 @@ export const routes = [
 	// {
 	// 	title: 'Portfolio', icon: 'chart-pie',
 	// 	name: 'portfolio', path: '/portfolio',
-	// },
-
-	// {
-	// 	title: 'News', icon: 'newspaper',
-	// 	name: 'news', path: '/news',
 	// },
 
 	{

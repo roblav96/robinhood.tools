@@ -1,5 +1,6 @@
 // 
 
+import * as schedule from 'node-schedule'
 export * from '../../common/hours'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
@@ -7,7 +8,6 @@ import * as Rx from '../../common/rxjs'
 import * as rkeys from '../../common/rkeys'
 import * as pretty from '../../common/pretty'
 import * as hours from '../../common/hours'
-import * as schedule from 'node-schedule'
 import * as pandora from './pandora'
 import * as redis from './redis'
 

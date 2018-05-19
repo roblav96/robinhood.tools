@@ -58,7 +58,7 @@ export function send(config: Http.Config) {
 						return reject(new boom(parsed.err, {
 							statusCode: 422,
 							message: parsed.err.message,
-							data: { data },
+							data: { data, config: _.pick(config, ['method','url']) },
 						}))
 					}
 					data = parsed.value
@@ -74,7 +74,7 @@ export function send(config: Http.Config) {
 				return reject(new boom(error || res.statusMessage, {
 					statusCode: res.statusCode,
 					message: error ? error.message : res.statusMessage,
-					data: { data },
+					data: { data, config: _.pick(config, ['method','url']) },
 				}))
 			}
 

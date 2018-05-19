@@ -15,6 +15,7 @@ import * as redis from './redis'
 import * as security from './security'
 import { PolkaRequest } from '../api/polka.request'
 import Emitter from '../../common/emitter'
+import clock from '../../common/clock'
 
 
 
@@ -23,7 +24,7 @@ pandora.on('socket.listening', function(hubmsg) {
 	pandora.send({ clientId: hubmsg.host.clientId }, 'socket.listening', { port })
 })
 
-const wss = new uws.Server({
+export const wss = new uws.Server({
 	host: process.env.HOST, port,
 
 	verifyClient(incoming, next: (allow: boolean, code?: number, message?: string) => void) {
@@ -83,12 +84,16 @@ exithook(function onexit() { wss.close() })
 
 const emitter = new Emitter()
 
-interface Client extends uws.WebSocket {
-	subs: string[]
-	authed: boolean
-	doc: Security.Doc
+declare global {
+	namespace Socket {
+		interface Client extends uws.WebSocket {
+			subs: string[]
+			authed: boolean
+			doc: Security.Doc
+		}
+	}
 }
-function onconnection(client: Client, req: PolkaRequest) {
+function onconnection(client: Socket.Client, req: PolkaRequest) {
 	client.subs = []
 	client.authed = req.authed
 	client.doc = req.doc
@@ -133,8 +138,6 @@ function onconnection(client: Client, req: PolkaRequest) {
 
 }
 
-export const clients = wss.clients as Client[]
-
 export function emit(name: string, data?: any) {
 	if (emitter.listenerCount(name) == 0) return;
 	emitter.emit(name, JSON.stringify({ name, data } as Socket.Event))
@@ -144,11 +147,9 @@ export function broadcast(name: string, data?: any) {
 	wss.broadcast(JSON.stringify({ name, data } as Socket.Event))
 }
 
-export function send(client: Client, name: string, data?: any) {
+export function send(client: Socket.Client, name: string, data?: any) {
 	client.send(JSON.stringify({ name, data } as Socket.Event))
 }
-
-
 
 
 

@@ -93,6 +93,7 @@ async function syncInstruments() {
 }
 
 async function syncTickers() {
+	if (process.env.DEVELOPMENT) console.info('syncTickers start ->')
 	let tickers = await Promise.all([
 		// stocks
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {

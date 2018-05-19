@@ -44,7 +44,7 @@ export function number(value: number, { precision, compact, plusminus, percent, 
 		precision = 2
 		let abs = Math.abs(value)
 		if (abs < 3) precision = 3;
-		if (abs >= 1000) precision = 1;
+		if (abs >= 2000) precision = 1;
 		if (abs >= 10000) precision = 0;
 	}
 
@@ -55,7 +55,7 @@ export function number(value: number, { precision, compact, plusminus, percent, 
 	})
 
 	if (compact) {
-		let units = ['k', 'M', 'T']
+		let units = ['k', 'M', 'B', 'T']
 		let split = fixed.split(',')
 		if (split.length > 1) {
 			let end = Math.max(precision, 0)
@@ -73,9 +73,15 @@ export function number(value: number, { precision, compact, plusminus, percent, 
 		}
 	}
 
-	if (dollar) fixed = '$' + fixed;
-	if (plusminus && value > 0) fixed = '+' + fixed;
-	if (plusminus && value < 0) fixed = fixed.replace('-', '–');
+	let cash = dollar ? '$' : ''
+	if (plusminus && value > 0) {
+		fixed = '+' + cash + fixed
+	}
+	else if (plusminus && value < 0) {
+		fixed = fixed.substr(1)
+		fixed = '–' + cash + fixed
+	}
+	else { fixed = cash + fixed };
 	if (percent) fixed += '%';
 
 	return fixed

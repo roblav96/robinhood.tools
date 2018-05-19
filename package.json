@@ -45,6 +45,7 @@
 		"lodash": "latest",
 		"lunr": "latest",
 		"mdi": "latest",
+		"modern-normalize": "latest",
 		"mqtt": "latest",
 		"mqtt-connection": "latest",
 		"node-forge": "latest",

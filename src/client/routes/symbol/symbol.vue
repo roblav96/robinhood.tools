@@ -13,40 +13,115 @@
 
 <template>
 	<section class="symbol-route">
-		<section class="hero is-small has-background-white-bis">
-			<div v-visible="!busy" class="hero-body">
+		<section class="hero is-small">
+			<div v-visible="!busy" class="hero-body message mb-0" v-green-red:is="wbquote.change">
 				<div class="container">
 					<!-- <div v-is:widescreenAndUp.is-variable v-is:widescreenOnly.is-4 v-is:fullhdOnly.is-8 class="columns"> -->
-					<div class="columns">
+					<div class="columns is-desktop">
 
 
 
-						<div class="column flex">
-							<div class="mr-8">
-								<symbol-logo class="is-88x88 shadow-md" :symbol="symbol"></symbol-logo>
+						<div class="column is-4 flex">
+							<div class="mr-6">
+								<symbol-logo class="is-64x64 shadow-md" :symbol="symbol"></symbol-logo>
 							</div>
 							<div>
-								<p class="title">
-									{{symbol}}
-									<span v-show="delisted||suspended" class="tag is-danger font-medium">{{vcapitalize(wbquote.status)}}</span>
+								<p class="title bg-white">
+									<span>{{symbol}}</span>
+									<span v-show="!instrument.alive" class="tag is-medium is-danger align-top">Untradable</span>
+									<span v-show="delisted||suspended" class="tag is-medium is-danger align-top">{{vcapitalize(wbquote.status)}}</span>
 								</p>
 								<p class="is-size-5">{{name}}</p>
-								<p class="is-size-7">{{ticker.disExchangeCode}}</p>
 							</div>
 						</div>
 
 
 
-						<div class="column is-narrow">
+						<!-- <p class="tag m-0 mb-4 title is-size-4 h-initial px-4 is-white border-color border rounded-l-none">
+									{{symbol}}
+								</p>
+								<p class="tag m-0 subtitle is-size-6 h-initial is-white border-color border rounded-l-none">
+									{{name}}
+								</p>
+						<div class="column">
+							<div class="tags">
+								<span class="tag m-0 mb-2 title is-size-4 h-initial px-4 is-white border-color border rounded-l-none">
+									{{symbol}}
+								</span>
+								<span class="tag m-0 subtitle is-size-6 h-initial is-white border-color border rounded-l-none">
+									{{name}}
+								</span>
+							</div>
+						</div> -->
+
+
+
+						<div class="column">
+							<div class="tags has-addons">
+								<span class="tag title is-size-4 h-initial py-1 leading-tight is-white border-success border">
+									{{vnumber(wbquote.price)}}
+								</span>
+								<span class="tag is-large font-medium bg-transparent border-color border" v-green-red="wbquote.change">
+									{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true,precision:2})}})
+								</span>
+							</div>
+						</div>
+
+
+
+					</div>
+
+					<nav class="tabs is-toggle is-centered is-fullwidth rounded">
+						<div class="container">
+							<ul class="has-background-white">
+								<li :class="{ 'is-active': tabindex == i }" v-on:click="tabindex = i" v-for="(tab, i) in tabs">
+									<a class="no-underline">
+										<b-icon :icon="tab.icon"></b-icon>
+										<span>{{tab.title}}</span>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</nav>
+
+				</div>
+			</div>
+			<hr class="h-px my-0">
+		</section>
+
+		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+			<component :is="tabs[tabindex].vcomponent" class="has-background-white"></component>
+		</transition>
+
+	</section>
+</template>
+
+
+
+<!-- <div class="mr-4">
+								<p class="title leading-tight">{{vnumber(wbquote.price)}}</p>
+								<p class="is-size-6">{{vfromnow(wbquote.mktradeTime,{max:1,verbose:true})}}</p>
+							</div>
+							<div class="mr-4">
+								<p class="is-size-4 leading-tight" v-green-red="wbquote.change">
+									<span>{{vnumber(wbquote.change,{plusminus:true})}}</span>
+									<span>({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true,precision:2})}})</span>
+								</p>
+								<p class="is-size-6">Intra-Day</p>
+							</div> -->
+
+
+
+<!-- <div class="column is-narrow">
 							<div class="columns is-mobile">
 								<div class="column is-narrow">
 									<p class="title">{{vnumber(wbquote.price)}}</p>
 									<p class="is-size-5 font-medium" v-green-red="wbquote.change">
-										{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true,precision:2})}})
+										
 									</p>
 									<p class="is-size-7">{{vfromnow(wbquote.mktradeTime,{max:1,verbose:true})}}</p>
 								</div>
-								<div v-show="isexthours" class="column is-narrow">
+								<div class="column is-narrow">
 									<p class="is-size-7">{{exthours}}</p>
 									<p class="is-size-5 font-medium">{{vnumber(wbquote.pPrice)}}</p>
 									<p class="is-size-7 font-medium" v-green-red="wbquote.pChange">
@@ -61,15 +136,15 @@
 									<p class="is-size-5 leading-none font-medium">{{vnumber(marketcap,{compact:true,precision:0})}}</p>
 								</div>
 							</div>
-						</div>
+						</div> -->
 
 
 
-						<div class="column is-3 is-2-fullhd">
+<!-- <div class="column is-3 is-2-fullhd content text-sm">
 							<div class="columns is-mobile is-gapless mb-1">
-								<p class="column is-narrow is-size-7">Bid</p>
-								<p class="column is-size-7 has-text-centered">Spread</p>
-								<p class="column is-narrow is-size-7">Ask</p>
+								<p class="column is-narrow">Bid</p>
+								<p class="column has-text-centered">Spread</p>
+								<p class="column is-narrow">Ask</p>
 							</div>
 							<div class="columns is-mobile is-gapless mb-0">
 								<div class="column is-6">
@@ -81,9 +156,9 @@
 								</div>
 							</div>
 							<div class="columns is-mobile is-gapless mb-1">
-								<p class="column is-narrow is-size-7 has-text-danger font-medium">{{vnumber(wbquote.bid)}}</p>
-								<p class="column is-size-7 has-text-centered font-medium">{{vnumber(vpercent(wbquote.ask, wbquote.bid),{percent:true})}}</p>
-								<p class="column is-narrow is-size-7 has-text-success font-medium">{{vnumber(wbquote.ask)}}</p>
+								<p class="column is-narrow has-text-danger">{{vnumber(wbquote.bid)}}</p>
+								<p class="column has-text-centered">{{vnumber(vpercent(wbquote.ask, wbquote.bid),{percent:true})}}</p>
+								<p class="column is-narrow has-text-success">{{vnumber(wbquote.ask)}}</p>
 							</div>
 							<div class="columns is-mobile is-gapless mb-0">
 								<div class="column is-6">
@@ -95,15 +170,15 @@
 								</div>
 							</div>
 							<div class="columns is-mobile is-gapless mb-0">
-								<p class="column is-size-7 has-text-success font-medium">{{vnumber(wbquote.bidSize,{precision:0})}}</p>
-								<p class="column is-size-7 has-text-centered font-medium"></p>
-								<p class="column is-size-7 has-text-danger has-text-right font-medium">{{vnumber(wbquote.askSize,{precision:0})}}</p>
+								<p class="column has-text-success">{{vnumber(wbquote.bidSize,{precision:0})}}</p>
+								<p class="column has-text-centered"></p>
+								<p class="column has-text-danger has-text-right">{{vnumber(wbquote.askSize,{precision:0})}}</p>
 							</div>
-						</div>
+						</div> -->
 
 
 
-						<!-- <div class="column">
+<!-- <div class="column">
 							<p class="is-size-7 leading-tight">10day Volume</p>
 							<p class="is-size-5 font-medium">{{vnumber(wbquote.avgVol10D,{compact:true})}}</p>
 							<p class="is-size-7 leading-tight">3mo Volume</p>
@@ -112,7 +187,7 @@
 
 
 
-						<!-- <div class="column is-narrow">
+<!-- <div class="column is-narrow">
 							<table class="table is-narrower is-fullwidth bg-transparent align-bottom">
 								<tbody>
 									<tr>
@@ -136,7 +211,7 @@
 							</table>
 						</div> -->
 
-						<!-- <div class="column">
+<!-- <div class="column">
 							<div class="columns is-mobile">
 								<div class="column is-narrow">
 									<p class="title is-size-3">
@@ -168,9 +243,9 @@
 							</div>
 						</div> -->
 
-						<!-- <div class="tablet-only:block hidden column is-4-tablet"></div> -->
+<!-- <div class="tablet-only:block hidden column is-4-tablet"></div> -->
 
-						<!-- <div class="column is-4-tablet is-3-desktop is-2-fullhd">
+<!-- <div class="column is-4-tablet is-3-desktop is-2-fullhd">
 							<table class="table is-narrowest is-fullwidth content is-small bg-transparent">
 								<tbody>
 									<tr v-for="deal in vdeals">
@@ -182,34 +257,8 @@
 							</table>
 						</div> -->
 
-						<!-- <article class="message column is-dark">
+<!-- <article class="message column is-dark">
 							<div class="message-body">
 								haiii
 							</div>
 						</article> -->
-
-					</div>
-				</div>
-			</div>
-			<div class="hero-foot">
-				<nav class="tabs is-boxed">
-					<div class="container">
-						<ul>
-							<li :class="{ 'is-active': tabindex == i }" v-on:click="tabindex = i" v-for="(tab, i) in tabs">
-								<a>
-									<b-icon :icon="tab.icon"></b-icon>
-									<span>{{tab.title}}</span>
-								</a>
-							</li>
-						</ul>
-					</div>
-				</nav>
-			</div>
-		</section>
-
-		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-			<component :is="tabs[tabindex].vcomponent" class="has-background-white"></component>
-		</transition>
-
-	</section>
-</template>
