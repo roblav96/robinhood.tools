@@ -4,20 +4,10 @@
 <style>
 /**/
 
-.symbol-route .hero-body .progress::-webkit-progress-bar {
+section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 	background-color: white;
 	border: 1px solid var(--border);
 }
-
-/*.symbol-route .message.is-success li.is-active a {
-	border-color: var(--success) !important;
-	background-color: var(--success) !important;
-}
-
-.symbol-route .message.is-danger li.is-active a {
-	border-color: var(--danger) !important;
-	background-color: var(--danger) !important;
-}*/
 
 </style>
 
@@ -25,9 +15,8 @@
 	<section class="symbol-route">
 		<section class="hero is-small">
 			<!-- <div v-visible="!busy" class="hero-body message" v-green-red:is="wbquote.change"> -->
-			<div v-visible="!busy" class="hero-body message has-background-white-bis">
+			<div v-visible="!busy" class="hero-body message">
 				<div class="container">
-					<!-- <div v-is:widescreenAndUp.is-variable v-is:widescreenOnly.is-4 v-is:fullhdOnly.is-8 class="columns"> -->
 					<div class="columns">
 
 

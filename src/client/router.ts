@@ -35,10 +35,10 @@ export const routes = [
 		name: 'screener', path: '/screener',
 	},
 
-	{
-		title: 'Cryptocurrencies', icon: 'bitcoin',
-		name: 'crypto', path: '/crypto',
-	},
+	// {
+	// 	title: 'Cryptocurrencies', icon: 'bitcoin',
+	// 	name: 'crypto', path: '/crypto',
+	// },
 
 	// {
 	// 	title: 'Order Book', icon: 'book-open-variant',

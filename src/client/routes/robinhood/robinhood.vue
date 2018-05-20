@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<section class="robinhood-route">
+	<section>
 		<section class="hero is-small">
 			<div class="hero-body">
 				<div class="container">

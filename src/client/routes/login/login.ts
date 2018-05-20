@@ -58,7 +58,7 @@ export default class extends Vue {
 				socket.discover(),
 				socket.toPromise('ready'),
 			]).then(() => {
-				alert.toast(`Robinhood login success! Hello ${response.rhusername}...`)
+				alert.toast(`Robinhood login success! Hello ${response.rhusername}`)
 				this.$router.push({ name: 'robinhood' })
 			})
 

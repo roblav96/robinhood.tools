@@ -13,7 +13,7 @@
 <template>
 	<section class="accounts-route">
 
-		<section class="hero is-small has-background-white-bis">
+		<section class="hero is-small">
 			<div class="hero-body">
 				<div class="container">
 					<img class="image w-64" src="@/assets/robinhood-banner.png">

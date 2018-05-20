@@ -37,9 +37,9 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		}
 		let endpoint = `[${config.method}] ${config.url.replace(process.env.DOMAIN, '')}`
 		console.log('%c◀ ' + endpoint, 'color: red; font-weight: bolder;', message)
-		if (!payload || payload.statusCode != 401) {
-			alert.snackbar({ message: endpoint + ' ➤ ' + message, type: 'is-danger' })
-		}
+		// if (!(payload && payload.statusCode == 401)) {
+		alert.snackbar({ message: endpoint + ' ➤ ' + message, type: 'is-danger' })
+		// }
 		return Promise.reject(error)
 	})
 

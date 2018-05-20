@@ -22,8 +22,7 @@ nav.navbar {
 }
 
 nav.navbar div.dropdown-content a,
-nav.navbar div.dropdown-content div.has-link a,
-nav.navbar div.navbar-menu a.navbar-item {
+nav.navbar div.dropdown-content div.has-link a {
 	display: flex;
 	align-items: center;
 }
@@ -61,13 +60,14 @@ nav.navbar div.dropdown-content a > span.icon {
 				<div class="navbar-start">
 					<b-tooltip :active="breakpoints.desktopAndUp" :label="route.title" position="is-bottom" v-for="route in routes"
 					    :key="route.name">
-						<router-link class="navbar-item h-full" :to="{ name: route.name }">
+						<router-link class="navbar-item flex items-center" :to="{ name: route.name }">
 							<b-icon class="mx-1" :icon="route.icon" size="is-28x28"></b-icon>
 							<span class="is-hidden-desktop ml-2">{{ route.title }}</span>
 						</router-link>
 					</b-tooltip>
 					<b-tooltip v-if="!rhusername" label="Robinhood Login" :active="breakpoints.desktopAndUp" position="is-bottom">
-						<router-link class="navbar-item hover-rhgreen" :to="{ name: 'login' }" active-class exact-active-class>
+						<router-link class="navbar-item flex items-center hover-rhgreen" :to="{ name: 'login' }" active-class
+						    exact-active-class>
 							<img class="image is-28x28 mx-1" src="@/assets/robinhood-logo.svg" alt="Robinhood Login">
 							<span class="is-hidden-desktop ml-2">Login</span>
 						</router-link>
@@ -76,8 +76,8 @@ nav.navbar div.dropdown-content a > span.icon {
 
 				<div class="navbar-end">
 
-					<b-dropdown v-if="rhusername && breakpoints.desktopAndUp" position="is-bottom-left">
-						<router-link class="navbar-item hover-rhgreen" :to="{ name: 'robinhood' }" slot="trigger" active-class
+					<!-- <b-dropdown v-if="rhusername && breakpoints.desktopAndUp" hoverable position="is-bottom-left">
+						<router-link class="navbar-item flex items-center hover-rhgreen" :to="{ name: 'robinhood' }" slot="trigger" active-class
 						    exact-active-class>
 							<img class="image is-28x28 mr-2 touch:ml-1 touch:mr-3" src="@/assets/robinhood-logo.svg" alt="Robinhood">
 							<span class="leading-tight font-medium font-mono">
@@ -116,14 +116,28 @@ nav.navbar div.dropdown-content a > span.icon {
 							<b-icon icon="logout"></b-icon>
 							Logout
 						</b-dropdown-item>
-					</b-dropdown>
+					</b-dropdown> -->
 
-					<router-link v-else-if="rhusername" class="navbar-item hover-rhgreen" :to="{ name: 'robinhood' }" active-class
-					    exact-active-class>
+					<!-- <router-link v-else-if="rhusername" class="navbar-item flex items-center hover-rhgreen" :to="{ name: 'robinhood' }"
+					    active-class exact-active-class>
 						<img class="image is-28x28 mr-2 touch:ml-1 touch:mr-3" src="@/assets/robinhood-logo.svg" alt="Robinhood">
 						<span class="leading-tight font-medium font-mono">
 							{{vnumber(equityvalue,{dollar:true,precision:2})}}
 						</span>
+					</router-link> -->
+
+					<router-link v-if="rhusername" class="navbar-item flex items-center desktop:py-0" :to="{ name: 'robinhood' }" active-class
+					    exact-active-class>
+						<img class="image is-28x28 mr-2 touch:ml-1 touch:mr-3" src="@/assets/robinhood-logo.svg" alt="Robinhood">
+						<div class="flex flex-col self-center">
+							<p class="leading-tight font-medium font-mono">
+								{{vnumber(equityvalue,{dollar:true,precision:2})}}
+							</p>
+							<p class="text-sm" v-green-red="equitychange">
+								{{vnumber(equitychange,{dollar:true,precision:2,plusminus:true})}}
+								({{vnumber(equitypercent,{precision:2,plusminus:true,percent:true})}})
+							</p>
+						</div>
 					</router-link>
 
 				</div>

@@ -35,6 +35,10 @@ $shade in $shades {
 	}
 }
 
+.border-color {
+	border-color: $border;
+}
+
 // 
 // ████  ICON  ████
 // 
@@ -60,10 +64,10 @@ html.has-navbar-fixed-top section.hero.is-fullheight {
 }
 
 // 
-// ████  BORDER  ████
+// ████  BODY  ████
 // 
-.border-color {
-	border-color: $border;
+.router-view {
+	background-color: $white-bis;
 }
 
 // 

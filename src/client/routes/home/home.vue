@@ -12,7 +12,7 @@
 <template>
 	<section>
 
-		<section class="hero is-fullheight has-background-white-bis">
+		<section class="hero is-fullheight">
 			<div class="hero-body">
 				<div class="container self-start">
 

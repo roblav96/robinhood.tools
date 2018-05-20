@@ -12,7 +12,7 @@ section.login-route form {
 
 <template>
 	<section class="login-route">
-		<section class="hero is-fullheight has-background-white-bis">
+		<section class="hero is-fullheight">
 			<div class="hero-body">
 				<section class="section container self-start">
 					<div class="columns is-mobile justify-center">

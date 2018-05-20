@@ -1,8 +1,8 @@
 // 
 
+import * as buefy from 'buefy/types/components'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
-import * as buefy from 'buefy/types/components'
 import vm from '@/client/vm'
 
 

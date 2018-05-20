@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<section class="robinhood-route">
+	<section>
 		<h1>robinhood.accounts</h1>
 	</section>
 </template>
