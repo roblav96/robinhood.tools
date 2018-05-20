@@ -65,9 +65,9 @@ $colors: map-merge($colors, ('accent':($accent, $white)));
 $colors: map-merge($colors, ('rhgreen':($rhgreen, $white)));
 $colors: map-merge($colors, ('rhred':($rhred, $white)));
 // 
-// $body-background-color: $white-bis;
-$footer-background-color: $grey-lightest;
-// $button-disabled-opacity: 0.33;
+$body-background-color: $white;
+$footer-background-color: $white-ter;
+$button-disabled-opacity: 0.33;
 // 
 $link-visited: $pink;
 $link-focus-border: $link;
