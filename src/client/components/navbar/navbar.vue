@@ -60,7 +60,7 @@ nav.navbar div.dropdown-content a > span.icon {
 				<div class="navbar-start">
 					<b-tooltip :active="breakpoints.desktopAndUp" :label="route.title" position="is-bottom" v-for="route in routes"
 					    :key="route.name">
-						<router-link class="navbar-item flex items-center" :to="{ name: route.name }">
+						<router-link class="navbar-item flex items-center h-full" :to="{ name: route.name }">
 							<b-icon class="mx-1" :icon="route.icon" size="is-28x28"></b-icon>
 							<span class="is-hidden-desktop ml-2">{{ route.title }}</span>
 						</router-link>
