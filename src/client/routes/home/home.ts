@@ -6,7 +6,11 @@ import Vue from 'vue'
 
 
 
-@Vts.Component
+@Vts.Component({
+	components: {
+		'v-searchbar': () => import('@/client/components/searchbar/searchbar'),
+	},
+})
 export default class extends Vue {
 
 	boxes = [{

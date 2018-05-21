@@ -21,10 +21,10 @@
 $pair in $colors {
 	$color: nth($pair, 1);
 	.hover-#{$name}:hover {
-		color: $color !important;
+		color: #{$color} !important;
 	}
 	.border-#{$name} {
-		border-color: $color !important;
+		border-color: #{$color} !important;
 		border-style: solid;
 	}
 }
@@ -32,10 +32,10 @@ $pair in $colors {
 @each $name,
 $shade in $shades {
 	.hover-#{$name}:hover {
-		color: $shade !important;
+		color: #{$shade} !important;
 	}
 	.border-#{$name} {
-		border-color: $shade !important;
+		border-color: #{$shade} !important;
 		border-style: solid;
 	}
 }
@@ -66,13 +66,7 @@ html.has-navbar-fixed-top section.hero.is-fullheight {
 	min-height: calc(100vh - #{$navbar-height});
 }
 
-nav.navbar {
-	height: $navbar-height;
-	min-height: $navbar-height;
-	max-height: $navbar-height;
-}
-
-.navbar-brand a[href].navbar-item:hover {
+.navbar-brand a.navbar-item:hover {
 	background-color: $navbar-item-hover-background-color;
 }
 

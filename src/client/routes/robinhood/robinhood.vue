@@ -20,26 +20,26 @@
 					</div> -->
 					<div class="column">
 						<div class="p-4 card border-rhgreen border-0 border-l-4">
-							<p class="leading-tighter is-size-4 font-medium">{{user.first_name}} {{user.last_name}}</p>
-							<p class="is-size-6">{{user.username}}</p>
+							<p class="title is-size-4 font-medium">{{user.first_name}} {{user.last_name}}</p>
+							<p class="subtitle is-size-6">{{user.username}}</p>
 						</div>
 					</div>
 					<div class="column">
 						<div class="p-4 card">
-							<p class="leading-tighter is-size-4 font-medium font-mono">{{vnumber(equityvalue,{precision:2,dollar:true})}}</p>
-							<p class="is-size-6">Equity Value</p>
+							<p class="title is-size-4 font-medium font-mono">{{vnumber(equityvalue,{precision:2,dollar:true})}}</p>
+							<p class="subtitle is-size-6">Equity Value</p>
 						</div>
 					</div>
 					<div class="column">
 						<div class="p-4 card">
-							<p class="leading-tighter is-size-4 font-medium font-mono">{{vnumber(marketvalue,{precision:2,dollar:true})}}</p>
-							<p class="is-size-6">Market Value</p>
+							<p class="title is-size-4 font-medium font-mono">{{vnumber(marketvalue,{precision:2,dollar:true})}}</p>
+							<p class="subtitle is-size-6">Market Value</p>
 						</div>
 					</div>
 					<div class="column">
 						<div class="p-4 card">
-							<p class="leading-tighter is-size-4 font-medium font-mono">{{vnumber(buyingpower,{precision:2,dollar:true})}}</p>
-							<p class="is-size-6">Buying Power</p>
+							<p class="title is-size-4 font-medium font-mono">{{vnumber(buyingpower,{precision:2,dollar:true})}}</p>
+							<p class="subtitle is-size-6">Buying Power</p>
 						</div>
 					</div>
 				</div>

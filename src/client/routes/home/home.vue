@@ -4,9 +4,6 @@
 <style>
 /**/
 
-
-/**/
-
 </style>
 
 <template>
@@ -20,7 +17,9 @@
 						<img class="max-w-ns mb-12" width="25%" src="@/assets/logo-primary.svg" alt="Robinhood Tools">
 						<h1 class="is-size-2 font-semibold">Robinhood Tools</h1>
 						<h2 class="is-size-4">Advanced trading tools and resources for Robinhood Web.</h2>
+						<!-- <v-searchbar class="justify-center is-medium" size="is-medium"></v-searchbar> -->
 					</section>
+
 
 					<section class="section columns is-multiline">
 						<div v-for="box in boxes" class="column is-half-tablet is-one-quarter-widescreen">

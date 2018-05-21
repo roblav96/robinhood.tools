@@ -47,7 +47,9 @@ nav.navbar div.dropdown-content a > span.icon {
 					<p class="text-sm" :class="scolor">{{state}}</p>
 				</div>
 
-				<v-searchbar></v-searchbar>
+				<b-field class="navbar-item">
+					<v-searchbar></v-searchbar>
+				</b-field>
 
 				<span class="navbar-burger burger" :class="{ 'is-active': showmenu }" v-on:click="showmenu = !showmenu">
 					<span></span>
@@ -126,16 +128,15 @@ nav.navbar div.dropdown-content a > span.icon {
 						</span>
 					</router-link> -->
 
-					<router-link v-if="rhusername" class="navbar-item flex items-center desktop:py-0" :to="{ name: 'robinhood' }" active-class
-					    exact-active-class>
+					<router-link v-if="rhusername" class="navbar-item flex items-center desktop:py-0" :to="{ name: 'robinhood' }"
+					    active-class exact-active-class>
 						<img class="image is-28x28 mr-2 touch:ml-1 touch:mr-3" src="@/assets/robinhood-logo.svg" alt="Robinhood">
 						<div class="flex flex-col self-center">
 							<p class="leading-tight font-medium font-mono">
 								{{vnumber(equityvalue,{dollar:true,precision:2})}}
 							</p>
 							<p class="text-sm" v-bull-bear="equitychange">
-								{{vnumber(equitychange,{dollar:true,precision:2,plusminus:true})}}
-								({{vnumber(equitypercent,{precision:2,plusminus:true,percent:true})}})
+								{{vnumber(equitychange,{dollar:true,precision:2,plusminus:true})}} ({{vnumber(equitypercent,{precision:2,plusminus:true,percent:true})}})
 							</p>
 						</div>
 					</router-link>
