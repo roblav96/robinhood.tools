@@ -56,6 +56,10 @@ $fullhd: 1408px;
 $column-gap: 1rem;
 $dimensions: 16 20 24 28 32 40 48 56 64 72 80 88 96 104 112 120;
 // 
+$speed: 100ms;
+$speed-slow: 200ms;
+$speed-slower: 300ms;
+// 
 @import '~bulma/sass/utilities/all';
 @import '~buefy/src/scss/utils/all';
 // 

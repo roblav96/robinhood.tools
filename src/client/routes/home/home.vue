@@ -30,10 +30,10 @@
 						<div class="box content">
 							<div class="has-text-centered">
 								<b-icon :icon="box.icon" size="is-xxlarge" type="is-primary" class="mb-4"></b-icon>
-								<p class="text-inherit title is-4">{{ box.title }}</p>
+								<p class="text-inherit title is-4">{{box.title}}</p>
 							</div>
 							<hr class="my-4">
-							<p>{{ box.desc }}</p>
+							<p>{{box.desc}}</p>
 						</div>
 					</div>
 				</div>
@@ -45,28 +45,14 @@
 				<div class="container has-text-centered">
 					<nav class="tabs is-medium is-toggle is-centered">
 						<ul>
-							<router-link tag="li" :to="{name:'markets'}">
+							<router-link tag="li" :to="{name:route.name}" v-for="route in routes" :key="route.name">
 								<a>
-									<b-icon size="is-medium" icon="earth"></b-icon>
-									<span class="font-medium">Explore Markets</span>
-								</a>
-							</router-link>
-							<router-link tag="li" :to="{name:'news'}">
-								<a>
-									<b-icon size="is-medium" icon="newspaper"></b-icon>
-									<span class="font-medium">News Stream</span>
-								</a>
-							</router-link>
-							<router-link tag="li" :to="{name:'screener'}">
-								<a>
-									<b-icon size="is-medium" icon="radar"></b-icon>
-									<span class="font-medium">Stock Screener</span>
+									<b-icon size="is-medium" :icon="route.icon"></b-icon>
+									<span class="font-medium">{{route.title}}</span>
 								</a>
 							</router-link>
 						</ul>
 					</nav>
-
-
 				</div>
 			</div>
 		</section>

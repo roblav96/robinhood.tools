@@ -61,7 +61,7 @@ function update() {
 }
 update()
 
-const handler = _.debounce(update, 1000, { leading: false, trailing: true })
+const handler = _.debounce(update, 300, { leading: false, trailing: true })
 window.addEventListener('resize', handler, { passive: true })
 
 store.register('breakpoints', state)

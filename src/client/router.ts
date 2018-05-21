@@ -18,6 +18,7 @@ export const routes = [
 	{
 		title: 'My Lists', icon: 'format-list-bulleted',
 		name: 'lists', path: '/lists',
+		component: () => import('@/client/routes/lists/lists'),
 	},
 
 	{

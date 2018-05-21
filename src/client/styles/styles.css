@@ -4,6 +4,11 @@
 	background-color: var(--white-bis);
 }*/
 
+.button .icon:first-child:not(:last-child) {
+	margin-left: -0.25rem;
+	margin-right: 0.25rem;
+}
+
 img.is-png {
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;

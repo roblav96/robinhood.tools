@@ -54,22 +54,21 @@ export default class extends Mixins(VMixin, RHMixin) {
 		return 'has-text-grey'
 	}
 
-	get routes() {
-		return this.$router.options.routes.filter(function(route) {
-			return route.title && route.icon
-		})
-		// let routes = [] as VueRouteConfig[]
-		// this.$router.options.routes.forEach(function(route) {
-		// 	if (Array.isArray(route.children)) {
-		// 		if (route.name == 'robinhood') {
-		// 			routes.push(route.children.find(v => v.name == 'robinhood.orders'))
-		// 		}
-		// 	}
-		// 	if (route.title && route.icon) routes.push(route);
-		// })
-		// // routes.push({ title: 'Order Book', icon: 'book-open-variant', name: 'robinhood.orders' } as VueRouteConfig)
-		// return routes
-	}
+	isroute(name: string) { return name == this.$route.name }
+
+	// get routes() {
+	// let routes = [] as VueRouteConfig[]
+	// this.$router.options.routes.forEach(function(route) {
+	// 	if (Array.isArray(route.children)) {
+	// 		if (route.name == 'robinhood') {
+	// 			routes.push(route.children.find(v => v.name == 'robinhood.orders'))
+	// 		}
+	// 	}
+	// 	if (route.title && route.icon) routes.push(route);
+	// })
+	// // routes.push({ title: 'Order Book', icon: 'book-open-variant', name: 'robinhood.orders' } as VueRouteConfig)
+	// return routes
+	// }
 
 }
 

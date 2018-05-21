@@ -27,6 +27,12 @@ export default class extends Vue {
 	get breakpoints() { return this.$store.state.breakpoints }
 	get rhusername() { return this.$store.state.security.rhusername }
 
+	get routes() {
+		return this.$router.options.routes.filter(function(route) {
+			return route.title && route.icon
+		})
+	}
+
 }
 
 
