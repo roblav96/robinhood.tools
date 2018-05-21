@@ -20,11 +20,18 @@ import socket from '@/client/adapters/socket'
 export default class Lists extends Mixins(VMixin, RHMixin) {
 
 	created() {
-		this.synclists().then(this.syncsymbols)
+		this.lists = [{ name: 'Recently Viewed', symbols: this.recents.slice(0, 10).map(v => v.symbol) }]
+		this.syncsymbols()
+		clock.on('1s', this.syncsymbols, this)
+		// this.synclists().then(() => {
+		// 	clock.on('1s', this.syncsymbols, this)
+		// 	// return this.syncsymbols()
+		// })
 	}
 
 	beforeDestroy() {
-		socket.offListener(this.onwbquote, this)
+		clock.offListener(this.syncsymbols, this)
+		// socket.offListener(this.onwbquote, this)
 		lockr.set('lists.lists', this.lists)
 	}
 
@@ -59,19 +66,27 @@ export default class Lists extends Mixins(VMixin, RHMixin) {
 			symbols, rkeys: [rkeys.RH.INSTRUMENTS, rkeys.WB.QUOTES],
 		}).then((response: any[]) => {
 			response.forEach(v => {
-				this.instruments.push(v.instrument)
-				this.wbquotes.push(v.wbquote)
+				this.onitem('instruments', v.instrument)
+				this.onitem('wbquotes', v.wbquote)
+				// this.instruments.push(v.instrument)
+				// this.wbquotes.push(v.wbquote)
 			})
-			socket.offListener(this.onwbquote, this)
-			symbols.forEach(v => socket.on(`${rkeys.WB.QUOTES}:${v}`, this.onwbquote, this))
+			// socket.offListener(this.onwbquote, this)
+			// symbols.forEach(v => socket.on(`${rkeys.WB.QUOTES}:${v}`, this.onwbquote, this))
 		}).catch(error => console.error(`syncsymbols Error ->`, error))
 	}
 
-	onwbquote(wbquote: Webull.Quote) {
-		let found = this.wbquotes.find(v => v.symbol == wbquote.symbol)
+	onitem(key: string, item: any) {
+		let found = this[key].find(v => v.symbol == item.symbol)
 		// console.log(`found ->`, found)
-		found ? Object.assign(found, wbquote) : this.wbquotes.push(wbquote)
+		found ? Object.assign(found, item) : this[key].push(item)
 	}
+
+	// onwbquote(wbquote: Webull.Quote) {
+	// 	let found = this.wbquotes.find(v => v.symbol == wbquote.symbol)
+	// 	// console.log(`found ->`, found)
+	// 	found ? Object.assign(found, wbquote) : this.wbquotes.push(wbquote)
+	// }
 
 	gotosymbol(symbol: string) {
 		this.$router.push({ name: 'symbol', params: { symbol } })

@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<section class="">
+	<section class="pb-12">
 
 		<section class="section" v-for="list in lists" :key="list.name">
 			<div class="container">
@@ -21,6 +21,9 @@
 						<b-table-column label="Symbol" class="is-clickable" v-on:click.native="gotosymbol(props.row.symbol)">
 							<p class="whitespace-no-wrap is-size-5 font-medium">{{props.row.symbol}}</p>
 							<p class="is-size-7">{{props.row.name}}</p>
+						</b-table-column>
+						<b-table-column label="Market Cap" class="" numeric>
+							{{vnumber(vmarketcap(props.row.price,props.row.totalShares),{compact:true,precision:2})}}
 						</b-table-column>
 						<b-table-column label="Price" class="" numeric>
 							{{vnumber(props.row.price)}}

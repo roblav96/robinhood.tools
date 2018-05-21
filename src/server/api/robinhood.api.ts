@@ -83,9 +83,10 @@ polka.route({
 		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids });
 
 		let opts = { all: req.body.all == true }
-		let resolved = await pAll(synckeys.map(key => {
-			return () => robinhood.sync[key](req.doc, opts)
-		}), { concurrency: 1 })
+		// let resolved = await pAll(synckeys.map(key => {
+		// 	return () => robinhood.sync[key](req.doc, opts)
+		// }), { concurrency: 1 })
+		let resolved = await Promise.all(synckeys.map(k => robinhood.sync[k](req.doc, opts)))
 
 		let response = {} as any
 		synckeys.forEach((k, i) => response[k] = resolved[i])

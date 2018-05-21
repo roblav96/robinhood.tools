@@ -3,6 +3,7 @@
 import '../main'
 import * as pAll from 'p-all'
 import * as pQueue from 'p-queue'
+import * as boom from 'boom'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as pandora from '../adapters/pandora'
@@ -42,7 +43,13 @@ clock.on('1s', function ontick(i) {
 
 			queue.add(() => fn(client.doc).then(data => {
 				socket.send(client, name, { [key]: data })
-			}).catch(console.error))
+			}).catch(error => {
+				if (boom.isBoom(error)) {
+					Object.assign(error.data, { doc: client.doc })
+					console.error(`queue.add Error ->`, JSON.stringify(error, null, 4))
+				}
+				else console.error(`queue.add Error ->`, error);
+			}))
 
 		})
 	})

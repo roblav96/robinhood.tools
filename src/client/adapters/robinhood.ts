@@ -47,7 +47,9 @@ export function sync(body: {
 
 store.watch(state => state.security.rhusername, rhusername => {
 	if (!rhusername) return;
+	console.time(`sync`)
 	sync().then(onsync).then(function(response) {
+		console.timeEnd(`sync`)
 		console.log('robinhood sync response ->', JSON.parse(JSON.stringify(response)))
 		Object.keys(response).forEach(function(key) {
 			lockr.set(`rh.${key}`, response[key])
