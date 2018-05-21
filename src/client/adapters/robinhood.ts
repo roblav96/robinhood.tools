@@ -45,21 +45,17 @@ export function sync(body: {
 
 
 
+let L_KEYS = ['accounts', 'orders', 'portfolios', 'positions'] as KeysOf<Robinhood.State>
 store.watch(state => state.security.rhusername, rhusername => {
 	if (!rhusername) return;
-	console.time(`sync`)
 	sync().then(onsync).then(function(response) {
-		console.timeEnd(`sync`)
 		console.log('robinhood sync response ->', JSON.parse(JSON.stringify(response)))
 		Object.keys(response).forEach(function(key) {
 			lockr.set(`rh.${key}`, response[key])
 		})
+		socket.offListener(onsync)
+		L_KEYS.forEach(k => socket.on(`${rkeys.RH.SYNC}:${k}`, onsync))
 	})
-})
-
-let L_KEYS = ['accounts', 'orders', 'portfolios', 'positions'] as KeysOf<Robinhood.State>
-L_KEYS.forEach(function(key) {
-	socket.on(`${rkeys.RH.SYNC}:${key}`, onsync)
 })
 
 

@@ -47,6 +47,10 @@ clock.on('1s', function ontick(i) {
 					socket.send(client, name, { [key]: data })
 				}).catch(error => {
 					if (boom.isBoom(error)) {
+						if (error.output.statusCode == 429) {
+							console.error(`queue.add Error ->`, error.data.data.detail)
+							return clock.toPromise('10s')
+						}
 						Object.assign(error.data, { doc: client.doc })
 						console.error(`queue.add Error ->`, JSON.stringify(error, null, 4))
 					}
