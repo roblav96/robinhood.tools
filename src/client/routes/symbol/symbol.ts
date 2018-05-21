@@ -3,7 +3,6 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
-import lockr from 'lockr'
 import VMixin from '@/client/mixins/v.mixin'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
@@ -13,6 +12,7 @@ import * as webull from '@/common/webull'
 import * as hours from '@/common/hours'
 import * as http from '@/client/adapters/http'
 import * as utils from '@/client/adapters/utils'
+import lockr from 'lockr'
 import clock from '@/common/clock'
 import socket from '@/client/adapters/socket'
 
@@ -142,7 +142,9 @@ export default class extends Mixins(VMixin) {
 			http.post('/symbols/deals', { symbols }).then(response => {
 				this.deals = response[0]
 			}),
-		]).catch(error => console.error('w_symbol Error ->', error)).finally(() => {
+		]).catch(error => {
+			console.error('w_symbol Error ->', error)
+		}).finally(() => {
 			socket.on(`${rkeys.WB.QUOTES}:${this.symbol}`, this.onwbquote, this)
 			socket.on(`${rkeys.WB.DEALS}:${this.symbol}`, this.ondeal, this)
 		})

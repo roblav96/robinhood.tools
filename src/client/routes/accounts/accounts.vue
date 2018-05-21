@@ -4,10 +4,6 @@
 <style>
 /**/
 
-.table-nowrap-first tr > td:first-child {
-	white-space: nowrap;
-}
-
 </style>
 
 <template>
@@ -36,19 +32,19 @@
 		</section>
 
 		<div class="container">
-			<b-table class="table-nowrap-first" :data="daccount">
+			<b-table class="nowrap-first" :data="daccount">
 				<template slot-scope="props">
 					<b-table-column class="font-medium" width="1" field="k" label="Key">{{ props.row.k }}</b-table-column>
 					<b-table-column field="v" label="Value">{{ props.row.v }}</b-table-column>
 				</template>
 			</b-table>
-			<b-table class="table-nowrap-first" :data="dmargin">
+			<b-table class="nowrap-first" :data="dmargin">
 				<template slot-scope="props">
 					<b-table-column class="font-medium" width="1" field="k" label="Key">{{ props.row.k }}</b-table-column>
 					<b-table-column field="v" label="Value">{{ props.row.v }}</b-table-column>
 				</template>
 			</b-table>
-			<b-table class="table-nowrap-first" :data="dinstant">
+			<b-table class="nowrap-first" :data="dinstant">
 				<template slot-scope="props">
 					<b-table-column class="font-medium" width="1" field="k" label="Key">{{ props.row.k }}</b-table-column>
 					<b-table-column field="v" label="Value">{{ props.row.v }}</b-table-column>

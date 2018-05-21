@@ -157,6 +157,7 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 	if (Object.keys(toquote).length == 0) return;
 	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
+	toquote.symbol = symbol
 	Object.assign(QUOTES[symbol], toquote)
 	Object.assign(SAVES[symbol], toquote)
 	emitter.emit('toquote', topic, toquote)

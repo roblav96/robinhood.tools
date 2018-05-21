@@ -14,14 +14,14 @@
 					<!-- <div class="column">
 						<div class="box">
 							<img class="image w-64 mb-4" src="@/assets/robinhood-banner.png">
-							<p class="subtitle font-medium">{{user.first_name}} {{user.last_name}}</p>
-							<p class="">{{user.username}}</p>
+							<p class="subtitle font-medium">{{rh.user.first_name}} {{rh.user.last_name}}</p>
+							<p class="">{{rh.user.username}}</p>
 						</div>
 					</div> -->
 					<div class="column">
 						<div class="p-4 card border-rhgreen border-0 border-l-4">
-							<p class="title is-size-4 font-medium">{{user.first_name}} {{user.last_name}}</p>
-							<p class="subtitle is-size-6">{{user.username}}</p>
+							<p class="title is-size-4 font-medium">{{rh.user.first_name}} {{rh.user.last_name}}</p>
+							<p class="subtitle is-size-6">{{rh.user.username}}</p>
 						</div>
 					</div>
 					<div class="column">

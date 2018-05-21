@@ -73,7 +73,11 @@ polka.route({
 	},
 	handler: async function apisync(req, res) {
 		let allsyncs = Object.keys(robinhood.sync)
-		let synckeys = (req.body.synckeys || allsyncs.filter(k => !['watchlists'].includes(k))) as string[]
+		let synckeys = req.body.synckeys as string[]
+		if (!synckeys) {
+			let skips = req.body.all ? [] : ['watchlists']
+			synckeys = allsyncs.filter(k => !skips.includes(k))
+		}
 
 		let invalids = _.difference(synckeys, allsyncs)
 		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids });

@@ -76,9 +76,9 @@ const P_KEYS = (({
 
 export function onsync(response: Robinhood.State) {
 	Object.keys(response).forEach(function(key) {
-		let target = state[key]
-		let source = response[key]
-		state[key] = source
+		state[key] = response[key]
+		// let target = state[key]
+		// let source = response[key]
 		// if (core.object.is(source)) {
 		// 	core.object.assign(target, source, true)
 		// } else if (Array.isArray(source)) {

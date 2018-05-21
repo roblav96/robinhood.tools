@@ -10,6 +10,9 @@ import * as core from '@/common/core'
 import * as rkeys from '@/common/rkeys'
 import * as http from '@/client/adapters/http'
 import * as robinhood from '@/client/adapters/robinhood'
+import lockr from 'lockr'
+import clock from '@/common/clock'
+import socket from '@/client/adapters/socket'
 
 
 
@@ -20,32 +23,37 @@ export default class Lists extends Mixins(VMixin, RHMixin) {
 		this.synclists().then(this.syncsymbols)
 	}
 
-	lists = [] as { name: string, symbols: string[] }[]
+	beforeDestroy() {
+		socket.offListener(this.onwbquote, this)
+		lockr.set('lists.lists', this.lists)
+	}
+
+	lists = lockr.get('lists.lists', [] as { name: string, symbols: string[] }[])
 	synclists() {
-		this.lists = [{ name: 'Recently Viewed', symbols: this.recents.slice(0, 20).map(v => v.symbol) }]
-		if (this.rh.positions.length > 0) {
-			this.lists.push({ name: 'Robinhood Positions', symbols: this.rh.positions.map(v => v.symbol) })
-		}
+		let lists = [{ name: 'Recently Viewed', symbols: this.recents.slice(0, 10).map(v => v.symbol) }]
 		return Promise.all([
-			!this.rhusername ? Promise.resolve() : robinhood.sync({ synckeys: ['watchlists'] }).then(response => {
-				this.lists.push({
+			this.rhusername && robinhood.sync({ synckeys: ['watchlists'] }).then(response => {
+				lists.push({
 					name: 'Robinhood Watchlist',
 					symbols: response.watchlists.map(v => v.symbol),
 				})
 			}),
 			http.get('https://securitiesapi.webull.com/api/securities/market/tabs/1/region/6').then((response: Webull.Api.HotLists) => {
 				response.marketCategoryList.slice(0, 4).forEach(v => {
-					this.lists.push({ name: v.name, symbols: v.tickerTupleArrayList.map(v => v.disSymbol) })
+					lists.push({ name: v.name, symbols: v.tickerTupleArrayList.map(v => v.disSymbol) })
 				})
 			})
-		]).catch(error => console.error(`synclists Error ->`, error))
+		]).then(() => this.lists = lists).catch(error => console.error(`synclists Error ->`, error))
 	}
 
 	instruments = [] as Robinhood.Instrument[]
 	wbquotes = [] as Webull.Quote[]
 
+	tabledata(symbols: string[]) {
+		return this.wbquotes.filter(v => symbols.includes(v.symbol))
+	}
+
 	syncsymbols() {
-		console.log(`this ->`, this)
 		let symbols = _.uniq(_.flatten(this.lists.map(v => v.symbols)))
 		return http.post('/symbols/rkeys', {
 			symbols, rkeys: [rkeys.RH.INSTRUMENTS, rkeys.WB.QUOTES],
@@ -54,7 +62,19 @@ export default class Lists extends Mixins(VMixin, RHMixin) {
 				this.instruments.push(v.instrument)
 				this.wbquotes.push(v.wbquote)
 			})
+			socket.offListener(this.onwbquote, this)
+			symbols.forEach(v => socket.on(`${rkeys.WB.QUOTES}:${v}`, this.onwbquote, this))
 		}).catch(error => console.error(`syncsymbols Error ->`, error))
+	}
+
+	onwbquote(wbquote: Webull.Quote) {
+		let found = this.wbquotes.find(v => v.symbol == wbquote.symbol)
+		// console.log(`found ->`, found)
+		found ? Object.assign(found, wbquote) : this.wbquotes.push(wbquote)
+	}
+
+	gotosymbol(symbol: string) {
+		this.$router.push({ name: 'symbol', params: { symbol } })
 	}
 
 }
