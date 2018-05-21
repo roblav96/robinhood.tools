@@ -97,7 +97,7 @@ declare global {
 			cash_available_for_withdrawal: number
 			cash_balances: string
 			cash_held_for_orders: number
-			created_at: string
+			created_at: number
 			deactivated: boolean
 			deposit_halted: boolean
 			instant_eligibility: Account.InstantEligibility
@@ -114,7 +114,7 @@ declare global {
 			uncleared_deposits: number
 			unsettled_debit: number
 			unsettled_funds: number
-			updated_at: string
+			updated_at: number
 			url: string
 			user: string
 			withdrawal_halted: boolean
@@ -125,14 +125,14 @@ declare global {
 				reinstatement_date: string
 				reversal: string
 				state: string
-				updated_at: string
+				updated_at: number
 			}
 			interface MarginBalances {
 				cash: number
 				cash_available_for_withdrawal: number
 				cash_held_for_options_collateral: number
 				cash_held_for_orders: number
-				created_at: string
+				created_at: number
 				day_trade_buying_power: number
 				day_trade_buying_power_held_for_orders: number
 				day_trade_ratio: number
@@ -150,7 +150,7 @@ declare global {
 				uncleared_deposits: number
 				unsettled_debit: number
 				unsettled_funds: number
-				updated_at: string
+				updated_at: number
 			}
 		}
 
@@ -178,7 +178,7 @@ declare global {
 		interface Position {
 			account: string
 			average_buy_price: number
-			created_at: string
+			created_at: number
 			instrument: string
 			intraday_average_buy_price: number
 			intraday_quantity: number
@@ -190,7 +190,8 @@ declare global {
 			shares_held_for_sells: number
 			shares_held_for_stock_grants: number
 			shares_pending_from_options_events: number
-			updated_at: string
+			symbol: string
+			updated_at: number
 			url: string
 		}
 
@@ -214,7 +215,7 @@ declare global {
 			source: string
 			summary: string
 			title: string
-			updated_at: string
+			updated_at: number
 			url: string
 		}
 
@@ -244,7 +245,7 @@ declare global {
 		interface User {
 			additional_info: string
 			basic_info: string
-			created_at: string
+			created_at: number
 			email: string
 			email_verified: boolean
 			employment: string
@@ -274,7 +275,7 @@ declare global {
 			account: string
 			average_price: number
 			cancel: any
-			created_at: string
+			created_at: number
 			cumulative_quantity: number
 			executions: Order.Execution[]
 			extended_hours: boolean
@@ -296,7 +297,7 @@ declare global {
 			time_in_force: string
 			trigger: string
 			type: string
-			updated_at: string
+			updated_at: number
 			url: string
 		}
 		namespace Order {
@@ -305,13 +306,13 @@ declare global {
 				price: number
 				quantity: number
 				settlement_date: string
-				timestamp: string
+				timestamp: number
 			}
 		}
 
 		interface Subscription {
 			account: string
-			created_at: string
+			created_at: number
 			credit: number
 			ended_at: string
 			id: string
@@ -331,16 +332,16 @@ declare global {
 		}
 
 		interface WatchlistMeta {
-			created_at: string
+			created_at: number
 			currency_pair_ids: string[]
 			id: string
 			name: string
-			updated_at: string
+			updated_at: number
 			url: string
 			user: string
 		}
 		interface Watchlist {
-			created_at: string
+			created_at: number
 			instrument: string
 			symbol: string
 			url: string
@@ -351,7 +352,7 @@ declare global {
 			ach_relationship: string
 			amount: number
 			cancel: any
-			created_at: string
+			created_at: number
 			direction: string
 			early_access_amount: number
 			expected_landing_date: string
@@ -359,7 +360,7 @@ declare global {
 			id: string
 			scheduled: boolean
 			state: string
-			updated_at: string
+			updated_at: number
 			url: string
 		}
 
@@ -370,7 +371,7 @@ declare global {
 			bank_account_number: number
 			bank_account_type: string
 			bank_routing_number: number
-			created_at: string
+			created_at: number
 			id: string
 			initial_deposit: number
 			unlink: string

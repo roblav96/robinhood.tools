@@ -22,7 +22,7 @@ export default class extends Mixins(VMixin) {
 
 	oninput = _.debounce(this.sync, 300)
 	sync() {
-		if (!this.query) return this.recents();
+		if (!this.query) return this.syncrecents();
 		this.busy = true
 		return http.get('/search', {
 			query: { query: this.query },
@@ -33,10 +33,10 @@ export default class extends Mixins(VMixin) {
 		}).finally(() => this.busy = false)
 	}
 
-	recents() {
+	syncrecents() {
 		this.busy = true
 		return http.post('/recents', {
-			symbols: this.$store.state.recents.map(v => v.symbol),
+			symbols: this.recents.map(v => v.symbol),
 		}).then((response: Robinhood.Instrument[]) => {
 			this.results = response
 		}).catch(error => {

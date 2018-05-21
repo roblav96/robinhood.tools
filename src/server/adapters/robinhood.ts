@@ -75,7 +75,7 @@ export const sync = {
 	},
 
 	achtransfers({ rhtoken }: Security.Doc, opts = { all: false }) {
-		let query = opts.all ? {} : { 'updated_at[gte]': dayjs().subtract(1, 'day').format('YYYY-MM-DD') }
+		let query = opts.all ? {} : { 'updated_at[gte]': dayjs().subtract(1, 'week').format('YYYY-MM-DD') }
 		return paginated({ url: 'https://api.robinhood.com/ach/transfers/', query, rhtoken }) as Promise<Robinhood.AchTransfer[]>
 	},
 
@@ -84,7 +84,7 @@ export const sync = {
 	},
 
 	orders({ rhtoken }: Security.Doc, opts = { all: false }) {
-		let query = opts.all ? {} : { 'updated_at[gte]': dayjs().subtract(1, 'day').format('YYYY-MM-DD') }
+		let query = opts.all ? {} : { 'updated_at[gte]': dayjs().subtract(1, 'week').format('YYYY-MM-DD') }
 		return paginated({ url: 'https://api.robinhood.com/orders/', query, rhtoken }) as Promise<Robinhood.Order[]>
 	},
 
@@ -92,9 +92,12 @@ export const sync = {
 		return paginated({ url: 'https://api.robinhood.com/portfolios/', rhtoken }) as Promise<Robinhood.Portfolio[]>
 	},
 
-	positions({ rhtoken }: Security.Doc, opts = { all: false }) {
+	async positions({ rhtoken }: Security.Doc, opts = { all: false }) {
 		let query = { nonzero: !opts.all }
-		return paginated({ url: 'https://api.robinhood.com/positions/', query, rhtoken }) as Promise<Robinhood.Position[]>
+		let positions = await paginated({ url: 'https://api.robinhood.com/positions/', query, rhtoken }) as Robinhood.Position[]
+		let dsymbols = await dSymbols(positions.map(v => v.instrument))
+		positions.forEach(v => v.symbol = dsymbols[v.instrument])
+		return positions
 	},
 
 	subscriptions({ rhtoken }: Security.Doc, opts = { all: false }) {
@@ -110,16 +113,21 @@ export const sync = {
 
 	async watchlists({ rhtoken }: Security.Doc) {
 		let lists = await paginated({ url: 'https://api.robinhood.com/watchlists/', rhtoken }) as Robinhood.WatchlistMeta[]
-		let results = _.flatten(await pAll(lists.map(list => {
+		let watchlists = _.flatten(await pAll(lists.map(list => {
 			return () => paginated({ url: list.url, rhtoken }) as Promise<Robinhood.Watchlist[]>
 		})))
-		let ids = results.map(v => v.instrument)
-		let dsymbols = await redis.main.hmget(rkeys.RH.IDS, ...ids)
-		dsymbols = redis.fixHmget(dsymbols, ids)
-		results.forEach(v => v.symbol = dsymbols[v.instrument])
-		return results
+		let dsymbols = await dSymbols(watchlists.map(v => v.instrument))
+		watchlists.forEach(v => v.symbol = dsymbols[v.instrument])
+		return watchlists
 	},
 
+}
+
+
+
+export async function dSymbols(instruments: string[]) {
+	let dsymbols = await redis.main.hmget(rkeys.RH.IDS, ...instruments)
+	return redis.fixHmget(dsymbols, instruments) as Dict<string>
 }
 
 // export async function ________({ rhtoken }: Security.Doc) {

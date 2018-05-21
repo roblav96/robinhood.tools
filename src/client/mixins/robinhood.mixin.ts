@@ -14,16 +14,16 @@ import store from '@/client/store'
 @Vts.Component
 export default class extends Vue {
 
-	get equityvalue() { return _.sum(this.$store.state.rh.portfolios.map(v => v.extended_hours_equity || v.equity)) }
-	get equityprev() { return _.sum(this.$store.state.rh.portfolios.map(v => v.adjusted_equity_previous_close || v.equity_previous_close)) }
+	get rh() { return this.$store.state.rh }
+
+	get equityvalue() { return _.sum(this.rh.portfolios.map(v => v.extended_hours_equity || v.equity)) }
+	get equityprev() { return _.sum(this.rh.portfolios.map(v => v.adjusted_equity_previous_close || v.equity_previous_close)) }
 	get equitychange() { return this.equityvalue - this.equityprev }
 	get equitypercent() { return core.calc.percent(this.equityvalue, this.equityprev) }
 
-	get marketvalue() { return _.sum(this.$store.state.rh.portfolios.map(v => v.extended_hours_market_value || v.market_value)) }
-	get cashvalue() { return _.sum(this.$store.state.rh.accounts.map(v => v.cash)) }
-	get buyingpower() { return _.sum(this.$store.state.rh.accounts.map(v => v.buying_power)) }
-
-	get user() { return this.$store.state.rh.user }
+	get marketvalue() { return _.sum(this.rh.portfolios.map(v => v.extended_hours_market_value || v.market_value)) }
+	get cashvalue() { return _.sum(this.rh.accounts.map(v => v.cash)) }
+	get buyingpower() { return _.sum(this.rh.accounts.map(v => v.buying_power)) }
 
 }
 

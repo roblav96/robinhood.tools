@@ -134,12 +134,9 @@ export default class extends Mixins(VMixin) {
 		this.reset()
 		let symbols = [this.symbol]
 		Promise.all([
-			http.post('/symbols', { symbols }).then(response => {
+			http.post('/symbols/rkeys', { symbols }).then(response => {
 				console.log(this.symbol, 'response ->', JSON.parse(JSON.stringify(response)))
-				this.instrument = response[0]
-				this.ticker = response[1]
-				this.wbquote = response[2]
-				this.yhquote = response[3]
+				Object.assign(this, _.omit(response[0], ['symbol']))
 				this.busy = false
 			}),
 			http.post('/symbols/deals', { symbols }).then(response => {

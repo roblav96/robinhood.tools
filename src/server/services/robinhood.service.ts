@@ -21,7 +21,7 @@ const queue = new pQueue({ concurrency: 1 })
 clock.on('1s', function ontick(i) {
 	if (queue.pending > 0) return;
 
-	let mod = 5
+	let mod = 3
 	let state = hours.rxstate.value
 	if (state == 'CLOSED') mod = 10;
 	if (state == 'REGULAR') mod = 1;

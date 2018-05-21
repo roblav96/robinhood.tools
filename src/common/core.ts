@@ -20,8 +20,9 @@ export const isNodejs = !isBrowser
 
 
 
+const FIXDATE = ['created_at', 'timestamp', 'updated_at']
+const FIXURL = ['account', 'ach_relationship', 'instrument', 'watchlist']
 export function fix(target: any, deep?: any) {
-	let fixurl = ['account', 'ach_relationship', 'instrument', 'watchlist']
 	Object.keys(target).forEach(key => {
 		let value = target[key]
 		if (value == null) return;
@@ -35,7 +36,8 @@ export function fix(target: any, deep?: any) {
 		else if (value === 'undefined') target[key] = undefined;
 		else if (value === 'true') target[key] = true;
 		else if (value === 'false') target[key] = false;
-		else if (value.includes('.robinhood.com') && fixurl.includes(key)) {
+		else if (FIXDATE.includes(key)) target[key] = new Date(value).valueOf();
+		else if (value.includes('.robinhood.com') && FIXURL.includes(key)) {
 			target[key] = value.split('/').splice(-2, 1)[0]
 		}
 	})

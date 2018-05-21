@@ -3,8 +3,8 @@
 import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
 import * as _ from '@/common/lodash'
-import * as robinhood from '@/client/adapters/robinhood'
 import * as http from '@/client/adapters/http'
+import * as robinhood from '@/client/adapters/robinhood'
 import * as alert from '@/client/adapters/alert'
 import store from '@/client/store'
 import socket from '@/client/adapters/socket'
@@ -54,10 +54,8 @@ export default class extends Vue {
 
 			Object.assign(this.$store.state.security, response)
 			alert.toast(`Robinhood login success! Hello ${response.rhusername}`)
-			return Promise.all([
-				socket.discover(),
-				socket.toPromise('ready'),
-			]).then(() => this.$router.push({ name: 'robinhood' }))
+			this.$router.push({ name: 'robinhood' })
+			return socket.discover()
 
 		}).catch(error => {
 			console.error('submit Error ->', error)
