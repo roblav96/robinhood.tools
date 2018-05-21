@@ -41,15 +41,18 @@ clock.on('1s', function ontick(i) {
 			let fn = robinhood.sync[key] as (doc: Security.Doc) => Promise<any>
 			if (!fn) return;
 
-			queue.add(() => fn(client.doc).then(data => {
-				socket.send(client, name, { [key]: data })
-			}).catch(error => {
-				if (boom.isBoom(error)) {
-					Object.assign(error.data, { doc: client.doc })
-					console.error(`queue.add Error ->`, JSON.stringify(error, null, 4))
-				}
-				else console.error(`queue.add Error ->`, error);
-			}))
+			queue.add(() => {
+				if (!client.doc.rhtoken) return;
+				return fn(client.doc).then(data => {
+					socket.send(client, name, { [key]: data })
+				}).catch(error => {
+					if (boom.isBoom(error)) {
+						Object.assign(error.data, { doc: client.doc })
+						console.error(`queue.add Error ->`, JSON.stringify(error, null, 4))
+					}
+					else console.error(`queue.add Error ->`, error);
+				})
+			})
 
 		})
 	})
