@@ -26,6 +26,7 @@ declare global {
 { (Polka as any).Router = Polka().constructor }
 export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest, PolkaResponse> {
 
+	schemas = {} as Dict<Api.RouterSchemaMap<FastestValidator.Schema>>
 	validators = {} as Dict<Api.RouterSchemaMap<FastestValidator.CompiledValidator>>
 	rhdocurls = {} as Dict<boolean>
 
@@ -41,9 +42,11 @@ export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest,
 			this.rhdocurls[opts.url] = true
 		}
 		if (opts.schema) {
+			this.schemas[opts.url] = {}
 			this.validators[opts.url] = {}
 			Object.keys(opts.schema).forEach(key => {
 				let schema = opts.schema[key]
+				this.schemas[opts.url][key] = schema
 				this.validators[opts.url][key] = new FastestValidator().compile(schema)
 			})
 		}

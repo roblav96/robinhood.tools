@@ -9,6 +9,7 @@ import * as Polka from 'polka'
 import * as cookie from 'cookie'
 import * as fastjsonparse from 'fast-json-parse'
 import * as boom from 'boom'
+import * as matchit from 'matchit'
 import polka from './polka'
 
 
@@ -20,18 +21,13 @@ export class PolkaRequest {
 	cookies: Dict<string>
 	authed: boolean
 	doc: Security.Doc
+	match: matchit.Match
 }
 util.inherits(TurboRequest, PolkaRequest)
 
 
 
 polka.use(function request(req, res, next) {
-
-	// req.socket.on('connect', function() { console.log('connection -> connect') })
-	// req.socket.on('finish', function() { console.log('connection -> finish') })
-	// req.socket.on('end', function() { console.log('connection -> end') })
-	// req.socket.on('close', function() { console.log('connection -> close') })
-	// req.socket.on('error', function(error) { console.log('connection Error ->', error) })
 
 	req.headers = {}
 	let rawheaders = req._options.headers
@@ -44,15 +40,7 @@ polka.use(function request(req, res, next) {
 	let cookies = req.headers['cookie']
 	req.cookies = cookies ? cookie.parse(cookies) : {}
 
-	// let keys = Object.keys(req.query)
-	// if (keys.length > 0) {
-	// 	let i: number, len = keys.length
-	// 	for (i = 0; i < len; i++) {
-	// 		let key = keys[i]
-	// 		let value = req.query[key]
-	// 		req.query[key] = JSON.parse(req.query[key])
-	// 	}
-	// }
+	req.match = matchit.match(req.path, polka.routes[req.method])[0]
 
 	req.body = {}
 	if (req.method == 'GET') return next();

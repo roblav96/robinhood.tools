@@ -12,37 +12,46 @@ import polka from './polka'
 
 
 const RKEYS = {
-	instruments: rkeys.RH.INSTRUMENTS,
-	tickers: rkeys.WB.TICKERS,
-	wbquotes: rkeys.WB.QUOTES,
-	yhquotes: rkeys.YH.QUOTES,
+	[rkeys.RH.INSTRUMENTS]: 'instrument',
+	[rkeys.WB.TICKERS]: 'ticker',
+	[rkeys.WB.QUOTES]: 'wbquote',
+	[rkeys.YH.QUOTES]: 'yhquote',
 }
 
 polka.route({
 	method: 'POST',
-	url: '/api/symbols',
+	url: '/api/symbols/rkeys',
 	schema: {
 		body: {
 			symbols: { type: 'array', items: 'string' },
-			gets: { type: 'array', items: 'string', optional: true },
+			rkeys: { type: 'array', items: 'string', optional: true },
 		},
 	},
 	async handler(req, res) {
 		let allkeys = Object.keys(RKEYS)
 		let symbols = req.body.symbols as string[]
-		let gets = (req.body.gets || allkeys) as string[]
+		let rkeys = (req.body.rkeys || allkeys) as string[]
 
-		let invalids = _.difference(gets, allkeys)
+		let invalids = _.difference(rkeys, allkeys)
 		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids });
 
 		let coms = [] as Redis.Coms
 		symbols.forEach(function(symbol) {
-			gets.forEach(function(key) {
-				coms.push(['hgetall', `${RKEYS[key]}:${symbol}`])
+			rkeys.forEach(function(rkey) {
+				coms.push(['hgetall', `${rkey}:${symbol}`])
 			})
 		})
-		let response = await redis.main.coms(coms)
-		response.forEach(core.fix)
+		let resolved = await redis.main.coms(coms)
+		resolved.forEach(core.fix)
+
+		let ii = 0
+		let response = []
+		symbols.forEach(function(symbol, i) {
+			response[i] = { symbol }
+			rkeys.forEach(function(rkey) {
+				response[i][RKEYS[rkey]] = resolved[ii++]
+			})
+		})
 
 		return response
 	}

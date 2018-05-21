@@ -11,7 +11,7 @@ import polka from './polka'
 
 
 
-polka.use(function(req, res, next) {
+polka.use(function securityhook(req, res, next) {
 	req.authed = false
 
 	let doc = {

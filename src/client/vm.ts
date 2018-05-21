@@ -1,7 +1,7 @@
 // 
 
 global.Promise = require('zousan/src/zousan')
-global.Zousan.suppressUncaughtRejectionError = true
+// global.Zousan.suppressUncaughtRejectionError = true
 
 import Vue from 'vue'
 import '@/common/clock'

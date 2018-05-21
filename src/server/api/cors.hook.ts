@@ -13,7 +13,7 @@ const ALLOW_HEADERS = [
 
 
 
-polka.use(function cors(req, res, next) {
+polka.use(function corshook(req, res, next) {
 
 	let origin = req.headers['origin']
 	if (!origin || !origin.includes(ORIGIN)) {

@@ -6,6 +6,7 @@ import Vue from 'vue'
 import VMixin from '@/client/mixins/v.mixin'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
+import * as rkeys from '@/common/rkeys'
 import * as http from '@/client/adapters/http'
 
 
@@ -34,8 +35,12 @@ export default class Lists extends Mixins(VMixin) {
 
 	syncquotes() {
 		let symbols = _.uniq(_.flatten(this.lists.map(v => v.symbols)))
-		return http.post('/symbols', { symbols, gets: [123] }).then(response => {
+		return http.post('/symbols/rkeys', {
+			symbols, rkeys: [rkeys.RH.INSTRUMENTS, rkeys.WB.QUOTES],
+		}).then(response => {
 			console.log('response ->', response)
+		}).catch(function(error) {
+			console.error(`syncquotes Error ->`, error)
 		})
 	}
 
