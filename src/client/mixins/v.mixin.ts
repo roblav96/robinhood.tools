@@ -6,6 +6,7 @@ import Vue from 'vue'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as pretty from '@/common/pretty'
+import * as utils from '@/client/adapters/utils'
 
 
 
@@ -20,7 +21,8 @@ export default class extends Vue {
 	vcapitalize(value: string) { if (!value) return value; return core.string.capitalize(value) }
 	vstamp(stamp: number) { if (!stamp) return stamp; return pretty.stamp(stamp) }
 	vfromnow(stamp: number, opts: Partial<FromNowOpts>) { if (!stamp) return stamp; return pretty.fromNow(stamp, opts) }
-	vnumber(value: number, opts: Partial<FormatNumberOpts>) { if (!Number.isFinite(value)) return value; return pretty.number(value, opts) }
+	// vnumber(value: number, opts: Partial<FormatNumberOpts>) { return utils.number(value, opts) }
+	vnumber(value: number, opts: Partial<FormatNumberOpts>) { return value }
 	vpercent(to: number, from: number) { if (!to || !from) return NaN; return core.calc.percent(to, from) }
 	vslider(value: number, min: number, max: number) { if (!value) return NaN; return core.calc.slider(value, min, max) }
 

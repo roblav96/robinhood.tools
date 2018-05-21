@@ -9,6 +9,7 @@ import * as rkeys from '@/common/rkeys'
 import * as robinhood from '@/client/adapters/robinhood'
 import * as security from '@/client/adapters/security'
 import * as http from '@/client/adapters/http'
+import * as utils from '@/client/adapters/utils'
 import store from '@/client/store'
 import socket from '@/client/adapters/socket'
 
@@ -86,7 +87,7 @@ function tovalue(key: string, value: any) {
 		value = pretty.fromNow(new Date(value).valueOf(), { verbose: true })
 	}
 	else if (core.number.isFinite(value)) {
-		value = pretty.number(value, { precision: 2 })
+		value = utils.number(value, { precision: 2 })
 	}
 	else if (core.boolean.is(value)) {
 		value = _.startCase(value as any)

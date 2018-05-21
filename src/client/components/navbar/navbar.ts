@@ -7,6 +7,7 @@ import VMixin from '@/client/mixins/v.mixin'
 import RHMixin from '@/client/mixins/robinhood.mixin'
 import * as _ from '@/common/lodash'
 import * as pretty from '@/common/pretty'
+import * as utils from '@/client/adapters/utils'
 import dayjs from '@/common/dayjs'
 import clock from '@/common/clock'
 
@@ -45,7 +46,7 @@ export default class extends Mixins(VMixin, RHMixin) {
 
 	time = ''
 	onsec() { this.time = dayjs().format('h:mm:ssa') }
-	get state() { return pretty.marketState(this.$store.state.hours.state) }
+	get state() { return utils.marketState(this.$store.state.hours.state) }
 	get scolor() {
 		let state = this.$store.state.hours.state
 		if (!state) return 'has-text-grey';

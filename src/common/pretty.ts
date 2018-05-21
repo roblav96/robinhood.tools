@@ -3,7 +3,6 @@
 import * as prettyms from 'pretty-ms'
 import * as prettybytes from 'pretty-bytes'
 import * as humanize from 'humanize-plus'
-import * as webull from './webull'
 import dayjs from './dayjs'
 
 
@@ -14,8 +13,6 @@ export function bytes(bytes: number) { return prettybytes(bytes) }
 export function plural(value: string, count: number) {
 	return humanize.pluralize(count, value)
 }
-
-
 
 export function stamp(stamp = Date.now(), format = 'dddd, MMM DD YYYY, hh:mm:ssa') {
 	return dayjs(stamp).format(format)
@@ -33,75 +30,12 @@ export function fromNow(stamp: number, opts = {} as Partial<FromNowOpts>) {
 	return ms + ' ago'
 }
 
-
-
-declare global { interface FormatNumberOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean } }
-export function number(value: number, { precision, compact, plusminus, percent, dollar } = {} as Partial<FormatNumberOpts>) {
-	if (!Number.isFinite(value)) return value;
-
-	if (!Number.isFinite(precision) && compact) precision = 0;
-	if (!Number.isFinite(precision)) {
-		precision = 2
-		let abs = Math.abs(value)
-		if (abs < 3) precision = 3;
-		if (abs >= 2000) precision = 1;
-		if (abs >= 10000) precision = 0;
-	}
-
-	if (percent || plusminus) precision = Math.min(precision, 2);
-	let fixed = value.toLocaleString('en', {
-		maximumFractionDigits: precision,
-		minimumFractionDigits: precision,
-	})
-
-	if (compact) {
-		let units = ['k', 'M', 'B', 'T']
-		let split = fixed.split(',')
-		if (split.length > 1) {
-			let end = Math.max(precision, 0)
-			let float = Number.parseFloat(`${split[0]}.${split[1].substring(0, end)}`)
-			fixed = `${float}${units[split.length - 2]}`
-		}
-	}
-
-	if (precision > 0) {
-		let iend = fixed.indexOf('.')
-		if (iend > 0) {
-			let ending = fixed.substring(iend + 1)
-			let zeros = '0'.repeat(Math.max(precision - ending.length, 0))
-			fixed += zeros
-		}
-	}
-
-	let cash = dollar ? '$' : ''
-	if (plusminus && value > 0) {
-		fixed = '+' + cash + fixed
-	}
-	else if (plusminus && value < 0) {
-		fixed = fixed.substr(1)
-		fixed = '–' + cash + fixed
-	}
-	else { fixed = cash + fixed };
-	if (percent) fixed += '%';
-
-	return fixed
-}
-
 export function formatNumber(value: any, precision = 0) {
 	let formatted = !isNaN(value) && humanize.formatNumber(value, precision)
 	if (formatted) return formatted;
 	let unit = value.replace(/[0-9.]/g, '').trim()
 	unit = ' ' + unit
 	return humanize.formatNumber(Number.parseFloat(value), precision) + unit
-}
-
-
-
-export function marketState(state: Hours.State) {
-	if (state == 'REGULAR') return 'Markets Open';
-	if (state.includes('PRE')) return 'Pre Market';
-	if (state.includes('POST')) return 'After Hours';
-	return 'Markets Closed'
 }
 
 
