@@ -12,31 +12,35 @@
 			<div class="container">
 				<div class="columns">
 					<!-- <div class="column">
-						<img class="image w-64" src="@/assets/robinhood-banner.png">
+						<div class="box">
+							<img class="image w-64 mb-4" src="@/assets/robinhood-banner.png">
+							<p class="subtitle font-medium">{{user.first_name}} {{user.last_name}}</p>
+							<p class="">{{user.username}}</p>
+						</div>
 					</div> -->
 					<div class="column">
-						<article class="message is-dark card">
-							<div class="message-header">Equity Value</div>
-							<div class="message-body">
-								<p class="leading-none font-mono is-size-3 font-semibold">{{vnumber(equityvalue,{precision:2,dollar:true})}}</p>
-							</div>
-						</article>
+						<div class="p-4 card border-rhgreen border-0 border-l-4">
+							<p class="leading-tighter is-size-4 font-medium">{{user.first_name}} {{user.last_name}}</p>
+							<p class="is-size-6">{{user.username}}</p>
+						</div>
 					</div>
 					<div class="column">
-						<article class="message is-dark card">
-							<div class="message-header">Market Value</div>
-							<div class="message-body">
-								<p class="leading-none font-mono is-size-3 font-semibold">{{vnumber(marketvalue,{precision:2,dollar:true})}}</p>
-							</div>
-						</article>
+						<div class="p-4 card">
+							<p class="leading-tighter is-size-4 font-medium font-mono">{{vnumber(equityvalue,{precision:2,dollar:true})}}</p>
+							<p class="is-size-6">Equity Value</p>
+						</div>
 					</div>
 					<div class="column">
-						<article class="message is-dark card">
-							<div class="message-header">Buying Power</div>
-							<div class="message-body">
-								<p class="leading-none font-mono is-size-3 font-semibold">{{vnumber(buyingpower,{precision:2,dollar:true})}}</p>
-							</div>
-						</article>
+						<div class="p-4 card">
+							<p class="leading-tighter is-size-4 font-medium font-mono">{{vnumber(marketvalue,{precision:2,dollar:true})}}</p>
+							<p class="is-size-6">Market Value</p>
+						</div>
+					</div>
+					<div class="column">
+						<div class="p-4 card">
+							<p class="leading-tighter is-size-4 font-medium font-mono">{{vnumber(buyingpower,{precision:2,dollar:true})}}</p>
+							<p class="is-size-6">Buying Power</p>
+						</div>
 					</div>
 				</div>
 			</div>

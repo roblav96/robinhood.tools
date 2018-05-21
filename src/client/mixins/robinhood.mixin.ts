@@ -20,7 +20,7 @@ export default class extends Vue {
 	get equitypercent() { return core.calc.percent(this.equityvalue, this.equityprev) }
 
 	get marketvalue() { return _.sum(this.$store.state.rh.portfolios.map(v => v.extended_hours_market_value || v.market_value)) }
-
+	get cashvalue() { return _.sum(this.$store.state.rh.accounts.map(v => v.cash)) }
 	get buyingpower() { return _.sum(this.$store.state.rh.accounts.map(v => v.buying_power)) }
 
 	get user() { return this.$store.state.rh.user }
