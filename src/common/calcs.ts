@@ -8,34 +8,27 @@ declare global {
 
 	namespace Calc {
 
-		interface TinyQuote {
+		interface Tiny {
 			symbol: string
 			price: number
 			eodPrice: number
-			volume: number
+			openPrice: number
+			closePrice: number
+			prevClose: number
 			updated: number
 		}
 
-		interface Quote extends TinyQuote {
+		interface Full extends Tiny {
 			tickerId: number
 			status: string
 			// 
 			name: string
 			typeof: keyof typeof rkeys.SYMBOLS
-			exchangeName: string
+			exchange: string
 			mic: string
 			acronym: string
 			country: string
 			// 
-			maker: string
-			makerAddress: string
-			vibrate: number
-			yield: number
-			// 
-			price: number
-			openPrice: number
-			closePrice: number
-			prevClose: number
 			yearHigh: number
 			yearLow: number
 			dayHigh: number
@@ -46,10 +39,10 @@ declare global {
 			bidSize: number
 			askSize: number
 			// 
+			deals: number
 			buyVolume: number
 			sellVolume: number
 			// 
-			dealCount: number
 			avgVolume: number
 			avgVolume10Day: number
 			avgVolume3Month: number
