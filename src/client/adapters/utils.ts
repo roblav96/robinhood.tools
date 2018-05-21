@@ -9,7 +9,6 @@ const UNITS = ['k', 'M', 'B', 'T']
 declare global { interface FormatNumberOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean } }
 export function number(value: number, { precision, compact, plusminus, percent, dollar } = {} as Partial<FormatNumberOpts>) {
 	if (!Number.isFinite(value)) return value;
-	console.log(`value ->`, value)
 
 	if (!Number.isFinite(precision)) {
 		if (compact) precision = 0;
@@ -22,40 +21,35 @@ export function number(value: number, { precision, compact, plusminus, percent, 
 		}
 	}
 	if (percent || plusminus) precision = Math.min(precision, 2);
-	// let fixed = value.toFixed(precision)
 
-	// let int = precision > 0 ? fixed.slice(0, fixed.length - precision - 1) : fixed
-	let str = value.toString()
-	// let split = value.toString().split('.')
-	let int = precision > 0 ? str.slice(0, str.length - precision - 1) : str
-	// let end = split[1] ? split[1].slice(0, precision) : '';
-	// console.log(`int ->`, int)
-	let fixed = int.slice(-3)
-	let n: number, i = 1
-	for (n = 1000; n < value; n *= 1000) {
-		let from = i * 3; i++; let to = i * 3;
-		fixed = int.slice(-to, -from) + ',' + fixed
+	let unit = -1
+	if (compact) {
+		while (value >= 1000) { value = value / 1000; unit++ }
 	}
-	// console.log(`fixed ->`, fixed)
-	// fixed = [int, end].join('.')
-	// console.log(`fixed ->`, fixed)
 
-	// let n = 1000
-	// let i n = 0
-	// while (value >= n) {
-	// 	n *= 1000
-	// 	i++
-	// }
+	let split = value.toString().split('.')
+	let int = split[0]
+	let fixed = int.slice(-3)
+	{
+		let n: number, i = 1
+		for (n = 1000; n < value; n *= 1000) {
+			let from = i * 3
+			i++
+			let to = i * 3
+			fixed = int.slice(-to, -from) + ',' + fixed
+		}
+	}
 
-	// if (compact) {
-	// 	let units = ['k', 'M', 'B', 'T']
-	// 	let split = fixed.split(',')
-	// 	if (split.length > 1) {
-	// 		let end = Math.max(precision, 0)
-	// 		let float = Number.parseFloat(`${split[0]}.${split[1].substring(0, end)}`)
-	// 		fixed = `${float}${units[split.length - 2]}`
-	// 	}
-	// }
+	if (precision > 0 && !(compact && unit == -1)) {
+		let end = split[1] || ''
+		fixed += '.'
+		let i: number, len = precision
+		for (i = 0; i < len; i++) {
+			fixed += end[i] || '0'
+		}
+	}
+
+	if (compact) fixed += UNITS[unit] || '';
 
 	let cash = dollar ? '$' : ''
 	if (plusminus && value > 0) {
