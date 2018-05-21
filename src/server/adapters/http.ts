@@ -31,8 +31,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 		if (host.includes('webull.com') || host.includes('stocks666.com')) {
 			Object.assign(config.headers, {
-				'cache-control': 'no-cache',
-				pragma: 'no-cache',
+				host,
 				origin: 'https://app.webull.com',
 				referer: 'https://app.webull.com',
 				ver: '1.8.4',
@@ -40,6 +39,8 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 				os: 'web',
 				osv: 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)',
 				dnt: '1', hl: 'en', locale: 'eng', tz: 'America/New_York',
+				pragma: 'no-cache',
+				'cache-control': 'no-cache',
 			})
 			config.headers['user-agent'] = config.headers['osv']
 			if (config.wbauth) {

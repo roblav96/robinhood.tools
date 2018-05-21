@@ -97,11 +97,11 @@ async function syncTickers() {
 	let tickers = await Promise.all([
 		// stocks
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
-			query: { pageSize: 9999, sourceRegionId: 1, hl: 'en' }
+			query: { pageSize: 9999 }
 		}),
 		// etfs
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
-			query: { pageSize: 9999, sourceRegionId: 1, hl: 'en' }
+			query: { pageSize: 9999 }
 		}),
 	]) as Webull.Ticker[]
 	tickers = _.flatten(tickers)
@@ -178,9 +178,7 @@ async function syncIndexes(indexes: string[]) {
 	let tickers = await pAll(symbols.map(symbol => {
 		return () => getTicker(symbol, 1)
 	}), { concurrency: 2 })
-	let response = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/globalIndices/1', {
-		query: { hl: 'en' },
-	}) as Webull.Api.MarketIndex[]
+	let response = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/globalIndices/1') as Webull.Api.MarketIndex[]
 	response.forEach(v => v.marketIndexList.forEach(vv => tickers.push(vv)))
 	tickers.remove(v => !v || (v.secType && v.secType.includes(52)) || v.disSymbol == 'IBEX')
 	await finishSync('INDEXES', tickers)

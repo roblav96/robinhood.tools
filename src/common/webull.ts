@@ -123,11 +123,21 @@ declare global {
 				id: number
 				name: string
 				tickerTupleArrayList: T[]
+				type: number
 			}
 			interface MarketIndex {
 				labelId: number
 				marketIndexList: Ticker[]
 				regionLabelName: string
+			}
+			interface HotLists {
+				hotEtf: {
+					listId: string
+					name: string
+					ticker: Ticker
+				}[]
+				indexList: Ticker[]
+				marketCategoryList: TupleArrayList<Ticker>[]
 			}
 		}
 

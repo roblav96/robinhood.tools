@@ -44,7 +44,7 @@ nav.navbar div.dropdown-content a > span.icon {
 
 				<div class="is-hidden-mobile navbar-item py-0 flex flex-col self-center">
 					<p class="leading-tight font-medium font-mono">{{time}}</p>
-					<p class="text-sm" :class="scolor">{{state}}</p>
+					<p class="text-sm font-medium" :class="scolor">{{state}}</p>
 				</div>
 
 				<b-field class="navbar-item">
@@ -134,7 +134,7 @@ nav.navbar div.dropdown-content a > span.icon {
 							<p class="leading-tight font-medium font-mono">
 								{{vnumber(equityvalue,{dollar:true,precision:2})}}
 							</p>
-							<p class="text-sm" v-bull-bear="equitychange">
+							<p class="text-sm font-medium" v-bull-bear="equitychange">
 								{{vnumber(equitychange,{dollar:true,precision:2,plusminus:true})}} ({{vnumber(equitypercent,{precision:2,plusminus:true,percent:true})}})
 							</p>
 						</div>

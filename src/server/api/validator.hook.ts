@@ -28,7 +28,8 @@ polka.use(function validator(req, res, next) {
 			if (Array.isArray(invalids)) {
 				let invalid = invalids[0]
 				Object.assign(invalid, { key, value: value[invalid.field] })
-				return next(boom.preconditionFailed(JSON.stringify(invalid), { hook: 'validator' }))
+				// let string = Object.keys(invalid).map(k => `${k}: ${invalid[k]}`).join(', ').trim()
+				return next(boom.preconditionFailed(invalid.message, { hook: 'validator' }))
 			}
 		}
 	}

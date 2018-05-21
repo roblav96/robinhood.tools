@@ -12,10 +12,10 @@
 		<section class="section">
 			<div class="container">
 
-				<b-table class="table-nowrap-first" narrowed striped hoverable :data="recents">
+				<b-table class="table-nowrap-first" narrowed striped hoverable>
 					<template slot-scope="props">
 						<b-table-column class="has-text-left" width="1">
-							<symbol-logo class="align-middle is-32x32" :symbol="props.row.symbol"></symbol-logo>
+							<symbol-logo class="shadow align-middle is-32x32" :symbol="props.row.symbol"></symbol-logo>
 						</b-table-column>
 						<b-table-column class="align-middle" label="Symbol">
 							{{props.row.symbol}}

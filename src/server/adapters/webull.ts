@@ -44,13 +44,13 @@ export function fix(quote: Webull.Quote) {
 
 
 
-async function getChunked(fsymbols: Dict<number>, url: string, auth = false) {
+async function getChunked(fsymbols: Dict<number>, url: string, wbauth = false) {
 	let inverse = _.invert(fsymbols)
 	let tids = Object.values(fsymbols)
 	let chunks = core.array.chunks(tids, _.ceil(tids.length / 128)).map(v => v.join(','))
 	let items = await pAll(chunks.map(chunk => {
 		return () => http.get(url, {
-			query: { tickerIds: chunk }, wbauth: auth,
+			query: { tickerIds: chunk }, wbauth,
 		})
 	}), { concurrency: 1 })
 	items = _.flatten(items)

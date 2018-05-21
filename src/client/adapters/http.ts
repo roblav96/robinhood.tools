@@ -30,16 +30,21 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		return config
 
 	}).then(http.send).catch(function(error: boom) {
+		if (error.isBoom && _.get(error, 'data.data.isBoom')) {
+			Object.assign(error.output.payload, error.data.data)
+		}
+
 		let message = error.message
 		let payload = _.get(error, 'output.payload') as boom.Payload
 		if (payload) {
-			message = JSON.stringify(payload.error == payload.message ? _.omit(payload, 'error') : payload)
+			message = payload.error
+			if (message != payload.message) message += ` ➤ "${payload.message}"`;
 		}
+
 		let endpoint = `[${config.method}] ${config.url.replace(process.env.DOMAIN, '')}`
 		console.log('%c◀ ' + endpoint, 'color: red; font-weight: bolder;', message)
-		// if (!(payload && payload.statusCode == 401)) {
 		alert.snackbar({ message: endpoint + ' ➤ ' + message, type: 'is-danger' })
-		// }
+
 		return Promise.reject(error)
 	})
 

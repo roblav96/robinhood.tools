@@ -17,7 +17,6 @@ const RKEYS = {
 	wbquotes: rkeys.WB.QUOTES,
 	yhquotes: rkeys.YH.QUOTES,
 }
-const ALLOWED = Object.keys(RKEYS)
 
 polka.route({
 	method: 'POST',
@@ -25,21 +24,21 @@ polka.route({
 	schema: {
 		body: {
 			symbols: { type: 'array', items: 'string' },
-			dockeys: { type: 'array', items: 'string', optional: true },
+			gets: { type: 'array', items: 'string', optional: true },
 		},
 	},
 	async handler(req, res) {
+		let allkeys = Object.keys(RKEYS)
 		let symbols = req.body.symbols as string[]
-		let dockeys = req.body.dockeys as string[]
-		if (!Array.isArray(dockeys)) dockeys = ALLOWED as any;
+		let gets = (req.body.gets || allkeys) as string[]
 
-		let invalids = _.difference(dockeys, ALLOWED)
+		let invalids = _.difference(gets, allkeys)
 		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids });
 
 		let coms = [] as Redis.Coms
 		symbols.forEach(function(symbol) {
-			dockeys.forEach(function(dockey) {
-				coms.push(['hgetall', `${RKEYS[dockey]}:${symbol}`])
+			gets.forEach(function(key) {
+				coms.push(['hgetall', `${RKEYS[key]}:${symbol}`])
 			})
 		})
 		let response = await redis.main.coms(coms)
