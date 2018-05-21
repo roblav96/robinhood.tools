@@ -279,9 +279,8 @@ declare global {
 			yield: number
 			yrHigh: number
 			yrLow: number
-			// 
-			typeof: keyof typeof rkeys.SYMBOLS
-			name: string
+			// typeof: keyof typeof rkeys.SYMBOLS
+			// name: string
 		}
 
 	}

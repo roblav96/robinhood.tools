@@ -249,6 +249,7 @@ export const object = {
 	nullify<T = object>(target: T) {
 		Object.keys(target).forEach(function(key) {
 			target[key] = null
+			delete target[key]
 		})
 	},
 	sortKeys<T = object>(target: T): T {

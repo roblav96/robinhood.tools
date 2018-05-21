@@ -4,9 +4,11 @@ import * as rkeys from './rkeys'
 
 
 
+
+
 declare global {
 
-	namespace Calc {
+	namespace Quotes {
 
 		interface Tiny {
 			symbol: string
@@ -23,6 +25,7 @@ declare global {
 			status: string
 			// 
 			name: string
+			fullName: string
 			typeof: keyof typeof rkeys.SYMBOLS
 			exchange: string
 			mic: string

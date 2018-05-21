@@ -35,8 +35,12 @@ export const BENCHMARKS = {
 
 
 
-// export const QUOTES = 'quotes'
-// export const DEALS = 'deals'
+export const QUOTES = 'quotes'
+export const DEALS = 'deals'
+
+
+
+
 
 // export const ITEMS = 'items'
 // export const PRODUCTS = 'products'
