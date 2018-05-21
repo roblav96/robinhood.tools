@@ -15,6 +15,7 @@ import * as robinhood from '../adapters/robinhood'
 import * as utils from '../adapters/utils'
 import * as webull from '../adapters/webull'
 import * as yahoo from '../adapters/yahoo'
+import * as iex from '../adapters/iex'
 import clock from '../../common/clock'
 
 
@@ -131,9 +132,11 @@ async function syncTickers() {
 	scoms.merge(coms)
 	await redis.main.coms(coms)
 	await webull.syncTickersQuotes(fsymbols)
-	let yhquotes = await yahoo.getQuotes(Object.keys(fsymbols))
+	let symbols = Object.keys(fsymbols)
+	let yhquotes = await yahoo.getQuotes(symbols)
 	await redis.main.coms(yhquotes.map(v => ['hmset', `${rkeys.YH.QUOTES}:${v.symbol}`, v as any]))
-	if (process.env.DEVELOPMENT) console.info('syncTickers done ->', Object.keys(fsymbols).length);
+	await iex.sync(symbols)
+	if (process.env.DEVELOPMENT) console.info('syncTickers done ->', symbols.length);
 }
 
 

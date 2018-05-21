@@ -7,6 +7,7 @@ export { HR } from './hours'
 export { RH } from './robinhood'
 export { WB } from './webull'
 export { YH } from './yahoo'
+export { IEX } from './iex'
 
 
 

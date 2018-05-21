@@ -64,7 +64,10 @@ export function fixPipeline(resolved: any[]) {
 		for (i = 0; i < len; i++) {
 			let result = resolved[i]
 			let error = result[0]
-			if (error) throw new Error(error);
+			if (error) {
+				error.index = i
+				throw error
+			}
 			resolved[i] = result[1]
 		}
 	}
