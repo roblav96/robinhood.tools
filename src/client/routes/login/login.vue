@@ -4,39 +4,33 @@
 <style>
 /**/
 
-section.login-route form {
-	max-width: 334px;
-}
-
 </style>
 
 <template>
-	<section class="login-route">
-		<section class="hero is-fullheight">
-			<div class="hero-body">
-				<section class="section container self-start">
-					<div class="columns is-mobile justify-center">
-						<form class="column is-narrow box" v-on:submit.prevent="submit">
-							<figure class="image mb-4 w-2/3">
-								<img src="@/assets/robinhood-banner.png">
-							</figure>
-							<b-field class="mb-2" label="Email or Username">
-								<b-input ref="username_input" type="text" icon="account" v-model="username" required :disabled="busy || ismfa"></b-input>
-							</b-field>
-							<b-field class="mb-4" label="Password">
-								<b-input type="password" icon="lock" v-model="password" password-reveal required :disabled="busy || ismfa"></b-input>
-							</b-field>
-							<v-grecaptcha v-if="!ishuman" class="mb-4"></v-grecaptcha>
-							<b-field v-show="ismfa" class="mb-4" label="Two-Factor Authentication">
-								<b-input ref="mfa_input" type="number" icon="phone-locked" v-model="mfa" :disabled="busy"></b-input>
-							</b-field>
-							<button class="button w-full is-rhgreen" type="submit" :disabled="!ready || busy" :class="{ 'is-loading': busy }">
-								Login
-							</button>
-						</form>
-					</div>
-				</section>
+	<section class="section is-medium">
+		<div class="container">
+			<div class="columns is-mobile justify-center">
+				<div class="column is-narrow">
+					<form class="box" style="max-width: 342px;" v-on:submit.prevent="submit">
+						<figure class="image mb-4 w-2/3">
+							<img src="@/assets/robinhood-banner.png">
+						</figure>
+						<b-field class="mb-2" label="Email or Username">
+							<b-input ref="username_input" type="text" icon="account" v-model="username" required :disabled="busy || ismfa"></b-input>
+						</b-field>
+						<b-field class="mb-4" label="Password">
+							<b-input type="password" icon="lock" v-model="password" password-reveal required :disabled="busy || ismfa"></b-input>
+						</b-field>
+						<v-grecaptcha v-if="!ishuman" class="mb-4"></v-grecaptcha>
+						<b-field v-show="ismfa" class="mb-4" label="Two-Factor Authentication">
+							<b-input ref="mfa_input" type="number" icon="phone-locked" v-model="mfa" :disabled="busy"></b-input>
+						</b-field>
+						<button class="button w-full is-rhgreen" type="submit" :disabled="!ready || busy" :class="{ 'is-loading': busy }">
+							Login
+						</button>
+					</form>
+				</div>
 			</div>
-		</section>
+		</div>
 	</section>
 </template>

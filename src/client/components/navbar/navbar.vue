@@ -133,7 +133,7 @@ nav.navbar div.dropdown-content a > span.icon {
 							<p class="leading-tight font-medium font-mono">
 								{{vnumber(equityvalue,{dollar:true,precision:2})}}
 							</p>
-							<p class="text-sm" v-green-red="equitychange">
+							<p class="text-sm" v-bull-bear="equitychange">
 								{{vnumber(equitychange,{dollar:true,precision:2,plusminus:true})}}
 								({{vnumber(equitypercent,{precision:2,plusminus:true,percent:true})}})
 							</p>

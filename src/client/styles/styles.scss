@@ -55,20 +55,20 @@ $shade in $shades {
 // 
 // ████  NAVBAR  ████
 // 
+html.has-navbar-fixed-top section.router-view.is-fullheight,
 html.has-navbar-fixed-top section.hero.is-fullheight {
 	min-height: calc(100vh - #{$navbar-height});
+}
+
+nav.navbar {
+	height: $navbar-height;
+	min-height: $navbar-height;
+	max-height: $navbar-height;
 }
 
 .navbar-brand a[href].navbar-item:hover {
 	background-color: $navbar-item-hover-background-color;
 }
-
-// 
-// ████  BODY  ████
-// 
-// .router-view {
-// 	background-color: $white-bis;
-// }
 
 // 
 // ████  ANIMATION  ████

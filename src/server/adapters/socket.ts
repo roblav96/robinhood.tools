@@ -127,7 +127,7 @@ function onconnection(client: Socket.Client, req: PolkaRequest) {
 	})
 
 	client.on('close', function onclose(code, reason) {
-		if (code != 1001) console.warn('client close ->', code, reason);
+		if (code > 1001) console.warn('client close ->', code, reason);
 		core.nullify(this.doc)
 		this.subs.forEach(v => emitter.off(v, this.send, this))
 		this.terminate()

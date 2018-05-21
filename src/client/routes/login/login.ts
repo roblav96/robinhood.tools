@@ -16,9 +16,7 @@ import socket from '@/client/adapters/socket'
 		'v-grecaptcha': () => import('@/client/components/grecaptcha'),
 	},
 	beforeRouteEnter(to, from, next) {
-		// if (process.env.DEVELOPMENT) return next();
 		if (!store.state.security.rhusername) return next();
-		alert.toast('Redirecting to account page...')
 		next({ name: 'robinhood' })
 	},
 })
@@ -26,6 +24,7 @@ export default class extends Vue {
 
 	mounted() {
 		this.username_input.focus()
+		setImmediate(() => document.documentElement.scrollTo({ top: 0, behavior: 'instant' }))
 	}
 
 	get username_input() { return this.$refs.username_input as HTMLInputElement }
@@ -54,13 +53,11 @@ export default class extends Vue {
 			}
 
 			Object.assign(this.$store.state.security, response)
+			alert.toast(`Robinhood login success! Hello ${response.rhusername}`)
 			return Promise.all([
 				socket.discover(),
 				socket.toPromise('ready'),
-			]).then(() => {
-				alert.toast(`Robinhood login success! Hello ${response.rhusername}`)
-				this.$router.push({ name: 'robinhood' })
-			})
+			]).then(() => this.$router.push({ name: 'robinhood' }))
 
 		}).catch(error => {
 			console.error('submit Error ->', error)

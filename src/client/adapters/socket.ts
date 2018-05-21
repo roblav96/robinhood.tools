@@ -37,16 +37,10 @@ class Socket extends Emitter {
 		}).catch(error => console.error('discover Error ->', error))
 	}
 
-	// private onuuid(data: any) {
-	// 	console.log('onuuid ->', data)
-	// }
-
 	private onopen() {
 		this.strsubs = ''
 		if (!this.ready()) return;
 		this.emit('ready')
-		// this.offListener(this.onuuid)
-		// this.on(`${rkeys.WS.UUID}:${security.doc.uuid}`, this.onuuid, this)
 	}
 	private onclose() {
 		this.strsubs = ''

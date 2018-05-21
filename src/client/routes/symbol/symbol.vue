@@ -14,7 +14,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 <template>
 	<section class="symbol-route">
 		<section class="hero is-small">
-			<!-- <div v-visible="!busy" class="hero-body message" v-green-red:is="wbquote.change"> -->
+			<!-- <div v-visible="!busy" class="hero-body message" v-bull-bear:is="wbquote.change"> -->
 			<div v-visible="!busy" class="hero-body message">
 				<div class="container">
 					<div class="columns">
@@ -38,10 +38,10 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 
 
 						<div class="column flex justify-center">
-							<!-- <div class="has-text-centered self-start bg-white border-solid border-1 rounded-lg px-4 py-2" v-green-red:border="wbquote.change"> -->
+							<!-- <div class="has-text-centered self-start bg-white border-solid border-1 rounded-lg px-4 py-2" v-bull-bear:border="wbquote.change"> -->
 							<div class="has-text-centered self-start bg-white border-grey-lightest border-solid border-1 rounded-lg px-4 py-2">
 								<p class="title">{{vnumber(wbquote.price)}}</p>
-								<p class="is-size-5 font-medium" v-green-red="wbquote.change">
+								<p class="is-size-5 font-medium" v-bull-bear="wbquote.change">
 									<span>{{vnumber(wbquote.change,{plusminus:true})}}</span>
 									<span>({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true,precision:2})}})</span>
 								</p>
@@ -68,7 +68,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 								<span class="tag title is-size-4 h-initial py-1 leading-tight is-white border-success border">
 									{{vnumber(wbquote.price)}}
 								</span>
-								<span class="tag is-large font-medium bg-transparent border-color border" v-green-red="wbquote.change">
+								<span class="tag is-large font-medium bg-transparent border-color border" v-bull-bear="wbquote.change">
 									{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true,precision:2})}})
 								</span>
 							</div>
@@ -100,9 +100,9 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 
 
 
-				<nav class="tabs is-toggle is-centered is-fullwidth rounded mt-6">
+				<nav class="tabs is-toggle is-centered is-fullwidth mt-6">
 					<div class="container">
-						<ul class="has-background-white">
+						<ul class="has-background-white rounded">
 							<li :class="{ 'is-active': tabindex == i }" v-on:click="tabindex = i" v-for="(tab, i) in tabs">
 								<a class="no-underline">
 									<b-icon :icon="tab.icon"></b-icon>
@@ -120,9 +120,11 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 
 		<hr class="h-px my-0">
 
-		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-			<component :is="tabs[tabindex].vcomponent" class="has-background-white"></component>
-		</transition>
+		<section class="section has-background-white">
+			<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+				<component :is="tabs[tabindex].vcomponent" class=""></component>
+			</transition>
+		</section>
 
 	</section>
 </template>
@@ -134,7 +136,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 								<p class="is-size-6">{{vfromnow(wbquote.mktradeTime,{max:1,verbose:true})}}</p>
 							</div>
 							<div class="mr-4">
-								<p class="is-size-4 leading-tight" v-green-red="wbquote.change">
+								<p class="is-size-4 leading-tight" v-bull-bear="wbquote.change">
 									<span>{{vnumber(wbquote.change,{plusminus:true})}}</span>
 									<span>({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true,precision:2})}})</span>
 								</p>
@@ -147,7 +149,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 							<div class="columns is-mobile">
 								<div class="column is-narrow">
 									<p class="title">{{vnumber(wbquote.price)}}</p>
-									<p class="is-size-5 font-medium" v-green-red="wbquote.change">
+									<p class="is-size-5 font-medium" v-bull-bear="wbquote.change">
 										
 									</p>
 									<p class="is-size-7">{{vfromnow(wbquote.mktradeTime,{max:1,verbose:true})}}</p>
@@ -155,7 +157,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 								<div class="column is-narrow">
 									<p class="is-size-7">{{exthours}}</p>
 									<p class="is-size-5 font-medium">{{vnumber(wbquote.pPrice)}}</p>
-									<p class="is-size-7 font-medium" v-green-red="wbquote.pChange">
+									<p class="is-size-7 font-medium" v-bull-bear="wbquote.pChange">
 										{{vnumber(wbquote.pChange,{plusminus:true})}} ({{vnumber(wbquote.pChRatio*100,{plusminus:true,percent:true,precision:2})}})
 									</p>
 									<p class="is-size-7">{{vfromnow(wbquote.faTradeTime,{max:1,verbose:true})}}</p>
@@ -223,14 +225,14 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 								<tbody>
 									<tr>
 										<td class="title is-size-3">{{vnumber(wbquote.price)}}</td>
-										<td class="is-size-5 font-medium" v-green-red="wbquote.change">
+										<td class="is-size-5 font-medium" v-bull-bear="wbquote.change">
 											{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true})}})
 										</td>
 									</tr>
 									<tr>
 										<td class="is-size-5 font-medium">{{vnumber(wbquote.pPrice)}}</td>
 										<td class="">
-											<p class="is-size-6 font-medium" v-green-red="wbquote.pChange">
+											<p class="is-size-6 font-medium" v-bull-bear="wbquote.pChange">
 												{{vnumber(wbquote.pChange,{plusminus:true})}} ({{vnumber(wbquote.pChRatio*100,{plusminus:true,percent:true})}})
 											</p>
 										</td>
@@ -252,7 +254,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 											{{vnumber(wbquote.volume,{compact:true})}}
 										</span>
 									</p>
-									<p class="subtitle is-size-5 whitespace-no-wrap font-medium" v-green-red="wbquote.change">
+									<p class="subtitle is-size-5 whitespace-no-wrap font-medium" v-bull-bear="wbquote.change">
 										{{vnumber(wbquote.change,{plusminus:true})}} ({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true})}})
 									</p>
 									<p class="subtitle is-size-7">{{vfromnow(wbquote.mktradeTime,{max:1,verbose:true})}}</p>
@@ -260,7 +262,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 								<div v-show="$store.state.hours.state!='REGULAR'" class="column is-narrow">
 									<p class="subtitle is-size-7">{{exthours}}</p>
 									<p class="title is-size-4 font-medium">{{vnumber(wbquote.pPrice)}}</p>
-									<p class="subtitle is-size-6 whitespace-no-wrap font-medium" v-green-red="wbquote.pChange">
+									<p class="subtitle is-size-6 whitespace-no-wrap font-medium" v-bull-bear="wbquote.pChange">
 										{{vnumber(wbquote.pChange,{plusminus:true})}} ({{vnumber(wbquote.pChRatio*100,{plusminus:true,percent:true})}})
 									</p>
 									<p class="subtitle is-size-7">{{vfromnow(wbquote.faTradeTime,{max:1,verbose:true})}}</p>

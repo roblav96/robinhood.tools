@@ -9,7 +9,6 @@ import lockr from 'lockr'
 import Fingerprint2 from 'fingerprintjs2'
 import clock from '@/common/clock'
 import store from '@/client/store'
-import socket from '@/client/adapters/socket'
 import * as http from '@/client/adapters/http'
 
 

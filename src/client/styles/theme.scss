@@ -65,6 +65,10 @@ $colors: map-merge($colors, ('accent':($accent, $white)));
 $colors: map-merge($colors, ('rhgreen':($rhgreen, $white)));
 $colors: map-merge($colors, ('rhred':($rhred, $white)));
 // 
+$section-padding: 2rem 1.5rem;
+$section-padding-medium: 4rem 1.5rem;
+$section-padding-large: 8rem 1.5rem;
+// 
 $body-background-color: $white;
 $footer-background-color: $white-ter;
 $button-disabled-opacity: 0.33;

@@ -21,12 +21,19 @@ Vue.directive('is', function(el, { arg, modifiers }, { context }) {
 
 
 
-Vue.directive('green-red', function(el, { value, arg }) {
+Vue.directive('bull-bear', function(el, { value, arg }) {
 	if (!core.number.isFinite(value)) return;
 	arg = arg || 'has-text'
 	if (value == 0) return el.classList.remove(arg + '-danger', arg + '-success');
 	el.classList.toggle(arg + '-success', value > 0)
 	el.classList.toggle(arg + '-danger', value < 0)
+})
+
+Vue.directive('bg-bull-bear', function(el, { value, arg }) {
+	if (!core.number.isFinite(value)) return;
+	if (value == 0) return el.classList.remove('bg-bullish', 'bg-bearish');
+	el.classList.toggle('bg-bullish', value > 0)
+	el.classList.toggle('bg-bearish', value < 0)
 })
 
 
@@ -46,7 +53,7 @@ declare module 'vue/types/vnode' {
 
 
 
-// Vue.directive('ui-green-red', {
+// Vue.directive('ui-bull-bear', {
 // 	bind(el, binding, vnode) { },
 // 	inserted(el, binding, vnode) { },
 // 	update(el, binding, vnode) { },

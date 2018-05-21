@@ -48,6 +48,7 @@ export default class extends Mixins(VMixin, RHMixin) {
 	get state() { return pretty.marketState(this.$store.state.hours.state) }
 	get scolor() {
 		let state = this.$store.state.hours.state
+		if (!state) return 'has-text-grey';
 		if (state == 'REGULAR') return 'has-text-success';
 		if (state.includes('PRE') || state.includes('POST')) return 'has-text-warning';
 		return 'has-text-grey'

@@ -1,5 +1,9 @@
 /**/
 
+section.router-view {
+	background-color: var(--white-bis);
+}
+
 img.is-png {
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
@@ -8,6 +12,14 @@ img.is-png {
 span.tooltip:after {
 	font-size: 1rem;
 	font-weight: 500;
+}
+
+.bg-bullish {
+	background-color: #E3FCEC;
+}
+
+.bg-bearish {
+	background-color: #FCEBEA;
 }
 
 /**/
