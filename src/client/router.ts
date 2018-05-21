@@ -21,7 +21,7 @@ export const routes = [
 	},
 
 	{
-		title: 'Global Markets', icon: 'earth',
+		title: 'Explore Markets', icon: 'earth',
 		name: 'markets', path: '/markets',
 	},
 
@@ -121,15 +121,12 @@ export const routes = [
 
 
 
-// let fixscroll = false
 const router = new VueRouter({
 	routes, mode: 'history',
 	linkExactActiveClass: 'is-active',
 	scrollBehavior: function(to, from, saved) {
-		// fixscroll = false
 		if (to.name == from.name) return;
 		if (!from.name || saved) return;
-		// fixscroll = true
 		return { x: 0, y: 0 }
 	},
 })
@@ -137,10 +134,6 @@ const router = new VueRouter({
 router.afterEach(function(to, from) {
 	let route = routes.find(v => v.name == to.name)
 	document.title = route ? route.title || core.string.capitalize(route.name) : core.string.capitalize(to.name)
-	// if (fixscroll) {
-	// 	fixscroll = false
-	// 	setTimeout(() => document.documentElement.scrollTo({ top: 0, behavior: 'instant' }), 100)
-	// }
 })
 
 export default router

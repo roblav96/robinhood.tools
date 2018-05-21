@@ -15,8 +15,8 @@
 			<router-view class="router-view is-fullheight"></router-view>
 		</transition>
 
-		<hr class="h-px my-0">
-		<section class="footer hero is-small py-0">
+		<hr>
+		<section class="footer hero py-0">
 			<div class="hero-body">
 				<div class="container">
 					<div class="content has-text-centered">

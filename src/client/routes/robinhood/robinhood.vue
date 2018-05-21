@@ -8,7 +8,7 @@
 
 <template>
 	<section>
-		<section class="section">
+		<section class="section has-background-white-bis">
 			<div class="container">
 				<div class="columns">
 					<!-- <div class="column">
@@ -44,20 +44,24 @@
 					</div>
 				</div>
 			</div>
-		</section>
 
-		<nav class="tabs is-toggle is-centered is-fullwidth">
-			<div class="container">
-				<ul class="has-background-white rounded">
-					<router-link tag="li" v-for="(route,i) in routes" :to="{ name: route.name }" :key="i">
-						<a>
-							<b-icon :icon="route.icon"></b-icon>
-							<span>{{route.title}}</span>
-						</a>
-					</router-link>
-				</ul>
-			</div>
-		</nav>
+			<nav class="tabs is-toggle is-centered is-fullwidth mt-8">
+				<div class="container">
+					<ul class="has-background-white rounded">
+						<router-link tag="li" v-for="(route,i) in routes" :to="{ name: route.name }" :key="i">
+							<a>
+								<b-icon :icon="route.icon"></b-icon>
+								<span>{{route.title}}</span>
+							</a>
+						</router-link>
+					</ul>
+				</div>
+			</nav>
+
+		</section>
+		<hr class="h-px my-0 mb-8">
+
+
 
 		<router-view></router-view>
 
