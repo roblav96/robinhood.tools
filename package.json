@@ -58,6 +58,7 @@
 		"polka": "latest",
 		"pretty-bytes": "latest",
 		"pretty-ms": "latest",
+		"proxify-url": "latest",
 		"rxjs": "latest",
 		"signal-exit": "latest",
 		"simple-get": "latest",

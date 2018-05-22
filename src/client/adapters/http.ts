@@ -6,6 +6,7 @@ import * as core from '@/common/core'
 import * as http from '@/common/http'
 import * as security from '@/client/adapters/security'
 import * as alert from '@/client/adapters/alert'
+import * as proxify from 'proxify-url'
 import * as boom from 'boom'
 import url from 'url'
 
@@ -64,5 +65,15 @@ export function post<B = any, T = any>(url: string, body?: B, config = {} as Par
 }
 
 
+
+
+
+// let url = proxify('https://query1.finance.yahoo.com/v7/finance/quote?symbols=amd,nvda')
+// console.log('url ->', url)
+// http.get(url).then(function(response) {
+// 	console.log(`response ->`, response)
+// }).catch(function(error) {
+// 	console.error(`created Error -> %O`, error)
+// })
 
 

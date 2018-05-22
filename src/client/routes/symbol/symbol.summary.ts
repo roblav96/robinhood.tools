@@ -24,7 +24,7 @@ export default class extends Mixins(VMixin) {
 	}
 
 	vvalue(value: any) {
-		if (Number.isFinite(value)) return utils.vnumber(value, {  });
+		if (Number.isFinite(value)) return utils.vnumber(value, {});
 		return value
 	}
 
