@@ -21,6 +21,9 @@ export const BASIC = {
 	timestamp: 0,
 }
 Object.keys(BASIC).forEach(k => BASIC[k] = undefined)
+declare global { namespace Quotes { type IBasic = typeof BASIC; interface Basic extends IBasic { } } }
+
+
 
 export const LIVE = {
 	status: '',
@@ -68,10 +71,17 @@ export const LIVE = {
 	quoteMakerAddress: '',
 }
 Object.keys(LIVE).forEach(k => LIVE[k] = undefined)
+declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Basic { } } }
+
+
 
 export const CALC = {
+
 }
 Object.keys(CALC).forEach(k => CALC[k] = undefined)
+declare global { namespace Quotes { type ICalc = typeof CALC; interface Calc extends ICalc, Live { } } }
+
+
 
 export const FULL = {
 	fullName: '',
@@ -89,6 +99,7 @@ export const FULL = {
 	sharesFloat: 0,
 }
 Object.keys(FULL).forEach(k => FULL[k] = undefined)
+declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
 
 
 
@@ -100,6 +111,7 @@ export const DEAL = {
 	timestamp: 0,
 }
 Object.keys(DEAL).forEach(k => DEAL[k] = undefined)
+declare global { namespace Quotes { type IDeal = typeof DEAL; interface Deal extends IDeal { } } }
 
 
 
@@ -107,21 +119,6 @@ Object.keys(DEAL).forEach(k => DEAL[k] = undefined)
 
 declare global {
 	namespace Quotes {
-
-		type IBasic = typeof BASIC
-		interface Basic extends IBasic { }
-
-		type ILive = typeof LIVE
-		interface Live extends ILive, Basic { }
-
-		type ICalc = typeof CALC
-		interface Calc extends ICalc, Live { }
-
-		type IFull = typeof FULL
-		interface Full extends IFull, Calc { }
-
-		type IDeal = typeof DEAL
-		interface Deal extends IDeal { }
 
 	}
 }

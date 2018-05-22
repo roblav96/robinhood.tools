@@ -45,6 +45,8 @@ declare global {
 			'stats': Stats
 		}
 
+		interface Item extends Relevant, News, Company, EarningsMeta, EstimatesMeta, EffectiveSpread, EffectiveSpreadMeta, FinancialsMeta, Quote, Stats { }
+
 		interface Relevant {
 			peers: boolean
 			symbols: string[]
@@ -119,7 +121,7 @@ declare global {
 			venueName: string
 			volume: number
 		}
-		interface EffectiveSpreadItem {
+		interface EffectiveSpreadMeta {
 			spreads: EffectiveSpread[]
 			symbol: string
 		}
