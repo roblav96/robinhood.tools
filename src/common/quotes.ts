@@ -21,6 +21,7 @@ Object.keys(BASIC).forEach(k => BASIC[k] = undefined)
 
 export const LIVE = {
 	status: '',
+	statusUpdatedAt: 0,
 	alive: true,
 	// 
 	open: 0,

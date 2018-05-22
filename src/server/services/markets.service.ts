@@ -8,7 +8,7 @@ import * as redis from '../adapters/redis'
 import * as socket from '../adapters/socket'
 import * as webull from '../adapters/webull'
 import clock from '../../common/clock'
-const watcher = require('../adapters/webull.watcher') as Webull.Watcher<Webull.Quote>
+const watcher = require('../adapters/watcher') as Webull.Watcher<Webull.Quote>
 const { emitter, QUOTES, SAVES, EMITS } = watcher
 
 

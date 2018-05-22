@@ -8,7 +8,7 @@ import * as redis from '../adapters/redis'
 import * as socket from '../adapters/socket'
 import * as webull from '../adapters/webull'
 import clock from '../../common/clock'
-const watcher = require('../adapters/webull.watcher') as Webull.Watcher<Quotes.Full>
+const watcher = require('../adapters/watcher') as Webull.Watcher<Quotes.Full>
 const { emitter, QUOTES, SAVES, EMITS } = watcher
 
 
@@ -83,19 +83,26 @@ watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
 
 
 
+clock.on('5s', function onsave() {
+	let symbols = Object.keys(SAVES).filter(k => Object.keys(SAVES[k]).length > 0)
+	if (symbols.length == 0) return;
+	let coms = []
+	symbols.forEach(k => coms.push(['hmset', `${rkeys.QUOTES}:${k}`, SAVES[k]]))
+	redis.main.coms(coms)
+	symbols.forEach(k => SAVES[k] = {} as any)
+})
+
+
+
 emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let symbol = wbquote.symbol
 	let quote = QUOTES[symbol]
 	let toquote = {} as Quotes.Full
 	if (!quote) return console.warn('ondata !quote symbol ->', symbol);
-
-	if (topic == webull.mqtt_topics.TICKER_STATUS) {
-
-	}
-
 	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
+
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
-		applywbquote(quote, { deal: wbquote.deal, tradeTime: wbquote.tradeTime } as Webull.Quote, toquote)
+		// applywbquote(quote, { deal: wbquote.deal, tradeTime: wbquote.tradeTime } as Webull.Quote, toquote)
 		applydeal(quote, {
 			symbol,
 			side: wbquote.tradeBsFlag,
@@ -108,6 +115,11 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	}
 
 	if (Object.keys(toquote).length == 0) return;
+
+	if (topic == webull.mqtt_topics.TICKER_STATUS) {
+		toquote.statusUpdatedAt = Date.now()
+	}
+
 	applycalcs(quote, toquote)
 	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
 	Object.assign(QUOTES[symbol], toquote)
@@ -131,6 +143,51 @@ function applydeal(quote: Quotes.Full, deal: Quotes.Deal, toquote = {} as Quotes
 	socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
 	return toquote
 }
+
+
+
+// topic: keyof typeof webull.mqtt_topics
+// const TOPIC_MAP = {} as Dict<Dict<KeyMapValue>>
+// Object.keys(KEY_MAP).forEach(k => {
+// 	let v = KEY_MAP[k]
+// 	if (!v.topic) return;
+// 	if (!TOPIC_MAP[v.topic]) TOPIC_MAP[v.topic] = {};
+// 	TOPIC_MAP[v.topic][k] = v
+// })
+// console.log(`TOPIC_MAP ->`, TOPIC_MAP)
+
+interface KeyMapValue {
+	key: keyof Quotes.Full
+	gt: boolean
+	time: boolean
+}
+const KEY_MAP = (({
+	'faStatus': ({ key: 'status' } as KeyMapValue) as any,
+	'status': ({ key: 'status' } as KeyMapValue) as any,
+	'status0': ({ key: 'status' } as KeyMapValue) as any,
+	'open': ({ key: 'openPrice' } as KeyMapValue) as any,
+	'close': ({ key: 'closePrice' } as KeyMapValue) as any,
+	'preClose': ({ key: 'prevClose' } as KeyMapValue) as any,
+	'fiftyTwoWkHigh': ({ key: 'yearHigh' } as KeyMapValue) as any,
+	'fiftyTwoWkLow': ({ key: 'yearLow' } as KeyMapValue) as any,
+	'bid': ({ key: 'bidPrice' } as KeyMapValue) as any,
+	'ask': ({ key: 'askPrice' } as KeyMapValue) as any,
+	'bidSize': ({ key: 'bidSize' } as KeyMapValue) as any,
+	'askSize': ({ key: 'askSize' } as KeyMapValue) as any,
+	'totalShares': ({ key: 'sharesOutstanding' } as KeyMapValue) as any,
+	'outstandingShares': ({ key: 'sharesFloat' } as KeyMapValue) as any,
+	'turnoverRate': ({ key: 'turnoverRate' } as KeyMapValue) as any,
+	'vibrateRatio': ({ key: 'vibrateRatio' } as KeyMapValue) as any,
+	'yield': ({ key: 'yield' } as KeyMapValue) as any,
+	'faTradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
+	'tradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
+	'mktradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
+	'dealNum': ({ key: 'dealNum', gt: true } as KeyMapValue) as any,
+	'volume': ({ key: 'volume', gt: true } as KeyMapValue) as any,
+	// '____': ({ key: '____' } as KeyMapValue) as any,
+} as Webull.Quote) as any) as Dict<KeyMapValue>
+
+
 
 
 
@@ -225,13 +282,9 @@ function applycalcs(quote: Quotes.Full, toquote: Quotes.Full) {
 
 
 
-clock.on('5s', function onsave() {
-	let symbols = Object.keys(SAVES).filter(k => Object.keys(SAVES[k]).length > 0)
-	if (symbols.length == 0) return;
-	let coms = []
-	symbols.forEach(k => coms.push(['hmset', `${rkeys.QUOTES}:${k}`, SAVES[k]]))
-	redis.main.coms(coms)
-	symbols.forEach(k => SAVES[k] = {} as any)
-})
+
+
+import * as benchmarkify from 'benchmarkify'
+console.warn(`dtsgen benchmarkify ->`, console.dtsgen(benchmarkify))
 
 

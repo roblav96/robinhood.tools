@@ -105,7 +105,7 @@
 		"dotenv": "latest",
 		"dts-gen-v2": "latest",
 		"execa": "latest",
-		"nanobench": "latest",
+		"benchmarkify": "latest",
 		"node-sass": "latest",
 		"npm-run-all": "latest",
 		"onchange": "latest",
