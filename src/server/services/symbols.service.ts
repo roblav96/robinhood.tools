@@ -54,7 +54,7 @@ async function start() {
 
 
 
-schedule.scheduleJob('00 3 * * 1-5', async function sync() {
+schedule.scheduleJob('50 3 * * 1-5', async function sync() {
 	await syncInstruments()
 	await syncTickers()
 })

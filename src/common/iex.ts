@@ -4,18 +4,6 @@
 
 export const IEX = {
 	BATCH: 'iex:batch',
-	BOOK: 'iex:book',
-	COMPANY: 'iex:company',
-	DIVIDENDS: 'iex:dividends',
-	EARNINGS: 'iex:earnings',
-	ESTIMATES: 'iex:estimates',
-	FINANCIALS: 'iex:financials',
-	NEWS: 'iex:news',
-	PEERS: 'iex:peers',
-	QUOTE: 'iex:quote',
-	RELEVANT: 'iex:relevant',
-	SPLITS: 'iex:splits',
-	STATS: 'iex:stats',
 }
 
 

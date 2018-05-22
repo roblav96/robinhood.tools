@@ -1,5 +1,6 @@
 // 
 
+import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as redis from './redis'

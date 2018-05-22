@@ -40,6 +40,7 @@ export function fix(target: any, deep?: any) {
 		else if (value.includes('.robinhood.com') && FIXURL.includes(key)) {
 			target[key] = value.split('/').splice(-2, 1)[0]
 		}
+		else if (json.is(value)) target[key] = JSON.parse(value);
 	})
 }
 
@@ -54,6 +55,10 @@ export function nullify(target: any) {
 	} else if (object.is(target)) {
 		Object.keys(target).forEach(k => target[k] = null)
 	}
+}
+
+export function fallback<T>(...values: T[]): T {
+	return _.compact(values)[0]
 }
 
 

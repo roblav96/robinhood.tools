@@ -264,6 +264,7 @@ declare global {
 			settlDate: string
 			settlement: number
 			status: string
+			status0: string
 			symbol: string
 			targetPrice: number
 			tickerId: number
