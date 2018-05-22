@@ -86,7 +86,6 @@ clock.on('5s', function onsave() {
 	if (symbols.length == 0) return;
 	let coms = []
 	symbols.forEach(k => coms.push(['hmset', `${rkeys.QUOTES}:${k}`, SAVES[k]]))
-	console.log(`coms ->`, coms)
 	redis.main.coms(coms)
 	symbols.forEach(k => SAVES[k] = {} as any)
 })
