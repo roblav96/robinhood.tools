@@ -29,7 +29,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 								<p class="title leading-tight">
 									<span>{{symbol}}</span>
 									<span v-show="!instrument.alive" class="tag is-medium is-danger align-top">Untradable</span>
-									<span v-show="delisted||suspended" class="tag is-medium is-danger align-top">{{vcapitalize(wbquote.status)}}</span>
+									<span v-show="delisted||suspended" class="tag is-medium is-danger align-top">{{vcapitalize(quote.status)}}</span>
 								</p>
 								<p class="is-size-5">{{name}}</p>
 							</div>
@@ -40,10 +40,10 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 						<div class="column flex justify-center">
 							<!-- <div class="has-text-centered self-start bg-white border-solid border-1 rounded-lg px-4 py-2" v-bull-bear:border="wbquote.change"> -->
 							<div class="has-text-centered self-start bg-white border-grey-lightest border-solid border-1 rounded-lg px-4 py-2">
-								<p class="title">{{vnumber(wbquote.price)}}</p>
-								<p class="is-size-5 font-medium" v-bull-bear="wbquote.change">
-									<span>{{vnumber(wbquote.change,{plusminus:true})}}</span>
-									<span>({{vnumber(wbquote.changeRatio*100,{plusminus:true,percent:true,precision:2})}})</span>
+								<p class="title">{{vnumber(quote.price)}}</p>
+								<p class="is-size-5 font-medium" v-bull-bear="quote.change">
+									<span>{{vnumber(quote.change,{plusminus:true})}}</span>
+									<span>({{vnumber(quote.percent*100,{plusminus:true,percent:true,precision:2})}})</span>
 								</p>
 							</div>
 						</div>
@@ -52,7 +52,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 
 						<div class="column flex justify-end">
 							<div class="has-text-right self-start bg-white border-grey-lightest border-solid border-1 rounded-l-lg px-4 py-2 mr-6">
-								<p class="is-size-4 font-medium">{{vnumber(wbquote.volume,{compact:true,precision:2})}}</p>
+								<p class="is-size-4 font-medium">{{vnumber(quote.volume,{compact:true,precision:2})}}</p>
 								<p class="is-size-6">Volume</p>
 							</div>
 							<div class="has-text-right self-start bg-white border-grey-lightest border-solid border-1 rounded-l-lg px-4 py-2">

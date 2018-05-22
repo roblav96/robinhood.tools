@@ -74,11 +74,13 @@ export default class extends Mixins(VMixin) {
 	}
 
 	busy = true
-	instrument = {} as Robinhood.Instrument
-	ticker = {} as Webull.Ticker
+	quote = {} as Quotes.Quote
+	wbticker = {} as Webull.Ticker
 	wbquote = {} as Webull.Quote
+	instrument = {} as Robinhood.Instrument
 	yhquote = {} as Yahoo.Quote
-	deals = [] as Webull.Deal[]
+	iexitem = {} as Yahoo.Quote
+	deals = [] as Quotes.Deal[]
 
 	@Vts.Watch('price', { immediate: true }) w_price(price: number) {
 		document.title = `${this.symbol} ${price} (${this.vnumber(this.percent, { plusminus: true, percent: true })})`
@@ -120,14 +122,16 @@ export default class extends Mixins(VMixin) {
 	}
 
 	reset() {
-		socket.offListener(this.onwbquote, this)
-		socket.offListener(this.ondeal, this)
 		this.busy = true
-		this.instrument = {} as any
-		this.ticker = {} as any
-		this.wbquote = {} as any
-		this.yhquote = {} as any
-		this.deals.splice(0)
+		socket.offListener(this.onquote, this)
+		socket.offListener(this.ondeal, this)
+		core.nullify(this.quote)
+		core.nullify(this.wbticker)
+		core.nullify(this.wbquote)
+		core.nullify(this.instrument)
+		core.nullify(this.yhquote)
+		core.nullify(this.iexitem)
+		core.nullify(this.deals)
 	}
 
 	@Vts.Watch('symbol', { immediate: true }) w_symbol(to: string, from: string) {
@@ -136,7 +140,7 @@ export default class extends Mixins(VMixin) {
 		Promise.all([
 			http.post('/symbols/rkeys', { symbols }).then(response => {
 				console.log(this.symbol, 'response ->', JSON.parse(JSON.stringify(response)))
-				Object.assign(this, _.omit(response[0], ['symbol']))
+				core.object.merge(this, _.omit(response[0], ['symbol']))
 				this.busy = false
 			}),
 			http.post('/symbols/deals', { symbols }).then(response => {
@@ -145,15 +149,16 @@ export default class extends Mixins(VMixin) {
 		]).catch(error => {
 			console.error('w_symbol Error ->', error)
 		}).finally(() => {
-			socket.on(`${rkeys.WB.QUOTES}:${this.symbol}`, this.onwbquote, this)
-			socket.on(`${rkeys.WB.DEALS}:${this.symbol}`, this.ondeal, this)
+			socket.on(`${rkeys.QUOTES}:${this.symbol}`, this.onquote, this)
+			socket.on(`${rkeys.DEALS}:${this.symbol}`, this.ondeal, this)
 		})
 	}
 
-	onwbquote(wbquote: Webull.Quote) {
-		Object.assign(this.wbquote, wbquote)
+	onquote(quote: Quotes.Quote) {
+		console.log(`quote ->`, JSON.stringify(quote, null, 4))
+		core.object.merge(this.quote, quote)
 	}
-	ondeal(deal: Webull.Deal) {
+	ondeal(deal: Quotes.Deal) {
 		this.deals.unshift(deal)
 		this.deals.splice(20)
 	}

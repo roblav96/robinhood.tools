@@ -117,7 +117,7 @@ Object.keys(DEAL).forEach(k => DEAL[k] = undefined)
 
 declare global {
 	namespace Quotes {
-
+		interface Quote extends Quotes.Full { }
 	}
 }
 

@@ -37,17 +37,19 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as Env) {
 
 
 
-// ENV.DEBUGGER = false
+ENV.DEBUGGER = false
 
 export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 
 	Process(pandora.process('api').entry('./api/api'), { SCALE: 2, /*os.cpus().length,*/ })
 
+	Process(pandora.process('search.service').entry('./services/search.service'), { SCALE: 1 })
 	Process(pandora.process('hours.service').entry('./services/hours.service'), { SCALE: 1 })
 	Process(pandora.process('robinhood.service').entry('./services/robinhood.service'), { SCALE: 1 })
 	Process(pandora.process('symbols.service').entry('./services/symbols.service'), { SCALE: 1 })
 
-	Process(pandora.process('stocks.service').entry('./services/quotes.service'), { SYMBOLS: 'STOCKS', SCALE: 1, /*os.cpus().length,*/ })
+	let SCALE = 1 // os.cpus().length
+	// Process(pandora.process('stocks.service').entry('./services/quotes.service'), { SYMBOLS: 'STOCKS', SCALE, })
 	// Process(pandora.process('forex.service').entry('./services/quotes.service'), { SYMBOLS: 'FOREX', SCALE: 1, })
 	// Process(pandora.process('indexes.service').entry('./services/quotes.service'), { SYMBOLS: 'INDEXES', SCALE: 1, })
 

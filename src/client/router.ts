@@ -126,7 +126,7 @@ const router = new VueRouter({
 	routes, mode: 'history',
 	linkExactActiveClass: 'is-active',
 	scrollBehavior: function(to, from, saved) {
-		if (to.name == from.name) return;
+		// if (to.name == from.name) return;
 		if (!from.name || saved) return;
 		return { x: 0, y: 0 }
 	},

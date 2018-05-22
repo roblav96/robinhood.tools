@@ -62,7 +62,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		let wbquote = resolved[ii++] as Webull.Quote
 		let instrument = resolved[ii++] as Robinhood.Instrument
 		let yhquote = resolved[ii++] as Yahoo.Quote
-		let iexbatch = resolved[ii++] as Iex.Batch
+		let iexitem = resolved[ii++] as Iex.Item
 
 		// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
 		// console.log('wbquote ->', JSON.parse(JSON.stringify(wbquote)))
@@ -82,10 +82,10 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 			mic: instrument.mic,
 			acronym: instrument.acronym,
 			listDate: new Date(instrument.list_date).valueOf(),
-			exchange: core.fallback(_.get(iexbatch, 'company.exchange'), _.get(iexbatch, 'quote.primaryExchange')),
-			sharesOutstanding: _.round(core.fallback(wbquote.totalShares, yhquote.sharesOutstanding, _.get(iexbatch, 'stats.sharesOutstanding'))),
-			sharesFloat: _.round(core.fallback(wbquote.outstandingShares, _.get(iexbatch, 'stats.float'))),
-			avgVolume: _.round(core.fallback(wbquote.avgVolume, _.get(iexbatch, 'quote.avgTotalVolume'))),
+			exchange: core.fallback(iexitem.exchange, iexitem.primaryExchange),
+			sharesOutstanding: _.round(core.fallback(wbquote.totalShares, yhquote.sharesOutstanding, iexitem.sharesOutstanding)),
+			sharesFloat: _.round(core.fallback(wbquote.outstandingShares, iexitem.float)),
+			avgVolume: _.round(core.fallback(wbquote.avgVolume, iexitem.avgTotalVolume)),
 			avgVolume10Day: _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day)),
 			avgVolume3Month: _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month)),
 		} as Quotes.Full)

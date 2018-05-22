@@ -87,7 +87,7 @@ function tovalue(key: string, value: any) {
 		value = pretty.fromNow(new Date(value).valueOf(), { verbose: true })
 	}
 	else if (core.number.isFinite(value)) {
-		value = utils.number(value, { precision: 2 })
+		value = utils.vnumber(value, { precision: 2 })
 	}
 	else if (core.boolean.is(value)) {
 		value = _.startCase(value as any)

@@ -53,7 +53,10 @@ export function nullify(target: any) {
 		target.forEach(v => v = null)
 		target.splice(0)
 	} else if (object.is(target)) {
-		Object.keys(target).forEach(k => target[k] = null)
+		Object.keys(target).forEach(k => {
+			target[k] = null
+			delete target[k]
+		})
 	}
 }
 

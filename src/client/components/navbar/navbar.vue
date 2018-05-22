@@ -68,7 +68,7 @@ nav.navbar div.dropdown-content a > span.icon {
 						</router-link>
 					</b-tooltip>
 					<b-tooltip v-if="!rhusername" label="Robinhood Login" :active="breakpoints.desktopAndUp" position="is-bottom">
-						<router-link class="navbar-item flex items-center" :to="{name:'login'}" active-class exact-active-class>
+						<router-link class="navbar-item flex items-center h-full" :to="{name:'login'}" active-class exact-active-class>
 							<img class="image is-28x28 mx-1" src="@/assets/robinhood-logo.svg" alt="Robinhood Login">
 							<span class="is-hidden-desktop ml-2">Login</span>
 						</router-link>

@@ -5,22 +5,24 @@ import Default from 'pandora/dist/default'
 
 
 
-// export default Default
-
-// export default {
-// 	// actuator: {},
-// 	// reporter: {
-// 	// 	file: {
-// 	// 		enabled: false,
-// 	// 	},
-// 	// },
-// 	logger: {
-// 		logsDir: './logs',
-// 		appLogger: {
-// 			stdoutLevel: 'NONE',
-// 			level: 'NONE',
-// 		},
-// 	},
-// } as typeof Default
+export default {
+	actuator: {
+		http: {
+			enabled: false, port: 7004,
+		},
+	},
+	// reporter: {
+	// 	file: {
+	// 		enabled: false,
+	// 	},
+	// },
+	// logger: {
+	// 	logsDir: './logs',
+	// 	appLogger: {
+	// 		stdoutLevel: 'NONE',
+	// 		level: 'NONE',
+	// 	},
+	// },
+} as typeof Default
 
 

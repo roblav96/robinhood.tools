@@ -12,10 +12,12 @@ import polka from './polka'
 
 
 const RKEYS = {
-	[rkeys.RH.INSTRUMENTS]: 'instrument',
-	[rkeys.WB.TICKERS]: 'ticker',
+	[rkeys.QUOTES]: 'quote',
+	[rkeys.WB.TICKERS]: 'wbticker',
 	[rkeys.WB.QUOTES]: 'wbquote',
+	[rkeys.RH.INSTRUMENTS]: 'instrument',
 	[rkeys.YH.QUOTES]: 'yhquote',
+	[rkeys.IEX.ITEMS]: 'iexitem',
 }
 
 polka.route({
@@ -37,9 +39,7 @@ polka.route({
 
 		let coms = [] as Redis.Coms
 		symbols.forEach(function(symbol) {
-			rkeys.forEach(function(rkey) {
-				coms.push(['hgetall', `${rkey}:${symbol}`])
-			})
+			rkeys.forEach(rkey => coms.push(['hgetall', `${rkey}:${symbol}`]))
 		})
 		let resolved = await redis.main.coms(coms)
 		resolved.forEach(core.fix)

@@ -141,7 +141,7 @@ async function syncTickers() {
 	let yhquotes = await yahoo.getQuotes(symbols)
 	await redis.main.coms(yhquotes.map(v => ['hmset', `${rkeys.YH.QUOTES}:${v.symbol}`, v as any]))
 
-	if (process.env.DEVELOPMENT) console.log('iex.syncBatch ->');
+	if (process.env.DEVELOPMENT) console.log('iex.syncItems ->');
 	await iex.syncItems(symbols)
 
 	if (process.env.DEVELOPMENT) console.info('syncTickers done ->', symbols.length);

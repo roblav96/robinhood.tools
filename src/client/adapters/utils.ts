@@ -7,13 +7,14 @@ import * as core from '@/common/core'
 
 const UNITS = ['K', 'M', 'B', 'T']
 declare global { interface FormatNumberOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean } }
-export function number(value: number, { precision, compact, plusminus, percent, dollar } = {} as Partial<FormatNumberOpts>) {
+export function vnumber(value: number, { precision, compact, plusminus, percent, dollar } = {} as Partial<FormatNumberOpts>) {
 	if (!Number.isFinite(precision)) {
 		if (compact) precision = 0;
 		else {
 			precision = 2
 			let abs = Math.abs(value)
-			if (abs >= 10000) precision = 0;
+			if (compact === undefined && abs >= 10000) compact = true;
+			else if (abs >= 10000) precision = 0;
 			else if (abs >= 2000) precision = 1;
 			else if (abs < 3) precision = 3;
 		}
@@ -62,7 +63,7 @@ export function number(value: number, { precision, compact, plusminus, percent, 
 
 	return fixed
 }
-if (process.env.DEVELOPMENT) Object.assign(window, { number });
+if (process.env.DEVELOPMENT) Object.assign(window, { vnumber });
 
 
 
