@@ -58,7 +58,7 @@ export function send(config: Http.Config) {
 						return reject(new boom(parsed.err, {
 							statusCode: 422,
 							message: parsed.err.message,
-							data: { data, config: _.pick(config, ['method','url']) },
+							data: { data, config: _.pick(config, ['method', 'url']) },
 						}))
 					}
 					data = parsed.value
@@ -74,7 +74,7 @@ export function send(config: Http.Config) {
 				return reject(new boom(error || res.statusMessage, {
 					statusCode: res.statusCode,
 					message: error ? error.message : res.statusMessage,
-					data: { data, config: _.pick(config, ['method','url']) },
+					data: { data, config: _.pick(config, ['method', 'url']) },
 				}))
 			}
 
@@ -90,9 +90,7 @@ export function send(config: Http.Config) {
 		if (!reject && config.retries > 0) {
 			config.retries--
 			if (process.env.DEVELOPMENT && process.env.SERVER) {
-				console.error('retry Error ->', error)
-				// console.warn('retry config ->', config)
-				console.warn('retry config.retries ->', config.retries)
+				console.warn('retry Error ->', config, error)
 			}
 			return clock.toPromise(config.retryTick).then(() => send(config))
 		}

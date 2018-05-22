@@ -57,10 +57,12 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 	let ii = 0
 	let coms = [] as Redis.Coms
 	symbols.forEach(function(symbol, i) {
-		console.log(`symbol ->`, symbol)
 		let quote = resolved[ii++] as Quotes.Full
+		console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
 		let wbticker = resolved[ii++] as Webull.Ticker
+		console.log('wbticker ->', JSON.parse(JSON.stringify(wbticker)))
 		let wbquote = resolved[ii++] as Webull.Quote
+		console.log('wbquote ->', JSON.parse(JSON.stringify(wbquote)))
 		let instrument = resolved[ii++] as Robinhood.Instrument
 		let yhquote = resolved[ii++] as Yahoo.Quote
 		let iexbatch = resolved[ii++] as Iex.Batch

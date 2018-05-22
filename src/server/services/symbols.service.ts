@@ -31,7 +31,8 @@ async function start() {
 
 	// await redis.main.del(rkeys.WB.SYMBOLS)
 	let tickers = await redis.main.exists(rkeys.WB.SYMBOLS)
-	if (tickers == 0) await syncTickers();
+	// if (tickers == 0) await syncTickers();
+	await syncTickers()
 
 	// await redis.main.del(rkeys.SYMBOLS.STOCKS)
 	let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)
@@ -65,6 +66,7 @@ schedule.scheduleJob('00 4 * * 1-5', async function reset() {
 
 
 async function syncInstruments() {
+	if (process.env.DEVELOPMENT) console.log('syncInstruments start ->');
 	await pForever(async function getInstruments(url) {
 		let { results, next } = await http.get(url) as Robinhood.Api.Paginated<Robinhood.Instrument>
 		results.remove(v => Array.isArray(v.symbol.match(utils.matchSymbol)))
@@ -89,19 +91,20 @@ async function syncInstruments() {
 		return next || pForever.end
 
 	}, 'https://api.robinhood.com/instruments/')
+	if (process.env.DEVELOPMENT) console.info('syncInstruments done ->');
 }
 
 async function syncTickers() {
-	if (process.env.DEVELOPMENT) console.info('syncTickers start ->');
+	if (process.env.DEVELOPMENT) console.log('syncTickers start ->');
 
 	let tickers = await Promise.all([
 		// stocks
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
-			query: { pageSize: 9999 }
+			query: { pageSize: 9999, hl: 'en' },
 		}),
 		// etfs
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
-			query: { pageSize: 9999 }
+			query: { pageSize: 9999, hl: 'en' },
 		}),
 	]) as Webull.Ticker[]
 	tickers = _.flatten(tickers)
@@ -131,10 +134,15 @@ async function syncTickers() {
 	scoms.merge(coms)
 	await redis.main.coms(coms)
 
+	if (process.env.DEVELOPMENT) console.log('webull.syncTickersQuotes ->');
 	await webull.syncTickersQuotes(fsymbols)
 	let symbols = Object.keys(fsymbols)
+
+	if (process.env.DEVELOPMENT) console.log('yahoo.getQuotes ->');
 	let yhquotes = await yahoo.getQuotes(symbols)
 	await redis.main.coms(yhquotes.map(v => ['hmset', `${rkeys.YH.QUOTES}:${v.symbol}`, v as any]))
+
+	if (process.env.DEVELOPMENT) console.log('iex.syncBatch ->');
 	await iex.syncBatch(symbols)
 
 	if (process.env.DEVELOPMENT) console.info('syncTickers done ->', symbols.length);
@@ -143,6 +151,7 @@ async function syncTickers() {
 
 
 async function syncStocks() {
+	if (process.env.DEVELOPMENT) console.log('syncStocks start ->');
 	let symbols = await redis.main.smembers(rkeys.WB.SYMBOLS) as string[]
 	let tids = await redis.main.hgetall(rkeys.WB.TIDS) as Dict<number>
 	tids = _.mapValues(tids, v => Number.parseInt(v as any))
@@ -164,6 +173,7 @@ async function syncStocks() {
 }
 
 async function syncForex() {
+	if (process.env.DEVELOPMENT) console.log('syncForex start ->');
 	let symbols = core.clone(webull.forex)
 	webull.fiats.forEach(v => webull.fiats.forEach(vv => {
 		if (v == vv) return;
@@ -178,6 +188,7 @@ async function syncForex() {
 }
 
 async function syncIndexes() {
+	if (process.env.DEVELOPMENT) console.log('syncIndexes start ->');
 	let symbols = core.clone(webull.indexes)
 	let tickers = await pAll(symbols.map(symbol => {
 		return () => getTicker(symbol, 1)
@@ -202,7 +213,7 @@ async function finishSync(type: keyof typeof rkeys.SYMBOLS, tickers: Webull.Tick
 }
 
 async function getTicker(symbol: string, tickerType: number) {
-	let response = await http.get('https://infoapi.webull.com/api/search/tickers2', {
+	let response = await http.get('https://infoapi.webull.com/api/search/tickers3', {
 		query: { keys: symbol, tickerType },
 	}) as Webull.Api.Paginated<Webull.Ticker>
 	if (!Array.isArray(response.list)) return;

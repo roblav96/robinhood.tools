@@ -5,7 +5,7 @@ import * as core from '@/common/core'
 
 
 
-const UNITS = ['k', 'M', 'B', 'T']
+const UNITS = ['K', 'M', 'B', 'T']
 declare global { interface FormatNumberOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean } }
 export function number(value: number, { precision, compact, plusminus, percent, dollar } = {} as Partial<FormatNumberOpts>) {
 	if (!Number.isFinite(precision)) {

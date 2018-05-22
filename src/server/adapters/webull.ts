@@ -49,7 +49,7 @@ async function getChunked(fsymbols: Dict<number>, url: string, wbauth = false) {
 	let chunks = core.array.chunks(tids, _.ceil(tids.length / 128)).map(v => v.join(','))
 	let items = await pAll(chunks.map(chunk => {
 		return () => http.get(url, {
-			query: { tickerIds: chunk }, wbauth,
+			query: { tickerIds: chunk, hl: 'en' }, // wbauth,
 		})
 	}), { concurrency: 1 })
 	items = _.flatten(items)
@@ -224,7 +224,7 @@ export async function syncTickersQuotes(fsymbols: Dict<number>) {
 
 
 // // export async function search(query: string) {
-// // 	// return got.get('https://infoapi.webull.com/api/search/tickers2', {
+// // 	// return got.get('https://infoapi.webull.com/api/search/tickers3', {
 // // 	// 	query: { keys: query },
 // // 	// 	json: true,
 // // 	// }).then(function({ body }) {
