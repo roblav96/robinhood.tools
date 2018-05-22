@@ -2,7 +2,6 @@
 
 export * from '../../common/webull'
 export * from './webull.mqtt'
-export * from './webull.watcher'
 import * as pAll from 'p-all'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'

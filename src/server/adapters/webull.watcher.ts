@@ -22,18 +22,18 @@ declare global {
 			emitter: typeof emitter
 			QUOTES: Dict<T>
 			SAVES: Dict<T>
+			EMITS: Dict<T>
 		}
 	}
 }
 export let rkey = ''
-export let onSymbols = _.noop as (hubmsg: Pandora.HubMessage, fsymbols: Dict<number>) => Promise<void>
+export let onSymbols = _.noop as (hubmsg: Pandora.HubMessage, symbols: string[]) => Promise<void>
 export const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'>()
 export const QUOTES = {} as Dict
 export const SAVES = {} as Dict
+export const EMITS = {} as Dict
 
-const EMITS = {} as Dict
 const CLIENTS = [] as webull.MqttClient[]
-console.log(`CLIENTS ->`, CLIENTS)
 
 pandora.once('symbols.ready', onsymbols)
 pandora.broadcast({}, 'symbols.start')
@@ -50,15 +50,19 @@ async function onsymbols(hubmsg: Pandora.HubMessage) {
 	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) {
 		fsymbols = utils[`DEV_${process.env.SYMBOLS}`]
 	}
+	let symbols = Object.keys(fsymbols)
 
 	CLIENTS.forEach(v => v.destroy())
 	core.object.nullify(QUOTES)
 	core.object.nullify(EMITS)
 	core.object.nullify(SAVES)
 
-	await onSymbols(hubmsg, fsymbols)
+	await onSymbols(hubmsg, symbols)
 
-	let symbols = Object.keys(fsymbols)
+	if (_.isEmpty(QUOTES)) {
+		return console.error(`onsymbols Error ->`, '_.isEmpty(QUOTES)')
+	}
+
 	await redis.main.coms(symbols.map(function(symbol, i) {
 		EMITS[symbol] = {} as any
 		SAVES[symbol] = {} as any
@@ -85,6 +89,15 @@ clock.on('5s', function onconnect() {
 	let client = CLIENTS.find(v => v.started == false)
 	if (!client) return;
 	client.connect()
+})
+
+clock.on('3s', function onsave() {
+	let symbols = Object.keys(SAVES).filter(k => Object.keys(SAVES[k]).length > 0)
+	if (symbols.length == 0) return;
+	let coms = []
+	symbols.forEach(k => coms.push(['hmset', `${rkeys.QUOTES}:${k}`, SAVES[k]]))
+	redis.main.coms(coms)
+	symbols.forEach(k => SAVES[k] = {} as any)
 })
 
 clock.on('1s', function onsocket() {
