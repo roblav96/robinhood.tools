@@ -1,23 +1,57 @@
+
+
+
 // 
 
 import '../main'
+import * as pAll from 'p-all'
+import * as schedule from 'node-schedule'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
+import * as quotes from '../../common/quotes'
+import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
+import * as hours from '../adapters/hours'
 import * as socket from '../adapters/socket'
+import * as utils from '../adapters/utils'
 import * as webull from '../adapters/webull'
+import * as http from '../adapters/http'
+import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
-const watcher = require('../adapters/webull.watcher') as Webull.Watcher<Quotes.Full>
-const { emitter, QUOTES, SAVES, EMITS } = watcher
 
 
 
-watcher.rkey = rkeys.QUOTES
+export const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'>()
+export const CLIENTS = [] as webull.MqttClient[]
+export const QUOTES = {} as Dict<Quotes.Full>
+export const EMITS = {} as Dict<Quotes.Full>
+export const SAVES = {} as Dict<Quotes.Full>
 
-watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
+pandora.once('symbols.ready', onSymbols)
+pandora.broadcast({}, 'symbols.start')
+if (process.env.SYMBOLS == 'STOCKS') {
+	pandora.on('symbols.reset', onSymbols)
+}
+
+async function onSymbols(hubmsg: Pandora.HubMessage) {
 	let resets = hubmsg.action == 'symbols.reset'
 
+	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
+		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
+		await utils.getFullSymbols(process.env.SYMBOLS)
+	)
+	// if (process.env.DEVELOPMENT) return;
+	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) {
+		fsymbols = utils[`DEV_${process.env.SYMBOLS}`]
+	}
+
+	CLIENTS.forEach(v => v.destroy())
+	core.object.nullify(QUOTES)
+	core.object.nullify(EMITS)
+	core.object.nullify(SAVES)
+
+	let symbols = Object.keys(fsymbols)
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => [
 		['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`],
 		['hgetall', `${rkeys.YH.QUOTES}:${v}`],
@@ -28,6 +62,7 @@ watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
 	])))
 	resolved.forEach(core.fix)
 
+	let coms = [] as Redis.Coms
 	let ii = 0
 	symbols.forEach(function(symbol, i) {
 		let instrument = resolved[ii++] as Robinhood.Instrument
@@ -43,7 +78,6 @@ watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
 			typeof: process.env.SYMBOLS,
 			name: core.fallback(instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name),
 			fullName: core.fallback(instrument.name, yhquote.longName, wbticker.name),
-			status: core.fallback(wbquote.faStatus, wbquote.status),
 			alive: instrument.alive,
 			mic: instrument.mic,
 			acronym: instrument.acronym,
@@ -57,10 +91,11 @@ watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
 			avgVolume3Month: _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month)),
 		} as Quotes.Full)
 
-		core.object.repair(quote, applywbquote(quote, wbquote))
+		core.object.repair(quote, onwbquote(quote, wbquote))
 
 		let reset = {
-			eodPrice: quote.price,
+			status: core.fallback(wbquote.faStatus, wbquote.status),
+			eodPrice: quote.price || quote.prevClose,
 			dayHigh: quote.price, dayLow: quote.price,
 			open: quote.price, high: quote.price, low: quote.price, close: quote.price,
 			count: 0, deals: 0, dealNum: 0,
@@ -76,12 +111,60 @@ watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
 		applycalcs(quote, quote)
 
 		QUOTES[symbol] = quote
+		EMITS[symbol] = {} as any
+		SAVES[symbol] = {} as any
+
+		let rkey = `${rkeys.QUOTES}:${symbol}`
+		coms.push(['hmset', rkey, quote as any])
+		socket.emit(rkey, quote)
 
 	})
 
+	await redis.main.coms(coms)
+
+	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 128))
+	CLIENTS.splice(0, Infinity, ...chunks.map((chunk, i) => new webull.MqttClient({
+		fsymbols: _.fromPairs(chunk),
+		topics: process.env.SYMBOLS,
+		index: i, chunks: chunks.length,
+		connect: chunks.length == 1 && i == 0,
+		// verbose: true,
+	}, emitter)))
+
 }
 
+// emitter.on('connect', i => console.log('connect ->', i))
 
+clock.on('5s', function onconnect() {
+	if (CLIENTS.length == 0) return;
+	let client = CLIENTS.find(v => v.started == false)
+	if (!client) return;
+	client.connect()
+})
+
+clock.on('1s', function onsocket() {
+	Object.keys(EMITS).forEach(symbol => {
+		let toquote = EMITS[symbol]
+		if (Object.keys(toquote).length == 0) return;
+		toquote.symbol = symbol
+		socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
+		EMITS[symbol] = {} as any
+	})
+	// 
+	// let keys = Object.keys(SAVES).filter(k => Object.keys(SAVES[k]).length > 0)
+	// if (keys.length == 0) return;
+	// let coms = []
+	// keys.forEach(k => coms.push(['hmset', `${rkeys.QUOTES}:${k}`, SAVES[k]]))
+	// redis.main.coms(coms)
+	// keys.forEach(k => SAVES[k] = {} as any)
+	// 
+	// let coms = Object.keys(SAVES).filter(key => {
+	// 	return Object.keys(SAVES[key]).length > 0
+	// }).map(v => ['hmset', `${rkeys.QUOTES}:${v}`, SAVES[v]])
+	// if (coms.length == 0) return;
+	// redis.main.coms(coms as any)
+	// Object.keys(SAVES).forEach(symbol => SAVES[symbol] = {} as any)
+})
 
 emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let symbol = wbquote.symbol
@@ -89,14 +172,10 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let toquote = {} as Quotes.Full
 	if (!quote) return console.warn('ondata !quote symbol ->', symbol);
 
-	if (topic == webull.mqtt_topics.TICKER_STATUS) {
-
-	}
-
 	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
-		applywbquote(quote, { deal: wbquote.deal, tradeTime: wbquote.tradeTime } as Webull.Quote, toquote)
-		applydeal(quote, {
+		onwbquote(quote, { deal: wbquote.deal, tradeTime: wbquote.tradeTime } as Webull.Quote, toquote)
+		ondeal(quote, {
 			symbol,
 			side: wbquote.tradeBsFlag,
 			price: wbquote.deal,
@@ -104,7 +183,7 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 			timestamp: wbquote.tradeTime,
 		}, toquote)
 	} else {
-		applywbquote(quote, wbquote, toquote)
+		onwbquote(quote, wbquote, toquote)
 	}
 
 	if (Object.keys(toquote).length == 0) return;
@@ -119,7 +198,7 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 
 
-function applydeal(quote: Quotes.Full, deal: Quotes.Deal, toquote = {} as Quotes.Full) {
+function ondeal(quote: Quotes.Full, deal: Quotes.Deal, toquote = {} as Quotes.Full) {
 	let symbol = quote.symbol
 
 	toquote.deals++
@@ -135,23 +214,23 @@ function applydeal(quote: Quotes.Full, deal: Quotes.Deal, toquote = {} as Quotes
 
 
 const NOT_EQUALS = (({
-	'faStatus': ('status' as keyof Quotes.Full) as any,
-	'status': ('status' as keyof Quotes.Full) as any,
-	'status0': ('status' as keyof Quotes.Full) as any,
-	// 'deal': ('price' as keyof Quotes.Full) as any,
-	// 'price': ('price' as keyof Quotes.Full) as any,
-	// 'pPrice': ('price' as keyof Quotes.Full) as any,
-	'open': ('openPrice' as keyof Quotes.Full) as any,
-	'close': ('closePrice' as keyof Quotes.Full) as any,
-	'preClose': ('prevClose' as keyof Quotes.Full) as any,
-	// 'high': ('dayHigh' as keyof Quotes.Full) as any,
-	// 'low': ('dayLow' as keyof Quotes.Full) as any,
-	'fiftyTwoWkHigh': ('yearHigh' as keyof Quotes.Full) as any,
-	'fiftyTwoWkLow': ('yearLow' as keyof Quotes.Full) as any,
 	'bid': ('bidPrice' as keyof Quotes.Full) as any,
 	'ask': ('askPrice' as keyof Quotes.Full) as any,
 	'bidSize': ('bidSize' as keyof Quotes.Full) as any,
 	'askSize': ('askSize' as keyof Quotes.Full) as any,
+	'deal': ('price' as keyof Quotes.Full) as any,
+	'price': ('price' as keyof Quotes.Full) as any,
+	'pPrice': ('price' as keyof Quotes.Full) as any,
+	'faStatus': ('status' as keyof Quotes.Full) as any,
+	'status': ('status' as keyof Quotes.Full) as any,
+	'status0': ('status' as keyof Quotes.Full) as any,
+	'open': ('openPrice' as keyof Quotes.Full) as any,
+	'close': ('closePrice' as keyof Quotes.Full) as any,
+	'preClose': ('prevClose' as keyof Quotes.Full) as any,
+	'high': ('dayHigh' as keyof Quotes.Full) as any,
+	'low': ('dayLow' as keyof Quotes.Full) as any,
+	'fiftyTwoWkHigh': ('yearHigh' as keyof Quotes.Full) as any,
+	'fiftyTwoWkLow': ('yearLow' as keyof Quotes.Full) as any,
 	'totalShares': ('sharesOutstanding' as keyof Quotes.Full) as any,
 	'outstandingShares': ('sharesFloat' as keyof Quotes.Full) as any,
 	'turnoverRate': ('turnoverRate' as keyof Quotes.Full) as any,
@@ -160,23 +239,27 @@ const NOT_EQUALS = (({
 	// '____': ('____' as keyof Quotes.Full) as any,
 } as Webull.Quote) as any) as Dict<string>
 
-const TRADE_TIMES = (({
+const GREATER_THANS = (({
 	'faTradeTime': ('timestamp' as keyof Quotes.Full) as any,
 	'tradeTime': ('timestamp' as keyof Quotes.Full) as any,
 	'mktradeTime': ('timestamp' as keyof Quotes.Full) as any,
-} as Webull.Quote) as any) as Dict<string>
-
-const GREATER_THANS = (({
 	'dealNum': ('dealNum' as keyof Quotes.Full) as any,
 	'volume': ('volume' as keyof Quotes.Full) as any,
+	// '____': ('____' as keyof Quotes.Full) as any,
 } as Webull.Quote) as any) as Dict<string>
 
-function applywbquote(quote: Quotes.Full, wbquote: Webull.Quote, toquote = {} as Quotes.Full) {
+// const OUT_RANGE = (({
+// 	// '____': ('____' as keyof Quotes.Full) as any,
+// 	// '____': ('____' as keyof Quotes.Full) as any,
+// 	// '____': ('____' as keyof Quotes.Full) as any,
+// } as Webull.Quote) as any) as Dict<string>
+
+function onwbquote(quote: Quotes.Full, wbquote: Webull.Quote, toquote = {} as Quotes.Full) {
 	let symbol = quote.symbol
 	// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
-	Object.keys(wbquote).forEach(wbkey => {
-		let source = wbquote[wbkey]
-		let key = NOT_EQUALS[wbkey]
+	Object.keys(wbquote).forEach((k: keyof Quotes.Full) => {
+		let source = wbquote[k]
+		let key = NOT_EQUALS[k]
 		if (key) {
 			let target = quote[key]
 			if (target != source) {
@@ -184,15 +267,7 @@ function applywbquote(quote: Quotes.Full, wbquote: Webull.Quote, toquote = {} as
 			}
 			return
 		}
-		key = TRADE_TIMES[wbkey]
-		if (key) {
-			let target = quote[key]
-			if (target == null || source > target) {
-				toquote[key] = source
-			}
-			return
-		}
-		key = GREATER_THANS[wbkey]
+		key = GREATER_THANS[k]
 		if (key) {
 			let target = quote[key]
 			if (target == null || source > target) {
@@ -220,18 +295,36 @@ function applycalcs(quote: Quotes.Full, toquote: Quotes.Full) {
 		let ask = toquote.askPrice || quote.askPrice
 		toquote.spread = ask - bid
 	}
-	return toquote
 }
 
 
 
-clock.on('5s', function onsave() {
-	let symbols = Object.keys(SAVES).filter(k => Object.keys(SAVES[k]).length > 0)
-	if (symbols.length == 0) return;
-	let coms = []
-	symbols.forEach(k => coms.push(['hmset', `${rkeys.QUOTES}:${k}`, SAVES[k]]))
-	redis.main.coms(coms)
-	symbols.forEach(k => SAVES[k] = {} as any)
-})
+if (process.env.SYMBOLS == 'STOCKS') require('./calcs.service');
+declare global { namespace NodeJS { export interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
+
+
+
+
+
+// } else if (key == 'volume') {
+// 	let volume = quote.volume
+// 	console.log('symbol ->', symbol)
+// 	console.log('volume ->', volume)
+// 	console.log('value ->', value)
+// 	if (value > volume || Math.abs(core.calc.percent(value, volume)) > 5) {
+// 		toquote.volume = value
+// 	}
+// 	// if (value > quote.volume && hours.rxstate.value == 'REGULAR') {
+// 	// if (value > quote.volume) {
+// 	// 	toquote.volume = value
+// 	// }
+// 	// let volume = quote.volume
+// 	// if (value == volume) return;
+// 	// if (value > volume || Math.abs(core.calc.percent(value, volume)) > 5) {
+// 	// 	toquote.volume = value
+// 	// }
+// 	// let percent = core.calc.percent(value, volume)
+// 	// if (percent > 95) return;
+// 	// if (value > volume || percent < -95) return toquote.volume = value;
 
 

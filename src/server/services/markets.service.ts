@@ -26,24 +26,27 @@ watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
 	let ii = 0
 	symbols.forEach(function(symbol, i) {
 		let wbticker = resolved[ii++] as Webull.Ticker
-		QUOTES[symbol] = resolved[ii++] as Webull.Quote
-		core.object.merge(QUOTES[symbol], {
+		let wbquote = resolved[ii++] as Webull.Quote
+		core.object.merge(wbquote, {
 			symbol,
 			tickerId: wbticker.tickerId,
 			typeof: process.env.SYMBOLS,
 			name: core.fallback(wbticker.tinyName, wbticker.name),
 		})
+		QUOTES[symbol] = wbquote
 	})
 
 }
 
-const GREATERS = {
+
+
+const GREATER_THANS = {
 	faTradeTime: 1,
 	mktradeTime: 1,
 	tradeTime: 1,
 } as Webull.Quote
 
-const RESETABLES = {
+const DOES_RESET = {
 	dealNum: 1,
 	volume: 1,
 } as Webull.Quote
@@ -58,12 +61,12 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	Object.keys(wbquote).forEach(key => {
 		let target = quote[key]
 		let source = wbquote[key]
-		if (GREATERS[key]) {
+		if (GREATER_THANS[key]) {
 			if (source > target) {
 				toquote[key] = source
 			}
 		}
-		else if (RESETABLES[key]) {
+		else if (DOES_RESET[key]) {
 			if (source > target || Math.abs(core.calc.percent(source, target)) > 5) {
 				toquote[key] = source
 			}
@@ -80,6 +83,8 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	core.object.merge(SAVES[symbol], toquote)
 
 })
+
+
 
 clock.on('5s', function onsave() {
 	let symbols = Object.keys(SAVES).filter(k => Object.keys(SAVES[k]).length > 0)
