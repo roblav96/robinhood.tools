@@ -7,6 +7,7 @@ import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
 import * as socket from '../adapters/socket'
 import * as webull from '../adapters/webull'
+import clock from '../../common/clock'
 const watcher = require('../adapters/webull.watcher') as Webull.Watcher<Webull.Quote>
 const { emitter, QUOTES, SAVES, EMITS } = watcher
 
@@ -78,6 +79,16 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	core.object.merge(EMITS[symbol], toquote)
 	core.object.merge(SAVES[symbol], toquote)
 
+})
+
+clock.on('5s', function onsave() {
+	let symbols = Object.keys(SAVES).filter(k => Object.keys(SAVES[k]).length > 0)
+	if (symbols.length == 0) return;
+	let coms = []
+	symbols.forEach(k => coms.push(['hmset', `${rkeys.QUOTES}:${k}`, SAVES[k]]))
+	console.log(`coms ->`, coms)
+	redis.main.coms(coms)
+	symbols.forEach(k => SAVES[k] = {} as any)
 })
 
 
