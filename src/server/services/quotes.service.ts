@@ -57,6 +57,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 	let ii = 0
 	let coms = [] as Redis.Coms
 	symbols.forEach(function(symbol, i) {
+		console.log(`symbol ->`, symbol)
 		let quote = resolved[ii++] as Quotes.Full
 		let wbticker = resolved[ii++] as Webull.Ticker
 		let wbquote = resolved[ii++] as Webull.Quote
@@ -106,13 +107,15 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 
 		applycalcs(quote, quote)
 
+		console.log(symbol, 'quote ->', quote)
+
 		Object.assign(QUOTES, { [symbol]: quote })
 		Object.assign(SAVES, { [symbol]: {} })
 		Object.assign(EMITS, { [symbol]: {} })
 
 		let rkey = `${rkeys.QUOTES}:${symbol}`
 		socket.emit(rkey, quote)
-		coms.push(['hmset', rkey, quote as any])
+		// coms.push(['hmset', rkey, quote as any])
 
 	})
 
@@ -177,13 +180,12 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let tokeys = Object.keys(toquote)
 	if (tokeys.length == 0) return;
 
-	if (process.env.SYMBOLS == 'STOCKS') {
-		applycalcs(quote, toquote)
-	}
+	applycalcs(quote, toquote)
 
 	Object.assign(QUOTES[symbol], toquote)
 	Object.assign(EMITS[symbol], toquote)
 	Object.assign(SAVES[symbol], toquote)
+
 	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
 
 })
@@ -193,15 +195,15 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 function applycalcs(quote: Quotes.Full, toquote: Quotes.Full) {
 	let symbol = quote.symbol
 
-	if (toquote.status) {
-		toquote.statusUpdatedAt = Date.now()
-	}
-
 	if (toquote.price) {
 		toquote.close = toquote.price
-		toquote.change = toquote.price - quote.eodPrice
-		toquote.percent = core.calc.percent(toquote.price, quote.eodPrice)
-		toquote.marketCap = core.number.round(toquote.price * quote.sharesOutstanding)
+		if (quote.eodPrice) {
+			toquote.change = toquote.price - quote.eodPrice
+			toquote.percent = core.calc.percent(toquote.price, quote.eodPrice)
+		}
+		if (quote.sharesOutstanding) {
+			toquote.marketCap = _.round(toquote.price * quote.sharesOutstanding)
+		}
 	}
 
 	if (toquote.askPrice || toquote.bidPrice) {
@@ -322,6 +324,10 @@ function applywbquote(quote: Quotes.Full, wbquote: Webull.Quote, toquote = {} as
 			}
 		}
 	})
+
+	if (toquote.status) {
+		toquote.statusUpdatedAt = Date.now()
+	}
 
 	return toquote
 }
