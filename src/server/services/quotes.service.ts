@@ -19,12 +19,35 @@ import clock from '../../common/clock'
 
 
 
+// export const override = {
+// 	rkey: '',
+// 	coms: (symbol: string) => [],
+// 	forEach: (opts: {
+// 		hubmsg: Pandora.HubMessage
+// 		symbol: string
+// 		ii: number
+// 		resolved: any[][]
+// 	}) => { },
+// }
+
+// export let eachSymbol: (opts: {
+// 	hubmsg: Pandora.HubMessage
+// 	symbol: string
+// 	instrument: Robinhood.Instrument
+// 	yhquote: Yahoo.Quote
+// 	iexbatch: Iex.Batch
+// 	wbticker: Webull.Ticker
+// 	wbquote: Webull.Quote
+// 	quote: any
+// }) => void
+
+
+
 export const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'>()
 export const CLIENTS = [] as webull.MqttClient[]
 export const QUOTES = {} as Dict<Quotes.Full>
 export const EMITS = {} as Dict<Quotes.Full>
 export const SAVES = {} as Dict<Quotes.Full>
-export let middleware: Promise<any>
 
 pandora.once('symbols.ready', onSymbols)
 pandora.broadcast({}, 'symbols.start')
@@ -63,50 +86,54 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 	let coms = [] as Redis.Coms
 	let ii = 0
 	symbols.forEach(function(symbol, i) {
-		let instrument = resolved[ii++] as Robinhood.Instrument
-		let yhquote = resolved[ii++] as Yahoo.Quote
-		let iexbatch = resolved[ii++] as Iex.Batch
-		let wbticker = resolved[ii++] as Webull.Ticker
-		let wbquote = resolved[ii++] as Webull.Quote
-		let quote = resolved[ii++] as Quotes.Full
+		override.forEach({ hubmsg, symbol, ii, resolved })
 
-		core.object.merge(quote, {
-			symbol,
-			tickerId: wbticker.tickerId,
-			typeof: process.env.SYMBOLS,
-			name: core.fallback(instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name),
-			fullName: core.fallback(instrument.name, yhquote.longName, wbticker.name),
-			alive: instrument.alive,
-			mic: instrument.mic,
-			acronym: instrument.acronym,
-			listDate: new Date(instrument.list_date).valueOf(),
-			country: core.fallback(instrument.country, wbticker.regionAlias).toUpperCase(),
-			exchange: core.fallback(iexbatch.company.exchange, iexbatch.quote.primaryExchange),
-			sharesOutstanding: _.round(core.fallback(wbquote.totalShares, yhquote.sharesOutstanding, iexbatch.stats.sharesOutstanding)),
-			sharesFloat: _.round(core.fallback(wbquote.outstandingShares, iexbatch.stats.float)),
-			avgVolume: _.round(core.fallback(wbquote.avgVolume, iexbatch.quote.avgTotalVolume)),
-			avgVolume10Day: _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day)),
-			avgVolume3Month: _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month)),
-		} as Quotes.Full)
+		// let instrument = resolved[ii++] as Robinhood.Instrument
+		// let yhquote = resolved[ii++] as Yahoo.Quote
+		// let iexbatch = resolved[ii++] as Iex.Batch
+		// let wbticker = resolved[ii++] as Webull.Ticker
+		// let wbquote = resolved[ii++] as Webull.Quote
+		// let quote = resolved[ii++] as Quotes.Full
 
-		core.object.repair(quote, onwbquote(quote, wbquote))
+		// eachSymbol({ hubmsg, symbol, instrument, yhquote, iexbatch, wbticker, wbquote, quote })
 
-		let reset = {
-			status: core.fallback(wbquote.faStatus, wbquote.status),
-			eodPrice: quote.price || quote.prevClose,
-			dayHigh: quote.price, dayLow: quote.price,
-			open: quote.price, high: quote.price, low: quote.price, close: quote.price,
-			count: 0, deals: 0, dealNum: 0,
-			bidVolume: 0, askVolume: 0,
-			volume: 0, size: 0,
-			dealVolume: 0, dealSize: 0,
-			buyVolume: 0, buySize: 0,
-			sellVolume: 0, sellSize: 0,
-		} as Quotes.Full
-		core.object.repair(quote, reset)
-		if (resets) core.object.merge(quote, reset);
+		// core.object.merge(quote, {
+		// 	symbol,
+		// 	tickerId: wbticker.tickerId,
+		// 	typeof: process.env.SYMBOLS,
+		// 	name: core.fallback(instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name),
+		// 	fullName: core.fallback(instrument.name, yhquote.longName, wbticker.name),
+		// 	alive: instrument.alive,
+		// 	mic: instrument.mic,
+		// 	acronym: instrument.acronym,
+		// 	listDate: new Date(instrument.list_date).valueOf(),
+		// 	country: core.fallback(instrument.country, wbticker.regionAlias).toUpperCase(),
+		// 	exchange: core.fallback(iexbatch.company.exchange, iexbatch.quote.primaryExchange),
+		// 	sharesOutstanding: _.round(core.fallback(wbquote.totalShares, yhquote.sharesOutstanding, iexbatch.stats.sharesOutstanding)),
+		// 	sharesFloat: _.round(core.fallback(wbquote.outstandingShares, iexbatch.stats.float)),
+		// 	avgVolume: _.round(core.fallback(wbquote.avgVolume, iexbatch.quote.avgTotalVolume)),
+		// 	avgVolume10Day: _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day)),
+		// 	avgVolume3Month: _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month)),
+		// } as Quotes.Full)
 
-		applycalcs(quote, quote)
+		// core.object.repair(quote, onwbquote(quote, wbquote))
+
+		// let reset = {
+		// 	status: core.fallback(wbquote.faStatus, wbquote.status),
+		// 	eodPrice: quote.price || quote.prevClose,
+		// 	dayHigh: quote.price, dayLow: quote.price,
+		// 	open: quote.price, high: quote.price, low: quote.price, close: quote.price,
+		// 	count: 0, deals: 0, dealNum: 0,
+		// 	bidVolume: 0, askVolume: 0,
+		// 	volume: 0, size: 0,
+		// 	dealVolume: 0, dealSize: 0,
+		// 	buyVolume: 0, buySize: 0,
+		// 	sellVolume: 0, sellSize: 0,
+		// } as Quotes.Full
+		// core.object.repair(quote, reset)
+		// if (resets) core.object.merge(quote, reset);
+
+		// applycalcs(quote, quote)
 
 		QUOTES[symbol] = quote
 		EMITS[symbol] = {} as any
