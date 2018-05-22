@@ -102,59 +102,83 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
-		// applywbquote(quote, { deal: wbquote.deal, tradeTime: wbquote.tradeTime } as Webull.Quote, toquote)
-		applydeal(quote, {
-			symbol,
-			side: wbquote.tradeBsFlag,
-			price: wbquote.deal,
-			size: wbquote.volume,
-			timestamp: wbquote.tradeTime,
-		}, toquote)
+		applywbdeal(quote, wbquote, toquote)
 	} else {
 		applywbquote(quote, wbquote, toquote)
 	}
 
-	if (Object.keys(toquote).length == 0) return;
-
-	if (topic == webull.mqtt_topics.TICKER_STATUS) {
-		toquote.statusUpdatedAt = Date.now()
-	}
+	let tokeys = Object.keys(toquote)
+	if (tokeys.length == 0) return;
 
 	applycalcs(quote, toquote)
-	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
+
 	Object.assign(QUOTES[symbol], toquote)
 	Object.assign(EMITS[symbol], toquote)
 	Object.assign(SAVES[symbol], toquote)
-	// socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
+	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
 
 })
 
 
 
-function applydeal(quote: Quotes.Full, deal: Quotes.Deal, toquote = {} as Quotes.Full) {
+function applycalcs(quote: Quotes.Full, toquote: Quotes.Full) {
 	let symbol = quote.symbol
 
-	toquote.deals++
-	if (deal.side == 'N') {
-		toquote.volume = quote.volume + deal.size
+	if (toquote.status) {
+		toquote.statusUpdatedAt = Date.now()
 	}
 
+	if (toquote.price) {
+		toquote.close = toquote.price
+		toquote.change = toquote.price - quote.eodPrice
+		toquote.percent = core.calc.percent(toquote.price, quote.eodPrice)
+		toquote.marketCap = core.number.round(toquote.price * quote.sharesOutstanding)
+	}
 
-	socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
+	if (toquote.askPrice || toquote.bidPrice) {
+		let bid = toquote.bidPrice || quote.bidPrice
+		let ask = toquote.askPrice || quote.askPrice
+		toquote.spread = ask - bid
+	}
+
 	return toquote
 }
 
 
 
-// topic: keyof typeof webull.mqtt_topics
-// const TOPIC_MAP = {} as Dict<Dict<KeyMapValue>>
-// Object.keys(KEY_MAP).forEach(k => {
-// 	let v = KEY_MAP[k]
-// 	if (!v.topic) return;
-// 	if (!TOPIC_MAP[v.topic]) TOPIC_MAP[v.topic] = {};
-// 	TOPIC_MAP[v.topic][k] = v
-// })
-// console.log(`TOPIC_MAP ->`, TOPIC_MAP)
+function applywbdeal(quote: Quotes.Full, wbdeal: Webull.Deal, toquote = {} as Quotes.Full) {
+	let symbol = quote.symbol
+
+	let deal = webull.toDeal(wbdeal)
+	socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
+
+	if (deal.timestamp > quote.timestamp) {
+		toquote.timestamp = deal.timestamp
+		if (deal.price != quote.price) {
+			toquote.price = deal.price
+		}
+	}
+
+	toquote.deals = quote.deals + 1
+	toquote.dealSize = quote.dealSize + deal.size
+	toquote.dealVolume = quote.dealVolume + deal.size
+
+	if (deal.side == 'B') {
+		toquote.buySize = quote.buySize + deal.size
+		toquote.buyVolume = quote.buyVolume + deal.size
+	}
+	else if (deal.side == 'S') {
+		toquote.sellSize = quote.sellSize + deal.size
+		toquote.sellVolume = quote.sellVolume + deal.size
+	}
+	else {
+		toquote.volume = quote.volume + deal.size
+	}
+
+	return toquote
+}
+
+
 
 interface KeyMapValue {
 	key: keyof Quotes.Full
@@ -165,118 +189,66 @@ const KEY_MAP = (({
 	'faStatus': ({ key: 'status' } as KeyMapValue) as any,
 	'status': ({ key: 'status' } as KeyMapValue) as any,
 	'status0': ({ key: 'status' } as KeyMapValue) as any,
+	// 
 	'open': ({ key: 'openPrice' } as KeyMapValue) as any,
 	'close': ({ key: 'closePrice' } as KeyMapValue) as any,
 	'preClose': ({ key: 'prevClose' } as KeyMapValue) as any,
+	// 
+	'high': ({ key: 'dayHigh' } as KeyMapValue) as any,
+	'low': ({ key: 'dayLow' } as KeyMapValue) as any,
 	'fiftyTwoWkHigh': ({ key: 'yearHigh' } as KeyMapValue) as any,
 	'fiftyTwoWkLow': ({ key: 'yearLow' } as KeyMapValue) as any,
+	// 
 	'bid': ({ key: 'bidPrice' } as KeyMapValue) as any,
 	'ask': ({ key: 'askPrice' } as KeyMapValue) as any,
 	'bidSize': ({ key: 'bidSize' } as KeyMapValue) as any,
 	'askSize': ({ key: 'askSize' } as KeyMapValue) as any,
+	// 
 	'totalShares': ({ key: 'sharesOutstanding' } as KeyMapValue) as any,
 	'outstandingShares': ({ key: 'sharesFloat' } as KeyMapValue) as any,
 	'turnoverRate': ({ key: 'turnoverRate' } as KeyMapValue) as any,
 	'vibrateRatio': ({ key: 'vibrateRatio' } as KeyMapValue) as any,
 	'yield': ({ key: 'yield' } as KeyMapValue) as any,
+	// 
 	'faTradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
 	'tradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
 	'mktradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
+	// 
 	'dealNum': ({ key: 'dealNum', gt: true } as KeyMapValue) as any,
 	'volume': ({ key: 'volume', gt: true } as KeyMapValue) as any,
 	// '____': ({ key: '____' } as KeyMapValue) as any,
 } as Webull.Quote) as any) as Dict<KeyMapValue>
 
-
-
-
-
-const NOT_EQUALS = (({
-	'faStatus': ('status' as keyof Quotes.Full) as any,
-	'status': ('status' as keyof Quotes.Full) as any,
-	'status0': ('status' as keyof Quotes.Full) as any,
-	// 'deal': ('price' as keyof Quotes.Full) as any,
-	// 'price': ('price' as keyof Quotes.Full) as any,
-	// 'pPrice': ('price' as keyof Quotes.Full) as any,
-	'open': ('openPrice' as keyof Quotes.Full) as any,
-	'close': ('closePrice' as keyof Quotes.Full) as any,
-	'preClose': ('prevClose' as keyof Quotes.Full) as any,
-	// 'high': ('dayHigh' as keyof Quotes.Full) as any,
-	// 'low': ('dayLow' as keyof Quotes.Full) as any,
-	'fiftyTwoWkHigh': ('yearHigh' as keyof Quotes.Full) as any,
-	'fiftyTwoWkLow': ('yearLow' as keyof Quotes.Full) as any,
-	'bid': ('bidPrice' as keyof Quotes.Full) as any,
-	'ask': ('askPrice' as keyof Quotes.Full) as any,
-	'bidSize': ('bidSize' as keyof Quotes.Full) as any,
-	'askSize': ('askSize' as keyof Quotes.Full) as any,
-	'totalShares': ('sharesOutstanding' as keyof Quotes.Full) as any,
-	'outstandingShares': ('sharesFloat' as keyof Quotes.Full) as any,
-	'turnoverRate': ('turnoverRate' as keyof Quotes.Full) as any,
-	'vibrateRatio': ('vibrateRatio' as keyof Quotes.Full) as any,
-	'yield': ('yield' as keyof Quotes.Full) as any,
-	// '____': ('____' as keyof Quotes.Full) as any,
-} as Webull.Quote) as any) as Dict<string>
-
-const TRADE_TIMES = (({
-	'faTradeTime': ('timestamp' as keyof Quotes.Full) as any,
-	'tradeTime': ('timestamp' as keyof Quotes.Full) as any,
-	'mktradeTime': ('timestamp' as keyof Quotes.Full) as any,
-} as Webull.Quote) as any) as Dict<string>
-
-const GREATER_THANS = (({
-	'dealNum': ('dealNum' as keyof Quotes.Full) as any,
-	'volume': ('volume' as keyof Quotes.Full) as any,
-} as Webull.Quote) as any) as Dict<string>
-
 function applywbquote(quote: Quotes.Full, wbquote: Webull.Quote, toquote = {} as Quotes.Full) {
 	let symbol = quote.symbol
-	// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
-	Object.keys(wbquote).forEach(wbkey => {
-		let source = wbquote[wbkey]
-		let key = NOT_EQUALS[wbkey]
-		if (key) {
-			let target = quote[key]
-			if (target != source) {
-				toquote[key] = source
-			}
-			return
+	Object.keys(wbquote).forEach(k => {
+		let wbvalue = wbquote[k]
+		let keymap = KEY_MAP[k]
+		if (!keymap) return;
+		let qkey = keymap.key
+		let qvalue = quote[qkey]
+		if (qvalue == null) {
+			toquote[qkey] = wbvalue
 		}
-		key = TRADE_TIMES[wbkey]
-		if (key) {
-			let target = quote[key]
-			if (target == null || source > target) {
-				toquote[key] = source
+		else if (keymap.gt || keymap.time) {
+			if (wbvalue > qvalue) {
+				toquote[qkey] = wbvalue
+				if (keymap.time) {
+					if (wbquote.tradeTime == wbquote.mktradeTime && wbquote.price && wbquote.price != quote.price) {
+						toquote.price = wbquote.price
+					}
+					else if (wbquote.tradeTime == wbquote.faTradeTime && wbquote.pPrice && wbquote.pPrice != quote.price) {
+						toquote.price = wbquote.pPrice
+					}
+				}
 			}
-			return
 		}
-		key = GREATER_THANS[wbkey]
-		if (key) {
-			let target = quote[key]
-			if (target == null || source > target) {
-				toquote[key] = source
+		else if (wbvalue != qvalue) {
+			if (wbvalue > qvalue) {
+				toquote[qkey] = wbvalue
 			}
-			return
 		}
 	})
-	// console.log(`toquote ->`, JSON.parse(JSON.stringify(toquote)))
-	return toquote
-}
-
-
-
-function applycalcs(quote: Quotes.Full, toquote: Quotes.Full) {
-	let symbol = quote.symbol
-	if (toquote.price) {
-		toquote.close = toquote.price
-		toquote.change = toquote.price - quote.eodPrice
-		toquote.percent = core.calc.percent(toquote.price, quote.eodPrice)
-		toquote.marketCap = core.number.round(toquote.price * quote.sharesOutstanding)
-	}
-	if (toquote.askPrice || toquote.bidPrice) {
-		let bid = toquote.bidPrice || quote.bidPrice
-		let ask = toquote.askPrice || quote.askPrice
-		toquote.spread = ask - bid
-	}
 	return toquote
 }
 
@@ -284,7 +256,41 @@ function applycalcs(quote: Quotes.Full, toquote: Quotes.Full) {
 
 
 
-import * as benchmarkify from 'benchmarkify'
-console.warn(`dtsgen benchmarkify ->`, console.dtsgen(benchmarkify))
+// const NOT_EQUALS = (({
+// 	'faStatus': ('status' as keyof Quotes.Full) as any,
+// 	'status': ('status' as keyof Quotes.Full) as any,
+// 	'status0': ('status' as keyof Quotes.Full) as any,
+// 	// 'deal': ('price' as keyof Quotes.Full) as any,
+// 	// 'price': ('price' as keyof Quotes.Full) as any,
+// 	// 'pPrice': ('price' as keyof Quotes.Full) as any,
+// 	'open': ('openPrice' as keyof Quotes.Full) as any,
+// 	'close': ('closePrice' as keyof Quotes.Full) as any,
+// 	'preClose': ('prevClose' as keyof Quotes.Full) as any,
+// 	// 'high': ('dayHigh' as keyof Quotes.Full) as any,
+// 	// 'low': ('dayLow' as keyof Quotes.Full) as any,
+// 	'fiftyTwoWkHigh': ('yearHigh' as keyof Quotes.Full) as any,
+// 	'fiftyTwoWkLow': ('yearLow' as keyof Quotes.Full) as any,
+// 	'bid': ('bidPrice' as keyof Quotes.Full) as any,
+// 	'ask': ('askPrice' as keyof Quotes.Full) as any,
+// 	'bidSize': ('bidSize' as keyof Quotes.Full) as any,
+// 	'askSize': ('askSize' as keyof Quotes.Full) as any,
+// 	'totalShares': ('sharesOutstanding' as keyof Quotes.Full) as any,
+// 	'outstandingShares': ('sharesFloat' as keyof Quotes.Full) as any,
+// 	'turnoverRate': ('turnoverRate' as keyof Quotes.Full) as any,
+// 	'vibrateRatio': ('vibrateRatio' as keyof Quotes.Full) as any,
+// 	'yield': ('yield' as keyof Quotes.Full) as any,
+// 	// '____': ('____' as keyof Quotes.Full) as any,
+// } as Webull.Quote) as any) as Dict<string>
+
+// const TRADE_TIMES = (({
+// 	'faTradeTime': ('timestamp' as keyof Quotes.Full) as any,
+// 	'tradeTime': ('timestamp' as keyof Quotes.Full) as any,
+// 	'mktradeTime': ('timestamp' as keyof Quotes.Full) as any,
+// } as Webull.Quote) as any) as Dict<string>
+
+// const GREATER_THANS = (({
+// 	'dealNum': ('dealNum' as keyof Quotes.Full) as any,
+// 	'volume': ('volume' as keyof Quotes.Full) as any,
+// } as Webull.Quote) as any) as Dict<string>
 
 

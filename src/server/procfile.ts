@@ -57,10 +57,10 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 	// 	SYMBOLS: 'FOREX',
 	// 	SCALE: 1,
 	// })
-	// Process(pandora.process('indexes.service').entry('./services/markets.service'), {
-	// 	SYMBOLS: 'INDEXES',
-	// 	SCALE: 1,
-	// })
+	Process(pandora.process('indexes.service').entry('./services/markets.service'), {
+		SYMBOLS: 'INDEXES',
+		SCALE: 1,
+	})
 
 
 

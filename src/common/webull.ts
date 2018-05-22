@@ -6,6 +6,14 @@ import * as core from './core'
 
 
 
+export const WB = {
+	SYMBOLS: 'wb:symbols',
+	TIDS: 'wb:tids',
+	TICKERS: 'wb:tickers',
+	QUOTES: 'wb:quotes',
+	DEALS: 'wb:deals',
+}
+
 export const forex = [
 	'BTCUSD', 'XAUUSD', 'XAGUSD',
 ]
@@ -18,18 +26,6 @@ export const indexes = [
 	'FVX', 'TNX', 'TYX', // treasury bonds
 	'SRVIX', 'VIX', // volatility
 ]
-
-
-
-export const WB = {
-	SYMBOLS: 'wb:symbols',
-	TIDS: 'wb:tids',
-	TICKERS: 'wb:tickers',
-	QUOTES: 'wb:quotes',
-	DEALS: 'wb:deals',
-}
-
-
 
 export enum ticker_status {
 	CLOSED = 'B',
@@ -97,6 +93,18 @@ export enum mqtt_topics {
 	TICKER_BID_ASK = 14,
 	TICKER_DEAL_DETAILS = 15,
 	MARKET_ETFS = 16,
+}
+
+
+
+export function toDeal(wbdeal: Webull.Deal) {
+	return {
+		price: wbdeal.deal,
+		side: wbdeal.tradeBsFlag,
+		size: wbdeal.volume,
+		symbol: wbdeal.symbol,
+		timestamp: wbdeal.tradeTime,
+	} as Quotes.Deal
 }
 
 
@@ -176,9 +184,9 @@ declare global {
 		interface BidAsk { price: number, volume: number }
 
 		interface Deal {
+			deal: number
 			symbol: string
 			tickerId: number
-			deal: number
 			tradeBsFlag: 'N' | 'B' | 'S'
 			tradeTime: number
 			volume: number

@@ -56,8 +56,8 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let quote = QUOTES[symbol]
 	let toquote = {} as Webull.Quote
 	if (!quote) return console.warn('ondata !quote symbol ->', symbol);
+	console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 
-	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 	Object.keys(wbquote).forEach(key => {
 		let target = quote[key]
 		let source = wbquote[key]
@@ -77,10 +77,10 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	})
 
 	if (Object.keys(toquote).length == 0) return;
-	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
 	core.object.merge(QUOTES[symbol], toquote)
 	core.object.merge(EMITS[symbol], toquote)
 	core.object.merge(SAVES[symbol], toquote)
+	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
 
 })
 
