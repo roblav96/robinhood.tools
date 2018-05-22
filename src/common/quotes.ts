@@ -6,6 +6,9 @@ import * as rkeys from './rkeys'
 
 export const BASIC = {
 	symbol: '',
+	tickerId: 0,
+	name: '',
+	typeof: '' as keyof typeof rkeys.SYMBOLS,
 	price: 0,
 	change: 0,
 	percent: 0,
@@ -13,11 +16,11 @@ export const BASIC = {
 	openPrice: 0,
 	closePrice: 0,
 	prevClose: 0,
+	volume: 0,
+	size: 0,
 	timestamp: 0,
 }
 Object.keys(BASIC).forEach(k => BASIC[k] = undefined)
-
-
 
 export const LIVE = {
 	status: '',
@@ -34,8 +37,6 @@ export const LIVE = {
 	dayHigh: 0,
 	dayLow: 0,
 	// 
-	volume: 0,
-	size: 0,
 	marketCap: 0,
 	// 
 	spread: 0,
@@ -63,27 +64,22 @@ export const LIVE = {
 	vibrateRatio: 0,
 	yield: 0,
 	// 
+	quoteMaker: '',
+	quoteMakerAddress: '',
 }
 Object.keys(LIVE).forEach(k => LIVE[k] = undefined)
 
-
-
 export const CALC = {
-
 }
 Object.keys(CALC).forEach(k => CALC[k] = undefined)
 
-
-
 export const FULL = {
-	tickerId: 0,
-	name: '',
 	fullName: '',
-	typeof: '' as keyof typeof rkeys.SYMBOLS,
 	mic: '',
 	acronym: '',
-	country: '',
 	exchange: '',
+	country: '',
+	currency: '',
 	listDate: 0,
 	// 
 	avgVolume: 0,
@@ -91,7 +87,6 @@ export const FULL = {
 	avgVolume3Month: 0,
 	sharesOutstanding: 0,
 	sharesFloat: 0,
-	// 
 }
 Object.keys(FULL).forEach(k => FULL[k] = undefined)
 

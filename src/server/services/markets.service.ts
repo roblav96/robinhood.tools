@@ -13,7 +13,7 @@ const { emitter, QUOTES, SAVES, EMITS } = watcher
 
 
 
-watcher.rkey = rkeys.WB.QUOTES
+watcher.RKEY = rkeys.WB.QUOTES
 
 watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
 
@@ -27,6 +27,7 @@ watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
 	symbols.forEach(function(symbol, i) {
 		let wbticker = resolved[ii++] as Webull.Ticker
 		let wbquote = resolved[ii++] as Webull.Quote
+		console.log(`wbquote ->`, wbquote)
 		core.object.merge(wbquote, {
 			symbol,
 			tickerId: wbticker.tickerId,
@@ -40,39 +41,37 @@ watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
 
 
 
-const GREATER_THANS = {
-	faTradeTime: 1,
-	mktradeTime: 1,
-	tradeTime: 1,
-} as Webull.Quote
-
-const DOES_RESET = {
-	dealNum: 1,
-	volume: 1,
-} as Webull.Quote
+type TKeyMapValue = KeyMapValue<Webull.Quote>
+const KEY_MAP = (({
+	faStatus: ({ greater: true } as TKeyMapValue) as any,
+	faTradeTime: ({ greater: true } as TKeyMapValue) as any,
+	mktradeTime: ({ greater: true } as TKeyMapValue) as any,
+	tradeTime: ({ greater: true } as TKeyMapValue) as any,
+	dealNum: ({ greater: true, resets: true } as TKeyMapValue) as any,
+	volume: ({ greater: true, resets: true } as TKeyMapValue) as any,
+} as Webull.Quote) as any) as Dict<TKeyMapValue>
 
 emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let symbol = wbquote.symbol
 	let quote = QUOTES[symbol]
 	let toquote = {} as Webull.Quote
 	if (!quote) return console.warn('ondata !quote symbol ->', symbol);
-	console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
+	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 
-	Object.keys(wbquote).forEach(key => {
-		let target = quote[key]
-		let source = wbquote[key]
-		if (GREATER_THANS[key]) {
-			if (source > target) {
-				toquote[key] = source
+	Object.keys(wbquote).forEach(k => {
+		let target = quote[k]
+		let source = wbquote[k]
+		let keymap = KEY_MAP[k]
+		if (keymap) {
+			if (keymap.greater && source > target) {
+				toquote[k] = source
 			}
-		}
-		else if (DOES_RESET[key]) {
-			if (source > target || Math.abs(core.calc.percent(source, target)) > 5) {
-				toquote[key] = source
+			if (keymap.resets && Math.abs(core.calc.percent(source, target)) > 50) {
+				toquote[k] = source
 			}
 		}
 		else if (source != target) {
-			toquote[key] = source
+			toquote[k] = source
 		}
 	})
 
@@ -90,9 +89,9 @@ clock.on('5s', function onsave() {
 	let symbols = Object.keys(SAVES).filter(k => Object.keys(SAVES[k]).length > 0)
 	if (symbols.length == 0) return;
 	let coms = []
-	symbols.forEach(k => coms.push(['hmset', `${rkeys.QUOTES}:${k}`, SAVES[k]]))
+	symbols.forEach(v => coms.push(['hmset', `${rkeys.QUOTES}:${v}`, SAVES[v]]))
 	redis.main.coms(coms)
-	symbols.forEach(k => SAVES[k] = {} as any)
+	symbols.forEach(v => Object.assign(SAVES, { [v]: {} }))
 })
 
 

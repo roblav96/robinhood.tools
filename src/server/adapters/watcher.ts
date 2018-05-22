@@ -14,24 +14,29 @@ import clock from '../../common/clock'
 
 
 declare global {
-	namespace NodeJS { export interface ProcessEnv { SYMBOLS: SymbolsTypes } }
 	namespace Webull {
 		interface Watcher<T> {
-			rkey: string
 			onSymbols: typeof onSymbols
 			emitter: typeof emitter
 			QUOTES: Dict<T>
 			SAVES: Dict<T>
 			EMITS: Dict<T>
+			RKEY: string
 		}
 	}
+	interface KeyMapValue<T> {
+		key: keyof T
+		greater: boolean
+		resets: boolean
+		time: boolean
+	}
 }
-export let rkey = ''
 export let onSymbols = _.noop as (hubmsg: Pandora.HubMessage, symbols: string[]) => Promise<void>
 export const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'>()
 export const QUOTES = {} as Dict
 export const SAVES = {} as Dict
 export const EMITS = {} as Dict
+export let RKEY = ''
 
 const CLIENTS = [] as webull.MqttClient[]
 
@@ -59,16 +64,15 @@ async function onsymbols(hubmsg: Pandora.HubMessage) {
 
 	await onSymbols(hubmsg, symbols)
 
-	if (_.isEmpty(QUOTES)) {
-		return console.error(`onsymbols Error ->`, '_.isEmpty(QUOTES)')
-	}
+	if (_.isEmpty(QUOTES)) return console.error(`onsymbols Error ->`, '_.isEmpty(QUOTES)');
 
 	await redis.main.coms(symbols.map(function(symbol, i) {
-		EMITS[symbol] = {} as any
-		SAVES[symbol] = {} as any
+		Object.assign(SAVES, { [symbol]: {} })
+		Object.assign(EMITS, { [symbol]: {} })
 		let quote = QUOTES[symbol]
-		socket.emit(`${rkey}:${symbol}`, quote)
-		return ['hmset', `${rkey}:${symbol}`, quote as any]
+		let rkey = `${RKEY}:${symbol}`
+		socket.emit(rkey, quote)
+		return ['hmset', rkey, quote as any]
 	}))
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 128))
@@ -93,11 +97,11 @@ clock.on('5s', function onconnect() {
 
 clock.on('1s', function onsocket() {
 	Object.keys(EMITS).forEach(symbol => {
-		let toquote = EMITS[symbol]
-		if (Object.keys(toquote).length == 0) return;
-		toquote.symbol = symbol
-		socket.emit(`${rkey}:${symbol}`, toquote)
-		EMITS[symbol] = {} as any
+		let quote = EMITS[symbol]
+		if (Object.keys(quote).length == 0) return;
+		quote.symbol = symbol
+		socket.emit(`${RKEY}:${symbol}`, quote)
+		Object.assign(EMITS, { [symbol]: {} })
 	})
 })
 

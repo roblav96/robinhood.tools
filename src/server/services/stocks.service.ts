@@ -13,7 +13,7 @@ const { emitter, QUOTES, SAVES, EMITS } = watcher
 
 
 
-watcher.rkey = rkeys.QUOTES
+watcher.RKEY = rkeys.QUOTES
 
 watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
 	let resets = hubmsg.action == 'symbols.reset'
@@ -34,6 +34,7 @@ watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
 		let yhquote = resolved[ii++] as Yahoo.Quote
 		let iexbatch = resolved[ii++] as Iex.Batch
 		let wbticker = resolved[ii++] as Webull.Ticker
+		console.log('wbticker ->', wbticker)
 		let wbquote = resolved[ii++] as Webull.Quote
 		let quote = resolved[ii++] as Quotes.Full
 
@@ -43,12 +44,13 @@ watcher.onSymbols = async function onsymbols(hubmsg, symbols) {
 			typeof: process.env.SYMBOLS,
 			name: core.fallback(instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name),
 			fullName: core.fallback(instrument.name, yhquote.longName, wbticker.name),
+			currency: wbquote.currency,
 			status: core.fallback(wbquote.faStatus, wbquote.status),
 			alive: instrument.alive,
 			mic: instrument.mic,
 			acronym: instrument.acronym,
 			listDate: new Date(instrument.list_date).valueOf(),
-			country: core.fallback(instrument.country, wbticker.regionAlias).toUpperCase(),
+			country: core.fallback(instrument.country, wbquote.countryISOCode, wbquote.regionAlias).toUpperCase(),
 			exchange: core.fallback(iexbatch.company.exchange, iexbatch.quote.primaryExchange),
 			sharesOutstanding: _.round(core.fallback(wbquote.totalShares, yhquote.sharesOutstanding, iexbatch.stats.sharesOutstanding)),
 			sharesFloat: _.round(core.fallback(wbquote.outstandingShares, iexbatch.stats.float)),
@@ -180,44 +182,40 @@ function applywbdeal(quote: Quotes.Full, wbdeal: Webull.Deal, toquote = {} as Qu
 
 
 
-interface KeyMapValue {
-	key: keyof Quotes.Full
-	gt: boolean
-	time: boolean
-}
+type TKeyMapValue = KeyMapValue<Quotes.Full>
 const KEY_MAP = (({
-	'faStatus': ({ key: 'status' } as KeyMapValue) as any,
-	'status': ({ key: 'status' } as KeyMapValue) as any,
-	'status0': ({ key: 'status' } as KeyMapValue) as any,
+	'faStatus': ({ key: 'status' } as TKeyMapValue) as any,
+	'status': ({ key: 'status' } as TKeyMapValue) as any,
+	'status0': ({ key: 'status' } as TKeyMapValue) as any,
 	// 
-	'open': ({ key: 'openPrice' } as KeyMapValue) as any,
-	'close': ({ key: 'closePrice' } as KeyMapValue) as any,
-	'preClose': ({ key: 'prevClose' } as KeyMapValue) as any,
+	'open': ({ key: 'openPrice' } as TKeyMapValue) as any,
+	'close': ({ key: 'closePrice' } as TKeyMapValue) as any,
+	'preClose': ({ key: 'prevClose' } as TKeyMapValue) as any,
 	// 
-	'high': ({ key: 'dayHigh' } as KeyMapValue) as any,
-	'low': ({ key: 'dayLow' } as KeyMapValue) as any,
-	'fiftyTwoWkHigh': ({ key: 'yearHigh' } as KeyMapValue) as any,
-	'fiftyTwoWkLow': ({ key: 'yearLow' } as KeyMapValue) as any,
+	'high': ({ key: 'dayHigh' } as TKeyMapValue) as any,
+	'low': ({ key: 'dayLow' } as TKeyMapValue) as any,
+	'fiftyTwoWkHigh': ({ key: 'yearHigh' } as TKeyMapValue) as any,
+	'fiftyTwoWkLow': ({ key: 'yearLow' } as TKeyMapValue) as any,
 	// 
-	'bid': ({ key: 'bidPrice' } as KeyMapValue) as any,
-	'ask': ({ key: 'askPrice' } as KeyMapValue) as any,
-	'bidSize': ({ key: 'bidSize' } as KeyMapValue) as any,
-	'askSize': ({ key: 'askSize' } as KeyMapValue) as any,
+	'bid': ({ key: 'bidPrice' } as TKeyMapValue) as any,
+	'ask': ({ key: 'askPrice' } as TKeyMapValue) as any,
+	'bidSize': ({ key: 'bidSize' } as TKeyMapValue) as any,
+	'askSize': ({ key: 'askSize' } as TKeyMapValue) as any,
 	// 
-	'totalShares': ({ key: 'sharesOutstanding' } as KeyMapValue) as any,
-	'outstandingShares': ({ key: 'sharesFloat' } as KeyMapValue) as any,
-	'turnoverRate': ({ key: 'turnoverRate' } as KeyMapValue) as any,
-	'vibrateRatio': ({ key: 'vibrateRatio' } as KeyMapValue) as any,
-	'yield': ({ key: 'yield' } as KeyMapValue) as any,
+	'totalShares': ({ key: 'sharesOutstanding' } as TKeyMapValue) as any,
+	'outstandingShares': ({ key: 'sharesFloat' } as TKeyMapValue) as any,
+	'turnoverRate': ({ key: 'turnoverRate' } as TKeyMapValue) as any,
+	'vibrateRatio': ({ key: 'vibrateRatio' } as TKeyMapValue) as any,
+	'yield': ({ key: 'yield' } as TKeyMapValue) as any,
 	// 
-	'faTradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
-	'tradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
-	'mktradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
+	'faTradeTime': ({ key: 'timestamp', time: true } as TKeyMapValue) as any,
+	'tradeTime': ({ key: 'timestamp', time: true } as TKeyMapValue) as any,
+	'mktradeTime': ({ key: 'timestamp', time: true } as TKeyMapValue) as any,
 	// 
-	'dealNum': ({ key: 'dealNum', gt: true } as KeyMapValue) as any,
-	'volume': ({ key: 'volume', gt: true } as KeyMapValue) as any,
-	// '____': ({ key: '____' } as KeyMapValue) as any,
-} as Webull.Quote) as any) as Dict<KeyMapValue>
+	'dealNum': ({ key: 'dealNum', greater: true } as TKeyMapValue) as any,
+	'volume': ({ key: 'volume', greater: true } as TKeyMapValue) as any,
+	// '____': ({ key: '____' } as TKeyMapValue) as any,
+} as Webull.Quote) as any) as Dict<TKeyMapValue>
 
 function applywbquote(quote: Quotes.Full, wbquote: Webull.Quote, toquote = {} as Quotes.Full) {
 	let symbol = quote.symbol
@@ -230,7 +228,7 @@ function applywbquote(quote: Quotes.Full, wbquote: Webull.Quote, toquote = {} as
 		if (qvalue == null) {
 			toquote[qkey] = wbvalue
 		}
-		else if (keymap.gt || keymap.time) {
+		else if (keymap.greater || keymap.time) {
 			if (wbvalue > qvalue) {
 				toquote[qkey] = wbvalue
 				if (keymap.time) {
