@@ -46,10 +46,10 @@ export function fix(quote: Webull.Quote) {
 async function getChunked(fsymbols: Dict<number>, url: string, wbauth = false) {
 	let inverse = _.invert(fsymbols)
 	let tids = Object.values(fsymbols)
-	let chunks = core.array.chunks(tids, _.ceil(tids.length / 128)).map(v => v.join(','))
+	let chunks = core.array.chunks(tids, _.ceil(tids.length / 128))
 	let items = await pAll(chunks.map(chunk => {
 		return () => http.get(url, {
-			query: { tickerIds: chunk, hl: 'en' }, // wbauth,
+			query: { tickerIds: chunk.join(','), hl: 'en' }, // wbauth,
 		})
 	}), { concurrency: 1 })
 	items = _.flatten(items)
