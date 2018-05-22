@@ -64,8 +64,8 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		let yhquote = resolved[ii++] as Yahoo.Quote
 		let iexbatch = resolved[ii++] as Iex.Batch
 
-		console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
-		console.log('wbquote ->', JSON.parse(JSON.stringify(wbquote)))
+		// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
+		// console.log('wbquote ->', JSON.parse(JSON.stringify(wbquote)))
 
 		core.object.merge(quote, {
 			symbol,
@@ -90,15 +90,14 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 			avgVolume3Month: _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month)),
 		} as Quotes.Full)
 
-		let toquote = {} as Quotes.Full
-		applywbquote(quote, wbquote, toquote)
+		let toquote = applywbquote(quote, wbquote)
 		core.object.repair(quote, toquote)
 
 		let reset = {
 			eodPrice: quote.price,
 			dayHigh: quote.price, dayLow: quote.price,
 			open: quote.price, high: quote.price, low: quote.price, close: quote.price,
-			count: 0, deals: 0, dealNum: 0,
+			count: 0, deals: 0,
 			bidVolume: 0, askVolume: 0,
 			volume: 0, size: 0,
 			dealVolume: 0, dealSize: 0,
@@ -110,7 +109,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 
 		applycalcs(quote, quote)
 
-		console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
+		// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
 
 		Object.assign(QUOTES, { [symbol]: quote })
 		Object.assign(SAVES, { [symbol]: {} })
@@ -122,7 +121,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 
 	})
 
-	// await redis.main.coms(coms)
+	await redis.main.coms(coms)
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 128))
 	CLIENTS.splice(0, Infinity, ...chunks.map((chunk, i) => new webull.MqttClient({
@@ -152,7 +151,7 @@ clock.on('5s', function onsave() {
 		coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, quote as any])
 		Object.assign(SAVES, { [symbol]: {} })
 	})
-	// if (coms.length > 0) redis.main.coms(coms);
+	if (coms.length > 0) redis.main.coms(coms);
 })
 
 clock.on('1s', function onsocket() {
@@ -168,11 +167,11 @@ clock.on('1s', function onsocket() {
 
 
 emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
-	return
 	let symbol = wbquote.symbol
 	let quote = QUOTES[symbol]
 	let toquote = {} as Quotes.Full
 	if (!quote) return console.warn('ondata !quote symbol ->', symbol);
+
 	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
@@ -184,13 +183,13 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let tokeys = Object.keys(toquote)
 	if (tokeys.length == 0) return;
 
+	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
+
 	applycalcs(quote, toquote)
 
 	Object.assign(QUOTES[symbol], toquote)
 	Object.assign(EMITS[symbol], toquote)
 	Object.assign(SAVES[symbol], toquote)
-
-	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
 
 })
 
@@ -284,14 +283,11 @@ const KEY_MAP = (({
 	'vibrateRatio': ({ key: 'vibrateRatio' } as KeyMapValue) as any,
 	'yield': ({ key: 'yield' } as KeyMapValue) as any,
 	// 
-	// 'price': ({ key: 'price', onlynull: true } as KeyMapValue) as any,
-	// 'pPrice': ({ key: 'price', onlynull: true } as KeyMapValue) as any,
-	// 
 	'faTradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
 	'tradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
 	'mktradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
 	// 
-	'dealNum': ({ key: 'dealNum', greater: true, resets: true } as KeyMapValue) as any,
+	'dealNum': ({ key: 'deals', greater: true, resets: true } as KeyMapValue) as any,
 	'volume': ({ key: 'volume', greater: true, resets: true } as KeyMapValue) as any,
 	// '____': ({ key: '____' } as KeyMapValue) as any,
 } as Webull.Quote) as any) as Dict<KeyMapValue>

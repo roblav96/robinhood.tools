@@ -4,6 +4,7 @@ import * as rkeys from './rkeys'
 
 
 
+declare global { namespace Quotes { type IBasic = typeof BASIC; interface Basic extends IBasic { } } }
 export const BASIC = {
 	symbol: '',
 	tickerId: 0,
@@ -21,10 +22,10 @@ export const BASIC = {
 	timestamp: 0,
 }
 Object.keys(BASIC).forEach(k => BASIC[k] = undefined)
-declare global { namespace Quotes { type IBasic = typeof BASIC; interface Basic extends IBasic { } } }
 
 
 
+declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Basic { } } }
 export const LIVE = {
 	status: '',
 	statusUpdatedAt: 0,
@@ -40,8 +41,6 @@ export const LIVE = {
 	dayHigh: 0,
 	dayLow: 0,
 	// 
-	marketCap: 0,
-	// 
 	spread: 0,
 	bidPrice: 0,
 	askPrice: 0,
@@ -50,7 +49,6 @@ export const LIVE = {
 	bidVolume: 0,
 	askVolume: 0,
 	// 
-	dealNum: 0,
 	count: 0,
 	deals: 0,
 	dealVolume: 0,
@@ -63,6 +61,7 @@ export const LIVE = {
 	buySize: 0,
 	sellSize: 0,
 	// 
+	marketCap: 0,
 	turnoverRate: 0,
 	vibrateRatio: 0,
 	yield: 0,
@@ -71,18 +70,18 @@ export const LIVE = {
 	quoteMakerAddress: '',
 }
 Object.keys(LIVE).forEach(k => LIVE[k] = undefined)
-declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Basic { } } }
 
 
 
+declare global { namespace Quotes { type ICalc = typeof CALC; interface Calc extends ICalc, Live { } } }
 export const CALC = {
 
 }
 Object.keys(CALC).forEach(k => CALC[k] = undefined)
-declare global { namespace Quotes { type ICalc = typeof CALC; interface Calc extends ICalc, Live { } } }
 
 
 
+declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
 export const FULL = {
 	fullName: '',
 	mic: '',
@@ -99,10 +98,10 @@ export const FULL = {
 	sharesFloat: 0,
 }
 Object.keys(FULL).forEach(k => FULL[k] = undefined)
-declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
 
 
 
+declare global { namespace Quotes { type IDeal = typeof DEAL; interface Deal extends IDeal { } } }
 export const DEAL = {
 	symbol: '',
 	price: 0,
@@ -111,7 +110,6 @@ export const DEAL = {
 	timestamp: 0,
 }
 Object.keys(DEAL).forEach(k => DEAL[k] = undefined)
-declare global { namespace Quotes { type IDeal = typeof DEAL; interface Deal extends IDeal { } } }
 
 
 
