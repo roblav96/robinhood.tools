@@ -31,8 +31,7 @@ async function start() {
 
 	// await redis.main.del(rkeys.WB.SYMBOLS)
 	let tickers = await redis.main.exists(rkeys.WB.SYMBOLS)
-	// if (tickers == 0)
-	await syncTickers();
+	if (tickers == 0) await syncTickers();
 
 	// await redis.main.del(rkeys.SYMBOLS.STOCKS)
 	let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)

@@ -44,46 +44,79 @@ export function fix(quote: Webull.Quote) {
 
 
 
-async function getItems(fsymbols: Dict<number>, url: string, wbauth = false) {
+export async function syncTickersQuotes(fsymbols: Dict<number>) {
 	let inverse = _.invert(fsymbols)
 	let tickerIds = Object.values(fsymbols)
-	if (tickerIds.length > 128) throw boom.entityTooLarge('tickerIds -> ' + tickerIds.length)
-	return http.get(url, {
-		query: { tickerIds: tickerIds.join(','), hl: 'en' }, wbauth,
-	}).then((items: any[]) => {
-		items.forEach(item => {
-			core.fix(item)
-			fix(item)
-			item.symbol = inverse[item.tickerId]
+	let chunks = core.array.chunks(tickerIds, _.floor(tickerIds.length / 100))
+	await pAll(chunks.map(chunk => {
+		return () => Promise.all([
+			http.get('https://securitiesapi.webull.com/api/securities/ticker/v2', {
+				query: { tickerIds: chunk.join(','), hl: 'en' },
+			}),
+			http.get('https://quoteapi.webull.com/api/quote/tickerRealTimes/full', {
+				query: { tickerIds: chunk.join(','), hl: 'en' }, wbauth: true,
+			}),
+		]).then(function(resolved: any[][]) {
+			let coms = []
+			resolved.forEach((items, i) => {
+				items.forEach(item => {
+					core.fix(item)
+					fix(item)
+					item.symbol = inverse[item.tickerId]
+					if (i == 0) coms.push(['hmset', `${rkeys.WB.TICKERS}:${item.symbol}`, item]);
+					if (i == 1) coms.push(['hmset', `${rkeys.WB.QUOTES}:${item.symbol}`, item]);
+				})
+			})
+			return redis.main.coms(coms)
 		})
-		return items
-	})
-}
-
-export function getFullQuotes(fsymbols: Dict<number>): Promise<Webull.Quote[]> {
-	return getItems(fsymbols, 'https://quoteapi.webull.com/api/quote/tickerRealTimes/full', true)
-}
-
-export function getTickers(fsymbols: Dict<number>): Promise<Webull.Ticker[]> {
-	return getItems(fsymbols, 'https://securitiesapi.webull.com/api/securities/ticker/v2')
-}
-
-export async function syncTickersQuotes(fsymbols: Dict<number>) {
-	let coms = [] as Redis.Coms
-	let wbquotes = await getFullQuotes(fsymbols)
-	wbquotes.forEach(function(v) {
-		let rkey = `${rkeys.WB.QUOTES}:${v.symbol}`
-		coms.push(['hmset', rkey, v as any])
-	})
-	let wbtickers = await getTickers(fsymbols)
-	wbtickers.forEach(function(v) {
-		let rkey = `${rkeys.WB.TICKERS}:${v.symbol}`
-		coms.push(['hmset', rkey, v as any])
-	})
-	await redis.main.coms(coms)
+	}), { concurrency: 1 })
 }
 
 
+
+
+
+// async function getItems(fsymbols: Dict<number>, url: string, wbauth = false) {
+// 	let inverse = _.invert(fsymbols)
+// 	let tickerIds = Object.values(fsymbols)
+// 	if (tickerIds.length > 128) {
+// 		console.error(`getItems tickerIds > 128`)
+// 		return []
+// 	}
+// 	return http.get(url, {
+// 		query: { tickerIds: tickerIds.join(','), hl: 'en' }, wbauth,
+// 	}).then((items: any[]) => {
+// 		items.forEach(item => {
+// 			core.fix(item)
+// 			fix(item)
+// 			item.symbol = inverse[item.tickerId]
+// 		})
+// 		return items
+// 	})
+// }
+
+// export function getFullQuotes(fsymbols: Dict<number>): Promise<Webull.Quote[]> {
+// 	return getItems(fsymbols, 'https://quoteapi.webull.com/api/quote/tickerRealTimes/full', true)
+// }
+
+// export function getTickers(fsymbols: Dict<number>): Promise<Webull.Ticker[]> {
+// 	return getItems(fsymbols, 'https://securitiesapi.webull.com/api/securities/ticker/v2')
+// }
+
+// export async function syncTickersQuotes(fsymbols: Dict<number>) {
+// 	let coms = [] as Redis.Coms
+// 	let wbquotes = await getFullQuotes(fsymbols)
+// 	wbquotes.forEach(function(v) {
+// 		let rkey = `${rkeys.WB.QUOTES}:${v.symbol}`
+// 		coms.push(['hmset', rkey, v as any])
+// 	})
+// 	let wbtickers = await getTickers(fsymbols)
+// 	wbtickers.forEach(function(v) {
+// 		let rkey = `${rkeys.WB.TICKERS}:${v.symbol}`
+// 		coms.push(['hmset', rkey, v as any])
+// 	})
+// 	await redis.main.coms(coms)
+// }
 
 
 
