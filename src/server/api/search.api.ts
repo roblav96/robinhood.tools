@@ -23,7 +23,7 @@ polka.route({
 		let { results } = await http.get('https://api.robinhood.com/instruments/', {
 			query: { query }, retries: 0,
 		}) as Robinhood.Api.Paginated<Robinhood.Instrument>
-		results.remove(v => !v || !v.symbol || Array.isArray(v.symbol.match(utils.symbolFilter)))
+		results.remove(v => !v || !v.symbol || Array.isArray(v.symbol.match(utils.matchSymbol)))
 		// console.log('results ->', results)
 		return results.map(v => _.pick(v, IKEYS))
 		// let instruments = await getInstruments(results.map(v => v.symbol))

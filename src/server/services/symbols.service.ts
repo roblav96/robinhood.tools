@@ -45,7 +45,7 @@ async function start() {
 
 	// await redis.main.del(rkeys.SYMBOLS.INDEXES)
 	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
-	if (indexes == 0) await syncIndexes(webull.indexes);
+	if (indexes == 0) await syncIndexes();
 
 	ready = true
 	pandora.broadcast({}, 'symbols.ready')
@@ -69,7 +69,7 @@ schedule.scheduleJob('00 4 * * 1-5', async function reset() {
 async function syncInstruments() {
 	await pForever(async function getInstruments(url) {
 		let { results, next } = await http.get(url) as Robinhood.Api.Paginated<Robinhood.Instrument>
-		results.remove(v => Array.isArray(v.symbol.match(utils.symbolFilter)))
+		results.remove(v => Array.isArray(v.symbol.match(utils.matchSymbol)))
 
 		if (process.env.DEVELOPMENT) console.log('getInstruments ->', results.length, next);
 
@@ -94,7 +94,8 @@ async function syncInstruments() {
 }
 
 async function syncTickers() {
-	if (process.env.DEVELOPMENT) console.info('syncTickers start ->')
+	if (process.env.DEVELOPMENT) console.info('syncTickers start ->');
+
 	let tickers = await Promise.all([
 		// stocks
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/8', {
@@ -106,7 +107,7 @@ async function syncTickers() {
 		}),
 	]) as Webull.Ticker[]
 	tickers = _.flatten(tickers)
-	tickers.remove(v => Array.isArray(v.disSymbol.match(utils.symbolFilter)))
+	tickers.remove(v => Array.isArray(v.disSymbol.match(utils.matchSymbol)))
 	tickers.forEach(core.fix)
 	tickers.forEach(v => {
 		if (!v.disSymbol.includes('-')) return;
@@ -131,11 +132,13 @@ async function syncTickers() {
 	coms.push(['hmset', rkeys.WB.TIDS, fsymbols as any])
 	scoms.merge(coms)
 	await redis.main.coms(coms)
+
 	await webull.syncTickersQuotes(fsymbols)
 	let symbols = Object.keys(fsymbols)
 	let yhquotes = await yahoo.getQuotes(symbols)
 	await redis.main.coms(yhquotes.map(v => ['hmset', `${rkeys.YH.QUOTES}:${v.symbol}`, v as any]))
-	await iex.sync(symbols)
+	await iex.syncBatch(symbols)
+
 	if (process.env.DEVELOPMENT) console.info('syncTickers done ->', symbols.length);
 }
 
@@ -163,24 +166,24 @@ async function syncStocks() {
 }
 
 async function syncForex() {
-	let symbols = ['BTCUSD', 'XAUUSD', 'XAGUSD']
+	let symbols = core.clone(webull.forex)
 	webull.fiats.forEach(v => webull.fiats.forEach(vv => {
 		if (v == vv) return;
 		symbols.push(v + vv)
 	}))
 	let tickers = await pAll(symbols.map(symbol => {
 		return () => getTicker(symbol, 6)
-	}), { concurrency: 2 })
+	}), { concurrency: 1 })
 	tickers.remove(v => !v)
 	await finishSync('FOREX', tickers)
 	if (process.env.DEVELOPMENT) console.info('syncForex done ->', tickers.length);
 }
 
-async function syncIndexes(indexes: string[]) {
-	let symbols = core.clone(indexes)
+async function syncIndexes() {
+	let symbols = core.clone(webull.indexes)
 	let tickers = await pAll(symbols.map(symbol => {
 		return () => getTicker(symbol, 1)
-	}), { concurrency: 2 })
+	}), { concurrency: 1 })
 	let response = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/globalIndices/1') as Webull.Api.MarketIndex[]
 	response.forEach(v => v.marketIndexList.forEach(vv => tickers.push(vv)))
 	tickers.remove(v => !v || (v.secType && v.secType.includes(52)) || v.disSymbol == 'IBEX')

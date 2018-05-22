@@ -28,7 +28,7 @@ export function getBatch(symbols: string[], types = [
 
 
 
-export async function sync(symbols: string[]) {
+export async function syncBatch(symbols: string[]) {
 	let chunks = core.array.chunks(symbols, _.ceil(symbols.length / 100))
 	let response = await pAll(chunks.map(chunk => {
 		return () => getBatch(chunk).then(async function(response: Iex.BatchResponse) {

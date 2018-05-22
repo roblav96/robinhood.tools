@@ -6,15 +6,18 @@ import * as core from './core'
 
 
 
+export const forex = [
+	'BTCUSD', 'XAUUSD', 'XAGUSD',
+]
 export const fiats = [
 	'AUD', 'CAD', 'CHF', 'CNH', 'CNY', 'EUR', 'GBP', 'HDK', 'JPY', 'NZD', 'RUB', 'USD',
-] as string[]
+]
 
 export const indexes = [
 	'RUI', 'RUT', // russell 2000
 	'FVX', 'TNX', 'TYX', // treasury bonds
 	'SRVIX', 'VIX', // volatility
-] as string[]
+]
 
 
 
