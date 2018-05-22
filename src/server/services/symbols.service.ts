@@ -25,6 +25,8 @@ pandora.on('symbols.start', function(hubmsg) {
 
 async function start() {
 
+	// await redis.main.purge(rkeys.QUOTES)
+
 	// await redis.main.del(rkeys.RH.SYMBOLS)
 	let instruments = await redis.main.exists(rkeys.RH.SYMBOLS)
 	if (instruments == 0) await syncInstruments();

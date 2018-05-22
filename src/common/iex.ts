@@ -8,7 +8,7 @@ export const IEX = {
 
 
 
-export const TYPES = [
+export const BATCH_TYPES = [
 	'book',
 	'company',
 	'dividends',
@@ -24,6 +24,20 @@ export const TYPES = [
 	'stats',
 	'volume-by-venue',
 ]
+
+
+
+export const ISSUE_TYPES = {
+	'': `Not Available, Warrant, Note, or Non-Filing`,
+	ad: `American Depository Receipt (ADR)`,
+	re: `Real Estate Investment Trust (REIT)`,
+	ce: `Closed End Fund (Stock and Bond Fund)`,
+	si: `Secondary Issue`,
+	lp: `Limited Partnerships`,
+	cs: `Common Stock`,
+	et: `Exchange Traded Fund (ETF)`,
+}
+export function issueType(type = '') { return ISSUE_TYPES[type] }
 
 
 

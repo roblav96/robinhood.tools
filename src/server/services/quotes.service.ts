@@ -9,6 +9,7 @@ import * as utils from '../adapters/utils'
 import * as redis from '../adapters/redis'
 import * as socket from '../adapters/socket'
 import * as webull from '../adapters/webull'
+import * as iex from '../adapters/iex'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
 
@@ -64,18 +65,28 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		let yhquote = resolved[ii++] as Yahoo.Quote
 		let iexitem = resolved[ii++] as Iex.Item
 
+		// console.warn('symbol ->', symbol)
 		// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
-		// console.log('wbquote ->', JSON.parse(JSON.stringify(wbquote)))
+		// console.log('wbticker ->', wbticker)
+		// console.log('wbquote ->', wbquote)
+		// console.log('instrument ->', instrument)
+		// console.log('yhquote ->', yhquote)
+		// console.log('iexitem ->', iexitem)
 
 		core.object.merge(quote, {
 			symbol,
 			tickerId: wbticker.tickerId,
 			typeof: process.env.SYMBOLS,
 			name: core.fallback(instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name),
-			fullName: core.fallback(instrument.name, yhquote.longName, wbticker.name),
+			fullName: core.fallback(iexitem.companyName, instrument.name, yhquote.longName, wbticker.name),
 			country: core.fallback(instrument.country, wbquote.countryISOCode, wbquote.regionAlias),
+			issueType: iexitem.issueType,
 			currency: wbquote.currency,
-		})
+			sector: iexitem.sector,
+			industry: iexitem.industry,
+			website: iexitem.website,
+			description: iexitem.description,
+		} as Quotes.Quote)
 
 		core.object.merge(quote, {
 			alive: instrument.alive,
@@ -109,7 +120,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 
 		applycalcs(quote, quote)
 
-		// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
+		// console.log(`quote ->`, quote)
 
 		Object.assign(QUOTES, { [symbol]: quote })
 		Object.assign(SAVES, { [symbol]: {} })

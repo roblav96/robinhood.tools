@@ -45,15 +45,12 @@ polka.route({
 		resolved.forEach(core.fix)
 
 		let ii = 0
-		let response = []
-		symbols.forEach(function(symbol, i) {
-			response[i] = { symbol }
-			rkeys.forEach(function(rkey) {
-				response[i][RKEYS[rkey]] = resolved[ii++]
-			})
+		return symbols.map(symbol => {
+			return rkeys.reduce((prev, curr) => {
+				prev[RKEYS[curr]] = resolved[ii++]
+				return prev
+			}, {})
 		})
-
-		return response
 	}
 })
 

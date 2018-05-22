@@ -88,7 +88,12 @@ export const FULL = {
 	acronym: '',
 	exchange: '',
 	country: '',
+	issueType: '',
 	currency: '',
+	sector: '',
+	industry: '',
+	website: '',
+	description: '',
 	listDate: 0,
 	// 
 	avgVolume: 0,
