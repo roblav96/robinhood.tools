@@ -5,7 +5,6 @@ import * as pAll from 'p-all'
 import * as pForever from 'p-forever'
 import * as schedule from 'node-schedule'
 import * as _ from '../../common/lodash'
-import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as pandora from '../adapters/pandora'
@@ -16,7 +15,6 @@ import * as utils from '../adapters/utils'
 import * as webull from '../adapters/webull'
 import * as yahoo from '../adapters/yahoo'
 import * as iex from '../adapters/iex'
-import clock from '../../common/clock'
 
 
 

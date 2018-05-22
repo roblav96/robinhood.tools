@@ -14,27 +14,26 @@ import clock from '../../common/clock'
 
 
 declare global {
-	interface WebullWatcher<T> {
-		rkey: string
-		onSymbols: (hubmsg: Pandora.HubMessage, fsymbols: Dict<number>) => Promise<void>
-		// onData: (topic: number, wbquote: Webull.Quote) => T
-		readonly emitter: typeof emitter
-		readonly QUOTES: Dict<T>
-		readonly EMITS: Dict<T>
-		readonly SAVES: Dict<T>
-	}
 	namespace NodeJS { export interface ProcessEnv { SYMBOLS: SymbolsTypes } }
+	namespace Webull {
+		interface Watcher<T> {
+			rkey: string
+			onSymbols: typeof onSymbols
+			emitter: typeof emitter
+			QUOTES: Dict<T>
+			SAVES: Dict<T>
+		}
+	}
 }
 export let rkey = ''
-export let onSymbols = _.noop as (...args) => any
-// export let onData = _.noop as (...args) => any
-
+export let onSymbols = _.noop as (hubmsg: Pandora.HubMessage, fsymbols: Dict<number>) => Promise<void>
 export const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'>()
 export const QUOTES = {} as Dict
-export const EMITS = {} as Dict
 export const SAVES = {} as Dict
 
+const EMITS = {} as Dict
 const CLIENTS = [] as webull.MqttClient[]
+console.log(`CLIENTS ->`, CLIENTS)
 
 pandora.once('symbols.ready', onsymbols)
 pandora.broadcast({}, 'symbols.start')
@@ -61,9 +60,9 @@ async function onsymbols(hubmsg: Pandora.HubMessage) {
 
 	let symbols = Object.keys(fsymbols)
 	await redis.main.coms(symbols.map(function(symbol, i) {
-		let quote = QUOTES[symbol]
 		EMITS[symbol] = {} as any
 		SAVES[symbol] = {} as any
+		let quote = QUOTES[symbol]
 		socket.emit(`${rkey}:${symbol}`, quote)
 		return ['hmset', `${rkey}:${symbol}`, quote as any]
 	}))
@@ -97,6 +96,10 @@ clock.on('1s', function onsocket() {
 		EMITS[symbol] = {} as any
 	})
 })
+
+
+
+
 
 // emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 // 	let symbol = wbquote.symbol
