@@ -50,7 +50,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		['hgetall', `${rkeys.WB.QUOTES}:${v}`],
 		['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`],
 		['hgetall', `${rkeys.YH.QUOTES}:${v}`],
-		['hgetall', `${rkeys.IEX.BATCH}:${v}`],
+		['hgetall', `${rkeys.IEX.ITEMS}:${v}`],
 	])))
 	resolved.forEach(core.fix)
 
@@ -58,14 +58,15 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 	let coms = [] as Redis.Coms
 	symbols.forEach(function(symbol, i) {
 		let quote = resolved[ii++] as Quotes.Full
-		console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
+		// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
 		let wbticker = resolved[ii++] as Webull.Ticker
-		console.log('wbticker ->', JSON.parse(JSON.stringify(wbticker)))
+		// console.log('wbticker ->', JSON.parse(JSON.stringify(wbticker)))
 		let wbquote = resolved[ii++] as Webull.Quote
-		console.log('wbquote ->', JSON.parse(JSON.stringify(wbquote)))
+		// console.log('wbquote ->', JSON.parse(JSON.stringify(wbquote)))
 		let instrument = resolved[ii++] as Robinhood.Instrument
 		let yhquote = resolved[ii++] as Yahoo.Quote
 		let iexbatch = resolved[ii++] as Iex.Batch
+		// console.log(`iexbatch ->`, JSON.parse(JSON.stringify(iexbatch)))
 
 		core.object.merge(quote, {
 			symbol,

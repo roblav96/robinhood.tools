@@ -3,6 +3,7 @@
 export * from '../../common/webull'
 export * from './webull.mqtt'
 import * as pAll from 'p-all'
+import * as boom from 'boom'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
@@ -43,30 +44,28 @@ export function fix(quote: Webull.Quote) {
 
 
 
-async function getChunked(fsymbols: Dict<number>, url: string, wbauth = false) {
+async function getItems(fsymbols: Dict<number>, url: string, wbauth = false) {
 	let inverse = _.invert(fsymbols)
-	let tids = Object.values(fsymbols)
-	let chunks = core.array.chunks(tids, _.ceil(tids.length / 128))
-	let items = await pAll(chunks.map(chunk => {
-		return () => http.get(url, {
-			query: { tickerIds: chunk.join(','), hl: 'en' }, // wbauth,
+	let tickerIds = Object.values(fsymbols)
+	if (tickerIds.length > 128) throw boom.entityTooLarge('tickerIds -> ' + tickerIds.length)
+	return http.get(url, {
+		query: { tickerIds: tickerIds.join(','), hl: 'en' }, wbauth,
+	}).then((items: any[]) => {
+		items.forEach(item => {
+			core.fix(item)
+			fix(item)
+			item.symbol = inverse[item.tickerId]
 		})
-	}), { concurrency: 1 })
-	items = _.flatten(items)
-	items.forEach(function(item) {
-		core.fix(item)
-		fix(item)
-		item.symbol = inverse[item.tickerId]
+		return items
 	})
-	return items
 }
 
 export function getFullQuotes(fsymbols: Dict<number>): Promise<Webull.Quote[]> {
-	return getChunked(fsymbols, 'https://quoteapi.webull.com/api/quote/tickerRealTimes/full', true)
+	return getItems(fsymbols, 'https://quoteapi.webull.com/api/quote/tickerRealTimes/full', true)
 }
 
 export function getTickers(fsymbols: Dict<number>): Promise<Webull.Ticker[]> {
-	return getChunked(fsymbols, 'https://securitiesapi.webull.com/api/securities/ticker/v2')
+	return getItems(fsymbols, 'https://securitiesapi.webull.com/api/securities/ticker/v2')
 }
 
 export async function syncTickersQuotes(fsymbols: Dict<number>) {
@@ -85,6 +84,26 @@ export async function syncTickersQuotes(fsymbols: Dict<number>) {
 }
 
 
+
+
+
+// async function getChunked(fsymbols: Dict<number>, url: string, wbauth = false) {
+// 	let inverse = _.invert(fsymbols)
+// 	let tids = Object.values(fsymbols)
+// 	let chunks = core.array.chunks(tids, _.ceil(tids.length / 100)).map(v => v.join(','))
+// 	return _.flatten(await pAll(chunks.map(chunk => {
+// 		return () => http.get(url, {
+// 			query: { tickerIds: chunk, hl: 'en' }, wbauth,
+// 		}).then((items: any[]) => {
+// 			items.forEach(item => {
+// 				core.fix(item)
+// 				fix(item)
+// 				item.symbol = inverse[item.tickerId]
+// 			})
+// 			return items
+// 		})
+// 	}), { concurrency: 1 }))
+// }
 
 
 

@@ -31,8 +31,8 @@ async function start() {
 
 	// await redis.main.del(rkeys.WB.SYMBOLS)
 	let tickers = await redis.main.exists(rkeys.WB.SYMBOLS)
-	// if (tickers == 0) await syncTickers();
-	await syncTickers()
+	// if (tickers == 0)
+	await syncTickers();
 
 	// await redis.main.del(rkeys.SYMBOLS.STOCKS)
 	let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)
@@ -49,7 +49,7 @@ async function start() {
 	ready = true
 	pandora.broadcast({}, 'symbols.ready')
 
-} start().catch(error => console.error('start Error ->', error))
+} start().catch(error => console.error(`start Error -> %O`, error))
 
 
 
@@ -133,17 +133,17 @@ async function syncTickers() {
 	coms.push(['hmset', rkeys.WB.TIDS, fsymbols as any])
 	scoms.merge(coms)
 	await redis.main.coms(coms)
+	let symbols = Object.keys(fsymbols)
 
 	if (process.env.DEVELOPMENT) console.log('webull.syncTickersQuotes ->');
 	await webull.syncTickersQuotes(fsymbols)
-	let symbols = Object.keys(fsymbols)
 
 	if (process.env.DEVELOPMENT) console.log('yahoo.getQuotes ->');
 	let yhquotes = await yahoo.getQuotes(symbols)
 	await redis.main.coms(yhquotes.map(v => ['hmset', `${rkeys.YH.QUOTES}:${v.symbol}`, v as any]))
 
 	if (process.env.DEVELOPMENT) console.log('iex.syncBatch ->');
-	await iex.syncBatch(symbols)
+	await iex.syncItems(symbols)
 
 	if (process.env.DEVELOPMENT) console.info('syncTickers done ->', symbols.length);
 }
@@ -181,7 +181,7 @@ async function syncForex() {
 	}))
 	let tickers = await pAll(symbols.map(symbol => {
 		return () => getTicker(symbol, 6)
-	}), { concurrency: 1 })
+	}), { concurrency: 2 })
 	tickers.remove(v => !v)
 	await finishSync('FOREX', tickers)
 	if (process.env.DEVELOPMENT) console.info('syncForex done ->', tickers.length);
@@ -192,7 +192,7 @@ async function syncIndexes() {
 	let symbols = core.clone(webull.indexes)
 	let tickers = await pAll(symbols.map(symbol => {
 		return () => getTicker(symbol, 1)
-	}), { concurrency: 1 })
+	}), { concurrency: 2 })
 	let response = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/globalIndices/1') as Webull.Api.MarketIndex[]
 	response.forEach(v => v.marketIndexList.forEach(vv => tickers.push(vv)))
 	tickers.remove(v => !v || (v.secType && v.secType.includes(52)) || v.disSymbol == 'IBEX')

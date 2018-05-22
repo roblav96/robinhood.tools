@@ -11,7 +11,7 @@ import * as http from './http'
 
 
 
-export function getBatch(symbols: string[], types = [
+export async function getItems(symbols: string[], types = [
 	'company',
 	'earnings',
 	'estimates',
@@ -21,34 +21,35 @@ export function getBatch(symbols: string[], types = [
 	'relevant',
 	'stats',
 ]) {
-	return http.get('https://api.iextrading.com/1.0/stock/market/batch', {
+	let response = await http.get('https://api.iextrading.com/1.0/stock/market/batch', {
 		query: { symbols: symbols.join(','), types: types.join(',') },
-	}) as Promise<Iex.BatchResponse>
+	}) as Iex.BatchResponse
+	return Object.keys(response).map(function(symbol) {
+		let item = { symbol } as Iex.Item
+		let values = response[symbol]
+		Object.keys(values).forEach(function(key) {
+			let value = values[key]
+			if (core.object.is(value)) core.object.repair(item, value);
+			if (Array.isArray(value)) item[key] = value;
+		})
+		return item
+	})
 }
 
 
 
-export async function syncBatch(symbols: string[]) {
+export async function syncItems(symbols: string[]) {
 	let chunks = core.array.chunks(symbols, _.ceil(symbols.length / 100))
-	let response = await pAll(chunks.map(chunk => {
-		return () => getBatch(chunk).then(async function(response: Iex.BatchResponse) {
-			let coms = [] as Redis.Coms
-			Object.keys(response).forEach(function(symbol) {
-				let values = response[symbol]
-				Object.keys(values).forEach(function(key) {
-					let value = values[key]
-					if (!value || _.isEmpty(value)) return delete values[key];
-					if (core.object.is(value)) value.symbol = symbol;
+	return _.flatten(await pAll(chunks.map(chunk => {
+		return () => getItems(chunk).then(function(items) {
+			return redis.main.coms(items.map(item => {
+				let mapped = _.mapValues(item, (v, k) => {
+					return typeof v == 'object' ? JSON.stringify(v) : v
 				})
-				coms.push(['hmset', `${rkeys.IEX.BATCH}:${symbol}`, _.mapValues(values, v => JSON.stringify(v)) as any])
-			})
-			await redis.main.coms(coms)
-			return response
+				return ['hmset', `${rkeys.IEX.ITEMS}:${item.symbol}`, mapped as any]
+			})).then(() => items)
 		})
-	}), { concurrency: 1 })
-	return response.reduce(function(previous, current, index) {
-		return Object.assign(previous, current)
-	}, {})
+	}), { concurrency: 2 }))
 }
 
 

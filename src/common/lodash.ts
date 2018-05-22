@@ -13,6 +13,7 @@ export {
 	delay,
 	difference,
 	flatten,
+	floor,
 	fromPairs,
 	functions,
 	functionsIn,

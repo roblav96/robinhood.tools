@@ -36,11 +36,11 @@ export function fix(target: any, deep?: any) {
 		else if (value === 'undefined') target[key] = undefined;
 		else if (value === 'true') target[key] = true;
 		else if (value === 'false') target[key] = false;
+		else if (json.is(value)) target[key] = JSON.parse(value);
 		else if (FIXDATE.includes(key)) target[key] = new Date(value).valueOf();
 		else if (value.includes('.robinhood.com') && FIXURL.includes(key)) {
 			target[key] = value.split('/').splice(-2, 1)[0]
 		}
-		else if (json.is(value)) target[key] = JSON.parse(value);
 	})
 }
 
@@ -268,7 +268,7 @@ export const object = {
 
 
 export const json = {
-	is<T = object>(value: T): value is T {
+	is<T = object>(value: T) {
 		if (string.is(value)) {
 			if (value.charAt(0) == '{') return true;
 			if (value.charAt(0) == '[') return true;

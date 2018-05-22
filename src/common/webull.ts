@@ -152,6 +152,10 @@ declare global {
 			}
 		}
 
+		interface Item extends Ticker, Quote {
+			symbol: string
+		}
+
 		interface Ticker {
 			currencyId: number
 			disExchangeCode: string

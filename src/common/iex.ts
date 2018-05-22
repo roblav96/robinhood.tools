@@ -3,7 +3,7 @@
 
 
 export const IEX = {
-	BATCH: 'iex:batch',
+	ITEMS: 'iex:items',
 }
 
 
@@ -45,7 +45,9 @@ declare global {
 			'stats': Stats
 		}
 
-		interface Item extends Relevant, News, Company, EarningsMeta, EstimatesMeta, EffectiveSpread, EffectiveSpreadMeta, FinancialsMeta, Quote, Stats { }
+		interface Item extends Relevant, News, Company, EarningsMeta, EstimatesMeta, EffectiveSpread, EffectiveSpreadMeta, FinancialsMeta, Quote, Stats {
+			symbol: string
+		}
 
 		interface Relevant {
 			peers: boolean
