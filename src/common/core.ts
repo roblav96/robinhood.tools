@@ -247,8 +247,11 @@ export const object = {
 	},
 	repair<T = object>(target: T, source: T) {
 		Object.keys(source).forEach(function(key) {
-			let value = source[key]
-			if (target[key] == null && value != null) target[key] = value;
+			let tvalue = target[key]
+			let svalue = source[key]
+			if (tvalue == null && svalue != null) {
+				target[key] = svalue
+			}
 		})
 	},
 	nullify<T = object>(target: T) {

@@ -20,10 +20,11 @@ import clock from '../../common/clock'
 
 
 export const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'>()
-const CLIENTS = [] as webull.MqttClient[]
-const QUOTES = {} as Dict<Quotes.Full>
-const EMITS = {} as Dict<Quotes.Full>
-const SAVES = {} as Dict<Quotes.Full>
+export const CLIENTS = [] as webull.MqttClient[]
+export const QUOTES = {} as Dict<Quotes.Full>
+export const EMITS = {} as Dict<Quotes.Full>
+export const SAVES = {} as Dict<Quotes.Full>
+export let middleware: Promise<any>
 
 pandora.once('symbols.ready', onSymbols)
 pandora.broadcast({}, 'symbols.start')
@@ -48,8 +49,6 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 	core.object.nullify(EMITS)
 	core.object.nullify(SAVES)
 
-	await redis.main.purge(rkeys.QUOTES)
-
 	let symbols = Object.keys(fsymbols)
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => [
 		['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`],
@@ -61,8 +60,6 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 	])))
 	resolved.forEach(core.fix)
 
-	console.log(`resolved ->`, JSON.parse(JSON.stringify(resolved)))
-
 	let coms = [] as Redis.Coms
 	let ii = 0
 	symbols.forEach(function(symbol, i) {
@@ -73,16 +70,16 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		let wbquote = resolved[ii++] as Webull.Quote
 		let quote = resolved[ii++] as Quotes.Full
 
-		Object.assign(quote, {
+		core.object.merge(quote, {
 			symbol,
 			tickerId: wbticker.tickerId,
 			typeof: process.env.SYMBOLS,
+			name: core.fallback(instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name),
+			fullName: core.fallback(instrument.name, yhquote.longName, wbticker.name),
 			alive: instrument.alive,
 			mic: instrument.mic,
 			acronym: instrument.acronym,
 			listDate: new Date(instrument.list_date).valueOf(),
-			name: core.fallback(instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name),
-			fullName: core.fallback(instrument.name, yhquote.longName, wbticker.name),
 			country: core.fallback(instrument.country, wbticker.regionAlias).toUpperCase(),
 			exchange: core.fallback(iexbatch.company.exchange, iexbatch.quote.primaryExchange),
 			sharesOutstanding: _.round(core.fallback(wbquote.totalShares, yhquote.sharesOutstanding, iexbatch.stats.sharesOutstanding)),
@@ -92,22 +89,22 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 			avgVolume3Month: _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month)),
 		} as Quotes.Full)
 
-		_.defaults(quote, onwbquote(quote, wbquote))
+		core.object.repair(quote, onwbquote(quote, wbquote))
 
 		let reset = {
 			status: core.fallback(wbquote.faStatus, wbquote.status),
 			eodPrice: quote.price || quote.prevClose,
 			dayHigh: quote.price, dayLow: quote.price,
 			open: quote.price, high: quote.price, low: quote.price, close: quote.price,
-			count: 0, deals: 0,
+			count: 0, deals: 0, dealNum: 0,
 			bidVolume: 0, askVolume: 0,
 			volume: 0, size: 0,
 			dealVolume: 0, dealSize: 0,
 			buyVolume: 0, buySize: 0,
 			sellVolume: 0, sellSize: 0,
 		} as Quotes.Full
-		_.defaults(quote, reset)
-		if (resets) Object.assign(quote, reset);
+		core.object.repair(quote, reset)
+		if (resets) core.object.merge(quote, reset);
 
 		applycalcs(quote, quote)
 
@@ -244,9 +241,16 @@ const GREATER_THANS = (({
 	'faTradeTime': ('timestamp' as keyof Quotes.Full) as any,
 	'tradeTime': ('timestamp' as keyof Quotes.Full) as any,
 	'mktradeTime': ('timestamp' as keyof Quotes.Full) as any,
+	'dealNum': ('dealNum' as keyof Quotes.Full) as any,
 	'volume': ('volume' as keyof Quotes.Full) as any,
 	// '____': ('____' as keyof Quotes.Full) as any,
 } as Webull.Quote) as any) as Dict<string>
+
+// const OUT_RANGE = (({
+// 	// '____': ('____' as keyof Quotes.Full) as any,
+// 	// '____': ('____' as keyof Quotes.Full) as any,
+// 	// '____': ('____' as keyof Quotes.Full) as any,
+// } as Webull.Quote) as any) as Dict<string>
 
 function onwbquote(quote: Quotes.Full, wbquote: Webull.Quote, toquote = {} as Quotes.Full) {
 	let symbol = quote.symbol

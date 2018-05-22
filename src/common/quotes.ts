@@ -45,6 +45,7 @@ export const LIVE = {
 	bidVolume: 0,
 	askVolume: 0,
 	// 
+	dealNum: 0,
 	count: 0,
 	deals: 0,
 	dealVolume: 0,
@@ -60,6 +61,7 @@ export const LIVE = {
 	turnoverRate: 0,
 	vibrateRatio: 0,
 	yield: 0,
+	// 
 }
 Object.keys(LIVE).forEach(k => LIVE[k] = undefined)
 
@@ -88,6 +90,7 @@ export const FULL = {
 	avgVolume3Month: 0,
 	sharesOutstanding: 0,
 	sharesFloat: 0,
+	// 
 }
 Object.keys(FULL).forEach(k => FULL[k] = undefined)
 
