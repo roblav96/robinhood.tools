@@ -29,14 +29,14 @@ async function onready(hubmsg: Pandora.HubMessage) {
 
 	idx = lunr(function() {
 		this.ref('symbol')
-		this.field('symbol', { boost: 10 })
+		this.field('symbol', { boost: 100 })
 		this.field('name', { boost: 5 })
 		this.field('description')
-		this.metadataWhitelist = ['position', 'constructor']
+		this.metadataWhitelist = ['position']
 		quotes.forEach(v => this.add(v))
 	})
 
-	onquery({ data: 'tech' } as any)
+	onquery({ data: 'amd' } as any)
 
 }
 
@@ -44,6 +44,7 @@ async function onready(hubmsg: Pandora.HubMessage) {
 
 pandora.on('search.query', onquery)
 function onquery(hubmsg: Pandora.HubMessage) {
+	console.log(`hubmsg ->`, hubmsg)
 	let query = hubmsg.data as string
 	console.time(query)
 	let results = idx.search(`${query}~1`)

@@ -43,7 +43,7 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 
 	// Process(pandora.process('api').entry('./api/api'), { SCALE: 2 })
 
-	// Process(pandora.process('symbols.service').entry('./services/symbols.service'), { SCALE: 1 })
+	Process(pandora.process('symbols.service').entry('./services/symbols.service'), { SCALE: 1 })
 	Process(pandora.process('search.service').entry('./services/search.service'), { SCALE: 1 })
 	// Process(pandora.process('hours.service').entry('./services/hours.service'), { SCALE: 1 })
 	// Process(pandora.process('robinhood.service').entry('./services/robinhood.service'), { SCALE: 1 })
