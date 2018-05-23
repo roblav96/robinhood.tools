@@ -2,6 +2,74 @@
 
 
 
+export const YH = {
+	QUOTES: 'yh:quotes',
+}
+
+
+
+// export const FIELDS = [
+// 	'ask',
+// 	'askSize',
+// 	'averageDailyVolume10Day',
+// 	'averageDailyVolume3Month',
+// 	'bid',
+// 	'bidSize',
+// 	'currency',
+// 	'esgPopulated',
+// 	'exchange',
+// 	'exchangeDataDelayedBy',
+// 	'exchangeTimezoneName',
+// 	'exchangeTimezoneShortName',
+// 	'fiftyDayAverage',
+// 	'fiftyDayAverageChange',
+// 	'fiftyDayAverageChangePercent',
+// 	'fiftyTwoWeekHigh',
+// 	'fiftyTwoWeekHighChange',
+// 	'fiftyTwoWeekHighChangePercent',
+// 	'fiftyTwoWeekLow',
+// 	'fiftyTwoWeekLowChange',
+// 	'fiftyTwoWeekLowChangePercent',
+// 	'fiftyTwoWeekRange',
+// 	'financialCurrency',
+// 	'fullExchangeName',
+// 	'gmtOffSetMilliseconds',
+// 	'language',
+// 	'longName',
+// 	'market',
+// 	'marketCap',
+// 	'marketState',
+// 	'messageBoardId',
+// 	'preMarketChange',
+// 	'preMarketChangePercent',
+// 	'preMarketPrice',
+// 	'preMarketTime',
+// 	'priceHint',
+// 	'quoteSourceName',
+// 	'quoteType',
+// 	'regularMarketChange',
+// 	'regularMarketChangePercent',
+// 	'regularMarketDayHigh',
+// 	'regularMarketDayLow',
+// 	'regularMarketDayRange',
+// 	'regularMarketOpen',
+// 	'regularMarketPreviousClose',
+// 	'regularMarketPrice',
+// 	'regularMarketTime',
+// 	'regularMarketVolume',
+// 	'sharesOutstanding',
+// 	'shortName',
+// 	'sourceInterval',
+// 	'symbol',
+// 	'tradeable',
+// 	// 'trailingThreeMonthNavReturns',
+// 	// 'trailingThreeMonthReturns',
+// 	'twoHundredDayAverage',
+// 	'twoHundredDayAverageChange',
+// 	'twoHundredDayAverageChangePercent',
+// 	// 'ytdReturn',
+// ]
+
 export const SUMMARY_MODULES = [
 	// stocks
 	'assetProfile', 'balanceSheetHistory', 'balanceSheetHistoryQuarterly', 'calendarEvents',
@@ -13,12 +81,6 @@ export const SUMMARY_MODULES = [
 	// funds
 	'fundProfile', 'topHoldings', 'fundPerformance',
 ]
-
-
-
-export const YH = {
-	QUOTES: 'yh:quotes',
-}
 
 
 

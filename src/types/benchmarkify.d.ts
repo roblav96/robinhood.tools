@@ -40,8 +40,8 @@ declare module 'benchmarkify' {
 		}
 	}
 	class Benchmarkify {
-		constructor(name: string, opts: Benchmarkify.Options)
-		createSuite(name: string, opts: Benchmarkify.SuiteOptions): Benchmarkify.Suite
+		constructor(name: string, opts?: Partial<Benchmarkify.Options>)
+		createSuite(name: string, opts?: Partial<Benchmarkify.SuiteOptions>): Benchmarkify.Suite
 		printHeader(platformInfo?: boolean): this
 		printPlatformInfo(): void
 		run(suites: Benchmarkify.Suite[]): Promise<Benchmarkify.Result[]>

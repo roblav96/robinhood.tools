@@ -25,25 +25,20 @@ pandora.on('symbols.start', function(hubmsg) {
 
 async function start() {
 
-	// await redis.main.purge(rkeys.QUOTES)
+	return syncTickers()
 
-	// await redis.main.del(rkeys.RH.SYMBOLS)
 	let instruments = await redis.main.exists(rkeys.RH.SYMBOLS)
 	if (instruments == 0) await syncInstruments();
 
-	// await redis.main.del(rkeys.WB.SYMBOLS)
 	let tickers = await redis.main.exists(rkeys.WB.SYMBOLS)
 	if (tickers == 0) await syncTickers();
 
-	// await redis.main.del(rkeys.SYMBOLS.STOCKS)
 	let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)
 	if (stocks == 0) await syncStocks();
 
-	// await redis.main.del(rkeys.SYMBOLS.FOREX)
 	let forex = await redis.main.exists(rkeys.SYMBOLS.FOREX)
 	if (forex == 0) await syncForex();
 
-	// await redis.main.del(rkeys.SYMBOLS.INDEXES)
 	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
 	if (indexes == 0) await syncIndexes();
 
@@ -110,8 +105,8 @@ async function syncTickers() {
 	]) as Webull.Ticker[]
 	tickers = _.flatten(tickers)
 	tickers.remove(v => Array.isArray(v.disSymbol.match(utils.matchSymbol)))
-	tickers.forEach(core.fix)
 	tickers.forEach(v => {
+		core.fix(v)
 		if (!v.disSymbol.includes('-')) return;
 		let split = v.disSymbol.split('-')
 		let start = split.shift()
@@ -119,6 +114,15 @@ async function syncTickers() {
 		let middle = end.length == 1 ? '.' : '-'
 		v.disSymbol = start + middle + end.slice(-1)
 	})
+
+	let tids = tickers.map(v => v.tickerId).filter(Number.isFinite)
+	let chunks = core.array.chunks(tids, _.ceil(tids.length / 256))
+	let valids = _.flatten(await pAll(chunks.map(chunk => {
+		return () => http.get('https://quoteapi.webull.com/api/quote/tickerRealTimes', {
+			query: { tickerIds: chunk.join(','), hl: 'en' },
+		}) as Promise<Webull.Ticker[]>
+	}))).map(v => v.tickerId)
+	tickers.remove(v => !valids.includes(v.tickerId))
 
 	let coms = [] as Redis.Coms
 	let scoms = new redis.SetsComs(rkeys.WB.SYMBOLS)
@@ -137,11 +141,10 @@ async function syncTickers() {
 	let symbols = Object.keys(fsymbols)
 
 	if (process.env.DEVELOPMENT) console.log('webull.syncTickersQuotes ->');
-	await webull.syncTickersQuotes(fsymbols)
+	// await webull.syncTickersQuotes(fsymbols)
 
-	if (process.env.DEVELOPMENT) console.log('yahoo.getQuotes ->');
-	let yhquotes = await yahoo.getQuotes(symbols)
-	await redis.main.coms(yhquotes.map(v => ['hmset', `${rkeys.YH.QUOTES}:${v.symbol}`, v as any]))
+	if (process.env.DEVELOPMENT) console.log('yahoo.syncQuotes ->');
+	await yahoo.syncQuotes(symbols)
 
 	if (process.env.DEVELOPMENT) console.log('iex.syncItems ->');
 	await iex.syncItems(symbols)

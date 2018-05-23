@@ -40,16 +40,16 @@ export async function getItems(symbols: string[], types = [
 
 export async function syncItems(symbols: string[]) {
 	let chunks = core.array.chunks(symbols, _.ceil(symbols.length / 100))
-	return _.flatten(await pAll(chunks.map(chunk => {
+	await pAll(chunks.map(chunk => {
 		return () => getItems(chunk).then(function(items) {
 			return redis.main.coms(items.map(item => {
 				let mapped = _.mapValues(item, (v, k) => {
 					return typeof v == 'object' ? JSON.stringify(v) : v
 				})
 				return ['hmset', `${rkeys.IEX.ITEMS}:${item.symbol}`, mapped as any]
-			})).then(() => items)
+			}))
 		})
-	}), { concurrency: 2 }))
+	}), { concurrency: 2 })
 }
 
 
