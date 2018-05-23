@@ -48,14 +48,15 @@ export function clone<T extends object = object>(target: T): T {
 	return JSON.parse(JSON.stringify(target))
 }
 
-export function nullify(target: any) {
-	if (Array.isArray(target)) {
-		target.forEach(v => v = null)
-		target.splice(0)
-	} else if (object.is(target)) {
-		Object.keys(target).forEach(k => {
-			target[k] = null
-			delete target[k]
+export function nullify(value: any) {
+	if (Array.isArray(value)) {
+		value.forEach(v => v = null)
+		value.splice(0)
+	}
+	else if (object.is(value)) {
+		Object.keys(value).forEach(k => {
+			value[k] = null
+			delete value[k]
 		})
 	}
 }
@@ -234,6 +235,13 @@ export const object = {
 			target[key] = svalue;
 		})
 	},
+	clean<T = object>(target: T, returns = false) {
+		Object.keys(target).forEach(function(key) {
+			let tvalue = target[key]
+			if (tvalue === null || tvalue === undefined) _.unset(target, key);
+		})
+		if (returns) return target;
+	},
 	compact<T = object>(target: T, returns = false) {
 		Object.keys(target).forEach(function(key) {
 			let tvalue = target[key]
@@ -257,11 +265,14 @@ export const object = {
 			}
 		})
 	},
-	nullify<T = object>(target: T) {
+	difference<T = object>(target: T, source: T): T {
+		let difference = {} as T
 		Object.keys(target).forEach(function(key) {
-			target[key] = null
-			delete target[key]
+			let tvalue = target[key]
+			let svalue = source[key]
+			if (tvalue != svalue) difference[key] = tvalue;
 		})
+		return difference
 	},
 	sortKeys<T = object>(target: T): T {
 		return _.fromPairs(_.sortBy(_.toPairs(target as any))) as any

@@ -16,9 +16,9 @@ import clock from '../../common/clock'
 
 
 const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'>()
-const QUOTES = {} as Dict<Quotes.Full>
-const SAVES = {} as Dict<Quotes.Full>
-const EMITS = {} as Dict<Quotes.Full>
+const QUOTES = {} as Dict<Quotes.Quote>
+const SAVES = {} as Dict<Quotes.Quote>
+const EMITS = {} as Dict<Quotes.Quote>
 const CLIENTS = [] as webull.MqttClient[]
 
 pandora.once('symbols.ready', onSymbols)
@@ -34,16 +34,15 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
 		await utils.getFullSymbols(process.env.SYMBOLS)
 	)
+
 	// if (process.env.DEVELOPMENT) return;
-	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) {
-		fsymbols = utils[`DEV_${process.env.SYMBOLS}`]
-	}
+	// if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 	let symbols = Object.keys(fsymbols)
 
 	CLIENTS.forEach(v => v.destroy())
-	core.object.nullify(QUOTES)
-	core.object.nullify(EMITS)
-	core.object.nullify(SAVES)
+	core.nullify(QUOTES)
+	core.nullify(EMITS)
+	core.nullify(SAVES)
 
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => [
 		['hgetall', `${rkeys.QUOTES}:${v}`],
@@ -58,48 +57,42 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 	let ii = 0
 	let coms = [] as Redis.Coms
 	symbols.forEach(function(symbol, i) {
-		let quote = resolved[ii++] as Quotes.Full
+		let quote = resolved[ii++] as Quotes.Quote
 		let wbticker = resolved[ii++] as Webull.Ticker
 		let wbquote = resolved[ii++] as Webull.Quote
 		let instrument = resolved[ii++] as Robinhood.Instrument
 		let yhquote = resolved[ii++] as Yahoo.Quote
 		let iexitem = resolved[ii++] as Iex.Item
 
-		// console.warn('symbol ->', symbol)
-		// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
-		// console.log('wbticker ->', wbticker)
-		// console.log('wbquote ->', wbquote)
-		// console.log('instrument ->', instrument)
-		// console.log('yhquote ->', yhquote)
-		// console.log('iexitem ->', iexitem)
-
 		core.object.merge(quote, {
 			symbol,
 			tickerId: wbticker.tickerId,
 			typeof: process.env.SYMBOLS,
-			name: core.fallback(instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name),
-			fullName: core.fallback(iexitem.companyName, instrument.name, yhquote.longName, wbticker.name),
+			name: core.fallback(iexitem.companyName, instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name),
+			fullName: core.fallback(instrument.name, yhquote.longName, wbticker.name),
 			country: core.fallback(instrument.country, wbquote.countryISOCode, wbquote.regionAlias),
+			timezone: wbquote.utcOffset,
 			issueType: iexitem.issueType,
 			currency: wbquote.currency,
 			sector: iexitem.sector,
 			industry: iexitem.industry,
 			website: iexitem.website,
 			description: iexitem.description,
-		} as Quotes.Quote)
-
-		core.object.merge(quote, {
 			alive: instrument.alive,
 			mic: instrument.mic,
 			acronym: instrument.acronym,
 			listDate: new Date(instrument.list_date).valueOf(),
-			exchange: core.fallback(iexitem.exchange, iexitem.primaryExchange),
+			exchange: core.fallback(iexitem.exchange, iexitem.primaryExchange, wbticker.exchangeCode, wbticker.disExchangeCode),
 			sharesOutstanding: _.round(core.fallback(wbquote.totalShares, yhquote.sharesOutstanding, iexitem.sharesOutstanding)),
 			sharesFloat: _.round(core.fallback(wbquote.outstandingShares, iexitem.float)),
-			avgVolume: _.round(core.fallback(wbquote.avgVolume, iexitem.avgTotalVolume)),
-			avgVolume10Day: _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day)),
-			avgVolume3Month: _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month)),
-		} as Quotes.Full)
+		} as Quotes.Quote)
+
+		if (quote.name == quote.fullName) delete quote.fullName;
+
+		quote.avgVolume10Day = _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day))
+		quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))
+		quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, iexitem.avgTotalVolume))
+		if (!quote.avgVolume) quote.avgVolume = _.round(quote.avgVolume10Day, quote.avgVolume3Month);
 
 		let toquote = applywbquote(quote, wbquote)
 		core.object.repair(quote, toquote)
@@ -114,13 +107,22 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 			dealVolume: 0, dealSize: 0,
 			buyVolume: 0, buySize: 0,
 			sellVolume: 0, sellSize: 0,
-		} as Quotes.Full
+		} as Quotes.Quote
 		core.object.repair(quote, reset)
 		if (resets) core.object.merge(quote, reset);
 
 		applycalcs(quote, quote)
 
-		// console.log(`quote ->`, quote)
+		if (process.env.DEVELOPMENT && +process.env.SCALE == 1) {
+			console.warn(symbol, '->', quote.name)
+			// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
+			console.log('wbticker ->', wbticker)
+			console.log('wbquote ->', wbquote)
+			// console.log('instrument ->', instrument)
+			// console.log('yhquote ->', yhquote)
+			// console.log('iexitem ->', iexitem)
+			console.log(`quote ->`, quote)
+		}
 
 		Object.assign(QUOTES, { [symbol]: quote })
 		Object.assign(SAVES, { [symbol]: {} })
@@ -180,7 +182,7 @@ clock.on('1s', function onsocket() {
 emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let symbol = wbquote.symbol
 	let quote = QUOTES[symbol]
-	let toquote = {} as Quotes.Full
+	let toquote = {} as Quotes.Quote
 	if (!quote) return console.warn('ondata !quote symbol ->', symbol);
 
 	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
@@ -206,7 +208,7 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 
 
-function applycalcs(quote: Quotes.Full, toquote: Quotes.Full) {
+function applycalcs(quote: Quotes.Quote, toquote: Quotes.Quote) {
 	let symbol = quote.symbol
 
 	if (toquote.price) {
@@ -231,7 +233,7 @@ function applycalcs(quote: Quotes.Full, toquote: Quotes.Full) {
 
 
 
-function applywbdeal(quote: Quotes.Full, wbdeal: Webull.Deal, toquote = {} as Quotes.Full) {
+function applywbdeal(quote: Quotes.Quote, wbdeal: Webull.Deal, toquote = {} as Quotes.Quote) {
 	let symbol = quote.symbol
 
 	let deal = webull.toDeal(wbdeal)
@@ -266,7 +268,7 @@ function applywbdeal(quote: Quotes.Full, wbdeal: Webull.Deal, toquote = {} as Qu
 
 
 interface KeyMapValue {
-	key: keyof Quotes.Full
+	key: keyof Quotes.Quote
 	greater: boolean, resets: boolean, time: boolean, onlynull: boolean,
 }
 const KEY_MAP = (({
@@ -306,7 +308,7 @@ const KEYED_MAP = _.mapValues(KEY_MAP, v => v.key)
 
 
 
-function applywbquote(quote: Quotes.Full, wbquote: Webull.Quote, toquote = {} as Quotes.Full) {
+function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote = {} as Quotes.Quote) {
 	let symbol = quote.symbol
 	Object.keys(wbquote).forEach(k => {
 		let wbvalue = wbquote[k]

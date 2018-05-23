@@ -61,7 +61,7 @@ export function token(): Promise<void> {
 		console.error('token Error ->', error)
 		console.dir(error)
 		if (error && error.isBoom && error.output.statusCode == 401) {
-			core.object.nullify(doc)
+			core.nullify(doc)
 		}
 		return new Promise(r => setTimeout(r, 3000)).then(token)
 	})

@@ -88,6 +88,7 @@ export const FULL = {
 	acronym: '',
 	exchange: '',
 	country: '',
+	timezone: '',
 	issueType: '',
 	currency: '',
 	sector: '',

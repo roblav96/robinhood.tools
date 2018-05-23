@@ -45,7 +45,8 @@ async function start() {
 
 	// await redis.main.del(rkeys.SYMBOLS.INDEXES)
 	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
-	if (indexes == 0) await syncIndexes();
+	// if (indexes == 0) 
+	await syncIndexes();
 
 	ready = true
 	pandora.broadcast({}, 'symbols.ready')
@@ -196,7 +197,7 @@ async function syncIndexes() {
 	}), { concurrency: 2 })
 	let response = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/globalIndices/1') as Webull.Api.MarketIndex[]
 	response.forEach(v => v.marketIndexList.forEach(vv => tickers.push(vv)))
-	tickers.remove(v => !v || (v.secType && v.secType.includes(52)) || v.disSymbol == 'IBEX')
+	tickers.remove(v => !v || (v.secType && v.secType.includes(52)) || ['IBEX', 'STI'].includes(v.disSymbol))
 	await finishSync('INDEXES', tickers)
 	if (process.env.DEVELOPMENT) console.info('syncIndexes done ->', tickers.length);
 }
