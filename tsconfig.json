@@ -7,7 +7,7 @@
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"allowSyntheticDefaultImports": true,
-		"sourceMap": true,
+		"inlineSourceMap": true,
 		"removeComments": true,
 		"pretty": true,
 		"outDir": "dist",
