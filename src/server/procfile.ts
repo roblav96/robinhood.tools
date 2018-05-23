@@ -48,7 +48,7 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 	// Process(pandora.process('robinhood.service').entry('./services/robinhood.service'), { SCALE: 1 })
 	Process(pandora.process('symbols.service').entry('./services/symbols.service'), { SCALE: 1 })
 
-	let SCALE = os.cpus().length
+	let SCALE = 1 // os.cpus().length
 	Process(pandora.process('stocks.service').entry('./services/quotes.service'), { SYMBOLS: 'STOCKS', SCALE, })
 	// Process(pandora.process('forex.service').entry('./services/quotes.service'), { SYMBOLS: 'FOREX', SCALE: 1, })
 	// Process(pandora.process('indexes.service').entry('./services/quotes.service'), { SYMBOLS: 'INDEXES', SCALE: 1, })
