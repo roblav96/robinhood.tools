@@ -235,19 +235,11 @@ export const object = {
 			target[key] = svalue;
 		})
 	},
-	clean<T = object>(target: T, returns = false) {
+	clean<T = object>(target: T) {
 		Object.keys(target).forEach(function(key) {
-			let tvalue = target[key]
-			if (tvalue === null || tvalue === undefined) _.unset(target, key);
+			let value = target[key]
+			if (value == null || (number.is(value) && !Number.isFinite(value))) delete target[key];
 		})
-		if (returns) return target;
-	},
-	compact<T = object>(target: T, returns = false) {
-		Object.keys(target).forEach(function(key) {
-			let tvalue = target[key]
-			if (tvalue === null || tvalue === undefined) _.unset(target, key);
-		})
-		if (returns) return target;
 	},
 	merge<T = object>(target: T, source: T) {
 		Object.keys(source).forEach(function(key) {

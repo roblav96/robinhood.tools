@@ -16,6 +16,8 @@ import clock from '../../common/clock'
 
 
 const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'>()
+const WB_QUOTES = {} as Dict<Webull.Quote>
+const WB_EMITS = {} as Dict<Webull.Quote>
 const QUOTES = {} as Dict<Quotes.Quote>
 const SAVES = {} as Dict<Quotes.Quote>
 const EMITS = {} as Dict<Quotes.Quote>
@@ -36,10 +38,12 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 	)
 
 	// if (process.env.DEVELOPMENT) return;
-	// if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
+	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 	let symbols = Object.keys(fsymbols)
 
 	CLIENTS.forEach(v => v.destroy())
+	core.nullify(WB_QUOTES)
+	core.nullify(WB_EMITS)
 	core.nullify(QUOTES)
 	core.nullify(EMITS)
 	core.nullify(SAVES)
@@ -112,6 +116,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		if (resets) core.object.merge(quote, reset);
 
 		applycalcs(quote, quote)
+		core.object.clean(quote)
 
 		if (process.env.DEVELOPMENT && +process.env.SCALE == 1) {
 			console.warn(symbol, '->', quote.name)
