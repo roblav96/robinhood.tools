@@ -4,10 +4,9 @@ import * as rkeys from './rkeys'
 
 
 
-declare global { namespace Quotes { type IBasic = typeof BASIC; interface Basic extends IBasic { } } }
-export const BASIC = {
+declare global { namespace Quotes { type ITiny = typeof TINY; interface Tiny extends ITiny { } } }
+export const TINY = {
 	symbol: '',
-	tickerId: 0,
 	name: '',
 	typeof: '' as keyof typeof rkeys.SYMBOLS,
 	price: 0,
@@ -21,11 +20,11 @@ export const BASIC = {
 	size: 0,
 	timestamp: 0,
 }
-Object.keys(BASIC).forEach(k => BASIC[k] = undefined)
+Object.keys(TINY).forEach(k => TINY[k] = undefined)
 
 
 
-declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Basic { } } }
+declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Tiny { } } }
 export const LIVE = {
 	status: '',
 	statusUpdatedAt: 0,
@@ -83,6 +82,7 @@ Object.keys(CALC).forEach(k => CALC[k] = undefined)
 
 declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
 export const FULL = {
+	tickerId: 0,
 	fullName: '',
 	mic: '',
 	acronym: '',

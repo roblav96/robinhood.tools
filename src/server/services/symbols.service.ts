@@ -45,8 +45,7 @@ async function start() {
 
 	// await redis.main.del(rkeys.SYMBOLS.INDEXES)
 	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
-	// if (indexes == 0) 
-	await syncIndexes();
+	if (indexes == 0) await syncIndexes();
 
 	ready = true
 	pandora.broadcast({}, 'symbols.ready')
