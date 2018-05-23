@@ -16,12 +16,13 @@ import clock from '../../common/clock'
 
 
 const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'>()
+const CLIENTS = [] as webull.MqttClient[]
 const WB_QUOTES = {} as Dict<Webull.Quote>
 const WB_EMITS = {} as Dict<Webull.Quote>
+const WB_SAVES = {} as Dict<Webull.Quote>
 const QUOTES = {} as Dict<Quotes.Quote>
-const SAVES = {} as Dict<Quotes.Quote>
 const EMITS = {} as Dict<Quotes.Quote>
-const CLIENTS = [] as webull.MqttClient[]
+const SAVES = {} as Dict<Quotes.Quote>
 
 pandora.once('symbols.ready', onSymbols)
 pandora.broadcast({}, 'symbols.start')
@@ -44,6 +45,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 	CLIENTS.forEach(v => v.destroy())
 	core.nullify(WB_QUOTES)
 	core.nullify(WB_EMITS)
+	core.nullify(WB_SAVES)
 	core.nullify(QUOTES)
 	core.nullify(EMITS)
 	core.nullify(SAVES)
@@ -92,7 +94,6 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		} as Quotes.Quote)
 
 		if (quote.name == quote.fullName) delete quote.fullName;
-
 		quote.avgVolume10Day = _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day))
 		quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))
 		quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, iexitem.avgTotalVolume))
@@ -118,20 +119,26 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		applycalcs(quote, quote)
 		core.object.clean(quote)
 
-		if (process.env.DEVELOPMENT && +process.env.SCALE == 1) {
-			console.warn(symbol, '->', quote.name)
-			// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
-			console.log('wbticker ->', wbticker)
-			console.log('wbquote ->', wbquote)
-			// console.log('instrument ->', instrument)
-			// console.log('yhquote ->', yhquote)
-			// console.log('iexitem ->', iexitem)
-			console.log(`quote ->`, quote)
-		}
+		// if (process.env.DEVELOPMENT && +process.env.SCALE == 1) {
+		// 	console.warn(symbol, '->', quote.name)
+		// 	// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
+		// 	console.log('wbticker ->', wbticker)
+		// 	console.log('wbquote ->', wbquote)
+		// 	// console.log('instrument ->', instrument)
+		// 	// console.log('yhquote ->', yhquote)
+		// 	// console.log('iexitem ->', iexitem)
+		// 	console.log(`quote ->`, quote)
+		// }
 
+		WB_QUOTES[symbol] = Object.assign({
+			typeof: quote.typeof, name: quote.name,
+		} as Webull.Quote, wbquote)
+		console.log(`WB_QUOTES[symbol] ->`, WB_QUOTES[symbol])
+		Object.assign(WB_EMITS, { [symbol]: {} })
+		Object.assign(WB_SAVES, { [symbol]: {} })
 		Object.assign(QUOTES, { [symbol]: quote })
-		Object.assign(SAVES, { [symbol]: {} })
 		Object.assign(EMITS, { [symbol]: {} })
+		Object.assign(SAVES, { [symbol]: {} })
 
 		let rkey = `${rkeys.QUOTES}:${symbol}`
 		socket.emit(rkey, quote)
@@ -161,24 +168,30 @@ clock.on('5s', function onconnect() {
 	client.connect()
 })
 
+const rrkeys = [rkeys.WB.QUOTES, rkeys.QUOTES]
 clock.on('5s', function onsave() {
-	let coms = []
-	Object.keys(SAVES).forEach(symbol => {
-		let quote = SAVES[symbol]
-		if (Object.keys(quote).length == 0) return;
-		coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, quote as any])
-		Object.assign(SAVES, { [symbol]: {} })
+	let coms = [];
+	[WB_SAVES, SAVES].forEach((saves, i) => {
+		let rkey = rrkeys[i]
+		Object.keys(saves).forEach(symbol => {
+			let quote = saves[symbol]
+			if (Object.keys(quote).length == 0) return;
+			coms.push(['hmset', `${rkey}:${symbol}`, quote as any])
+			Object.assign(saves, { [symbol]: {} })
+		})
 	})
 	if (coms.length > 0) redis.main.coms(coms);
 })
-
 clock.on('1s', function onsocket() {
-	Object.keys(EMITS).forEach(symbol => {
-		let quote = EMITS[symbol]
-		if (Object.keys(quote).length == 0) return;
-		quote.symbol = symbol
-		socket.emit(`${rkeys.QUOTES}:${symbol}`, quote)
-		Object.assign(EMITS, { [symbol]: {} })
+	[WB_EMITS, EMITS].forEach((emits, i) => {
+		let rkey = rrkeys[i]
+		Object.keys(emits).forEach(symbol => {
+			let quote = emits[symbol]
+			if (Object.keys(quote).length == 0) return;
+			quote.symbol = symbol
+			socket.emit(`${rkey}:${symbol}`, quote)
+			Object.assign(emits, { [symbol]: {} })
+		})
 	})
 })
 
@@ -188,7 +201,7 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let symbol = wbquote.symbol
 	let quote = QUOTES[symbol]
 	let toquote = {} as Quotes.Quote
-	if (!quote) return console.warn('ondata !quote symbol ->', symbol);
+	if (!quote) return console.warn('QUOTES ondata !quote symbol ->', symbol);
 
 	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 
@@ -200,14 +213,11 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 	let tokeys = Object.keys(toquote)
 	if (tokeys.length == 0) return;
-
 	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
-
 	applycalcs(quote, toquote)
-
-	Object.assign(QUOTES[symbol], toquote)
-	Object.assign(EMITS[symbol], toquote)
-	Object.assign(SAVES[symbol], toquote)
+	core.object.merge(QUOTES[symbol], toquote)
+	core.object.merge(EMITS[symbol], toquote)
+	core.object.merge(SAVES[symbol], toquote)
 
 })
 
@@ -321,12 +331,7 @@ function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote = {} a
 		if (!keymap) return;
 		let qkey = keymap.key
 		let qvalue = quote[qkey]
-
-		if (qvalue == null) {
-			qvalue = wbvalue
-			quote[qkey] = wbvalue
-			toquote[qkey] = wbvalue
-		}
+		if (qvalue == null) { qvalue = wbvalue; quote[qkey] = wbvalue; toquote[qkey] = wbvalue }
 
 		// console.log(k, '->', wbvalue, '->', qkey, '->', qvalue, '->', quote[qkey])
 
@@ -354,6 +359,42 @@ function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote = {} a
 
 	return toquote
 }
+
+
+
+emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
+	let symbol = wbquote.symbol
+	let quote = WB_QUOTES[symbol]
+	let toquote = {} as Webull.Quote
+	if (!quote) return console.warn('WB_QUOTES ondata !quote symbol ->', symbol);
+
+	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
+
+	Object.keys(wbquote).forEach(k => {
+		let source = wbquote[k]
+		let target = quote[k]
+		if (target == null) { target = source; quote[k] = source; toquote[k] = source }
+		let keymap = KEY_MAP[k]
+		if (keymap) {
+			if (keymap.greater && source > target) {
+				toquote[k] = source
+			}
+			if (keymap.resets && Math.abs(core.calc.percent(source, target)) > 50) {
+				toquote[k] = source
+			}
+		}
+		else if (source != target) {
+			toquote[k] = source
+		}
+	})
+
+	if (Object.keys(toquote).length == 0) return;
+	// console.info(symbol, '->', webull.mqtt_topics[topic], toquote)
+	core.object.merge(WB_QUOTES[symbol], toquote)
+	core.object.merge(WB_EMITS[symbol], toquote)
+	core.object.merge(WB_SAVES[symbol], toquote)
+
+})
 
 
 
