@@ -125,7 +125,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 		core.object.repair(quote, reset)
 		if (resets) core.object.merge(quote, reset);
 
-		applycalcs(quote, quote)
+		applycalcs(quote)
 		core.object.clean(quote)
 
 		// if (process.env.DEVELOPMENT && +process.env.SCALE == 1) {
@@ -283,7 +283,7 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 
 
-function applycalcs(quote: Quotes.Quote, toquote: Quotes.Quote) {
+function applycalcs(quote: Quotes.Quote, toquote = quote) {
 	let symbol = quote.symbol
 
 	if (toquote.price) {

@@ -25,7 +25,7 @@ pandora.on('symbols.start', function(hubmsg) {
 
 async function start() {
 
-	return syncTickers()
+	// return syncTickers()
 
 	let instruments = await redis.main.exists(rkeys.RH.SYMBOLS)
 	if (instruments == 0) await syncInstruments();
@@ -115,6 +115,7 @@ async function syncTickers() {
 		v.disSymbol = start + middle + end.slice(-1)
 	})
 
+	if (process.env.DEVELOPMENT) console.log('webull valids ->');
 	let tids = tickers.map(v => v.tickerId).filter(Number.isFinite)
 	let chunks = core.array.chunks(tids, _.ceil(tids.length / 256))
 	let valids = _.flatten(await pAll(chunks.map(chunk => {
@@ -141,7 +142,7 @@ async function syncTickers() {
 	let symbols = Object.keys(fsymbols)
 
 	if (process.env.DEVELOPMENT) console.log('webull.syncTickersQuotes ->');
-	// await webull.syncTickersQuotes(fsymbols)
+	await webull.syncTickersQuotes(fsymbols)
 
 	if (process.env.DEVELOPMENT) console.log('yahoo.syncQuotes ->');
 	await yahoo.syncQuotes(symbols)
@@ -185,7 +186,7 @@ async function syncForex() {
 	}))
 	let tickers = await pAll(symbols.map(symbol => {
 		return () => getTicker(symbol, 6)
-	}), { concurrency: 2 })
+	}), { concurrency: 1 })
 	tickers.remove(v => !v)
 	await finishSync('FOREX', tickers)
 	if (process.env.DEVELOPMENT) console.info('syncForex done ->', tickers.length);
@@ -196,7 +197,7 @@ async function syncIndexes() {
 	let symbols = core.clone(webull.indexes)
 	let tickers = await pAll(symbols.map(symbol => {
 		return () => getTicker(symbol, 1)
-	}), { concurrency: 2 })
+	}), { concurrency: 1 })
 	let response = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/globalIndices/1') as Webull.Api.MarketIndex[]
 	response.forEach(v => v.marketIndexList.forEach(vv => tickers.push(vv)))
 	tickers.remove(v => !v || (v.secType && v.secType.includes(52)) || ['IBEX', 'STI'].includes(v.disSymbol))
