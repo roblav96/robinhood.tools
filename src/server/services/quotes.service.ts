@@ -222,10 +222,7 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	Object.keys(wbquote).forEach(k => {
 		let source = wbquote[k]
 		let target = quote[k]
-		// if (target == null) { target = source; quote[k] = source; toquote[k] = source }
-		if (target == null) {
-			console.warn(`target == null`)
-		}
+		if (target == null) { target = source; quote[k] = source; toquote[k] = source }
 		let keymap = KEY_MAP[k]
 		if (keymap) {
 			if (keymap.time && source > target) {

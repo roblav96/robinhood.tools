@@ -11,33 +11,46 @@ import * as utils from '../adapters/utils'
 
 
 
-let index = lunr(_.noop)
+let idx = lunr(_.noop)
 
-// pandora.on('symbols.reset', onSymbols)
-// pandora.once('symbols.ready', onSymbols)
-// pandora.broadcast({}, 'symbols.start')
+pandora.once('symbols.ready', onready)
+pandora.broadcast({}, 'symbols.start')
 
-pandora.on('quotes.ready', _.debounce(onReady, 1000, { leading: false, trailing: true }))
-async function onReady(hubmsg: Pandora.HubMessage) {
+pandora.on('quotes.ready', _.debounce(onready, 1000, { leading: false, trailing: true }))
+async function onready(hubmsg: Pandora.HubMessage) {
 	console.log(`hubmsg ->`, hubmsg.action)
-	return
 
-	let symbols = await utils.getSymbols()
+	let symbols = (await redis.main.keys(`${rkeys.QUOTES}:*`)).map(v => v.split(':').pop())
 
-	symbols.splice(10)
+	let ikeys = ['symbol', 'name', 'description'] as KeysOf<Iex.Item>
+	let quotes = (await redis.main.coms(symbols.map(v => {
+		return ['hmget', `${rkeys.QUOTES}:${v}`].concat(ikeys)
+	}))).map(v => redis.fixHmget(v, ikeys)) as Quotes.Quote[]
 
-	let ikeys = ['companyName', 'description', 'symbol'] as KeysOf<Iex.Item>
-	let coms = symbols.map(v => ['hmget', `${rkeys.IEX.ITEMS}:${v}`].concat(ikeys))
-	let resolved = await redis.main.coms(coms)
-	resolved = resolved.map(v => redis.fixHmget(v, ikeys))
+	idx = lunr(function() {
+		this.ref('symbol')
+		this.field('symbol', { boost: 10 })
+		this.field('name', { boost: 5 })
+		this.field('description')
+		this.metadataWhitelist = ['position', 'constructor']
+		quotes.forEach(v => this.add(v))
+	})
 
-	console.log(`resolved ->`, resolved)
-
-
+	onquery({ data: 'tech' } as any)
 
 }
 
 
 
+pandora.on('search.query', onquery)
+function onquery(hubmsg: Pandora.HubMessage) {
+	let query = hubmsg.data as string
+	console.time(query)
+	let results = idx.search(`${query}~1`)
+	console.timeEnd(query)
+	console.log('results ->', results)
+	if (!hubmsg.host) return;
+	pandora.send({ clientId: hubmsg.host.clientId }, 'search.results', results)
+}
 
 

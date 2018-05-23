@@ -4,6 +4,10 @@ import * as pandora from 'pandora'
 
 
 
+export function getClient() {
+	return pandora.getHub().hubClient
+}
+
 export function publish(fn: Function) {
 	return pandora.getHub().publish({ [fn.name]: fn }, {
 		name: fn.name,
@@ -26,6 +30,13 @@ export function send(selector: Hub.Selector, action: string, data = {} as any) {
 export function broadcast(selector: Hub.Selector, action: string, data = {} as any) {
 	pandora.getHub().hubClient.multipleSend(selector, action, { data })
 }
+// export function invoke(selector: Hub.Selector, action: string, data = {} as any) {
+// 	let client = pandora.getHub().hubClient
+// 	client.send(selector, action, { data })
+// 	return new Promise(function(resolve) {
+// 		client.once(action, resolve)
+// 	})
+// }
 
 export function once(action: string, fn: (hubmsg: Pandora.HubMessage) => void) {
 	pandora.getHub().hubClient.once(action, fn)

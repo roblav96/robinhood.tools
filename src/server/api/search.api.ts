@@ -3,6 +3,7 @@
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
+import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as utils from '../adapters/utils'
@@ -20,15 +21,36 @@ polka.route({
 	},
 	async handler(req, res) {
 		let query = core.string.clean(req.query.query).toLowerCase()
-		let { results } = await http.get('https://api.robinhood.com/instruments/', {
-			query: { query }, retries: 0,
-		}) as Robinhood.Api.Paginated<Robinhood.Instrument>
-		results.remove(v => !v || !v.symbol || Array.isArray(v.symbol.match(utils.matchSymbol)))
-		// console.log('results ->', results)
-		return results.map(v => _.pick(v, IKEYS))
-		// let instruments = await getInstruments(results.map(v => v.symbol))
-		// console.log('instruments ->', instruments)
-		// return instruments
+		if (!query) return []
+		console.log(`query ->`, query)
+
+		let results = (await new Promise<Pandora.HubMessage>(resolve => {
+			pandora.once('search.results', resolve)
+			pandora.send({ processName: 'search.service' }, 'search.query', query)
+		})).data as Quotes.Quote[]
+
+		// console.log(`results ->`, results)
+		// pandora.once('search.results', function onresults(hubmsg: Pandora.HubMessage) {
+		// 	console.log(`search.results hubmsg ->`, hubmsg)
+		// 	let results = hubmsg.data as Quotes.Quote[]
+
+		// })
+
+
+
+		return []
+
+
+
+		// let { results } = await http.get('https://api.robinhood.com/instruments/', {
+		// 	query: { query }, retries: 0,
+		// }) as Robinhood.Api.Paginated<Robinhood.Instrument>
+		// results.remove(v => !v || !v.symbol || Array.isArray(v.symbol.match(utils.matchSymbol)))
+		// // console.log('results ->', results)
+		// return results.map(v => _.pick(v, IKEYS))
+		// // let instruments = await getInstruments(results.map(v => v.symbol))
+		// // console.log('instruments ->', instruments)
+		// // return instruments
 	}
 })
 
