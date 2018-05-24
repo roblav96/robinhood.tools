@@ -171,7 +171,6 @@ export class MqttClient {
 			for (i = 0; i < len; i++) {
 				let wbquote = payload.data[i]
 				if (wbquote) {
-					delete wbquote.countryISOCode
 					webull.fix(wbquote)
 					wbquote.tickerId = tid
 					wbquote.symbol = symbol
