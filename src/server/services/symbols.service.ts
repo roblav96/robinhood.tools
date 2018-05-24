@@ -43,11 +43,7 @@ async function start() {
 	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
 	if (indexes == 0) await syncIndexes();
 
-	let keys = await redis.main.keys(`${rkeys.QUOTES}:*`)
-	console.log(`keys ->`, keys)
-	if (keys.length == 0) {
-		
-	}
+	await syncQuotes()
 
 	ready = true
 	pandora.broadcast({}, 'symbols.ready')
@@ -237,6 +233,20 @@ async function getTicker(symbol: string, tickerType: number) {
 	}) as Webull.Api.Paginated<Webull.Ticker>
 	if (!Array.isArray(response.list)) return;
 	return response.list.find(v => v.disSymbol == symbol)
+}
+
+
+
+async function syncQuotes() {
+	if (process.env.DEVELOPMENT) console.log('syncQuotes start ->');
+	let symbols = await utils.getAllSymbols()
+	let alls = await quotes.getAlls(symbols)
+	let resolved = await redis.main.coms(alls.map(all => {
+		let rkey = `${rkeys.QUOTES}:${all.symbol}`
+		return ['hmset', rkey, quotes.initquote(all) as any]
+	}))
+	console.log(`resolved ->`, resolved)
+	if (process.env.DEVELOPMENT) console.info('syncQuotes done ->', symbols.length);
 }
 
 

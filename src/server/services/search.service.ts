@@ -15,12 +15,12 @@ import * as utils from '../adapters/utils'
 const CACHE = [] as Quotes.Quote[]
 const WADES = { symbol: null, name: null, description: null }
 
-const onready = _.debounce(_onready, 3000, { leading: false, trailing: true })
-pandora.once('symbols.ready', onready)
+const _onready = _.debounce(onready, 3000, { leading: false, trailing: true })
+pandora.once('symbols.ready', _onready)
 pandora.broadcast({}, 'symbols.start')
-pandora.on('quotes.ready', onready)
+pandora.on('quotes.ready', _onready)
 
-async function _onready(hubmsg: Pandora.HubMessage) {
+async function onready() {
 
 	let keys = await redis.main.keys(`${rkeys.QUOTES}:*`)
 	let ikeys = ['symbol', 'name', 'description', 'avgVolume'] as KeysOf<Quotes.Quote>

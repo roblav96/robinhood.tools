@@ -70,6 +70,10 @@ export async function getInstanceFullSymbols(type = 'STOCKS' as keyof typeof rke
 	return (resolved ? JSON.parse(resolved) : {}) as Dict<number>
 }
 
+export async function getAllSymbols() {
+	return _.flatten(await Promise.all(Object.keys(rkeys.SYMBOLS).map(k => getSymbols(k as any))))
+}
+
 
 
 import * as fs from 'fs'

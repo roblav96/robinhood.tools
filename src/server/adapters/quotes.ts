@@ -212,19 +212,16 @@ export function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote
 		let keymap = KEY_MAP[k]
 		if (!keymap || !keymap.key) return;
 
-		if (k == 'status0') {
-			console.warn(symbol, `status0 ->`, wbquote.status0)
-		}
-
 		let qkey = keymap.key
 		let qvalue = quote[qkey]
 		if (qvalue == null) { qvalue = wbvalue; quote[qkey] = wbvalue; toquote[qkey] = wbvalue }
 
-		let tovalue = toquote[qkey]
-		if (tovalue) {
-			console.warn(symbol, `k ->`, k, `wbvalue ->`, wbvalue, `qkey ->`, qkey, `qvalue ->`, qvalue, `tovalue ->`, tovalue)
-			qvalue = tovalue
-		}
+		// if (k == 'status0') console.warn(symbol, `status0 ->`, wbquote.status0);
+		// let tovalue = toquote[qkey]
+		// if (tovalue && tovalue != qvalue) {
+		// 	console.warn(symbol, `k ->`, k, `wbvalue ->`, wbvalue, `qkey ->`, qkey, `qvalue ->`, qvalue, `tovalue ->`, tovalue)
+		// 	qvalue = tovalue
+		// }
 
 		if (keymap.time || keymap.greater) {
 			if (wbvalue > qvalue) {
