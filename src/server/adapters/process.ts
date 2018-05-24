@@ -27,9 +27,11 @@ if (+process.env.INSTANCE == 0) process.env.PRIMARY = true;
 
 
 
-import * as Pandora from 'pandora'
-process.env.OFFSET = Pandora.processContext ? Pandora.processContext.context.processRepresentation.offset : 0
-process.env.ORDER = Pandora.processContext ? Pandora.processContext.context.processRepresentation.order : 0
+// import * as Pandora from 'pandora'
+// process.env.OFFSET = Pandora.processContext ? Pandora.processContext.context.processRepresentation.offset : 0
+// process.env.ORDER = Pandora.processContext ? Pandora.processContext.context.processRepresentation.order : 0
+process.env.OFFSET = 0
+process.env.ORDER = 0
 if (!+process.env.OFFSET && process.env.PRIMARY) process.env.FIRST = true;
 
 
