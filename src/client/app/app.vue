@@ -11,7 +11,7 @@
 
 		<v-navbar></v-navbar>
 
-		<transition :enter-active-class="initing == null ? 'animated-slower fadeIn' : ''" leave-active-class="opacity-0">
+		<transition :enter-active-class="initing==null?'animated-slower fadeIn':''" leave-active-class="opacity-0">
 			<router-view class="router-view is-fullheight"></router-view>
 		</transition>
 
@@ -31,10 +31,8 @@
 				<nav class="tabs is-boxed is-centered">
 					<div class="container">
 						<ul>
-							<router-link tag="li" v-for="route in routes" :key="route.name" :to="{ name: route.name }">
-								<a>
-									<span>{{ route.name }}</span>
-								</a>
+							<router-link tag="li" v-for="route in routes" :key="route.name" :to="{name:route.name}">
+								<a>{{vcapitalize(route.name)}}</a>
 							</router-link>
 						</ul>
 					</div>

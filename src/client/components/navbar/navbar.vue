@@ -64,7 +64,9 @@ nav.navbar div.dropdown-content a > span.icon {
 					    :key="route.name">
 						<router-link class="navbar-item flex items-center h-full" :to="{name:route.name}">
 							<b-icon class="mx-1" size="is-28x28" :icon="route.icon"></b-icon>
-							<span :class="{'is-hidden-desktop':!isroute(route.name),'font-medium':isroute(route.name)}" class="ml-2 animated-slow fadeIn">{{route.title}}</span>
+							<span :class="{'is-hidden-desktop':!isroute(route.name),'font-medium':isroute(route.name)}" class="ml-2 animated-slow fadeIn">
+								{{vcapitalize(route.name)}}
+							</span>
 						</router-link>
 					</b-tooltip>
 					<b-tooltip v-if="!rhusername" label="Robinhood Login" :active="breakpoints.desktopAndUp" position="is-bottom">
