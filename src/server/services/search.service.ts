@@ -12,15 +12,14 @@ import * as utils from '../adapters/utils'
 
 
 
-const cache = [] as Quotes.Quote[]
-const wades = { symbol: null, name: null, description: null }
+const QUOTES = [] as Quotes.Quote[]
+const WADES = { symbol: null, name: null, description: null }
 
 pandora.once('symbols.ready', onready)
 pandora.broadcast({}, 'symbols.start')
 // pandora.on('quotes.ready', _.debounce(onready, 1000, { leading: false, trailing: true }))
 
 async function onready(hubmsg: Pandora.HubMessage) {
-	console.log(`hubmsg ->`, hubmsg.action)
 
 	let ikeys = ['symbol', 'name', 'description', 'avgVolume'] as KeysOf<Quotes.Quote>
 	let keys = await redis.main.keys(`${rkeys.QUOTES}:*`)
@@ -30,9 +29,10 @@ async function onready(hubmsg: Pandora.HubMessage) {
 		v = redis.fixHmget(v, ikeys)
 		core.fix(v)
 		return v
-	})//.sort((a, b) => core.sort.alphabetically(a.symbol, b.symbol))
+	})
+	// .sort((a, b) => core.sort.alphabetically(a.symbol, b.symbol))
 
-	cache.splice(0, Infinity, ...quotes.map(v => ({
+	QUOTES.splice(0, Infinity, ...quotes.map(v => ({
 		symbol: v.symbol,
 		avgVolume: v.avgVolume || 0,
 	} as Quotes.Quote)))
@@ -40,11 +40,11 @@ async function onready(hubmsg: Pandora.HubMessage) {
 	let symbols = quotes.map(v => v.symbol)
 	Wade.config.stopWords.remove(v => symbols.includes(v.toUpperCase()))
 
-	Object.keys(wades).forEach(key => {
-		wades[key] = Wade.save(Wade(quotes.map(v => v[key] || '')))
+	Object.keys(WADES).forEach(key => {
+		WADES[key] = Wade.save(Wade(quotes.map(v => v[key] || '')))
 	})
 
-	onquery({ data: 'am' } as any)
+	// onquery({ data: 'am' } as any)
 
 
 
@@ -68,7 +68,6 @@ async function onready(hubmsg: Pandora.HubMessage) {
 	// console.log('metas ->', metas)
 	// let results = metas.map(meta => QUOTES[meta.index])
 	// console.log('results ->', results)
-
 
 
 
@@ -99,28 +98,20 @@ const MAX = 20
 pandora.on('search.query', onquery)
 async function onquery(hubmsg: Pandora.HubMessage) {
 	let query = hubmsg.data as string
-	console.log(`query ->`, query)
 
 	let symbols = [] as string[]
-	Object.keys(wades).forEach(key => {
+	Object.keys(WADES).forEach(key => {
 		if (symbols.length > MAX) return;
-		let caches = Wade(wades[key])(query).map(({ index }) => cache[index]) as Quotes.Quote[]
-		caches.sort((a, b) => b.avgVolume - a.avgVolume).forEach(({ symbol }) => {
+		let quotes = Wade(WADES[key])(query).map(({ index }) => QUOTES[index]) as Quotes.Quote[]
+		quotes.sort((a, b) => b.avgVolume - a.avgVolume).forEach(({ symbol }) => {
 			if (symbols.includes(symbol)) return;
 			if (symbols.length >= MAX) return;
 			symbols.push(symbol)
 		})
 	})
 
-	let ikeys = ['symbol', 'name', 'description'] as KeysOf<Quotes.Quote>
-	let results = (await redis.main.coms(symbols.map(symbol => {
-		return ['hmget', `${rkeys.QUOTES}:${symbol}`].concat(ikeys)
-	}))).map(v => redis.fixHmget(v, ikeys)) as Quotes.Quote[]
-	results.forEach(core.fix)
-	console.log('results ->', results)
-
 	if (!hubmsg.host) return;
-	pandora.send({ clientId: hubmsg.host.clientId }, 'search.results', results)
+	pandora.send({ clientId: hubmsg.host.clientId }, 'search.results', symbols)
 
 
 

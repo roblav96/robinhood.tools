@@ -41,7 +41,7 @@ function Process(chain: ProcessRepresentationChainModifier, env = {} as Env) {
 
 export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 
-	// Process(pandora.process('api').entry('./api/api'), { SCALE: 2 })
+	Process(pandora.process('api').entry('./api/api'), { SCALE: 2 })
 
 	Process(pandora.process('symbols.service').entry('./services/symbols.service'), { SCALE: 1 })
 	Process(pandora.process('search.service').entry('./services/search.service'), { SCALE: 1 })

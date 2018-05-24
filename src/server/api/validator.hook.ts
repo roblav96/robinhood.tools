@@ -17,7 +17,8 @@ polka.use(function validatorhook(req, res, next) {
 			let key = keys[i]
 			let value = req[key]
 
-			let schemakeys = Object.keys(schemas[key])
+			let schema = schemas[key]
+			let schemakeys = Object.keys(schema)
 			let valuekeys = Object.keys(value)
 			let ii: number, lenn = valuekeys.length
 			for (ii = 0; ii < lenn; ii++) {
