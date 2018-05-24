@@ -83,7 +83,7 @@ export default class extends Mixins(VMixin) {
 	deals = [] as Quotes.Deal[]
 
 	@Vts.Watch('price', { immediate: true }) w_price(price: number) {
-		document.title = `${this.symbol} ${price} (${this.vnumber(this.percent, { plusminus: true, percent: true })})`
+		document.title = `${this.symbol} ${price} (${this.vnumber(this.quote.percent, { plusminus: true, percent: true })})`
 	}
 
 	get name() { return this.instrument.simple_name || this.instrument.name }

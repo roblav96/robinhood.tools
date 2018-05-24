@@ -75,8 +75,8 @@ export function initquote(
 	} as Quotes.Quote)
 
 	quote.name = core.fallback(iexitem.companyName, instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name)
-	quote.fullName = core.fallback(instrument.name, yhquote.longName, wbticker.name)
-	if (quote.fullName == quote.name) delete quote.fullName;
+	quote.nameLong = core.fallback(instrument.name, yhquote.longName, wbticker.name)
+	if (quote.nameLong == quote.name) delete quote.nameLong;
 
 	quote.avgVolume10Day = _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day))
 	quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))
@@ -354,7 +354,7 @@ export const mockquote = {
 	size: 0,
 	yield: 0.0023,
 	dayLow: 240.25,
-	fullName: 'NVIDIA Corporation Common Stock',
+	nameLong: 'NVIDIA Corporation Common Stock',
 	closePrice: 247.54,
 	buyVolume: 924,
 	name: 'NVIDIA Corporation',
