@@ -6,7 +6,8 @@ import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
-import * as webull from '../adapters/webull'
+import * as utils from '../adapters/utils'
+import * as pAll from 'p-all'
 
 
 
@@ -30,6 +31,23 @@ export async function getAlls(symbols: string[]) {
 		yhquote: resolved[ii++],
 		iexitem: resolved[ii++],
 	}) as Quotes.All)
+}
+
+
+
+export async function syncAllQuotes() {
+	let symbols = await utils.getAllSymbols()
+	symbols.splice(10)
+	let chunks = core.array.chunks(symbols, _.ceil(symbols.length / 256))
+	await pAll(chunks.map(chunk => async () => {
+		let alls = await getAlls(chunk)
+		await redis.main.coms(alls.map(all => {
+			console.log(`all ->`, JSON.stringify(all, null, 4))
+			let rkey = `${rkeys.QUOTES}:${all.symbol}`
+			return ['hmset', rkey, initquote(all) as any]
+		}))
+	}), { concurrency: 1 })
+	return symbols
 }
 
 
