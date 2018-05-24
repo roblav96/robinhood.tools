@@ -100,12 +100,12 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		let deal = quotes.todeal(wbquote)
 		socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
 
-		let toquote = quotes.applydeal(QUOTES[symbol], deal)
-		if (Object.keys(toquote).length > 0) {
-			toquote.symbol = symbol
-			core.object.merge(QUOTES[symbol], toquote)
-			core.object.merge(EMITS[symbol], toquote)
-			core.object.merge(SAVES[symbol], toquote)
+		let dealquote = quotes.applydeal(QUOTES[symbol], deal)
+		if (Object.keys(dealquote).length > 0) {
+			dealquote.symbol = symbol
+			core.object.merge(QUOTES[symbol], dealquote)
+			core.object.merge(EMITS[symbol], dealquote)
+			core.object.merge(SAVES[symbol], dealquote)
 		}
 
 		return
@@ -144,6 +144,16 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		core.object.merge(WB_QUOTES[symbol], toquote)
 		core.object.merge(WB_EMITS[symbol], toquote)
 		core.object.merge(WB_SAVES[symbol], toquote)
+
+		if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
+			let baquote = quotes.applybidask(QUOTES[symbol], toquote)
+			if (Object.keys(baquote).length > 0) {
+				baquote.symbol = symbol
+				core.object.merge(QUOTES[symbol], baquote)
+				core.object.merge(EMITS[symbol], baquote)
+				core.object.merge(SAVES[symbol], baquote)
+			}
+		}
 	}
 
 })
@@ -156,61 +166,49 @@ function ontick(i: number) {
 	let coms = [] as Redis.Coms
 	SYMBOLS.forEach(symbol => {
 
-		let toquote = EMITS[symbol]
 		let wbquote = WB_EMITS[symbol]
+		let toquote = EMITS[symbol]
 		if (Object.keys(wbquote).length > 0) {
 			quotes.applywbquote(QUOTES[symbol], wbquote, toquote)
+			core.object.merge(WB_QUOTES[symbol], wbquote)
+			core.object.merge(WB_SAVES[symbol], wbquote)
 			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
-			Object.assign(WB_EMITS, { [symbol]: {} })
 		}
 		if (Object.keys(toquote).length > 0) {
 			quotes.applycalcs(QUOTES[symbol], toquote)
-			toquote.symbol = symbol
 			core.object.merge(QUOTES[symbol], toquote)
 			core.object.merge(SAVES[symbol], toquote)
 			socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
-			Object.assign(EMITS, { [symbol]: {} })
 		}
 
 		if (save) {
 			if (Object.keys(WB_SAVES[symbol]).length > 0) {
 				coms.push(['hmset', `${rkeys.WB.QUOTES}:${symbol}`, WB_SAVES[symbol] as any])
-				Object.assign(WB_SAVES, { [symbol]: {} })
 			}
 
-			let saves = SAVES[symbol]
-			if (Object.keys(saves).length > 0) {
-				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, saves as any])
-				Object.assign(SAVES, { [symbol]: {} })
-			}
+			let toquote = SAVES[symbol]
+			if (Object.keys(toquote).length == 0) return;
+			coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, toquote as any])
+			if (!toquote.timestamp) return;
+
+			let quote = QUOTES[symbol]
+			quotes.resetquote(quote)
 
 		}
 
 	})
 
+	SYMBOLS.forEach(symbol => {
+		Object.assign(WB_EMITS, { [symbol]: {} })
+		Object.assign(EMITS, { [symbol]: {} })
+		if (save) {
+			Object.assign(WB_SAVES, { [symbol]: {} })
+			Object.assign(SAVES, { [symbol]: {} })
+		}
+	})
+
 	redis.main.coms(coms)
 
 }
-
-
-
-// function on10secs() {
-// 	let coms = []
-
-
-
-// 	Object.keys(SAVES).forEach(symbol => {
-// 		let quote = SAVES[symbol]
-// 		if (Object.keys(quote).length == 0) return;
-// 		coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, quote as any])
-// 		Object.assign(SAVES, { [symbol]: {} })
-// 	})
-
-// 	if (coms.length == 0) return;
-// 	redis.main.coms(coms)
-
-// }
-
-
 
 

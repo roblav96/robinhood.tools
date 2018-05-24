@@ -100,24 +100,24 @@ export default class extends Mixins(VMixin) {
 		return state
 	}
 
-	get price() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pPrice : this.wbquote.price }
-	get change() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pChange : this.wbquote.change }
-	get percent() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pChRatio * 100 : this.wbquote.changeRatio * 100 }
-	get marketcap() { return this.wbquote.totalShares * this.price }
+	// get price() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pPrice : this.wbquote.price }
+	// get change() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pChange : this.wbquote.change }
+	// get percent() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pChRatio * 100 : this.wbquote.changeRatio * 100 }
+	// get marketcap() { return this.wbquote.totalShares * this.price }
 
 	get baprice() {
-		if (Object.keys(this.wbquote).length == 0) return { bid: 0, ask: 0 };
-		let max = this.wbquote.ask - this.wbquote.bid
-		let price = this.price
-		let bid = core.calc.slider(price - this.wbquote.bid, 0, max)
-		let ask = core.calc.slider(this.wbquote.ask - price, 0, max)
+		if (Object.keys(this.quote).length == 0) return { bid: 0, ask: 0 };
+		let max = this.quote.askPrice - this.quote.bidPrice
+		let price = this.quote.price
+		let bid = core.calc.slider(price - this.quote.bidPrice, 0, max)
+		let ask = core.calc.slider(this.quote.askPrice - price, 0, max)
 		return { bid, ask }
 	}
-	get basize() {
-		if (Object.keys(this.wbquote).length == 0) return { bid: 0, ask: 0 };
-		let max = this.wbquote.bidSize + this.wbquote.askSize
-		let bid = core.calc.slider(this.wbquote.bidSize, 0, max)
-		let ask = core.calc.slider(this.wbquote.askSize, 0, max)
+	get balot() {
+		if (Object.keys(this.quote).length == 0) return { bid: 0, ask: 0 };
+		let max = this.quote.bidLot + this.quote.askLot
+		let bid = core.calc.slider(this.quote.bidLot, 0, max)
+		let ask = core.calc.slider(this.quote.askLot, 0, max)
 		return { bid, ask }
 	}
 
@@ -155,10 +155,11 @@ export default class extends Mixins(VMixin) {
 	}
 
 	onquote(quote: Quotes.Quote) {
-		console.log(`quote ->`, JSON.stringify(quote, null, 4))
+		// console.log(`quote ->`, JSON.stringify(quote, null, 4))
 		core.object.merge(this.quote, quote)
 	}
 	ondeal(deal: Quotes.Deal) {
+		// console.log(`deal ->`, JSON.stringify(deal, null, 4))
 		this.deals.unshift(deal)
 		this.deals.splice(20)
 	}

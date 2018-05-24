@@ -50,7 +50,45 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 
 
 
-						<div class="column flex justify-end">
+						<div class="column is-3 content text-sm">
+							<div class="columns is-mobile is-gapless mb-1">
+								<p class="column is-narrow">Bid</p>
+								<p class="column has-text-centered">Spread</p>
+								<p class="column is-narrow">Ask</p>
+							</div>
+							<div class="columns is-mobile is-gapless mb-0">
+								<div class="column is-6">
+									<progress class="progress is-danger is-small rounded-none mb-0" :value="baprice.bid" :min="0" :max="100"
+									    style="transform: rotate(180deg);"></progress>
+								</div>
+								<div class="column is-6">
+									<progress class="progress is-success is-small rounded-none mb-0" :value="baprice.ask" :min="0" :max="100"></progress>
+								</div>
+							</div>
+							<div class="columns is-mobile is-gapless mb-1">
+								<p class="column is-narrow has-text-danger">{{vnumber(quote.bidPrice)}}</p>
+								<p class="column has-text-centered">{{vnumber(vpercent(quote.askPrice, quote.bidPrice),{percent:true})}}</p>
+								<p class="column is-narrow has-text-success">{{vnumber(quote.askPrice)}}</p>
+							</div>
+							<div class="columns is-mobile is-gapless mb-0">
+								<div class="column is-6">
+									<progress class="progress is-success is-small rounded-none mb-0" :value="balot.bid" :min="0" :max="100"
+									    style="transform: rotate(180deg);"></progress>
+								</div>
+								<div class="column is-6">
+									<progress class="progress is-danger is-small rounded-none mb-0" :value="balot.ask" :min="0" :max="100"></progress>
+								</div>
+							</div>
+							<div class="columns is-mobile is-gapless mb-0">
+								<p class="column has-text-success">{{vnumber(quote.bidLot,{precision:0})}}</p>
+								<p class="column has-text-centered"></p>
+								<p class="column has-text-danger has-text-right">{{vnumber(quote.askLot,{precision:0})}}</p>
+							</div>
+						</div>
+
+
+
+						<!-- <div class="column flex justify-end">
 							<div class="has-text-right self-start bg-white border-grey-lightest border-solid border-1 rounded-l-lg px-4 py-2 mr-6">
 								<p class="is-size-4 font-medium">{{vnumber(quote.volume,{compact:true,precision:2})}}</p>
 								<p class="is-size-6">Volume</p>
@@ -59,7 +97,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 								<p class="is-size-4 font-medium">{{vnumber(marketcap,{compact:true,precision:2})}}</p>
 								<p class="is-size-6">Market Cap</p>
 							</div>
-						</div>
+						</div> -->
 
 
 
@@ -168,44 +206,6 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 									<p class="is-size-7">Market Cap</p>
 									<p class="is-size-5 leading-none font-medium">{{vnumber(marketcap,{compact:true,precision:0})}}</p>
 								</div>
-							</div>
-						</div> -->
-
-
-
-<!-- <div class="column is-3 is-2-fullhd content text-sm">
-							<div class="columns is-mobile is-gapless mb-1">
-								<p class="column is-narrow">Bid</p>
-								<p class="column has-text-centered">Spread</p>
-								<p class="column is-narrow">Ask</p>
-							</div>
-							<div class="columns is-mobile is-gapless mb-0">
-								<div class="column is-6">
-									<progress class="progress is-danger is-small rounded-none mb-0" :value="baprice.bid" :min="0" :max="100"
-									    style="transform: rotate(180deg);"></progress>
-								</div>
-								<div class="column is-6">
-									<progress class="progress is-success is-small rounded-none mb-0" :value="baprice.ask" :min="0" :max="100"></progress>
-								</div>
-							</div>
-							<div class="columns is-mobile is-gapless mb-1">
-								<p class="column is-narrow has-text-danger">{{vnumber(wbquote.bid)}}</p>
-								<p class="column has-text-centered">{{vnumber(vpercent(wbquote.ask, wbquote.bid),{percent:true})}}</p>
-								<p class="column is-narrow has-text-success">{{vnumber(wbquote.ask)}}</p>
-							</div>
-							<div class="columns is-mobile is-gapless mb-0">
-								<div class="column is-6">
-									<progress class="progress is-success is-small rounded-none mb-0" :value="basize.bid" :min="0" :max="100"
-									    style="transform: rotate(180deg);"></progress>
-								</div>
-								<div class="column is-6">
-									<progress class="progress is-danger is-small rounded-none mb-0" :value="basize.ask" :min="0" :max="100"></progress>
-								</div>
-							</div>
-							<div class="columns is-mobile is-gapless mb-0">
-								<p class="column has-text-success">{{vnumber(wbquote.bidSize,{precision:0})}}</p>
-								<p class="column has-text-centered"></p>
-								<p class="column has-text-danger has-text-right">{{vnumber(wbquote.askSize,{precision:0})}}</p>
 							</div>
 						</div> -->
 

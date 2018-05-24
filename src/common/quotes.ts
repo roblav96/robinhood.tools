@@ -7,42 +7,49 @@ import * as rkeys from './rkeys'
 declare global { namespace Quotes { type ITiny = typeof TINY; interface Tiny extends ITiny { } } }
 export const TINY = {
 	symbol: '',
-	name: '',
-	// typeof: '' as keyof typeof rkeys.SYMBOLS,
 	price: 0,
+	timestamp: 0,
+}
+export const TINY_KEYS = Object.keys(TINY)
+TINY_KEYS.forEach(k => TINY[k] = undefined)
+
+
+
+declare global { namespace Quotes { type ISmall = typeof SMALL; interface Small extends ISmall, Tiny { } } }
+export const SMALL = {
+	name: '',
 	change: 0,
 	percent: 0,
-	eodPrice: 0,
+	startPrice: 0,
 	openPrice: 0,
 	closePrice: 0,
 	prevClose: 0,
-	volume: 0,
 	size: 0,
-	timestamp: 0,
+	volume: 0,
 }
-Object.keys(TINY).forEach(k => TINY[k] = undefined)
+export const SMALL_KEYS = Object.keys(SMALL)
+SMALL_KEYS.forEach(k => SMALL[k] = undefined)
 
 
 
-declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Tiny { } } }
+declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Small { } } }
 export const LIVE = {
 	status: '',
-	statusUpdatedAt: 0,
-	alive: true,
+	statusTimestamp: 0,
+	alive: false,
 	// 
 	open: 0,
 	high: 0,
 	low: 0,
 	close: 0,
 	// 
-	yearHigh: 0,
-	yearLow: 0,
-	dayHigh: 0,
-	dayLow: 0,
-	// 
-	spread: 0,
 	bidPrice: 0,
 	askPrice: 0,
+	spread: 0,
+	bidSpread: 0,
+	askSpread: 0,
+	bidLot: 0,
+	askLot: 0,
 	bidSize: 0,
 	askSize: 0,
 	bidVolume: 0,
@@ -51,9 +58,9 @@ export const LIVE = {
 	count: 0,
 	deals: 0,
 	dealVolume: 0,
-	dealVolumeFlow: 0,
+	dealFlowVolume: 0,
 	dealSize: 0,
-	dealSizeFlow: 0,
+	dealFlowSize: 0,
 	// 
 	buyVolume: 0,
 	sellVolume: 0,
@@ -68,15 +75,30 @@ export const LIVE = {
 	quoteMaker: '',
 	quoteMakerAddress: '',
 }
-Object.keys(LIVE).forEach(k => LIVE[k] = undefined)
+export const LIVE_KEYS = Object.keys(LIVE)
+LIVE_KEYS.forEach(k => LIVE[k] = undefined)
 
 
 
 declare global { namespace Quotes { type ICalc = typeof CALC; interface Calc extends ICalc, Live { } } }
 export const CALC = {
-
+	yearHigh: 0,
+	yearLow: 0,
+	dayHigh: 0,
+	dayLow: 0,
+	// 
+	regPrice: 0,
+	regChange: 0,
+	regPercent: 0,
+	prePrice: 0,
+	preChange: 0,
+	prePercent: 0,
+	postPrice: 0,
+	postChange: 0,
+	postPercent: 0,
 }
-Object.keys(CALC).forEach(k => CALC[k] = undefined)
+export const CALC_KEYS = Object.keys(CALC)
+CALC_KEYS.forEach(k => CALC[k] = undefined)
 
 
 
@@ -103,7 +125,8 @@ export const FULL = {
 	sharesOutstanding: 0,
 	sharesFloat: 0,
 }
-Object.keys(FULL).forEach(k => FULL[k] = undefined)
+export const FULL_KEYS = Object.keys(FULL)
+FULL_KEYS.forEach(k => FULL[k] = undefined)
 
 
 
@@ -115,7 +138,8 @@ export const DEAL = {
 	side: '' as 'N' | 'B' | 'S',
 	timestamp: 0,
 }
-Object.keys(DEAL).forEach(k => DEAL[k] = undefined)
+export const DEAL_KEYS = Object.keys(DEAL)
+DEAL_KEYS.forEach(k => DEAL[k] = undefined)
 
 
 

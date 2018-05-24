@@ -26,7 +26,7 @@ pandora.on('symbols.start', function() {
 
 async function start() {
 
-	// return syncEverything()
+	// await quotes.syncAllQuotes(true)
 
 	let keys = [
 		rkeys.RH.SYMBOLS, rkeys.WB.SYMBOLS,

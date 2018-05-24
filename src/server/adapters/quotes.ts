@@ -6,6 +6,7 @@ import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
 import * as utils from '../adapters/utils'
+import * as hours from '../adapters/hours'
 import * as pAll from 'p-all'
 
 
@@ -82,10 +83,10 @@ export function initquote(
 	quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, _.round(quote.avgVolume10Day, quote.avgVolume3Month)))
 
 	core.object.repair(quote, applywbquote(quote, wbquote))
+	core.object.repair(quote, applybidask(quote, wbquote))
 
-	let reset = resetquote(quote)
-	core.object.repair(quote, reset)
-	if (resets) core.object.merge(quote, reset);
+	let reset = resetquote(quote, true)
+	resets ? core.object.merge(quote, reset) : core.object.repair(quote, reset)
 
 	applycalcs(quote)
 	core.object.clean(quote)
@@ -105,18 +106,30 @@ export function initquote(
 
 }
 
-export function resetquote(quote: Quotes.Quote) {
-	return {
-		eodPrice: quote.price,
-		dayHigh: quote.price, dayLow: quote.price,
+
+
+export function resetquote(quote: Quotes.Quote, resets = false) {
+	let reset = {
+		size: 0,
+		bidSize: 0, askSize: 0,
+		buySize: 0, sellSize: 0,
+		dealSize: 0, dealFlowSize: 0,
 		open: quote.price, high: quote.price, low: quote.price, close: quote.price,
-		count: 0, deals: 0,
-		bidVolume: 0, askVolume: 0,
-		volume: 0, size: 0,
-		dealVolume: 0, dealSize: 0,
-		buyVolume: 0, buySize: 0,
-		sellVolume: 0, sellSize: 0,
+		bidSpread: quote.bidPrice, askSpread: quote.askPrice,
 	} as Quotes.Quote
+	if (resets) {
+		reset.volume = 0
+		Object.keys(reset).forEach(key => {
+			if (key.indexOf('Size') == -1) return;
+			reset[key.replace('Size', 'Volume')] = 0
+		})
+		core.object.merge(reset, {
+			startPrice: quote.price,
+			dayHigh: quote.price, dayLow: quote.price,
+			count: 0, deals: 0,
+		} as Quotes.Quote)
+	}
+	return reset
 }
 
 
@@ -147,14 +160,40 @@ export function applydeal(quote: Quotes.Quote, deal: Quotes.Deal, toquote = {} a
 	if (deal.side == 'B') {
 		toquote.buySize = quote.buySize + deal.size
 		toquote.buyVolume = quote.buyVolume + deal.size
-	}
-	else if (deal.side == 'S') {
+	} else if (deal.side == 'S') {
 		toquote.sellSize = quote.sellSize + deal.size
 		toquote.sellVolume = quote.sellVolume + deal.size
-	}
-	else {
+	} else {
 		toquote.volume = quote.volume + deal.size
 	}
+
+	return toquote
+}
+
+
+
+export function applybidask(quote: Quotes.Quote, wbquote: Webull.Quote, toquote = {} as Quotes.Quote) {
+
+	let keymap = [
+		{ key: 'bid', fn: 'min' },
+		{ key: 'ask', fn: 'max' },
+	]
+	keymap.forEach(({ key, fn }) => {
+		let kprice = `${key}Price`
+		let kspread = `${key}Spread`
+		if (wbquote[key] && wbquote[key] > 0) {
+			toquote[kspread] = _[fn]([quote[kspread], quote[key], wbquote[key]])
+			toquote[kprice] = wbquote[key]
+		}
+		let ksize = `${key}Size`
+		let klot = `${key}Lot`
+		let kvolume = `${key}Volume`
+		if (wbquote[ksize]) {
+			toquote[klot] = wbquote[ksize]
+			toquote[ksize] = quote[ksize] + wbquote[ksize]
+			toquote[kvolume] = quote[kvolume] + wbquote[ksize]
+		}
+	})
 
 	return toquote
 }
@@ -173,21 +212,22 @@ export const KEY_MAP = (({
 	'close': ({ key: 'closePrice' } as KeyMapValue) as any,
 	'preClose': ({ key: 'prevClose' } as KeyMapValue) as any,
 	// 
-	'high': ({ key: 'dayHigh' } as KeyMapValue) as any,
-	'low': ({ key: 'dayLow' } as KeyMapValue) as any,
+	// 'high': ({ key: 'dayHigh' } as KeyMapValue) as any,
+	// 'low': ({ key: 'dayLow' } as KeyMapValue) as any,
 	'fiftyTwoWkHigh': ({ key: 'yearHigh' } as KeyMapValue) as any,
 	'fiftyTwoWkLow': ({ key: 'yearLow' } as KeyMapValue) as any,
 	// 
-	'bid': ({ key: 'bidPrice' } as KeyMapValue) as any,
-	'ask': ({ key: 'askPrice' } as KeyMapValue) as any,
-	'bidSize': ({ key: 'bidSize' } as KeyMapValue) as any,
-	'askSize': ({ key: 'askSize' } as KeyMapValue) as any,
+	// 'bid': ({ key: 'bidPrice' } as KeyMapValue) as any,
+	// 'ask': ({ key: 'askPrice' } as KeyMapValue) as any,
+	// 'bidSize': ({ key: 'bidLot' } as KeyMapValue) as any,
+	// 'askSize': ({ key: 'askLot' } as KeyMapValue) as any,
 	// 
-	'totalShares': ({ key: 'sharesOutstanding' } as KeyMapValue) as any,
-	'outstandingShares': ({ key: 'sharesFloat' } as KeyMapValue) as any,
 	'turnoverRate': ({ key: 'turnoverRate' } as KeyMapValue) as any,
 	'vibrateRatio': ({ key: 'vibrateRatio' } as KeyMapValue) as any,
 	'yield': ({ key: 'yield' } as KeyMapValue) as any,
+	// 
+	'totalShares': ({ key: 'sharesOutstanding' } as KeyMapValue) as any,
+	'outstandingShares': ({ key: 'sharesFloat' } as KeyMapValue) as any,
 	// 
 	'faTradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
 	'tradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
@@ -224,7 +264,7 @@ export function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote
 	})
 
 	if (toquote.status) {
-		toquote.statusUpdatedAt = Date.now()
+		toquote.statusTimestamp = Date.now()
 	}
 
 	if (toquote.timestamp) {
@@ -241,23 +281,41 @@ export function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote
 
 
 
-export function applycalcs(quote: Quotes.Quote, toquote = quote) {
+export function applycalcs(quote: Quotes.Quote, toquote?: Quotes.Quote) {
+	if (!toquote) { toquote = quote } else { core.object.merge(quote, toquote) };
 
 	if (toquote.price) {
-		toquote.close = toquote.price
-		if (quote.eodPrice) {
-			toquote.change = toquote.price - quote.eodPrice
-			toquote.percent = core.calc.percent(toquote.price, quote.eodPrice)
+		toquote.change = quote.price - quote.startPrice
+		toquote.percent = core.calc.percent(quote.price, quote.startPrice)
+
+		let state = hours.getState(hours.rxhours.value, quote.timestamp)
+		if (state == 'REGULAR') {
+			toquote.regPrice = quote.price
+			toquote.regChange = quote.price - quote.openPrice
+			toquote.regPercent = core.calc.percent(quote.price, quote.openPrice)
+		} else if (state.indexOf('PRE') == 0) {
+			toquote.prePrice = quote.price
+			toquote.preChange = quote.price - quote.startPrice
+			toquote.prePercent = core.calc.percent(quote.price, quote.startPrice)
+		} else if (state.indexOf('POST') == 0) {
+			toquote.postPrice = quote.price
+			toquote.postChange = quote.price - quote.closePrice
+			toquote.postPercent = core.calc.percent(quote.price, quote.closePrice)
 		}
+
+		toquote.close = quote.price
+
 		if (quote.sharesOutstanding) {
-			toquote.marketCap = _.round(toquote.price * quote.sharesOutstanding)
+			toquote.marketCap = _.round(quote.price * quote.sharesOutstanding)
 		}
 	}
 
 	if (toquote.askPrice || toquote.bidPrice) {
-		let bid = toquote.bidPrice || quote.bidPrice
-		let ask = toquote.askPrice || quote.askPrice
-		toquote.spread = ask - bid
+		toquote.spread = quote.askPrice - quote.bidPrice
+	}
+
+	if (toquote.askSize || toquote.bidSize) {
+
 	}
 
 	return toquote
@@ -285,12 +343,12 @@ export const mockquote = {
 	dayHigh: 247.59,
 	industry: 'Semiconductors',
 	askVolume: 0,
-	eodPrice: 247.5,
+	startPrice: 247.5,
 	currency: 'USD',
 	alive: true,
 	sharesOutstanding: 606000000,
 	sellVolume: 400,
-	statusUpdatedAt: 1527159036999,
+	statusTimestamp: 1527159036999,
 	change: -0.75,
 	mic: 'XNAS',
 	size: 0,
