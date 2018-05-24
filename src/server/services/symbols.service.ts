@@ -26,26 +26,12 @@ pandora.on('symbols.start', function(hubmsg) {
 
 async function start() {
 
-	// console.time(`syncAllQuotes`)
-	// let symbols = await quotes.syncAllQuotes()
-	// console.timeEnd(`syncAllQuotes`)
-	// console.log(`symbols.length ->`, symbols.length)
-	// return
-
-	let instruments = await redis.main.exists(rkeys.RH.SYMBOLS)
-	if (instruments == 0) await syncInstruments();
-
-	let tickers = await redis.main.exists(rkeys.WB.SYMBOLS)
-	if (tickers == 0) await syncTickers();
-
-	let stocks = await redis.main.exists(rkeys.SYMBOLS.STOCKS)
-	if (stocks == 0) await syncStocks();
-
-	let forex = await redis.main.exists(rkeys.SYMBOLS.FOREX)
-	if (forex == 0) await syncForex();
-
-	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
-	if (indexes == 0) await syncIndexes();
+	let keys = [
+		rkeys.RH.SYMBOLS, rkeys.WB.SYMBOLS,
+		rkeys.SYMBOLS.STOCKS, rkeys.SYMBOLS.FOREX, rkeys.SYMBOLS.INDEXES,
+	]
+	let exists = await redis.main.coms(keys.map(k => ['exists', k])) as number[]
+	if (_.sum(exists) != keys.length) await quotes.syncAllQuotes();
 
 	ready = true
 	pandora.broadcast({}, 'symbols.ready')
@@ -54,15 +40,15 @@ async function start() {
 
 
 
-schedule.scheduleJob('50 3 * * 1-5', async function sync() {
+schedule.scheduleJob('50 3 * * 1-5', () => syncEverything(true))
+async function syncEverything(resets = false) {
 	await syncInstruments()
 	await syncTickers()
-})
-
-schedule.scheduleJob('00 4 * * 1-5', async function reset() {
 	await syncStocks()
-	pandora.broadcast({}, 'symbols.reset')
-})
+	await syncForex()
+	await syncIndexes()
+	await quotes.syncAllQuotes(resets)
+}
 
 
 
@@ -154,13 +140,6 @@ async function syncTickers() {
 
 	if (process.env.DEVELOPMENT) console.log('iex.syncItems ->');
 	await iex.syncItems(symbols)
-
-	if (process.env.DEVELOPMENT) console.log('quotes.sync ->');
-	let alls = await quotes.getAlls(symbols)
-	await redis.main.coms(alls.map(all => {
-		let symbol = all.symbol
-		return ['hmset', `${rkeys.QUOTES}:${symbol}`, quotes.initquote(all) as any]
-	}))
 
 	if (process.env.DEVELOPMENT) console.info('syncTickers done ->', symbols.length);
 }

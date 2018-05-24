@@ -4,50 +4,46 @@ export * from '../../common/quotes'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
-import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
 import * as utils from '../adapters/utils'
 import * as pAll from 'p-all'
 
 
 
-export async function getAlls(symbols: string[]) {
-	let resolved = await redis.main.coms(_.flatten(symbols.map(v => [
-		['hgetall', `${rkeys.QUOTES}:${v}`],
-		['hgetall', `${rkeys.WB.TICKERS}:${v}`],
-		['hgetall', `${rkeys.WB.QUOTES}:${v}`],
-		['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`],
-		['hgetall', `${rkeys.YH.QUOTES}:${v}`],
-		['hgetall', `${rkeys.IEX.ITEMS}:${v}`],
-	])))
+export const ALL_KEYS = {
+	'quote': rkeys.QUOTES,
+	'wbticker': rkeys.WB.TICKERS,
+	'wbquote': rkeys.WB.QUOTES,
+	'instrument': rkeys.RH.INSTRUMENTS,
+	'yhquote': rkeys.YH.QUOTES,
+	'iexitem': rkeys.IEX.ITEMS,
+}
+
+export async function getAlls(symbols: string[], allkeys = Object.keys(ALL_KEYS) as (keyof typeof ALL_KEYS)[]) {
+	let resolved = await redis.main.coms(_.flatten(symbols.map(v => {
+		return allkeys.map(k => ['hgetall', `${ALL_KEYS[k]}:${v}`])
+	})))
 	resolved.forEach(core.fix)
-	let ii = 0
-	return symbols.map(symbol => ({
-		symbol,
-		quote: resolved[ii++],
-		wbticker: resolved[ii++],
-		wbquote: resolved[ii++],
-		instrument: resolved[ii++],
-		yhquote: resolved[ii++],
-		iexitem: resolved[ii++],
-	}) as Quotes.All)
+	let i = 0
+	return symbols.map(symbol => {
+		let all = { symbol } as Quotes.All
+		allkeys.forEach(k => all[k] = resolved[i++])
+		return all
+	})
 }
 
 
 
-export async function syncAllQuotes() {
+export async function syncAllQuotes(resets = false) {
 	let symbols = await utils.getAllSymbols()
-	symbols.splice(10)
 	let chunks = core.array.chunks(symbols, _.ceil(symbols.length / 256))
 	await pAll(chunks.map(chunk => async () => {
 		let alls = await getAlls(chunk)
 		await redis.main.coms(alls.map(all => {
-			console.log(`all ->`, JSON.stringify(all, null, 4))
 			let rkey = `${rkeys.QUOTES}:${all.symbol}`
-			return ['hmset', rkey, initquote(all) as any]
+			return ['hmset', rkey, initquote(all, resets) as any]
 		}))
 	}), { concurrency: 1 })
-	return symbols
 }
 
 
@@ -71,7 +67,7 @@ export function initquote(
 		mic: instrument.mic,
 		acronym: instrument.acronym,
 		listDate: new Date(instrument.list_date).valueOf(),
-		country: core.fallback(instrument.country, wbquote.countryISOCode, wbquote.regionAlias),
+		country: core.fallback(instrument.country, wbquote.countryISOCode, wbquote.regionAlias, wbticker.regionIsoCode),
 		exchange: core.fallback(iexitem.exchange, iexitem.primaryExchange, wbticker.exchangeCode, wbticker.disExchangeCode),
 		sharesOutstanding: _.round(core.fallback(wbquote.totalShares, yhquote.sharesOutstanding, iexitem.sharesOutstanding)),
 		sharesFloat: _.round(core.fallback(wbquote.outstandingShares, iexitem.float)),
@@ -125,24 +121,40 @@ export function resetquote(quote: Quotes.Quote) {
 
 
 
-function applycalcs(quote: Quotes.Quote, toquote = quote) {
+export function todeal(wbdeal: Webull.Deal) {
+	return {
+		price: wbdeal.deal,
+		side: wbdeal.tradeBsFlag,
+		size: wbdeal.volume,
+		symbol: wbdeal.symbol,
+		timestamp: wbdeal.tradeTime,
+	} as Quotes.Deal
+}
+
+export function applydeal(quote: Quotes.Quote, deal: Quotes.Deal, toquote = {} as Quotes.Quote) {
 	let symbol = quote.symbol
 
-	if (toquote.price) {
-		toquote.close = toquote.price
-		if (quote.eodPrice) {
-			toquote.change = toquote.price - quote.eodPrice
-			toquote.percent = core.calc.percent(toquote.price, quote.eodPrice)
-		}
-		if (quote.sharesOutstanding) {
-			toquote.marketCap = _.round(toquote.price * quote.sharesOutstanding)
+	if (deal.timestamp > quote.timestamp) {
+		toquote.timestamp = deal.timestamp
+		if (deal.price != quote.price) {
+			toquote.price = deal.price
 		}
 	}
 
-	if (toquote.askPrice || toquote.bidPrice) {
-		let bid = toquote.bidPrice || quote.bidPrice
-		let ask = toquote.askPrice || quote.askPrice
-		toquote.spread = ask - bid
+	toquote.deals = quote.deals + 1
+	toquote.dealSize = quote.dealSize + deal.size
+	toquote.dealVolume = quote.dealVolume + deal.size
+
+	if (deal.side == 'B') {
+		toquote.buySize = quote.buySize + deal.size
+		toquote.buyVolume = quote.buyVolume + deal.size
+	}
+	else if (deal.side == 'S') {
+		toquote.sellSize = quote.sellSize + deal.size
+		toquote.sellVolume = quote.sellVolume + deal.size
+	}
+	else {
+		toquote.volume = quote.volume + deal.size
 	}
 
 	return toquote
@@ -191,37 +203,6 @@ export const KEY_MAP = (({
 
 
 
-export function applydeal(quote: Quotes.Quote, deal: Quotes.Deal, toquote = {} as Quotes.Quote) {
-	let symbol = quote.symbol
-
-	if (deal.timestamp > quote.timestamp) {
-		toquote.timestamp = deal.timestamp
-		if (deal.price != quote.price) {
-			toquote.price = deal.price
-		}
-	}
-
-	toquote.deals = quote.deals + 1
-	toquote.dealSize = quote.dealSize + deal.size
-	toquote.dealVolume = quote.dealVolume + deal.size
-
-	if (deal.side == 'B') {
-		toquote.buySize = quote.buySize + deal.size
-		toquote.buyVolume = quote.buyVolume + deal.size
-	}
-	else if (deal.side == 'S') {
-		toquote.sellSize = quote.sellSize + deal.size
-		toquote.sellVolume = quote.sellVolume + deal.size
-	}
-	else {
-		toquote.volume = quote.volume + deal.size
-	}
-
-	return toquote
-}
-
-
-
 export function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote = {} as Quotes.Quote) {
 	let symbol = wbquote.symbol
 
@@ -262,6 +243,31 @@ export function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote
 		if (wbquote.faTradeTime == toquote.timestamp && wbquote.pPrice && wbquote.pPrice != quote.price) {
 			toquote.price = wbquote.pPrice
 		}
+	}
+
+	return toquote
+}
+
+
+
+export function applycalcs(quote: Quotes.Quote, toquote = quote) {
+	let symbol = quote.symbol
+
+	if (toquote.price) {
+		toquote.close = toquote.price
+		if (quote.eodPrice) {
+			toquote.change = toquote.price - quote.eodPrice
+			toquote.percent = core.calc.percent(toquote.price, quote.eodPrice)
+		}
+		if (quote.sharesOutstanding) {
+			toquote.marketCap = _.round(toquote.price * quote.sharesOutstanding)
+		}
+	}
+
+	if (toquote.askPrice || toquote.bidPrice) {
+		let bid = toquote.bidPrice || quote.bidPrice
+		let ask = toquote.askPrice || quote.askPrice
+		toquote.spread = ask - bid
 	}
 
 	return toquote

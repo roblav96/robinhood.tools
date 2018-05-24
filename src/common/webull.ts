@@ -97,16 +97,6 @@ export enum mqtt_topics {
 
 
 
-export function toDeal(wbdeal: Webull.Deal) {
-	return {
-		price: wbdeal.deal,
-		side: wbdeal.tradeBsFlag,
-		size: wbdeal.volume,
-		symbol: wbdeal.symbol,
-		timestamp: wbdeal.tradeTime,
-	} as Quotes.Deal
-}
-
 
 
 declare global {
