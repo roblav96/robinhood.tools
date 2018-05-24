@@ -12,8 +12,8 @@ import * as utils from '../adapters/utils'
 
 
 
-// let searchindex: lunr.Index
-let searchindex: any
+// let QUOTES = [] as Quotes.Quote[]
+let INDEXES = { symbols: null, names: null, descriptions: null }
 
 pandora.once('symbols.ready', onready)
 pandora.broadcast({}, 'symbols.start')
@@ -22,24 +22,40 @@ pandora.broadcast({}, 'symbols.start')
 async function onready(hubmsg: Pandora.HubMessage) {
 	console.log(`hubmsg ->`, hubmsg.action)
 
-	let symbols = (await redis.main.keys(`${rkeys.QUOTES}:*`)).map(v => v.split(':').pop())
+	let ikeys = ['symbol', 'name', 'description', 'avgVolume'] as KeysOf<Quotes.Quote>
+	let keys = await redis.main.keys(`${rkeys.QUOTES}:*`)
+	let quotes = (await redis.main.coms(keys.map(key => {
+		return ['hmget', key].concat(ikeys)
+	}))).map((v: Quotes.Quote) => {
+		v = redis.fixHmget(v, ikeys)
+		core.fix(v)
+		return v
+	})
 
-	let ikeys = ['symbol', 'name', 'description'] as KeysOf<Quotes.Quote>
-	let quotes = (await redis.main.coms(symbols.map(v => {
-		return ['hmget', `${rkeys.QUOTES}:${v}`].concat(ikeys)
-	}))).map(v => redis.fixHmget(v, ikeys)) as Quotes.Quote[]
+	let symbols = quotes.map(quote => {
+		if (!quote.symbol || !quote.symbol.toLowerCase) {
+			console.warn(`quote ->`, quote)
+		}
+		return quote.symbol.toLowerCase()
+	})
+	console.log(`symbols ->`, symbols)
+	return
+	// INDEXES.symbols = Wade.save(Wade())
+	// INDEXES.names = Wade.save(Wade(QUOTES.map(v => v.name || '')))
+	// INDEXES.descriptions = Wade.save(Wade(QUOTES.map(v => v.description || '')))
 
-	// quotes.splice(10)
-
-	console.time(`Wade`)
-	let searchsymbols = Wade(quotes.map(v => v.symbol))
-	console.log(`searchsymbols -> %O`, searchsymbols, searchsymbols)
-	let searchnames = Wade(quotes.map(v => v.name))
-	let searchdescriptions = Wade(quotes.map(v => v.description))
+	console.log(`symbols ->`, symbols)
+	// let search = Wade(symbols)
 	// console.log('search ->', search)
-	let index = Wade.save(search)
-	// console.log('index ->', index)
-	console.timeEnd(`Wade`)
+	return
+
+	let metas = search('all')
+	console.log('metas ->', metas)
+	let results = metas.map(meta => QUOTES[meta.index])
+	console.log('results ->', results)
+
+
+
 
 	// quotes = quotes.map(quote => _.mapValues(quote, (v: string, k) => {
 	// 	return v.toLowerCase()

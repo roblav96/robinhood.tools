@@ -55,16 +55,16 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 
 
 
+
+
 	// Process(pandora.process('benchmark').entry('./benchmarks/api.benchmark'), {
 	// 	SCALE: 1,
 	// })
 
-
-
-	if (!DEVELOPMENT) {
-		pandora.process('dashboard').scale(1)
-		pandora.service('dashboard', path.resolve(PROJECT, 'node_modules/pandora-dashboard/dist/Dashboard')).process('dashboard')
-	}
+	// if (!DEVELOPMENT) {
+	// 	pandora.process('dashboard').scale(1)
+	// 	pandora.service('dashboard', path.resolve(PROJECT, 'node_modules/pandora-dashboard/dist/Dashboard')).process('dashboard')
+	// }
 
 }
 

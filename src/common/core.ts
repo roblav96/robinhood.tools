@@ -20,12 +20,14 @@ export const isNodejs = !isBrowser
 
 
 
+const FIXSKIP = ['symbol']
 const FIXDATE = ['created_at', 'timestamp', 'updated_at']
 const FIXURL = ['account', 'ach_relationship', 'instrument', 'watchlist']
 export function fix(target: any, deep?: any) {
 	Object.keys(target).forEach(key => {
 		let value = target[key]
 		if (value == null) return;
+		else if (FIXSKIP.includes(key)) return;
 		else if (deep === true && Array.isArray(value)) return value.forEach(fix);
 		else if (deep === true && object.is(value)) return fix(value);
 		else if (!string.is(value)) return;
@@ -134,15 +136,15 @@ export const string = {
 	leven(a: string, b: string) {
 		return leven(a, b) as number
 	},
-	fuzzysearch(needle: string, haystack: string) {
-		let hlen = haystack.length
-		let nlen = needle.length
+	fuzzysearch(value: string, search: string) {
+		let hlen = value.length
+		let nlen = search.length
 		if (nlen > hlen) return false;
-		if (nlen === hlen) return needle === haystack;
+		if (nlen === hlen) return search === value;
 		outer: for (let i = 0, j = 0; i < nlen; i++) {
-			let nch = needle.charCodeAt(i)
+			let nch = search.charCodeAt(i)
 			while (j < hlen) {
-				if (haystack.charCodeAt(j++) === nch) {
+				if (value.charCodeAt(j++) === nch) {
 					continue outer
 				}
 			}
