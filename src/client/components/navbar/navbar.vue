@@ -14,7 +14,7 @@ span.navbar-burger.burger > span {
 }
 
 nav.navbar {
-	border-bottom: 1px solid var(--white-ter);
+	border-bottom: 1px solid var(--grey-lightest);
 }
 
 nav.navbar div.navbar-item.field {

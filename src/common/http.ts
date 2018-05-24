@@ -14,6 +14,7 @@ export function config(config: Partial<Http.Config>) {
 	_.defaults(config, {
 		headers: {},
 		verbose: false,
+		silent: false,
 		debug: false,
 		timeout: 10000,
 		retries: process.env.CLIENT ? 0 : 3,
@@ -89,7 +90,7 @@ export function send(config: Http.Config) {
 		let reject = boom.isBoom(error) && [401, 500].includes(error.output.statusCode)
 		if (!reject && config.retries > 0) {
 			config.retries--
-			if (process.env.DEVELOPMENT && process.env.SERVER) {
+			if (!config.silent && process.env.DEVELOPMENT && process.env.SERVER) {
 				console.warn('retry Error ->', config, error)
 			}
 			return clock.toPromise(config.retryTick).then(() => send(config))
@@ -114,6 +115,7 @@ declare global {
 			retries: number
 			retryTick: Clock.Tick
 			verbose: boolean
+			silent: boolean
 			debug: boolean
 			isProxy: boolean
 			rhtoken: string

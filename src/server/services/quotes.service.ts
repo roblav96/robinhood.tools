@@ -158,7 +158,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 	await redis.main.coms(coms)
 	pandora.broadcast({}, 'quotes.ready')
 
-	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 128))
+	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 256))
 	CLIENTS.splice(0, Infinity, ...chunks.map((chunk, i) => new webull.MqttClient({
 		fsymbols: _.fromPairs(chunk),
 		topics: process.env.SYMBOLS,

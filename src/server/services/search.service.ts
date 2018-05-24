@@ -21,10 +21,9 @@ pandora.broadcast({}, 'symbols.start')
 pandora.on('quotes.ready', onready)
 
 async function _onready(hubmsg: Pandora.HubMessage) {
-	// console.log('hubmsg ->', hubmsg)
 
-	let ikeys = ['symbol', 'name', 'description', 'avgVolume'] as KeysOf<Quotes.Quote>
 	let keys = await redis.main.keys(`${rkeys.QUOTES}:*`)
+	let ikeys = ['symbol', 'name', 'description', 'avgVolume'] as KeysOf<Quotes.Quote>
 	let quotes = (await redis.main.coms(keys.map(key => {
 		return ['hmget', key].concat(ikeys)
 	}))).map((v: Quotes.Quote) => {
@@ -53,7 +52,6 @@ async function _onready(hubmsg: Pandora.HubMessage) {
 
 const MAX = 20
 pandora.reply('search.query', async function onquery(query: string) {
-	console.log(`onquery query ->`, query)
 	let symbols = [] as string[]
 	Object.keys(WADES).forEach(key => {
 		if (symbols.length > MAX) return;
@@ -66,23 +64,5 @@ pandora.reply('search.query', async function onquery(query: string) {
 	})
 	return symbols
 })
-
-// pandora.on('search.query', onquery)
-// async function onquery(hubmsg: Pandora.HubMessage<string>) {
-
-// 	let symbols = [] as string[]
-// 	Object.keys(WADES).forEach(key => {
-// 		if (symbols.length > MAX) return;
-// 		let quotes = Wade(WADES[key])(hubmsg.data).map(({ index }) => CACHE[index]) as Quotes.Quote[]
-// 		quotes.sort((a, b) => b.avgVolume - a.avgVolume).forEach(({ symbol }) => {
-// 			if (symbols.includes(symbol)) return;
-// 			if (symbols.length >= MAX) return;
-// 			symbols.push(symbol)
-// 		})
-// 	})
-
-// 	pandora.send({ clientId: hubmsg.host.clientId }, 'search.results', symbols)
-
-// }
 
 

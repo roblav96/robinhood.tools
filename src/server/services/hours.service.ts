@@ -16,8 +16,8 @@ schedule.scheduleJob('00 * * * *', syncHours).invoke()
 
 async function syncHours() {
 	let today = dayjs().format('YYYY-MM-DD')
-	let url = 'https://api.robinhood.com/markets/XNYS/hours/' + today + '/'
-	let rhours = await http.get(url, { retries: Infinity }) as Robinhood.Hours
+	let url = 'https://api.robinhood.com/markets/XASE/hours/' + today + '/'
+	let rhours = await http.get(url, { retries: Infinity, retryTick: '10s', silent: true }) as Robinhood.Hours
 	let hhours = { openToday: rhours.is_open, date: rhours.date } as Hours
 	if (hhours.openToday) {
 		hhours.prepre = dayjs(new Date(rhours.opens_at)).subtract(5, 'hour').subtract(30, 'minute').valueOf()

@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<section class="has-background-white-bis">
+	<section class="">
 
 		<section class="hero is-primary is-bold">
 			<div class="hero-body">

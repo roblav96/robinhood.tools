@@ -7,12 +7,12 @@
 </style>
 
 <template>
-	<div id="app" :class="{ 'opacity-0': initing == true, 'animated-slow fadeIn': initing == false }">
+	<div id="app" class="has-background-white-bis" :class="{'opacity-0':initing==true,'animated-slow fadeIn':initing==false}">
 
 		<v-navbar></v-navbar>
 
 		<transition :enter-active-class="initing == null ? 'animated-slower fadeIn' : ''" leave-active-class="opacity-0">
-			<router-view class="router-view is-fullheight has-background-white-bis"></router-view>
+			<router-view class="router-view is-fullheight"></router-view>
 		</transition>
 
 		<hr>

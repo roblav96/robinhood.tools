@@ -15,7 +15,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 	<section class="symbol-route">
 		<section class="hero is-small">
 			<!-- <div v-visible="!busy" class="hero-body message" v-bull-bear:is="wbquote.change"> -->
-			<div v-visible="!busy" class="hero-body message">
+			<div v-visible="!busy" class="hero-body">
 				<div class="container">
 					<div class="columns">
 
