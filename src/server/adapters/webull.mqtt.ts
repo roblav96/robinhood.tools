@@ -86,7 +86,7 @@ export class MqttClient {
 			clientId: 'mqtt_' + Math.random().toString(),
 			protocolId: 'MQTT',
 			protocolVersion: 4,
-			keepalive: 10,
+			keepalive: 30,
 			clean: true,
 		})
 		this.client.on('data', this.ondata)
@@ -97,7 +97,7 @@ export class MqttClient {
 				clock.on(this.options.timeout, this.reconnect, this)
 			}
 		} else {
-			console.log('started connect ->', this.options.index)
+			console.log('started connect ->', this.options.index, 'connected ->', this.connected)
 		}
 	}
 
@@ -171,7 +171,7 @@ export class MqttClient {
 			for (i = 0; i < len; i++) {
 				let wbquote = payload.data[i]
 				if (wbquote) {
-					core.fix(wbquote)
+					delete wbquote.countryISOCode
 					webull.fix(wbquote)
 					wbquote.tickerId = tid
 					wbquote.symbol = symbol

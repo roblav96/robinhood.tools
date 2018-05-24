@@ -20,11 +20,13 @@ import * as quotes from '../adapters/quotes'
 
 
 let ready = false
-pandora.on('symbols.start', function(hubmsg) {
+pandora.on('symbols.start', function() {
 	if (ready) pandora.broadcast({}, 'symbols.ready');
 })
 
 async function start() {
+
+	// return syncEverything()
 
 	let keys = [
 		rkeys.RH.SYMBOLS, rkeys.WB.SYMBOLS,
@@ -48,6 +50,7 @@ async function syncEverything(resets = false) {
 	await syncForex()
 	await syncIndexes()
 	await quotes.syncAllQuotes(resets)
+	pandora.broadcast({}, 'symbols.reset')
 }
 
 

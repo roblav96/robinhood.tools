@@ -21,7 +21,15 @@ export function fix(quote: Webull.Quote) {
 	if (quote.mktradeTime) quote.mktradeTime = new Date(quote.mktradeTime).valueOf();
 	if (quote.tradeTime) quote.tradeTime = new Date(quote.tradeTime).valueOf();
 
-	['bid', 'ask'].forEach(key => {
+	Object.keys(quote).forEach(key => {
+		let value = quote[key]
+		if (core.string.is(value) && !isNaN(value as any)) {
+			quote[key] = Number.parseFloat(value)
+		}
+	})
+
+	let bakeys = ['bid', 'ask']
+	bakeys.forEach(key => {
 		if (!quote[key]) delete quote[key];
 		let lkey = `${key}List`
 		let list = quote[lkey] as Webull.BidAsk[]

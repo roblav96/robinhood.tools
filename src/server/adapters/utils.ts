@@ -8,9 +8,9 @@ import * as redis from './redis'
 
 
 export const DEV_STOCKS = {
-	SPY: 913243251,
+	// SPY: 913243251,
 	NVDA: 913257561,
-	AAPL: 913256135,
+	// AAPL: 913256135,
 	// AMD: 913254235,
 	// FB: 913303928,
 	// BAC: 913254999,

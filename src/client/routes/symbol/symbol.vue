@@ -43,7 +43,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 								<p class="title">{{vnumber(quote.price)}}</p>
 								<p class="is-size-5 font-medium" v-bull-bear="quote.change">
 									<span>{{vnumber(quote.change,{plusminus:true})}}</span>
-									<span>({{vnumber(quote.percent*100,{plusminus:true,percent:true,precision:2})}})</span>
+									<span>({{vnumber(quote.percent,{plusminus:true,percent:true,precision:2})}})</span>
 								</p>
 							</div>
 						</div>
