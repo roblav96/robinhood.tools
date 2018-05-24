@@ -15,6 +15,7 @@ import * as utils from '../adapters/utils'
 import * as webull from '../adapters/webull'
 import * as yahoo from '../adapters/yahoo'
 import * as iex from '../adapters/iex'
+import * as quotes from '../adapters/quotes'
 
 
 
@@ -149,6 +150,13 @@ async function syncTickers() {
 
 	if (process.env.DEVELOPMENT) console.log('iex.syncItems ->');
 	await iex.syncItems(symbols)
+
+	if (process.env.DEVELOPMENT) console.log('quotes.sync ->');
+	let alls = await quotes.getAlls(symbols)
+	await redis.main.coms(alls.map(all => {
+		let symbol = all.symbol
+		return ['hmset', `${rkeys.QUOTES}:${symbol}`, quotes.initquote(all) as any]
+	}))
 
 	if (process.env.DEVELOPMENT) console.info('syncTickers done ->', symbols.length);
 }

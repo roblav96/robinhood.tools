@@ -8,7 +8,7 @@ declare global { namespace Quotes { type ITiny = typeof TINY; interface Tiny ext
 export const TINY = {
 	symbol: '',
 	name: '',
-	typeof: '' as keyof typeof rkeys.SYMBOLS,
+	// typeof: '' as keyof typeof rkeys.SYMBOLS,
 	price: 0,
 	change: 0,
 	percent: 0,
@@ -124,6 +124,15 @@ Object.keys(DEAL).forEach(k => DEAL[k] = undefined)
 declare global {
 	namespace Quotes {
 		interface Quote extends Quotes.Full { }
+		interface All {
+			symbol: string
+			quote: Quote
+			wbticker: Webull.Ticker
+			wbquote: Webull.Quote
+			instrument: Robinhood.Instrument
+			yhquote: Yahoo.Quote
+			iexitem: Iex.Item
+		}
 	}
 }
 
