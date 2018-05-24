@@ -24,19 +24,6 @@ const ENV = {
 } as Env
 interface Env extends Partial<NodeJS.ProcessEnv> { [key: string]: any }
 
-
-
-let ORDER = 1
-function Process(chain: ProcessRepresentationChainModifier, env = {} as Env) {
-	_.defaults(env, ENV)
-	return (chain
-		.nodeArgs(['--no-warnings', '--expose-gc', '--max_old_space_size=2048'])
-		.env(env).scale(env.SCALE).order(ORDER++)
-	)
-}
-
-
-
 // ENV.DEBUGGER = false
 
 export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
@@ -66,6 +53,15 @@ export default function procfile(pandora: Pandora.ProcfileReconcilerAccessor) {
 	// 	pandora.service('dashboard', path.resolve(PROJECT, 'node_modules/pandora-dashboard/dist/Dashboard')).process('dashboard')
 	// }
 
+}
+
+let ORDER = 1
+function Process(chain: ProcessRepresentationChainModifier, env = {} as Env) {
+	_.defaults(env, ENV)
+	return (chain
+		.nodeArgs(['--no-warnings', '--expose-gc', '--max_old_space_size=2048'])
+		.env(env).scale(env.SCALE).order(ORDER++)
+	)
 }
 
 

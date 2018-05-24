@@ -58,7 +58,7 @@ async function onsymbols() {
 	)
 
 	// if (process.env.DEVELOPMENT) return;
-	// if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
+	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 
 	SYMBOLS.push(...Object.keys(fsymbols))
 	let alls = await quotes.getAlls(SYMBOLS, ['quote', 'wbquote'])
