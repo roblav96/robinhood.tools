@@ -43,6 +43,12 @@ async function start() {
 	let indexes = await redis.main.exists(rkeys.SYMBOLS.INDEXES)
 	if (indexes == 0) await syncIndexes();
 
+	let keys = await redis.main.keys(`${rkeys.QUOTES}:*`)
+	console.log(`keys ->`, keys)
+	if (keys.length == 0) {
+		
+	}
+
 	ready = true
 	pandora.broadcast({}, 'symbols.ready')
 
