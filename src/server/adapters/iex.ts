@@ -49,7 +49,7 @@ export async function syncItems(symbols: string[]) {
 				return ['hmset', `${rkeys.IEX.ITEMS}:${item.symbol}`, mapped as any]
 			}))
 		})
-	}), { concurrency: 1 })
+	}), { concurrency: 2 })
 }
 
 

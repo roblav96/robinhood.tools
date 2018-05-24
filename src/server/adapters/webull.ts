@@ -69,7 +69,7 @@ export async function syncTickersQuotes(fsymbols: Dict<number>) {
 			})
 			return redis.main.coms(coms)
 		})
-	}), { concurrency: 1 })
+	}), { concurrency: 2 })
 }
 
 

@@ -122,7 +122,7 @@ async function syncTickers() {
 		return () => http.get('https://quoteapi.webull.com/api/quote/tickerRealTimes', {
 			query: { tickerIds: chunk.join(','), hl: 'en' },
 		}) as Promise<Webull.Ticker[]>
-	}))).map(v => v.tickerId)
+	}), { concurrency: 2 })).map(v => v.tickerId)
 	tickers.remove(v => !valids.includes(v.tickerId))
 
 	let coms = [] as Redis.Coms
@@ -186,7 +186,7 @@ async function syncForex() {
 	}))
 	let tickers = await pAll(symbols.map(symbol => {
 		return () => getTicker(symbol, 6)
-	}), { concurrency: 1 })
+	}), { concurrency: 2 })
 	tickers.remove(v => !v)
 	await finishSync('FOREX', tickers)
 	if (process.env.DEVELOPMENT) console.info('syncForex done ->', tickers.length);
@@ -197,7 +197,7 @@ async function syncIndexes() {
 	let symbols = core.clone(webull.indexes)
 	let tickers = await pAll(symbols.map(symbol => {
 		return () => getTicker(symbol, 1)
-	}), { concurrency: 1 })
+	}), { concurrency: 2 })
 	let response = await http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/globalIndices/1') as Webull.Api.MarketIndex[]
 	response.forEach(v => v.marketIndexList.forEach(vv => tickers.push(vv)))
 	tickers.remove(v => !v || (v.secType && v.secType.includes(52)) || ['IBEX', 'STI'].includes(v.disSymbol))
