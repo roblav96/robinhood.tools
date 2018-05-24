@@ -18,7 +18,7 @@ export const forex = [
 	'BTCUSD', 'XAUUSD', 'XAGUSD',
 ]
 export const fiats = [
-	'AUD', 'CAD', 'CHF', 'CNH', 'CNY', 'EUR', 'GBP', 'HDK', 'JPY', 'NZD', 'RUB', 'USD',
+	'AUD', 'CAD', 'CHF', 'CNH', 'CNY', 'EUR', 'GBP', 'HDK', 'JPY', 'KRW', 'MXN', 'NZD', 'RUB', 'SEK', 'USD',
 ]
 
 export const indexes = [
@@ -268,7 +268,6 @@ declare global {
 			settlDate: string
 			settlement: number
 			status: string
-			status0: string
 			symbol: string
 			targetPrice: number
 			tickerId: number

@@ -132,7 +132,6 @@ export function todeal(wbdeal: Webull.Deal) {
 }
 
 export function applydeal(quote: Quotes.Quote, deal: Quotes.Deal, toquote = {} as Quotes.Quote) {
-	let symbol = quote.symbol
 
 	if (deal.timestamp > quote.timestamp) {
 		toquote.timestamp = deal.timestamp
@@ -169,7 +168,6 @@ interface KeyMapValue {
 export const KEY_MAP = (({
 	'faStatus': ({ key: 'status' } as KeyMapValue) as any,
 	'status': ({ key: 'status' } as KeyMapValue) as any,
-	'status0': ({ key: 'status' } as KeyMapValue) as any,
 	// 
 	'open': ({ key: 'openPrice' } as KeyMapValue) as any,
 	'close': ({ key: 'closePrice' } as KeyMapValue) as any,
@@ -204,7 +202,6 @@ export const KEY_MAP = (({
 
 
 export function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote = {} as Quotes.Quote) {
-	let symbol = wbquote.symbol
 
 	Object.keys(wbquote).forEach(k => {
 		let wbvalue = wbquote[k]
@@ -215,18 +212,12 @@ export function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote
 		let qvalue = quote[qkey]
 		if (qvalue == null) { qvalue = wbvalue; quote[qkey] = wbvalue; toquote[qkey] = wbvalue }
 
-		// if (k == 'status0') console.warn(symbol, `status0 ->`, wbquote.status0);
-		// let tovalue = toquote[qkey]
-		// if (tovalue && tovalue != qvalue) {
-		// 	console.warn(symbol, `k ->`, k, `wbvalue ->`, wbvalue, `qkey ->`, qkey, `qvalue ->`, qvalue, `tovalue ->`, tovalue)
-		// 	qvalue = tovalue
-		// }
-
 		if (keymap.time || keymap.greater) {
 			if (wbvalue > qvalue) {
 				toquote[qkey] = wbvalue
 			}
-		} else if (wbvalue != qvalue) {
+		}
+		else if (wbvalue != qvalue) {
 			toquote[qkey] = wbvalue
 		}
 
@@ -251,7 +242,6 @@ export function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote
 
 
 export function applycalcs(quote: Quotes.Quote, toquote = quote) {
-	let symbol = quote.symbol
 
 	if (toquote.price) {
 		toquote.close = toquote.price
@@ -272,5 +262,80 @@ export function applycalcs(quote: Quotes.Quote, toquote = quote) {
 
 	return toquote
 }
+
+
+
+
+
+export const mockquote = {
+	listDate: 916963200000,
+	country: 'US',
+	close: 246.75,
+	price: 246.73,
+	turnoverRate: 0.0191,
+	openPrice: 240.28,
+	volume: 11077801,
+	sharesFloat: 580151962,
+	askSize: 25,
+	symbol: 'NVDA',
+	exchange: 'Nasdaq Global Select',
+	bidVolume: 0,
+	high: 247.5,
+	yearLow: 135.71,
+	dayHigh: 247.59,
+	industry: 'Semiconductors',
+	askVolume: 0,
+	eodPrice: 247.5,
+	currency: 'USD',
+	alive: true,
+	sharesOutstanding: 606000000,
+	sellVolume: 400,
+	statusUpdatedAt: 1527159036999,
+	change: -0.75,
+	mic: 'XNAS',
+	size: 0,
+	yield: 0.0023,
+	dayLow: 240.25,
+	fullName: 'NVIDIA Corporation Common Stock',
+	closePrice: 247.54,
+	buyVolume: 924,
+	name: 'NVIDIA Corporation',
+	askPrice: 247.7,
+	percent: -0.30303030303030304,
+	tickerId: 913257561,
+	website: 'http://www.nvidia.com',
+	issueType: 'cs',
+	dealSize: 5199,
+	status: 'POST_TRADE',
+	avgVolume3Month: 14787943,
+	avgVolume: 17520461,
+	sector: 'Technology',
+	avgVolume10Day: 14491447,
+	prevClose: 242.55,
+	low: 247.5,
+	vibrateRatio: 0.0303,
+	acronym: 'NASDAQ',
+	yearHigh: 260.5,
+	bidSize: 12,
+	buySize: 924,
+	dealVolume: 5199,
+	open: 247.5,
+	bidPrice: 247.36,
+	count: 0,
+	sellSize: 400,
+	timezone: 'America/New_York',
+	spread: 0.339999999999975,
+	deals: 111847,
+	marketCap: 149530500000,
+	description: 'NVIDIA Corp is a developer of graphics processing unit. It caters to areas like gaming, professional visualization, datacenter and automobiles.',
+	timestamp: 1527170047000
+} as Quotes.Quote
+
+// import * as benchmark from '../../common/benchmark'
+// benchmark.simple('object', [
+// 	function noop() { },
+// 	function keys() { Object.keys(mockquote) },
+// 	function assign() { Object.assign(mockquote, mockquote) },
+// ])
 
 

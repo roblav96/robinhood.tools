@@ -25,6 +25,7 @@ clock.on('5s', function onconnect() {
 	client.connect()
 })
 
+const SYMBOLS = [] as string[]
 const WB_QUOTES = {} as Dict<Webull.Quote>
 const WB_EMITS = {} as Dict<Webull.Quote>
 const WB_SAVES = {} as Dict<Webull.Quote>
@@ -36,7 +37,10 @@ pandora.once('symbols.ready', onsymbols)
 pandora.broadcast({}, 'symbols.start')
 async function onsymbols() {
 
+	clock.offListener(ontick)
 	CLIENTS.forEach(v => v.destroy())
+	core.nullify(CLIENTS)
+	core.nullify(SYMBOLS)
 	core.nullify(WB_QUOTES)
 	core.nullify(WB_EMITS)
 	core.nullify(WB_SAVES)
@@ -52,8 +56,8 @@ async function onsymbols() {
 	// if (process.env.DEVELOPMENT) return;
 	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 
-	let symbols = Object.keys(fsymbols)
-	let alls = await quotes.getAlls(symbols, ['quote', 'wbquote'])
+	SYMBOLS.push(...Object.keys(fsymbols))
+	let alls = await quotes.getAlls(SYMBOLS, ['quote', 'wbquote'])
 	alls.forEach(all => {
 		let symbol = all.symbol
 
@@ -68,7 +72,7 @@ async function onsymbols() {
 
 	})
 
-	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(symbols.length / 256))
+	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 128))
 	CLIENTS.splice(0, Infinity, ...chunks.map((chunk, i) => new webull.MqttClient({
 		fsymbols: _.fromPairs(chunk),
 		topics: process.env.SYMBOLS,
@@ -76,6 +80,8 @@ async function onsymbols() {
 		connect: chunks.length == 1 && i == 0,
 		// verbose: true,
 	}, emitter)))
+
+	clock.on('1s', ontick)
 
 	pandora.broadcast({}, 'quotes.ready')
 
@@ -92,20 +98,19 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 		let quote = QUOTES[symbol]
 		let toquote = quotes.applydeal(quote, deal)
-		if (Object.keys(toquote).length == 0) return;
-
-		quotes.applycalcs(quote, toquote)
-		core.object.merge(QUOTES[symbol], toquote)
-		core.object.merge(EMITS[symbol], toquote)
-		core.object.merge(SAVES[symbol], toquote)
+		if (Object.keys(toquote).length > 0) {
+			toquote.symbol = symbol
+			core.object.merge(QUOTES[symbol], toquote)
+			core.object.merge(EMITS[symbol], toquote)
+			core.object.merge(SAVES[symbol], toquote)
+		}
 
 		return
 	}
 
+	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 	let quote = WB_QUOTES[symbol]
 	let toquote = {} as Webull.Quote
-	if (!quote) return console.warn('ondata !quote symbol ->', symbol);
-	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 
 	Object.keys(wbquote).forEach(k => {
 		let source = wbquote[k]
@@ -125,101 +130,83 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		}
 	})
 
-	if (Object.keys(toquote).length == 0) return;
-	core.object.merge(WB_QUOTES[symbol], toquote)
-	core.object.merge(WB_EMITS[symbol], toquote)
-	core.object.merge(WB_SAVES[symbol], toquote)
+	if (Object.keys(toquote).length > 0) {
+		// console.info(symbol, '->', webull.mqtt_topics[topic], '->', wbquote, toquote)
+		toquote.symbol = symbol
+		core.object.merge(WB_QUOTES[symbol], toquote)
+		core.object.merge(WB_EMITS[symbol], toquote)
+		core.object.merge(WB_SAVES[symbol], toquote)
+	}
 
 })
 
 
 
-clock.on('1s', function onsocket() {
+function ontick(i: number) {
+	let save = i % 10 == 0
 
-	Object.keys(WB_EMITS).forEach(symbol => {
-		let wbquote = WB_EMITS[symbol]
-		if (Object.keys(wbquote).length == 0) return;
-		wbquote.symbol = symbol
+	let coms = [] as Redis.Coms
+	SYMBOLS.forEach(symbol => {
+		{
+			let toquote = EMITS[symbol]
+			let wbquote = WB_EMITS[symbol]
 
-		let quote = QUOTES[symbol]
-		let toquote = quotes.applywbquote(quote, wbquote)
-		if (Object.keys(toquote).length > 0) {
-			quotes.applycalcs(quote, toquote)
-			core.object.merge(QUOTES[symbol], toquote)
-			core.object.merge(EMITS[symbol], toquote)
-			core.object.merge(SAVES[symbol], toquote)
+			if (Object.keys(wbquote).length > 0) {
+				quotes.applywbquote(QUOTES[symbol], wbquote, toquote)
+				socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
+				Object.assign(WB_EMITS, { [symbol]: {} })
+			}
+
+			if (Object.keys(toquote).length > 0) {
+				quotes.applycalcs(QUOTES[symbol], toquote)
+				toquote.symbol = symbol
+				core.object.merge(QUOTES[symbol], toquote)
+				core.object.merge(SAVES[symbol], toquote)
+				socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
+				Object.assign(EMITS, { [symbol]: {} })
+			}
+
 		}
 
-		socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
-		Object.assign(WB_EMITS, { [symbol]: {} })
+		if (save) {
+
+			if (Object.keys(WB_SAVES[symbol]).length > 0) {
+				coms.push(['hmset', `${rkeys.WB.QUOTES}:${symbol}`, WB_SAVES[symbol] as any])
+				Object.assign(WB_SAVES, { [symbol]: {} })
+			}
+
+			let saves = SAVES[symbol]
+			if (Object.keys(saves).length > 0) {
+				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, saves as any])
+				Object.assign(SAVES, { [symbol]: {} })
+			}
+
+		}
+
 	})
 
-	Object.keys(EMITS).forEach(symbol => {
-		let quote = EMITS[symbol]
-		if (Object.keys(quote).length == 0) return;
-		quote.symbol = symbol
-		socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, quote)
-		Object.assign(EMITS, { [symbol]: {} })
-	})
-
-})
-
-
-
-clock.on('10s', function onsave() {
-	let coms = []
-
-	Object.keys(WB_SAVES).forEach(symbol => {
-		let quote = WB_SAVES[symbol]
-		if (Object.keys(quote).length == 0) return;
-		coms.push(['hmset', `${rkeys.WB.QUOTES}:${symbol}`, quote as any])
-		Object.assign(WB_SAVES, { [symbol]: {} })
-	})
-
-	Object.keys(SAVES).forEach(symbol => {
-		let quote = SAVES[symbol]
-		if (Object.keys(quote).length == 0) return;
-		coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, quote as any])
-		Object.assign(SAVES, { [symbol]: {} })
-	})
-
-	if (coms.length == 0) return;
 	redis.main.coms(coms)
 
-})
+}
 
 
 
+// function on10secs() {
+// 	let coms = []
 
 
-// emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
-// 	let symbol = wbquote.symbol
-// 	let quote = QUOTES[symbol]
-// 	let toquote = {} as Quotes.Quote
-// 	if (!quote) return console.warn('QUOTES ondata !quote symbol ->', symbol);
-// 	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
 
-// 	let from = core.clone(quote)
-// 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
-// 		let deal = quotes.todeal(wbquote)
-// 		quotes.applydeal(quote, deal, toquote)
-// 		socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
-// 	} else {
-// 		quotes.applywbquote(quote, wbquote, toquote)
-// 	}
+// 	Object.keys(SAVES).forEach(symbol => {
+// 		let quote = SAVES[symbol]
+// 		if (Object.keys(quote).length == 0) return;
+// 		coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, quote as any])
+// 		Object.assign(SAVES, { [symbol]: {} })
+// 	})
 
-// 	let tokeys = Object.keys(toquote)
-// 	if (tokeys.length == 0) return;
+// 	if (coms.length == 0) return;
+// 	redis.main.coms(coms)
 
-// 	let diff = tokeys.reduce((item, key) => { item[key] = from[key]; return item }, {})
-// 	console.info(symbol, '->', webull.mqtt_topics[topic], diff, toquote)
-
-// 	quotes.applycalcs(quote, toquote)
-// 	core.object.merge(QUOTES[symbol], toquote)
-// 	core.object.merge(EMITS[symbol], toquote)
-// 	core.object.merge(SAVES[symbol], toquote)
-
-// })
+// }
 
 
 

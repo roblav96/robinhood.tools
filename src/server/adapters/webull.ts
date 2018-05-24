@@ -16,7 +16,6 @@ import * as http from './http'
 export function fix(quote: Webull.Quote) {
 	if (quote.faStatus) quote.faStatus = webull.ticker_status[quote.faStatus];
 	if (quote.status) quote.status = webull.ticker_status[quote.status];
-	if (quote.status0) quote.status0 = webull.ticker_status[quote.status0];
 
 	if (quote.faTradeTime) quote.faTradeTime = new Date(quote.faTradeTime).valueOf();
 	if (quote.mktradeTime) quote.mktradeTime = new Date(quote.mktradeTime).valueOf();
