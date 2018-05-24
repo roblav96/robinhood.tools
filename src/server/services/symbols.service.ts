@@ -31,7 +31,7 @@ async function start() {
 		rkeys.SYMBOLS.STOCKS, rkeys.SYMBOLS.FOREX, rkeys.SYMBOLS.INDEXES,
 	]
 	let exists = await redis.main.coms(keys.map(k => ['exists', k])) as number[]
-	if (_.sum(exists) != keys.length) await quotes.syncAllQuotes();
+	if (_.sum(exists) != keys.length) await syncEverything();
 
 	ready = true
 	pandora.broadcast({}, 'symbols.ready')
