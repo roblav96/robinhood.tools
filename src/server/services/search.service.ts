@@ -12,8 +12,8 @@ import * as utils from '../adapters/utils'
 
 
 
-// let QUOTES = [] as Quotes.Quote[]
-let INDEXES = { symbols: null, names: null, descriptions: null }
+const cache = [] as Quotes.Quote[]
+const wades = { symbol: null, name: null, description: null }
 
 pandora.once('symbols.ready', onready)
 pandora.broadcast({}, 'symbols.start')
@@ -30,29 +30,44 @@ async function onready(hubmsg: Pandora.HubMessage) {
 		v = redis.fixHmget(v, ikeys)
 		core.fix(v)
 		return v
+	})//.sort((a, b) => core.sort.alphabetically(a.symbol, b.symbol))
+
+	cache.splice(0, Infinity, ...quotes.map(v => ({
+		symbol: v.symbol,
+		avgVolume: v.avgVolume || 0,
+	} as Quotes.Quote)))
+
+	let symbols = quotes.map(v => v.symbol)
+	Wade.config.stopWords.remove(v => symbols.includes(v.toUpperCase()))
+
+	Object.keys(wades).forEach(key => {
+		wades[key] = Wade.save(Wade(quotes.map(v => v[key] || '')))
 	})
 
-	let symbols = quotes.map(quote => {
-		if (!quote.symbol || !quote.symbol.toLowerCase) {
-			console.warn(`quote ->`, quote)
-		}
-		return quote.symbol.toLowerCase()
-	})
-	console.log(`symbols ->`, symbols)
-	return
-	// INDEXES.symbols = Wade.save(Wade())
-	// INDEXES.names = Wade.save(Wade(QUOTES.map(v => v.name || '')))
-	// INDEXES.descriptions = Wade.save(Wade(QUOTES.map(v => v.description || '')))
+	onquery({ data: 'am' } as any)
 
-	console.log(`symbols ->`, symbols)
-	// let search = Wade(symbols)
-	// console.log('search ->', search)
-	return
 
-	let metas = search('all')
-	console.log('metas ->', metas)
-	let results = metas.map(meta => QUOTES[meta.index])
-	console.log('results ->', results)
+
+	// let isymbols = Wade(INDEXES.symbols)(query).map(meta => meta.index)
+	// console.log('isymbols ->', isymbols)
+	// let inames = Wade(INDEXES.names)(query).map(meta => meta.index)
+	// console.log('inames ->', inames)
+	// let idescriptions = Wade(INDEXES.descriptions)(query).map(meta => meta.index)
+	// console.log('idescriptions ->', idescriptions)
+
+
+	// let indexes = isymbols.concat(inames).concat(idescriptions)
+	// console.log('indexes ->', indexes)
+	// let uniqs = _.uniq(isymbols.concat(inames).concat(idescriptions))
+	// console.log(`uniqs ->`, uniqs)
+
+	// return
+	// console.log(`symbols ->`, symbols)
+	// let search = Wade(INDEXES.names)
+	// let metas = search('Powell')
+	// console.log('metas ->', metas)
+	// let results = metas.map(meta => QUOTES[meta.index])
+	// console.log('results ->', results)
 
 
 
@@ -80,30 +95,55 @@ async function onready(hubmsg: Pandora.HubMessage) {
 
 
 
+const MAX = 20
 pandora.on('search.query', onquery)
-function onquery(hubmsg: Pandora.HubMessage) {
+async function onquery(hubmsg: Pandora.HubMessage) {
 	let query = hubmsg.data as string
 	console.log(`query ->`, query)
 
-	// let results = searchindex.search(`symbol:${query} ${query}~1`)
-	// let results = searchindex.search(query)
-
-	let results = searchindex.query(function(q) {
-		// q.clause({ boost: 10, fields: ['symbol'] })
-		q.term(query, { fields: ['symbol'] })
-		// q.term(query, { fields: ['symbol'], boost: 1, editDistance: 1 })
-		// q.term(query, { fields: ['name'], boost: 5, editDistance: 1 })
-		// q.term(query, { editDistance: 1 })
-		// return q.term(query, { boost: 100, usePipeline: true })
-		// q.term(query, { boost: 10, usePipeline: false, wildcard: lunr.Query.wildcard.TRAILING })
-		// q.term(query, { boost: 1, editDistance: 1 })
+	let symbols = [] as string[]
+	Object.keys(wades).forEach(key => {
+		if (symbols.length > MAX) return;
+		let caches = Wade(wades[key])(query).map(({ index }) => cache[index]) as Quotes.Quote[]
+		caches.sort((a, b) => b.avgVolume - a.avgVolume).forEach(({ symbol }) => {
+			if (symbols.includes(symbol)) return;
+			if (symbols.length >= MAX) return;
+			symbols.push(symbol)
+		})
 	})
 
-	results.splice(9)
+	let ikeys = ['symbol', 'name', 'description'] as KeysOf<Quotes.Quote>
+	let results = (await redis.main.coms(symbols.map(symbol => {
+		return ['hmget', `${rkeys.QUOTES}:${symbol}`].concat(ikeys)
+	}))).map(v => redis.fixHmget(v, ikeys)) as Quotes.Quote[]
+	results.forEach(core.fix)
 	console.log('results ->', results)
 
 	if (!hubmsg.host) return;
 	pandora.send({ clientId: hubmsg.host.clientId }, 'search.results', results)
+
+
+
+	// // let results = searchindex.search(`symbol:${query} ${query}~1`)
+	// // let results = searchindex.search(query)
+
+	// let results = searchindex.query(function(q) {
+	// 	// q.clause({ boost: 10, fields: ['symbol'] })
+	// 	q.term(query, { fields: ['symbol'] })
+	// 	// q.term(query, { fields: ['symbol'], boost: 1, editDistance: 1 })
+	// 	// q.term(query, { fields: ['name'], boost: 5, editDistance: 1 })
+	// 	// q.term(query, { editDistance: 1 })
+	// 	// return q.term(query, { boost: 100, usePipeline: true })
+	// 	// q.term(query, { boost: 10, usePipeline: false, wildcard: lunr.Query.wildcard.TRAILING })
+	// 	// q.term(query, { boost: 1, editDistance: 1 })
+	// })
+
+	// results.splice(9)
+	// console.log('results ->', results)
+
+	// if (!hubmsg.host) return;
+	// pandora.send({ clientId: hubmsg.host.clientId }, 'search.results', results)
+
 }
 
 
