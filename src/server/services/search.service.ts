@@ -12,14 +12,16 @@ import * as utils from '../adapters/utils'
 
 
 
-const QUOTES = [] as Quotes.Quote[]
+const CACHE = [] as Quotes.Quote[]
 const WADES = { symbol: null, name: null, description: null }
 
+const onready = _.debounce(_onready, 3000, { leading: false, trailing: true })
 pandora.once('symbols.ready', onready)
 pandora.broadcast({}, 'symbols.start')
-// pandora.on('quotes.ready', _.debounce(onready, 1000, { leading: false, trailing: true }))
+pandora.on('quotes.ready', onready)
 
-async function onready(hubmsg: Pandora.HubMessage) {
+async function _onready(hubmsg: Pandora.HubMessage) {
+	// console.log('hubmsg ->', hubmsg)
 
 	let ikeys = ['symbol', 'name', 'description', 'avgVolume'] as KeysOf<Quotes.Quote>
 	let keys = await redis.main.keys(`${rkeys.QUOTES}:*`)
@@ -30,9 +32,9 @@ async function onready(hubmsg: Pandora.HubMessage) {
 		core.fix(v)
 		return v
 	})
-	// .sort((a, b) => core.sort.alphabetically(a.symbol, b.symbol))
 
-	QUOTES.splice(0, Infinity, ...quotes.map(v => ({
+	core.nullify(CACHE)
+	CACHE.push(...quotes.map(v => ({
 		symbol: v.symbol,
 		avgVolume: v.avgVolume || 0,
 	} as Quotes.Quote)))
@@ -41,100 +43,46 @@ async function onready(hubmsg: Pandora.HubMessage) {
 	Wade.config.stopWords.remove(v => symbols.includes(v.toUpperCase()))
 
 	Object.keys(WADES).forEach(key => {
+		core.nullify(WADES[key])
 		WADES[key] = Wade.save(Wade(quotes.map(v => v[key] || '')))
 	})
-
-	// onquery({ data: 'am' } as any)
-
-
-
-	// let isymbols = Wade(INDEXES.symbols)(query).map(meta => meta.index)
-	// console.log('isymbols ->', isymbols)
-	// let inames = Wade(INDEXES.names)(query).map(meta => meta.index)
-	// console.log('inames ->', inames)
-	// let idescriptions = Wade(INDEXES.descriptions)(query).map(meta => meta.index)
-	// console.log('idescriptions ->', idescriptions)
-
-
-	// let indexes = isymbols.concat(inames).concat(idescriptions)
-	// console.log('indexes ->', indexes)
-	// let uniqs = _.uniq(isymbols.concat(inames).concat(idescriptions))
-	// console.log(`uniqs ->`, uniqs)
-
-	// return
-	// console.log(`symbols ->`, symbols)
-	// let search = Wade(INDEXES.names)
-	// let metas = search('Powell')
-	// console.log('metas ->', metas)
-	// let results = metas.map(meta => QUOTES[meta.index])
-	// console.log('results ->', results)
-
-
-
-	// quotes = quotes.map(quote => _.mapValues(quote, (v: string, k) => {
-	// 	return v.toLowerCase()
-	// })) as any
-
-	// let builder = new lunr.Builder()
-	// builder.ref('symbol')
-	// searchindex = builder.build()
-
-	// searchindex = lunr(function() {
-	// 	this.ref('symbol')
-	// 	this.field('symbol')
-	// 	this.field('name')
-	// 	this.field('description')
-	// 	// this.metadataWhitelist = ['position']
-	// 	quotes.forEach(v => this.add(v))
-	// })
-
-	// onquery({ data: 'nv' } as any)
 
 }
 
 
 
 const MAX = 20
-pandora.on('search.query', onquery)
-async function onquery(hubmsg: Pandora.HubMessage) {
-	let query = hubmsg.data as string
-
+pandora.reply('search.query', async function onquery(query: string) {
+	console.log(`onquery query ->`, query)
 	let symbols = [] as string[]
 	Object.keys(WADES).forEach(key => {
 		if (symbols.length > MAX) return;
-		let quotes = Wade(WADES[key])(query).map(({ index }) => QUOTES[index]) as Quotes.Quote[]
+		let quotes = Wade(WADES[key])(query).map(({ index }) => CACHE[index]) as Quotes.Quote[]
 		quotes.sort((a, b) => b.avgVolume - a.avgVolume).forEach(({ symbol }) => {
 			if (symbols.includes(symbol)) return;
 			if (symbols.length >= MAX) return;
 			symbols.push(symbol)
 		})
 	})
+	return symbols
+})
 
-	if (!hubmsg.host) return;
-	pandora.send({ clientId: hubmsg.host.clientId }, 'search.results', symbols)
+// pandora.on('search.query', onquery)
+// async function onquery(hubmsg: Pandora.HubMessage<string>) {
 
+// 	let symbols = [] as string[]
+// 	Object.keys(WADES).forEach(key => {
+// 		if (symbols.length > MAX) return;
+// 		let quotes = Wade(WADES[key])(hubmsg.data).map(({ index }) => CACHE[index]) as Quotes.Quote[]
+// 		quotes.sort((a, b) => b.avgVolume - a.avgVolume).forEach(({ symbol }) => {
+// 			if (symbols.includes(symbol)) return;
+// 			if (symbols.length >= MAX) return;
+// 			symbols.push(symbol)
+// 		})
+// 	})
 
+// 	pandora.send({ clientId: hubmsg.host.clientId }, 'search.results', symbols)
 
-	// // let results = searchindex.search(`symbol:${query} ${query}~1`)
-	// // let results = searchindex.search(query)
-
-	// let results = searchindex.query(function(q) {
-	// 	// q.clause({ boost: 10, fields: ['symbol'] })
-	// 	q.term(query, { fields: ['symbol'] })
-	// 	// q.term(query, { fields: ['symbol'], boost: 1, editDistance: 1 })
-	// 	// q.term(query, { fields: ['name'], boost: 5, editDistance: 1 })
-	// 	// q.term(query, { editDistance: 1 })
-	// 	// return q.term(query, { boost: 100, usePipeline: true })
-	// 	// q.term(query, { boost: 10, usePipeline: false, wildcard: lunr.Query.wildcard.TRAILING })
-	// 	// q.term(query, { boost: 1, editDistance: 1 })
-	// })
-
-	// results.splice(9)
-	// console.log('results ->', results)
-
-	// if (!hubmsg.host) return;
-	// pandora.send({ clientId: hubmsg.host.clientId }, 'search.results', results)
-
-}
+// }
 
 

@@ -11,6 +11,15 @@ import polka from './polka'
 
 
 
+async function getQuotes(symbols: string[]) {
+	let ikeys = ['symbol', 'name', 'acronym', 'price'] as KeysOf<Quotes.Quote>
+	let quotes = (await redis.main.coms(symbols.map(symbol => {
+		return ['hmget', `${rkeys.QUOTES}:${symbol}`].concat(ikeys)
+	}))).map(v => redis.fixHmget(v, ikeys)) as Quotes.Quote[]
+	quotes.forEach(core.fix)
+	return quotes
+}
+
 polka.route({
 	method: 'GET',
 	url: '/api/search',
@@ -18,18 +27,21 @@ polka.route({
 		query: { query: 'string' },
 	},
 	async handler(req, res) {
-		let query = core.string.clean(req.query.query).toLowerCase()
-		if (!query) return []
-		console.log(`query ->`, query)
+		let query = req.query.query as string
+		if (!query) return [];
 
-		let symbols = (await new Promise<Pandora.HubMessage>(resolve => {
-			pandora.once('search.results', resolve)
-			pandora.send({ processName: 'search.service' }, 'search.query', query)
-		})).data as string[]
+		let symbols = await pandora.invoke({
+			processName: 'search.service',
+		}, 'search.query', query) as string[]
+		console.log(`symbols ->`, symbols)
 
+		// let symbols = (await new Promise<Pandora.HubMessage>(resolve => {
+		// 	pandora.once('search.results', resolve)
+		// 	pandora.send({ processName: 'search.service' }, 'search.query', query)
+		// })).data as string[]
 
-		console.log(`results ->`, results)
-		return results
+		// return getQuotes(symbols)
+
 	}
 })
 
@@ -51,15 +63,6 @@ polka.route({
 		return results
 	}
 })
-
-async function toquotes(symbols: string[]) {
-	let ikeys = ['symbol', 'name', 'acronym', 'price'] as KeysOf<Quotes.Quote>
-	let quotes = (await redis.main.coms(symbols.map(symbol => {
-		return ['hmget', `${rkeys.QUOTES}:${symbol}`].concat(ikeys)
-	}))).map(v => redis.fixHmget(v, ikeys)) as Quotes.Quote[]
-	quotes.forEach(core.fix)
-	return quotes
-}
 
 
 

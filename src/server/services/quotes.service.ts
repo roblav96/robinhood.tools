@@ -38,6 +38,7 @@ if (process.env.SYMBOLS == 'STOCKS') {
 }
 
 async function onSymbols(hubmsg: Pandora.HubMessage) {
+	console.time(`onSymbols`)
 	let resets = hubmsg.action == 'symbols.reset'
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
@@ -46,7 +47,7 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 	)
 
 	// if (process.env.DEVELOPMENT) return;
-	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
+	// if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 	let symbols = Object.keys(fsymbols)
 
 	CLIENTS.forEach(v => v.destroy())
@@ -168,6 +169,8 @@ async function onSymbols(hubmsg: Pandora.HubMessage) {
 
 	clock.on('1s', onsocket)
 	clock.on('10s', onsave)
+	
+	console.timeEnd(`onSymbols`)
 
 }
 

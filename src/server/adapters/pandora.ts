@@ -1,6 +1,8 @@
 // 
 
 import * as pandora from 'pandora'
+import * as boom from 'boom'
+import * as security from './security'
 
 
 
@@ -30,13 +32,6 @@ export function send(selector: Hub.Selector, action: string, data = {} as any) {
 export function broadcast(selector: Hub.Selector, action: string, data = {} as any) {
 	pandora.getHub().hubClient.multipleSend(selector, action, { data })
 }
-// export function invoke(selector: Hub.Selector, action: string, data = {} as any) {
-// 	let client = pandora.getHub().hubClient
-// 	client.send(selector, action, { data })
-// 	return new Promise(function(resolve) {
-// 		client.once(action, resolve)
-// 	})
-// }
 
 export function once(action: string, fn: (hubmsg: Pandora.HubMessage) => void) {
 	pandora.getHub().hubClient.once(action, fn)
@@ -46,6 +41,37 @@ export function on(action: string, fn: (hubmsg: Pandora.HubMessage) => void) {
 }
 export function off(action: string, fn: (hubmsg: Pandora.HubMessage) => void) {
 	pandora.getHub().hubClient.removeListener(action, fn)
+}
+
+interface InvokeReplyData {
+	request: any
+	response: any
+	reqId: string
+	error: Error
+}
+export function reply(action: string, fn: (data: any) => Promise<any>) {
+	on(action, function oninvoke(hubmsg: Pandora.HubMessage<InvokeReplyData>) {
+		let reqId = hubmsg.data.reqId
+		let clientId = hubmsg.host.clientId
+		return fn(hubmsg.data.request).then(response => {
+			send({ clientId }, action, { reqId, response } as InvokeReplyData)
+		}).catch(error => {
+			send({ clientId }, action, { reqId, error } as InvokeReplyData)
+		})
+	})
+}
+export function invoke(selector: Hub.Selector, action: string, data = {} as any) {
+	let reqId = security.randomBits(16)
+	let clientId = pandora.getHub().hubClient.getLocation().clientId
+	return new Promise((resolve, reject) => {
+		on(action, function onreply(hubmsg: Pandora.HubMessage<InvokeReplyData>) {
+			if (hubmsg.host.clientId == clientId) return;
+			if (hubmsg.data.reqId != reqId) return;
+			off(action, onreply)
+			hubmsg.data.error ? reject(hubmsg.data.error) : resolve(hubmsg.data.response)
+		})
+		send(selector, action, { reqId, request: data } as InvokeReplyData)
+	})
 }
 
 
