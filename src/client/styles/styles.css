@@ -1,5 +1,6 @@
 /**/
 
+
 /*section.router-view {
 	background-color: var(--white-bis);
 }*/
@@ -29,6 +30,7 @@ span.tooltip:after {
 	font-weight: 500;
 }
 
+
 /**/
 
 .bg-bullish {
@@ -39,11 +41,13 @@ span.tooltip:after {
 	background-color: #FCEBEA;
 }
 
+
 /**/
 
 .border-debug {
 	border: 1px solid red !important;
 }
+
 
 /**/
 
@@ -81,6 +85,7 @@ table.table.is-narrowest td {
 	vertical-align: middle;
 }
 
+
 /**/
 
 p.title,
@@ -101,6 +106,7 @@ p.content,
 	color: inherit !important;
 }
 
+
 /**/
 
 span.tag.is-small {
@@ -108,6 +114,7 @@ span.tag.is-small {
 	padding-left: 0.5rem;
 	padding-right: 0.5rem;
 }
+
 
 /**/
 
@@ -137,10 +144,12 @@ span.icon.is-xxlarge > i.mdi::before {
 	font-size: 5rem;
 }
 
+
 /**/
 
 .animated-loading {
 	animation-duration: 3s !important;
 }
+
 
 /**/

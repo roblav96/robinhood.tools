@@ -9,6 +9,16 @@ div.searchbar div.dropdown-content {
 	max-height: 75vh;
 }
 
+div.searchbar a.dropdown-item.is-hovered,
+div.searchbar a.dropdown-item:hover {
+	color: inherit;
+}
+
+div.searchbar a.dropdown-item.is-hovered .title,
+div.searchbar a.dropdown-item:hover .title {
+	color: var(--primary);
+}
+
 </style>
 
 <template>
@@ -21,7 +31,7 @@ div.searchbar div.dropdown-content {
 					<symbol-logo class="is-32x32 shadow" :symbol="props.option.symbol"></symbol-logo>
 				</div>
 				<div class="column">
-					<p class="title is-size-5">{{ props.option.symbol }}</p>
+					<p class="title is-size-5 mr-1">{{ props.option.symbol }}</p>
 					<p class="subtitle is-size-6">{{ props.option.name }}</p>
 				</div>
 			</div>
