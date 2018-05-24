@@ -63,7 +63,7 @@ export function reply(action: string, fn: (data: any) => Promise<any>) {
 export function invoke(selector: Hub.Selector, action: string, data = {} as any) {
 	let reqId = security.randomBits(16)
 	let clientId = pandora.getHub().hubClient.getLocation().clientId
-	return new Promise((resolve, reject) => {
+	return new Promise<any>((resolve, reject) => {
 		on(action, function onreply(hubmsg: Pandora.HubMessage<InvokeReplyData>) {
 			if (hubmsg.host.clientId == clientId) return;
 			if (hubmsg.data.reqId != reqId) return;
