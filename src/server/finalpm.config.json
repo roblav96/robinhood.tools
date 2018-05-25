@@ -1,8 +1,0 @@
-{
-	"applications": [{
-		"name": "polka",
-		"run": "finalpm/polka.js",
-		"mode": "cluster",
-		"instances": 2
-	}]
-}

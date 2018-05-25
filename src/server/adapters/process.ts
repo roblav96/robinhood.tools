@@ -27,11 +27,8 @@ if (+process.env.INSTANCE == 0) process.env.PRIMARY = true;
 
 
 
-// import * as Pandora from 'pandora'
-// process.env.OFFSET = Pandora.processContext ? Pandora.processContext.context.processRepresentation.offset : 0
-// process.env.ORDER = Pandora.processContext ? Pandora.processContext.context.processRepresentation.order : 0
-process.env.OFFSET = 0
-process.env.ORDER = 0
+process.env.OFFSET = +process.env.INSTANCE
+process.env.ORDER = +process.env.INSTANCE
 if (!+process.env.OFFSET && process.env.PRIMARY) process.env.FIRST = true;
 
 
@@ -45,24 +42,4 @@ process.on('unhandledRejection', function(error) {
 	if (process.env.PRODUCTION) process.exit(1);
 })
 
-
-
-// import * as fkill from 'fkill'
-// process.on('SIGTERM', function(signal) {
-// 	console.log('process.on SIGTERM ->', process.pid)
-// 	console.log('process.on SIGTERM signal ->', signal)
-// 	fkill(process.pid, { force: true, tree: true })
-// })
-// import * as exithook from 'exit-hook'
-// exithook(function() {
-// 	console.log('exithook ->', process.pid)
-// 	fkill(process.pid, { force: true, tree: true })
-// })
-// import * as sigexit from 'signal-exit'
-// sigexit(function(code, signal) {
-// 	console.log('sigexit ->', process.pid)
-// 	console.log('sigexit code ->', code)
-// 	console.log('sigexit signal ->', signal)
-// 	fkill(process.pid, { force: true, tree: true })
-// })
 
