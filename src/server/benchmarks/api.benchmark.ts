@@ -1,7 +1,7 @@
 // 
 
 import '../main'
-import chalk from 'chalk'
+import * as clc from 'cli-color'
 import * as execa from 'execa'
 import * as url from 'url'
 import * as http from 'http'
@@ -9,7 +9,7 @@ import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
 import * as pAll from 'p-all'
 import * as Table from 'cli-table2'
-import * as Pandora from 'pandora'
+// import * as Pandora from 'pandora'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as pretty from '../../common/pretty'
@@ -71,7 +71,7 @@ async function start() {
 			pretty.formatNumber(v.latency.avg, 2),
 			pretty.formatNumber(v.latency.stdev, 2),
 			pretty.formatNumber(v.latency.pStdev, 2) + '%',
-			v.errors.non2xx3xx ? chalk.bold.red(dropped) : dropped,
+			v.errors.non2xx3xx ? clc.bold.red(dropped) : dropped,
 		])
 	})
 

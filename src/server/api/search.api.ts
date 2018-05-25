@@ -30,11 +30,11 @@ polka.route({
 		let query = req.query.query as string
 		if (!query) return [];
 
-		let symbols = await pandora.invoke({
-			processName: 'search.service',
-		}, 'search.query', query)
-		let quotes = await getQuotes(symbols)
-		return quotes
+		// let symbols = await pandora.invoke({
+		// 	processName: 'search.service',
+		// }, 'search.query', query)
+		// let quotes = await getQuotes(symbols)
+		// return quotes
 
 	}
 })

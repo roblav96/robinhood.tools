@@ -14,22 +14,21 @@ declare namespace NodeJS {
 		CLIENT: any
 		SERVER: any
 		PROJECT: any
+		DEBUGGER: any
+		APPLICATION: any
+		APPLICATIONS: any
 		HOST: any
 		PORT: any
-		OFFSET: any
-		FIRST: any
-		ORDER: any
 		MASTER: any
 		WORKER: any
 		PRIMARY: any
-		SCALE: any
 		INSTANCE: any
-		DEBUGGER: any
-		PANDORA_DEV: any
-		CPUS: any
+		INSTANCES: any
 		SYMBOLS: SymbolsTypes
-		APPLICATION: any
-		APPLICATIONS: any
+		// OFFSET: any
+		// FIRST: any
+		// ORDER: any
+		// SCALE: any
 	}
 }
 

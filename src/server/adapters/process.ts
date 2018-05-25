@@ -20,20 +20,26 @@ import * as os from 'os'
 import * as cluster from 'cluster'
 if (cluster.isMaster) process.env.MASTER = true;
 if (cluster.isWorker) process.env.WORKER = true;
-process.env.CPUS = process.env.CPUS || os.cpus().length
-process.env.SCALE = process.env.SCALE || 1
+// process.env.CPUS = process.env.CPUS || os.cpus().length
+// process.env.SCALE = process.env.SCALE || 1
 process.env.INSTANCE = cluster.isWorker ? cluster.worker.id - 1 : 0;
 if (+process.env.INSTANCE == 0) process.env.PRIMARY = true;
 
 
 
-process.env.OFFSET = +process.env.INSTANCE
-process.env.ORDER = +process.env.INSTANCE
-if (!+process.env.OFFSET && process.env.PRIMARY) process.env.FIRST = true;
+import * as sigexit from 'signal-exit'
+if (cluster && cluster.worker) {
+	sigexit(() => cluster.worker.disconnect())
+}
 
 
 
-import chalk from 'chalk'
+// process.env.OFFSET = +process.env.INSTANCE
+// process.env.ORDER = +process.env.INSTANCE
+// if (!+process.env.OFFSET && process.env.PRIMARY) process.env.FIRST = true;
+
+
+
 process.on('uncaughtException', function(error) {
 	console.error('UNCAUGHT EXCEPTION', '->', error)
 })

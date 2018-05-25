@@ -10,7 +10,7 @@ import * as url from 'url'
 import * as uws from 'uws'
 import * as cookie from 'cookie'
 import * as fastjsonparse from 'fast-json-parse'
-import * as pandora from './pandora'
+// import * as pandora from './pandora'
 import * as redis from './redis'
 import * as security from './security'
 import { PolkaRequest } from '../api/polka.request'
@@ -20,9 +20,9 @@ import clock from '../../common/clock'
 
 
 const port = +process.env.PORT + +process.env.OFFSET + +process.env.INSTANCE
-pandora.on('socket.listening', function(hubmsg) {
-	pandora.send({ clientId: hubmsg.host.clientId }, 'socket.listening', { port })
-})
+// pandora.on('socket.listening', function(hubmsg) {
+// 	pandora.send({ clientId: hubmsg.host.clientId }, 'socket.listening', { port })
+// })
 
 export const wss = new uws.Server({
 	host: process.env.HOST, port,
@@ -73,7 +73,7 @@ wss.on('error', function onerror(error) {
 wss.on('listening', function onlistening() {
 	let address = wss.httpServer.address() as AddressInfo
 	console.info('wss listening ->', address.port)
-	pandora.broadcast({ processName: 'api' }, 'socket.onlistening', { port: address.port })
+	// pandora.broadcast({ processName: 'api' }, 'socket.onlistening', { port: address.port })
 })
 
 wss.on('connection', onconnection)

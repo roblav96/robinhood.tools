@@ -7,7 +7,7 @@ import * as schedule from 'node-schedule'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
-import * as pandora from '../adapters/pandora'
+// import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as robinhood from '../adapters/robinhood'
@@ -20,9 +20,9 @@ import * as quotes from '../adapters/quotes'
 
 
 let ready = false
-pandora.on('symbols.start', function() {
-	if (ready) pandora.broadcast({}, 'symbols.ready');
-})
+// pandora.on('symbols.start', function() {
+// 	if (ready) pandora.broadcast({}, 'symbols.ready');
+// })
 
 async function start() {
 
@@ -36,7 +36,7 @@ async function start() {
 	if (_.sum(exists) != keys.length) await syncEverything();
 
 	ready = true
-	pandora.broadcast({}, 'symbols.ready')
+	// pandora.broadcast({}, 'symbols.ready')
 
 } start().catch(error => console.error(`start Error -> %O`, error))
 
@@ -50,7 +50,7 @@ async function syncEverything(resets = false) {
 	await syncForex()
 	await syncIndexes()
 	await quotes.syncAllQuotes(resets)
-	pandora.broadcast({}, 'symbols.reset')
+	// pandora.broadcast({}, 'symbols.reset')
 }
 
 

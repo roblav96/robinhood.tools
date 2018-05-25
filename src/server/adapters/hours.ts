@@ -8,7 +8,7 @@ import * as Rx from '../../common/rxjs'
 import * as rkeys from '../../common/rkeys'
 import * as pretty from '../../common/pretty'
 import * as hours from '../../common/hours'
-import * as pandora from './pandora'
+// import * as pandora from './pandora'
 import * as redis from './redis'
 
 
@@ -16,7 +16,7 @@ import * as redis from './redis'
 export const rxhours = new Rx.BehaviorSubject(null as Hours)
 export const rxstate = new Rx.BehaviorSubject(null as Hours.State)
 
-pandora.on('syncHours', syncHours)
+// pandora.on('syncHours', syncHours)
 schedule.scheduleJob('* * * * *', syncHours).invoke()
 
 async function syncHours() {

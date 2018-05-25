@@ -8,8 +8,8 @@ Object.assign(util.inspect.styles, { string: 'green', regexp: 'green', date: 'gr
 
 
 
-import chalk from 'chalk'
 import dayjs from '../../common/dayjs'
+import * as clc from 'cli-color'
 import * as StackTracey from 'stacktracey'
 const _console = {} as typeof console
 let methods = ['log', 'info', 'warn', 'error']
@@ -24,17 +24,17 @@ for (i = 0; i < len; i++) {
 			let stamp = dayjs().format('hh:mm:ss:SSS')
 			let colors = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' }
 			let color = (colors[method] || 'magenta') as string
-			let square = chalk[color + 'Bright']('█') as string
+			let square = clc[color + 'Bright']('█') as string
 			if (method == 'error') color = color + 'Bright';
-			let file = chalk.bold(`${chalk[color](site.fileName)}:${site.line}`)
+			let file = clc.bold(`${clc[color](site.fileName)}:${site.line}`)
 			let pname = 'moleculer'
 			let pi = process.env.INSTANCE ? `[${process.env.INSTANCE}]` : ''
-			let output = chalk.underline(`${square}[${file}]${pi}${pname}${site.callee}[${chalk.grey(stamp)}]`)
+			let output = clc.underline(`${square}[${file}]${pi}${pname}${site.callee}[${clc.blackBright(stamp)}]`)
 			if (method == 'error' && args.length > 0) {
 				let error = 'ERROR'
 				let first = args[0]
 				if (util.isString(first) && first.indexOf('UN') == 0) error = first;
-				output = chalk.bold.redBright(`████  ${error}  ████\r\n`) + output
+				output = clc.bold.redBright(`████  ${error}  ████\r\n`) + output
 			}
 			process.stdout.write(`\r\n${output}\r\n`)
 			_console[method].apply(console, args)
@@ -43,11 +43,11 @@ for (i = 0; i < len; i++) {
 	})
 }
 
-
+console.log(`process.env.DEBUGGER ->`, process.env.DEBUGGER)
 
 import * as inspector from 'inspector'
 import * as exithook from 'exit-hook'
-if (process.env.DEBUGGER != 'false') {
+if (process.env.DEBUGGER == 'true') {
 	inspector.open(process.debugPort + +process.env.INSTANCE)
 	if (+process.env.INSTANCE == 0) console.clear();
 	exithook(function() { inspector.close() })

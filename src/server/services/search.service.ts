@@ -6,7 +6,7 @@ import * as Wade from 'wade'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
-import * as pandora from '../adapters/pandora'
+// import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
 import * as utils from '../adapters/utils'
 
@@ -16,9 +16,9 @@ const CACHE = [] as Quotes.Quote[]
 const WADES = { symbol: null, name: null, description: null }
 
 const _onready = _.debounce(onready, 3000, { leading: false, trailing: true })
-pandora.once('symbols.ready', _onready)
-pandora.broadcast({}, 'symbols.start')
-pandora.on('quotes.ready', _onready)
+// pandora.once('symbols.ready', _onready)
+// pandora.broadcast({}, 'symbols.start')
+// pandora.on('quotes.ready', _onready)
 
 async function onready() {
 
@@ -51,18 +51,18 @@ async function onready() {
 
 
 const MAX = 20
-pandora.reply('search.query', async function onquery(query: string) {
-	let symbols = [] as string[]
-	Object.keys(WADES).forEach(key => {
-		if (symbols.length > MAX) return;
-		let quotes = Wade(WADES[key])(query).map(({ index }) => CACHE[index]) as Quotes.Quote[]
-		quotes.sort((a, b) => b.avgVolume - a.avgVolume).forEach(({ symbol }) => {
-			if (symbols.includes(symbol)) return;
-			if (symbols.length >= MAX) return;
-			symbols.push(symbol)
-		})
-	})
-	return symbols
-})
+// pandora.reply('search.query', async function onquery(query: string) {
+// 	let symbols = [] as string[]
+// 	Object.keys(WADES).forEach(key => {
+// 		if (symbols.length > MAX) return;
+// 		let quotes = Wade(WADES[key])(query).map(({ index }) => CACHE[index]) as Quotes.Quote[]
+// 		quotes.sort((a, b) => b.avgVolume - a.avgVolume).forEach(({ symbol }) => {
+// 			if (symbols.includes(symbol)) return;
+// 			if (symbols.length >= MAX) return;
+// 			symbols.push(symbol)
+// 		})
+// 	})
+// 	return symbols
+// })
 
 

@@ -4,7 +4,7 @@ import '../main'
 import dayjs from '../../common/dayjs'
 import * as schedule from 'node-schedule'
 import * as rkeys from '../../common/rkeys'
-import * as pandora from '../adapters/pandora'
+// import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as socket from '../adapters/socket'
@@ -28,7 +28,7 @@ async function syncHours() {
 		hhours.postpost = dayjs(new Date(rhours.closes_at)).add(4, 'hour').valueOf()
 	}
 	await redis.main.hmset(rkeys.HR.HOURS, hhours)
-	pandora.broadcast({}, 'syncHours')
+	// pandora.broadcast({}, 'syncHours')
 }
 
 hours.rxhours.subscribe(function(hhours) {

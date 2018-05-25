@@ -9,11 +9,9 @@ import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
 import * as boom from 'boom'
 import * as fkill from 'fkill'
-import * as pandora from 'pandora'
 import PolkaRouter from './polka.router'
 
-
-
+console.log(`PolkaRouter ->`, PolkaRouter)
 const polka = new PolkaRouter({
 
 	onError(error: boom<any>, req, res, next) {

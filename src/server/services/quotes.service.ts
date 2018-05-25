@@ -4,7 +4,7 @@ import '../main'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
-import * as pandora from '../adapters/pandora'
+// import * as pandora from '../adapters/pandora'
 import * as utils from '../adapters/utils'
 import * as redis from '../adapters/redis'
 import * as socket from '../adapters/socket'
@@ -33,11 +33,11 @@ const QUOTES = {} as Dict<Quotes.Quote>
 const EMITS = {} as Dict<Quotes.Quote>
 const SAVES = {} as Dict<Quotes.Quote>
 
-pandora.once('symbols.ready', onsymbols)
-pandora.broadcast({}, 'symbols.start')
-if (process.env.SYMBOLS == 'STOCKS') {
-	pandora.on('symbols.reset', onsymbols)
-}
+// pandora.once('symbols.ready', onsymbols)
+// pandora.broadcast({}, 'symbols.start')
+// if (process.env.SYMBOLS == 'STOCKS') {
+// 	pandora.on('symbols.reset', onsymbols)
+// }
 
 async function onsymbols() {
 
@@ -87,7 +87,7 @@ async function onsymbols() {
 
 	clock.on('1s', ontick)
 
-	pandora.broadcast({}, 'quotes.ready')
+	// pandora.broadcast({}, 'quotes.ready')
 
 }
 
