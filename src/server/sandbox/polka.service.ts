@@ -1,9 +1,8 @@
 // 
 
-import * as inspector from 'inspector'
-inspector.open(process.debugPort + Math.round(Math.random() * 10))
-
-import { Server as TurboServer } from 'turbo-http'
+import '../main'
+import * as moleculer from 'moleculer'
+import * as Mts from 'moleculer-decorators'
 import * as TurboRequest from 'turbo-http/lib/request'
 import * as TurboResponse from 'turbo-http/lib/response'
 import * as turbo from 'turbo-http'
@@ -12,7 +11,22 @@ import * as _ from 'lodash'
 
 
 
-const polka = Polka<TurboServer, TurboRequest, TurboResponse>({
+@Mts.Service({
+	name: 'PolkaService',
+	settings: {
+		silent: true,
+	},
+})
+class PolkaService extends Mts.BaseSchema {
+	created() {
+		console.log(`PolkaService -> createds`)
+	}
+}
+module.exports = PolkaService
+
+
+
+const polka = Polka<(turbo.Server), TurboRequest, TurboResponse>({
 
 })
 

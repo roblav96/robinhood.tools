@@ -28,6 +28,8 @@ declare namespace NodeJS {
 		PANDORA_DEV: any
 		CPUS: any
 		SYMBOLS: SymbolsTypes
+		APPLICATION: any
+		APPLICATIONS: any
 	}
 }
 
