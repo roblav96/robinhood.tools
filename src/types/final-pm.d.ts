@@ -1,10 +1,27 @@
 // 
 
-declare namespace FinalPM {
+declare module 'final-pm' {
 
-	interface ApplicationConfig {
+	export interface Configuration {
+		'applications': Application[]
+		'config-path': string
+		'daemon-log': string
+		'home': string
+		'ignore-env': string[]
+		'is-local': boolean
+		'npm-global-config': string
+		'npm-user-config': string
+		'socket': string
+		'socket-host': string
+		'socket-path': string
+		'socket-port': string
+	}
+
+	export interface Application {
 		'args': string[]
 		'base-path': string
+		'builtin': boolean
+		'config-path': string
 		'cwd': string
 		'env': NodeJS.ProcessEnv
 		'instances': number
@@ -29,20 +46,6 @@ declare namespace FinalPM {
 		'type': string
 		'unique-instances': boolean
 	}
-
-	interface FinalDefaultConfig {
-		'applications': ApplicationConfig[]
-		'daemon-log': string
-		'home': string
-		'ignore-env': string[]
-		'npm-global-config': string
-		'npm-user-config': string
-		'socket': string
-	}
-
-}
-
-declare module 'final-pm' {
 
 	export class daemon {
 		constructor(...args: any[])
