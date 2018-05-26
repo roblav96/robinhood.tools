@@ -16,6 +16,7 @@ import clock from '../../common/clock'
 
 
 
+declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
 const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'>()
 const CLIENTS = [] as webull.MqttClient[]
 clock.on('5s', function onconnect() {

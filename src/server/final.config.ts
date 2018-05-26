@@ -1,29 +1,21 @@
 // 
 
+import * as final from 'final-pm'
 import * as _ from 'lodash'
 import * as os from 'os'
-import * as path from 'path'
-import * as pkgup from 'pkg-up'
-import * as final from 'final-pm'
 
 
 
-const applications = [] as final.Application[]
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const DEVELOPMENT = process.env.NODE_ENV == 'development'
-const PROJECT = path.dirname(pkgup.sync())
-const PACKAGE = require(path.join(PROJECT, 'package.json'))
 
-const env = {
-	NODE_ENV: process.env.NODE_ENV,
-	PROJECT, NAME: PACKAGE.name, VERSION: PACKAGE.version,
-	DOMAIN: (DEVELOPMENT ? 'dev.' : '') + PACKAGE.domain,
-	DEBUGGER: DEVELOPMENT,
-	HOST: '127.0.0.1', PORT: 12300,
-} as NodeJS.ProcessEnv
-
+declare global { namespace NodeJS { interface ProcessEnv { HOST: any; PORT: any } } }
+const applications = [] as final.Application[]
 const app = {
-	'env': env,
+	'env': {
+		NODE_ENV: process.env.NODE_ENV,
+		HOST: '127.0.0.1', PORT: 12300,
+	},
 	'instances': 1,
 	'mode': 'fork',
 	'ready-on': 'message',
@@ -33,13 +25,14 @@ const app = {
 	// 'stop-signal': 'disconnect',
 } as final.Application
 
-// env.DEBUGGER = false
+if (DEVELOPMENT) app.env.DEBUGGER = true;
 
 
 
 {
 
-	Application({ name: 'api', run: 'api/api', instances: 2 })
+	Application({ name: 'main', run: 'main', instances: 1 })
+	// Application({ name: 'api', run: 'api/api', instances: 2 })
 
 	// Application({ name: 'symbols-service', run: 'services/symbols.service', env: { SCALE: 1 } })
 	// Application({ name: 'search-service', run: 'services/search.service', env: { SCALE: 1 } })
@@ -56,13 +49,13 @@ const app = {
 
 
 function Application(application: Partial<final.Application>) {
-	_.defaults(application.env, app.env)
 	_.defaults(application, app)
 	application.mode = application.instances > 1 ? 'cluster' : 'fork'
 	application.run += '.js'
 	applications.push(application as any)
 }
 
+declare global { namespace NodeJS { interface ProcessEnv { APPLICATION: any; APPLICATIONS: any } } }
 let apps = JSON.stringify(applications.map((v, i) => {
 	let app = {
 		index: i, name: v.name, instances: v.instances,
@@ -71,9 +64,10 @@ let apps = JSON.stringify(applications.map((v, i) => {
 	return app
 }))
 applications.forEach(v => v.env.APPLICATIONS = apps)
-
-console.log(`applications ->`, JSON.stringify(applications, null, 4))
+// console.log(`applications ->`, JSON.stringify(applications, null, 4))
 
 module.exports = { applications }
+
+
 
 

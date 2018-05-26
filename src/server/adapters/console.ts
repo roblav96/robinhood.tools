@@ -3,7 +3,7 @@
 
 
 import * as util from 'util'
-Object.assign(util.inspect.defaultOptions, { depth: 2, showHidden: false, showProxy: false, compact: false, breakLength: Infinity, maxArrayLength: Infinity, colors: true } as Partial<typeof util.inspect.defaultOptions>)
+Object.assign(util.inspect.defaultOptions, { depth: 1, showHidden: false, showProxy: false, compact: false, breakLength: Infinity, maxArrayLength: Infinity, colors: true } as Partial<typeof util.inspect.defaultOptions>)
 Object.assign(util.inspect.styles, { string: 'green', regexp: 'green', date: 'green', number: 'magenta', boolean: 'blue', undefined: 'red', null: 'red', symbol: 'cyan', special: 'cyan' })
 
 
@@ -27,7 +27,7 @@ for (i = 0; i < len; i++) {
 			let square = clc[color + 'Bright']('█') as string
 			if (method == 'error') color = color + 'Bright';
 			let file = clc.bold(`${clc[color](site.fileName)}:${site.line}`)
-			let pname = 'moleculer'
+			let pname = process.env.PNAME ? `[${process.env.PNAME}]` : ''
 			let pi = process.env.INSTANCE ? `[${process.env.INSTANCE}]` : ''
 			let output = clc.underline(`${square}[${file}]${pi}${pname}${site.callee}[${clc.blackBright(stamp)}]`)
 			if (method == 'error' && args.length > 0) {
@@ -43,16 +43,16 @@ for (i = 0; i < len; i++) {
 	})
 }
 
-console.log(`process.env.DEBUGGER ->`, process.env.DEBUGGER)
-
 import * as inspector from 'inspector'
-import * as exithook from 'exit-hook'
-if (process.env.DEBUGGER == 'true') {
-	inspector.open(process.debugPort + +process.env.INSTANCE)
+import * as sigexit from 'signal-exit'
+if (process.env.DEBUGGER) {
+	let port = process.debugPort + +process.env.INSTANCE
+	inspector.open(port)
 	if (+process.env.INSTANCE == 0) console.clear();
-	exithook(function() { inspector.close() })
+	sigexit(() => inspector.close())
 }
-declare global { namespace NodeJS { export interface Process { debugPort: number } } }
+declare global { namespace NodeJS { interface Process { debugPort: number } } }
+declare global { namespace NodeJS { interface ProcessEnv { DEBUGGER: any } } }
 
 
 

@@ -13,18 +13,7 @@ declare namespace NodeJS {
 		DOMAIN: any
 		CLIENT: any
 		SERVER: any
-		PROJECT: any
-		DEBUGGER: any
-		APPLICATION: any
-		APPLICATIONS: any
-		HOST: any
-		PORT: any
-		MASTER: any
-		WORKER: any
-		PRIMARY: any
-		INSTANCE: any
-		INSTANCES: any
-		SYMBOLS: SymbolsTypes
+
 		// OFFSET: any
 		// FIRST: any
 		// ORDER: any

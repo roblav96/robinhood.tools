@@ -13,4 +13,5 @@ import './adapters/process'
 import './adapters/console'
 import '../common/clock'
 
-
+console.warn(`main ready`)
+console.log(`process.env ->`, process.env)
