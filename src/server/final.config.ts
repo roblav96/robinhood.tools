@@ -31,13 +31,14 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 
 {
 
-	Application({ name: 'main', run: 'main', instances: 1 })
+	Application({ name: 'main1', run: 'main', instances: 2 })
+	Application({ name: 'main2', run: 'main', instances: 1 })
 	// Application({ name: 'api', run: 'api/api', instances: 2 })
 
-	// Application({ name: 'symbols-service', run: 'services/symbols.service', env: { SCALE: 1 } })
-	// Application({ name: 'search-service', run: 'services/search.service', env: { SCALE: 1 } })
-	// Application({ name: 'hours-service', run: 'services/hours.service', env: { SCALE: 1 } })
-	// Application({ name: 'robinhood-service', run: 'services/robinhood.service', env: { SCALE: 1 } })
+	// Application({ name: 'symbols-service', run: 'services/symbols.service' })
+	// Application({ name: 'search-service', run: 'services/search.service' })
+	// Application({ name: 'hours-service', run: 'services/hours.service' })
+	// Application({ name: 'robinhood-service', run: 'services/robinhood.service' })
 
 	// let instances = os.cpus().length
 	// Application({ name: 'stocks-service', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
@@ -52,19 +53,20 @@ function Application(application: Partial<final.Application>) {
 	_.defaults(application, app)
 	application.mode = application.instances > 1 ? 'cluster' : 'fork'
 	application.run += '.js'
-	applications.push(application as any)
+	applications.push(JSON.parse(JSON.stringify(application)))
 }
 
-declare global { namespace NodeJS { interface ProcessEnv { APPLICATION: any; APPLICATIONS: any } } }
-let apps = JSON.stringify(applications.map((v, i) => {
-	let app = {
-		index: i, name: v.name, instances: v.instances,
-	} as Partial<final.Application>
-	v.env.APPLICATION = JSON.stringify(app)
-	return app
+declare global {
+	interface Representation { offset: number; name: string; scale: number }
+	namespace NodeJS { interface ProcessEnv { REPRESENTATION: any; REPRESENTATIONS: any } }
+}
+let reps = JSON.stringify(applications.map((v, i) => {
+	let rep = { offset: i, name: v.name, scale: v.instances } as Representation
+	v.env.REPRESENTATION = JSON.stringify(rep)
+	return rep
 }))
-applications.forEach(v => v.env.APPLICATIONS = apps)
-// console.log(`applications ->`, JSON.stringify(applications, null, 4))
+applications.forEach(v => v.env.REPRESENTATIONS = reps)
+console.log(`applications ->`, JSON.stringify(applications, null, 4))
 
 module.exports = { applications }
 

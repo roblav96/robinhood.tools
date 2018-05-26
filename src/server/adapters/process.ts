@@ -33,12 +33,16 @@ dotenv.config({ path: path.resolve(project, `env/server.${process.env.NODE_ENV}.
 
 
 
-declare global { namespace NodeJS { interface ProcessEnv { MASTER: any; WORKER: any; INSTANCE: any; PRIMARY: any } } }
 import * as cluster from 'cluster'
 if (cluster.isMaster) process.env.MASTER = true;
 if (cluster.isWorker) process.env.WORKER = true;
-process.env.INSTANCE = cluster.isWorker ? cluster.worker.id - 1 : 0;
+if (process.env.FINAL_PM_INSTANCE_NUMBER) {
+	process.env.INSTANCE = process.env.FINAL_PM_INSTANCE_NUMBER
+} else {
+	process.env.INSTANCE = cluster.isWorker ? cluster.worker.id - 1 : 0;
+}
 if (+process.env.INSTANCE == 0) process.env.PRIMARY = true;
+declare global { namespace NodeJS { interface ProcessEnv { MASTER: any; WORKER: any; INSTANCE: any; PRIMARY: any } } }
 
 
 
@@ -49,19 +53,18 @@ if (cluster.isWorker) {
 
 
 
-declare global { namespace NodeJS { interface ProcessEnv { CPUS: any } } }
 import * as os from 'os'
 process.env.CPUS = os.cpus().length
+declare global { namespace NodeJS { interface ProcessEnv { CPUS: any } } }
 
 
 
-declare global { namespace NodeJS { interface ProcessEnv { INDEX: any; LENGTH: any; SCALE: any; PNAME: any } } }
-import * as final from 'final-pm'
-let app = (process.env.APPLICATION ? JSON.parse(process.env.APPLICATION) : {}) as final.Application & { index: number }
-let apps = (process.env.APPLICATIONS ? JSON.parse(process.env.APPLICATIONS) : []) as final.Application[]
-process.env.PNAME = app.name || 'app'
-process.env.INDEX = app.index || 0
-process.env.SCALE = app.instances || 0
-process.env.LENGTH = apps.length || 1
+let rep = (process.env.REPRESENTATION ? JSON.parse(process.env.REPRESENTATION) : {}) as Representation
+let reps = (process.env.REPRESENTATIONS ? JSON.parse(process.env.REPRESENTATIONS) : []) as Representation[]
+process.env.NAME = rep.name
+process.env.SCALE = rep.scale || 1
+process.env.OFFSET = rep.offset || 0
+process.env.LENGTH = reps.length || 1
+declare global { namespace NodeJS { interface ProcessEnv { NAME: any; SCALE: any; OFFSET: any; LENGTH: any } } }
 
 

@@ -14,4 +14,4 @@ import './adapters/console'
 import '../common/clock'
 
 console.warn(`main ready`)
-console.log(`process.env ->`, process.env)
+// console.log(`process.env ->`, JSON.stringify(process.env, null, 4))

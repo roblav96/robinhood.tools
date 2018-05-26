@@ -27,9 +27,9 @@ for (i = 0; i < len; i++) {
 			let square = clc[color + 'Bright']('█') as string
 			if (method == 'error') color = color + 'Bright';
 			let file = clc.bold(`${clc[color](site.fileName)}:${site.line}`)
-			let pname = process.env.PNAME ? `[${process.env.PNAME}]` : ''
-			let pi = process.env.INSTANCE ? `[${process.env.INSTANCE}]` : ''
-			let output = clc.underline(`${square}[${file}]${pi}${pname}${site.callee}[${clc.blackBright(stamp)}]`)
+			let name = process.env.NAME ? `[${process.env.NAME}]` : ''
+			let instance = process.env.INSTANCE ? `[${process.env.INSTANCE}]` : ''
+			let output = clc.underline(`${square}[${file}]${instance}${name}${site.callee}[${clc.blackBright(stamp)}]`)
 			if (method == 'error' && args.length > 0) {
 				let error = 'ERROR'
 				let first = args[0]
@@ -46,9 +46,11 @@ for (i = 0; i < len; i++) {
 import * as inspector from 'inspector'
 import * as sigexit from 'signal-exit'
 if (process.env.DEBUGGER) {
-	let port = process.debugPort + +process.env.INSTANCE
+	let offset = +process.env.INSTANCE + +process.env.OFFSET
+	console.log(`offset ->`, offset)
+	let port = process.debugPort + +process.env.INSTANCE + +process.env.OFFSET
 	inspector.open(port)
-	if (+process.env.INSTANCE == 0) console.clear();
+	// if ( == 0) console.clear();
 	sigexit(() => inspector.close())
 }
 declare global { namespace NodeJS { interface Process { debugPort: number } } }
