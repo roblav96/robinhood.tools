@@ -46,11 +46,15 @@ for (i = 0; i < len; i++) {
 import * as inspector from 'inspector'
 import * as sigexit from 'signal-exit'
 if (process.env.DEBUGGER) {
-	let offset = +process.env.INSTANCE + +process.env.OFFSET
-	console.log(`offset ->`, offset)
-	let port = process.debugPort + +process.env.INSTANCE + +process.env.OFFSET
+	let offset = +process.env.OFFSET + +process.env.INSTANCE
+	let port = process.debugPort + offset
 	inspector.open(port)
-	// if ( == 0) console.clear();
+	if (offset == 0) {
+		let stdout = (console as any)._stdout
+		console.log(`stdout.isTTY ->`, stdout.isTTY)
+		if (stdout.isTTY) { stdout.isTTY = false; process.nextTick(() => stdout.isTTY = true) }
+		console.clear()
+	}
 	sigexit(() => inspector.close())
 }
 declare global { namespace NodeJS { interface Process { debugPort: number } } }

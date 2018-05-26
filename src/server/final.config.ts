@@ -9,7 +9,6 @@ import * as os from 'os'
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const DEVELOPMENT = process.env.NODE_ENV == 'development'
 
-declare global { namespace NodeJS { interface ProcessEnv { HOST: any; PORT: any } } }
 const applications = [] as final.Application[]
 const app = {
 	'env': {
@@ -18,12 +17,14 @@ const app = {
 	},
 	'instances': 1,
 	'mode': 'fork',
-	'ready-on': 'message',
+	'ready-on': 'instant',
+	'restart-crashing-delay': 3000,
 	'node-args': ['--no-warnings', '--expose-gc', '--max_old_space_size=2048'],
 	// 'logger': 'idk-logger',
 	// 'logger-args': ['dont', 'log', '...'],
 	// 'stop-signal': 'disconnect',
 } as final.Application
+declare global { namespace NodeJS { interface ProcessEnv { HOST: any; PORT: any } } }
 
 if (DEVELOPMENT) app.env.DEBUGGER = true;
 
@@ -31,8 +32,10 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 
 {
 
-	Application({ name: 'main1', run: 'main', instances: 2 })
-	Application({ name: 'main2', run: 'main', instances: 1 })
+	// Application({ name: 'main1', run: 'main', instances: 1 })
+	// Application({ name: 'main2', run: 'main', instances: 2 })
+
+	Application({ name: 'radio', run: 'services/radio.service' })
 	// Application({ name: 'api', run: 'api/api', instances: 2 })
 
 	// Application({ name: 'symbols-service', run: 'services/symbols.service' })
@@ -51,25 +54,26 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 
 function Application(application: Partial<final.Application>) {
 	_.defaults(application, app)
-	application.mode = application.instances > 1 ? 'cluster' : 'fork'
+	// application.mode = application.instances > 1 ? 'cluster' : 'fork'
 	application.run += '.js'
 	applications.push(JSON.parse(JSON.stringify(application)))
 }
 
-declare global {
-	interface Representation { offset: number; name: string; scale: number }
-	namespace NodeJS { interface ProcessEnv { REPRESENTATION: any; REPRESENTATIONS: any } }
-}
-let reps = JSON.stringify(applications.map((v, i) => {
-	let rep = { offset: i, name: v.name, scale: v.instances } as Representation
-	v.env.REPRESENTATION = JSON.stringify(rep)
-	return rep
+let envs = JSON.stringify(applications.map((v, i) => {
+	let env = {
+		NAME: v.name,
+		SCALE: v.instances,
+		OFFSET: i,
+		LENGTH: applications.length,
+	} as final.ProcessEnv
+	Object.assign(v.env, env)
+	return env
 }))
-applications.forEach(v => v.env.REPRESENTATIONS = reps)
-console.log(`applications ->`, JSON.stringify(applications, null, 4))
+declare global { namespace NodeJS { interface ProcessEnv { NAME: any; SCALE: any; OFFSET: any; LENGTH: any; ENVS: any; FINAL_PM_INSTANCE_NUMBER: any } } }
+
+applications.forEach(v => v.env.ENVS = envs)
+// console.log(`applications ->`, JSON.stringify(applications, null, 4))
 
 module.exports = { applications }
-
-
 
 
