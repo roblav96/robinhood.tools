@@ -2,6 +2,7 @@
 
 import * as final from 'final-pm'
 import * as _ from 'lodash'
+import * as path from 'path'
 import * as os from 'os'
 
 
@@ -19,9 +20,12 @@ const app = {
 	'mode': 'fork',
 	'ready-on': 'instant',
 	'restart-crashing-delay': 3000,
-	'node-args': ['--no-warnings', '--expose-gc', '--max_old_space_size=2048'],
-	// 'logger': 'idk-logger',
-	// 'logger-args': ['dont', 'log', '...'],
+	'node-args': [
+		// '--require', path.resolve(__dirname, 'main.js'),
+		'--no-warnings', '--expose-gc', '--max_old_space_size=2048',
+	],
+	// 'logger': 'file-logger',
+	// 'logger-args': [],
 	// 'stop-signal': 'disconnect',
 } as final.Application
 declare global { namespace NodeJS { interface ProcessEnv { HOST: any; PORT: any } } }

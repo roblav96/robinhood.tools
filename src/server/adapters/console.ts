@@ -44,7 +44,7 @@ for (i = 0; i < len; i++) {
 }
 
 import * as inspector from 'inspector'
-import * as sigexit from 'signal-exit'
+import * as exithook from 'exit-hook'
 if (process.env.DEBUGGER) {
 	let offset = +process.env.OFFSET + +process.env.INSTANCE
 	let port = process.debugPort + offset
@@ -55,7 +55,7 @@ if (process.env.DEBUGGER) {
 		if (stdout.isTTY) { stdout.isTTY = false; process.nextTick(() => stdout.isTTY = true) }
 		console.clear()
 	}
-	sigexit(() => inspector.close())
+	exithook(() => inspector.close())
 }
 declare global { namespace NodeJS { interface Process { debugPort: number } } }
 declare global { namespace NodeJS { interface ProcessEnv { DEBUGGER: any } } }

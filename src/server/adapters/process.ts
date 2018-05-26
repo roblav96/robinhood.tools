@@ -43,9 +43,9 @@ declare global { namespace NodeJS { interface ProcessEnv { INSTANCE: any; PRIMAR
 
 
 
-import * as sigexit from 'signal-exit'
+import * as exithook from 'exit-hook'
 if (cluster.isWorker) {
-	sigexit(() => cluster.worker.disconnect())
+	exithook(() => cluster.worker.disconnect())
 }
 
 
