@@ -38,13 +38,36 @@ Vue.directive('bg-bull-bear', function(el, { value, arg }) {
 
 
 
+// Vue.directive('number-ticker', function(el, { oldValue, value }: { oldValue: number, value: number }) {
+// 	if (value == oldValue) return;
+// 	if (!Number.isFinite(value)) return;
+// 	let direction = value > oldValue ? 'up' : 'down' as 'up' | 'down'
+// 	let voldValue = Number.isFinite(oldValue) ? utils.vnumber(oldValue) : ''
+// 	let olddigits = voldValue.split('')
+// 	console.log('olddigits ->', olddigits)
+// 	let vvalue = utils.vnumber(value)
+// 	let digits = vvalue.split('')
+// 	console.log('digits ->', digits)
+// 	digits.forEach((digit, i) => {
+// 		let old = olddigits[i]
+// 		if (digit == old) return;
+// 		let child = el.children.item(i)
+// 		let span = document.createElement('span')
+// 		span.innerText = digit
+// 		if (!child) return el.appendChild(span);
+// 		el.removeChild(child)
+// 		el.appendChild(span)
+// 	})
+// })
+
+
+
 
 
 declare module 'vue/types/vnode' {
 	export interface VNodeDirective {
 		rawName: string
 		def: DirectiveOptions
-		// def: VNodeDirectiveDef
 	}
 	interface VNodeDirectiveDef extends DirectiveOptions { [key: string]: any }
 }

@@ -32,7 +32,7 @@ class Socket extends Emitter {
 			this.clients.forEach(v => v.destroy())
 			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
 				return new WebSocketClient(v, {
-					// query: security.headers,
+					// verbose: true,
 				}).on('open', this.onopen, this).on('close', this.onclose, this).on('message', this.onmessage, this)
 			}))
 		}).catch(error => console.error('discover Error ->', error))

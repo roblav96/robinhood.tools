@@ -27,7 +27,6 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 			let protocol = process.env.DEVELOPMENT ? 'http://' : 'https://'
 			config.url = protocol + process.env.DOMAIN + '/api' + config.url
 			security.cookies()
-			// _.defaults(config.headers, security.headers())
 		}
 
 		return config

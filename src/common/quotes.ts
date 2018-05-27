@@ -105,7 +105,7 @@ CALC_KEYS.forEach(k => CALC[k] = undefined)
 declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
 export const FULL = {
 	tickerId: 0,
-	nameLong: '',
+	fullName: '',
 	mic: '',
 	acronym: '',
 	exchange: '',

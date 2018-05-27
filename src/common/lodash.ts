@@ -39,6 +39,7 @@ export {
 	once,
 	orderBy,
 	pick,
+	random,
 	remove,
 	round,
 	sample,

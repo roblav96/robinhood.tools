@@ -43,6 +43,7 @@ const copts = {
 
 export function cookies() {
 	document.cookie = cookie.serialize('x-uuid', `${doc.uuid}.${Date.now()}`, copts)
+	document.cookie = cookie.serialize('x-finger', doc.finger, copts)
 }
 
 
@@ -61,7 +62,6 @@ export function token(): Promise<void> {
 	}).then(function(finger) {
 		doc.finger = finger
 		lockr.set('security.finger', doc.finger)
-		document.cookie = cookie.serialize('x-finger', doc.finger, copts)
 		return http.get('/security/token', { retries: Infinity })
 
 	}).then(function(response: Security.Doc) {

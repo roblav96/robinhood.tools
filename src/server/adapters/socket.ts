@@ -1,6 +1,7 @@
 // 
 
 import { AddressInfo } from 'net'
+import { PolkaRequest } from '../api/polka.request'
 export * from '../../common/socket'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
@@ -12,7 +13,6 @@ import * as cookie from 'cookie'
 import * as fastjsonparse from 'fast-json-parse'
 import * as redis from './redis'
 import * as security from './security'
-import { PolkaRequest } from '../api/polka.request'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
 import radio from './radio'
@@ -61,8 +61,6 @@ export const wss = new uws.Server({
 	}
 
 })
-
-wss.httpServer.timeout = 10000
 
 wss.on('error', function onerror(error) {
 	console.error('wss Error ->', error)

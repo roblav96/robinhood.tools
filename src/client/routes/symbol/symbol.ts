@@ -66,6 +66,7 @@ export default class extends Mixins(VMixin) {
 
 	mounted() {
 		clock.on('1s', this.$forceUpdate, this)
+		clock.on('1s', () => this.quote.price = _.round(this.quote.price + _.random(-1, 1, true), 2))
 	}
 
 	beforeDestroy() {
@@ -82,13 +83,12 @@ export default class extends Mixins(VMixin) {
 	iexitem = {} as Yahoo.Quote
 	deals = [] as Quotes.Deal[]
 
-	@Vts.Watch('price', { immediate: true }) w_price(price: number) {
-		document.title = `${this.symbol} ${price} (${this.vnumber(this.quote.percent, { plusminus: true, percent: true })})`
+	@Vts.Watch('quote.price', { immediate: true }) w_price(price: number) {
+		document.title = `${this.symbol} ${this.vnumber(price)} (${this.vnumber(this.quote.percent, { plusminus: true, percent: true })})`
 	}
 
-	get name() { return this.instrument.simple_name || this.instrument.name }
 	get vdeals() { return this.deals.filter((v, i) => i < 4) }
-	dealcolor(deal: Webull.Deal) { return { 'has-text-success': deal.tradeBsFlag == 'B', 'has-text-danger': deal.tradeBsFlag == 'S' } }
+	dealcolor(deal: Quotes.Deal) { return { 'has-text-success': deal.side == 'B', 'has-text-danger': deal.side == 'S' } }
 
 	get delisted() { return webull.ticker_status[this.wbquote.status] == webull.ticker_status.DELISTED }
 	get suspended() { return webull.ticker_status[this.wbquote.status] == webull.ticker_status.SUSPENSION }
@@ -99,11 +99,6 @@ export default class extends Mixins(VMixin) {
 		if (state.includes('POST')) return 'After Hours';
 		return state
 	}
-
-	// get price() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pPrice : this.wbquote.price }
-	// get change() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pChange : this.wbquote.change }
-	// get percent() { return this.wbquote.faTradeTime > this.wbquote.mktradeTime ? this.wbquote.pChRatio * 100 : this.wbquote.changeRatio * 100 }
-	// get marketcap() { return this.wbquote.totalShares * this.price }
 
 	get baprice() {
 		if (Object.keys(this.quote).length == 0) return { bid: 0, ask: 0 };
