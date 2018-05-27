@@ -33,7 +33,7 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 
 {
 
-	// Application({ name: 'radio', run: 'services/radio.service' })
+	Application({ name: 'radio', run: 'services/radio.service' })
 	Application({ name: 'api', run: 'api/api', instances: 2 })
 
 	// Application({ name: 'symbols-service', run: 'services/symbols.service' })

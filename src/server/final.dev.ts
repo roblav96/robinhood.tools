@@ -10,7 +10,7 @@ const { applications } = require('./final.config') as final.Configuration
 let clis = [] as execa.ExecaChildProcess[]
 function spawn(app: final.Application, instance: number) {
 	app.env.FINAL_PM_INSTANCE_NUMBER = instance
-	let cli = execa('node', [app.run].concat(app['node-args']), {
+	let cli = execa('node', app['node-args'].concat(app.run), {
 		env: app.env as any,
 		extendEnv: false,
 		killSignal: 'SIGKILL',
@@ -23,14 +23,8 @@ function spawn(app: final.Application, instance: number) {
 let ii = 0
 applications.forEach((app, i) => {
 	Array.from(Array(app.instances), function(v, instance) {
-		let ms = 10 * ii++
-		console.log('ms ->', ms)
-		setTimeout(spawn, ms, app, instance)
+		setTimeout(spawn, 1 * ii++, app, instance)
 	})
-	// let ii: number, len = app.instances
-	// for (ii = 0; ii < len; ii++) {
-	// 	setTimeout(spawn, 10)
-	// }
 })
 
 Promise.all(clis).then(function(resolved) {
