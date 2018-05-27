@@ -10,19 +10,19 @@ import * as url from 'url'
 import * as uws from 'uws'
 import * as cookie from 'cookie'
 import * as fastjsonparse from 'fast-json-parse'
-// import * as pandora from './pandora'
 import * as redis from './redis'
 import * as security from './security'
 import { PolkaRequest } from '../api/polka.request'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
+import radio from './radio'
 
 
 
 const port = +process.env.PORT + +process.env.OFFSET + +process.env.INSTANCE
-// pandora.on('socket.listening', function(hubmsg) {
-// 	pandora.send({ clientId: hubmsg.host.clientId }, 'socket.listening', { port })
-// })
+radio.on('socket.listening', function(event) {
+	radio.send({ uuid: event.host.uuid }, 'socket.listening', port)
+})
 
 export const wss = new uws.Server({
 	host: process.env.HOST, port,
@@ -36,17 +36,15 @@ export const wss = new uws.Server({
 			let cookies = req.headers.cookie
 			if (!cookies) return next(false, 412, `Precondition Failed: "cookies"`);
 
-			let cparsed = cookie.parse(cookies)
-			let qparsed = qs.parse(url.parse(req.url).query)
-
+			let parsed = cookie.parse(cookies)
 			let doc = {
 				ip: security.ip(req.headers),
-				uuid: qparsed['x-uuid'],
-				finger: qparsed['x-finger'],
+				uuid: parsed['x-uuid'],
+				finger: parsed['x-finger'],
 				hostname: req.headers['hostname'],
 				useragent: req.headers['user-agent'],
-				bits: cparsed['x-bits'],
-				token: cparsed['x-token']
+				bits: parsed['x-bits'],
+				token: parsed['x-token']
 			} as Security.Doc
 
 			let failed = security.isDoc(doc)
@@ -73,12 +71,15 @@ wss.on('error', function onerror(error) {
 wss.on('listening', function onlistening() {
 	let address = wss.httpServer.address() as AddressInfo
 	console.info('wss listening ->', address.port)
-	// pandora.broadcast({ processName: 'api' }, 'socket.onlistening', { port: address.port })
+	radio.send({ name: 'api' }, 'socket.onlistening', address.port)
 })
 
 wss.on('connection', onconnection)
 
-exithook(function onexit() { wss.close() })
+exithook(function onexit() {
+	wss.httpServer.close()
+	wss.close()
+})
 
 
 

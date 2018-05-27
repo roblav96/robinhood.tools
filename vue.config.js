@@ -50,7 +50,7 @@ module.exports = {
 			args[0]['process.env'][process.env.NODE_ENV.toUpperCase()] = `"${true}"`
 			args[0]['process.env'].NAME = `"${package.name}"`
 			args[0]['process.env'].VERSION = `"${package.version}"`
-			args[0]['process.env'].DOMAIN = `"${(DEVELOPMENT ? 'http://dev.' : 'https://') + package.domain}"`
+			args[0]['process.env'].DOMAIN = `"${(DEVELOPMENT ? 'dev.' : '') + package.domain}"`
 			let env = dotenv.config({ path: path.resolve(__dirname, 'env/client.env') }).parsed || {}
 			Object.assign(env, dotenv.config({ path: path.resolve(__dirname, 'env/client.' + process.env.NODE_ENV + '.env') }).parsed || {})
 			Object.keys(env).forEach(k => args[0]['process.env'][k] = `"${env[k]}"`)

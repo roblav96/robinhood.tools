@@ -50,8 +50,8 @@ if (cluster.isWorker) {
 
 
 
-// import * as os from 'os'
-// process.env.CPUS = os.cpus().length
-// declare global { namespace NodeJS { interface ProcessEnv { CPUS: any } } }
+import * as os from 'os'
+process.env.CPUS = os.cpus().length
+declare global { namespace NodeJS { interface ProcessEnv { CPUS: any } } }
 
 

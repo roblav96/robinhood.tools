@@ -20,11 +20,10 @@ radio.on('syncHours', syncHours)
 schedule.scheduleJob('* * * * *', syncHours).invoke()
 
 async function syncHours() {
-	console.log(`syncHours`)
-	let hhours = await redis.main.hgetall(rkeys.HR.HOURS) as Hours
-	if (_.isEmpty(hhours)) return;
-	core.fix(hhours)
-	if (!_.isEqual(rxhours.value, hhours)) rxhours.next(hhours);
+	let rhours = await redis.main.hgetall(rkeys.HR.HOURS) as Hours
+	if (_.isEmpty(rhours)) return;
+	core.fix(rhours)
+	if (!_.isEqual(rxhours.value, rhours)) rxhours.next(rhours);
 	let state = hours.getState(rxhours.value)
 	if (rxstate.value != state) rxstate.next(state);
 }

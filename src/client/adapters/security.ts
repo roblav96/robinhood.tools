@@ -5,6 +5,7 @@ import * as security from '@/common/security'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as boom from 'boom'
+import * as cookie from 'cookie'
 import lockr from 'lockr'
 import Fingerprint2 from 'fingerprintjs2'
 import clock from '@/common/clock'
@@ -28,12 +29,20 @@ export const doc = {
 	finger: lockr.get('security.finger'),
 } as Security.Doc
 
-export function headers() {
-	let headers = {
-		'x-uuid': `${doc.uuid}.${Date.now()}`,
-		'x-finger': doc.finger,
-	} as Dict<string>
-	return headers
+// export function headers() {
+// 	let headers = {
+// 		'x-uuid': `${doc.uuid}.${Date.now()}`,
+// 		'x-finger': doc.finger,
+// 	} as Dict<string>
+// 	return headers
+// }
+
+const copts = {
+	domain: process.env.DOMAIN, path: '/', sameSite: true,
+} as cookie.CookieSerializeOptions
+
+export function cookies() {
+	document.cookie = cookie.serialize('x-uuid', `${doc.uuid}.${Date.now()}`, copts)
 }
 
 
@@ -44,6 +53,7 @@ export function token(): Promise<void> {
 			doc.uuid = security.randomBits(security.LENGTHS.uuid)
 			lockr.set('security.uuid', doc.uuid)
 		}
+
 		return doc.finger ? doc.finger : new Promise<string>(function(resolve) {
 			new Fingerprint2().get(resolve)
 		})
@@ -51,6 +61,7 @@ export function token(): Promise<void> {
 	}).then(function(finger) {
 		doc.finger = finger
 		lockr.set('security.finger', doc.finger)
+		document.cookie = cookie.serialize('x-finger', doc.finger, copts)
 		return http.get('/security/token', { retries: Infinity })
 
 	}).then(function(response: Security.Doc) {

@@ -52,7 +52,10 @@ wss.on('connection', function onconnection(client: Radio.Client, req: IncomingMe
 
 clock.on('5s', () => wss.broadcast('ping'))
 
-exithook(() => wss.close())
+exithook(function onexit() {
+	wss.httpServer.close()
+	wss.close()
+})
 
 
 

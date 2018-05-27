@@ -4,7 +4,6 @@ import '../main'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
-// import * as pandora from '../adapters/pandora'
 import * as utils from '../adapters/utils'
 import * as redis from '../adapters/redis'
 import * as socket from '../adapters/socket'
@@ -13,6 +12,7 @@ import * as iex from '../adapters/iex'
 import * as quotes from '../adapters/quotes'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
+import radio from '../adapters/radio'
 
 
 
@@ -34,13 +34,13 @@ const QUOTES = {} as Dict<Quotes.Quote>
 const EMITS = {} as Dict<Quotes.Quote>
 const SAVES = {} as Dict<Quotes.Quote>
 
-// pandora.once('symbols.ready', onsymbols)
-// pandora.broadcast({}, 'symbols.start')
-// if (process.env.SYMBOLS == 'STOCKS') {
-// 	pandora.on('symbols.reset', onsymbols)
-// }
+radio.once('symbols.ready', onsymbols)
+radio.emit('symbols.start')
+if (process.env.SYMBOLS == 'STOCKS') {
+	radio.on('symbols.reset', onsymbols)
+}
 
-async function onsymbols() {
+async function onsymbols(event: Radio.Event) {
 
 	clock.offListener(ontick)
 	CLIENTS.forEach(v => v.destroy())
@@ -88,7 +88,9 @@ async function onsymbols() {
 
 	clock.on('1s', ontick)
 
-	// pandora.broadcast({}, 'quotes.ready')
+	if (event.name == 'symbols.reset') {
+		radio.emit('quotes.ready')
+	}
 
 }
 

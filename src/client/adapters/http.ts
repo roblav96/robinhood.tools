@@ -24,8 +24,10 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 		}
 
 		if (config.url[0] == '/') {
-			config.url = process.env.DOMAIN + '/api' + config.url
-			_.defaults(config.headers, security.headers())
+			let protocol = process.env.DEVELOPMENT ? 'http://' : 'https://'
+			config.url = protocol + process.env.DOMAIN + '/api' + config.url
+			security.cookies()
+			// _.defaults(config.headers, security.headers())
 		}
 
 		return config

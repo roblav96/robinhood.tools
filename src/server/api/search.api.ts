@@ -3,10 +3,10 @@
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
-import * as pandora from '../adapters/pandora'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as utils from '../adapters/utils'
+import radio from '../adapters/radio'
 import polka from './polka'
 
 
@@ -29,13 +29,9 @@ polka.route({
 	async handler(req, res) {
 		let query = req.query.query as string
 		if (!query) return [];
-
-		// let symbols = await pandora.invoke({
-		// 	processName: 'search.service',
-		// }, 'search.query', query)
-		// let quotes = await getQuotes(symbols)
-		// return quotes
-
+		let symbols = await radio.invoke({}, 'search.query', query)
+		let quotes = await getQuotes(symbols)
+		return quotes
 	}
 })
 

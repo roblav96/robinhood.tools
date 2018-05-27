@@ -45,15 +45,6 @@ server.listen(port, process.env.HOST, function onlisten() {
 	console.info('api listening ->', address.port)
 })
 
-// fkill(`:${port}`).finally(function() {
-// 	return new Promise(function(resolve) {
-// 		server.listen(port, process.env.HOST, resolve)
-// 	})
-// }).then(function() {
-// 	let address = server.address()
-// 	console.info('api listening ->', address.port)
-// })
-
 exithook(function() {
 	server.connections.forEach(v => v.close())
 	server.close()
