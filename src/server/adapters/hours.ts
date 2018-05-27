@@ -20,6 +20,7 @@ radio.on('syncHours', syncHours)
 schedule.scheduleJob('* * * * *', syncHours).invoke()
 
 async function syncHours() {
+	console.log(`syncHours`)
 	let hhours = await redis.main.hgetall(rkeys.HR.HOURS) as Hours
 	if (_.isEmpty(hhours)) return;
 	core.fix(hhours)

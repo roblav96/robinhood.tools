@@ -4,8 +4,9 @@ import * as Sockette from 'sockette'
 import * as uws from 'uws'
 import * as fastjsonparse from 'fast-json-parse'
 import * as security from './security'
-import clock from '../../common/clock'
+import * as Rx from '../../common/rxjs'
 import Emitter from '../../common/emitter'
+import clock from '../../common/clock'
 
 
 
@@ -16,51 +17,53 @@ class Radio extends Emitter {
 	private name = process.env.NAME
 	private instance = +process.env.INSTANCE
 	private get host() {
-		return { name: process.env.NAME, uuid: this.uuid, instance: +process.env.INSTANCE } as Radio.Host
+		return { name: this.name, uuid: this.uuid, instance: this.instance } as Radio.Host
 	}
 
 	constructor() {
 		super()
-		// clock.on('1s', this.sync, this)
 		this.sockette = new Sockette(`ws://localhost:${+process.env.PORT - 1}/radio`, {
 			timeout: 1000,
 			maxAttempts: Infinity,
 			onopen: this.onopen,
 			onclose: this.onclose,
 			onerror: this.onerror,
-			onmessage: this.onmessage,
+			onmessage: this.onmessage
 		})
-		console.log(`this.sockette ->`, this.sockette)
 	}
 
-	alive = false
+	isopen = false
+	isready = false
+
 	private onopen = () => {
-		console.info(`onopen ->`)
-		this.alive = true
-		this.emit('open')
 		this.sockette.send('__onopen__')
 	}
 	private onclose = (event: CloseEvent) => {
 		console.warn('onclose ->', event)
-		this.alive = false
-		this.emit('close', event)
-		clock.once('1s', this.sockette.open, this)
+		this.isopen = false
+		super.emit('close', event)
+		this.sockette.open()
 	}
 	private onerror = (event: ErrorEvent) => {
 		if (event.message.indexOf('uWs') != 0) {
 			console.error(`onerror Error -> %O`, event)
 		}
-		this.alive = false
-		this.emit('error', event)
-		clock.once('1s', this.sockette.open, this)
+		this.isopen = false
+		super.emit('error', event)
+		this.sockette.open()
 	}
 	private onmessage = ({ data }: MessageEvent) => {
 		let message = data as string
 		if (message == 'pong') return;
 		if (message == 'ping') return this.sockette.send('pong');
+		if (message == '__onopen__') {
+			this.isopen = true
+			super.emit('open')
+			return
+		}
 		if (message == '__onready__') {
-			this.ready = true
-			this.emit('ready')
+			this.isready = true
+			super.emit('ready')
 			return
 		}
 		let parsed = fastjsonparse(message)
@@ -68,22 +71,23 @@ class Radio extends Emitter {
 		let event = parsed.value as Radio.Event
 		if (event.selector) {
 			if (event.selector.uuid && event.selector.uuid != this.uuid) return;
-			if (event.selector.name && event.selector.name != process.env.NAME) return;
-			if (event.selector.instance && event.selector.instance != +process.env.INSTANCE) return;
+			if (event.selector.name && event.selector.name != this.name) return;
+			if (Number.isFinite(event.selector.instance) && event.selector.instance != this.instance) return;
 		}
-		this.emit(event.name, event.data)
+		super.emit(event.name, ...event.args)
 	}
 
-	ready = false
-	pready() {
-		if (this.alive) return Promise.resolve();
-		return this.toPromise('ready')
-	}
-
-	send(event: Partial<Radio.Event>) {
+	event(event: Partial<Radio.Event>) {
 		event.host = this.host
 		let message = JSON.stringify(event)
-		this.sockette.send(message)
+		if (this.isopen && this.isready) return this.sockette.send(message);
+		this.toPromise('ready').then(() => this.sockette.send(message))
+	}
+	emit(name: string, ...args: any[]) {
+		this.event({ name, args })
+	}
+	send(selector: Radio.Host, name: string, ...args: any[]) {
+		this.event({ selector, name, args })
 	}
 
 }
@@ -95,11 +99,9 @@ export default radio
 
 declare global {
 	namespace Radio {
-		interface Event<Data = any> {
+		interface Event {
 			name: string
-			data: Data
-			// action: string
-			// subs: string[]
+			args: any[]
 			host: Host
 			selector: Partial<Host>
 		}

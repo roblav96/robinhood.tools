@@ -8,7 +8,6 @@ import * as exithook from 'exit-hook'
 import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
 import * as boom from 'boom'
-import radio from '../adapters/radio'
 import PolkaRouter from './polka.router'
 
 

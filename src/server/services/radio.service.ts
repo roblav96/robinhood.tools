@@ -5,6 +5,7 @@ import { IncomingMessage } from 'http'
 import * as exithook from 'exit-hook'
 import * as Sockette from 'sockette'
 import * as uws from 'uws'
+import clock from '../../common/clock'
 
 
 
@@ -15,8 +16,6 @@ const wss = new uws.Server({
 		next(incoming.req.headers['host'] == `localhost:${port}`)
 	},
 })
-
-// wss.httpServer.timeout = 10000
 
 wss.on('error', function onerror(error) {
 	console.error('wss Error ->', error)
@@ -32,6 +31,7 @@ wss.on('connection', function onconnection(client: Radio.Client, req: IncomingMe
 		if (message == 'pong') return;
 		if (message == 'ping') return this.send('pong');
 		if (message == '__onopen__') {
+			this.send('__onopen__')
 			if (wss.clients.length == +process.env.TOTAL) {
 				wss.broadcast('__onready__')
 			}
@@ -49,6 +49,8 @@ wss.on('connection', function onconnection(client: Radio.Client, req: IncomingMe
 	client.on('error', function onerror(error) { console.error('client Error ->', error) })
 
 })
+
+clock.on('5s', () => wss.broadcast('ping'))
 
 exithook(() => wss.close())
 
