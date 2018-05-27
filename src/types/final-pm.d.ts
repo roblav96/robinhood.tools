@@ -23,7 +23,7 @@ declare module 'final-pm' {
 		'builtin': boolean
 		'config-path': string
 		'cwd': string
-		'env': NodeJS.ProcessEnv
+		'env': Partial<NodeJS.ProcessEnv>
 		'instances': number
 		'kill-signal': string
 		'log-retention-timeout': number

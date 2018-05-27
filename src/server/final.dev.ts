@@ -7,6 +7,9 @@ const { applications } = require('./final.config') as final.Configuration
 
 
 
+process.stdout.setMaxListeners(99)
+process.stderr.setMaxListeners(99)
+
 let clis = [] as execa.ExecaChildProcess[]
 function spawn(app: final.Application, instance: number) {
 	app.env.FINAL_PM_INSTANCE_NUMBER = instance
@@ -28,7 +31,7 @@ function spawn(app: final.Application, instance: number) {
 let ii = 0
 applications.forEach((app, i) => {
 	Array.from(Array(app.instances), function(v, instance) {
-		setTimeout(spawn, 1 * ii++, app, instance)
+		setTimeout(spawn, 100 * ii++, app, instance)
 	})
 })
 

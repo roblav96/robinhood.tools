@@ -22,6 +22,7 @@ const app = {
 	'restart-crashing-delay': 3000,
 	'node-args': [
 		// '--require', path.resolve(__dirname, 'main.js'),
+		// '--trace-warnings',
 		'--no-warnings', '--expose-gc', '--max_old_space_size=2048',
 	],
 } as final.Application
@@ -41,16 +42,17 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 	Application({ name: 'hours', run: 'services/hours.service' })
 	Application({ name: 'robinhood', run: 'services/robinhood.service' })
 
-	// let instances = os.cpus().length
-	// Application({ name: 'stocks-service', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
-	// Application({ name: 'forex-service', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
-	// Application({ name: 'indexes-service', run: 'services/quotes.service', env: { SYMBOLS: 'INDEXES' } })
+	let instances = os.cpus().length
+	Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
+	// Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
+	// Application({ name: 'indexes', run: 'services/quotes.service', env: { SYMBOLS: 'INDEXES' } })
 
 }
 
 
 
 function Application(application: Partial<final.Application>) {
+	_.defaults(application.env, app.env)
 	_.defaults(application, app)
 	application.run = path.resolve(__dirname, `${application.run}.js`)
 	applications.push(JSON.parse(JSON.stringify(application)))
@@ -74,7 +76,7 @@ applications.forEach(v => {
 	v.env.TOTAL = total
 	v.env.ENVS = envs
 })
-// console.log(`applications ->`, JSON.stringify(applications, null, 4))
+console.log(`applications ->`, JSON.stringify(applications, null, 4))
 
 module.exports = { applications } as final.Configuration
 
