@@ -20,7 +20,6 @@
 		"server:dev": "rimraf dist && run-p server:watch server:onchange cli:focus",
 		"server:onchange": "sleep 2 && onchange 'dist/server/**/*.js' 'dist/common/**/*.js' --killSignal SIGKILL --delay 300 -- run-s server:start",
 		"server:start": "run-s k && rimraf dist/server/log.txt && final-pm --config dist/server/final.config.js start all && final-pm show all && final-pm log --follow --lines 999",
-		"server:onchange:bak": "sleep 2 && onchange 'dist/server/**/*.js' 'dist/common/**/*.js' --killSignal SIGKILL --delay 300 -- node dist/server/final.dev.js",
 		"rw": "tsc --project .server.tsconfig.json --watch --noEmit",
 		"server:watch": "tsc --project .server.tsconfig.json --watch",
 		"server:build": "tsc --project .server.tsconfig.json",
