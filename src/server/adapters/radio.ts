@@ -41,7 +41,7 @@ class Radio extends Emitter<string, Radio.Event> {
 		this.sockette.send('__onopen__')
 	}
 	private onclose = (event: CloseEvent) => {
-		console.warn('onclose ->', event)
+		// console.warn('onclose ->', event)
 		this.isopen = false
 		this.reconnect()
 	}

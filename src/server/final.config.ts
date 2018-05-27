@@ -20,17 +20,13 @@ const app = {
 	'mode': 'fork',
 	'ready-on': 'instant',
 	'restart-crashing-delay': 3000,
-	'node-args': [
-		// '--require', path.resolve(__dirname, 'main.js'),
-		// '--trace-warnings',
-		'--no-warnings', '--expose-gc', '--max_old_space_size=2048',
-	],
+	'node-args': ['--no-warnings', '--expose-gc', '--max_old_space_size=2048'],
 } as final.Application
 declare global { namespace NodeJS { interface ProcessEnv { HOST: any; PORT: any } } }
 
+
+
 if (DEVELOPMENT) app.env.DEBUGGER = true;
-
-
 
 {
 
@@ -60,13 +56,13 @@ function Application(application: Partial<final.Application>) {
 
 let total = 0
 let envs = JSON.stringify(applications.map((v, i) => {
-	total += v.instances
 	let env = {
 		NAME: v.name,
 		SCALE: v.instances,
-		OFFSET: i,
+		OFFSET: total,
 		LENGTH: applications.length,
 	} as NodeJS.ProcessEnv
+	total += v.instances
 	Object.assign(v.env, env)
 	return env
 }))
@@ -76,7 +72,7 @@ applications.forEach(v => {
 	v.env.TOTAL = total
 	v.env.ENVS = envs
 })
-console.log(`applications ->`, JSON.stringify(applications, null, 4))
+// console.log(`applications ->`, JSON.stringify(applications, null, 4))
 
 module.exports = { applications } as final.Configuration
 
