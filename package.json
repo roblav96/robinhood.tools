@@ -14,16 +14,10 @@
 		"client:watch": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
 		"client:build": "rimraf dist/client && cross-env NODE_ENV=production vue-cli-service build --mode production",
 		"client:tailwind": "tailwind build node_modules/tailwindcss/utilities.css --config src/client/styles/tailwind.js --output src/client/styles/tailwind.css",
-		
-		"r": "rimraf dist && run-p server:watch final:onchange cli:focus",
-		"final:onchange": "sleep 2 && onchange 'dist/server/**/*.js' 'dist/common/**/*.js' --killSignal SIGKILL --delay 300 -- node dist/server/final.dev.js",
-		
 		"k": "final-pm --kill --force",
 		"rs": "npm run server:dev",
 		"server:dev": "rimraf dist && run-p server:watch server:onchange cli:focus",
-		"server:onchange": "onchange 'dist/server/**/*.js' 'dist/common/**/*.js' --killSignal SIGKILL --delay 300 -- run-s server:start",
-		"server:start": "run-s k && final-pm --config dist/server/final.config.js start all && final-pm show all --verbose && final-pm log --follow --lines 9999",
-		
+		"server:onchange": "sleep 2 && onchange 'dist/server/**/*.js' 'dist/common/**/*.js' --killSignal SIGKILL --delay 300 -- node dist/server/final.dev.js",
 		"rw": "tsc --project .server.tsconfig.json --watch --noEmit",
 		"server:watch": "tsc --project .server.tsconfig.json --watch",
 		"server:build": "tsc --project .server.tsconfig.json",

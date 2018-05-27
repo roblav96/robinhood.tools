@@ -17,6 +17,11 @@ function spawn(app: final.Application, instance: number) {
 	})
 	cli.stdout.pipe(process.stdout)
 	cli.stderr.pipe(process.stderr)
+	cli.then(function(resolved) {
+		console.log(`clis resolved ->`, resolved)
+	}).catch(function(error) {
+		console.error(`clis Error -> %O`, error)
+	})
 	clis.push(cli)
 }
 
@@ -27,11 +32,7 @@ applications.forEach((app, i) => {
 	})
 })
 
-Promise.all(clis).then(function(resolved) {
-	console.log(`clis resolved ->`, resolved)
-}).catch(function(error) {
-	console.error(`clis Error -> %O`, error)
-})
+
 
 // exithook(function() {
 // 	clis.forEach(v => v.kill('SIGKILL'))
