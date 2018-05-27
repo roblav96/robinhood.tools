@@ -37,7 +37,7 @@ dotenv.config({ path: path.resolve(project, `env/server.${process.env.NODE_ENV}.
 
 
 import * as cluster from 'cluster'
-process.env.INSTANCE = (process.env.FINAL_PM_INSTANCE_NUMBER ? process.env.FINAL_PM_INSTANCE_NUMBER : (cluster.isWorker ? cluster.worker.id - 1 : 0))
+process.env.INSTANCE = process.env.FINAL_PM_INSTANCE_NUMBER || (cluster.isWorker ? cluster.worker.id - 1 : 0)
 if (+process.env.INSTANCE == 0) process.env.PRIMARY = true;
 declare global { namespace NodeJS { interface ProcessEnv { INSTANCE: any; PRIMARY: any } } }
 
@@ -50,8 +50,8 @@ if (cluster.isWorker) {
 
 
 
-// import * as os from 'os'
-// process.env.CPUS = os.cpus().length
-// declare global { namespace NodeJS { interface ProcessEnv { CPUS: any } } }
+import * as os from 'os'
+process.env.CPUS = os.cpus().length
+declare global { namespace NodeJS { interface ProcessEnv { CPUS: any } } }
 
 

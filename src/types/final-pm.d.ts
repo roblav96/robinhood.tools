@@ -2,10 +2,6 @@
 
 declare module 'final-pm' {
 
-	export interface ProcessEnv extends Partial<NodeJS.ProcessEnv> {
-		[key: string]: any
-	}
-
 	export interface Configuration {
 		'applications': Application[]
 		'config-path': string
@@ -27,7 +23,7 @@ declare module 'final-pm' {
 		'builtin': boolean
 		'config-path': string
 		'cwd': string
-		'env': ProcessEnv
+		'env': NodeJS.ProcessEnv
 		'instances': number
 		'kill-signal': string
 		'log-retention-timeout': number

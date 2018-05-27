@@ -24,9 +24,6 @@ const app = {
 		// '--require', path.resolve(__dirname, 'main.js'),
 		'--no-warnings', '--expose-gc', '--max_old_space_size=2048',
 	],
-	// 'logger': 'file-logger',
-	// 'logger-args': [],
-	// 'stop-signal': 'disconnect',
 } as final.Application
 declare global { namespace NodeJS { interface ProcessEnv { HOST: any; PORT: any } } }
 
@@ -36,11 +33,8 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 
 {
 
-	// Application({ name: 'main1', run: 'main', instances: 1 })
-	// Application({ name: 'main2', run: 'main', instances: 2 })
-
-	Application({ name: 'radio', run: 'services/radio.service' })
-	// Application({ name: 'api', run: 'api/api', instances: 2 })
+	// Application({ name: 'radio', run: 'services/radio.service' })
+	Application({ name: 'api', run: 'api/api', instances: 2 })
 
 	// Application({ name: 'symbols-service', run: 'services/symbols.service' })
 	// Application({ name: 'search-service', run: 'services/search.service' })
@@ -58,8 +52,7 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 
 function Application(application: Partial<final.Application>) {
 	_.defaults(application, app)
-	// application.mode = application.instances > 1 ? 'cluster' : 'fork'
-	application.run += '.js'
+	application.run = path.resolve(__dirname, `${application.run}.js`)
 	applications.push(JSON.parse(JSON.stringify(application)))
 }
 
@@ -69,7 +62,7 @@ let envs = JSON.stringify(applications.map((v, i) => {
 		SCALE: v.instances,
 		OFFSET: i,
 		LENGTH: applications.length,
-	} as final.ProcessEnv
+	} as NodeJS.ProcessEnv
 	Object.assign(v.env, env)
 	return env
 }))
@@ -78,6 +71,6 @@ declare global { namespace NodeJS { interface ProcessEnv { NAME: any; SCALE: any
 applications.forEach(v => v.env.ENVS = envs)
 // console.log(`applications ->`, JSON.stringify(applications, null, 4))
 
-module.exports = { applications }
+module.exports = { applications } as final.Configuration
 
 

@@ -51,7 +51,6 @@ if (process.env.DEBUGGER) {
 	inspector.open(port)
 	if (offset == 0) {
 		let stdout = (console as any)._stdout
-		console.log(`stdout.isTTY ->`, stdout.isTTY)
 		if (stdout.isTTY) { stdout.isTTY = false; process.nextTick(() => stdout.isTTY = true) }
 		console.clear()
 	}
