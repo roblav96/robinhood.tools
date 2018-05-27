@@ -36,10 +36,10 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 	Application({ name: 'radio', run: 'services/radio.service' })
 	Application({ name: 'api', run: 'api/api', instances: 2 })
 
-	// Application({ name: 'symbols-service', run: 'services/symbols.service' })
-	// Application({ name: 'search-service', run: 'services/search.service' })
-	// Application({ name: 'hours-service', run: 'services/hours.service' })
-	// Application({ name: 'robinhood-service', run: 'services/robinhood.service' })
+	Application({ name: 'hours', run: 'services/hours.service' })
+	// Application({ name: 'symbols', run: 'services/symbols.service' })
+	// Application({ name: 'search', run: 'services/search.service' })
+	// Application({ name: 'robinhood', run: 'services/robinhood.service' })
 
 	// let instances = os.cpus().length
 	// Application({ name: 'stocks-service', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
@@ -56,7 +56,9 @@ function Application(application: Partial<final.Application>) {
 	applications.push(JSON.parse(JSON.stringify(application)))
 }
 
+let total = 0
 let envs = JSON.stringify(applications.map((v, i) => {
+	total += v.instances
 	let env = {
 		NAME: v.name,
 		SCALE: v.instances,
@@ -66,9 +68,12 @@ let envs = JSON.stringify(applications.map((v, i) => {
 	Object.assign(v.env, env)
 	return env
 }))
-declare global { namespace NodeJS { interface ProcessEnv { NAME: any; SCALE: any; OFFSET: any; LENGTH: any; ENVS: any; FINAL_PM_INSTANCE_NUMBER: any } } }
+declare global { namespace NodeJS { interface ProcessEnv { NAME: string; SCALE: any; OFFSET: any; LENGTH: any; TOTAL: any; ENVS: any; FINAL_PM_INSTANCE_NUMBER: any } } }
 
-applications.forEach(v => v.env.ENVS = envs)
+applications.forEach(v => {
+	v.env.TOTAL = total
+	v.env.ENVS = envs
+})
 // console.log(`applications ->`, JSON.stringify(applications, null, 4))
 
 module.exports = { applications } as final.Configuration

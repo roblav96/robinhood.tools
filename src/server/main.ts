@@ -13,4 +13,7 @@ import './adapters/process'
 import './adapters/console'
 import '../common/clock'
 
+global.WebSocket = require('uws')
+import './adapters/radio'
+
 
