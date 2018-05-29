@@ -10,7 +10,7 @@
 	<section>
 		<div class="container">
 			<div class="columns">
-				<div class="column is-12-tablet is-8-desktop is-4-widescreen">
+				<div class="column is-6-desktop is-4-widescreen">
 					<b-table class="nowrap-first" narrowed :data="tabledata">
 						<template slot-scope="props" slot="header"></template>
 						<template slot-scope="props">

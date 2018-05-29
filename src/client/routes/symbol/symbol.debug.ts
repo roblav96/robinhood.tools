@@ -28,7 +28,7 @@ export default class extends Mixins(VMixin) {
 	}
 
 	rowvalue(value: any) {
-		if (core.number.isFinite(value)) return utils.vnumber(value, { nozeros: true });
+		if (core.number.isFinite(value)) return utils.vnumber(value, { compact: false, nozeros: true });
 		// if (core.string.is(value)) return core.string.clean(value);
 		return value
 	}

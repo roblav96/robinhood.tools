@@ -17,7 +17,6 @@
 			"*.tsconfig.*",
 			"*.sublime*",
 			"*.gitignore*",
-			"*.debug*",
 			"*favicon*",
 			"*nginx*",
 			"*server*",
