@@ -6,8 +6,8 @@ import * as core from '@/common/core'
 
 
 const UNITS = ['K', 'M', 'B', 'T']
-declare global { interface FormatNumberOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean } }
-export function vnumber(value: number, { precision, compact, plusminus, percent, dollar } = {} as Partial<FormatNumberOpts>) {
+declare global { interface FormatNumberOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } }
+export function vnumber(value: number, { precision, compact, plusminus, percent, dollar, nozeros } = {} as Partial<FormatNumberOpts>) {
 	if (!Number.isFinite(precision)) {
 		if (compact) precision = 0;
 		else {
@@ -18,7 +18,7 @@ export function vnumber(value: number, { precision, compact, plusminus, percent,
 			else if (abs >= 2000) precision = 1;
 			else if (abs < 3) precision = 3;
 		}
-	}
+	} else { nozeros = false }
 	if (percent || plusminus) precision = Math.min(precision, 2);
 
 	let unit = -1
@@ -41,10 +41,12 @@ export function vnumber(value: number, { precision, compact, plusminus, percent,
 
 	if (precision > 0 && !(compact && unit == -1)) {
 		let end = split[1] || ''
-		fixed += '.'
-		let i: number, len = precision
-		for (i = 0; i < len; i++) {
-			fixed += end[i] || '0'
+		if (!nozeros || !Number.isNaN(Number.parseInt(end))) {
+			fixed += '.'
+			let i: number, len = precision
+			for (i = 0; i < len; i++) {
+				fixed += end[i] || '0'
+			}
 		}
 	}
 

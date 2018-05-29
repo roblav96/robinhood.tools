@@ -34,6 +34,10 @@ const { components, tabs } = new utils.Tabs('symbol', [{
 	id: 'calcs',
 	icon: 'calculator',
 	component: () => import('@/client/routes/symbol/symbol.calcs'),
+}, {
+	id: 'debug',
+	icon: 'bug',
+	component: () => import('@/client/routes/symbol/symbol.debug'),
 }])
 
 @Vts.Component({
@@ -65,12 +69,10 @@ export default class extends Mixins(VMixin) {
 	}
 
 	mounted() {
-		clock.on('1s', this.$forceUpdate, this)
 		// clock.on('1s', () => this.quote.price = _.round(this.quote.price + _.random(-1, 1, true), 2))
 	}
 
 	beforeDestroy() {
-		clock.offListener(this.$forceUpdate, this)
 		this.reset()
 	}
 
@@ -87,7 +89,7 @@ export default class extends Mixins(VMixin) {
 		document.title = `${this.symbol} ${this.vnumber(price)} (${this.vnumber(this.quote.percent, { plusminus: true, percent: true })})`
 	}
 
-	get vdeals() { return this.deals.filter((v, i) => i < 4) }
+	get vdeals() { return this.deals.filter((v, i) => i < 10) }
 	dealcolor(deal: Quotes.Deal) { return { 'has-text-success': deal.side == 'B', 'has-text-danger': deal.side == 'S' } }
 
 	get delisted() { return webull.ticker_status[this.wbquote.status] == webull.ticker_status.DELISTED }
@@ -133,17 +135,17 @@ export default class extends Mixins(VMixin) {
 		this.reset()
 		let symbols = [this.symbol]
 		Promise.all([
-			http.post('/symbols/rkeys', { symbols }).then(response => {
-				console.log(this.symbol, 'response ->', JSON.parse(JSON.stringify(response)))
-				core.object.merge(this, _.omit(response[0], ['symbol']))
-				this.busy = false
+			http.post('/quotes/alls', { symbols }).then((response: Quotes.All[]) => {
+				console.log(this.symbol, '/quotes/alls response ->', JSON.parse(JSON.stringify(response)))
+				core.object.merge(this, _.omit(response[0], ['symbol']) as any)
 			}),
-			http.post('/symbols/deals', { symbols }).then(response => {
+			http.post('/quotes/deals', { symbols }).then(response => {
 				this.deals = response[0]
 			}),
 		]).catch(error => {
 			console.error('w_symbol Error ->', error)
 		}).finally(() => {
+			this.busy = false
 			socket.on(`${rkeys.QUOTES}:${this.symbol}`, this.onquote, this)
 			socket.on(`${rkeys.DEALS}:${this.symbol}`, this.ondeal, this)
 		})
@@ -156,7 +158,6 @@ export default class extends Mixins(VMixin) {
 	ondeal(deal: Quotes.Deal) {
 		// console.log(`deal ->`, JSON.stringify(deal, null, 4))
 		this.deals.unshift(deal)
-		this.deals.splice(20)
 	}
 
 }

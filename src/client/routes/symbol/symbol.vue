@@ -45,6 +45,9 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 								<p class="is-size-6 font-medium font-mono" v-bull-bear="quote.change">
 									{{vnumber(quote.change,{plusminus:true})}} ({{vnumber(quote.percent,{plusminus:true,percent:true,precision:2})}})
 								</p>
+								<!-- <p class="is-size-7">{{vfromnow(quote.timestamp,{max:1,verbose:true})}}</p> -->
+								<p class="is-size-7" v-timestamp="quote.timestamp"></p>
+								<!-- <timestamp :timestamp="quote.timestamp"></timestamp> -->
 							</div>
 						</div>
 

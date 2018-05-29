@@ -4,6 +4,8 @@ export * from '../../common/quotes'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
+import * as quotes from '../../common/quotes'
+import * as iex from '../../common/iex'
 import * as redis from '../adapters/redis'
 import * as utils from '../adapters/utils'
 import * as hours from '../adapters/hours'
@@ -11,18 +13,9 @@ import * as pAll from 'p-all'
 
 
 
-export const ALL_KEYS = {
-	'quote': rkeys.QUOTES,
-	'wbticker': rkeys.WB.TICKERS,
-	'wbquote': rkeys.WB.QUOTES,
-	'instrument': rkeys.RH.INSTRUMENTS,
-	'yhquote': rkeys.YH.QUOTES,
-	'iexitem': rkeys.IEX.ITEMS,
-}
-
-export async function getAlls(symbols: string[], allkeys = Object.keys(ALL_KEYS) as (keyof typeof ALL_KEYS)[]) {
+export async function getAlls(symbols: string[], allkeys = Object.keys(quotes.ALL_KEYS) as (keyof typeof quotes.ALL_KEYS)[]) {
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => {
-		return allkeys.map(k => ['hgetall', `${ALL_KEYS[k]}:${v}`])
+		return allkeys.map(k => ['hgetall', `${quotes.ALL_KEYS[k]}:${v}`])
 	})))
 	resolved.forEach(core.fix)
 	let i = 0
@@ -32,8 +25,6 @@ export async function getAlls(symbols: string[], allkeys = Object.keys(ALL_KEYS)
 		return all
 	})
 }
-
-
 
 export async function syncAllQuotes(resets = false) {
 	let symbols = await utils.getAllSymbols()
@@ -58,7 +49,6 @@ export function initquote(
 		symbol,
 		tickerId: wbticker.tickerId,
 		timezone: wbquote.utcOffset,
-		issueType: iexitem.issueType,
 		currency: wbquote.currency,
 		sector: iexitem.sector,
 		industry: iexitem.industry,
@@ -67,6 +57,7 @@ export function initquote(
 		alive: instrument.alive,
 		mic: instrument.mic,
 		acronym: instrument.acronym,
+		issueType: iex.ISSUE_TYPES[iexitem.issueType],
 		listDate: new Date(instrument.list_date).valueOf(),
 		country: core.fallback(instrument.country, wbquote.countryISOCode, wbquote.regionAlias, wbticker.regionIsoCode),
 		exchange: core.fallback(iexitem.exchange, iexitem.primaryExchange, wbticker.exchangeCode, wbticker.disExchangeCode),
@@ -314,69 +305,69 @@ export function applycalcs(quote: Quotes.Quote, toquote?: Quotes.Quote) {
 
 
 
-export const mockquote = {
-	listDate: 916963200000,
-	country: 'US',
-	close: 246.75,
-	price: 246.73,
-	turnoverRate: 0.0191,
-	openPrice: 240.28,
-	volume: 11077801,
-	sharesFloat: 580151962,
-	askSize: 25,
-	symbol: 'NVDA',
-	exchange: 'Nasdaq Global Select',
-	bidVolume: 0,
-	high: 247.5,
-	yearLow: 135.71,
-	dayHigh: 247.59,
-	industry: 'Semiconductors',
-	askVolume: 0,
-	startPrice: 247.5,
-	currency: 'USD',
-	alive: true,
-	sharesOutstanding: 606000000,
-	sellVolume: 400,
-	statusTimestamp: 1527159036999,
-	change: -0.75,
-	mic: 'XNAS',
-	size: 0,
-	yield: 0.0023,
-	dayLow: 240.25,
-	fullName: 'NVIDIA Corporation Common Stock',
-	closePrice: 247.54,
-	buyVolume: 924,
-	name: 'NVIDIA Corporation',
-	askPrice: 247.7,
-	percent: -0.30303030303030304,
-	tickerId: 913257561,
-	website: 'http://www.nvidia.com',
-	issueType: 'cs',
-	dealSize: 5199,
-	status: 'POST_TRADE',
-	avgVolume3Month: 14787943,
-	avgVolume: 17520461,
-	sector: 'Technology',
-	avgVolume10Day: 14491447,
-	prevClose: 242.55,
-	low: 247.5,
-	vibrateRatio: 0.0303,
-	acronym: 'NASDAQ',
-	yearHigh: 260.5,
-	bidSize: 12,
-	buySize: 924,
-	dealVolume: 5199,
-	open: 247.5,
-	bidPrice: 247.36,
-	count: 0,
-	sellSize: 400,
-	timezone: 'America/New_York',
-	spread: 0.339999999999975,
-	deals: 111847,
-	marketCap: 149530500000,
-	description: 'NVIDIA Corp is a developer of graphics processing unit. It caters to areas like gaming, professional visualization, datacenter and automobiles.',
-	timestamp: 1527170047000
-} as Quotes.Quote
+// export const mockquote = {
+// 	listDate: 916963200000,
+// 	country: 'US',
+// 	close: 246.75,
+// 	price: 246.73,
+// 	turnoverRate: 0.0191,
+// 	openPrice: 240.28,
+// 	volume: 11077801,
+// 	sharesFloat: 580151962,
+// 	askSize: 25,
+// 	symbol: 'NVDA',
+// 	exchange: 'Nasdaq Global Select',
+// 	bidVolume: 0,
+// 	high: 247.5,
+// 	yearLow: 135.71,
+// 	dayHigh: 247.59,
+// 	industry: 'Semiconductors',
+// 	askVolume: 0,
+// 	startPrice: 247.5,
+// 	currency: 'USD',
+// 	alive: true,
+// 	sharesOutstanding: 606000000,
+// 	sellVolume: 400,
+// 	statusTimestamp: 1527159036999,
+// 	change: -0.75,
+// 	mic: 'XNAS',
+// 	size: 0,
+// 	yield: 0.0023,
+// 	dayLow: 240.25,
+// 	fullName: 'NVIDIA Corporation Common Stock',
+// 	closePrice: 247.54,
+// 	buyVolume: 924,
+// 	name: 'NVIDIA Corporation',
+// 	askPrice: 247.7,
+// 	percent: -0.30303030303030304,
+// 	tickerId: 913257561,
+// 	website: 'http://www.nvidia.com',
+// 	issueType: 'cs',
+// 	dealSize: 5199,
+// 	status: 'POST_TRADE',
+// 	avgVolume3Month: 14787943,
+// 	avgVolume: 17520461,
+// 	sector: 'Technology',
+// 	avgVolume10Day: 14491447,
+// 	prevClose: 242.55,
+// 	low: 247.5,
+// 	vibrateRatio: 0.0303,
+// 	acronym: 'NASDAQ',
+// 	yearHigh: 260.5,
+// 	bidSize: 12,
+// 	buySize: 924,
+// 	dealVolume: 5199,
+// 	open: 247.5,
+// 	bidPrice: 247.36,
+// 	count: 0,
+// 	sellSize: 400,
+// 	timezone: 'America/New_York',
+// 	spread: 0.339999999999975,
+// 	deals: 111847,
+// 	marketCap: 149530500000,
+// 	description: 'NVIDIA Corp is a developer of graphics processing unit. It caters to areas like gaming, professional visualization, datacenter and automobiles.',
+// 	timestamp: 1527170047000
+// } as Quotes.Quote
 
 // import * as benchmark from '../../common/benchmark'
 // benchmark.simple('object', [

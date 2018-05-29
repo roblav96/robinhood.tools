@@ -87,7 +87,8 @@ class Radio extends Emitter<string, Radio.Event> {
 		event.host = this.host
 		let message = JSON.stringify(event)
 		if (this.isready) return this.sockette.send(message);
-		this.toPromise('ready').then(() => this.sockette.send(message))
+		this.once('ready', () => this.sockette.send(message))
+		// this.toPromise('ready').then(() => this.sockette.send(message))
 	}
 	emit(name: string, data?: any) {
 		this.event({ name, data })

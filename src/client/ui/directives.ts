@@ -2,7 +2,9 @@
 
 import Vue, { DirectiveOptions } from 'vue'
 import * as core from '@/common/core'
+import * as pretty from '@/common/pretty'
 import * as utils from '@/client/adapters/utils'
+import clock from '@/common/clock'
 
 
 
@@ -38,6 +40,21 @@ Vue.directive('bg-bull-bear', function(el, { value, arg }) {
 
 
 
+Vue.directive('timestamp', {
+	update(el, binding, vnode, oldVnode) {
+		if (!binding.value) return;
+		el.innerHTML = pretty.fromNow(binding.value, { max: 1, verbose: true })
+		clock.offContext('1s', el)
+		clock.once('1s', () => binding.def.update(el, binding, vnode, oldVnode), el)
+	},
+	unbind(el, binding, vnode) {
+		clock.offContext('1s', el)
+		console.log(`clock.listeners('1s') ->`, clock.listeners('1s'))
+	},
+})
+
+
+
 // Vue.directive('number-ticker', function(el, { oldValue, value }: { oldValue: number, value: number }) {
 // 	if (value == oldValue) return;
 // 	if (!Number.isFinite(value)) return;
@@ -66,8 +83,8 @@ Vue.directive('bg-bull-bear', function(el, { value, arg }) {
 
 declare module 'vue/types/vnode' {
 	export interface VNodeDirective {
-		rawName: string
-		def: DirectiveOptions
+		readonly rawName: string
+		readonly def: DirectiveOptions
 	}
 	interface VNodeDirectiveDef extends DirectiveOptions { [key: string]: any }
 }

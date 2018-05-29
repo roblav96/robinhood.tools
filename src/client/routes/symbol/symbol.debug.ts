@@ -17,6 +17,22 @@ export default class extends Mixins(VMixin) {
 
 	get parent() { return this.$parent as Symbol }
 
+	get tabledata() {
+		return Object.keys(this.parent.quote).map(key => ({
+			key, value: this.parent.quote[key],
+		})).sort((a, b) => core.sort.alphabetically(a.key, b.key))
+	}
+
+	rowkey(key: string) {
+		return this.vcapitalize(key)
+	}
+
+	rowvalue(value: any) {
+		if (core.number.isFinite(value)) return utils.vnumber(value, { nozeros: true });
+		// if (core.string.is(value)) return core.string.clean(value);
+		return value
+	}
+
 
 
 }

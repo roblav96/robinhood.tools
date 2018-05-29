@@ -15,6 +15,7 @@
 			"*.sublime*",
 			"*.gitignore*",
 			"*.debug*",
+			"*vendors.*",
 			"*tailwind*",
 			"*vue*",
 			"*license*",

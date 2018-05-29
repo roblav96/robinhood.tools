@@ -61,8 +61,10 @@ async function onsymbols(event: Radio.Event) {
 	alls.forEach(all => {
 		let symbol = all.symbol
 
-		all.quote.typeof = process.env.SYMBOLS
-		coms.push(['hset', `${rkeys.QUOTES}:${symbol}`, 'typeof', all.quote.typeof])
+		if (!all.quote.typeof) {
+			all.quote.typeof = process.env.SYMBOLS
+			coms.push(['hset', `${rkeys.QUOTES}:${symbol}`, 'typeof', all.quote.typeof])
+		}
 
 		Object.assign(WB_QUOTES, { [symbol]: all.wbquote })
 		Object.assign(WB_EMITS, { [symbol]: {} })
@@ -74,7 +76,7 @@ async function onsymbols(event: Radio.Event) {
 		socket.emit(`${rkeys.QUOTES}:${symbol}`, all.quote)
 	})
 
-	await redis.main.coms(coms)
+	if (coms.length > 0) await redis.main.coms(coms);
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
 	MQTTS.splice(0, Infinity, ...chunks.map((chunk, i) => new WebullMqttClient({
@@ -169,16 +171,20 @@ function ontick(i: number) {
 		let wbquote = WB_EMITS[symbol]
 		let toquote = EMITS[symbol]
 		if (Object.keys(wbquote).length > 0) {
+			wbquote.symbol = symbol
 			quotes.applywbquote(QUOTES[symbol], wbquote, toquote)
 			core.object.merge(WB_QUOTES[symbol], wbquote)
 			core.object.merge(WB_SAVES[symbol], wbquote)
 			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
+			// console.log('emit wbquote ->', wbquote)
 		}
 		if (Object.keys(toquote).length > 0) {
+			toquote.symbol = symbol
 			quotes.applycalcs(QUOTES[symbol], toquote)
 			core.object.merge(QUOTES[symbol], toquote)
 			core.object.merge(SAVES[symbol], toquote)
 			socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
+			// console.log('emit toquote ->', toquote)
 		}
 
 		if (save) {
@@ -191,9 +197,10 @@ function ontick(i: number) {
 			coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, toquote as any])
 			if (!toquote.timestamp) return;
 
+			// console.log('save quote ->', toquote)
+
 			let quote = QUOTES[symbol]
 			quotes.resetquote(quote)
-
 		}
 
 	})

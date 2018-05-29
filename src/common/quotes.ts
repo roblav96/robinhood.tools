@@ -4,6 +4,20 @@ import * as rkeys from './rkeys'
 
 
 
+export const ALL_KEYS = {
+	'quote': rkeys.QUOTES,
+	'wbticker': rkeys.WB.TICKERS,
+	'wbquote': rkeys.WB.QUOTES,
+	'instrument': rkeys.RH.INSTRUMENTS,
+	'yhquote': rkeys.YH.QUOTES,
+	'iexitem': rkeys.IEX.ITEMS,
+}
+// declare global { namespace Quotes { type AllKeys = keyof typeof ALL_KEYS } }
+
+
+
+
+
 declare global { namespace Quotes { type ITiny = typeof TINY; interface Tiny extends ITiny { } } }
 export const TINY = {
 	symbol: '',

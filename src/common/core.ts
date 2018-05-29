@@ -20,14 +20,13 @@ export const isNodejs = !isBrowser
 
 
 
-const FIXSKIP = ['symbol']
 const FIXDATE = ['created_at', 'timestamp', 'updated_at']
 const FIXURL = ['account', 'ach_relationship', 'instrument', 'watchlist']
 export function fix(target: any, deep?: any) {
 	Object.keys(target).forEach(key => {
 		let value = target[key]
 		if (value == null) return;
-		else if (FIXSKIP.includes(key)) return;
+		else if (key == 'symbol') return;
 		else if (deep === true && Array.isArray(value)) return value.forEach(fix);
 		else if (deep === true && object.is(value)) return fix(value);
 		else if (!string.is(value)) return;

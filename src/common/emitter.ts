@@ -48,6 +48,13 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 		return this
 	}
 
+	offContext<Name extends Names>(name: Name, context: any, once?: boolean): this {
+		this.listeners(name).forEach(fn => {
+			this.off(name, fn, context, once)
+		})
+		return this
+	}
+
 	offAll<Name extends Names>(name?: Name): this {
 		return this.removeAllListeners(name)
 	}

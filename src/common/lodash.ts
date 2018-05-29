@@ -12,6 +12,7 @@ export {
 	defaults,
 	delay,
 	difference,
+	filter,
 	flatten,
 	floor,
 	fromPairs,

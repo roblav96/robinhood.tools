@@ -34,14 +34,14 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 	Application({ name: 'api', run: 'api/api', instances: 2 })
 
 	Application({ name: 'symbols', run: 'services/symbols.service' })
-	// Application({ name: 'search', run: 'services/search.service' })
-	// Application({ name: 'hours', run: 'services/hours.service' })
-	// Application({ name: 'robinhood', run: 'services/robinhood.service' })
+	Application({ name: 'search', run: 'services/search.service' })
+	Application({ name: 'hours', run: 'services/hours.service' })
+	Application({ name: 'robinhood', run: 'services/robinhood.service' })
 
 	let instances = 1 // os.cpus().length
 	Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
-	// Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
-	// Application({ name: 'indexes', run: 'services/quotes.service', env: { SYMBOLS: 'INDEXES' } })
+	Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
+	Application({ name: 'indexes', run: 'services/quotes.service', env: { SYMBOLS: 'INDEXES' } })
 
 }
 

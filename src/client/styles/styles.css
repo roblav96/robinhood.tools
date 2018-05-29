@@ -54,33 +54,35 @@ span.tooltip:after {
 table.table th[width="1"],
 table.table td[width="1"],
 table.table.nowrap-first tr > th:first-child,
-table.table.nowrap-first tr > td:first-child {
+.nowrap-first table.table tr > th:first-child,
+table.table.nowrap-first tr > td:first-child,
+.nowrap-first table.table tr > td:first-child {
 	white-space: nowrap;
 }
 
-table.table.is-borderless td {
+table.table.is-borderless td,
+.is-borderless table.table td {
 	border-width: 0px;
 }
 
-table.table td {
-	line-height: 1.25;
-}
-
-table.table.is-narrow td {
-	line-height: 1.125;
+table.table.is-narrow td,
+.is-narrow table.table td {
 	padding: 0.25rem 0.5rem;
 }
 
-table.table.is-narrower td {
+table.table.is-narrower td,
+.is-narrower table.table td {
 	line-height: 1.125;
-	padding: 0rem 0.5rem;
+	padding: 0.125rem 0.5rem;
 }
 
-table.table.is-narrowest td {
+table.table.is-narrowest td,
+.is-narrowest table.table td {
 	line-height: 1.125;
 	padding: 0rem 0.25rem;
 }
 
+table.table.is-middle td,
 .is-middle table.table td {
 	vertical-align: middle;
 }
