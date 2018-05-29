@@ -47,10 +47,7 @@ Vue.directive('timestamp', {
 		clock.offContext('1s', el)
 		clock.once('1s', () => binding.def.update(el, binding, vnode, oldVnode), el)
 	},
-	unbind(el, binding, vnode) {
-		clock.offContext('1s', el)
-		console.log(`clock.listeners('1s') ->`, clock.listeners('1s'))
-	},
+	unbind(el, binding, vnode) { clock.offContext('1s', el) },
 })
 
 
