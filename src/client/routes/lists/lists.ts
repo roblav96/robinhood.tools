@@ -52,35 +52,37 @@ export default class Lists extends Mixins(VMixin, RHMixin) {
 			})
 		]).then(() => this.lists = lists).catch(error => console.error(`synclists Error ->`, error))
 	}
+	
+	defaultOpenedDetails = [1]
 
-	instruments = [] as Robinhood.Instrument[]
-	wbquotes = [] as Webull.Quote[]
+	quotes = [] as Quotes.Quote[]
 
 	tabledata(symbols: string[]) {
-		return this.wbquotes.filter(v => symbols.includes(v.symbol))
+		return this.quotes.filter(v => symbols.includes(v.symbol))
 	}
 
 	syncsymbols() {
 		let symbols = _.uniq(_.flatten(this.lists.map(v => v.symbols)))
-		return http.post('/symbols/rkeys', {
-			symbols, rkeys: [rkeys.RH.INSTRUMENTS, rkeys.WB.QUOTES],
-		}).then((response: any[]) => {
-			response.forEach(v => {
-				this.onitem('instruments', v.instrument)
-				this.onitem('wbquotes', v.wbquote)
-				// this.instruments.push(v.instrument)
-				// this.wbquotes.push(v.wbquote)
-			})
+		return http.post('/quotes/alls', {
+			symbols, types: ['quote'] as Quotes.AllKeys[],
+		}).then((response: Quotes.All[]) => {
+			this.quotes = response.map(v => v.quote)
+			// response.forEach(v => {
+			// this.onitem('instruments', v.instrument)
+			// this.onitem('wbquotes', v.wbquote)
+			// this.instruments.push(v.instrument)
+			// this.wbquotes.push(v.wbquote)
+			// })
 			// socket.offListener(this.onwbquote, this)
 			// symbols.forEach(v => socket.on(`${rkeys.WB.QUOTES}:${v}`, this.onwbquote, this))
 		}).catch(error => console.error(`syncsymbols Error ->`, error))
 	}
 
-	onitem(key: string, item: any) {
-		let found = this[key].find(v => v.symbol == item.symbol)
-		// console.log(`found ->`, found)
-		found ? Object.assign(found, item) : this[key].push(item)
-	}
+	// onitem(key: string, item: any) {
+	// 	let found = this[key].find(v => v.symbol == item.symbol)
+	// 	// console.log(`found ->`, found)
+	// 	found ? Object.assign(found, item) : this[key].push(item)
+	// }
 
 	// onwbquote(wbquote: Webull.Quote) {
 	// 	let found = this.wbquotes.find(v => v.symbol == wbquote.symbol)

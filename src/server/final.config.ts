@@ -38,7 +38,7 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 	Application({ name: 'hours', run: 'services/hours.service' })
 	Application({ name: 'robinhood', run: 'services/robinhood.service' })
 
-	let instances = 1 // os.cpus().length
+	let instances = os.cpus().length
 	Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
 	// Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
 	// Application({ name: 'indexes', run: 'services/quotes.service', env: { SYMBOLS: 'INDEXES' } })

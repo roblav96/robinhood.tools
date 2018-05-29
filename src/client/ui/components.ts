@@ -20,7 +20,7 @@ import * as benchmark from '@/common/benchmark'
 				anime.remove(el)
 				anime({
 					targets: el,
-					easing: 'easeInQuart',
+					easing: 'easeInQuint',
 					color: [
 						{ value: context.color, duration: 0, },
 						{ value: context.black, duration: 500, },

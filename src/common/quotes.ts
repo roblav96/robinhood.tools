@@ -12,7 +12,7 @@ export const ALL_KEYS = {
 	'yhquote': rkeys.YH.QUOTES,
 	'iexitem': rkeys.IEX.ITEMS,
 }
-// declare global { namespace Quotes { type AllKeys = keyof typeof ALL_KEYS } }
+declare global { namespace Quotes { type AllKeys = keyof typeof ALL_KEYS } }
 
 
 
@@ -120,6 +120,7 @@ CALC_KEYS.forEach(k => CALC[k] = undefined)
 declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
 export const FULL = {
 	tickerId: 0,
+	tinyName: '',
 	fullName: '',
 	mic: '',
 	acronym: '',

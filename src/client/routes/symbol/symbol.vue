@@ -28,8 +28,8 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 							<div class="has-text-left self-start bg-white border-grey-lightest border-solid border-1 rounded-r-lg px-4 py-2">
 								<p class="title">
 									<span class="whitespace-no-wrap">{{symbol}}</span>
-									<span v-show="!instrument.alive" class="tag is-medium is-danger align-top">Untradable</span>
-									<span v-show="delisted||suspended" class="tag is-medium is-danger align-top">{{vcapitalize(quote.status)}}</span>
+									<span v-show="!instrument.alive" class="tag is-medium is-danger align-top ml-2">Untradable</span>
+									<span v-show="delisted||suspended" class="tag is-medium is-danger align-top ml-2">{{vcapitalize(quote.status)}}</span>
 								</p>
 								<p class="is-size-6">{{quote.name}}</p>
 							</div>

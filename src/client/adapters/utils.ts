@@ -70,6 +70,7 @@ if (process.env.DEVELOPMENT) Object.assign(window, { vnumber });
 
 
 export function marketState(state: Hours.State) {
+	if (!state) return state;
 	if (state == 'REGULAR') return 'Markets Open';
 	if (state.includes('PRE')) return 'Pre Market';
 	if (state.includes('POST')) return 'After Hours';

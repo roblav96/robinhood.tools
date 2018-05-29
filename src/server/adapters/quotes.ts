@@ -13,15 +13,15 @@ import * as pAll from 'p-all'
 
 
 
-export async function getAlls(symbols: string[], allkeys = Object.keys(quotes.ALL_KEYS) as (keyof typeof quotes.ALL_KEYS)[]) {
+export async function getAlls(symbols: string[], allkeys = Object.keys(quotes.ALL_KEYS) as Quotes.AllKeys[]) {
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => {
 		return allkeys.map(k => ['hgetall', `${quotes.ALL_KEYS[k]}:${v}`])
 	})))
 	resolved.forEach(core.fix)
-	let i = 0
+	let ii = 0
 	return symbols.map(symbol => {
 		let all = { symbol } as Quotes.All
-		allkeys.forEach(k => all[k] = resolved[i++])
+		allkeys.forEach(k => all[k] = resolved[ii++])
 		return all
 	})
 }
@@ -66,6 +66,7 @@ export function initquote(
 	} as Quotes.Quote)
 
 	quote.name = core.fallback(iexitem.companyName, instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name)
+	quote.tinyName = core.fallback(instrument.simple_name, yhquote.shortName, quote.name)
 	quote.fullName = core.fallback(instrument.name, yhquote.longName, wbticker.name)
 	if (quote.fullName == quote.name) delete quote.fullName;
 
