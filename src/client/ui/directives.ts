@@ -1,6 +1,7 @@
 // 
 
 import Vue, { DirectiveOptions } from 'vue'
+import * as anime from 'animejs'
 import * as core from '@/common/core'
 import * as pretty from '@/common/pretty'
 import * as utils from '@/client/adapters/utils'
@@ -8,9 +9,25 @@ import clock from '@/common/clock'
 
 
 
-Vue.directive('visible', function(el, { value }) {
-	if (!core.boolean.is(value)) return;
+Vue.directive('visible', function(el, { value, oldValue }) {
+	if (value == oldValue || !core.boolean.is(value)) return;
 	el.classList.toggle('opacity-0', !value)
+	// console.log(`value ->`, value)
+	// anime.remove(el)
+	// if (value) {
+	// 	anime({
+	// 		targets: el,
+	// 		opacity: [
+	// 			{ value: 0, duration: 1, },
+	// 			{ value: 1, duration: 3000, },
+	// 		],
+	// 	})
+	// } else {
+	// 	anime({
+	// 		targets: el,
+	// 		opacity: 0,
+	// 	})
+	// }
 })
 
 

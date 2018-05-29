@@ -29,7 +29,8 @@ export async function getAlls(symbols: string[], allkeys = Object.keys(quotes.AL
 export async function syncAllQuotes(resets = false) {
 	let symbols = await utils.getAllSymbols()
 	let chunks = core.array.chunks(symbols, _.ceil(symbols.length / 256))
-	await pAll(chunks.map(chunk => async () => {
+	await pAll(chunks.map((chunk, i) => async () => {
+		if (process.env.DEVELOPMENT) console.log('syncAllQuotes ->', `${_.round((i / chunks.length) * 100)}%`);
 		let alls = await getAlls(chunk)
 		await redis.main.coms(alls.map(all => {
 			let rkey = `${rkeys.QUOTES}:${all.symbol}`

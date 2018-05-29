@@ -51,8 +51,20 @@ span.tooltip:after {
 
 /**/
 
-table.table th[width="1"],
-table.table td[width="1"],
+table.table th {
+	vertical-align: bottom;
+}
+
+table.table.is-middle td,
+.is-middle table.table td {
+	vertical-align: middle;
+}
+
+table.table.is-nowrap td,
+.is-nowrap table.table td {
+	white-space: nowrap;
+}
+
 table.table.nowrap-first tr > th:first-child,
 .nowrap-first table.table tr > th:first-child,
 table.table.nowrap-first tr > td:first-child,
@@ -82,10 +94,11 @@ table.table.is-narrowest td,
 	padding: 0rem 0.25rem;
 }
 
-table.table.is-middle td,
-.is-middle table.table td {
-	vertical-align: middle;
-}
+
+/*table.table th.font-mono,
+table.table td.font-mono {
+	white-space: nowrap;
+}*/
 
 
 /**/

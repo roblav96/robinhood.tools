@@ -7,25 +7,26 @@
 </style>
 
 <template>
+	<!-- <section v-visible="lists.length>0&&quotes.length>0" class="pb-12"> -->
 	<section class="pb-12">
 
 		<section class="section" v-for="list in lists" :key="list.name">
 			<div class="container">
 				<p class="is-size-3 font-semibold">{{list.name}}</p>
 				<hr class="mb-3 has-background-primary h-1">
-				<b-table class="is-middle card" narrowed hoverable :data="tabledata(list.symbols)" :opened-detailed="defaultOpenedDetails"
+				<b-table class="is-middle card is-nowrap" narrowed hoverable :data="tabledata(list.symbols)" :opened-detailed="defaultOpenedDetails"
 				    detailed detail-key="symbol">
 					<template slot-scope="props">
 						<b-table-column label="" width="1" class="is-clickable" v-on:click.native="gotosymbol(props.row.symbol)">
-							<symbol-logo class="shadow is-28x28" :symbol="props.row.symbol"></symbol-logo>
+							<symbol-logo class="shadow is-32x32" :symbol="props.row.symbol"></symbol-logo>
 						</b-table-column>
 						<b-table-column label="Symbol" width="1">
 							<!-- <span class="font-semibold">{{props.row.symbol}}</span> -->
-							<button class="button font-semibold leading-none py-1 h-initial" v-on:click="gotosymbol(props.row.symbol)">
+							<button class="button font-semibold leading-none h-initial" v-on:click="gotosymbol(props.row.symbol)">
 								{{props.row.symbol}}
 							</button>
 						</b-table-column>
-						<b-table-column label="Name">
+						<b-table-column label="Name" class="truncate max-w-ns">
 							{{props.row.tinyName}}
 						</b-table-column>
 						<b-table-column label="Price" class="font-mono" numeric>
@@ -33,7 +34,7 @@
 						</b-table-column>
 						<b-table-column label="Change" class="font-mono" numeric v-bull-bear="props.row.change">
 							{{vnumber(props.row.change,{plusminus:true})}}
-							<span>({{vnumber(props.row.percent,{plusminus:true,percent:true,precision:2})}})</span>
+							<span v-visible="Number.isFinite(props.row.percent)">({{vnumber(props.row.percent,{plusminus:true,percent:true,precision:2})}})</span>
 						</b-table-column>
 						<b-table-column label="Volume" class="font-mono" numeric>
 							{{vnumber(props.row.volume,{compact:true,precision:2})}}
@@ -48,7 +49,7 @@
 							{{vnumber(props.row.marketCap,{compact:true,precision:2})}}
 						</b-table-column>
 						<b-table-column label="Updated" class="" numeric>
-							{{vfromnow(props.row.timestamp,{max:1,verbose:true})}}
+							<span v-timestamp="props.row.timestamp"></span>
 						</b-table-column>
 					</template>
 

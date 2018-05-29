@@ -20,22 +20,24 @@ import socket from '@/client/adapters/socket'
 export default class Lists extends Mixins(VMixin, RHMixin) {
 
 	created() {
-		this.lists = [{ name: 'Recently Viewed', symbols: this.recents.slice(0, 10).map(v => v.symbol) }]
-		this.syncsymbols()
-		clock.on('1s', this.syncsymbols, this)
-		// this.synclists().then(() => {
-		// 	clock.on('1s', this.syncsymbols, this)
-		// 	// return this.syncsymbols()
-		// })
+		Promise.resolve().then(() => {
+			if (this.lists.length) return this.syncsymbols();
+		}).then(() => this.synclists().then(this.syncsymbols))
 	}
 
 	beforeDestroy() {
-		clock.offListener(this.syncsymbols, this)
-		// socket.offListener(this.onwbquote, this)
-		lockr.set('lists.lists', this.lists)
+		socket.offListener(this.onquote, this)
+		core.nullify(this.quotes)
 	}
 
+	defaultOpenedDetails = [1]
 	lists = lockr.get('lists.lists', [] as { name: string, symbols: string[] }[])
+	quotes = {} as Dict<Quotes.Quote>
+
+	tabledata(symbols: string[]) {
+		return symbols.map(v => this.quotes[v] || { symbol: v } as Quotes.Quote)
+	}
+
 	synclists() {
 		let lists = [{ name: 'Recently Viewed', symbols: this.recents.slice(0, 10).map(v => v.symbol) }]
 		return Promise.all([
@@ -50,15 +52,12 @@ export default class Lists extends Mixins(VMixin, RHMixin) {
 					lists.push({ name: v.name, symbols: v.tickerTupleArrayList.map(v => v.disSymbol) })
 				})
 			})
-		]).then(() => this.lists = lists).catch(error => console.error(`synclists Error ->`, error))
-	}
-	
-	defaultOpenedDetails = [1]
-
-	quotes = [] as Quotes.Quote[]
-
-	tabledata(symbols: string[]) {
-		return this.quotes.filter(v => symbols.includes(v.symbol))
+		]).catch(error => {
+			console.error(`synclists Error ->`, error)
+		}).finally(() => {
+			lockr.set('lists.lists', lists)
+			this.lists = lists
+		})
 	}
 
 	syncsymbols() {
@@ -66,29 +65,22 @@ export default class Lists extends Mixins(VMixin, RHMixin) {
 		return http.post('/quotes/alls', {
 			symbols, types: ['quote'] as Quotes.AllKeys[],
 		}).then((response: Quotes.All[]) => {
-			this.quotes = response.map(v => v.quote)
-			// response.forEach(v => {
-			// this.onitem('instruments', v.instrument)
-			// this.onitem('wbquotes', v.wbquote)
-			// this.instruments.push(v.instrument)
-			// this.wbquotes.push(v.wbquote)
-			// })
-			// socket.offListener(this.onwbquote, this)
-			// symbols.forEach(v => socket.on(`${rkeys.WB.QUOTES}:${v}`, this.onwbquote, this))
-		}).catch(error => console.error(`syncsymbols Error ->`, error))
+			socket.offListener(this.onquote, this)
+			response.forEach(v => {
+				this.quotes[v.symbol] = v.quote
+				socket.on(`${rkeys.QUOTES}:${v.symbol}`, this.onquote, this)
+				return v.quote
+			})
+		}).catch(error => {
+			console.error(`syncsymbols Error ->`, error)
+		})
 	}
 
-	// onitem(key: string, item: any) {
-	// 	let found = this[key].find(v => v.symbol == item.symbol)
-	// 	// console.log(`found ->`, found)
-	// 	found ? Object.assign(found, item) : this[key].push(item)
-	// }
-
-	// onwbquote(wbquote: Webull.Quote) {
-	// 	let found = this.wbquotes.find(v => v.symbol == wbquote.symbol)
-	// 	// console.log(`found ->`, found)
-	// 	found ? Object.assign(found, wbquote) : this.wbquotes.push(wbquote)
-	// }
+	onquote(toquote: Quotes.Quote) {
+		let quote = this.quotes[toquote.symbol]
+		quote ? core.object.merge(quote, toquote) : this.quotes[toquote.symbol] = toquote
+		console.log(`this.quotes ->`, this.quotes)
+	}
 
 	gotosymbol(symbol: string) {
 		this.$router.push({ name: 'symbol', params: { symbol } })

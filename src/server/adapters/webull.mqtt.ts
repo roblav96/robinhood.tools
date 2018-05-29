@@ -97,7 +97,7 @@ export default class WebullMqttClient {
 		this.client.on('error', this.onerror)
 		if (!this.started) {
 			this.started = true
-			clock.on('10s', this.reconnect, this)
+			clock.on('5s', this.reconnect, this)
 		} else console.log('connect started');
 	}
 
