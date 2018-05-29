@@ -31,7 +31,7 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 {
 
 	Application({ name: 'radio', run: 'services/radio.service' })
-	Application({ name: 'api', run: 'api/api', instances: 2 })
+	Application({ name: 'api', run: 'api/api', instances: 4 })
 
 	Application({ name: 'symbols', run: 'services/symbols.service' })
 	Application({ name: 'search', run: 'services/search.service' })
@@ -39,7 +39,7 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 	Application({ name: 'robinhood', run: 'services/robinhood.service' })
 
 	let instances = 1 // os.cpus().length
-	Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
+	// Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
 	// Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
 	// Application({ name: 'indexes', run: 'services/quotes.service', env: { SYMBOLS: 'INDEXES' } })
 

@@ -63,12 +63,12 @@ export const wss = new uws.Server({
 })
 
 wss.on('error', function onerror(error) {
-	console.error('wss Error ->', error)
+	console.error('socket Error ->', error)
 })
 
 wss.on('listening', function onlistening() {
 	let address = wss.httpServer.address() as AddressInfo
-	console.info('wss listening ->', address.port)
+	console.info('socket listening ->', address.port)
 	radio.send({ name: 'api' }, 'socket.onlistening', address.port)
 })
 
@@ -144,10 +144,6 @@ export function emit(name: string, data?: any) {
 
 export function broadcast(name: string, data?: any) {
 	wss.broadcast(JSON.stringify({ name, data } as Socket.Event))
-}
-
-export function send(client: Socket.Client, name: string, data?: any) {
-	client.send(JSON.stringify({ name, data } as Socket.Event))
 }
 
 

@@ -1,6 +1,7 @@
 // 
 
 import '../main'
+import { AddressInfo } from 'net'
 import { IncomingMessage } from 'http'
 import * as exithook from 'exit-hook'
 import * as Sockette from 'sockette'
@@ -9,20 +10,32 @@ import clock from '../../common/clock'
 
 
 
+const host = '127.0.0.1'
 const port = +process.env.PORT - 1
 const wss = new uws.Server({
-	host: 'localhost', port, path: 'radio',
+	host, port,
 	verifyClient(incoming, next: (allow: boolean, code?: number, message?: string) => void) {
-		next(incoming.req.headers['host'] == `localhost:${port}`)
+		next(incoming.req.headers.host == `${host}:${port}`)
 	},
 })
 
 wss.on('error', function onerror(error) {
-	console.error('wss Error ->', error)
+	console.error('radio Error ->', error)
 })
 
 wss.on('listening', function onlistening() {
-	console.info('wss listening ->', port)
+	let address = wss.httpServer.address() as AddressInfo
+	// console.info('radio listening ->', address)
+	console.log(`uws.native.server.group ->`, uws.native.server.group)
+})
+
+clock.on('5s', function onping() {
+	wss.broadcast('ping')
+})
+
+exithook(function onexit() {
+	wss.httpServer.close()
+	wss.close()
 })
 
 wss.on('connection', function onconnection(client: Radio.Client, req: IncomingMessage) {
@@ -48,13 +61,6 @@ wss.on('connection', function onconnection(client: Radio.Client, req: IncomingMe
 
 	client.on('error', function onerror(error) { console.error('client Error ->', error) })
 
-})
-
-clock.on('5s', () => wss.broadcast('ping'))
-
-exithook(function onexit() {
-	wss.httpServer.close()
-	wss.close()
 })
 
 

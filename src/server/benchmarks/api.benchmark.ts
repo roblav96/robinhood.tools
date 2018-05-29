@@ -23,7 +23,7 @@ async function run(url: string) {
 	console.log('run ->', url)
 	// let hub = Pandora.getHub()
 	// await hub.hubClient.invoke({ processName: 'api' }, 'gc', 'clear')
-	// await new Promise(r => setTimeout(r, 300))
+	// await new Promise(r => _.delay(r, 300))
 	// let proxy = await hub.getProxy({ name: 'memory' })
 	// let fromheap = await (proxy as any).memoryUsage() as NodeJS.MemoryUsage
 	let cli = await execa('wrk', [
@@ -112,7 +112,7 @@ setImmediate(() => start().catch(error => console.error(`'${error.cmd}' ->`, err
 
 
 // if (process.env.PRIMARY) {
-// 	setTimeout(async function() {
+// 	_.delay(async function() {
 // 		let proxy = await Pandora.getHub().getProxy({ name: 'memory' })
 // 		console.log('proxy ->', proxy)
 // 		let memory = await proxy.getProperty('memoryUsage')

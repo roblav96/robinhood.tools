@@ -23,7 +23,7 @@ polka.route({
 	url: '/api/websocket/discover',
 	async handler(req, res) {
 		radio.emit('socket.listening')
-		await new Promise(r => setTimeout(r, 100))
+		await new Promise(r => _.delay(r, 100))
 		// if (PORTS.length == 0) throw boom.badGateway('socket.listening');
 		let protocol = process.env.DEVELOPMENT ? 'ws' : 'wss'
 		return PORTS.map(port => `${protocol}://${process.env.DOMAIN}/websocket/${port}`)

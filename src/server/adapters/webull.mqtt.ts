@@ -74,7 +74,7 @@ export class MqttClient {
 		}
 		let multiplier = this.options.chunks == 1 ? core.math.random(1000, 3000) : 1000
 		let ms = core.math.dispersed(this.options.chunks * multiplier, this.options.index + 1, this.options.chunks)
-		setTimeout(this.ontimeout, ms)
+		_.delay(this.ontimeout, ms)
 	}
 	connect() {
 		if (this.connected == true) return;

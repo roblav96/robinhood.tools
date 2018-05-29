@@ -13,6 +13,11 @@ declare module 'turbo-net' {
 			'error': [Error, void]
 			'listening': void[]
 		}
+		interface Address {
+			address: string
+			family: string
+			port: number
+		}
 	}
 	export class Server extends EventEmitter {
 		constructor(options?: Server.Options)
@@ -20,7 +25,7 @@ declare module 'turbo-net' {
 		_closed: boolean
 		allowHalfOpen: boolean
 		connections: Connection[]
-		address(): { address: string, family: string, port: number }
+		address(): Server.Address
 		close(cb?: () => void): void
 		listen(cb?: () => void): void
 		listen(port?: number, cb?: () => void): void

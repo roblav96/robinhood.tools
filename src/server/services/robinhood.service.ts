@@ -43,7 +43,7 @@ clock.on('1s', function ontick(i) {
 			queue.add(() => {
 				if (!client.doc.rhtoken) return;
 				return fn(client.doc).then(data => {
-					socket.send(client, name, { [key]: data })
+					client.send(JSON.stringify({ name, data: { [key]: data } } as Socket.Event))
 				}).catch(error => {
 					if (boom.isBoom(error)) {
 						if (error.output.statusCode == 429) {

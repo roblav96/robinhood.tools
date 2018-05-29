@@ -308,7 +308,7 @@ export const math = {
 
 export const promise = {
 	delay(ms: number) {
-		return new Promise<void>(r => setTimeout(r, ms))
+		return new Promise<void>(r => _.delay(r, ms))
 	},
 }
 

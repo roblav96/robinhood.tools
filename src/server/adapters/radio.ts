@@ -11,9 +11,14 @@ import clock from '../../common/clock'
 
 
 
+const host = '127.0.0.1'
+const port = +process.env.PORT - 1
+const address = `ws://${host}:${port}`
+
 class Radio extends Emitter<string, Radio.Event> {
 
 	private sockette: Sockette
+	private verbose = true
 	private uuid = security.randomBits(16)
 	private name = process.env.NAME
 	private instance = +process.env.INSTANCE
@@ -23,7 +28,11 @@ class Radio extends Emitter<string, Radio.Event> {
 
 	constructor() {
 		super()
-		this.sockette = new Sockette(`ws://localhost:${+process.env.PORT - 1}/radio`, {
+		_.delay(this.create, 100)
+	}
+
+	private create = () => {
+		this.sockette = new Sockette(address, {
 			timeout: 1000,
 			maxAttempts: Infinity,
 			onopen: this.onopen,
@@ -38,17 +47,16 @@ class Radio extends Emitter<string, Radio.Event> {
 
 	private reconnect = _.debounce(() => this.sockette.open(), 100, { leading: false, trailing: true })
 	private onopen = () => {
+		if (this.verbose) console.info(`onopen ->`, address);
 		this.sockette.send('__onopen__')
 	}
 	private onclose = (event: CloseEvent) => {
-		// console.warn('onclose ->', event)
+		if (this.verbose) console.warn(`onclose ->`, address);
 		this.isopen = false
 		this.reconnect()
 	}
 	private onerror = (event: ErrorEvent) => {
-		if (event.message.indexOf('uWs') != 0) {
-			console.error(`onerror Error -> %O`, event)
-		}
+		console.error(`onerror Error -> %O`, event)
 		this.isopen = false
 		this.reconnect()
 	}

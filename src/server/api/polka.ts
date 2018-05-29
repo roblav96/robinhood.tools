@@ -45,7 +45,7 @@ server.listen(port, process.env.HOST, function onlisten() {
 	console.info('api listening ->', address.port)
 })
 
-exithook(function() {
+exithook(function onexit() {
 	server.connections.forEach(v => v.close())
 	server.close()
 })
