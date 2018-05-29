@@ -47,7 +47,6 @@ polka.route({
 		let fsymbols = await redis.main.hmget(rkeys.WB.TIDS, ...symbols) as Dict<number>
 		fsymbols = redis.fixHmget(fsymbols, symbols)
 		fsymbols = _.mapValues(fsymbols, v => Number.parseInt(v as any))
-		// fsymbols = _.filter(fsymbols, v => Number.isFinite(v)) as any
 
 		let resolved = await pAll(symbols.map(symbol => {
 			let tid = fsymbols[symbol]
