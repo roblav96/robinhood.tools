@@ -26,7 +26,7 @@ export function push(symbol: string) {
 }
 
 router.afterEach(function(to, from) {
-	if (to.name == 'symbol' && to.params.symbol) {
+	if (to.name.indexOf('symbol') == 0) {
 		push(to.params.symbol)
 	}
 })

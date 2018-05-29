@@ -18,54 +18,13 @@ import socket from '@/client/adapters/socket'
 
 
 
-const { components, tabs } = new utils.Tabs('symbol', [{
-	id: 'summary',
-	icon: 'cash-100',
-	component: () => import('@/client/routes/symbol/symbol.summary'),
-}, {
-	id: 'chart',
-	icon: 'chart-line',
-	component: () => import('@/client/routes/symbol/symbol.chart'),
-}, {
-	id: 'news',
-	icon: 'newspaper',
-	component: () => import('@/client/routes/symbol/symbol.news'),
-}, {
-	id: 'calcs',
-	icon: 'calculator',
-	component: () => import('@/client/routes/symbol/symbol.calcs'),
-}, {
-	id: 'debug',
-	icon: 'bug',
-	component: () => import('@/client/routes/symbol/symbol.debug'),
-}])
-
-@Vts.Component({
-	components,
-	// beforeRouteEnter(to, from, next) {
-	// 	if (!to.params.symbol) return next(false);
-	// 	if (to.query.tab && TABS.tabs.find(v => v.id == to.query.tab)) return next();
-	// 	let route = core.clone(to)
-	// 	let i = lockr.get('symbol.tab.tabindex', 0)
-	// 	route.query.tab = TABS.tabs[i].id
-	// 	next(route)
-	// },
-})
+@Vts.Component
 export default class extends Mixins(VMixin) {
 
 	get symbol() { return this.$route.params.symbol }
 
-	tabs = tabs
-	tabindex = 0
-
 	created() {
-		// Object.keys(this.$options.components).forEach(key => {
-		// 	let starts = 'v-symbol-tab-'
-		// 	if (!key.startsWith(starts)) return;
-		// 	let id = key.substr(starts.length)
-		// 	this.tabs.push({ id, title: _.startCase(id), component: key })
-		// })
-		// console.log('this.tabs ->', this.tabs)
+
 	}
 
 	mounted() {
@@ -75,6 +34,8 @@ export default class extends Mixins(VMixin) {
 	beforeDestroy() {
 		this.reset()
 	}
+
+	get routes() { return this.$router.options.routes.find(v => v.name == 'symbol').children.filter(v => v.icon) }
 
 	busy = true
 	quote = {} as Quotes.Quote

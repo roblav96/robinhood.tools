@@ -17,13 +17,19 @@ import socket from '@/client/adapters/socket'
 
 
 
-@Vts.Component
+@Vts.Component({
+	beforeRouteEnter(to, from, next) {
+		console.log(`to ->`, to)
+		return next()
+	},
+})
 export default class Lists extends Mixins(VMixin, RHMixin) {
 
 	created() {
-		Promise.resolve().then(() => {
-			if (this.lists.length) return this.syncsymbols();
-		}).then(() => this.synclists().then(this.syncsymbols))
+		this.synclists().then(this.syncsymbols)
+		// Promise.resolve().then(() => {
+		// 	if (this.lists.length) return this.syncsymbols();
+		// }).then(() => this.synclists().then(this.syncsymbols))
 	}
 
 	beforeDestroy() {

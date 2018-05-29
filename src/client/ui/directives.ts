@@ -9,14 +9,26 @@ import clock from '@/common/clock'
 
 
 
-Vue.directive('visible', {
-	bind(el, binding, vnode, oldVnode) {
-		binding.def.update(...arguments)
-	},
-	update(el, { value, oldValue }) {
-		if (value === oldValue || !core.boolean.is(value)) return;
-		el.classList.toggle('opacity-0', !value)
-	},
+Vue.directive('visible', function(el, { value, oldValue }) {
+	if (value === oldValue || !core.boolean.is(value)) return;
+	el.classList.toggle('invisible', !value)
+	anime.remove(el)
+	if (value == true) {
+		let t = Date.now()
+		Vue.nextTick(() => {
+			let smooth = ((Date.now() - t) * 3)
+			anime({
+				targets: el,
+				easing: 'easeInQuad',
+				delay: smooth > 10 ? smooth : 0,
+				opacity: [
+					{ value: 0, duration: 0 },
+					{ value: 1, duration: 50 + smooth },
+				],
+			})
+		})
+
+	}
 })
 
 

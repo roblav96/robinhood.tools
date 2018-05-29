@@ -13,47 +13,89 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 
 <template>
 	<section class="symbol-route">
+
 		<section class="hero is-small">
-			<!-- <div v-visible="!busy" class="hero-body message" v-bull-bear:is="wbquote.change"> -->
-			<div v-visible="!busy" class="hero-body">
+			<div class="hero-body">
+
+
+
 				<div class="container">
-					<div class="columns">
 
 
 
-						<div class="column flex justify-start">
+					<div v-visible="!busy" class="columns is-desktop">
+
+
+
+						<div class="column flex">
 							<div class="mr-6">
-								<symbol-logo class="is-80x80 shadow-md" :symbol="symbol"></symbol-logo>
+								<symbol-logo class="is-48x48 shadow" :symbol="symbol"></symbol-logo>
 							</div>
-							<div class="has-text-left self-start bg-white border-grey-lightest border-solid border-1 rounded-r-lg px-4 py-2">
-								<p class="title">
-									<span class="whitespace-no-wrap">{{symbol}}</span>
-									<span v-show="!instrument.alive" class="tag is-medium is-danger align-top ml-2">Untradable</span>
-									<span v-show="delisted||suspended" class="tag is-medium is-danger align-top ml-2">{{vcapitalize(quote.status)}}</span>
-								</p>
-								<p class="is-size-6">{{quote.name}}</p>
+							<div class="flex self-center bg-white border-grey-lightest border-solid border-1 rounded px-4 py-2">
+								<p class="self-center title leading-none mr-3 whitespace-no-wrap">{{symbol}}</p>
+								<p class="self-center is-size-6 leading-none">{{quote.name}}</p>
+								<!-- <span class="whitespace-no-wrap">{{symbol}}</span> -->
+								<!-- <span v-show="!instrument.alive" class="tag is-medium is-danger align-top ml-2">Untradable</span> -->
+								<!-- <span v-show="delisted||suspended" class="tag is-medium is-danger align-top ml-2">{{vcapitalize(quote.status)}}</span> -->
+								<!-- </p> -->
 							</div>
 						</div>
 
 
 
-						<div class="column is-narrow flex justify-center">
-							<div class="has-text-centered self-start bg-white border-grey-lightest border-solid border-1 rounded-lg px-4 py-2">
-								<!-- <p class="title">{{vnumber(quote.price)}}</p> -->
-								<!-- <p v-number-ticker="quote.price" class="title"></p> -->
-								<number-ticker :number="quote.price" class="title font-mono"></number-ticker>
+						<div class="column is-narrow flex">
+							<div class="flex self-center whitespace-no-wrap bg-white border-grey-lightest border-solid border-1 rounded px-4 py-2">
+								<number-ticker :number="quote.price" class="self-center title leading-none mr-3 font-mono"></number-ticker>
+								<p class="self-center is-size-6 leading-none font-medium font-mono" v-bull-bear="quote.change">
+									{{vnumber(quote.change,{plusminus:true})}}<br>
+									{{vnumber(quote.percent,{plusminus:true,percent:true,precision:2})}}
+								</p>
+								<!-- <p class="self-center is-size-6 leading-none">
+									<span class="font-mono" v-bull-bear="quote.change">
+										{{vnumber(quote.change,{plusminus:true})}} {{vnumber(quote.percent,{plusminus:true,percent:true,precision:2})}}<br>
+									</span>
+									<span v-timestamp="quote.timestamp"></span>
+								</p> -->
+							</div>
+							<!-- <div class="has-text-centered self-start bg-white border-grey-lightest border-solid border-1 rounded-lg px-4 py-2"> -->
+							<!-- <p class="title">{{vnumber(quote.price)}}</p> -->
+							<!-- <p v-number-ticker="quote.price" class="title"></p> -->
+							<!-- <number-ticker :number="quote.price" class="title font-mono"></number-ticker>
 								<p class="is-size-6 font-medium font-mono" v-bull-bear="quote.change">
 									{{vnumber(quote.change,{plusminus:true})}} ({{vnumber(quote.percent,{plusminus:true,percent:true,precision:2})}})
+								</p> -->
+							<!-- <p class="is-size-7">{{vfromnow(quote.timestamp,{max:1,verbose:true})}}</p> -->
+							<!-- <p class="is-size-7" v-timestamp="quote.timestamp"></p> -->
+							<!-- <timestamp :timestamp="quote.timestamp"></timestamp> -->
+							<!-- </div> -->
+						</div>
+
+
+
+						<div class="column is-narrow flex">
+							<div class="flex self-center bg-white border-grey-lightest border-solid border-1 rounded px-4 py-3">
+								<p class="self-center is-size-4 leading-none mr-2 font-medium whitespace-no-wrap">
+									{{vnumber(quote.volume,{compact:true})}}
 								</p>
-								<!-- <p class="is-size-7">{{vfromnow(quote.timestamp,{max:1,verbose:true})}}</p> -->
-								<!-- <p class="is-size-7" v-timestamp="quote.timestamp"></p> -->
-								<!-- <timestamp :timestamp="quote.timestamp"></timestamp> -->
+								<p class="self-center is-size-6 leading-none">Volume</p>
+							</div>
+							<div class="fullhd:flex hidden ml-6 self-center bg-white border-grey-lightest border-solid border-1 rounded px-4 py-3">
+								<p class="self-center is-size-4 leading-none mr-2 font-medium whitespace-no-wrap">
+									{{vnumber(quote.avgVolume,{compact:true})}}
+								</p>
+								<p class="self-center is-size-6 leading-none">Avg Volume</p>
+							</div>
+							<div v-show="quote.marketCap" class="desktop-only:hidden ml-6 flex self-center bg-white border-grey-lightest border-solid border-1 rounded px-4 py-3">
+								<p class="self-center is-size-4 leading-none mr-2 font-medium whitespace-no-wrap">
+									{{vnumber(quote.marketCap,{compact:true})}}
+								</p>
+								<p class="self-center is-size-6 leading-none">Market Cap</p>
 							</div>
 						</div>
 
 
 
-						<div class="column flex justify-end whitespace-no-wrap">
+						<!-- <div class="column flex justify-end whitespace-no-wrap">
 							<div class="has-text-right self-start bg-white border-grey-lightest border-solid border-1 rounded-l-lg px-4 py-2 mr-6">
 								<p class="is-size-4 font-medium font-mono">{{vnumber(quote.volume,{compact:true,precision:2})}}</p>
 								<p class="is-size-6">Volume</p>
@@ -66,7 +108,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 								<p class="is-size-4 font-medium font-mono">{{vnumber(quote.marketCap,{compact:true,precision:2})}}</p>
 								<p class="is-size-6">Market Cap</p>
 							</div>
-						</div>
+						</div> -->
 
 
 
@@ -142,32 +184,33 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 
 					</div>
 				</div>
-
-
-
-				<nav class="tabs is-toggle is-centered is-fullwidth mt-6">
-					<div class="container">
-						<ul class="has-background-white rounded">
-							<li :class="{ 'is-active': tabindex == i }" v-on:click="tabindex = i" v-for="(tab, i) in tabs">
-								<a class="no-underline">
-									<b-icon :icon="tab.icon"></b-icon>
-									<span>{{tab.title}}</span>
-								</a>
-							</li>
-						</ul>
-					</div>
-				</nav>
-
-
-
 			</div>
+
+
+
+			<nav class="tabs is-toggle is-centered is-fullwidth mb-6">
+				<div class="container">
+					<ul class="has-background-white rounded">
+						<router-link tag="li" v-for="route in routes" :key="route.name" :to="{name:route.name}">
+							<a class="no-underline">
+								<b-icon :icon="route.icon"></b-icon>
+								<span>{{vcapitalize(route.path)}}</span>
+							</a>
+						</router-link>
+					</ul>
+				</div>
+			</nav>
+
+
+
 		</section>
 
 		<hr class="h-px my-0">
 
 		<section class="section has-background-white">
 			<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-				<component :is="tabs[tabindex].vcomponent" class=""></component>
+				<!-- <component :is="tabs[tabindex].vcomponent" class=""></component> -->
+				<router-view></router-view>
 			</transition>
 		</section>
 

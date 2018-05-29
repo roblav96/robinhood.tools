@@ -16,11 +16,10 @@
 				<b-table class="card is-middle is-nowrap is-borderless is-scroll" hoverable :data="tabledata(list.symbols)" :opened-detailed="defaultOpenedDetails"
 				    detailed detail-key="symbol">
 					<template slot-scope="props">
-						<b-table-column label="">
+						<b-table-column label="" width="1">
 							<symbol-logo class="shadow is-32x32" :symbol="props.row.symbol"></symbol-logo>
 						</b-table-column>
-						<b-table-column label="Symbol">
-							<!-- <span class="is-size-5 leading-none font-semibold">{{props.row.symbol}}</span> -->
+						<b-table-column label="Symbol" width="1">
 							<button class="button is-size-5 font-semibold leading-none w-full h-initial" v-on:click="gotosymbol(props.row.symbol)">
 								{{props.row.symbol}}
 							</button>

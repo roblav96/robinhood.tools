@@ -5,6 +5,10 @@
 	background-color: var(--white-bis);
 }*/
 
+*[style*="display: none"] {
+	display: none !important;
+}
+
 .is-clickable {
 	pointer-events: auto;
 	cursor: pointer;

@@ -52,15 +52,39 @@ export const routes = [
 	// },
 
 	{
-		name: 'login', path: '/login',
-		component: () => import('@/client/routes/login/login'),
+		name: 'symbol', path: '/symbol/:symbol',
+		redirect: { name: 'symbol.summary' },
+		component: () => import('@/client/routes/symbol/symbol'),
+		children: [
+			{ path: '', redirect: { name: 'symbol.summary' } },
+			{ path: '*', redirect: { name: 'symbol.summary' } },
+			{
+				name: 'symbol.summary', path: 'summary', icon: 'bulletin-board',
+				component: () => import('@/client/routes/symbol/symbol.summary'),
+			},
+			{
+				name: 'symbol.chart', path: 'chart', icon: 'chart-line',
+				component: () => import('@/client/routes/symbol/symbol.chart'),
+			},
+			{
+				name: 'symbol.news', path: 'news', icon: 'newspaper',
+				component: () => import('@/client/routes/symbol/symbol.news'),
+			},
+			{
+				name: 'symbol.calcs', path: 'calcs', icon: 'calculator',
+				component: () => import('@/client/routes/symbol/symbol.calcs'),
+			},
+			{
+				name: 'symbol.debug', path: 'debug', icon: 'bug',
+				component: () => import('@/client/routes/symbol/symbol.debug'),
+			},
+		],
 	},
 
 	{
-		name: 'accounts', path: '/accounts',
-		component: () => import('@/client/routes/accounts/accounts'),
+		name: 'login', path: '/login',
+		component: () => import('@/client/routes/login/login'),
 	},
-
 	{
 		name: 'robinhood', path: '/robinhood',
 		component: () => import('@/client/routes/robinhood/robinhood'),
@@ -88,24 +112,10 @@ export const routes = [
 			// },
 		],
 	},
-
-	{
-		name: 'symbol', path: '/symbol/:symbol',
-		component: () => import('@/client/routes/symbol/symbol'),
-		// children: [
-		// 	{
-		// 		name: 'symbol.summary', path: 'summary',
-		// 		component: () => import('@/client/routes/symbol/symbol.summary'),
-		// 	},
-		// 	{
-		// 		name: 'symbol', path: '', redirect: { name: 'symbol.summary' }
-		// 	},
-		// 	{
-		// 		path: '*', redirect: { name: 'symbol.summary' }
-		// 	},
-		// ],
-	},
-
+	// {
+	// 	name: 'accounts', path: '/accounts',
+	// 	component: () => import('@/client/routes/accounts/accounts'),
+	// },
 	// {
 	// 	title: 'Portfolio', icon: 'chart-pie',
 	// 	name: 'portfolio', path: '/portfolio',
@@ -126,7 +136,7 @@ const router = new VueRouter({
 	routes, mode: 'history',
 	linkExactActiveClass: 'is-active',
 	scrollBehavior: function(to, from, saved) {
-		// if (to.name == from.name) return;
+		to.meta.scroll = saved
 		if (!from.name || saved) return;
 		return { x: 0, y: 0 }
 	},

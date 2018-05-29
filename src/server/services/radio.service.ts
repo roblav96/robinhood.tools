@@ -53,7 +53,7 @@ wss.on('connection', function onconnection(client: Radio.Client, req: IncomingMe
 	})
 
 	client.on('close', function onclose(code, reason) {
-		if (code > 1001) console.warn('client close ->', code, reason);
+		// if (code > 1001) console.warn('client close ->', code, reason);
 		this.terminate()
 		this.removeAllListeners()
 	})

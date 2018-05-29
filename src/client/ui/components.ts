@@ -23,7 +23,7 @@ import * as benchmark from '@/common/benchmark'
 					easing: 'easeInQuint',
 					color: [
 						{ value: context.color, duration: 0, },
-						{ value: context.black, duration: 500, },
+						{ value: context.black, duration: 1000, },
 					],
 				})
 			},
