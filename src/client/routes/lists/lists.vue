@@ -22,14 +22,11 @@
 							<p class="whitespace-no-wrap is-size-5 font-medium">{{props.row.symbol}}</p>
 							<p class="is-size-7">{{props.row.name}}</p>
 						</b-table-column>
-						<b-table-column label="Market Cap" class="" numeric>
-							{{vnumber(vmarketcap(props.row.price,props.row.totalShares),{compact:true,precision:2})}}
-						</b-table-column>
 						<b-table-column label="Price" class="" numeric>
 							{{vnumber(props.row.price)}}
 						</b-table-column>
-						<b-table-column label="Change" class="" numeric v-bull-bear="props.row.change">
-							<span>{{vnumber(props.row.change,{plusminus:true})}}</span>
+						<b-table-column label="Change" class="font-mono" numeric v-bull-bear="props.row.change">
+							{{vnumber(props.row.change,{plusminus:true})}}
 							<span>({{vnumber(props.row.changeRatio*100,{plusminus:true,percent:true,precision:2})}})</span>
 						</b-table-column>
 						<b-table-column label="Volume" class="" numeric>
@@ -40,6 +37,9 @@
 						</b-table-column>
 						<b-table-column label="3mo Volume" class="" numeric>
 							{{vnumber(props.row.avgVol3M,{compact:true,precision:2})}}
+						</b-table-column>
+						<b-table-column label="Market Cap" class="" numeric>
+							{{vnumber(vmarketcap(props.row.price,props.row.totalShares),{compact:true,precision:2})}}
 						</b-table-column>
 					</template>
 				</b-table>

@@ -25,7 +25,6 @@ module.exports = {
 		config.output.chunkFilename = '[name].chunk.js'
 
 		if (DEVELOPMENT) {
-			// config.devtool = 'source-map'
 			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/, /env/]))
 			config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
 				rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
@@ -34,6 +33,11 @@ module.exports = {
 				})
 			})
 		}
+
+		// config.plugins.push(new webpack.DllReferencePlugin({
+		// 	context: __dirname,
+		// 	manifest: require(path.resolve(__dirname, 'dist/client/vendors.json'))
+		// }))
 
 		// config.plugins.push(new BundleAnalyzerPlugin())
 

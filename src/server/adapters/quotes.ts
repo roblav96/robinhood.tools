@@ -91,17 +91,6 @@ export function initquote(
 	applycalcs(quote)
 	core.object.clean(quote)
 
-	// if (process.env.DEVELOPMENT && +process.env.SCALE == 1) {
-	// 	console.warn(symbol, '->', quote.name)
-	// 	// console.log(`quote ->`, JSON.parse(JSON.stringify(quote)))
-	// 	console.log('wbticker ->', wbticker)
-	// 	console.log('wbquote ->', wbquote)
-	// 	// console.log('instrument ->', instrument)
-	// 	// console.log('yhquote ->', yhquote)
-	// 	// console.log('iexitem ->', iexitem)
-	// 	console.log(`quote ->`, quote)
-	// }
-
 	return quote
 
 }

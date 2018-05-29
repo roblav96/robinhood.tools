@@ -27,7 +27,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 							</div>
 							<div class="has-text-left self-start bg-white border-grey-lightest border-solid border-1 rounded-r-lg px-4 py-2">
 								<p class="title">
-									<span>{{symbol}}</span>
+									{{symbol}}
 									<span v-show="!instrument.alive" class="tag is-medium is-danger align-top">Untradable</span>
 									<span v-show="delisted||suspended" class="tag is-medium is-danger align-top">{{vcapitalize(quote.status)}}</span>
 								</p>
@@ -37,12 +37,12 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 
 
 
-						<div class="column flex justify-center">
-							<!-- <div class="has-text-centered self-start bg-white border-solid border-1 rounded-lg px-4 py-2" v-bull-bear:border="wbquote.change"> -->
+						<div class="column is-narrow flex justify-center">
 							<div class="has-text-centered self-start bg-white border-grey-lightest border-solid border-1 rounded-lg px-4 py-2">
+								<!-- <p class="title">{{vnumber(quote.price)}}</p> -->
 								<!-- <p v-number-ticker="quote.price" class="title"></p> -->
-								<number-ticker :number="quote.price" class="title"></number-ticker>
-								<p class="is-size-6 font-medium" v-bull-bear="quote.change">
+								<number-ticker :number="quote.price" class="title font-mono"></number-ticker>
+								<p class="is-size-6 font-medium font-mono" v-bull-bear="quote.change">
 									{{vnumber(quote.change,{plusminus:true})}} ({{vnumber(quote.percent,{plusminus:true,percent:true,precision:2})}})
 								</p>
 							</div>
@@ -52,11 +52,15 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 
 						<div class="column flex justify-end">
 							<div class="has-text-right self-start bg-white border-grey-lightest border-solid border-1 rounded-l-lg px-4 py-2 mr-6">
-								<p class="is-size-4 font-medium">{{vnumber(quote.volume,{compact:true,precision:2})}}</p>
+								<p class="is-size-4 font-medium font-mono">{{vnumber(quote.volume,{compact:true,precision:2})}}</p>
 								<p class="is-size-6">Volume</p>
 							</div>
-							<div class="has-text-right self-start bg-white border-grey-lightest border-solid border-1 rounded-l-lg px-4 py-2">
-								<p class="is-size-4 font-medium">{{vnumber(quote.marketCap,{compact:true,precision:2})}}</p>
+							<div class="has-text-right self-start bg-white border-grey-lightest border-solid border-1 rounded-l-lg px-4 py-2 mr-6">
+								<p class="is-size-4 font-medium font-mono">{{vnumber(quote.avgVolume,{compact:true,precision:2})}}</p>
+								<p class="is-size-6">Avg Volume</p>
+							</div>
+							<div v-show="quote.marketCap" class="has-text-right self-start bg-white border-grey-lightest border-solid border-1 rounded-l-lg px-4 py-2">
+								<p class="is-size-4 font-medium font-mono">{{vnumber(quote.marketCap,{compact:true,precision:2})}}</p>
 								<p class="is-size-6">Market Cap</p>
 							</div>
 						</div>

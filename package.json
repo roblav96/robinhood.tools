@@ -8,12 +8,13 @@
 		"patch:types": "tsc-wtf && rimraf node_modules/vuex/types/vue.d.ts",
 		"patch:lockr": "curl --output node_modules/lockr/lockr.js 'https://raw.githubusercontent.com/tsironis/lockr/master/lockr.js'",
 		"patch:toposort": "replace-x 'throw' '//' node_modules/toposort/index.js",
-		"patch:final": "replace-x 'const color' 'return console.log(data.text)\n\tconst color' node_modules/final-pm/lib/cli/logging.js",
+		"patch:final": "replace-x 'const color' 'return console.log(data.text)\n\tconst scolor' node_modules/final-pm/lib/cli/logging.js",
 		"purge": "rimraf dist node_modules",
 		"rc": "npm run client:dev",
 		"client:dev": "onchange 'vue.config.js' --initial --killSignal SIGKILL --delay 300 -- run-p client:tailwind client:watch cli:focus",
 		"client:watch": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
 		"client:build": "rimraf dist/client && cross-env NODE_ENV=production vue-cli-service build --mode production",
+		"client:vendors": "webpack --config vendors.config.js",
 		"client:tailwind": "tailwind build node_modules/tailwindcss/utilities.css --config src/client/styles/tailwind.js --output src/client/styles/tailwind.css",
 		"k": "final-pm --kill --force",
 		"rs": "npm run server:dev",
@@ -30,7 +31,9 @@
 	"dependencies": {
 		"@ibm/plex": "latest",
 		"animate.css": "latest",
+		"animejs": "latest",
 		"boom": "latest",
+		"browser-process-hrtime": "latest",
 		"buefy": "latest",
 		"bulma": "latest",
 		"cookie": "latest",
@@ -78,6 +81,7 @@
 		"zousan": "latest"
 	},
 	"devDependencies": {
+		"@types/animejs": "latest",
 		"@types/boom": "latest",
 		"@types/cli-table2": "latest",
 		"@types/cookie": "latest",
@@ -124,7 +128,9 @@
 		"tsc-wtf": "latest",
 		"typescript": "latest",
 		"vue-template-compiler": "latest",
-		"webpack-bundle-analyzer": "latest"
+		"webpack": "latest",
+		"webpack-bundle-analyzer": "latest",
+		"webpack-cli": "latest"
 	},
 	"babel": {
 		"presets": [

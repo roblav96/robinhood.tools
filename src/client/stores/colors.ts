@@ -49,6 +49,8 @@ declare global {
 		success: string
 		warning: string
 		white: string
+		rhgreen: string
+		rhred: string
 	}
 	// interface Colors {
 	// 	'black': string

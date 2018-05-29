@@ -2,39 +2,45 @@
 
 import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
+import * as anime from 'animejs'
 import * as utils from '@/client/adapters/utils'
+import * as benchmark from '@/common/benchmark'
 
 
 
 @Vts.Component({
 	template: `
-		<span>{{digit}}</span>
+		<p><span v-digit="digit" v-for="(digit,i) in digits" :key="i">{{digit}}</span></p>
 	`,
-})
-class NumberTickerDigit extends Vue {
-	@Vts.Prop() direction: string
-	@Vts.Prop() digit: string
-	@Vts.Watch('digit', { immediate: true }) w_digit(to: string, from: string) {
-		if (to == from) return;
-	}
-}
-Vue.component('number-ticker-digit', NumberTickerDigit)
-
-@Vts.Component({
-	template: `
-		<p><number-ticker-digit v-for="(digit,i) in digits" :key="i" :digit="digit" :direction="direction"></number-ticker-digit></p>
-	`,
+	directives: {
+		digit: {
+			update(el, binding, vnode) {
+				if (!binding.value || binding.value == binding.oldValue) return;
+				let context = vnode.context as NumberTicker
+				anime.remove(el)
+				anime({
+					targets: el,
+					easing: 'easeInQuart',
+					color: [
+						{ value: context.color, duration: 0, },
+						{ value: context.black, duration: 500, },
+					],
+				})
+			},
+			unbind(el) { anime.remove(el) },
+		},
+	},
 })
 class NumberTicker extends Vue {
+	black: string
+	color: string
+	mounted() { this.black = window.getComputedStyle(this.$el).getPropertyValue('color') }
 	@Vts.Prop() number: number
-	@Vts.Watch('number', { immediate: true }) w_number(to: number, from: number) {
-		if (!Number.isFinite(to) || to == from) return;
-		this.direction = to > from ? 'up' : 'down'
-		console.log(`this.direction ->`, this.direction)
-		console.log(`to ->`, to)
-		console.log(`from ->`, from)
+	@Vts.Watch('number') w_number(to: number, from: number) {
+		if (!Number.isFinite(to) || !Number.isFinite(from) || to == from) return;
+		this.color = to > from ? this.colors.success : this.colors.danger
 	}
-	direction = null as 'up' | 'down'
+	get colors() { return this.$store.state.colors }
 	get digits() {
 		return Number.isFinite(this.number) ? utils.vnumber(this.number).split('') : []
 	}

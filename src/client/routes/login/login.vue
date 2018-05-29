@@ -11,7 +11,7 @@
 		<div class="container">
 			<div class="columns is-mobile justify-center">
 				<div class="column is-narrow">
-					<form class="box" style="max-width: 342px;" v-on:submit.prevent="submit">
+					<form class="box" style="max-width: 335px;" v-on:submit.prevent="submit">
 						<figure class="image mb-4 w-2/3">
 							<img src="@/assets/robinhood-banner.png">
 						</figure>

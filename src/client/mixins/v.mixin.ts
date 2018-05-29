@@ -28,6 +28,7 @@ export default class extends Vue {
 
 	get recents() { return this.$store.state.recents }
 	get breakpoints() { return this.$store.state.breakpoints }
+	get colors() { return this.$store.state.colors }
 	get rhusername() { return this.$store.state.security.rhusername }
 
 	get routes() {
