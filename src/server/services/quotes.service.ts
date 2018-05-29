@@ -8,7 +8,6 @@ import * as utils from '../adapters/utils'
 import * as redis from '../adapters/redis'
 import * as socket from '../adapters/socket'
 import * as webull from '../adapters/webull'
-import * as iex from '../adapters/iex'
 import * as quotes from '../adapters/quotes'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
@@ -16,7 +15,6 @@ import radio from '../adapters/radio'
 
 
 
-declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
 const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'>()
 const CLIENTS = [] as webull.MqttClient[]
 clock.on('5s', function onconnect() {
@@ -39,6 +37,7 @@ radio.emit('symbols.start')
 if (process.env.SYMBOLS == 'STOCKS') {
 	radio.on('symbols.reset', onsymbols)
 }
+declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
 
 async function onsymbols(event: Radio.Event) {
 

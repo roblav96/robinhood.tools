@@ -20,13 +20,12 @@ const wss = new uws.Server({
 })
 
 wss.on('error', function onerror(error) {
-	console.error('radio Error ->', error)
+	console.error(`radio Error -> %O`, error)
 })
 
 wss.on('listening', function onlistening() {
 	let address = wss.httpServer.address() as AddressInfo
 	// console.info('radio listening ->', address)
-	console.log(`uws.native.server.group ->`, uws.native.server.group)
 })
 
 clock.on('5s', function onping() {
@@ -59,7 +58,9 @@ wss.on('connection', function onconnection(client: Radio.Client, req: IncomingMe
 		this.removeAllListeners()
 	})
 
-	client.on('error', function onerror(error) { console.error('client Error ->', error) })
+	client.on('error', function onerror(error) {
+		console.error(`client Error -> %O`, error)
+	})
 
 })
 

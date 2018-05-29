@@ -18,7 +18,6 @@ const address = `ws://${host}:${port}`
 class Radio extends Emitter<string, Radio.Event> {
 
 	private sockette: Sockette
-	private verbose = true
 	private uuid = security.randomBits(16)
 	private name = process.env.NAME
 	private instance = +process.env.INSTANCE
@@ -45,20 +44,19 @@ class Radio extends Emitter<string, Radio.Event> {
 	isopen = false
 	isready = false
 
-	private reconnect = _.debounce(() => this.sockette.open(), 100, { leading: false, trailing: true })
 	private onopen = () => {
-		if (this.verbose) console.info(`onopen ->`, address);
+		// console.info(`onopen ->`, address);
 		this.sockette.send('__onopen__')
 	}
 	private onclose = (event: CloseEvent) => {
-		if (this.verbose) console.warn(`onclose ->`, address);
+		// console.warn(`onclose ->`, address);
 		this.isopen = false
-		this.reconnect()
+		this.sockette.reconnect()
 	}
 	private onerror = (event: ErrorEvent) => {
 		console.error(`onerror Error -> %O`, event)
 		this.isopen = false
-		this.reconnect()
+		this.sockette.reconnect()
 	}
 	private onmessage = ({ data }: MessageEvent) => {
 		let message = data as string
