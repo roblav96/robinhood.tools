@@ -66,7 +66,7 @@ export default class extends Mixins(VMixin) {
 
 	mounted() {
 		clock.on('1s', this.$forceUpdate, this)
-		clock.on('1s', () => this.quote.price = _.round(this.quote.price + _.random(-1, 1, true), 2))
+		// clock.on('1s', () => this.quote.price = _.round(this.quote.price + _.random(-1, 1, true), 2))
 	}
 
 	beforeDestroy() {

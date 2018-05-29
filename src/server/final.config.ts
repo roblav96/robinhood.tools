@@ -31,15 +31,15 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 {
 
 	Application({ name: 'radio', run: 'services/radio.service' })
-	Application({ name: 'api', run: 'api/api', instances: 4 })
+	Application({ name: 'api', run: 'api/api', instances: 2 })
 
 	Application({ name: 'symbols', run: 'services/symbols.service' })
-	Application({ name: 'search', run: 'services/search.service' })
-	Application({ name: 'hours', run: 'services/hours.service' })
-	Application({ name: 'robinhood', run: 'services/robinhood.service' })
+	// Application({ name: 'search', run: 'services/search.service' })
+	// Application({ name: 'hours', run: 'services/hours.service' })
+	// Application({ name: 'robinhood', run: 'services/robinhood.service' })
 
 	let instances = 1 // os.cpus().length
-	// Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
+	Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
 	// Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
 	// Application({ name: 'indexes', run: 'services/quotes.service', env: { SYMBOLS: 'INDEXES' } })
 
@@ -50,7 +50,7 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 function Application(application: Partial<final.Application>) {
 	_.defaults(application.env, app.env)
 	_.defaults(application, app)
-	application.run = path.resolve(__dirname, `${application.run}.js`)
+	application.run = path.join(__dirname, `${application.run}.js`)
 	applications.push(JSON.parse(JSON.stringify(application)))
 }
 

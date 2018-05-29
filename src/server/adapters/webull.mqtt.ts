@@ -9,109 +9,108 @@ import * as core from '../../common/core'
 import * as webull from './webull'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
+import radio from './radio'
 
 
 
-export class MqttClient {
+let mqtts = 0
+radio.on('webull.mqtts', function onmqtt(event: Radio.Event<number>) {
+	mqtts += event.data
+})
+
+type Topics = (keyof typeof webull.mqtt_topics)[]
+export default class WebullMqttClient {
 
 	private static topics = {
-		// STOCKS: ['COMMODITY', 'FOREIGN_EXCHANGE', 'TICKER', 'TICKER_BID_ASK', 'TICKER_DEAL_DETAILS', 'TICKER_HANDICAP', 'TICKER_MARKET_INDEX', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
-		STOCKS: ['TICKER', 'TICKER_DETAIL', 'TICKER_DEAL_DETAILS', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
-		FOREX: ['FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
-		INDEXES: ['TICKER_MARKET_INDEX', 'FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as KeysOf<typeof webull.mqtt_topics>,
+		STOCKS: ['TICKER', 'TICKER_DETAIL', 'TICKER_DEAL_DETAILS', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as Topics,
+		FOREX: ['FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as Topics,
+		INDEXES: ['TICKER_MARKET_INDEX', 'FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as Topics,
 	}
 
 	private static get options() {
 		return _.clone({
 			fsymbols: null as Dict<number>,
-			topics: null as keyof typeof MqttClient.topics,
-			index: 0, chunks: 1,
+			topics: '' as keyof typeof WebullMqttClient.topics,
 			host: 'push.webull.com', port: 9018,
-			timeout: '10s' as Clock.Tick,
-			connect: true,
-			retry: true,
 			verbose: false,
 		})
 	}
 
-	get name() { return 'mqtt://' + this.options.host + ':' + this.options.port }
-
 	constructor(
-		public options = {} as Partial<typeof MqttClient.options>,
+		public options = {} as Partial<typeof WebullMqttClient.options>,
 		private emitter: Emitter,
 	) {
-		_.defaults(this.options, MqttClient.options)
-		if (this.options.connect) this.connect();
+		_.defaults(this.options, WebullMqttClient.options)
+		_.delay(() => this.reconnect(), 100)
+		radio.emit('webull.mqtts', 1)
 	}
 
+	alive = false
 	started = false
-	connected = false
 	dsymbols: Dict<string>
 	client: MqttConnection
 
-	private nextId() { return core.math.random(1, 999) }
+	private nextId() { return _.random(111, 999) }
 
 	destroy() {
 		this.terminate()
 		clock.offListener(this.reconnect, this)
+		radio.emit('webull.mqtts', -1)
 	}
 
 	terminate() {
-		this.connected = false
+		this.alive = false
 		if (this.client) {
-			this.client.end()
 			this.client.destroy()
 			this.client.removeAllListeners()
 			this.client = null
 		}
 	}
 
+	private timeout: number
 	private ontimeout = () => this.connect()
 	private reconnect() {
-		if (this.connected == true) {
-			this.connected = false
+		if (this.alive) {
+			this.alive = false
 			this.client.pingreq()
+			return
 		}
-		let multiplier = this.options.chunks == 1 ? core.math.random(1000, 3000) : 1000
-		let ms = core.math.dispersed(this.options.chunks * multiplier, this.options.index + 1, this.options.chunks)
-		_.delay(this.ontimeout, ms)
+		clearTimeout(this.timeout)
+		this.timeout = _.delay(this.ontimeout, _.random(0, mqtts * 100))
 	}
-	connect() {
-		if (this.connected == true) return;
+
+	private connect() {
+		if (this.alive) return;
 		this.terminate()
-		this.client = new MqttConnection(net.connect(this.options.port, this.options.host))
+		this.client = new MqttConnection(net.createConnection(this.options.port, this.options.host))
 		this.client.connect({
 			username: process.env.WEBULL_DID,
 			password: process.env.WEBULL_TOKEN,
 			clientId: 'mqtt_' + Math.random().toString(),
 			protocolId: 'MQTT',
 			protocolVersion: 4,
-			keepalive: 30,
+			keepalive: 60,
 			clean: true,
 		})
 		this.client.on('data', this.ondata)
+		this.client.on('close', this.onclose)
 		this.client.on('error', this.onerror)
-		if (this.started == false) {
+		if (!this.started) {
 			this.started = true
-			if (this.options.retry) {
-				clock.on(this.options.timeout, this.reconnect, this)
-			}
-		} else {
-			console.log('started connect ->', this.options.index, 'connected ->', this.connected)
-		}
+			clock.on('10s', this.reconnect, this)
+		} else console.log('connect started');
 	}
 
 	private ondata = (packet: Mqtt.Packet) => {
 
 		if (packet.cmd == 'pingresp') {
-			this.connected = true
+			this.alive = true
 			return
 		}
 
 		if (packet.cmd == 'connack') {
-			if (this.options.verbose) console.info(this.name, '-> connect');
-			this.connected = true
-			this.emitter.emit('connect', this.options.index)
+			if (this.options.verbose) console.info('connect');
+			this.alive = true
 
 			this.dsymbols = _.invert(_.mapValues(this.options.fsymbols, v => v.toString()))
 			let topic = {
@@ -124,7 +123,7 @@ export class MqttClient {
 			}
 			let topics = Object.keys(webull.mqtt_topics).filter(v => !isNaN(v as any))
 			if (this.options.topics) {
-				topics = MqttClient.topics[this.options.topics].map(v => webull.mqtt_topics[v].toString())
+				topics = WebullMqttClient.topics[this.options.topics].map(v => webull.mqtt_topics[v].toString())
 			}
 
 			let subscriptions = topics.map(type => ({
@@ -136,14 +135,12 @@ export class MqttClient {
 		}
 
 		if (packet.cmd == 'suback') {
-			this.emitter.emit('subscribed', this.options.index)
 			return
 		}
 
 		if (packet.cmd == 'disconnect') {
-			if (this.options.verbose) console.warn(this.name, '-> disconnect');
-			this.connected = false
-			this.emitter.emit('disconnect', this.options.index)
+			if (this.options.verbose) console.warn('disconnect');
+			this.alive = false
 			this.destroy()
 		}
 
@@ -185,10 +182,14 @@ export class MqttClient {
 
 	}
 
+	private onclose = reason => {
+		console.warn('onclose ->', reason)
+		this.alive = false
+	}
+
 	private onerror = (error: Error) => {
-		// if (this.options.verbose) console.error(this.name, 'onerror Error ->', error);
-		console.error(this.name, 'onerror Error ->', error)
-		this.connected = false
+		console.error('onerror Error ->', error)
+		this.alive = false
 	}
 
 }

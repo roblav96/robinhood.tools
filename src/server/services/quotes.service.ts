@@ -9,20 +9,15 @@ import * as redis from '../adapters/redis'
 import * as socket from '../adapters/socket'
 import * as webull from '../adapters/webull'
 import * as quotes from '../adapters/quotes'
+import WebullMqttClient from '../adapters/webull.mqtt'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
 import radio from '../adapters/radio'
 
 
 
-const emitter = new Emitter<'connect' | 'subscribed' | 'disconnect' | 'data'>()
-const CLIENTS = [] as webull.MqttClient[]
-clock.on('5s', function onconnect() {
-	if (CLIENTS.length == 0) return;
-	let client = CLIENTS.find(v => v.started == false)
-	if (!client) return;
-	client.connect()
-})
+const emitter = new Emitter<'data'>()
+const MQTTS = [] as WebullMqttClient[]
 
 const SYMBOLS = [] as string[]
 const WB_QUOTES = {} as Dict<Webull.Quote>
@@ -42,8 +37,8 @@ declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: SymbolsTypes
 async function onsymbols(event: Radio.Event) {
 
 	clock.offListener(ontick)
-	CLIENTS.forEach(v => v.destroy())
-	core.nullify(CLIENTS)
+	MQTTS.forEach(v => v.destroy())
+	core.nullify(MQTTS)
 	core.nullify(SYMBOLS)
 	core.nullify(WB_QUOTES)
 	core.nullify(WB_EMITS)
@@ -60,10 +55,14 @@ async function onsymbols(event: Radio.Event) {
 	// if (process.env.DEVELOPMENT) return;
 	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 
+	let coms = [] as Redis.Coms
 	SYMBOLS.push(...Object.keys(fsymbols))
 	let alls = await quotes.getAlls(SYMBOLS, ['quote', 'wbquote'])
 	alls.forEach(all => {
 		let symbol = all.symbol
+
+		all.quote.typeof = process.env.SYMBOLS
+		coms.push(['hset', `${rkeys.QUOTES}:${symbol}`, 'typeof', all.quote.typeof])
 
 		Object.assign(WB_QUOTES, { [symbol]: all.wbquote })
 		Object.assign(WB_EMITS, { [symbol]: {} })
@@ -73,16 +72,15 @@ async function onsymbols(event: Radio.Event) {
 		Object.assign(SAVES, { [symbol]: {} })
 
 		socket.emit(`${rkeys.QUOTES}:${symbol}`, all.quote)
-
 	})
 
+	await redis.main.coms(coms)
+
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
-	CLIENTS.splice(0, Infinity, ...chunks.map((chunk, i) => new webull.MqttClient({
+	MQTTS.splice(0, Infinity, ...chunks.map((chunk, i) => new WebullMqttClient({
 		fsymbols: _.fromPairs(chunk),
 		topics: process.env.SYMBOLS,
-		index: i, chunks: chunks.length,
-		connect: chunks.length == 1 && i == 0,
-		// verbose: true,
+		verbose: true,
 	}, emitter)))
 
 	clock.on('1s', ontick)

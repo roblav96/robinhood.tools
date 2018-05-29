@@ -17,6 +17,7 @@ TINY_KEYS.forEach(k => TINY[k] = undefined)
 
 declare global { namespace Quotes { type ISmall = typeof SMALL; interface Small extends ISmall, Tiny { } } }
 export const SMALL = {
+	typeof: '' as SymbolsTypes,
 	name: '',
 	change: 0,
 	percent: 0,
