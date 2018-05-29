@@ -10,7 +10,7 @@ declare module 'sockette' {
 			onopen: (event: Event) => void
 			onclose: (event: CloseEvent) => void
 			onmessage: (event: MessageEvent) => void
-			onerror: (event: Event) => void
+			onerror: (event: ErrorEvent) => void
 			onreconnect: (event: Event) => void
 			onmaximum: (event: CloseEvent) => void
 		}

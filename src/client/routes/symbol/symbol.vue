@@ -27,7 +27,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 							</div>
 							<div class="has-text-left self-start bg-white border-grey-lightest border-solid border-1 rounded-r-lg px-4 py-2">
 								<p class="title">
-									{{symbol}}
+									<span class="whitespace-no-wrap">{{symbol}}</span>
 									<span v-show="!instrument.alive" class="tag is-medium is-danger align-top">Untradable</span>
 									<span v-show="delisted||suspended" class="tag is-medium is-danger align-top">{{vcapitalize(quote.status)}}</span>
 								</p>
@@ -53,7 +53,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 
 
 
-						<div class="column flex justify-end">
+						<div class="column flex justify-end whitespace-no-wrap">
 							<div class="has-text-right self-start bg-white border-grey-lightest border-solid border-1 rounded-l-lg px-4 py-2 mr-6">
 								<p class="is-size-4 font-medium font-mono">{{vnumber(quote.volume,{compact:true,precision:2})}}</p>
 								<p class="is-size-6">Volume</p>

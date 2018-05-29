@@ -20,8 +20,8 @@ import radio from './radio'
 
 
 const port = +process.env.PORT + +process.env.OFFSET + +process.env.INSTANCE
-radio.on('socket.listening', function(event) {
-	radio.send({ uuid: event.host.uuid }, 'socket.listening', port)
+radio.on('get.socket.listening', function(event) {
+	radio.emit('set.socket.listening', port)
 })
 
 export const wss = new uws.Server({
@@ -69,7 +69,7 @@ wss.on('error', function onerror(error) {
 wss.on('listening', function onlistening() {
 	let address = wss.httpServer.address() as AddressInfo
 	console.info('socket listening ->', address.port)
-	radio.send({ name: 'api' }, 'socket.onlistening', address.port)
+	radio.emit('set.socket.listening', address.port)
 })
 
 wss.on('connection', onconnection)
@@ -82,16 +82,6 @@ exithook(function onexit() {
 
 
 const emitter = new Emitter()
-
-declare global {
-	namespace Socket {
-		interface Client extends uws.WebSocket {
-			subs: string[]
-			authed: boolean
-			doc: Security.Doc
-		}
-	}
-}
 function onconnection(client: Socket.Client, req: PolkaRequest) {
 	client.subs = []
 	client.authed = req.authed
@@ -126,7 +116,7 @@ function onconnection(client: Socket.Client, req: PolkaRequest) {
 	})
 
 	client.on('close', function onclose(code, reason) {
-		if (code > 1001) console.warn('client close ->', code, reason);
+		// if (code > 1001) console.warn('client close ->', code, reason);
 		core.nullify(this.doc)
 		this.subs.forEach(v => emitter.off(v, this.send, this))
 		this.terminate()
@@ -145,6 +135,22 @@ export function emit(name: string, data?: any) {
 export function broadcast(name: string, data?: any) {
 	wss.broadcast(JSON.stringify({ name, data } as Socket.Event))
 }
+
+
+
+
+
+declare global {
+	namespace Socket {
+		interface Client extends uws.WebSocket {
+			subs: string[]
+			authed: boolean
+			doc: Security.Doc
+		}
+	}
+}
+
+
 
 
 
