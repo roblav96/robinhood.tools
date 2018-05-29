@@ -84,7 +84,7 @@ function filterkey(key: string, value: any) {
 
 function tovalue(key: string, value: any) {
 	if (['created_at', 'updated_at'].includes(key)) {
-		value = pretty.fromNow(new Date(value).valueOf(), { verbose: true })
+		value = utils.vfromnow(new Date(value).valueOf(), { verbose: true })
 	}
 	else if (core.number.isFinite(value)) {
 		value = utils.vnumber(value, { precision: 2 })

@@ -97,6 +97,17 @@ export enum mqtt_topics {
 
 
 
+export function fixSymbol(symbol: string) {
+	if (symbol.indexOf('-') == -1) return symbol;
+	let split = symbol.split('-')
+	let start = split.shift()
+	let end = split.pop()
+	let middle = end.length == 1 ? '.' : '-'
+	return start + middle + end.slice(-1)
+}
+
+
+
 
 
 declare global {

@@ -1,13 +1,14 @@
 // 
 
+import * as prettyms from 'pretty-ms'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 
 
 
 const UNITS = ['K', 'M', 'B', 'T']
-declare global { interface FormatNumberOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } }
-export function vnumber(value: number, { precision, compact, plusminus, percent, dollar, nozeros } = {} as Partial<FormatNumberOpts>) {
+declare global { interface VNumberOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } }
+export function vnumber(value: number, { precision, compact, plusminus, percent, dollar, nozeros } = {} as Partial<VNumberOpts>) {
 	if (!Number.isFinite(precision)) {
 		if (compact) precision = 0;
 		else {
@@ -66,6 +67,20 @@ export function vnumber(value: number, { precision, compact, plusminus, percent,
 	return fixed
 }
 if (process.env.DEVELOPMENT) Object.assign(window, { vnumber });
+
+
+
+declare global { interface VFromNowOpts extends prettyms.PrettyMsOptions { max: number, keepDecimalsOnWholeSeconds: boolean } }
+export function vfromnow(stamp: number, opts = {} as Partial<VFromNowOpts>) {
+	opts.secDecimalDigits = opts.secDecimalDigits || 0
+	opts.max = opts.max || 2
+	// let ms = prettyms(Date.now() - stamp, opts)
+	let ms = prettyms(Math.max(Date.now() - stamp, 1001), opts)
+	if (Number.isFinite(opts.max)) {
+		ms = ms.split(' ').splice(0, opts.verbose ? opts.max * 2 : opts.max).join(' ')
+	}
+	return ms + ' ago'
+}
 
 
 

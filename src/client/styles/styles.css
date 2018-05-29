@@ -51,6 +51,10 @@ span.tooltip:after {
 
 /**/
 
+div.is-scroll > div.table-wrapper {
+	overflow-x: auto;
+}
+
 table.table th {
 	vertical-align: bottom;
 }

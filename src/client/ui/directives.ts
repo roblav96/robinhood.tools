@@ -9,25 +9,14 @@ import clock from '@/common/clock'
 
 
 
-Vue.directive('visible', function(el, { value, oldValue }) {
-	if (value == oldValue || !core.boolean.is(value)) return;
-	el.classList.toggle('opacity-0', !value)
-	// console.log(`value ->`, value)
-	// anime.remove(el)
-	// if (value) {
-	// 	anime({
-	// 		targets: el,
-	// 		opacity: [
-	// 			{ value: 0, duration: 1, },
-	// 			{ value: 1, duration: 3000, },
-	// 		],
-	// 	})
-	// } else {
-	// 	anime({
-	// 		targets: el,
-	// 		opacity: 0,
-	// 	})
-	// }
+Vue.directive('visible', {
+	bind(el, binding, vnode, oldVnode) {
+		binding.def.update(...arguments)
+	},
+	update(el, { value, oldValue }) {
+		if (value === oldValue || !core.boolean.is(value)) return;
+		el.classList.toggle('opacity-0', !value)
+	},
 })
 
 
@@ -40,16 +29,16 @@ Vue.directive('is', function(el, { arg, modifiers }, { context }) {
 
 
 
-Vue.directive('bull-bear', function(el, { value, arg }) {
-	if (!core.number.isFinite(value)) return;
+Vue.directive('bull-bear', function(el, { value, oldValue, arg }) {
+	if (value === oldValue || !core.number.isFinite(value)) return;
 	arg = arg || 'has-text'
 	if (value == 0) return el.classList.remove(arg + '-danger', arg + '-success');
 	el.classList.toggle(arg + '-success', value > 0)
 	el.classList.toggle(arg + '-danger', value < 0)
 })
 
-Vue.directive('bg-bull-bear', function(el, { value, arg }) {
-	if (!core.number.isFinite(value)) return;
+Vue.directive('bg-bull-bear', function(el, { value, oldValue, arg }) {
+	if (value === oldValue || !core.number.isFinite(value)) return;
 	if (value == 0) return el.classList.remove('bg-bullish', 'bg-bearish');
 	el.classList.toggle('bg-bullish', value > 0)
 	el.classList.toggle('bg-bearish', value < 0)
@@ -60,7 +49,7 @@ Vue.directive('bg-bull-bear', function(el, { value, arg }) {
 Vue.directive('timestamp', {
 	update(el, binding, vnode, oldVnode) {
 		if (!binding.value) return;
-		el.innerHTML = pretty.fromNow(binding.value, { max: 1, verbose: true })
+		el.innerHTML = utils.vfromnow(binding.value, { max: 1, verbose: true })
 		clock.offContext('1s', el)
 		clock.once('1s', () => binding.def.update(el, binding, vnode, oldVnode), el)
 	},

@@ -8,6 +8,7 @@ import RHMixin from '@/client/mixins/robinhood.mixin'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as rkeys from '@/common/rkeys'
+import * as webull from '@/common/webull'
 import * as http from '@/client/adapters/http'
 import * as robinhood from '@/client/adapters/robinhood'
 import lockr from 'lockr'
@@ -30,6 +31,7 @@ export default class Lists extends Mixins(VMixin, RHMixin) {
 		core.nullify(this.quotes)
 	}
 
+	busy = true
 	defaultOpenedDetails = [1]
 	lists = lockr.get('lists.lists', [] as { name: string, symbols: string[] }[])
 	quotes = {} as Dict<Quotes.Quote>
@@ -49,9 +51,14 @@ export default class Lists extends Mixins(VMixin, RHMixin) {
 			}),
 			http.get('https://securitiesapi.webull.com/api/securities/market/tabs/1/region/6').then((response: Webull.Api.HotLists) => {
 				response.marketCategoryList.slice(0, 4).forEach(v => {
-					lists.push({ name: v.name, symbols: v.tickerTupleArrayList.map(v => v.disSymbol) })
+					lists.push({
+						name: v.name, symbols: v.tickerTupleArrayList.map(v => {
+							v.disSymbol = webull.fixSymbol(v.disSymbol)
+							return v.disSymbol
+						})
+					})
 				})
-			})
+			}),
 		]).catch(error => {
 			console.error(`synclists Error ->`, error)
 		}).finally(() => {
@@ -67,19 +74,19 @@ export default class Lists extends Mixins(VMixin, RHMixin) {
 		}).then((response: Quotes.All[]) => {
 			socket.offListener(this.onquote, this)
 			response.forEach(v => {
-				this.quotes[v.symbol] = v.quote
+				this.$set(this.quotes, v.symbol, v.quote)
 				socket.on(`${rkeys.QUOTES}:${v.symbol}`, this.onquote, this)
-				return v.quote
 			})
 		}).catch(error => {
 			console.error(`syncsymbols Error ->`, error)
+		}).finally(() => {
+			this.$nextTick(() => this.busy = false)
 		})
 	}
 
 	onquote(toquote: Quotes.Quote) {
 		let quote = this.quotes[toquote.symbol]
 		quote ? core.object.merge(quote, toquote) : this.quotes[toquote.symbol] = toquote
-		console.log(`this.quotes ->`, this.quotes)
 	}
 
 	gotosymbol(symbol: string) {

@@ -102,12 +102,7 @@ async function syncTickers() {
 	tickers.remove(v => Array.isArray(v.disSymbol.match(utils.regxSymbol)))
 	tickers.forEach(v => {
 		core.fix(v)
-		if (!v.disSymbol.includes('-')) return;
-		let split = v.disSymbol.split('-')
-		let start = split.shift()
-		let end = split.pop()
-		let middle = end.length == 1 ? '.' : '-'
-		v.disSymbol = start + middle + end.slice(-1)
+		v.disSymbol = webull.fixSymbol(v.disSymbol)
 	})
 
 	if (process.env.DEVELOPMENT) console.log('webull valids ->');
