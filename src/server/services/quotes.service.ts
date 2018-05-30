@@ -62,11 +62,11 @@ async function onsymbols(event: Radio.Event) {
 		}
 
 		Object.assign(WB_QUOTES, { [symbol]: all.wbquote })
-		Object.assign(WB_EMIT_QUOTES, { [symbol]: all.wbquote })
-		Object.assign(WB_SAVE_QUOTES, { [symbol]: all.wbquote })
+		Object.assign(WB_EMIT_QUOTES, { [symbol]: core.clone(all.wbquote) })
+		Object.assign(WB_SAVE_QUOTES, { [symbol]: core.clone(all.wbquote) })
 		Object.assign(QUOTES, { [symbol]: all.quote })
-		Object.assign(EMIT_QUOTES, { [symbol]: all.quote })
-		Object.assign(SAVE_QUOTES, { [symbol]: all.quote })
+		Object.assign(EMIT_QUOTES, { [symbol]: core.clone(all.quote) })
+		Object.assign(SAVE_QUOTES, { [symbol]: core.clone(all.quote) })
 
 		socket.emit(`${rkeys.QUOTES}:${symbol}`, all.quote)
 	})
@@ -100,7 +100,8 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 		let toquote = quotes.applydeal(QUOTES[symbol], deal)
 		if (Object.keys(toquote).length > 0) {
-			core.object.mergeAll([QUOTES[symbol], EMIT_QUOTES[symbol]], toquote)
+			core.object.merge(QUOTES[symbol], toquote)
+			// core.object.mergeAll([QUOTES[symbol], EMIT_QUOTES[symbol]], toquote)
 		}
 
 		return
@@ -128,12 +129,14 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 	if (Object.keys(toquote).length > 0) {
 		// console.info(symbol, '->', webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', toquote)
-		core.object.mergeAll([WB_QUOTES[symbol], WB_EMIT_QUOTES[symbol]], toquote)
+		core.object.merge(WB_QUOTES[symbol], toquote)
+		// core.object.mergeAll([WB_QUOTES[symbol], WB_EMIT_QUOTES[symbol]], toquote)
 
 		if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
 			let baquote = quotes.applybidask(QUOTES[symbol], toquote)
 			if (Object.keys(baquote).length > 0) {
-				core.object.mergeAll([QUOTES[symbol], EMIT_QUOTES[symbol]], baquote)
+				core.object.merge(QUOTES[symbol], baquote)
+				// core.object.mergeAll([QUOTES[symbol], EMIT_QUOTES[symbol]], baquote)
 			}
 		}
 	}
@@ -145,55 +148,48 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 function ontick(i: number) {
 	let save = i % 10 == 0
 
-	return
-
 	let coms = [] as Redis.Coms
 	SYMBOLS.forEach(symbol => {
 
-		let wbquote = WB_EMIT_QUOTES[symbol]
-		let toquote = EMIT_QUOTES[symbol]
+		let wbquote = core.object.difference(WB_EMIT_QUOTES[symbol], WB_QUOTES[symbol])
+		let toquote = core.object.difference(EMIT_QUOTES[symbol], QUOTES[symbol])
 		if (Object.keys(wbquote).length > 0) {
 			wbquote.symbol = symbol
 			quotes.applywbquote(QUOTES[symbol], wbquote, toquote)
-			// core.object.merge(WB_QUOTES[symbol], wbquote)
-			// core.object.merge(WB_SAVES[symbol], wbquote)
 			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
-			// console.log('emit wbquote ->', wbquote)
 		}
 		if (Object.keys(toquote).length > 0) {
 			toquote.symbol = symbol
 			quotes.applycalcs(QUOTES[symbol], toquote)
-			// core.object.merge(QUOTES[symbol], toquote)
-			// core.object.merge(SAVES[symbol], toquote)
+			core.object.merge(QUOTES[symbol], toquote)
 			socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
-			// console.log('emit toquote ->', toquote)
 		}
 
-		if (save) {
-			if (Object.keys(WB_SAVES[symbol]).length > 0) {
-				coms.push(['hmset', `${rkeys.WB.QUOTES}:${symbol}`, WB_SAVES[symbol] as any])
-			}
+		// if (save) {
+		// 	if (Object.keys(WB_SAVES[symbol]).length > 0) {
+		// 		coms.push(['hmset', `${rkeys.WB.QUOTES}:${symbol}`, WB_SAVES[symbol] as any])
+		// 	}
 
-			let toquote = SAVES[symbol]
-			if (Object.keys(toquote).length == 0) return;
-			coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, toquote as any])
-			if (!toquote.timestamp) return;
+		// 	let toquote = SAVES[symbol]
+		// 	if (Object.keys(toquote).length == 0) return;
+		// 	coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, toquote as any])
+		// 	if (!toquote.timestamp) return;
 
-			// console.log('save quote ->', toquote)
-			// toquote.liveCount = toquote.liveCount + 1
-			// let quote = QUOTES[symbol]
-			// core.object.merge(quote, quotes.resetlive(quote))
+		// 	// console.log('save quote ->', toquote)
+		// 	// toquote.liveCount = toquote.liveCount + 1
+		// 	// let quote = QUOTES[symbol]
+		// 	// core.object.merge(quote, quotes.resetlive(quote))
 
-		}
+		// }
 
 	})
 
 	SYMBOLS.forEach(symbol => {
-		Object.assign(WB_EMITS, { [symbol]: {} })
-		Object.assign(EMITS, { [symbol]: {} })
+		Object.assign(WB_EMIT_QUOTES, { [symbol]: core.clone(WB_QUOTES[symbol]) })
+		Object.assign(EMIT_QUOTES, { [symbol]: core.clone(QUOTES[symbol]) })
 		if (save) {
-			Object.assign(WB_SAVES, { [symbol]: {} })
-			Object.assign(SAVES, { [symbol]: {} })
+			Object.assign(WB_SAVE_QUOTES, { [symbol]: core.clone(WB_QUOTES[symbol]) })
+			Object.assign(SAVE_QUOTES, { [symbol]: core.clone(QUOTES[symbol]) })
 		}
 	})
 

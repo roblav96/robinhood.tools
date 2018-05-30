@@ -79,6 +79,16 @@ export async function getAllSymbols() {
 
 
 
+let usage = process.cpuUsage()
+export function cpuUsage() {
+	usage = process.cpuUsage(usage)
+	let cpu = {}
+	Object.keys(usage).forEach(k => {
+		cpu[k] = pretty.bytes(usage[k])
+	})
+	return cpu
+}
+
 export function memoryUsage() {
 	let memory = process.memoryUsage()
 	Object.keys(memory).forEach(k => {

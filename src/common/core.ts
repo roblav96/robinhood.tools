@@ -301,11 +301,16 @@ export const object = {
 	},
 	difference<T = object>(target: T, source: T): T {
 		let difference = {} as T
-		Object.keys(target).forEach(function differenceEach(key) {
+		let keys = Object.keys(target)
+		let i: number, len = keys.length
+		for (i = 0; i < len; i++) {
+			let key = keys[i]
 			let tvalue = target[key]
 			let svalue = source[key]
-			if (tvalue != svalue) difference[key] = tvalue;
-		})
+			if (tvalue != svalue) {
+				difference[key] = svalue
+			}
+		}
 		return difference
 	},
 	sortKeys<T = object>(target: T): T {
