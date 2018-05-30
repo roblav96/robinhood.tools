@@ -22,12 +22,12 @@ const MQTTS = [] as WebullMqttClient[]
 const SYMBOLS = [] as string[]
 
 const WB_QUOTES = {} as Dict<Webull.Quote>
-const WB_EMITS = {} as Dict<Webull.Quote>
-const WB_SAVES = {} as Dict<Webull.Quote>
-
 const QUOTES = {} as Dict<Quotes.Quote>
-const EMITS = {} as Dict<Quotes.Quote>
-const SAVES = {} as Dict<Quotes.Quote>
+
+// const WB_EMITS = {} as Dict<Webull.Quote>
+// const WB_SAVES = {} as Dict<Webull.Quote>
+// const EMITS = {} as Dict<Quotes.Quote>
+// const SAVES = {} as Dict<Quotes.Quote>
 
 radio.once('symbols.ready', onsymbols)
 radio.emit('symbols.start')
@@ -39,10 +39,10 @@ declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: TypeofSymbol
 async function onsymbols(event: Radio.Event) {
 
 	clock.offListener(ontick)
-	MQTTS.remove(v => !!v.destroy())
+	MQTTS.remove(v => v.destroy() || true)
 	core.nullify(SYMBOLS)
-	core.nullify(WB_QUOTES); core.nullify(WB_EMITS); core.nullify(WB_SAVES);
-	core.nullify(QUOTES); core.nullify(EMITS); core.nullify(SAVES);
+	core.nullify(WB_QUOTES)
+	core.nullify(QUOTES)
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
@@ -65,11 +65,7 @@ async function onsymbols(event: Radio.Event) {
 		quotes.conform({ quote, qkeys: quotes.CALC_KEYS_ALL, mutate: true })
 
 		Object.assign(WB_QUOTES, { [symbol]: wbquote })
-		Object.assign(WB_EMITS, { [symbol]: {} })
-		Object.assign(WB_SAVES, { [symbol]: {} })
 		Object.assign(QUOTES, { [symbol]: quote })
-		Object.assign(EMITS, { [symbol]: {} })
-		Object.assign(SAVES, { [symbol]: {} })
 
 		socket.emit(`${rkeys.QUOTES}:${symbol}`, quote)
 	})
@@ -93,6 +89,12 @@ async function onsymbols(event: Radio.Event) {
 
 
 
+const WB_UPDATED = [] as string[]
+const UPDATED = [] as string[]
+function mergekeys(updated: string[], keys: string[]) {
+	keys.forEach(k => { if (updated.indexOf(k) == -1) updated.push(k); })
+}
+
 emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let symbol = wbquote.symbol
 	if (!symbol) return console.warn(`!symbol ->`, webull.mqtt_topics[topic], wbquote);
@@ -102,8 +104,10 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
 
 		let toquote = quotes.applydeal(QUOTES[symbol], deal)
-		if (Object.keys(toquote).length > 0) {
-			core.object.mergeAll([QUOTES[symbol], EMITS[symbol]], toquote)
+		let tokeys = Object.keys(toquote)
+		if (tokeys.length > 0) {
+			mergekeys(UPDATED, tokeys)
+			core.object.merge(QUOTES[symbol], toquote, tokeys)
 		}
 
 		return
@@ -128,6 +132,10 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 			toquote[k] = source
 		}
 	})
+	
+	// ████████████████
+	//       here
+	// ████████████████
 
 	if (Object.keys(toquote).length > 0) {
 		// console.info(symbol, '->', webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', toquote)
@@ -199,6 +207,8 @@ function ontick(i: number) {
 		}
 
 	})
+	
+	return 
 
 	SYMBOLS.forEach(symbol => {
 		Object.assign(WB_EMITS, { [symbol]: {} })

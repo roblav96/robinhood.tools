@@ -265,8 +265,8 @@ export const object = {
 			}
 		}
 	},
-	merge<T = object>(target: T, source: T) {
-		let keys = Object.keys(source)
+	merge<T = object>(target: T, source: T, keys?: string[]) {
+		keys = keys || Object.keys(source)
 		let i: number, len = keys.length
 		for (i = 0; i < len; i++) {
 			let key = keys[i]
