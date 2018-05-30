@@ -27,7 +27,7 @@ class Radio extends Emitter<string, Radio.Event> {
 
 	constructor() {
 		super()
-		_.delay(this.create, 100)
+		_.delay(this.create, 300)
 	}
 
 	private create = () => {

@@ -17,12 +17,19 @@ declare global { namespace Quotes { type AllKeys = keyof typeof ALL_KEYS } }
 
 
 
-export function conform(quote: Quotes.Quote, qkeys: string[]) {
+export function conform<T>({
+	quote, qkeys, mutate,
+}: Partial<{ quote: Quotes.Quote, qkeys: string[], mutate: boolean }>): T {
+	if (!mutate) {
+		return qkeys.reduce((toquote, qkey, index) => {
+			if (quote[qkey] != null) toquote[qkey] = quote[qkey];
+			return toquote
+		}, {} as T)
+	}
 	Object.keys(quote).forEach(k => {
-		if (qkeys.indexOf(k) == -1) {
-			delete quote[k]
-		}
+		if (qkeys.indexOf(k) == -1) delete quote[k];
 	})
+	return quote as any
 }
 
 

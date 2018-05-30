@@ -277,8 +277,8 @@ export const object = {
 		}
 	},
 	mergeAll<T = object>(targets: T[], source: T) {
-		let size = targets.length
 		let keys = Object.keys(source)
+		let size = targets.length
 		let i: number, len = keys.length
 		for (i = 0; i < len; i++) {
 			let key = keys[i]
