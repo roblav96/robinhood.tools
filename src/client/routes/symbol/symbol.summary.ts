@@ -15,7 +15,7 @@ export default class extends Mixins(VMixin) {
 	all = this.$parent.all
 
 	created() {
-		console.log(`this.all ->`, this.all)
+		
 	}
 
 }

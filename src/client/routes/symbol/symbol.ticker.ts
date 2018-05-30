@@ -21,7 +21,7 @@ export default class extends Mixins(VMixin) {
 	deals = [] as Quotes.Deal[]
 
 	created() {
-		this.syncdeals()
+		// this.syncdeals()
 	}
 
 	beforeDestroy() {
@@ -56,6 +56,13 @@ export default class extends Mixins(VMixin) {
 		}
 		return bidask
 	}
+
+	states = [
+		{ name: '4am to 8pm', icon: 'theme-light-dark', key: '', calc: 'endPrice' },
+		{ name: 'Pre Market', icon: 'weather-sunset-up', key: 'pre', calc: 'startPrice' },
+		{ name: 'Regular', icon: 'weather-sunny', key: 'reg', calc: 'openPrice' },
+		{ name: 'After Hours', icon: 'weather-sunset-down', key: 'post', calc: 'closePrice' },
+	]
 
 }
 

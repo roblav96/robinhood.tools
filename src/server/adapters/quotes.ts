@@ -107,6 +107,7 @@ export function resetquote(quote: Quotes.Quote, resets = false) {
 		})
 		core.object.merge(reset, {
 			startPrice: quote.price,
+			endPrice: quote.price,
 			dayHigh: quote.price, dayLow: quote.price,
 			count: 0, deals: 0,
 		} as Quotes.Quote)
@@ -271,18 +272,21 @@ export function applycalcs(quote: Quotes.Quote, toquote?: Quotes.Quote) {
 		toquote.percent = core.calc.percent(quote.price, quote.startPrice)
 
 		let state = hours.getState(hours.rxhours.value, quote.timestamp)
-		if (state == 'REGULAR') {
-			toquote.regPrice = quote.price
-			toquote.regChange = quote.price - quote.openPrice
-			toquote.regPercent = core.calc.percent(quote.price, quote.openPrice)
-		} else if (state.indexOf('PRE') == 0) {
+		if (state.indexOf('PRE') == 0) {
 			toquote.prePrice = quote.price
 			toquote.preChange = quote.price - quote.startPrice
 			toquote.prePercent = core.calc.percent(quote.price, quote.startPrice)
+			toquote.preTimestamp = quote.timestamp
+		} else if (state == 'REGULAR') {
+			toquote.regPrice = quote.price
+			toquote.regChange = quote.price - quote.openPrice
+			toquote.regPercent = core.calc.percent(quote.price, quote.openPrice)
+			toquote.regTimestamp = quote.timestamp
 		} else if (state.indexOf('POST') == 0) {
 			toquote.postPrice = quote.price
 			toquote.postChange = quote.price - quote.closePrice
 			toquote.postPercent = core.calc.percent(quote.price, quote.closePrice)
+			toquote.postTimestamp = quote.timestamp
 		}
 
 		toquote.close = quote.price
@@ -294,10 +298,6 @@ export function applycalcs(quote: Quotes.Quote, toquote?: Quotes.Quote) {
 
 	if (toquote.askPrice || toquote.bidPrice) {
 		toquote.spread = quote.askPrice - quote.bidPrice
-	}
-
-	if (toquote.askSize || toquote.bidSize) {
-
 	}
 
 	return toquote

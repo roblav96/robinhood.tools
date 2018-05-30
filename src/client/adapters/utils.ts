@@ -18,9 +18,10 @@ export function vnumber(value: number, { precision, compact, plusminus, percent,
 			else if (abs >= 10000) precision = 0;
 			else if (abs >= 2000) precision = 1;
 			else if (abs < 3) precision = 3;
+			// if (plusminus && abs >= 1) precision = Math.min(precision, 2);
 		}
 	} else { nozeros = false }
-	if (percent || plusminus) precision = Math.min(precision, 2);
+	if (plusminus || percent) precision = Math.min(precision, 2);
 
 	let unit = -1
 	if (compact) {
@@ -72,13 +73,10 @@ if (process.env.DEVELOPMENT) Object.assign(window, { vnumber });
 
 declare global { interface VFromNowOpts extends prettyms.PrettyMsOptions { max: number, keepDecimalsOnWholeSeconds: boolean } }
 export function vfromnow(stamp: number, opts = {} as Partial<VFromNowOpts>) {
-	opts.secDecimalDigits = opts.secDecimalDigits || 0
-	opts.max = opts.max || 2
-	// let ms = prettyms(Date.now() - stamp, opts)
+	if (!Number.isFinite(opts.secDecimalDigits)) opts.secDecimalDigits = 0;
+	if (!Number.isFinite(opts.max)) opts.max = 1;
 	let ms = prettyms(Math.max(Date.now() - stamp, 1001), opts)
-	if (Number.isFinite(opts.max)) {
-		ms = ms.split(' ').splice(0, opts.verbose ? opts.max * 2 : opts.max).join(' ')
-	}
+	ms = ms.split(' ').splice(0, opts.verbose ? opts.max * 2 : opts.max).join(' ')
 	return ms + ' ago'
 }
 

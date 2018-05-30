@@ -12,30 +12,30 @@ import clock from '@/common/clock'
 Vue.directive('visible', function(el, { value, oldValue }) {
 	if (value === oldValue || !core.boolean.is(value)) return;
 	el.classList.toggle('invisible', !value)
-	anime.remove(el)
-	if (value == true) {
-		let t = Date.now()
-		Vue.nextTick(() => {
-			let smooth = ((Date.now() - t) * 3)
-			anime({
-				targets: el,
-				easing: 'easeInQuad',
-				delay: smooth > 10 ? smooth : 0,
-				opacity: [
-					{ value: 0, duration: 0 },
-					{ value: 1, duration: 50 + smooth },
-				],
-			})
-		})
-	}
+	// anime.remove(el)
+	// if (value == true) {
+	// 	let t = Date.now()
+	// 	Vue.nextTick(() => {
+	// 		let smooth = ((Date.now() - t) * 3)
+	// 		anime({
+	// 			targets: el,
+	// 			easing: 'easeInQuad',
+	// 			delay: smooth > 10 ? smooth : 0,
+	// 			opacity: [
+	// 				{ value: 0, duration: 0 },
+	// 				{ value: 1, duration: 50 + smooth },
+	// 			],
+	// 		})
+	// 	})
+	// }
 })
 
 
 
 Vue.directive('is', function(el, { arg, modifiers }, { context }) {
 	let classes = Object.keys(modifiers)
-	let value = context.$store.state.breakpoints[arg]
-	value ? el.classList.add(...classes) : el.classList.remove(...classes)
+	let value = context.$store.state.breakpoints[arg] as boolean
+	!value ? el.classList.remove(...classes) : el.classList.add(...classes)
 })
 
 
@@ -57,15 +57,30 @@ Vue.directive('bg-bull-bear', function(el, { value, oldValue, arg }) {
 
 
 
-Vue.directive('timestamp', {
-	update(el, binding, vnode, oldVnode) {
-		if (!binding.value) return;
-		el.innerHTML = utils.vfromnow(binding.value, { max: 1, verbose: true })
-		clock.offContext('1s', el)
-		clock.once('1s', () => binding.def.update(el, binding, vnode, oldVnode), el)
-	},
-	unbind(el, binding, vnode) { clock.offContext('1s', el) },
-})
+// Vue.directive('timestamp', {
+// 	update(el, binding, vnode, oldVnode) {
+// 		if (!binding.value) return binding.def.unbind(el, binding, vnode, oldVnode);
+// 		el.innerHTML = utils.vfromnow(binding.value, binding.modifiers)
+// 		clock.offContext('1s', el)
+// 		clock.once('1s', () => binding.def.update(el, binding, vnode, oldVnode), el)
+// 	},
+// 	unbind(el, binding, vnode, oldVnode) {
+// 		clock.offContext('1s', el)
+// 		el.innerHTML = ''
+// 	},
+// 	// bind(el, binding, vnode, oldVnode) {
+// 	// 	binding.value = Date.now()
+// 	// 	binding.def.update(el, binding, vnode, oldVnode)
+// 	// },
+// 	// inserted(el, binding, vnode, oldVnode) {
+// 	// 	binding.value = Date.now()
+// 	// 	binding.def.update(el, binding, vnode, oldVnode)
+// 	// },
+// 	// componentUpdated(el, binding, vnode, oldVnode) {
+// 	// 	binding.value = Date.now()
+// 	// 	binding.def.update(el, binding, vnode, oldVnode)
+// 	// },
+// })
 
 
 

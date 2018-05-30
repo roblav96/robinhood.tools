@@ -36,6 +36,7 @@ export const SMALL = {
 	change: 0,
 	percent: 0,
 	startPrice: 0,
+	endPrice: 0,
 	openPrice: 0,
 	closePrice: 0,
 	prevClose: 0,
@@ -102,15 +103,18 @@ export const CALC = {
 	dayHigh: 0,
 	dayLow: 0,
 	// 
-	regPrice: 0,
-	regChange: 0,
-	regPercent: 0,
 	prePrice: 0,
 	preChange: 0,
 	prePercent: 0,
+	preTimestamp: 0,
+	regPrice: 0,
+	regChange: 0,
+	regPercent: 0,
+	regTimestamp: 0,
 	postPrice: 0,
 	postChange: 0,
 	postPercent: 0,
+	postTimestamp: 0,
 }
 export const CALC_KEYS = Object.keys(CALC)
 CALC_KEYS.forEach(k => CALC[k] = undefined)

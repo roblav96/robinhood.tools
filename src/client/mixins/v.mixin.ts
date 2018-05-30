@@ -17,6 +17,8 @@ export default class extends Vue {
 	development = !!process.env.DEVELOPMENT
 	production = !!process.env.PRODUCTION
 
+	vcamel(value: string) { return _.camelCase(value) }
+	vscase(value: string) { return _.startCase(value) }
 	vtruncate(value: string, length = 64) { if (!value) return value; return _.truncate(value, { length }) }
 	vcapitalize(value: string) { if (!value) return value; return core.string.capitalize(value) }
 	vstamp(stamp: number) { if (!stamp) return stamp; return pretty.stamp(stamp) }

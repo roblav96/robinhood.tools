@@ -3,8 +3,37 @@
 import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
 import * as anime from 'animejs'
+import * as _ from '@/common/lodash'
+import * as core from '@/common/core'
 import * as utils from '@/client/adapters/utils'
-import * as benchmark from '@/common/benchmark'
+import clock from '@/common/clock'
+
+
+
+
+
+@Vts.Component({ template: `<span>{{fromnow}}</span>` })
+class Timestamp extends Vue {
+	fromnow = ''
+	@Vts.Prop() value: number
+	@Vts.Prop() opts: VFromNowOpts
+	@Vts.Watch('value') w_value() { this.sync() }
+	mounted() {
+		this.sync();
+		clock.on('1s', this.sync, this)
+	}
+	beforeDestroy() {
+		clock.off('1s', this.sync, this)
+	}
+	sync() {
+		if (!Number.isFinite(this.value)) return this.fromnow = '';
+		let opts = this.opts ? core.clone(this.opts) : {}
+		this.fromnow = utils.vfromnow(this.value, opts)
+	}
+}
+Vue.component('timestamp', Timestamp)
+
+
 
 
 
@@ -49,6 +78,8 @@ Vue.component('number-ticker', NumberTicker)
 
 
 
+
+
 @Vts.Component({
 	template: `
 		<figure class="image flex bg-white rounded">
@@ -57,19 +88,17 @@ Vue.component('number-ticker', NumberTicker)
 	`,
 })
 class SymbolLogo extends Vue {
-
 	@Vts.Prop() symbol: string
-
 	get src() { return 'https://storage.googleapis.com/iex/api/logos/' + this.symbol + '.png' }
-
 	onerror(event: Event) {
 		let el = event.target as HTMLImageElement
 		let src = 'https://bulma.io/images/placeholders/256x256.png'
 		if (el.src == src) return;
 		el.src = src
 	}
-
 }
 Vue.component('symbol-logo', SymbolLogo)
+
+
 
 

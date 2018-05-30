@@ -63,45 +63,48 @@ div.is-scroll > div.table-wrapper {
 	overflow-x: auto;
 }
 
-table.table th {
-	vertical-align: bottom;
-}
 
+/*table.table th {
+	vertical-align: bottom;
+}*/
+
+table.table.is-middle th,
+.b-table.is-middle table.table th,
 table.table.is-middle td,
-.is-middle table.table td {
+.b-table.is-middle table.table td {
 	vertical-align: middle;
 }
 
 table.table.is-nowrap td,
-.is-nowrap table.table td {
+.b-table.is-nowrap table.table td {
 	white-space: nowrap;
 }
 
 table.table.nowrap-first tr > th:first-child,
-.nowrap-first table.table tr > th:first-child,
+.b-table.nowrap-first table.table tr > th:first-child,
 table.table.nowrap-first tr > td:first-child,
-.nowrap-first table.table tr > td:first-child {
+.b-table.nowrap-first table.table tr > td:first-child {
 	white-space: nowrap;
 }
 
 table.table.is-borderless td,
-.is-borderless table.table td {
+.b-table.is-borderless table.table td {
 	border-width: 0px;
 }
 
 table.table.is-narrow td,
-.is-narrow table.table td {
+.b-table.is-narrow table.table td {
 	padding: 0.25rem 0.5rem;
 }
 
 table.table.is-narrower td,
-.is-narrower table.table td {
+.b-table.is-narrower table.table td {
 	line-height: 1.125;
 	padding: 0.125rem 0.5rem;
 }
 
 table.table.is-narrowest td,
-.is-narrowest table.table td {
+.b-table.is-narrowest table.table td {
 	line-height: 1.125;
 	padding: 0rem 0.25rem;
 }

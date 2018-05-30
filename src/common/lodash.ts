@@ -3,6 +3,7 @@
 export {
 	add,
 	after,
+	camelCase,
 	Cancelable,
 	ceil,
 	clone,

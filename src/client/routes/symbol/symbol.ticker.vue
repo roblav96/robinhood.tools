@@ -9,17 +9,55 @@
 <template>
 	<section class="section">
 		<div class="container">
-			<div class="columns is-multiline is-mobile">
 
 
 
-				<div class="column is-3">
-					<article class="message card has-background-white">
-						<div class="message-body border-success">
-							<p class="subtitle font-semibold">Pre Market</p>
-							<b-icon icon="moon"></b-icon>
-						</div>
-					</article>
+			<!-- <p class="is-size-3 font-semibold mb-4 text-center">Session Prices</p> -->
+			<div class="columns is-multiline is-mobile is-centered">
+				<div class="column" v-for="state in states" :key="state.name">
+					<table class="table is-middle is-fullwidth is-nowrap is-borderless card">
+						<thead>
+							<tr>
+								<th class="whitespace-no-wrap font-medium">{{state.name}}</th>
+								<th class="py-1 has-text-right">
+									<b-icon size="is-28x28" :icon="state.icon"></b-icon>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>{{vscase(state.calc)}}</td>
+								<td class="has-text-right font-medium font-mono">
+									{{vnumber(all.quote[state.calc])}}
+								</td>
+							</tr>
+							<tr>
+								<td>{{vscase(`${state.key}Price`)}}</td>
+								<td class="has-text-right font-medium font-mono">
+									{{vnumber(all.quote[vcamel(`${state.key}Price`)])}}
+								</td>
+							</tr>
+							<tr>
+								<td>{{vscase(`${state.key}Change`)}}</td>
+								<td class="has-text-right font-medium font-mono">
+									{{vnumber(all.quote[vcamel(`${state.key}Change`)],{nozeros:true,plusminus:true})}}
+								</td>
+							</tr>
+							<tr>
+								<td>{{vscase(`${state.key}Percent`)}}</td>
+								<td class="has-text-right font-medium font-mono">
+									{{vnumber(all.quote[vcamel(`${state.key}Percent`)],{nozeros:true,plusminus:true,percent:true})}}
+								</td>
+							</tr>
+							<tr>
+								<td>Updated</td>
+								<td class="has-text-right font-medium">
+									<timestamp :value="all.quote[vcamel(`${state.key}Timestamp`)]"></timestamp>
+									<!-- {{vfromnow(all.quote[vcamel(`${state.key}Timestamp`)],{max:1})}} -->
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 
 
