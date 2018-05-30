@@ -56,6 +56,9 @@ export function nullify(value: any) {
 	}
 	else if (object.is(value)) {
 		Object.keys(value).forEach(k => {
+			if (object.is(value[k])) {
+				return Object.assign(value, { [k]: {} })
+			}
 			value[k] = null
 			delete value[k]
 		})
@@ -275,6 +278,11 @@ export const object = {
 	sortKeys<T = object>(target: T): T {
 		return _.fromPairs(_.sortBy(_.toPairs(target as any))) as any
 	},
+	// empty<T = object>(target: T) {
+	// 	Object.keys(target).forEach(function(key) {
+	// 		let value = target[key]
+	// 	})
+	// },
 }
 
 

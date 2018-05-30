@@ -172,6 +172,7 @@ declare global {
 			instrument: Robinhood.Instrument
 			yhquote: Yahoo.Quote
 			iexitem: Iex.Item
+			// deals: Deal[]
 		}
 	}
 }

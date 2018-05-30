@@ -24,19 +24,12 @@ export default class extends Vue {
 	vnumber(value: number, opts?: Partial<VNumberOpts>) { if (!Number.isFinite(value)) return value; return utils.vnumber(value, opts) }
 	vpercent(to: number, from: number) { if (!to || !from) return NaN; return core.calc.percent(to, from) }
 	vslider(value: number, min: number, max: number) { if (!value) return NaN; return core.calc.slider(value, min, max) }
-	vmarketcap(price: number, shares: number) { return price * shares }
 
-	get recents() { return this.$store.state.recents }
-	get breakpoints() { return this.$store.state.breakpoints }
-	get colors() { return this.$store.state.colors }
-	get hours() { return this.$store.state.hours }
-	get rhusername() { return this.$store.state.security.rhusername }
-
-	get routes() {
-		return this.$router.options.routes.filter(function(route) {
-			return route.title && route.icon
-		})
-	}
+	breakpoints = this.$store.state.breakpoints
+	colors = this.$store.state.colors
+	hours = this.$store.state.hours
+	recents = this.$store.state.recents
+	rhusername = this.$store.state.security.rhusername
 
 }
 

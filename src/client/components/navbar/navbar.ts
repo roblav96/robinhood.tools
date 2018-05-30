@@ -31,6 +31,13 @@ export default class extends Mixins(VMixin, RHMixin) {
 		document.removeEventListener('pointerdown', this.onpointer)
 	}
 
+	isroute(name: string) { return name == this.$route.name }
+	get routes() {
+		return this.$router.options.routes.filter(function(route) {
+			return route.title && route.icon
+		})
+	}
+
 	showmenu = false
 	@Vts.Watch('showmenu') w_showmenu(to: boolean) {
 		document.removeEventListener('pointerdown', this.onpointer)
@@ -54,8 +61,6 @@ export default class extends Mixins(VMixin, RHMixin) {
 		if (state.includes('PRE') || state.includes('POST')) return 'has-text-warning';
 		return 'has-text-grey'
 	}
-
-	isroute(name: string) { return name == this.$route.name }
 
 	// get routes() {
 	// let routes = [] as VueRouteConfig[]

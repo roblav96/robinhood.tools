@@ -33,7 +33,7 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 							</div>
 							<div class="flex self-center bg-white border-grey-lightest border-solid border-1 rounded px-4 py-2">
 								<p class="self-center title leading-none mr-3 whitespace-no-wrap">{{symbol}}</p>
-								<p class="self-center is-size-6 leading-none">{{quote.name}}</p>
+								<p class="self-center is-size-6 leading-none">{{all.quote.name}}</p>
 								<!-- <span class="whitespace-no-wrap">{{symbol}}</span> -->
 								<!-- <span v-show="!instrument.alive" class="tag is-medium is-danger align-top ml-2">Untradable</span> -->
 								<!-- <span v-show="delisted||suspended" class="tag is-medium is-danger align-top ml-2">{{vcapitalize(quote.status)}}</span> -->
@@ -45,10 +45,9 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 
 						<div class="column is-narrow flex">
 							<div class="flex self-center whitespace-no-wrap bg-white border-grey-lightest border-solid border-1 rounded px-4 py-2">
-								<number-ticker :number="quote.price" class="self-center title leading-none mr-3 font-mono"></number-ticker>
-								<p class="self-center is-size-6 leading-none font-medium font-mono" v-bull-bear="quote.change">
-									{{vnumber(quote.change,{plusminus:true})}}<br>
-									{{vnumber(quote.percent,{plusminus:true,percent:true,precision:2})}}
+								<number-ticker :number="all.quote.price" class="self-center title leading-none mr-3 font-mono"></number-ticker>
+								<p class="self-center is-size-6 leading-none font-medium font-mono" v-bull-bear="all.quote.change">
+									{{vnumber(all.quote.change,{plusminus:true})}}<br> {{vnumber(all.quote.percent,{plusminus:true,percent:true,precision:2})}}
 								</p>
 								<!-- <p class="self-center is-size-6 leading-none">
 									<span class="font-mono" v-bull-bear="quote.change">
@@ -75,19 +74,19 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 						<div class="column is-narrow flex">
 							<div class="flex self-center bg-white border-grey-lightest border-solid border-1 rounded px-4 py-3">
 								<p class="self-center is-size-4 leading-none mr-2 font-medium whitespace-no-wrap">
-									{{vnumber(quote.volume,{compact:true})}}
+									{{vnumber(all.quote.volume,{compact:true})}}
 								</p>
 								<p class="self-center is-size-6 leading-none">Volume</p>
 							</div>
 							<div class="fullhd:flex hidden ml-6 self-center bg-white border-grey-lightest border-solid border-1 rounded px-4 py-3">
 								<p class="self-center is-size-4 leading-none mr-2 font-medium whitespace-no-wrap">
-									{{vnumber(quote.avgVolume,{compact:true})}}
+									{{vnumber(all.quote.avgVolume,{compact:true})}}
 								</p>
 								<p class="self-center is-size-6 leading-none">Avg Volume</p>
 							</div>
-							<div v-show="quote.marketCap" class="desktop-only:hidden ml-6 flex self-center bg-white border-grey-lightest border-solid border-1 rounded px-4 py-3">
+							<div v-show="all.quote.marketCap" class="desktop-only:hidden ml-6 flex self-center bg-white border-grey-lightest border-solid border-1 rounded px-4 py-3">
 								<p class="self-center is-size-4 leading-none mr-2 font-medium whitespace-no-wrap">
-									{{vnumber(quote.marketCap,{compact:true})}}
+									{{vnumber(all.quote.marketCap,{compact:true})}}
 								</p>
 								<p class="self-center is-size-6 leading-none">Market Cap</p>
 							</div>
@@ -209,7 +208,6 @@ section.symbol-route div.hero-body .progress::-webkit-progress-bar {
 
 		<section class="section has-background-white">
 			<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-				<!-- <component :is="tabs[tabindex].vcomponent" class=""></component> -->
 				<router-view></router-view>
 			</transition>
 		</section>

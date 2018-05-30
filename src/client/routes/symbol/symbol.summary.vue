@@ -7,9 +7,7 @@
 </style>
 
 <template>
-	<section>
-		<div class="container content">
-			<h1>im a summary</h1>
-		</div>
-	</section>
+	<div class="container">
+		<h1>im a summary</h1>
+	</div>
 </template>

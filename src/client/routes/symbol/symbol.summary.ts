@@ -5,19 +5,19 @@ import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import VMixin from '@/client/mixins/v.mixin'
 import Symbol from './symbol'
+import SymbolMixin from './symbol.mixin'
 import * as core from '@/common/core'
-import * as rkeys from '@/common/rkeys'
-import * as utils from '@/client/adapters/utils'
-import * as http from '@/client/adapters/http'
 
 
 
 @Vts.Component
 export default class extends Mixins(VMixin) {
+	$parent: Symbol
+	all = this.$parent.all
 
-	get parent() { return this.$parent as Symbol }
-
-
+	created() {
+		console.log(`this.all ->`, this.all)
+	}
 
 }
 
