@@ -5,9 +5,11 @@ import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import VMixin from '@/client/mixins/v.mixin'
 import Symbol from './symbol'
+import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as rkeys from '@/common/rkeys'
 import * as http from '@/client/adapters/http'
+import * as utils from '@/client/adapters/utils'
 import socket from '@/client/adapters/socket'
 
 
@@ -15,9 +17,9 @@ import socket from '@/client/adapters/socket'
 @Vts.Component
 export default class extends Mixins(VMixin) {
 	$parent: Symbol
-
 	symbol = this.$parent.symbol
 	all = this.$parent.all
+
 	deals = [] as Quotes.Deal[]
 
 	created() {
@@ -58,10 +60,10 @@ export default class extends Mixins(VMixin) {
 	}
 
 	states = [
-		{ name: '4am to 8pm', icon: 'theme-light-dark', key: '', calc: 'endPrice' },
-		{ name: 'Pre Market', icon: 'weather-sunset-up', key: 'pre', calc: 'startPrice' },
-		{ name: 'Regular', icon: 'weather-sunny', key: 'reg', calc: 'openPrice' },
-		{ name: 'After Hours', icon: 'weather-sunset-down', key: 'post', calc: 'closePrice' },
+		{ name: '4am to 8pm', icon: 'theme-light-dark', key: '', calc: 'startPrice', tip: 'Price at start of day (4:00am)' },
+		{ name: 'Pre Market', icon: 'weather-sunset-up', key: 'pre', calc: 'startPrice', tip: 'Price at start of day (4:00am)' },
+		{ name: 'Regular', icon: 'weather-sunny', key: 'reg', calc: 'openPrice', tip: 'Price at market open (9:30am)' },
+		{ name: 'After Hours', icon: 'weather-sunset-down', key: 'post', calc: 'closePrice', tip: 'Price at market close (4:00pm)' },
 	]
 
 }

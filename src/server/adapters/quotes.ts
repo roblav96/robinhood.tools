@@ -107,7 +107,6 @@ export function resetquote(quote: Quotes.Quote, resets = false) {
 		})
 		core.object.merge(reset, {
 			startPrice: quote.price,
-			endPrice: quote.price,
 			dayHigh: quote.price, dayLow: quote.price,
 			count: 0, deals: 0,
 		} as Quotes.Quote)

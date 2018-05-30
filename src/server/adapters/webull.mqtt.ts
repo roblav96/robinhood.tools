@@ -31,6 +31,7 @@ export default class WebullMqttClient {
 		return _.clone({
 			fsymbols: null as Dict<number>,
 			topics: '' as keyof typeof WebullMqttClient.topics,
+			heartbeat: '10s' as Clock.Tick,
 			host: 'push.webull.com', port: 9018,
 			verbose: false,
 		})
@@ -97,8 +98,8 @@ export default class WebullMqttClient {
 		this.client.on('error', this.onerror)
 		if (!this.started) {
 			this.started = true
-			clock.on('5s', this.reconnect, this)
-		} else console.log('connect started');
+			clock.on(this.options.heartbeat, this.reconnect, this)
+		} else console.log('connect reconnecting');
 	}
 
 	private ondata = (packet: Mqtt.Packet) => {

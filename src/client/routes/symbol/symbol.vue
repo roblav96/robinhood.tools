@@ -82,12 +82,12 @@ section.symbol-route div.bidask .progress::-webkit-progress-bar {
 			<nav class="tabs is-toggle is-centered is-fullwidth mb-0">
 				<div class="container px-6 desktop:px-0">
 					<ul class="has-background-white rounded">
-						<li :class="{'is-active':showticker}">
+						<!-- <li :class="{'is-active':showticker}">
 							<a class="no-underline" v-on:click="showticker = !showticker">
 								<b-icon :icon="showticker?'chevron-double-up':'chevron-double-down'"></b-icon>
 								<span>Ticker</span>
 							</a>
-						</li>
+						</li> -->
 						<router-link tag="li" v-for="route in routes" :key="route.name" :to="{name:route.name}">
 							<a class="no-underline">
 								<b-icon :icon="route.icon"></b-icon>

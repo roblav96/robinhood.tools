@@ -34,7 +34,7 @@ export default class VSymbol extends Mixins(VMixin) {
 	get routes() { return this.$router.options.routes.find(v => v.name == 'symbol').children.filter(v => v.icon) }
 
 	busy = true
-	showticker = true
+	showticker = false
 	all = core.array.dict(Object.keys(quotes.ALL_KEYS), {} as any) as Quotes.All
 
 	@Vts.Watch('all.quote.price', { immediate: true }) w_price(price: number) {

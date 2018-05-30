@@ -19,7 +19,7 @@ declare global { namespace Quotes { type AllKeys = keyof typeof ALL_KEYS } }
 
 
 declare global { namespace Quotes { type ITiny = typeof TINY; interface Tiny extends ITiny { } } }
-export const TINY = {
+const TINY = {
 	symbol: '',
 	price: 0,
 	timestamp: 0,
@@ -30,13 +30,10 @@ TINY_KEYS.forEach(k => TINY[k] = undefined)
 
 
 declare global { namespace Quotes { type ISmall = typeof SMALL; interface Small extends ISmall, Tiny { } } }
-export const SMALL = {
-	typeof: '' as SymbolsTypes,
-	name: '',
+const SMALL = {
 	change: 0,
 	percent: 0,
 	startPrice: 0,
-	endPrice: 0,
 	openPrice: 0,
 	closePrice: 0,
 	prevClose: 0,
@@ -49,7 +46,7 @@ SMALL_KEYS.forEach(k => SMALL[k] = undefined)
 
 
 declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Small { } } }
-export const LIVE = {
+const LIVE = {
 	status: '',
 	statusTimestamp: 0,
 	alive: false,
@@ -61,13 +58,14 @@ export const LIVE = {
 	// 
 	bidPrice: 0,
 	askPrice: 0,
+	bidSize: 0,
+	askSize: 0,
+	// 
 	spread: 0,
 	bidSpread: 0,
 	askSpread: 0,
-	bidLot: 0,
-	askLot: 0,
-	bidSize: 0,
-	askSize: 0,
+	bidSizeAccum: 0,
+	askSizeAccum: 0,
 	bidVolume: 0,
 	askVolume: 0,
 	// 
@@ -97,7 +95,7 @@ LIVE_KEYS.forEach(k => LIVE[k] = undefined)
 
 
 declare global { namespace Quotes { type ICalc = typeof CALC; interface Calc extends ICalc, Live { } } }
-export const CALC = {
+const CALC = {
 	yearHigh: 0,
 	yearLow: 0,
 	dayHigh: 0,
@@ -122,8 +120,10 @@ CALC_KEYS.forEach(k => CALC[k] = undefined)
 
 
 declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
-export const FULL = {
+const FULL = {
+	typeof: '' as SymbolsTypes,
 	tickerId: 0,
+	name: '',
 	tinyName: '',
 	fullName: '',
 	mic: '',
@@ -151,7 +151,7 @@ FULL_KEYS.forEach(k => FULL[k] = undefined)
 
 
 declare global { namespace Quotes { type IDeal = typeof DEAL; interface Deal extends IDeal { } } }
-export const DEAL = {
+const DEAL = {
 	symbol: '',
 	price: 0,
 	size: 0,

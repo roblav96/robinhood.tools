@@ -13,12 +13,12 @@
 
 
 			<!-- <p class="is-size-3 font-semibold mb-4 text-center">Session Prices</p> -->
-			<div class="columns is-multiline is-mobile is-centered">
+			<div class="columns is-multiline is-mobile">
 				<div class="column" v-for="state in states" :key="state.name">
 					<table class="table is-middle is-fullwidth is-nowrap is-borderless card">
 						<thead>
 							<tr>
-								<th class="whitespace-no-wrap font-medium">{{state.name}}</th>
+								<th class="whitespace-no-wrap">{{state.name}}</th>
 								<th class="py-1 has-text-right">
 									<b-icon size="is-28x28" :icon="state.icon"></b-icon>
 								</th>
@@ -26,7 +26,9 @@
 						</thead>
 						<tbody>
 							<tr>
-								<td>{{vscase(state.calc)}}</td>
+								<b-tooltip :label="state.tip" position="is-top" size="is-small" multilined>
+									<td>{{vscase(state.calc)}}</td>
+								</b-tooltip>
 								<td class="has-text-right font-medium font-mono">
 									{{vnumber(all.quote[state.calc])}}
 								</td>
@@ -39,13 +41,13 @@
 							</tr>
 							<tr>
 								<td>{{vscase(`${state.key}Change`)}}</td>
-								<td class="has-text-right font-medium font-mono">
+								<td class="has-text-right font-medium font-mono" v-bull-bear="all.quote[vcamel(`${state.key}Change`)]">
 									{{vnumber(all.quote[vcamel(`${state.key}Change`)],{nozeros:true,plusminus:true})}}
 								</td>
 							</tr>
 							<tr>
 								<td>{{vscase(`${state.key}Percent`)}}</td>
-								<td class="has-text-right font-medium font-mono">
+								<td class="has-text-right font-medium font-mono" v-bull-bear="all.quote[vcamel(`${state.key}Percent`)]">
 									{{vnumber(all.quote[vcamel(`${state.key}Percent`)],{nozeros:true,plusminus:true,percent:true})}}
 								</td>
 							</tr>
