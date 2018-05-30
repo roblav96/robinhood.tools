@@ -50,11 +50,12 @@ export default class extends Mixins(VMixin) {
 		this.syncQuery()
 	}
 	onblur(event: Event) {
-		
+
 	}
 
 	onselect(result: Quotes.Quote) {
-		this.$router.push({ name: 'symbol', params: { symbol: result.symbol } })
+		let name = this.$route.name.includes('symbol.') ? this.$route.name : 'symbol'
+		this.$router.push({ name, params: { symbol: result.symbol } })
 		setTimeout(() => {
 			this.searchbar.$el.querySelector('input').blur()
 			this.results.splice(0)

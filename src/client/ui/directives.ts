@@ -27,7 +27,6 @@ Vue.directive('visible', function(el, { value, oldValue }) {
 				],
 			})
 		})
-
 	}
 })
 
