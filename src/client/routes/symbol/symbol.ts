@@ -65,10 +65,10 @@ export default class VSymbol extends Mixins(VMixin) {
 		core.object.merge(this.all.quote, quote)
 	}
 
-	// @Vts.Watch('$route.name') w_$routename(name: string) {
-	// 	if (!name.includes('symbol.')) return;
-	// 	this.details = false
-	// }
+	@Vts.Watch('$route.name') w_$routename(name: string) {
+		if (!name.includes('symbol.')) return;
+		this.showticker = false
+	}
 
 }
 

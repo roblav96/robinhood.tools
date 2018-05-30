@@ -85,7 +85,7 @@ section.symbol-route div.bidask .progress::-webkit-progress-bar {
 					<ul class="has-background-white rounded">
 						<li :class="{'is-active':showticker}">
 							<a class="no-underline" v-on:click="showticker = !showticker">
-								<b-icon :icon="showticker?'arrow-up-bold':'arrow-down-bold'"></b-icon>
+								<b-icon :icon="showticker?'chevron-double-up':'chevron-double-down'"></b-icon>
 								<span>Ticker</span>
 							</a>
 						</li>
