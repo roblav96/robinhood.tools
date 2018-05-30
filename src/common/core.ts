@@ -55,7 +55,11 @@ export function nullify(value: any) {
 	}
 	else if (object.is(value)) {
 		Object.keys(value).forEach(k => {
-			Object.assign(value, { [k]: {} })
+			let v = value[k]
+			if (object.is(v)) {
+				return Object.assign(value, { [k]: {} })
+			}
+			value[k] = null
 		})
 	}
 }

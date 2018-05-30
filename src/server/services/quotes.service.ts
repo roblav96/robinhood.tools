@@ -184,8 +184,6 @@ function ontick(i: number) {
 			toquote.livestamp = stamp
 			toquote.liveCount++
 
-			// console.log(symbol, 'save ->', '\ndiffquote ->', diffquote)
-
 			let zkey = `${rkeys.LIVES}:${symbol}`
 			let lkey = `${zkey}:${toquote.livestamp}`
 			coms.push(['hmset', lkey, toquote as any])
@@ -207,6 +205,7 @@ function ontick(i: number) {
 	})
 
 	if (coms.length > 0) {
+		console.log('coms ->', coms)
 		redis.main.coms(coms)
 	}
 

@@ -1,5 +1,6 @@
 // 
 
+import * as core from './core'
 import * as rkeys from './rkeys'
 
 
@@ -22,40 +23,28 @@ declare global { namespace Quotes { type ITiny = typeof TINY; interface Tiny ext
 const TINY = {
 	symbol: '',
 	price: 0,
+	size: 0,
 	timestamp: 0,
 }
-export const TINY_KEYS = Object.keys(TINY)
-TINY_KEYS.forEach(k => TINY[k] = undefined)
+export const TINY_KEYS = Object.keys(TINY).sort() as (keyof typeof TINY)[]
+export const TINY_KEYS_ALL = TINY_KEYS.sort() as (keyof Quotes.Tiny)[]
+core.nullify(TINY)
 
 
 
-declare global { namespace Quotes { type ISmall = typeof SMALL; interface Small extends ISmall, Tiny { } } }
-const SMALL = {
-	change: 0,
-	percent: 0,
-	startPrice: 0,
-	openPrice: 0,
-	closePrice: 0,
-	prevClose: 0,
-	size: 0,
-	volume: 0,
-}
-export const SMALL_KEYS = Object.keys(SMALL)
-SMALL_KEYS.forEach(k => SMALL[k] = undefined)
-
-
-
-declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Small { } } }
+declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Tiny { } } }
 const LIVE = {
 	status: '',
 	statusTimestamp: 0,
-	alive: false,
 	livestamp: 0,
 	// 
 	open: 0,
 	high: 0,
 	low: 0,
 	close: 0,
+	// 
+	dayHigh: 0,
+	dayLow: 0,
 	// 
 	bidPrice: 0,
 	askPrice: 0,
@@ -72,6 +61,7 @@ const LIVE = {
 	// bidVolume: 0,
 	// askVolume: 0,
 	// 
+	volume: 0,
 	liveCount: 0,
 	dealCount: 0,
 	dealSize: 0,
@@ -85,25 +75,37 @@ const LIVE = {
 	// dealFlowSize: 0,
 	// 
 	// 
-	marketCap: 0,
 	turnoverRate: 0,
 	vibrateRatio: 0,
 	yield: 0,
-	// 
-	quoteMaker: '',
-	quoteMakerAddress: '',
 }
-export const LIVE_KEYS = Object.keys(LIVE)
-LIVE_KEYS.forEach(k => LIVE[k] = undefined)
+export const LIVE_KEYS = Object.keys(LIVE).sort() as (keyof typeof LIVE)[]
+export const LIVE_KEYS_ALL = LIVE_KEYS.concat(TINY_KEYS_ALL as any).sort() as (keyof Quotes.Live)[]
+core.nullify(LIVE)
 
 
 
 declare global { namespace Quotes { type ICalc = typeof CALC; interface Calc extends ICalc, Live { } } }
 const CALC = {
+	change: 0,
+	percent: 0,
+	startPrice: 0,
+	openPrice: 0,
+	closePrice: 0,
+	prevClose: 0,
 	yearHigh: 0,
 	yearLow: 0,
-	dayHigh: 0,
-	dayLow: 0,
+	// 
+	avgVolume: 0,
+	avgVolume10Day: 0,
+	avgVolume3Month: 0,
+	sharesOutstanding: 0,
+	sharesFloat: 0,
+	marketCap: 0,
+	// 
+	typeof: '' as TypeofSymbols,
+	quoteMaker: '',
+	quoteMakerAddress: '',
 	// 
 	prePrice: 0,
 	preChange: 0,
@@ -120,15 +122,16 @@ const CALC = {
 	postPercent: 0,
 	postTimestamp: 0,
 }
-export const CALC_KEYS = Object.keys(CALC)
-CALC_KEYS.forEach(k => CALC[k] = undefined)
+export const CALC_KEYS = Object.keys(CALC).sort() as (keyof typeof CALC)[]
+export const CALC_KEYS_ALL = CALC_KEYS.concat(LIVE_KEYS_ALL as any).sort() as (keyof Quotes.Calc)[]
+core.nullify(CALC)
 
 
 
 declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
 const FULL = {
-	typeof: '' as TypeofSymbols,
 	tickerId: 0,
+	alive: false,
 	name: '',
 	tinyName: '',
 	fullName: '',
@@ -143,15 +146,10 @@ const FULL = {
 	industry: '',
 	website: '',
 	listDate: 0,
-	// 
-	avgVolume: 0,
-	avgVolume10Day: 0,
-	avgVolume3Month: 0,
-	sharesOutstanding: 0,
-	sharesFloat: 0,
 }
-export const FULL_KEYS = Object.keys(FULL)
-FULL_KEYS.forEach(k => FULL[k] = undefined)
+export const FULL_KEYS = Object.keys(FULL).sort() as (keyof typeof FULL)[]
+export const FULL_KEYS_ALL = FULL_KEYS.concat(CALC_KEYS_ALL as any).sort() as (keyof Quotes.Full)[]
+core.nullify(FULL)
 
 
 
@@ -163,8 +161,8 @@ const DEAL = {
 	side: '' as 'N' | 'B' | 'S',
 	timestamp: 0,
 }
-export const DEAL_KEYS = Object.keys(DEAL)
-DEAL_KEYS.forEach(k => DEAL[k] = undefined)
+export const DEAL_KEYS = Object.keys(DEAL).sort() as (keyof Quotes.Deal)[]
+core.nullify(DEAL)
 
 
 
@@ -185,5 +183,16 @@ declare global {
 		}
 	}
 }
+
+
+
+
+
+// declare global { namespace Quotes { type ISmall = typeof SMALL; interface Small extends ISmall, Tiny { } } }
+// const SMALL = {
+
+// }
+// export const SMALL_KEYS = Object.keys(SMALL).concat(TINY_KEYS).sort() as (keyof Quotes.Small)[]
+// core.nullify(SMALL)
 
 
