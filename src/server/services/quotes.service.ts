@@ -21,11 +21,11 @@ const MQTTS = [] as WebullMqttClient[]
 
 const SYMBOLS = [] as string[]
 const WB_QUOTES = {} as Dict<Webull.Quote>
-const WB_EMITS = {} as Dict<Webull.Quote>
-const WB_SAVES = {} as Dict<Webull.Quote>
 const QUOTES = {} as Dict<Quotes.Quote>
-const EMITS = {} as Dict<Quotes.Quote>
-const SAVES = {} as Dict<Quotes.Quote>
+// const WB_EMITS = {} as Dict<Webull.Quote>
+// const WB_SAVES = {} as Dict<Webull.Quote>
+// const EMITS = {} as Dict<Quotes.Quote>
+// const SAVES = {} as Dict<Quotes.Quote>
 
 radio.once('symbols.ready', onsymbols)
 radio.emit('symbols.start')
@@ -41,11 +41,9 @@ async function onsymbols(event: Radio.Event) {
 	core.nullify(MQTTS)
 	core.nullify(SYMBOLS)
 	core.nullify(WB_QUOTES)
-	core.nullify(WB_EMITS)
-	core.nullify(WB_SAVES)
 	core.nullify(QUOTES)
-	core.nullify(EMITS)
-	core.nullify(SAVES)
+
+	return
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :

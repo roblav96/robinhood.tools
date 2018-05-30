@@ -50,17 +50,12 @@ export function clone<T extends object = object>(target: T): T {
 }
 
 export function nullify(value: any) {
-	if (Array.isArray(value)) {
-		value.forEach(v => v = null)
+	if (array.is(value)) {
 		value.splice(0)
 	}
 	else if (object.is(value)) {
 		Object.keys(value).forEach(k => {
-			if (object.is(value[k])) {
-				return Object.assign(value, { [k]: {} })
-			}
-			value[k] = null
-			delete value[k]
+			Object.assign(value, { [k]: {} })
 		})
 	}
 }
@@ -235,7 +230,7 @@ export const object = {
 	// is<T = object>(value: T): value is T { return _.isPlainObject(value) },
 	is<T = object>(value: T): value is T { return value && typeof value == 'object' && value.constructor == Object },
 	assign<T = object>(target: T, source: T, deep = false) {
-		Object.keys(source).forEach(function(key) {
+		Object.keys(source).forEach(function assignEach(key) {
 			let tvalue = target[key]
 			let svalue = source[key]
 			if (deep && object.is(tvalue) && object.is(svalue)) {
@@ -245,20 +240,20 @@ export const object = {
 		})
 	},
 	clean<T = object>(target: T) {
-		Object.keys(target).forEach(function(key) {
+		Object.keys(target).forEach(function cleanEach(key) {
 			let value = target[key]
 			if (value == null || (number.is(value) && !Number.isFinite(value))) delete target[key];
 		})
 	},
 	merge<T = object>(target: T, source: T) {
-		Object.keys(source).forEach(function(key) {
+		Object.keys(source).forEach(function mergeEach(key) {
 			let value = source[key]
 			if (value == null) return;
 			target[key] = value
 		})
 	},
 	repair<T = object>(target: T, source: T) {
-		Object.keys(source).forEach(function(key) {
+		Object.keys(source).forEach(function repairEach(key) {
 			let tvalue = target[key]
 			let svalue = source[key]
 			if (tvalue == null && svalue != null) {
@@ -268,7 +263,7 @@ export const object = {
 	},
 	difference<T = object>(target: T, source: T): T {
 		let difference = {} as T
-		Object.keys(target).forEach(function(key) {
+		Object.keys(target).forEach(function differenceEach(key) {
 			let tvalue = target[key]
 			let svalue = source[key]
 			if (tvalue != svalue) difference[key] = tvalue;

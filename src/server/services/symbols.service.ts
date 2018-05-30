@@ -39,7 +39,7 @@ async function start() {
 	ready = true
 	radio.emit('symbols.ready')
 
-} start().catch(error => console.error(`start Error -> %O`, error))
+} start().catch(error => console.error(`start Error ->`, error))
 
 
 
@@ -101,7 +101,7 @@ async function syncTickers() {
 	tickers = _.flatten(tickers)
 	tickers.remove(v => Array.isArray(v.disSymbol.match(utils.regxSymbol)))
 	tickers.forEach(v => {
-		core.fix(v)
+		webull.fix(v)
 		v.disSymbol = webull.fixSymbol(v.disSymbol)
 	})
 

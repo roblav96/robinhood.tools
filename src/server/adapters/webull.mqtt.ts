@@ -152,6 +152,7 @@ export default class WebullMqttClient {
 			let type = Number.parseInt(topic.type)
 			if (type == webull.mqtt_topics.TICKER_BID_ASK) {
 				payload.data.remove(v => {
+					delete v.countryISOCode
 					delete v.tradeTime
 					return !(
 						(Array.isArray(v.bidList) && v.bidList.length > 0)

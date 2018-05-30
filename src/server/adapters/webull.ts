@@ -12,7 +12,7 @@ import * as http from './http'
 
 
 
-export function fix(quote: Webull.Quote) {
+export function fix(quote: Partial<Webull.Ticker & Webull.Quote>) {
 	if (quote.faStatus) quote.faStatus = webull.ticker_status[quote.faStatus];
 	if (quote.status) quote.status = webull.ticker_status[quote.status];
 
