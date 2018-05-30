@@ -50,6 +50,7 @@ const LIVE = {
 	status: '',
 	statusTimestamp: 0,
 	alive: false,
+	livestamp: 0,
 	// 
 	open: 0,
 	high: 0,

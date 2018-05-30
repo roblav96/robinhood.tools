@@ -4,6 +4,7 @@ import '../main'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
+import * as pretty from '../../common/pretty'
 import * as utils from '../adapters/utils'
 import * as redis from '../adapters/redis'
 import * as socket from '../adapters/socket'
@@ -154,46 +155,60 @@ function ontick(i: number) {
 		let wbquote = core.object.difference(WB_EMIT_QUOTES[symbol], WB_QUOTES[symbol])
 		let toquote = core.object.difference(EMIT_QUOTES[symbol], QUOTES[symbol])
 		if (Object.keys(wbquote).length > 0) {
-			wbquote.symbol = symbol
 			quotes.applywbquote(QUOTES[symbol], wbquote, toquote)
+			wbquote.symbol = symbol
 			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
 		}
 		if (Object.keys(toquote).length > 0) {
-			toquote.symbol = symbol
 			quotes.applycalcs(QUOTES[symbol], toquote)
 			core.object.merge(QUOTES[symbol], toquote)
+			toquote.symbol = symbol
 			socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
 		}
 
-		// if (save) {
-		// 	if (Object.keys(WB_SAVES[symbol]).length > 0) {
-		// 		coms.push(['hmset', `${rkeys.WB.QUOTES}:${symbol}`, WB_SAVES[symbol] as any])
-		// 	}
+		if (save) {
+			let wbquote = core.object.difference(WB_SAVE_QUOTES[symbol], WB_QUOTES[symbol])
+			if (Object.keys(wbquote).length > 0) {
+				coms.push(['hmset', `${rkeys.WB.QUOTES}:${symbol}`, wbquote as any])
+			}
 
-		// 	let toquote = SAVES[symbol]
-		// 	if (Object.keys(toquote).length == 0) return;
-		// 	coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, toquote as any])
-		// 	if (!toquote.timestamp) return;
+			let toquote = QUOTES[symbol]
+			let savequote = SAVE_QUOTES[symbol]
+			let diffquote = core.object.difference(savequote, toquote)
+			if (Object.keys(diffquote).length == 0) return;
 
-		// 	// console.log('save quote ->', toquote)
-		// 	// toquote.liveCount = toquote.liveCount + 1
-		// 	// let quote = QUOTES[symbol]
-		// 	// core.object.merge(quote, quotes.resetlive(quote))
+			coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diffquote as any])
+			if (toquote.timestamp <= savequote.timestamp) return;
 
-		// }
+			let stamp = Date.now()
+			toquote.livestamp = stamp
+			toquote.liveCount++
+
+			// console.log(symbol, 'save ->', '\ndiffquote ->', diffquote)
+
+			let zkey = `${rkeys.LIVES}:${symbol}`
+			let lkey = `${zkey}:${toquote.livestamp}`
+			coms.push(['hmset', lkey, toquote as any])
+			coms.push(['zadd', zkey, stamp as any, lkey])
+
+			core.object.merge(QUOTES[symbol], quotes.resetlive(toquote))
+
+		}
 
 	})
 
 	SYMBOLS.forEach(symbol => {
-		Object.assign(WB_EMIT_QUOTES, { [symbol]: core.clone(WB_QUOTES[symbol]) })
-		Object.assign(EMIT_QUOTES, { [symbol]: core.clone(QUOTES[symbol]) })
+		core.object.merge(WB_EMIT_QUOTES[symbol], WB_QUOTES[symbol])
+		core.object.merge(EMIT_QUOTES[symbol], QUOTES[symbol])
 		if (save) {
-			Object.assign(WB_SAVE_QUOTES, { [symbol]: core.clone(WB_QUOTES[symbol]) })
-			Object.assign(SAVE_QUOTES, { [symbol]: core.clone(QUOTES[symbol]) })
+			core.object.merge(WB_SAVE_QUOTES[symbol], WB_QUOTES[symbol])
+			core.object.merge(SAVE_QUOTES[symbol], QUOTES[symbol])
 		}
 	})
 
-	redis.main.coms(coms)
+	if (coms.length > 0) {
+		redis.main.coms(coms)
+	}
 
 }
 
