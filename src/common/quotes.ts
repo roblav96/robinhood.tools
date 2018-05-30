@@ -108,10 +108,12 @@ const CALC = {
 	preChange: 0,
 	prePercent: 0,
 	preTimestamp: 0,
+	// 
 	regPrice: 0,
 	regChange: 0,
 	regPercent: 0,
 	regTimestamp: 0,
+	// 
 	postPrice: 0,
 	postChange: 0,
 	postPercent: 0,

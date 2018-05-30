@@ -28,10 +28,8 @@ export async function getAlls(symbols: string[], allkeys = Object.keys(quotes.AL
 
 export async function syncAllQuotes(resets = false) {
 	let symbols = await utils.getAllSymbols()
-
-	let coms = symbols.map(v => ['hdel', `${rkeys.QUOTES}:v`, 'name', 'fullName', 'tinyName', 'nameLong'])
-	await redis.main.coms(coms)
-
+	// let coms = symbols.map(v => ['hdel', `${rkeys.QUOTES}:${v}`, 'description', 'name', 'fullName', 'tinyName', 'nameLong'])
+	// await redis.main.coms(coms)
 	let chunks = core.array.chunks(symbols, _.ceil(symbols.length / 256))
 	await pAll(chunks.map((chunk, i) => async () => {
 		if (process.env.DEVELOPMENT) console.log('syncAllQuotes ->', `${_.round((i / chunks.length) * 100)}%`);
@@ -299,84 +297,10 @@ export function applycalcs(quote: Quotes.Quote, toquote?: Quotes.Quote) {
 	}
 
 	if (toquote.askPrice || toquote.bidPrice) {
-		toquote.spread = quote.askPrice - quote.bidPrice
+		// toquote.spread = quote.askPrice - quote.bidPrice
 	}
 
 	return toquote
 }
-
-
-
-
-
-// export const mockquote = {
-// 	listDate: 916963200000,
-// 	country: 'US',
-// 	close: 246.75,
-// 	price: 246.73,
-// 	turnoverRate: 0.0191,
-// 	openPrice: 240.28,
-// 	volume: 11077801,
-// 	sharesFloat: 580151962,
-// 	askSize: 25,
-// 	symbol: 'NVDA',
-// 	exchange: 'Nasdaq Global Select',
-// 	bidVolume: 0,
-// 	high: 247.5,
-// 	yearLow: 135.71,
-// 	dayHigh: 247.59,
-// 	industry: 'Semiconductors',
-// 	askVolume: 0,
-// 	startPrice: 247.5,
-// 	currency: 'USD',
-// 	alive: true,
-// 	sharesOutstanding: 606000000,
-// 	sellVolume: 400,
-// 	statusTimestamp: 1527159036999,
-// 	change: -0.75,
-// 	mic: 'XNAS',
-// 	size: 0,
-// 	yield: 0.0023,
-// 	dayLow: 240.25,
-// 	fullName: 'NVIDIA Corporation Common Stock',
-// 	closePrice: 247.54,
-// 	buyVolume: 924,
-// 	name: 'NVIDIA Corporation',
-// 	askPrice: 247.7,
-// 	percent: -0.30303030303030304,
-// 	tickerId: 913257561,
-// 	website: 'http://www.nvidia.com',
-// 	issueType: 'cs',
-// 	dealSize: 5199,
-// 	status: 'POST_TRADE',
-// 	avgVolume3Month: 14787943,
-// 	avgVolume: 17520461,
-// 	sector: 'Technology',
-// 	avgVolume10Day: 14491447,
-// 	prevClose: 242.55,
-// 	low: 247.5,
-// 	vibrateRatio: 0.0303,
-// 	acronym: 'NASDAQ',
-// 	yearHigh: 260.5,
-// 	bidSize: 12,
-// 	buySize: 924,
-// 	dealVolume: 5199,
-// 	open: 247.5,
-// 	bidPrice: 247.36,
-// 	count: 0,
-// 	sellSize: 400,
-// 	timezone: 'America/New_York',
-// 	spread: 0.339999999999975,
-// 	deals: 111847,
-// 	marketCap: 149530500000,
-// 	timestamp: 1527170047000
-// } as Quotes.Quote
-
-// import * as benchmark from '../../common/benchmark'
-// benchmark.simple('object', [
-// 	function noop() { },
-// 	function keys() { Object.keys(mockquote) },
-// 	function assign() { Object.assign(mockquote, mockquote) },
-// ])
 
 

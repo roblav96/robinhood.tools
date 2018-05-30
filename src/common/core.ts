@@ -272,6 +272,21 @@ export const object = {
 			}
 		}
 	},
+	mergeAll<T = object>(targets: T[], source: T) {
+		let size = targets.length
+		let keys = Object.keys(source)
+		let i: number, len = keys.length
+		for (i = 0; i < len; i++) {
+			let key = keys[i]
+			let value = source[key]
+			if (value != null) {
+				let ii: number, lenn = size
+				for (ii = 0; ii < lenn; ii++) {
+					targets[ii][key] = value
+				}
+			}
+		}
+	},
 	repair<T = object>(target: T, source: T) {
 		let keys = Object.keys(source)
 		let i: number, len = keys.length

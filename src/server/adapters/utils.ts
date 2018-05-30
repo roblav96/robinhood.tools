@@ -3,6 +3,7 @@
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
+import * as pretty from '../../common/pretty'
 import * as redis from './redis'
 
 
@@ -74,6 +75,16 @@ export async function getInstanceFullSymbols(type = 'STOCKS' as TypeofSymbols) {
 
 export async function getAllSymbols() {
 	return _.flatten(await Promise.all(Object.keys(rkeys.SYMBOLS).map(k => getSymbols(k as any))))
+}
+
+
+
+export function memoryUsage() {
+	let memory = process.memoryUsage()
+	Object.keys(memory).forEach(k => {
+		memory[k] = pretty.bytes(memory[k])
+	})
+	return memory
 }
 
 
