@@ -13,14 +13,14 @@ import radio from '../adapters/radio'
 
 
 const CACHE = [] as Quotes.Quote[]
-const WADES = { symbol: null, name: null, description: null }
+const WADES = { symbol: null, name: null }
 
 radio.once('symbols.ready', onready)
 radio.emit('symbols.start')
 async function onready() {
 
 	let keys = await redis.main.keys(`${rkeys.QUOTES}:*`)
-	let ikeys = ['symbol', 'name', 'description', 'avgVolume'] as KeysOf<Quotes.Quote>
+	let ikeys = ['symbol', 'name', 'avgVolume'] as KeysOf<Quotes.Quote>
 	let quotes = (await redis.main.coms(keys.map(key => {
 		return ['hmget', key].concat(ikeys)
 	}))).map((v: Quotes.Quote) => {

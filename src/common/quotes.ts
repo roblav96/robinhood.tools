@@ -71,8 +71,8 @@ const LIVE = {
 	// bidVolume: 0,
 	// askVolume: 0,
 	// 
-	// count: 0,
-	deals: 0,
+	liveCount: 0,
+	dealCount: 0,
 	dealSize: 0,
 	dealVolume: 0,
 	buySize: 0,
@@ -139,7 +139,6 @@ const FULL = {
 	sector: '',
 	industry: '',
 	website: '',
-	description: '',
 	listDate: 0,
 	// 
 	avgVolume: 0,

@@ -54,7 +54,6 @@ export function initquote(
 		sector: iexitem.sector,
 		industry: iexitem.industry,
 		website: iexitem.website,
-		description: iexitem.description,
 		alive: instrument.alive,
 		mic: instrument.mic,
 		acronym: instrument.acronym,
@@ -95,20 +94,20 @@ export function resetquote(quote: Quotes.Quote, resets = false) {
 		size: 0,
 		bidSize: 0, askSize: 0,
 		buySize: 0, sellSize: 0,
-		dealSize: 0, dealFlowSize: 0,
+		// dealSize: 0, dealFlowSize: 0,
 		open: quote.price, high: quote.price, low: quote.price, close: quote.price,
-		bidSpread: quote.bidPrice, askSpread: quote.askPrice,
+		// bidSpread: quote.bidPrice, askSpread: quote.askPrice,
 	} as Quotes.Quote
 	if (resets) {
 		reset.volume = 0
-		Object.keys(reset).forEach(key => {
-			if (key.indexOf('Size') == -1) return;
-			reset[key.replace('Size', 'Volume')] = 0
-		})
+		// Object.keys(reset).forEach(key => {
+		// 	if (key.indexOf('Size') == -1) return;
+		// 	reset[key.replace('Size', 'Volume')] = 0
+		// })
 		core.object.merge(reset, {
 			startPrice: quote.price,
 			dayHigh: quote.price, dayLow: quote.price,
-			count: 0, deals: 0,
+			liveCount: 0, dealCount: 0,
 		} as Quotes.Quote)
 	}
 	return reset
@@ -135,7 +134,7 @@ export function applydeal(quote: Quotes.Quote, deal: Quotes.Deal, toquote = {} a
 		}
 	}
 
-	toquote.deals = quote.deals + 1
+	toquote.dealCount = quote.dealCount + 1
 	toquote.dealSize = quote.dealSize + deal.size
 	toquote.dealVolume = quote.dealVolume + deal.size
 
@@ -215,7 +214,7 @@ export const KEY_MAP = (({
 	'tradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
 	'mktradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
 	// 
-	'dealNum': ({ key: 'deals', greater: true } as KeyMapValue) as any,
+	'dealNum': ({ key: 'dealCount', greater: true } as KeyMapValue) as any,
 	'volume': ({ key: 'volume', greater: true } as KeyMapValue) as any,
 	'dealAmount': ({ greater: true } as KeyMapValue) as any,
 	// '____': ({ key: '____' } as KeyMapValue) as any,
@@ -366,7 +365,6 @@ export function applycalcs(quote: Quotes.Quote, toquote?: Quotes.Quote) {
 // 	spread: 0.339999999999975,
 // 	deals: 111847,
 // 	marketCap: 149530500000,
-// 	description: 'NVIDIA Corp is a developer of graphics processing unit. It caters to areas like gaming, professional visualization, datacenter and automobiles.',
 // 	timestamp: 1527170047000
 // } as Quotes.Quote
 

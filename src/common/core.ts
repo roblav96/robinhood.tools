@@ -239,27 +239,50 @@ export const object = {
 			target[key] = svalue;
 		})
 	},
-	clean<T = object>(target: T) {
-		Object.keys(target).forEach(function cleanEach(key) {
+	filter<T = object>(target: T, fn: (value: any, key: string) => boolean) {
+		let keys = Object.keys(target)
+		let i: number, len = keys.length
+		for (i = 0; i < len; i++) {
+			let key = keys[i]
 			let value = target[key]
-			if (value == null || (number.is(value) && !Number.isFinite(value))) delete target[key];
-		})
+			if (fn(value, key)) {
+				delete target[key]
+			}
+		}
+	},
+	clean<T = object>(target: T) {
+		let keys = Object.keys(target)
+		let i: number, len = keys.length
+		for (i = 0; i < len; i++) {
+			let key = keys[i]
+			let value = target[key]
+			if (value == null || (number.is(value) && !number.isFinite(value))) {
+				delete target[key]
+			}
+		}
 	},
 	merge<T = object>(target: T, source: T) {
-		Object.keys(source).forEach(function mergeEach(key) {
+		let keys = Object.keys(source)
+		let i: number, len = keys.length
+		for (i = 0; i < len; i++) {
+			let key = keys[i]
 			let value = source[key]
-			if (value == null) return;
-			target[key] = value
-		})
+			if (value != null) {
+				target[key] = value
+			}
+		}
 	},
 	repair<T = object>(target: T, source: T) {
-		Object.keys(source).forEach(function repairEach(key) {
+		let keys = Object.keys(source)
+		let i: number, len = keys.length
+		for (i = 0; i < len; i++) {
+			let key = keys[i]
 			let tvalue = target[key]
 			let svalue = source[key]
 			if (tvalue == null && svalue != null) {
 				target[key] = svalue
 			}
-		})
+		}
 	},
 	difference<T = object>(target: T, source: T): T {
 		let difference = {} as T

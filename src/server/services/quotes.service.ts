@@ -22,10 +22,6 @@ const MQTTS = [] as WebullMqttClient[]
 const SYMBOLS = [] as string[]
 const WB_QUOTES = {} as Dict<Webull.Quote>
 const QUOTES = {} as Dict<Quotes.Quote>
-// const WB_EMITS = {} as Dict<Webull.Quote>
-// const WB_SAVES = {} as Dict<Webull.Quote>
-// const EMITS = {} as Dict<Quotes.Quote>
-// const SAVES = {} as Dict<Quotes.Quote>
 
 radio.once('symbols.ready', onsymbols)
 radio.emit('symbols.start')
@@ -37,13 +33,10 @@ declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: SymbolsTypes
 async function onsymbols(event: Radio.Event) {
 
 	clock.offListener(ontick)
-	MQTTS.forEach(v => v.destroy())
-	core.nullify(MQTTS)
+	MQTTS.remove(v => !!v.destroy())
 	core.nullify(SYMBOLS)
 	core.nullify(WB_QUOTES)
 	core.nullify(QUOTES)
-
-	return
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
@@ -52,9 +45,9 @@ async function onsymbols(event: Radio.Event) {
 
 	// if (process.env.DEVELOPMENT) return;
 	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
+	SYMBOLS.push(...Object.keys(fsymbols))
 
 	let coms = [] as Redis.Coms
-	SYMBOLS.push(...Object.keys(fsymbols))
 	let alls = await quotes.getAlls(SYMBOLS, ['quote', 'wbquote'])
 	alls.forEach(all => {
 		let symbol = all.symbol
@@ -64,17 +57,15 @@ async function onsymbols(event: Radio.Event) {
 			coms.push(['hset', `${rkeys.QUOTES}:${symbol}`, 'typeof', all.quote.typeof])
 		}
 
-		Object.assign(WB_QUOTES, { [symbol]: all.wbquote })
-		Object.assign(WB_EMITS, { [symbol]: {} })
-		Object.assign(WB_SAVES, { [symbol]: {} })
-		Object.assign(QUOTES, { [symbol]: all.quote })
-		Object.assign(EMITS, { [symbol]: {} })
-		Object.assign(SAVES, { [symbol]: {} })
+		WB_QUOTES[symbol] = all.wbquote
+		QUOTES[symbol] = all.quote
 
 		socket.emit(`${rkeys.QUOTES}:${symbol}`, all.quote)
 	})
 
 	if (coms.length > 0) await redis.main.coms(coms);
+
+	return
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
 	MQTTS.splice(0, Infinity, ...chunks.map((chunk, i) => new WebullMqttClient({
@@ -100,12 +91,10 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		let deal = quotes.todeal(wbquote)
 		socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
 
-		let dealquote = quotes.applydeal(QUOTES[symbol], deal)
-		if (Object.keys(dealquote).length > 0) {
-			dealquote.symbol = symbol
-			core.object.merge(QUOTES[symbol], dealquote)
-			core.object.merge(EMITS[symbol], dealquote)
-			core.object.merge(SAVES[symbol], dealquote)
+		let toquote = quotes.applydeal(QUOTES[symbol], deal)
+		if (Object.keys(toquote).length > 0) {
+			toquote.symbol = symbol
+			core.object.merge(QUOTES[symbol], toquote)
 		}
 
 		return
@@ -196,6 +185,8 @@ function ontick(i: number) {
 			if (!toquote.timestamp) return;
 
 			// console.log('save quote ->', toquote)
+
+			toquote.liveCount = toquote.liveCount + 1
 
 			let quote = QUOTES[symbol]
 			quotes.resetquote(quote)
