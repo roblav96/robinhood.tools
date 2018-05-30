@@ -52,14 +52,16 @@ export function clone<T extends object = object>(target: T): T {
 export function nullify(value: any) {
 	if (array.is(value)) {
 		value.splice(0)
-	}
-	else if (object.is(value)) {
+	} else if (object.is(value)) {
 		Object.keys(value).forEach(k => {
 			let v = value[k]
-			if (object.is(v)) {
-				return Object.assign(value, { [k]: {} })
+			if (array.is(v)) {
+				v.splice(0)
+			} else if (object.is(v)) {
+				Object.assign(value, { [k]: {} })
+			} else {
+				value[k] = null
 			}
-			value[k] = null
 		})
 	}
 }

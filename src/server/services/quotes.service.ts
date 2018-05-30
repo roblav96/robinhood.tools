@@ -24,10 +24,11 @@ const SYMBOLS = [] as string[]
 const WB_QUOTES = {} as Dict<Webull.Quote>
 const QUOTES = {} as Dict<Quotes.Quote>
 
-// const WB_EMITS = {} as Dict<Webull.Quote>
-// const WB_SAVES = {} as Dict<Webull.Quote>
-// const EMITS = {} as Dict<Quotes.Quote>
-// const SAVES = {} as Dict<Quotes.Quote>
+const WB_UPDATED = {} as Dict<string[]>
+const UPDATED = {} as Dict<string[]>
+function pushkeys(updated: string[], keys: string[]) {
+	keys.forEach(k => { if (updated.indexOf(k) == -1) updated.push(k); })
+}
 
 radio.once('symbols.ready', onsymbols)
 radio.emit('symbols.start')
@@ -41,8 +42,8 @@ async function onsymbols(event: Radio.Event) {
 	clock.offListener(ontick)
 	MQTTS.remove(v => v.destroy() || true)
 	core.nullify(SYMBOLS)
-	core.nullify(WB_QUOTES)
-	core.nullify(QUOTES)
+	core.nullify(WB_QUOTES); core.nullify(WB_UPDATED);
+	core.nullify(QUOTES); core.nullify(UPDATED);
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
@@ -62,10 +63,12 @@ async function onsymbols(event: Radio.Event) {
 			coms.push(['hset', `${rkeys.QUOTES}:${symbol}`, 'typeof', quote.typeof])
 		}
 
-		quotes.conform({ quote, qkeys: quotes.CALC_KEYS_ALL, mutate: true })
+		quotes.conform(quote, quotes.CALC_KEYS_ALL)
 
 		Object.assign(WB_QUOTES, { [symbol]: wbquote })
+		Object.assign(WB_UPDATED, { [symbol]: [] })
 		Object.assign(QUOTES, { [symbol]: quote })
+		Object.assign(UPDATED, { [symbol]: [] })
 
 		socket.emit(`${rkeys.QUOTES}:${symbol}`, quote)
 	})
@@ -89,12 +92,6 @@ async function onsymbols(event: Radio.Event) {
 
 
 
-const WB_UPDATED = [] as string[]
-const UPDATED = [] as string[]
-function mergekeys(updated: string[], keys: string[]) {
-	keys.forEach(k => { if (updated.indexOf(k) == -1) updated.push(k); })
-}
-
 emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let symbol = wbquote.symbol
 	if (!symbol) return console.warn(`!symbol ->`, webull.mqtt_topics[topic], wbquote);
@@ -106,7 +103,7 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		let toquote = quotes.applydeal(QUOTES[symbol], deal)
 		let tokeys = Object.keys(toquote)
 		if (tokeys.length > 0) {
-			mergekeys(UPDATED, tokeys)
+			pushkeys(UPDATED[symbol], tokeys)
 			core.object.merge(QUOTES[symbol], toquote, tokeys)
 		}
 
@@ -114,37 +111,37 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	}
 
 	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
-	let toquote = {} as Webull.Quote
+	let towbquote = {} as Webull.Quote
 	let quote = WB_QUOTES[symbol]
 	if (!quote) return console.warn(`!quote ->`, symbol, webull.mqtt_topics[topic], wbquote);
 
 	Object.keys(wbquote).forEach(k => {
 		let source = wbquote[k]
 		let target = quote[k]
-		if (target == null) { target = source; quote[k] = source; toquote[k] = source }
+		if (target == null) { target = source; quote[k] = source; towbquote[k] = source }
 		let keymap = quotes.KEY_MAP[k]
 		if (keymap && (keymap.time || keymap.greater)) {
 			if (source > target) {
-				toquote[k] = source
+				towbquote[k] = source
 			}
-		}
-		else if (source != target) {
-			toquote[k] = source
+		} else if (source != target) {
+			towbquote[k] = source
 		}
 	})
-	
-	// ████████████████
-	//       here
-	// ████████████████
 
-	if (Object.keys(toquote).length > 0) {
-		// console.info(symbol, '->', webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', toquote)
-		core.object.mergeAll([WB_QUOTES[symbol], WB_EMITS[symbol]], toquote)
+	let wbkeys = Object.keys(towbquote)
+	if (wbkeys.length > 0) {
+		pushkeys(WB_UPDATED[symbol], wbkeys)
+		core.object.merge(WB_QUOTES[symbol], towbquote, wbkeys)
+
+		// console.info(symbol, '->', webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
 
 		if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
-			let baquote = quotes.applybidask(QUOTES[symbol], toquote)
-			if (Object.keys(baquote).length > 0) {
-				core.object.mergeAll([QUOTES[symbol], EMITS[symbol]], baquote)
+			let toquote = quotes.applybidask(QUOTES[symbol], towbquote)
+			let tokeys = Object.keys(toquote)
+			if (tokeys.length > 0) {
+				pushkeys(UPDATED[symbol], tokeys)
+				core.object.merge(QUOTES[symbol], toquote, tokeys)
 			}
 		}
 	}
@@ -207,8 +204,8 @@ function ontick(i: number) {
 		}
 
 	})
-	
-	return 
+
+	return
 
 	SYMBOLS.forEach(symbol => {
 		Object.assign(WB_EMITS, { [symbol]: {} })
