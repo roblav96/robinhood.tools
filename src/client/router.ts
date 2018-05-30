@@ -53,11 +53,8 @@ export const routes = [
 
 	{
 		name: 'symbol', path: '/symbol/:symbol',
-		redirect: { name: 'symbol.summary' },
 		component: () => import('@/client/routes/symbol/symbol'),
 		children: [
-			{ path: '', redirect: { name: 'symbol.summary' } },
-			{ path: '*', redirect: { name: 'symbol.summary' } },
 			{
 				name: 'symbol.summary', path: 'summary', icon: 'bulletin-board',
 				component: () => import('@/client/routes/symbol/symbol.summary'),
@@ -78,6 +75,7 @@ export const routes = [
 				name: 'symbol.debug', path: 'debug', icon: 'bug',
 				component: () => import('@/client/routes/symbol/symbol.debug'),
 			},
+			{ path: '*', redirect: { name: 'symbol' } },
 		],
 	},
 

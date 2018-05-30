@@ -32,7 +32,7 @@ export function vnumber(value: number, { precision, compact, plusminus, percent,
 	let fixed = int.slice(-3)
 	{
 		let n: number, i = 1
-		for (n = 1000; n < value; n *= 1000) {
+		for (n = 1000; n <= value; n *= 1000) {
 			let from = i * 3
 			i++
 			let to = i * 3
@@ -80,6 +80,12 @@ export function vfromnow(stamp: number, opts = {} as Partial<VFromNowOpts>) {
 		ms = ms.split(' ').splice(0, opts.verbose ? opts.max * 2 : opts.max).join(' ')
 	}
 	return ms + ' ago'
+}
+
+
+
+export function randomPrice(price: number) {
+	return _.round(price + _.random(-1, 1, true), 2)
 }
 
 

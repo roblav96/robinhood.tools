@@ -17,7 +17,6 @@ import lockr from 'lockr'
 import clock from '@/common/clock'
 import store from '@/client/store'
 import socket from '@/client/adapters/socket'
-import SymbolMixin from './symbol.mixin'
 
 
 
@@ -42,35 +41,6 @@ export default class VSymbol extends Mixins(VMixin) {
 
 	@Vts.Watch('all.quote.price', { immediate: true }) w_price(price: number) {
 		document.title = `${this.symbol} ${this.vnumber(price)} (${this.vnumber(this.all.quote.percent, { plusminus: true, percent: true })})`
-	}
-
-	get vdeals() { return this.deals.filter((v, i) => i < 10) }
-	dealcolor(deal: Quotes.Deal) { return { 'has-text-success': deal.side == 'B', 'has-text-danger': deal.side == 'S' } }
-
-	get delisted() { return webull.ticker_status[this.all.wbquote.status] == webull.ticker_status.DELISTED }
-	get suspended() { return webull.ticker_status[this.all.wbquote.status] == webull.ticker_status.SUSPENSION }
-	get isexthours() { return this.hours.state != 'REGULAR' }
-	get exthours() {
-		let state = hours.getState(this.hours.hours, this.all.wbquote.faTradeTime)
-		if (state.includes('PRE')) return 'Pre Market';
-		if (state.includes('POST')) return 'After Hours';
-		return state
-	}
-
-	get baprice() {
-		if (Object.keys(this.all.quote).length == 0) return { bid: 0, ask: 0 };
-		let max = this.all.quote.askPrice - this.all.quote.bidPrice
-		let price = this.all.quote.price
-		let bid = core.calc.slider(price - this.all.quote.bidPrice, 0, max)
-		let ask = core.calc.slider(this.all.quote.askPrice - price, 0, max)
-		return { bid, ask }
-	}
-	get balot() {
-		if (Object.keys(this.all.quote).length == 0) return { bid: 0, ask: 0 };
-		let max = this.all.quote.bidLot + this.all.quote.askLot
-		let bid = core.calc.slider(this.all.quote.bidLot, 0, max)
-		let ask = core.calc.slider(this.all.quote.askLot, 0, max)
-		return { bid, ask }
 	}
 
 	reset() {

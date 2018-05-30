@@ -14,12 +14,12 @@ import * as http from '@/client/adapters/http'
 
 @Vts.Component
 export default class extends Mixins(VMixin) {
-
-	get parent() { return this.$parent as Symbol }
+	$parent: Symbol
+	all = this.$parent.all
 
 	get tabledata() {
-		return Object.keys(this.parent.quote).map(key => ({
-			key, value: this.parent.quote[key],
+		return Object.keys(this.all.quote).map(key => ({
+			key, value: this.all.quote[key],
 		})).sort((a, b) => core.sort.alphabetically(a.key, b.key))
 	}
 
