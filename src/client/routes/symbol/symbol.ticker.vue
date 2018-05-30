@@ -9,11 +9,18 @@
 <template>
 	<section class="section">
 		<div class="container">
-			<div class="columns">
+			<div class="columns is-multiline is-mobile">
 
 
 
-				<!--  -->
+				<div class="column is-3">
+					<article class="message card has-background-white">
+						<div class="message-body border-success">
+							<p class="subtitle font-semibold">Pre Market</p>
+							<b-icon icon="moon"></b-icon>
+						</div>
+					</article>
+				</div>
 
 
 

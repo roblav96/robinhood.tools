@@ -582,7 +582,19 @@ module.exports = {
 	minWidth: {
 		'initial': 'initial',
 		'0': '0',
+		'us': '5rem',
+		'ns': '10rem',
+		'xs': '20rem',
+		'sm': '30rem',
+		'md': '40rem',
+		'lg': '50rem',
+		'xl': '60rem',
+		'2xl': '70rem',
+		'3xl': '80rem',
+		'4xl': '90rem',
+		'5xl': '100rem',
 		'full': '100%',
+		'screen': '100vh',
 	},
 
 
@@ -603,8 +615,19 @@ module.exports = {
 	minHeight: {
 		'initial': 'initial',
 		'0': '0',
+		'us': '5rem',
+		'ns': '10rem',
+		'xs': '20rem',
+		'sm': '30rem',
+		'md': '40rem',
+		'lg': '50rem',
+		'xl': '60rem',
+		'2xl': '70rem',
+		'3xl': '80rem',
+		'4xl': '90rem',
+		'5xl': '100rem',
 		'full': '100%',
-		'screen': '100vh'
+		'screen': '100vh',
 	},
 
 
@@ -625,6 +648,7 @@ module.exports = {
 
 	maxWidth: {
 		'initial': 'initial',
+		'0': '0',
 		'us': '5rem',
 		'ns': '10rem',
 		'xs': '20rem',
@@ -637,6 +661,7 @@ module.exports = {
 		'4xl': '90rem',
 		'5xl': '100rem',
 		'full': '100%',
+		'screen': '100vh',
 	},
 
 
@@ -656,6 +681,18 @@ module.exports = {
 
 	maxHeight: {
 		'initial': 'initial',
+		'0': '0',
+		'us': '5rem',
+		'ns': '10rem',
+		'xs': '20rem',
+		'sm': '30rem',
+		'md': '40rem',
+		'lg': '50rem',
+		'xl': '60rem',
+		'2xl': '70rem',
+		'3xl': '80rem',
+		'4xl': '90rem',
+		'5xl': '100rem',
 		'full': '100%',
 		'screen': '100vh',
 	},

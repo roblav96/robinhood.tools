@@ -9,6 +9,11 @@ section.symbol-route div.bidask .progress::-webkit-progress-bar {
 	border: 1px solid var(--border);
 }
 
+
+/*section.symbol-route div.hero-body:first-of-type div.box {
+	padding: 0.5rem 1rem;
+}*/
+
 </style>
 
 <template>
@@ -18,43 +23,54 @@ section.symbol-route div.bidask .progress::-webkit-progress-bar {
 			<div class="hero-body">
 				<div class="container">
 
-					<div class="columns">
+					<div class="columns is-multiline is-mobile">
+
+						<div class="column is-narrow">
+							<symbol-logo class="is-48x48 card" :symbol="symbol"></symbol-logo>
+						</div>
 
 						<div class="column flex">
-							<div class="self-center mr-6">
-								<symbol-logo class="is-48x48 card" :symbol="symbol"></symbol-logo>
-							</div>
-							<div class="flex self-center card rounded px-4 py-2">
-								<p class="self-center title leading-none mr-3 whitespace-no-wrap">{{symbol}}</p>
-								<p class="self-center is-size-6 leading-none">{{all.quote.name}}</p>
+							<div class="box h-12 flex px-5">
+								<p class="self-center title mr-4 whitespace-no-wrap">{{symbol}}</p>
+								<p class="self-center is-size-6">{{breakpoints.widescreenAndUp?all.quote.name:all.quote.tinyName}}</p>
 							</div>
 						</div>
 
-						<div class="column is-narrow flex">
-							<div class="flex self-center whitespace-no-wrap card rounded px-4 py-2">
-								<number-ticker :number="all.quote.price" class="self-center title leading-none mr-3 font-mono"></number-ticker>
-								<p class="self-center is-size-6 leading-none font-medium font-mono" v-bull-bear="all.quote.change">
-									{{vnumber(all.quote.change,{plusminus:true})}}
-									<br> {{vnumber(all.quote.percent,{plusminus:true,percent:true,precision:2})}}
+						<div class="column is-narrow">
+							<div class="box h-12 flex px-5 whitespace-no-wrap font-mono">
+								<number-ticker :number="all.quote.price" class="self-center title mr-4"></number-ticker>
+								<p class="self-center is-size-6 font-medium" v-bull-bear="all.quote.change">
+									<span>{{vnumber(all.quote.change,{plusminus:true})}}</span>
+									<br>
+									<span>{{vnumber(all.quote.percent,{plusminus:true,percent:true,precision:2})}}</span>
 								</p>
 							</div>
-							<div class="flex self-center ml-6 card rounded px-4 py-3">
-								<p class="self-center is-size-4 leading-none mr-2 font-medium whitespace-no-wrap">
+						</div>
+
+						<div class="column is-narrow">
+							<div class="box h-12 flex">
+								<p class="self-center is-size-4 mr-2 font-medium whitespace-no-wrap">
 									{{vnumber(all.quote.volume,{compact:true})}}
 								</p>
-								<p class="self-center is-size-6 leading-none">Volume</p>
+								<p class="self-center is-size-6">Volume</p>
 							</div>
-							<div class="fullhd:flex hidden ml-6 self-center card rounded px-4 py-3">
-								<p class="self-center is-size-4 leading-none mr-2 font-medium whitespace-no-wrap">
+						</div>
+
+						<div class="column is-narrow fullhd:flex hidden">
+							<div class="box h-12 flex">
+								<p class="self-center is-size-4 mr-2 font-medium whitespace-no-wrap">
 									{{vnumber(all.quote.avgVolume,{compact:true})}}
 								</p>
-								<p class="self-center is-size-6 leading-none">Avg Volume</p>
+								<p class="self-center is-size-6">Avg Volume</p>
 							</div>
-							<div v-show="all.quote.marketCap" class="desktop:flex ml-6 hidden self-center card rounded px-4 py-3">
-								<p class="self-center is-size-4 leading-none mr-2 font-medium whitespace-no-wrap">
+						</div>
+
+						<div class="column is-narrow desktop:flex hidden">
+							<div class="box h-12 flex">
+								<p class="self-center is-size-4 mr-2 font-medium whitespace-no-wrap">
 									{{vnumber(all.quote.marketCap,{compact:true})}}
 								</p>
-								<p class="self-center is-size-6 leading-none">Market Cap</p>
+								<p class="self-center is-size-6">Market Cap</p>
 							</div>
 						</div>
 

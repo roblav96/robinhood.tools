@@ -13,7 +13,6 @@ import * as core from '@/common/core'
 export default class extends Mixins(VMixin) {
 	$parent: Symbol
 	all = this.$parent.all
-	deals = this.$parent.deals
 
 	created() {
 		console.log(`this.all ->`, this.all)
