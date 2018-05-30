@@ -36,6 +36,7 @@ export default class VSymbol extends Mixins(VMixin) {
 	get routes() { return this.$router.options.routes.find(v => v.name == 'symbol').children.filter(v => v.icon) }
 
 	busy = true
+	details = true
 	all = core.array.dict(Object.keys(quotes.ALL_KEYS), {} as any) as Quotes.All
 	deals = [] as Quotes.Deal[]
 

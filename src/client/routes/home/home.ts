@@ -10,6 +10,12 @@ import VMixin from '@/client/mixins/v.mixin'
 @Vts.Component
 export default class extends Mixins(VMixin) {
 
+	get routes() {
+		return this.$router.options.routes.filter(function(route) {
+			return route.title && route.icon
+		})
+	}
+
 	boxes = [{
 		icon: 'clock-fast',
 		title: 'Real-Time',
