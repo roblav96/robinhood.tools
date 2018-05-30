@@ -28,6 +28,10 @@ export async function getAlls(symbols: string[], allkeys = Object.keys(quotes.AL
 
 export async function syncAllQuotes(resets = false) {
 	let symbols = await utils.getAllSymbols()
+
+	let coms = symbols.map(v => ['hdel', `${rkeys.QUOTES}:v`, 'name', 'fullName', 'tinyName', 'nameLong'])
+	await redis.main.coms(coms)
+
 	let chunks = core.array.chunks(symbols, _.ceil(symbols.length / 256))
 	await pAll(chunks.map((chunk, i) => async () => {
 		if (process.env.DEVELOPMENT) console.log('syncAllQuotes ->', `${_.round((i / chunks.length) * 100)}%`);
@@ -68,7 +72,6 @@ export function initquote(
 	quote.name = core.fallback(iexitem.companyName, instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name)
 	quote.tinyName = core.fallback(instrument.simple_name, yhquote.shortName, quote.name)
 	quote.fullName = core.fallback(instrument.name, yhquote.longName, wbticker.name)
-	if (quote.fullName == quote.name) delete quote.fullName;
 
 	quote.avgVolume10Day = _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day))
 	quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))
@@ -77,7 +80,7 @@ export function initquote(
 	core.object.repair(quote, applywbquote(quote, wbquote))
 	core.object.repair(quote, applybidask(quote, wbquote))
 
-	let reset = resetquote(quote, true)
+	let reset = resetquote(quote)
 	resets ? core.object.merge(quote, reset) : core.object.repair(quote, reset)
 
 	applycalcs(quote)
@@ -89,27 +92,28 @@ export function initquote(
 
 
 
-export function resetquote(quote: Quotes.Quote, resets = false) {
-	let reset = {
+export function resetlive(quote: Quotes.Quote) {
+	return {
 		size: 0,
-		bidSize: 0, askSize: 0,
 		buySize: 0, sellSize: 0,
 		// dealSize: 0, dealFlowSize: 0,
 		open: quote.price, high: quote.price, low: quote.price, close: quote.price,
 		// bidSpread: quote.bidPrice, askSpread: quote.askPrice,
 	} as Quotes.Quote
-	if (resets) {
-		reset.volume = 0
-		// Object.keys(reset).forEach(key => {
-		// 	if (key.indexOf('Size') == -1) return;
-		// 	reset[key.replace('Size', 'Volume')] = 0
-		// })
-		core.object.merge(reset, {
-			startPrice: quote.price,
-			dayHigh: quote.price, dayLow: quote.price,
-			liveCount: 0, dealCount: 0,
-		} as Quotes.Quote)
-	}
+}
+
+export function resetquote(quote: Quotes.Quote) {
+	let reset = resetlive(quote)
+	reset.volume = 0
+	// Object.keys(reset).forEach(key => {
+	// 	if (key.indexOf('Size') == -1) return;
+	// 	reset[key.replace('Size', 'Volume')] = 0
+	// })
+	core.object.merge(reset, {
+		startPrice: quote.price,
+		dayHigh: quote.price, dayLow: quote.price,
+		liveCount: 0, dealCount: 0,
+	} as Quotes.Quote)
 	return reset
 }
 
@@ -216,7 +220,7 @@ export const KEY_MAP = (({
 	// 
 	'dealNum': ({ key: 'dealCount', greater: true } as KeyMapValue) as any,
 	'volume': ({ key: 'volume', greater: true } as KeyMapValue) as any,
-	'dealAmount': ({ greater: true } as KeyMapValue) as any,
+	'dealAmount': ({ key: 'dealCount', greater: true } as KeyMapValue) as any,
 	// '____': ({ key: '____' } as KeyMapValue) as any,
 } as Webull.Quote) as any) as Dict<KeyMapValue>
 

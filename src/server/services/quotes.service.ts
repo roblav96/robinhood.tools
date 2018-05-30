@@ -28,7 +28,7 @@ radio.emit('symbols.start')
 if (process.env.SYMBOLS == 'STOCKS') {
 	radio.on('symbols.reset', onsymbols)
 }
-declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: SymbolsTypes } } }
+declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: TypeofSymbols } } }
 
 async function onsymbols(event: Radio.Event) {
 
@@ -65,6 +65,7 @@ async function onsymbols(event: Radio.Event) {
 
 	if (coms.length > 0) await redis.main.coms(coms);
 
+	console.log(`QUOTES ->`, QUOTES)
 	return
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
@@ -185,11 +186,10 @@ function ontick(i: number) {
 			if (!toquote.timestamp) return;
 
 			// console.log('save quote ->', toquote)
+			// toquote.liveCount = toquote.liveCount + 1
+			// let quote = QUOTES[symbol]
+			// core.object.merge(quote, quotes.resetlive(quote))
 
-			toquote.liveCount = toquote.liveCount + 1
-
-			let quote = QUOTES[symbol]
-			quotes.resetquote(quote)
 		}
 
 	})
