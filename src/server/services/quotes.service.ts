@@ -181,11 +181,13 @@ function ontick(i: number) {
 			if (toquote.timestamp <= savequote.timestamp) return;
 
 			let stamp = Date.now()
-			toquote.livestamp = stamp
+			toquote.liveStamp = stamp
 			toquote.liveCount++
 
+			quotes.conform(toquote, quotes.LIVE_KEYS_ALL)
+
 			let zkey = `${rkeys.LIVES}:${symbol}`
-			let lkey = `${zkey}:${toquote.livestamp}`
+			let lkey = `${zkey}:${stamp}`
 			coms.push(['hmset', lkey, toquote as any])
 			coms.push(['zadd', zkey, stamp as any, lkey])
 
@@ -205,7 +207,7 @@ function ontick(i: number) {
 	})
 
 	if (coms.length > 0) {
-		console.log('coms ->', coms)
+		// console.log('coms ->', coms)
 		redis.main.coms(coms)
 	}
 

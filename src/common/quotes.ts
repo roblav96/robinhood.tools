@@ -17,6 +17,14 @@ declare global { namespace Quotes { type AllKeys = keyof typeof ALL_KEYS } }
 
 
 
+export function conform(quote: Quotes.Quote, qkeys: string[]) {
+	Object.keys(quote).forEach(k => {
+		if (qkeys.indexOf(k) == -1) {
+			delete quote[k]
+		}
+	})
+}
+
 
 
 declare global { namespace Quotes { type ITiny = typeof TINY; interface Tiny extends ITiny { } } }
@@ -36,7 +44,9 @@ declare global { namespace Quotes { type ILive = typeof LIVE; interface Live ext
 const LIVE = {
 	status: '',
 	statusTimestamp: 0,
-	livestamp: 0,
+	// 
+	liveStamp: 0,
+	liveCount: 0,
 	// 
 	open: 0,
 	high: 0,
@@ -62,7 +72,6 @@ const LIVE = {
 	// askVolume: 0,
 	// 
 	volume: 0,
-	liveCount: 0,
 	dealCount: 0,
 	dealSize: 0,
 	dealVolume: 0,
@@ -73,7 +82,6 @@ const LIVE = {
 	// 
 	// dealFlowVolume: 0,
 	// dealFlowSize: 0,
-	// 
 	// 
 	turnoverRate: 0,
 	vibrateRatio: 0,
