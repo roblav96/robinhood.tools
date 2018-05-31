@@ -40,6 +40,7 @@ export const LIVES = 'lives'
 export const CALCS = 'calcs'
 export const QUOTES = 'quotes'
 export const DEALS = 'deals'
+export const MINUTES = 'minutes'
 
 
 

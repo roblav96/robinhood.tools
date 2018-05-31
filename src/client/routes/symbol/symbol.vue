@@ -55,7 +55,7 @@ section.symbol-route div.bidask .progress::-webkit-progress-bar {
 						</div>
 					</div>
 
-					<div class="column is-narrow fullhd:flex hidden">
+					<div v-show="all.quote.avgVolume" class="column is-narrow fullhd:flex hidden">
 						<div class="box h-12 flex">
 							<p class="self-center is-size-4 mr-2 font-medium whitespace-no-wrap">
 								{{vnumber(all.quote.avgVolume,{compact:true})}}
@@ -64,7 +64,7 @@ section.symbol-route div.bidask .progress::-webkit-progress-bar {
 						</div>
 					</div>
 
-					<div class="column is-narrow desktop:flex hidden">
+					<div v-show="all.quote.marketCap" class="column is-narrow desktop:flex hidden">
 						<div class="box h-12 flex">
 							<p class="self-center is-size-4 mr-2 font-medium whitespace-no-wrap">
 								{{vnumber(all.quote.marketCap,{compact:true})}}

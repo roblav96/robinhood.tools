@@ -28,6 +28,7 @@ const WB_EMITS = {} as Dict<Webull.Quote>
 
 const CALCS = {} as Dict<Quotes.Calc>
 const LIVES = {} as Dict<Quotes.Live>
+const MINUTES = {} as Dict<Quotes.Live>
 const EMITS = {} as Dict<Quotes.Calc>
 
 radio.once('symbols.ready', onsymbols)
@@ -43,7 +44,7 @@ async function onsymbols(event: Radio.Event) {
 	MQTTS.remove(v => !v.destroy())
 	core.nullify(SYMBOLS)
 	core.nullify(WB_QUOTES); core.nullify(WB_SAVES); core.nullify(WB_EMITS);
-	core.nullify(CALCS); core.nullify(LIVES); core.nullify(EMITS);
+	core.nullify(CALCS); core.nullify(LIVES); core.nullify(MINUTES); core.nullify(EMITS);
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
@@ -70,6 +71,7 @@ async function onsymbols(event: Radio.Event) {
 		quotes.toConform(quote, quotes.CALC_KEYS_ALL)
 		Object.assign(CALCS, { [symbol]: core.clone(quote) })
 		Object.assign(LIVES, { [symbol]: core.clone(quote) })
+		Object.assign(MINUTES, { [symbol]: core.clone(quote) })
 		Object.assign(EMITS, { [symbol]: {} })
 
 		socket.emit(`${rkeys.QUOTES}:${symbol}`, quote)
@@ -141,7 +143,8 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 
 function ontick(i: number) {
-	let save = i % 10 == 0
+	let live = i % 10 == 0
+	let minute = i % 60 == 0
 
 	let coms = [] as Redis.Coms
 	SYMBOLS.forEach(symbol => {
@@ -150,6 +153,7 @@ function ontick(i: number) {
 		let toquote = EMITS[symbol]
 		let quote = CALCS[symbol]
 		let fquote = LIVES[symbol]
+		let mquote = MINUTES[symbol]
 
 		if (Object.keys(wbquote).length > 0) {
 			core.object.merge(WB_SAVES[symbol], wbquote)
@@ -168,8 +172,7 @@ function ontick(i: number) {
 			Object.assign(EMITS, { [symbol]: {} })
 		}
 
-		if (save) {
-
+		if (live) {
 			let wbsaves = WB_SAVES[symbol]
 			if (Object.keys(wbsaves).length > 0) {
 				coms.push(['hmset', `${rkeys.WB.QUOTES}:${symbol}`, wbsaves as any])
@@ -177,24 +180,43 @@ function ontick(i: number) {
 			}
 
 			let diff = core.object.difference(fquote, quote)
-			if (Object.keys(diff).length == 0) return;
+			if (Object.keys(diff).length > 0) {
 
-			coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diff as any])
-			if (!diff.timestamp || quote.timestamp <= fquote.timestamp) return;
+				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diff as any])
+				if (diff.timestamp && quote.timestamp > fquote.timestamp) {
 
-			quote.liveCount++
+					quote.liveCount++
 
-			let lkey = `${rkeys.LIVES}:${symbol}:${quote.timestamp}`
-			let lquote = quotes.getConformed(quote, quotes.LIVE_KEYS_ALL)
-			coms.push(['hmset', lkey, lquote as any])
-			let zkey = `${rkeys.LIVES}:${symbol}`
-			coms.push(['zadd', zkey, quote.timestamp as any, lkey])
+					let lkey = `${rkeys.LIVES}:${symbol}:${quote.timestamp}`
+					let lquote = quotes.getConformed(quote, quotes.LIVE_KEYS_ALL)
+					coms.push(['hmset', lkey, lquote as any])
 
-			socket.emit(`${rkeys.LIVES}:${symbol}`, lquote)
+					let zkey = `${rkeys.LIVES}:${symbol}`
+					coms.push(['zadd', zkey, quote.timestamp as any, lkey])
 
-			core.object.merge(quote, quotes.resetlive(quote))
-			core.object.merge(LIVES[symbol], quote)
+					socket.emit(`${rkeys.LIVES}:${symbol}`, lquote)
 
+					core.object.merge(quote, quotes.resetlive(quote))
+					core.object.merge(LIVES[symbol], quote)
+				}
+			}
+		}
+
+		if (minute) {
+			let diff = core.object.difference(mquote, quote)
+			if (Object.keys(diff).length > 0 && diff.timestamp && quote.timestamp > mquote.timestamp) {
+
+				let mkey = `${rkeys.MINUTES}:${symbol}:${quote.timestamp}`
+				let lquote = quotes.getConformed(quote, quotes.LIVE_KEYS_ALL)
+				coms.push(['hmset', mkey, lquote as any])
+
+				let zkey = `${rkeys.MINUTES}:${symbol}`
+				coms.push(['zadd', zkey, quote.timestamp as any, mkey])
+
+				socket.emit(`${rkeys.MINUTES}:${symbol}`, lquote)
+
+				core.object.merge(MINUTES[symbol], quote)
+			}
 		}
 
 	})
