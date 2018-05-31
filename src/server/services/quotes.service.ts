@@ -1,6 +1,7 @@
 // 
 
 import '../main'
+import * as Rx from '../../common/rxjs'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
@@ -66,11 +67,11 @@ async function onsymbols(event: Radio.Event) {
 			coms.push(['hset', `${rkeys.QUOTES}:${symbol}`, 'typeof', quote.typeof])
 		}
 
-		quotes.toConform(quote, quotes.CALC_KEYS_ALL)
-
 		Object.assign(WB_QUOTES, { [symbol]: wbquote })
 		Object.assign(WB_EMITS, { [symbol]: [] })
 		Object.assign(WB_SAVES, { [symbol]: [] })
+
+		quotes.toConform(quote, quotes.CALC_KEYS_ALL)
 		Object.assign(QUOTES, { [symbol]: quote })
 		Object.assign(EMITS, { [symbol]: [] })
 		Object.assign(SAVES, { [symbol]: [] })
@@ -115,10 +116,10 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		return
 	}
 
-	// console.log(symbol, webull.mqtt_topics[topic], '\nwbquote ->', wbquote)
+	// console.log(symbol, webull.mqtt_topics[topic], '->\nwbquote ->', wbquote)
 	let towbquote = {} as Webull.Quote
 	let quote = WB_QUOTES[symbol]
-	if (!quote) return console.warn(symbol, webull.mqtt_topics[topic], `!quote\nwbquote ->`, wbquote);
+	if (!quote) return console.warn(symbol, webull.mqtt_topics[topic], `!quote ->\nwbquote ->`, wbquote);
 
 	Object.keys(wbquote).forEach(k => {
 		let source = wbquote[k]
@@ -136,17 +137,18 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 	let wbkeys = Object.keys(towbquote)
 	if (wbkeys.length > 0) {
-		// console.info(symbol, webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
+		// console.info(symbol, webull.mqtt_topics[topic], '->\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
+		// console.info(symbol, webull.mqtt_topics[topic], '->\ntoquote ->', towbquote)
 		pushkeys(WB_EMITS[symbol], wbkeys)
 		core.object.merge(WB_QUOTES[symbol], towbquote, wbkeys)
 
-		// console.log(symbol, webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
+		// console.log(symbol, webull.mqtt_topics[topic], '->\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
 		if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
-			// console.info(symbol, webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
+			// console.info(symbol, webull.mqtt_topics[topic], '->\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
 			let toquote = quotes.applybidask(QUOTES[symbol], towbquote)
 			let tokeys = Object.keys(toquote)
 			if (tokeys.length > 0) {
-				// console.warn(symbol, webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
+				// console.warn(symbol, webull.mqtt_topics[topic], '->\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
 				pushkeys(EMITS[symbol], tokeys)
 				core.object.merge(QUOTES[symbol], toquote, tokeys)
 			}
@@ -183,6 +185,7 @@ function ontick(i: number) {
 		if (wbemits.length > 0) {
 			pushkeys(wbsaves, wbemits.splice(0))
 			quotes.applywbquote(quote, towbquote, toquote)
+			core.object.merge(quote, toquote)
 			towbquote.symbol = symbol
 			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, towbquote)
 		}
@@ -190,13 +193,16 @@ function ontick(i: number) {
 		if (emits.length > 0) {
 			pushkeys(saves, emits.splice(0))
 			quotes.applycalcs(quote, toquote)
+			core.object.merge(quote, toquote)
 			toquote.symbol = symbol
 			socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
 		}
 
-		core.object.merge(quote, toquote)
+		// console.log(`toquote ->`, toquote)
 
 		if (save) {
+
+			// console.log(`saves ->`, saves)
 
 			if (wbsaves.length > 0) {
 				let wbsavequote = updatedquote(wbsaves, wbquote)
@@ -206,7 +212,7 @@ function ontick(i: number) {
 			if (saves.length == 0) return;
 
 			let savequote = updatedquote(saves, quote)
-			console.log('savequote ->', savequote)
+			// console.log('savequote ->', savequote)
 			coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, savequote as any])
 			saves.splice(0)
 			if (!Number.isFinite(savequote.timestamp)) return;
@@ -245,11 +251,56 @@ function ontick(i: number) {
 	// })
 
 	if (coms.length > 0) {
-		console.log('coms ->', coms)
+		// console.log('coms ->', coms)
 		redis.main.coms(coms)
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+// const rxBuffer = new Rx.Subject<LiveQuote>()
+// const rxSub = rxBuffer
+// 	.buffer(Rx.Observable.fromEvent(process.ee3_private, shared.RKEY.SYS.TICK_1))
+// 	.filter(v => v.length > 0)
+// 	.map(lquotes => shared.rxMergeBuffer(lquotes, 'nano', 'symbol', true))
+// 	.subscribe(onLiveQuotes)
+
+// function onLiveQuotes(lquotes: Array<LiveQuote>) {
+// 	let coms = lquotes.map(function(lquote) {
+// 		let rkey = shared.RKEY.CALCS + ':' + lquote.symbol
+// 		return ['hmset', rkey, utils.tohset(lquote)]
+// 	}) as RedisComs
+
+// 	if (process.DEVELOPMENT) coms.splice(0);
+
+// 	redis.pipelinecoms(coms).then(function(resolved) {
+// 		utils.pipelineErrors(resolved)
+// 	}).catch(function(error) {
+// 		logger.error('onLiveQuotes > error', utils.peRender(error))
+// 	})
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
