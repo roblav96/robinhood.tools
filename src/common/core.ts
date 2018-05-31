@@ -58,7 +58,7 @@ export function nullify(value: any) {
 			if (array.is(v)) {
 				v.splice(0)
 			} else if (object.is(v)) {
-				Object.assign(value, { [k]: {} })
+				value[k] = {}
 			} else {
 				value[k] = null
 			}
@@ -307,19 +307,19 @@ export const object = {
 			}
 		}
 	},
-	difference<T = object>(target: T, source: T): T {
-		let difference = {} as T
-		let keys = Object.keys(target)
+	difference<T = object>(from: any, to: T) {
+		let diff = {} as T
+		let keys = Object.keys(to)
+		if (keys.length == 0) return diff;
 		let i: number, len = keys.length
 		for (i = 0; i < len; i++) {
 			let key = keys[i]
-			let tvalue = target[key]
-			let svalue = source[key]
-			if (tvalue != svalue) {
-				difference[key] = svalue
+			let value = to[key]
+			if (from[key] != value) {
+				diff[key] = value
 			}
 		}
-		return difference
+		return diff
 	},
 	sortKeys<T = object>(target: T): T {
 		return _.fromPairs(_.sortBy(_.toPairs(target as any))) as any

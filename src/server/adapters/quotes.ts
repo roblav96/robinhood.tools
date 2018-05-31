@@ -90,7 +90,7 @@ export function initquote(
 
 
 
-export function resetlive(quote: Quotes.Quote) {
+export function resetlive(quote: Quotes.Calc) {
 	return {
 		size: 0,
 		buySize: 0, sellSize: 0,
@@ -98,10 +98,10 @@ export function resetlive(quote: Quotes.Quote) {
 		// dealFlowSize: 0,
 		open: quote.price, high: quote.price, low: quote.price, close: quote.price,
 		// bidSpread: quote.bidPrice, askSpread: quote.askPrice,
-	} as Quotes.Quote
+	} as Quotes.Calc
 }
 
-export function resetquote(quote: Quotes.Quote) {
+export function resetquote(quote: Quotes.Calc) {
 	let reset = resetlive(quote)
 	reset.volume = 0
 	// Object.keys(reset).forEach(key => {
@@ -112,7 +112,7 @@ export function resetquote(quote: Quotes.Quote) {
 		startPrice: quote.price,
 		dayHigh: quote.price, dayLow: quote.price,
 		liveCount: 0, dealCount: 0,
-	} as Quotes.Quote)
+	} as Quotes.Calc)
 	return reset
 }
 
@@ -128,7 +128,7 @@ export function todeal(wbdeal: Webull.Deal) {
 	} as Quotes.Deal
 }
 
-export function applydeal(quote: Quotes.Quote, deal: Quotes.Deal, toquote = {} as Quotes.Quote) {
+export function applydeal(quote: Quotes.Live, deal: Quotes.Deal, toquote = {} as Quotes.Live) {
 
 	if (deal.timestamp > quote.timestamp) {
 		toquote.timestamp = deal.timestamp
@@ -156,7 +156,7 @@ export function applydeal(quote: Quotes.Quote, deal: Quotes.Deal, toquote = {} a
 
 
 
-export function applybidask(quote: Quotes.Quote, wbquote: Webull.Quote, toquote = {} as Quotes.Quote) {
+export function applybidask(quote: Quotes.Live, wbquote: Webull.Quote, toquote = {} as Quotes.Live) {
 
 	let keymap = [
 		{ key: 'bid', fn: 'min' },
@@ -185,7 +185,7 @@ export function applybidask(quote: Quotes.Quote, wbquote: Webull.Quote, toquote 
 
 
 interface KeyMapValue {
-	key: keyof Quotes.Quote
+	key: keyof Quotes.Calc
 	time: boolean, greater: boolean,
 }
 export const KEY_MAP = (({
@@ -206,6 +206,9 @@ export const KEY_MAP = (({
 	// 'bidSize': ({ key: 'bidLot' } as KeyMapValue) as any,
 	// 'askSize': ({ key: 'askLot' } as KeyMapValue) as any,
 	// 
+	'quoteMaker': ({ key: 'quoteMaker' } as KeyMapValue) as any,
+	'quoteMakerAddress': ({ key: 'quoteMakerAddress' } as KeyMapValue) as any,
+	// 
 	'turnoverRate': ({ key: 'turnoverRate' } as KeyMapValue) as any,
 	'vibrateRatio': ({ key: 'vibrateRatio' } as KeyMapValue) as any,
 	'yield': ({ key: 'yield' } as KeyMapValue) as any,
@@ -225,7 +228,7 @@ export const KEY_MAP = (({
 
 
 
-export function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote = {} as Quotes.Quote) {
+export function applywbquote(quote: Quotes.Live, wbquote: Webull.Quote, toquote = {} as Quotes.Live) {
 
 	Object.keys(wbquote).forEach(k => {
 		let wbvalue = wbquote[k]
@@ -265,7 +268,7 @@ export function applywbquote(quote: Quotes.Quote, wbquote: Webull.Quote, toquote
 
 
 
-export function applycalcs(quote: Quotes.Quote, toquote?: Quotes.Quote) {
+export function applycalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 	if (!toquote) { toquote = quote } else { core.object.merge(quote, toquote) };
 
 	if (toquote.price) {

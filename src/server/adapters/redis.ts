@@ -30,6 +30,7 @@ class Redis extends IORedis {
 	}
 
 	coms(coms: Redis.Coms): Promise<any[]> {
+		if (coms.length == 0) return Promise.resolve([]);
 		return this.pipeline(coms).exec().then(fixPipeline) as any
 	}
 

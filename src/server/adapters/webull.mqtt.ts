@@ -105,6 +105,7 @@ export default class WebullMqttClient {
 	private ondata = (packet: Mqtt.Packet) => {
 
 		if (packet.cmd == 'pingresp') {
+			// if (this.options.verbose) console.log('pong');
 			this.alive = true
 			return
 		}
@@ -136,6 +137,8 @@ export default class WebullMqttClient {
 		}
 
 		if (packet.cmd == 'suback') {
+			// if (this.options.verbose) console.info('subscribed');
+			this.client.pingreq()
 			return
 		}
 

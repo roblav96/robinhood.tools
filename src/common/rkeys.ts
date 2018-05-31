@@ -36,10 +36,10 @@ export const BENCHMARKS = {
 
 
 export const TINYS = 'tinys'
+export const LIVES = 'lives'
+export const CALCS = 'calcs'
 export const QUOTES = 'quotes'
 export const DEALS = 'deals'
-export const LIVES = 'lives'
-export const MINUTES = 'minutes'
 
 
 
