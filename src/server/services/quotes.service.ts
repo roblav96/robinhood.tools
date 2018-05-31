@@ -24,10 +24,12 @@ const SYMBOLS = [] as string[]
 const WB_QUOTES = {} as Dict<Webull.Quote>
 const QUOTES = {} as Dict<Quotes.Quote>
 
-const WB_UPDATED = {} as Dict<string[]>
-const UPDATED = {} as Dict<string[]>
-function pushkeys(updated: string[], keys: string[]) {
-	keys.forEach(k => { if (updated.indexOf(k) == -1) updated.push(k); })
+const WB_EMITS = {} as Dict<string[]>
+const EMITS = {} as Dict<string[]>
+const WB_SAVES = {} as Dict<string[]>
+const SAVES = {} as Dict<string[]>
+function pushkeys(keys: string[], tokeys: string[]) {
+	tokeys.forEach(k => { if (keys.indexOf(k) == -1) keys.push(k); })
 }
 
 radio.once('symbols.ready', onsymbols)
@@ -40,10 +42,11 @@ declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: TypeofSymbol
 async function onsymbols(event: Radio.Event) {
 
 	clock.offListener(ontick)
-	MQTTS.remove(v => v.destroy() || true)
+	MQTTS.forEach(v => v.destroy())
+	MQTTS.splice(0)
 	core.nullify(SYMBOLS)
-	core.nullify(WB_QUOTES); core.nullify(WB_UPDATED);
-	core.nullify(QUOTES); core.nullify(UPDATED);
+	core.nullify(WB_QUOTES); core.nullify(WB_EMITS); core.nullify(WB_SAVES);
+	core.nullify(QUOTES); core.nullify(EMITS); core.nullify(SAVES);
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
@@ -63,12 +66,14 @@ async function onsymbols(event: Radio.Event) {
 			coms.push(['hset', `${rkeys.QUOTES}:${symbol}`, 'typeof', quote.typeof])
 		}
 
-		quotes.conform(quote, quotes.CALC_KEYS_ALL)
+		quotes.toConform(quote, quotes.CALC_KEYS_ALL)
 
 		Object.assign(WB_QUOTES, { [symbol]: wbquote })
-		Object.assign(WB_UPDATED, { [symbol]: [] })
+		Object.assign(WB_EMITS, { [symbol]: [] })
+		Object.assign(WB_SAVES, { [symbol]: [] })
 		Object.assign(QUOTES, { [symbol]: quote })
-		Object.assign(UPDATED, { [symbol]: [] })
+		Object.assign(EMITS, { [symbol]: [] })
+		Object.assign(SAVES, { [symbol]: [] })
 
 		socket.emit(`${rkeys.QUOTES}:${symbol}`, quote)
 	})
@@ -103,17 +108,17 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		let toquote = quotes.applydeal(QUOTES[symbol], deal)
 		let tokeys = Object.keys(toquote)
 		if (tokeys.length > 0) {
-			pushkeys(UPDATED[symbol], tokeys)
+			pushkeys(EMITS[symbol], tokeys)
 			core.object.merge(QUOTES[symbol], toquote, tokeys)
 		}
 
 		return
 	}
 
-	// console.log(symbol, '->', webull.mqtt_topics[topic], '->', wbquote)
+	// console.log(symbol, webull.mqtt_topics[topic], '\nwbquote ->', wbquote)
 	let towbquote = {} as Webull.Quote
 	let quote = WB_QUOTES[symbol]
-	if (!quote) return console.warn(`!quote ->`, symbol, webull.mqtt_topics[topic], wbquote);
+	if (!quote) return console.warn(symbol, webull.mqtt_topics[topic], `!quote\nwbquote ->`, wbquote);
 
 	Object.keys(wbquote).forEach(k => {
 		let source = wbquote[k]
@@ -131,16 +136,18 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 	let wbkeys = Object.keys(towbquote)
 	if (wbkeys.length > 0) {
-		pushkeys(WB_UPDATED[symbol], wbkeys)
+		// console.info(symbol, webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
+		pushkeys(WB_EMITS[symbol], wbkeys)
 		core.object.merge(WB_QUOTES[symbol], towbquote, wbkeys)
 
-		// console.info(symbol, '->', webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
-
+		// console.log(symbol, webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
 		if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
+			// console.info(symbol, webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
 			let toquote = quotes.applybidask(QUOTES[symbol], towbquote)
 			let tokeys = Object.keys(toquote)
 			if (tokeys.length > 0) {
-				pushkeys(UPDATED[symbol], tokeys)
+				// console.warn(symbol, webull.mqtt_topics[topic], '\nwbquote ->', wbquote, '\ntoquote ->', towbquote)
+				pushkeys(EMITS[symbol], tokeys)
 				core.object.merge(QUOTES[symbol], toquote, tokeys)
 			}
 		}
@@ -150,80 +157,95 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 
 
+function updatedquote<T>(keys: string[], quote: T) {
+	let toquote = {} as T
+	if (keys.length == 0) return toquote;
+	keys.forEach(k => toquote[k] = quote[k])
+	return toquote
+}
+
 function ontick(i: number) {
 	let save = i % 10 == 0
 
 	let coms = [] as Redis.Coms
 	SYMBOLS.forEach(symbol => {
 
-		// let wbquote = 
+		let wbquote = WB_QUOTES[symbol]
+		let wbemits = WB_EMITS[symbol]
+		let wbsaves = WB_SAVES[symbol]
+		let towbquote = updatedquote(wbemits, wbquote)
 
-		// let wbquote = core.object.difference(WB_EMITS[symbol], WB_QUOTES[symbol])
-		// let toquote = core.object.difference(EMITS[symbol], QUOTES[symbol])
-		// if (Object.keys(wbquote).length > 0) {
-		// 	quotes.applywbquote(QUOTES[symbol], wbquote, toquote)
-		// 	wbquote.symbol = symbol
-		// 	socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
-		// }
-		// if (Object.keys(toquote).length > 0) {
-		// 	quotes.applycalcs(QUOTES[symbol], toquote)
-		// 	core.object.merge(QUOTES[symbol], toquote)
-		// 	toquote.symbol = symbol
-		// 	socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
-		// }
+		let quote = QUOTES[symbol]
+		let emits = EMITS[symbol]
+		let saves = SAVES[symbol]
+		let toquote = updatedquote(emits, quote)
 
-		return
+		if (wbemits.length > 0) {
+			pushkeys(wbsaves, wbemits.splice(0))
+			quotes.applywbquote(quote, towbquote, toquote)
+			towbquote.symbol = symbol
+			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, towbquote)
+		}
+
+		if (emits.length > 0) {
+			pushkeys(saves, emits.splice(0))
+			quotes.applycalcs(quote, toquote)
+			toquote.symbol = symbol
+			socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
+		}
+
+		core.object.merge(quote, toquote)
 
 		if (save) {
-			let wbquote = core.object.difference(WB_SAVE_QUOTES[symbol], WB_QUOTES[symbol])
-			if (Object.keys(wbquote).length > 0) {
-				coms.push(['hmset', `${rkeys.WB.QUOTES}:${symbol}`, wbquote as any])
+
+			if (wbsaves.length > 0) {
+				let wbsavequote = updatedquote(wbsaves, wbquote)
+				coms.push(['hmset', `${rkeys.WB.QUOTES}:${symbol}`, wbsavequote as any])
+				wbsaves.splice(0)
 			}
+			if (saves.length == 0) return;
 
-			let toquote = QUOTES[symbol]
-			let savequote = SAVE_QUOTES[symbol]
-			let diffquote = core.object.difference(savequote, toquote)
-			if (Object.keys(diffquote).length == 0) return;
+			let savequote = updatedquote(saves, quote)
+			console.log('savequote ->', savequote)
+			coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, savequote as any])
+			saves.splice(0)
+			if (!Number.isFinite(savequote.timestamp)) return;
 
-			coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diffquote as any])
-			if (toquote.timestamp <= savequote.timestamp) return;
+			// let stamp = Date.now()
+			// quote.liveStamp = stamp
+			quote.liveCount++
 
-			let stamp = Date.now()
-			toquote.liveStamp = stamp
-			toquote.liveCount++
 
-			quotes.conform(toquote, quotes.LIVE_KEYS_ALL)
 
+			let conformed = quotes.getConformed(quote, quotes.LIVE_KEYS_ALL)
 			let zkey = `${rkeys.LIVES}:${symbol}`
-			let lkey = `${zkey}:${stamp}`
-			coms.push(['hmset', lkey, toquote as any])
-			coms.push(['zadd', zkey, stamp as any, lkey])
+			let lkey = `${zkey}:${savequote.timestamp}`
+			coms.push(['hmset', lkey, conformed as any])
+			coms.push(['zadd', zkey, savequote.timestamp as any, lkey])
 
-			core.object.merge(QUOTES[symbol], quotes.resetlive(toquote))
+			core.object.merge(quote, quotes.resetlive(quote))
 
 		}
 
 	})
 
-	return
-
-	SYMBOLS.forEach(symbol => {
-		Object.assign(WB_EMITS, { [symbol]: {} })
-		Object.assign(EMITS, { [symbol]: {} })
-		if (save) {
-			Object.assign(WB_SAVES, { [symbol]: {} })
-			Object.assign(SAVES, { [symbol]: {} })
-		}
-		// core.object.merge(WB_EMITS[symbol], WB_QUOTES[symbol])
-		// core.object.merge(EMITS[symbol], QUOTES[symbol])
-		// if (save) {
-		// 	core.object.merge(WB_SAVES[symbol], WB_QUOTES[symbol])
-		// 	core.object.merge(SAVES[symbol], QUOTES[symbol])
-		// }
-	})
+	// SYMBOLS.forEach(symbol => {
+	// 	WB_EMITS[symbol].splice(0)
+	// 	EMITS[symbol].splice(0)
+	// 	if (save) {
+	// 		WB_SAVES[symbol].splice(0)
+	// 		SAVES[symbol].splice(0)
+	// 	}
+	// 	// core.object.merge(WB_EMITS[symbol], WB_QUOTES[symbol])
+	// 	// core.object.merge(EMITS[symbol], QUOTES[symbol])
+	// 	// if (save) {
+	// 	// 	core.object.merge(WB_SAVES[symbol], WB_QUOTES[symbol])
+	// 	// 	core.object.merge(SAVES[symbol], QUOTES[symbol])
+	// 	// }
+	// })
 
 	if (coms.length > 0) {
-		// console.log('coms ->', coms)
+		console.log('coms ->', coms)
 		redis.main.coms(coms)
 	}
 

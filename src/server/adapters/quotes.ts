@@ -94,7 +94,8 @@ export function resetlive(quote: Quotes.Quote) {
 	return {
 		size: 0,
 		buySize: 0, sellSize: 0,
-		// dealSize: 0, dealFlowSize: 0,
+		dealSize: 0,
+		// dealFlowSize: 0,
 		open: quote.price, high: quote.price, low: quote.price, close: quote.price,
 		// bidSpread: quote.bidPrice, askSpread: quote.askPrice,
 	} as Quotes.Quote

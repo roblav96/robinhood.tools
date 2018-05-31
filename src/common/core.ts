@@ -269,6 +269,7 @@ export const object = {
 	},
 	merge<T = object>(target: T, source: T, keys?: string[]) {
 		keys = keys || Object.keys(source)
+		if (keys.length == 0) return;
 		let i: number, len = keys.length
 		for (i = 0; i < len; i++) {
 			let key = keys[i]
@@ -278,8 +279,9 @@ export const object = {
 			}
 		}
 	},
-	mergeAll<T = object>(targets: T[], source: T) {
-		let keys = Object.keys(source)
+	mergeAll<T = object>(targets: T[], source: T, keys?: string[]) {
+		keys = keys || Object.keys(source)
+		if (keys.length == 0) return;
 		let size = targets.length
 		let i: number, len = keys.length
 		for (i = 0; i < len; i++) {

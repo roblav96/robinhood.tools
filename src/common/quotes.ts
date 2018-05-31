@@ -17,17 +17,19 @@ declare global { namespace Quotes { type AllKeys = keyof typeof ALL_KEYS } }
 
 
 
-export function conform<T>(quote: T, qkeys: string[]) {
+export function toConform<T>(quote: T, qkeys: string[]) {
 	Object.keys(quote).forEach(k => {
 		if (qkeys.indexOf(k) == -1) delete quote[k];
 	})
 	return quote
 }
-export function conformed<T>(quote: T, qkeys: string[]) {
-	return qkeys.reduce((toquote, qkey, index) => {
-		if (quote[qkey] != null) toquote[qkey] = quote[qkey];
-		return toquote
-	}, {} as T)
+export function getConformed<T>(quote: T, qkeys: string[]) {
+	let toquote = {} as T
+	qkeys.forEach(k => {
+		let v = quote[k]
+		if (v != null) toquote[k] = v;
+	})
+	return toquote
 }
 
 
@@ -50,7 +52,7 @@ const LIVE = {
 	status: '',
 	statusTimestamp: 0,
 	// 
-	liveStamp: 0,
+	// liveStamp: 0,
 	liveCount: 0,
 	// 
 	open: 0,
