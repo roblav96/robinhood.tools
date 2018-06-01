@@ -53,7 +53,7 @@ $desktop: 992px;
 $widescreen: 1200px;
 $fullhd: 1408px;
 // 
-$column-gap: 1rem;
+// $column-gap: 1rem;
 $dimensions: 16 20 24 28 32 40 48 56 64 72 80 88 96 104 112 120;
 // 
 $speed: 100ms;
@@ -77,9 +77,9 @@ $button-disabled-opacity: 0.33;
 $table-color: $text;
 $table-head-cell-color: $text;
 // 
-$section-padding: 2rem 1.5rem;
-$section-padding-medium: 4rem 1.5rem;
-$section-padding-large: 8rem 1.5rem;
+$section-padding: 1.5rem 1.5rem;
+$section-padding-medium: 3rem 1.5rem;
+$section-padding-large: 6rem 1.5rem;
 // 
 $link-visited: $pink;
 $link-focus-border: $link;

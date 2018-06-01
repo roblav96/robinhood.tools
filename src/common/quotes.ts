@@ -150,6 +150,7 @@ const FULL = {
 	name: '',
 	tinyName: '',
 	fullName: '',
+	description: '',
 	mic: '',
 	acronym: '',
 	exchange: '',

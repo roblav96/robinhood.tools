@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<section class="pb-12">
+	<section class="">
 
 		<section v-visible="!busy" class="section" v-for="list in lists" :key="list.name">
 			<div class="container">

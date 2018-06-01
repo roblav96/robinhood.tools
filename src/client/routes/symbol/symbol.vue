@@ -77,7 +77,7 @@ section.symbol-route div.bidask .progress::-webkit-progress-bar {
 			</div>
 
 		</section>
-		<section class="has-background-white-ter pb-8">
+		<section class="has-background-white-ter pb-6">
 
 			<nav class="tabs is-toggle is-centered is-fullwidth mb-0">
 				<div class="container px-6 desktop:px-0">

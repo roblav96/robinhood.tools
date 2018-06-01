@@ -59,6 +59,7 @@ export function initquote(
 		alive: instrument.alive,
 		mic: instrument.mic,
 		acronym: instrument.acronym,
+		description: iexitem.description,
 		issueType: iex.ISSUE_TYPES[iexitem.issueType],
 		listDate: new Date(instrument.list_date).valueOf(),
 		country: core.fallback(instrument.country, wbquote.countryISOCode, wbquote.regionAlias, wbticker.regionIsoCode),

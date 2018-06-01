@@ -1,7 +1,6 @@
 // 
 
 import '../main'
-import * as Rx from '../../common/rxjs'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
@@ -26,9 +25,8 @@ const WB_QUOTES = {} as Dict<Webull.Quote>
 const WB_SAVES = {} as Dict<Webull.Quote>
 const WB_EMITS = {} as Dict<Webull.Quote>
 
-const CALCS = {} as Dict<Quotes.Calc>
-const LIVES = {} as Dict<Quotes.Live>
-const MINUTES = {} as Dict<Quotes.Live>
+const QUOTES = {} as Dict<Quotes.Calc>
+const LIVES = {} as Dict<Quotes.Calc>
 const EMITS = {} as Dict<Quotes.Calc>
 
 radio.once('symbols.ready', onsymbols)
@@ -44,7 +42,7 @@ async function onsymbols(event: Radio.Event) {
 	MQTTS.remove(v => !v.destroy())
 	core.nullify(SYMBOLS)
 	core.nullify(WB_QUOTES); core.nullify(WB_SAVES); core.nullify(WB_EMITS);
-	core.nullify(CALCS); core.nullify(LIVES); core.nullify(MINUTES); core.nullify(EMITS);
+	core.nullify(QUOTES); core.nullify(LIVES); core.nullify(EMITS);
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
@@ -69,9 +67,8 @@ async function onsymbols(event: Radio.Event) {
 		Object.assign(WB_EMITS, { [symbol]: {} })
 
 		quotes.toConform(quote, quotes.CALC_KEYS_ALL)
-		Object.assign(CALCS, { [symbol]: core.clone(quote) })
+		Object.assign(QUOTES, { [symbol]: core.clone(quote) })
 		Object.assign(LIVES, { [symbol]: core.clone(quote) })
-		Object.assign(MINUTES, { [symbol]: core.clone(quote) })
 		Object.assign(EMITS, { [symbol]: {} })
 
 		socket.emit(`${rkeys.QUOTES}:${symbol}`, quote)
@@ -104,8 +101,8 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
 		let deal = quotes.todeal(wbquote)
 		socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
-		let toquote = quotes.applydeal(CALCS[symbol], deal)
-		core.object.mergeAll([CALCS[symbol], EMITS[symbol]], toquote)
+		let toquote = quotes.applydeal(QUOTES[symbol], deal)
+		core.object.mergeAll([QUOTES[symbol], EMITS[symbol]], toquote)
 		return
 	}
 
@@ -134,8 +131,8 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		// console.info(symbol, webull.mqtt_topics[topic], '->\ntowbquote ->', towbquote)
 
 		if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
-			let toquote = quotes.applybidask(CALCS[symbol], towbquote)
-			core.object.mergeAll([CALCS[symbol], EMITS[symbol]], toquote)
+			let toquote = quotes.applybidask(QUOTES[symbol], towbquote)
+			core.object.mergeAll([QUOTES[symbol], EMITS[symbol]], toquote)
 		}
 	}
 })
@@ -149,11 +146,9 @@ function ontick(i: number) {
 	let coms = [] as Redis.Coms
 	SYMBOLS.forEach(symbol => {
 
-		let wbquote = WB_EMITS[symbol]
+		let quote = QUOTES[symbol]
 		let toquote = EMITS[symbol]
-		let quote = CALCS[symbol]
-		let fquote = LIVES[symbol]
-		let mquote = MINUTES[symbol]
+		let wbquote = WB_EMITS[symbol]
 
 		if (Object.keys(wbquote).length > 0) {
 			core.object.merge(WB_SAVES[symbol], wbquote)
@@ -179,6 +174,7 @@ function ontick(i: number) {
 				Object.assign(WB_SAVES, { [symbol]: {} })
 			}
 
+			let fquote = LIVES[symbol]
 			let diff = core.object.difference(fquote, quote)
 			if (Object.keys(diff).length > 0) {
 
@@ -202,29 +198,9 @@ function ontick(i: number) {
 			}
 		}
 
-		if (minute) {
-			let diff = core.object.difference(mquote, quote)
-			if (Object.keys(diff).length > 0 && diff.timestamp && quote.timestamp > mquote.timestamp) {
-
-				let mkey = `${rkeys.MINUTES}:${symbol}:${quote.timestamp}`
-				let lquote = quotes.getConformed(quote, quotes.LIVE_KEYS_ALL)
-				coms.push(['hmset', mkey, lquote as any])
-
-				let zkey = `${rkeys.MINUTES}:${symbol}`
-				coms.push(['zadd', zkey, quote.timestamp as any, mkey])
-
-				socket.emit(`${rkeys.MINUTES}:${symbol}`, lquote)
-
-				core.object.merge(MINUTES[symbol], quote)
-			}
-		}
-
 	})
 
-	if (coms.length > 0) {
-		// console.log('coms ->', coms)
-		redis.main.coms(coms)
-	}
+	redis.main.coms(coms)
 
 }
 

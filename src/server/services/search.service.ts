@@ -12,7 +12,7 @@ import radio from '../adapters/radio'
 
 
 
-const CACHE = [] as Quotes.Quote[]
+const QUOTES = [] as Quotes.Quote[]
 const WADES = { symbol: null, name: null }
 
 radio.once('symbols.ready', onready)
@@ -29,8 +29,8 @@ async function onready() {
 		return v
 	})
 
-	core.nullify(CACHE)
-	CACHE.push(...quotes.map(v => ({
+	core.nullify(QUOTES)
+	QUOTES.push(...quotes.map(v => ({
 		symbol: v.symbol,
 		avgVolume: v.avgVolume || 0,
 	} as Quotes.Quote)))
@@ -52,7 +52,7 @@ radio.reply('search.query', async function onquery(query: string) {
 	let symbols = [] as string[]
 	Object.keys(WADES).forEach(key => {
 		if (symbols.length > MAX) return;
-		let quotes = Wade(WADES[key])(query).map(({ index }) => CACHE[index]) as Quotes.Quote[]
+		let quotes = Wade(WADES[key])(query).map(({ index }) => QUOTES[index]) as Quotes.Quote[]
 		quotes.sort((a, b) => b.avgVolume - a.avgVolume).forEach(({ symbol }) => {
 			if (symbols.includes(symbol)) return;
 			if (symbols.length >= MAX) return;
