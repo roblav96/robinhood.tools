@@ -5,6 +5,7 @@ import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import VMixin from '@/client/mixins/v.mixin'
 import Symbol from './symbol'
+import * as url from 'url'
 import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as rkeys from '@/common/rkeys'
@@ -52,7 +53,10 @@ export default class extends Mixins(VMixin) {
 
 	vvalue(key: keyof Quotes.Quote) {
 		let value = this.all.quote[key]
-		if (value && key == 'listDate') return dayjs(value).format('MMMM DD, YYYY');
+		if (value) {
+			if (key == 'website') return url.parse(value as any).host;
+			if (key == 'listDate') return dayjs(value).format('MMMM DD, YYYY');
+		}
 		if (core.number.isFinite(value)) return utils.vnumber(value);
 		// if (core.string.is(value)) return _.startCase(value);
 		if (core.boolean.is(value)) return !value ? 'No' : 'Yes';

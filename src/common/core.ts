@@ -16,7 +16,7 @@ export function isJunk(value: any) {
 // export function isTruthy(value: any) { return !isFalsey(value) }
 
 export const isBrowser = !new Function('try { return this === global; } catch(e) { return false }')()
-export const isNodejs = !isBrowser
+export const isNodeJS = !isBrowser
 
 
 

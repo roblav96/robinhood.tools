@@ -112,23 +112,27 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	if (!quote) return console.warn(symbol, webull.mqtt_topics[topic], `!quote ->\nwbquote ->`, wbquote);
 
 	Object.keys(wbquote).forEach(k => {
-		let source = wbquote[k]
-		let target = quote[k]
-		if (target == null) { target = source; quote[k] = source; towbquote[k] = source }
+		let to = wbquote[k]
+		let from = quote[k]
+		if (from == null) { from = to; quote[k] = to; towbquote[k] = to }
 		let keymap = quotes.KEY_MAP[k]
 		if (keymap && (keymap.time || keymap.greater)) {
-			if (source > target) {
-				towbquote[k] = source
+			if (keymap.time) {
+				if (to > from) towbquote[k] = to;
+			} else if (keymap.greater) {
+				if (to < from) {
+					if (core.calc.percent(to, from) < -50) towbquote[k] = to;
+				} else if (to > from) towbquote[k] = to;
 			}
-		} else if (source != target) {
-			towbquote[k] = source
+		} else if (to != from) {
+			towbquote[k] = to
 		}
 	})
 
 	let tokeys = Object.keys(towbquote)
 	if (tokeys.length > 0) {
-		core.object.mergeAll([WB_QUOTES[symbol], WB_EMITS[symbol]], towbquote, tokeys)
 		// console.info(symbol, webull.mqtt_topics[topic], '->\ntowbquote ->', towbquote)
+		core.object.mergeAll([WB_QUOTES[symbol], WB_EMITS[symbol]], towbquote, tokeys)
 
 		if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
 			let toquote = quotes.applybidask(QUOTES[symbol], towbquote)
@@ -141,7 +145,6 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 function ontick(i: number) {
 	let live = i % 10 == 0
-	let minute = i % 60 == 0
 
 	let coms = [] as Redis.Coms
 	SYMBOLS.forEach(symbol => {
@@ -208,9 +211,12 @@ function ontick(i: number) {
 
 
 
-
-
-
+// import * as benchmark from '../../common/benchmark'
+// benchmark.simple('calc.percent', [
+// 	function calcpercent() {
+// 		core.calc.percent(123,1234)
+// 	},
+// ])
 
 
 
