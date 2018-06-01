@@ -42,8 +42,8 @@
 							</th>
 						</tr>
 						<tr>
-							<th class="font-normal border-0" colspan="2">
-								{{all.quote.description}}
+							<th class="font-normal border-0 content" colspan="2">
+								<p>{{all.quote.description}}</p>
 							</th>
 						</tr>
 					</thead>

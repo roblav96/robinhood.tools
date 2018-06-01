@@ -30,7 +30,7 @@
 						<div class="box content">
 							<div class="has-text-centered">
 								<b-icon :icon="box.icon" size="is-xxlarge" type="is-primary" class="mb-4"></b-icon>
-								<p class="text-inherit title is-4">{{box.title}}</p>
+								<p class="font-semibold is-size-4">{{box.title}}</p>
 							</div>
 							<hr class="my-4">
 							<p>{{box.desc}}</p>

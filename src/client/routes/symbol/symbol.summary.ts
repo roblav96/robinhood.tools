@@ -10,6 +10,7 @@ import * as core from '@/common/core'
 import * as rkeys from '@/common/rkeys'
 import * as http from '@/client/adapters/http'
 import * as utils from '@/client/adapters/utils'
+import dayjs from '@/common/dayjs'
 import socket from '@/client/adapters/socket'
 
 
@@ -21,7 +22,7 @@ export default class extends Mixins(VMixin) {
 	all = this.$parent.all
 
 	created() {
-		
+
 	}
 
 	schemas = [
@@ -49,8 +50,9 @@ export default class extends Mixins(VMixin) {
 		},
 	] as Schema[]
 
-	vvalue(key: string) {
+	vvalue(key: keyof Quotes.Quote) {
 		let value = this.all.quote[key]
+		if (value && key == 'listDate') return dayjs(value).format('MMMM DD, YYYY');
 		if (core.number.isFinite(value)) return utils.vnumber(value);
 		// if (core.string.is(value)) return _.startCase(value);
 		if (core.boolean.is(value)) return !value ? 'No' : 'Yes';
