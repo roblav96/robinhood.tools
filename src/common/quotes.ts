@@ -5,7 +5,7 @@ import * as rkeys from './rkeys'
 
 
 
-export const ALL_KEYS = {
+export const ALL_RKEYS = {
 	'quote': rkeys.QUOTES,
 	'wbticker': rkeys.WB.TICKERS,
 	'wbquote': rkeys.WB.QUOTES,
@@ -13,17 +13,16 @@ export const ALL_KEYS = {
 	'yhquote': rkeys.YH.QUOTES,
 	'iexitem': rkeys.IEX.ITEMS,
 }
-declare global { namespace Quotes { type AllKeys = keyof typeof ALL_KEYS } }
+declare global { namespace Quotes { type AllKeys = keyof typeof ALL_RKEYS } }
 
 
 
-export function toConform<T>(quote: T, qkeys: string[]) {
+export function convert<T>(quote: T, qkeys: string[]) {
 	Object.keys(quote).forEach(k => {
 		if (qkeys.indexOf(k) == -1) delete quote[k];
 	})
-	return quote
 }
-export function getConformed<T>(quote: T, qkeys: string[]) {
+export function getConverted<T>(quote: T, qkeys: string[]) {
 	let toquote = {} as T
 	qkeys.forEach(k => {
 		let v = quote[k]
@@ -41,7 +40,7 @@ const TINY = {
 	timestamp: 0,
 }
 export const TINY_KEYS = Object.keys(TINY).sort() as (keyof typeof TINY)[]
-export const TINY_KEYS_ALL = TINY_KEYS.sort() as (keyof Quotes.Tiny)[]
+export const ALL_TINY_KEYS = TINY_KEYS.sort() as (keyof Quotes.Tiny)[]
 core.nullify(TINY)
 
 
@@ -88,7 +87,7 @@ const LIVE = {
 	yield: 0,
 }
 export const LIVE_KEYS = Object.keys(LIVE).sort() as (keyof typeof LIVE)[]
-export const LIVE_KEYS_ALL = LIVE_KEYS.concat(TINY_KEYS_ALL as any).sort() as (keyof Quotes.Live)[]
+export const ALL_LIVE_KEYS = LIVE_KEYS.concat(ALL_TINY_KEYS as any).sort() as (keyof Quotes.Live)[]
 core.nullify(LIVE)
 
 
@@ -137,7 +136,7 @@ const CALC = {
 	postTimestamp: 0,
 }
 export const CALC_KEYS = Object.keys(CALC).sort() as (keyof typeof CALC)[]
-export const CALC_KEYS_ALL = CALC_KEYS.concat(LIVE_KEYS_ALL as any).sort() as (keyof Quotes.Calc)[]
+export const ALL_CALC_KEYS = CALC_KEYS.concat(ALL_LIVE_KEYS as any).sort() as (keyof Quotes.Calc)[]
 core.nullify(CALC)
 
 
@@ -163,7 +162,7 @@ const FULL = {
 	listDate: 0,
 }
 export const FULL_KEYS = Object.keys(FULL).sort() as (keyof typeof FULL)[]
-export const FULL_KEYS_ALL = FULL_KEYS.concat(CALC_KEYS_ALL as any).sort() as (keyof Quotes.Full)[]
+export const ALL_FULL_KEYS = FULL_KEYS.concat(ALL_CALC_KEYS as any).sort() as (keyof Quotes.Full)[]
 core.nullify(FULL)
 
 

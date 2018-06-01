@@ -13,9 +13,9 @@ import * as pAll from 'p-all'
 
 
 
-export async function getAlls(symbols: string[], allkeys = Object.keys(quotes.ALL_KEYS) as Quotes.AllKeys[]) {
+export async function getAlls(symbols: string[], allkeys = Object.keys(quotes.ALL_RKEYS) as Quotes.AllKeys[]) {
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => {
-		return allkeys.map(k => ['hgetall', `${quotes.ALL_KEYS[k]}:${v}`])
+		return allkeys.map(k => ['hgetall', `${quotes.ALL_RKEYS[k]}:${v}`])
 	})))
 	resolved.forEach(core.fix)
 	let ii = 0
@@ -28,11 +28,11 @@ export async function getAlls(symbols: string[], allkeys = Object.keys(quotes.AL
 
 export async function syncAllQuotes(resets = false) {
 	let symbols = await utils.getAllSymbols()
-
-	// let ikeys = ['bidSize', 'bidVolume', 'bidSpread', 'askSize', 'askVolume', 'askSpread'] as KeysOf<Quotes.Quote>
-	// let coms = symbols.map(v => ['hdel', `${rkeys.QUOTES}:${v}`].concat(ikeys))
-	// await redis.main.coms(coms)
-
+	if (process.env.DEVELOPMENT) {
+		// let ikeys = ['bidSize', 'bidVolume', 'bidSpread', 'askSize', 'askVolume', 'askSpread'] as KeysOf<Quotes.Quote>
+		// let coms = symbols.map(v => ['hdel', `${rkeys.QUOTES}:${v}`].concat(ikeys))
+		// await redis.main.coms(coms)
+	}
 	let chunks = core.array.chunks(symbols, _.ceil(symbols.length / 256))
 	await pAll(chunks.map((chunk, i) => async () => {
 		if (process.env.DEVELOPMENT) console.log('syncAllQuotes ->', `${_.round((i / chunks.length) * 100)}%`);
@@ -107,17 +107,19 @@ export function resetlive(quote: Quotes.Calc) {
 }
 
 export function resetquote(quote: Quotes.Calc) {
-	let reset = resetlive(quote)
-	core.object.merge(reset, {
+	let toquote = resetlive(quote)
+	Object.keys(toquote).forEach(key => {
+		if (key.indexOf('Size') >= 0) {
+			toquote[key.replace('Size', 'Volume')] = 0
+		}
+	})
+	core.object.merge(toquote, {
 		volume: 0,
-		dealVolume: 0, dealFlowVolume: 0,
-		buyVolume: 0, sellVolume: 0,
-		bidVolume: 0, askVolume: 0,
 		liveCount: 0, dealCount: 0,
 		startPrice: quote.price,
 		dayHigh: quote.price, dayLow: quote.price,
 	} as Quotes.Calc)
-	return reset
+	return toquote
 }
 
 
@@ -145,14 +147,21 @@ export function applydeal(quote: Quotes.Live, deal: Quotes.Deal, toquote = {} as
 	toquote.dealSize = quote.dealSize + deal.size
 	toquote.dealVolume = quote.dealVolume + deal.size
 
+	let flow = 0
 	if (deal.side == 'B') {
 		toquote.buySize = quote.buySize + deal.size
 		toquote.buyVolume = quote.buyVolume + deal.size
+		flow = deal.size
 	} else if (deal.side == 'S') {
 		toquote.sellSize = quote.sellSize + deal.size
 		toquote.sellVolume = quote.sellVolume + deal.size
+		flow = -deal.size
 	} else {
 		toquote.volume = quote.volume + deal.size
+	}
+	if (flow) {
+		toquote.dealFlowSize = quote.dealFlowSize + flow
+		toquote.dealFlowVolume = quote.dealFlowVolume + flow
 	}
 
 	return toquote
@@ -161,49 +170,25 @@ export function applydeal(quote: Quotes.Live, deal: Quotes.Deal, toquote = {} as
 
 
 export function applybidask(quote: Quotes.Calc, wbquote: Webull.Quote, toquote = {} as Quotes.Calc) {
-
-	if (Number.isFinite(wbquote.bid)) {
-		toquote.bid = wbquote.bid
-		toquote.bidSpread = Math.min(quote.bidSpread || Infinity, quote.bid || Infinity, wbquote.bid || Infinity)
-	}
-	if (Number.isFinite(wbquote.ask)) {
-		toquote.ask = wbquote.ask
-		toquote.askSpread = Math.max(quote.askSpread || -Infinity, quote.ask || -Infinity, wbquote.ask || -Infinity)
-	}
-
-	if (Number.isFinite(wbquote.bidSize)) {
-		toquote.bids = wbquote.bidSize
-		toquote.bidSize = quote.bidSize + toquote.bids
-		toquote.bidVolume = quote.bidVolume + toquote.bids
-	}
-	if (Number.isFinite(wbquote.askSize)) {
-		toquote.asks = wbquote.askSize
-		toquote.askSize = quote.askSize + toquote.asks
-		toquote.askVolume = quote.askVolume + toquote.asks
-	}
-
-	console.log(`toquote ->`, toquote)
-
-	// let keymap = [
-	// 	{ key: 'bid', fn: 'min' },
-	// 	{ key: 'ask', fn: 'max' },
-	// ]
-	// keymap.forEach(({ key, fn }) => {
-	// 	let kprice = `${key}Price`
-	// 	let kspread = `${key}Spread`
-	// 	if (wbquote[key] && wbquote[key] > 0) {
-	// 		toquote[kspread] = _[fn]([quote[kspread], quote[key], wbquote[key]])
-	// 		toquote[kprice] = wbquote[key]
-	// 	}
-	// 	let ksize = `${key}Size`
-	// 	let klot = `${key}Lot`
-	// 	let kvolume = `${key}Volume`
-	// 	if (wbquote[ksize]) {
-	// 		toquote[klot] = wbquote[ksize]
-	// 		toquote[ksize] = quote[ksize] + wbquote[ksize]
-	// 		toquote[kvolume] = quote[kvolume] + wbquote[ksize]
-	// 	}
-	// })
+	let keymap = [
+		{ key: 'bid', fn: 'min', infinity: Infinity },
+		{ key: 'ask', fn: 'max', infinity: -Infinity },
+	]
+	keymap.forEach(({ key, fn, infinity }) => {
+		if (Number.isFinite(wbquote[key])) {
+			toquote[key] = wbquote[key]
+			let kspread = `${key}Spread`
+			toquote[kspread] = Math[fn](quote[kspread] || infinity, quote[key] || infinity, wbquote[key] || infinity)
+		}
+		let ksize = `${key}Size`
+		if (Number.isFinite(wbquote[ksize])) {
+			let ks = `${key}s`
+			toquote[ks] = wbquote[ksize]
+			toquote[ksize] = (quote[ksize] || 0) + wbquote[ksize]
+			let kvolume = `${key}Volume`
+			toquote[kvolume] = (quote[kvolume] || 0) + wbquote[ksize]
+		}
+	})
 
 	return toquote
 }

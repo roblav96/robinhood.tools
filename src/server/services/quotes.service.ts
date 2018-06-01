@@ -10,6 +10,7 @@ import * as redis from '../adapters/redis'
 import * as socket from '../adapters/socket'
 import * as webull from '../adapters/webull'
 import * as quotes from '../adapters/quotes'
+import * as hours from '../adapters/hours'
 import WebullMqttClient from '../adapters/webull.mqtt'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
@@ -29,20 +30,27 @@ const QUOTES = {} as Dict<Quotes.Calc>
 const LIVES = {} as Dict<Quotes.Calc>
 const EMITS = {} as Dict<Quotes.Calc>
 
-radio.once('symbols.ready', onsymbols)
+radio.once('symbols.ready', start)
 radio.emit('symbols.start')
 if (process.env.SYMBOLS == 'STOCKS') {
-	radio.on('symbols.reset', onsymbols)
+	radio.on('symbols.reset', start)
 }
 declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: TypeofSymbols } } }
 
-async function onsymbols(event: Radio.Event) {
-
+function stop() {
 	clock.offListener(ontick)
 	MQTTS.remove(v => !v.destroy())
 	core.nullify(SYMBOLS)
 	core.nullify(WB_QUOTES); core.nullify(WB_SAVES); core.nullify(WB_EMITS);
 	core.nullify(QUOTES); core.nullify(LIVES); core.nullify(EMITS);
+}
+hours.rxstate.subscribe(state => {
+	console.log(`state ->`, state)
+})
+
+async function start(event: Radio.Event) {
+
+	stop()
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
@@ -66,7 +74,7 @@ async function onsymbols(event: Radio.Event) {
 		Object.assign(WB_SAVES, { [symbol]: {} })
 		Object.assign(WB_EMITS, { [symbol]: {} })
 
-		quotes.toConform(quote, quotes.CALC_KEYS_ALL)
+		quotes.convert(quote, quotes.ALL_CALC_KEYS)
 		Object.assign(QUOTES, { [symbol]: core.clone(quote) })
 		Object.assign(LIVES, { [symbol]: core.clone(quote) })
 		Object.assign(EMITS, { [symbol]: {} })
@@ -186,7 +194,7 @@ function ontick(i: number) {
 					quote.liveStamp = Date.now()
 
 					let lkey = `${rkeys.LIVES}:${symbol}:${quote.timestamp}`
-					let lquote = quotes.getConformed(quote, quotes.LIVE_KEYS_ALL)
+					let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
 					coms.push(['hmset', lkey, lquote as any])
 					core.object.merge(diff, lquote)
 

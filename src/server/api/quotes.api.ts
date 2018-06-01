@@ -22,11 +22,11 @@ polka.route({
 		},
 	},
 	async handler(req, res) {
-		let allkeys = Object.keys(quotes.ALL_KEYS)
+		let allrkeys = Object.keys(quotes.ALL_RKEYS)
 		let symbols = req.body.symbols as string[]
-		let types = (req.body.types || allkeys) as Quotes.AllKeys[]
+		let types = (req.body.types || allrkeys) as Quotes.AllKeys[]
 
-		let invalids = _.difference(types, allkeys)
+		let invalids = _.difference(types, allrkeys)
 		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids });
 
 		return quotes.getAlls(symbols, types)
