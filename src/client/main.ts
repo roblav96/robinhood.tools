@@ -9,7 +9,7 @@ Object.assign(console, { dtsgen: function() { } })
 if (process.env.DEVELOPMENT) {
 	// console.dtsgen = require('@/common/dtsgen').default
 	Object.assign(window, require('@/common/core'))
-	Object.assign(window, require('@/common/pretty'))
+	// Object.assign(window, require('@/common/pretty'))
 }
 
 import 'modern-normalize'
