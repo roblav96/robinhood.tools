@@ -56,11 +56,10 @@ export default class extends Mixins(VMixin) {
 	onselect(result: Quotes.Quote) {
 		let name = this.$route.name.includes('symbol.') ? this.$route.name : 'symbol'
 		this.$router.push({ name, params: { symbol: result.symbol } })
-		this.searchbar.$el.querySelector('input').blur()
-		// setTimeout(() => {
-		// 	this.searchbar.$el.querySelector('input').blur()
-		// 	this.results.splice(0)
-		// }, 100)
+		setTimeout(() => {
+			this.searchbar.$el.querySelector('input').blur()
+			this.results.splice(0)
+		}, 100)
 	}
 
 }
