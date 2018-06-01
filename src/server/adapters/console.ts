@@ -26,7 +26,7 @@ for (i = 0; i < len; i++) {
 			let color = (colors[method] || 'magenta') as string
 			let square = clc[color + 'Bright']('█') as string
 			if (method == 'error') color = color + 'Bright';
-			let file = clc.bold(`${clc[color](site.fileName)}:${site.line}`)
+			let file = clc.bold(`${(site.fileName as string).slice(0, -3)}`) + ':' + site.line
 			let name = process.env.NAME ? `[${process.env.NAME}]` : ''
 			let instance = process.env.INSTANCE ? `[${process.env.INSTANCE}]` : ''
 			let output = clc.underline(`${square}[${file}]${instance}${name}${site.callee}[${clc.blackBright(stamp)}]`)
