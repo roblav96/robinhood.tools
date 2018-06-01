@@ -23,7 +23,6 @@ Rx.subscription(hours.rxstate).subscribe(state => {
 })
 
 async function start() {
-	console.info('start ->')
 
 	let keys = await redis.main.keys(`${rkeys.QUOTES}:*`)
 	let ikeys = ['symbol', 'name'] as KeysOf<Quotes.Quote>

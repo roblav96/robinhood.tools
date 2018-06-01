@@ -6,6 +6,7 @@ import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as pretty from '../../common/pretty'
+import * as benchmark from '../../common/benchmark'
 import * as utils from '../adapters/utils'
 import * as redis from '../adapters/redis'
 import * as socket from '../adapters/socket'
@@ -105,8 +106,10 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
 		let deal = quotes.todeal(wbquote)
 		socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
-		let toquote = quotes.applydeal(QUOTES[symbol], deal)
-		core.object.mergeAll([QUOTES[symbol], EMITS[symbol]], toquote)
+		let quote = QUOTES[symbol]
+		let toquote = quotes.applydeal(quote, deal)
+		quotes.applylives(quote, LIVES[symbol], toquote)
+		core.object.mergeAll([quote, EMITS[symbol]], toquote)
 		return
 	}
 
@@ -115,22 +118,23 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	let quote = WB_QUOTES[symbol]
 	if (!quote) return console.warn(symbol, webull.mqtt_topics[topic], `!quote ->\nwbquote ->`, wbquote);
 
-	Object.keys(wbquote).forEach(k => {
-		let to = wbquote[k]
-		let from = quote[k]
-		if (from == null) { from = to; quote[k] = to; towbquote[k] = to }
-		let keymap = quotes.KEY_MAP[k]
-		if (keymap && (keymap.time || keymap.greater)) {
-			if (keymap.time) {
-				if (to > from) towbquote[k] = to;
-			} else if (keymap.greater) {
-				if (to < from) {
-					if (core.calc.percent(to, from) < -50) towbquote[k] = to;
-				} else if (to > from) towbquote[k] = to;
-			}
-		} else if (to != from) {
-			towbquote[k] = to
-		}
+	Object.keys(wbquote).forEach(key => {
+		let to = wbquote[key]
+		let from = quote[key]
+		if (from == null) { from = to; quote[key] = to; towbquote[key] = to }
+		let keymap = quotes.KEY_MAP[key]
+		quotes.applykeymap(keymap, towbquote, key, to, from)
+		// if (keymap && (keymap.time || keymap.greater)) {
+		// 	if (keymap.time) {
+		// 		if (to > from) towbquote[k] = to;
+		// 	} else if (keymap.greater) {
+		// 		if (to < from) {
+		// 			if (core.calc.percent(to, from) < -10) towbquote[k] = to;
+		// 		} else if (to > from) towbquote[k] = to;
+		// 	}
+		// } else if (to != from) {
+		// 	towbquote[k] = to
+		// }
 	})
 
 	let tokeys = Object.keys(towbquote)
@@ -139,8 +143,10 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		core.object.mergeAll([WB_QUOTES[symbol], WB_EMITS[symbol]], towbquote, tokeys)
 
 		if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
-			let toquote = quotes.applybidask(QUOTES[symbol], towbquote)
-			core.object.mergeAll([QUOTES[symbol], EMITS[symbol]], toquote)
+			let quote = QUOTES[symbol]
+			let toquote = quotes.applybidask(quote, towbquote)
+			quotes.applylives(quote, LIVES[symbol], toquote)
+			core.object.mergeAll([quote, EMITS[symbol]], toquote)
 		}
 	}
 })
@@ -155,18 +161,20 @@ function ontick(i: number) {
 
 		let quote = QUOTES[symbol]
 		let toquote = EMITS[symbol]
-		let wbquote = WB_EMITS[symbol]
+		let towbquote = WB_EMITS[symbol]
 
-		if (Object.keys(wbquote).length > 0) {
-			core.object.merge(WB_SAVES[symbol], wbquote)
-			quotes.applywbquote(quote, wbquote, toquote)
+		if (Object.keys(towbquote).length > 0) {
+			core.object.merge(WB_SAVES[symbol], towbquote)
+			quotes.applywbquote(quote, towbquote, toquote)
+			quotes.applylives(quote, LIVES[symbol], toquote)
 			core.object.merge(quote, toquote)
-			wbquote.symbol = symbol
-			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
+			towbquote.symbol = symbol
+			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, towbquote)
 			Object.assign(WB_EMITS, { [symbol]: {} })
 		}
 
 		if (Object.keys(toquote).length > 0) {
+			quotes.applylives(quote, LIVES[symbol], toquote)
 			quotes.applycalcs(quote, toquote)
 			core.object.merge(quote, toquote)
 			toquote.symbol = symbol
@@ -184,6 +192,7 @@ function ontick(i: number) {
 			let fquote = LIVES[symbol]
 			let diff = core.object.difference(fquote, quote)
 			if (Object.keys(diff).length > 0) {
+				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diff as any])
 				if (diff.timestamp && quote.timestamp > fquote.timestamp) {
 
 					quote.liveCount++
@@ -192,18 +201,14 @@ function ontick(i: number) {
 					let lkey = `${rkeys.LIVES}:${symbol}:${quote.timestamp}`
 					let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
 					coms.push(['hmset', lkey, lquote as any])
-					core.object.merge(diff, lquote)
-
 					let zkey = `${rkeys.LIVES}:${symbol}`
 					coms.push(['zadd', zkey, quote.timestamp as any, lkey])
-
 					socket.emit(`${rkeys.LIVES}:${symbol}`, lquote)
 
 					core.object.merge(quote, quotes.resetlive(quote))
-					core.object.merge(LIVES[symbol], quote)
+					core.object.merge(fquote, quote)
 
 				}
-				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diff as any])
 			}
 		}
 
@@ -212,6 +217,12 @@ function ontick(i: number) {
 	redis.main.coms(coms)
 
 }
+
+
+
+
+
+
 
 
 

@@ -86,6 +86,7 @@ export function initquote(
 	let reset = resetquote(quote)
 	resets ? core.object.merge(quote, reset) : core.object.repair(quote, reset)
 
+	applylives(quote, quote, quote)
 	applycalcs(quote)
 	core.object.clean(quote)
 
@@ -109,12 +110,14 @@ export function resetlive(quote: Quotes.Calc) {
 export function resetquote(quote: Quotes.Calc) {
 	let toquote = resetlive(quote)
 	Object.keys(toquote).forEach(key => {
+		if (key.indexOf('size') >= 0) {
+			return toquote[key.replace('size', 'volume')] = 0
+		}
 		if (key.indexOf('Size') >= 0) {
-			toquote[key.replace('Size', 'Volume')] = 0
+			return toquote[key.replace('Size', 'Volume')] = 0
 		}
 	})
 	core.object.merge(toquote, {
-		volume: 0,
 		liveCount: 0, dealCount: 0,
 		startPrice: quote.price,
 		dayHigh: quote.price, dayLow: quote.price,
@@ -239,25 +242,46 @@ export const KEY_MAP = (({
 
 
 
+export function applykeymap(keymap: KeyMapValue, toquote: any, tokey: string, to: any, from: any) {
+	if (keymap && (keymap.time || keymap.greater)) {
+		if (keymap.time) {
+			if (to > from) toquote[tokey] = to;
+		}
+		else if (keymap.greater) {
+			if (to < from) {
+				if (core.calc.percent(to, from) < -10) toquote[tokey] = to;
+			}
+			else if (to > from) toquote[tokey] = to;
+		}
+	}
+	else if (to != from) {
+		toquote[tokey] = to
+	}
+}
+
+
+
 export function applywbquote(quote: Quotes.Live, wbquote: Webull.Quote, toquote = {} as Quotes.Live) {
 
-	Object.keys(wbquote).forEach(k => {
-		let wbvalue = wbquote[k]
-		let keymap = KEY_MAP[k]
+	Object.keys(wbquote).forEach(key => {
+		let wbvalue = wbquote[key]
+		let keymap = KEY_MAP[key]
 		if (!keymap || !keymap.key) return;
 
 		let qkey = keymap.key
 		let qvalue = quote[qkey]
 		if (qvalue == null) { qvalue = wbvalue; quote[qkey] = wbvalue; toquote[qkey] = wbvalue }
 
-		if (keymap.time || keymap.greater) {
-			if (wbvalue > qvalue) {
-				toquote[qkey] = wbvalue
-			}
-		}
-		else if (wbvalue != qvalue) {
-			toquote[qkey] = wbvalue
-		}
+		applykeymap(keymap, toquote, qkey, wbvalue, qvalue)
+
+		// if (keymap.time || keymap.greater) {
+		// 	if (wbvalue > qvalue) {
+		// 		toquote[qkey] = wbvalue
+		// 	}
+		// }
+		// else if (wbvalue != qvalue) {
+		// 	toquote[qkey] = wbvalue
+		// }
 
 	})
 
@@ -274,6 +298,22 @@ export function applywbquote(quote: Quotes.Live, wbquote: Webull.Quote, toquote 
 		}
 	}
 
+	return toquote
+}
+
+
+
+export function applylives(quote: Quotes.Calc, lquote: Quotes.Live, toquote: Quotes.Live) {
+	if (toquote.price) {
+		toquote.high = Math.max(quote.high || -Infinity, toquote.price)
+		toquote.low = Math.min(quote.low || Infinity, toquote.price)
+		toquote.close = quote.price
+		toquote.dayHigh = Math.max(quote.dayHigh || -Infinity, toquote.price)
+		toquote.dayLow = Math.min(quote.dayLow || Infinity, toquote.price)
+	}
+	if (toquote.volume) {
+		toquote.size = toquote.volume - lquote.volume
+	}
 	return toquote
 }
 
@@ -303,8 +343,6 @@ export function applycalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 			toquote.postPercent = core.calc.percent(quote.price, quote.closePrice)
 			toquote.postTimestamp = quote.timestamp
 		}
-
-		toquote.close = quote.price
 
 		if (quote.sharesOutstanding) {
 			toquote.marketCap = _.round(quote.price * quote.sharesOutstanding)
