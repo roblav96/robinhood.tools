@@ -198,6 +198,7 @@ declare global {
 		}
 
 		interface Quote extends Deal {
+			typeof: TypeOfSymbols
 			appNonETFData: {
 				change: number
 				changeRatio: number

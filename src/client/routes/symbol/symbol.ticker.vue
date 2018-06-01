@@ -20,7 +20,7 @@
 							<tr>
 								<th class="whitespace-no-wrap">{{state.name}}</th>
 								<th class="py-1 has-text-right">
-									<b-icon size="is-28x28" :icon="state.icon"></b-icon>
+									<b-icon size="is-24x24" :icon="state.icon"></b-icon>
 								</th>
 							</tr>
 						</thead>

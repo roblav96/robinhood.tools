@@ -34,7 +34,7 @@ export default class VSymbol extends Mixins(VMixin) {
 	get routes() { return this.$router.options.routes.find(v => v.name == 'symbol').children.filter(v => v.icon) }
 
 	busy = true
-	showticker = false
+	showticker = true
 	all = core.array.dict(Object.keys(quotes.ALL_RKEYS), {} as any) as Quotes.All
 
 	@Vts.Watch('all.quote.price', { immediate: true }) w_price(price: number) {
@@ -61,7 +61,7 @@ export default class VSymbol extends Mixins(VMixin) {
 	}
 
 	onquote(quote: Quotes.Quote) {
-		console.log(`quote ->`, JSON.stringify(quote, null, 4))
+		// console.log(`quote ->`, JSON.stringify(quote, null, 4))
 		core.object.merge(this.all.quote, quote)
 	}
 

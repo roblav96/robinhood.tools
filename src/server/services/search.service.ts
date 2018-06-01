@@ -8,6 +8,7 @@ import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
 import * as utils from '../adapters/utils'
+import * as quotes from '../adapters/quotes'
 import * as hours from '../adapters/hours'
 import radio from '../adapters/radio'
 
@@ -24,23 +25,19 @@ Rx.subscription(hours.rxstate).subscribe(state => {
 
 async function start() {
 
-	let keys = await redis.main.keys(`${rkeys.QUOTES}:*`)
-	let ikeys = ['symbol', 'name'] as KeysOf<Quotes.Quote>
-	let quotes = (await redis.main.coms(keys.map(key => {
-		return ['hmget', key].concat(ikeys)
-	}))).map((v: Quotes.Quote) => {
-		v = redis.fixHmget(v, ikeys)
-		v.symbol = v.symbol.toLowerCase()
-		v.name = core.string.clean(v.name).toLowerCase()
-		return v
-	})
+	let symbols = await utils.getAllSymbols()
+	let ikeys = ['name'] as KeysOf<Quotes.Quote>
+	let alls = await quotes.getAlls(symbols, ['quote'], [ikeys])
 
 	let builder = new lunr.Builder()
-	builder.metadataWhitelist = ['position']
+	// builder.metadataWhitelist = ['position']
 	builder.ref('symbol')
 	builder.field('symbol')
 	builder.field('name')
-	quotes.forEach(builder.add, builder)
+	alls.forEach(all => {
+		all.quote.symbol = all.symbol
+		builder.add(all.quote)
+	})
 	INDEX = builder.build()
 
 }

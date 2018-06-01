@@ -18,7 +18,7 @@
 						<tr>
 							<th class="whitespace-no-wrap">{{schema.name}}</th>
 							<th class="py-1 has-text-right">
-								<b-icon size="is-28x28" :icon="schema.icon"></b-icon>
+								<b-icon size="is-24x24" :icon="schema.icon"></b-icon>
 							</th>
 						</tr>
 					</thead>
@@ -38,7 +38,7 @@
 						<tr>
 							<th class="whitespace-no-wrap">Description</th>
 							<th class="py-1 has-text-right">
-								<b-icon size="is-28x28" icon="book-open-variant"></b-icon>
+								<b-icon size="is-24x24" icon="book-open-variant"></b-icon>
 							</th>
 						</tr>
 						<tr>

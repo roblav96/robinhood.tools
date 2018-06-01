@@ -55,20 +55,20 @@ export const DEV_INDEXES = {
 
 export const regxSymbol = /[^A-Z-.]/
 
-export async function getSymbols(type = 'STOCKS' as TypeofSymbols) {
+export async function getSymbols(type = 'STOCKS' as TypeOfSymbols) {
 	let resolved = await redis.main.get(rkeys.SYMBOLS[type])
 	return (resolved ? JSON.parse(resolved) : []) as string[]
 }
-export async function getInstanceSymbols(type = 'STOCKS' as TypeofSymbols) {
+export async function getInstanceSymbols(type = 'STOCKS' as TypeOfSymbols) {
 	let resolved = await redis.main.get(`${rkeys.SYMBOLS[type]}:${process.env.CPUS}:${process.env.INSTANCE}`)
 	return (resolved ? JSON.parse(resolved) : []) as string[]
 }
 
-export async function getFullSymbols(type = 'STOCKS' as TypeofSymbols) {
+export async function getFullSymbols(type = 'STOCKS' as TypeOfSymbols) {
 	let resolved = await redis.main.get(rkeys.FSYMBOLS[type])
 	return (resolved ? JSON.parse(resolved) : {}) as Dict<number>
 }
-export async function getInstanceFullSymbols(type = 'STOCKS' as TypeofSymbols) {
+export async function getInstanceFullSymbols(type = 'STOCKS' as TypeOfSymbols) {
 	let resolved = await redis.main.get(`${rkeys.FSYMBOLS[type]}:${process.env.CPUS}:${process.env.INSTANCE}`)
 	return (resolved ? JSON.parse(resolved) : {}) as Dict<number>
 }

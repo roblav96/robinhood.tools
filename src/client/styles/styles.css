@@ -68,6 +68,11 @@ div.is-scroll > div.table-wrapper {
 	vertical-align: bottom;
 }*/
 
+/*table.table tr > th:last-child > span.icon {
+	margin-top: 4px;
+	margin-bottom: 4px;
+}*/
+
 table.table.is-middle th,
 .b-table.is-middle table.table th,
 table.table.is-middle td,

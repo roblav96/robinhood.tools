@@ -131,7 +131,7 @@ async function syncTickers() {
 	let symbols = Object.keys(fsymbols)
 
 	if (process.env.DEVELOPMENT) console.log('webull.syncTickersQuotes ->');
-	await webull.syncTickersQuotes(fsymbols)
+	await webull.syncTickersQuotes(fsymbols, 'STOCKS')
 
 	if (process.env.DEVELOPMENT) console.log('yahoo.syncQuotes ->');
 	await yahoo.syncQuotes(symbols)
@@ -203,7 +203,7 @@ async function finishSync(type: keyof typeof rkeys.SYMBOLS, tickers: Webull.Tick
 		['set', rkeys.SYMBOLS[type], JSON.stringify(Object.keys(fsymbols))],
 		['set', rkeys.FSYMBOLS[type], JSON.stringify(fsymbols)],
 	])
-	await webull.syncTickersQuotes(fsymbols)
+	await webull.syncTickersQuotes(fsymbols, type)
 }
 
 async function getTicker(symbol: string, tickerType: number) {

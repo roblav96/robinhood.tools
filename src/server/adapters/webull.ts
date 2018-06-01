@@ -50,7 +50,7 @@ export function fix(quote: Partial<Webull.Ticker & Webull.Quote>) {
 
 
 
-export async function syncTickersQuotes(fsymbols: Dict<number>) {
+export async function syncTickersQuotes(fsymbols: Dict<number>, type: keyof typeof rkeys.SYMBOLS) {
 	let inverse = _.invert(fsymbols)
 	let tickerIds = Object.values(fsymbols)
 	let chunks = core.array.chunks(tickerIds, _.ceil(tickerIds.length / 256))
@@ -70,7 +70,10 @@ export async function syncTickersQuotes(fsymbols: Dict<number>) {
 					fix(item)
 					item.symbol = inverse[item.tickerId]
 					if (i == 0) coms.push(['hmset', `${rkeys.WB.TICKERS}:${item.symbol}`, item]);
-					if (i == 1) coms.push(['hmset', `${rkeys.WB.QUOTES}:${item.symbol}`, item]);
+					if (i == 1) {
+						item.typeof = type
+						coms.push(['hmset', `${rkeys.WB.QUOTES}:${item.symbol}`, item])
+					}
 				})
 			})
 			return redis.main.coms(coms)

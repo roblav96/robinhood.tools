@@ -68,8 +68,8 @@ export const routes = [
 				component: () => import('@/client/routes/symbol/symbol.news'),
 			},
 			{
-				name: 'symbol.calcs', path: 'calcs', icon: 'calculator',
-				component: () => import('@/client/routes/symbol/symbol.calcs'),
+				name: 'symbol.history', path: 'history', icon: 'calendar-clock',
+				component: () => import('@/client/routes/symbol/symbol.history'),
 			},
 			{
 				name: 'symbol.debug', path: 'debug', icon: 'bug',

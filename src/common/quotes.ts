@@ -120,7 +120,6 @@ const CALC = {
 	sharesFloat: number,
 	marketCap: number,
 	// 
-	typeof: string as TypeofSymbols,
 	quoteMaker: string,
 	quoteMakerAddress: string,
 	// 
@@ -148,6 +147,7 @@ core.nullify(CALC)
 declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
 const FULL = {
 	tickerId: number,
+	typeof: string as TypeOfSymbols,
 	alive: boolean,
 	name: string,
 	tinyName: string,

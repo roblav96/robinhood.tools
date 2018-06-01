@@ -20,7 +20,7 @@ import radio from '../adapters/radio'
 
 
 
-declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: TypeofSymbols } } }
+declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: TypeOfSymbols } } }
 const emitter = new Emitter<'data'>()
 const MQTTS = [] as WebullMqttClient[]
 const SYMBOLS = [] as string[]
@@ -37,8 +37,9 @@ radio.once('symbols.start', start)
 radio.emit('symbols.ready')
 
 Rx.subscription(hours.rxstate).subscribe(state => {
-	let states = ['PREPRE', 'CLOSED'] as Hours.State[]
-	if (states.includes(state)) start();
+	if (state == 'PREPRE') start();
+	// let states = ['PREPRE', 'CLOSED'] as Hours.State[]
+	// if (states.includes(state)) start();
 })
 
 async function start() {
@@ -49,9 +50,9 @@ async function start() {
 	core.nullify(WB_QUOTES); core.nullify(WB_SAVES); core.nullify(WB_EMITS);
 	core.nullify(QUOTES); core.nullify(LIVES); core.nullify(EMITS);
 
-	if (hours.rxstate.value == 'CLOSED') {
-		if (process.env.PRODUCTION) return;
-	}
+	// if (hours.rxstate.value == 'CLOSED') {
+	// 	if (process.env.PRODUCTION) return;
+	// }
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
@@ -62,14 +63,8 @@ async function start() {
 	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 	SYMBOLS.push(...Object.keys(fsymbols))
 
-	let coms = [] as Redis.Coms
 	let alls = await quotes.getAlls(SYMBOLS, ['quote', 'wbquote'])
 	alls.forEach(({ symbol, quote, wbquote }) => {
-
-		if (!quote.typeof) {
-			quote.typeof = process.env.SYMBOLS
-			coms.push(['hset', `${rkeys.QUOTES}:${symbol}`, 'typeof', quote.typeof])
-		}
 
 		Object.assign(WB_QUOTES, { [symbol]: core.clone(wbquote) })
 		Object.assign(WB_SAVES, { [symbol]: {} })
@@ -83,8 +78,6 @@ async function start() {
 		socket.emit(`${rkeys.QUOTES}:${symbol}`, quote)
 
 	})
-
-	await redis.main.coms(coms)
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
 	MQTTS.splice(0, Infinity, ...chunks.map((chunk, i) => new WebullMqttClient({

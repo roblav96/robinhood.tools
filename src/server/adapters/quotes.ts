@@ -13,15 +13,29 @@ import * as pAll from 'p-all'
 
 
 
-export async function getAlls(symbols: string[], allkeys = Object.keys(quotes.ALL_RKEYS) as Quotes.AllKeys[]) {
+export async function getAlls(symbols: string[], allrkeys = Object.keys(quotes.ALL_RKEYS) as Quotes.AllKeys[], allkeys = [] as string[][]) {
 	let resolved = await redis.main.coms(_.flatten(symbols.map(v => {
-		return allkeys.map(k => ['hgetall', `${quotes.ALL_RKEYS[k]}:${v}`])
+		return allrkeys.map((k, i) => {
+			let rkey = `${quotes.ALL_RKEYS[k]}:${v}`
+			let ikeys = allkeys[i]
+			if (Array.isArray(ikeys)) {
+				return ['hmget', rkey].concat(ikeys)
+			}
+			return ['hgetall', rkey]
+		})
 	})))
-	resolved.forEach(core.fix)
 	let ii = 0
 	return symbols.map(symbol => {
 		let all = { symbol } as Quotes.All
-		allkeys.forEach(k => all[k] = resolved[ii++])
+		allrkeys.forEach((k, i) => {
+			let resolve = resolved[ii++]
+			let ikeys = allkeys[i]
+			if (Array.isArray(ikeys)) {
+				resolve = redis.fixHmget(resolve, ikeys)
+			}
+			core.fix(resolve)
+			all[k] = resolve
+		})
 		return all
 	})
 }
@@ -55,6 +69,7 @@ export function initquote(
 	core.object.merge(quote, {
 		symbol,
 		tickerId: wbticker.tickerId,
+		typeof: wbquote.typeof,
 		timezone: wbquote.utcOffset,
 		currency: wbquote.currency,
 		sector: iexitem.sector,
