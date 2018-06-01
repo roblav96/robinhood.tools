@@ -99,18 +99,18 @@ export const string = {
 		return a.substr(0, position) + b + a.substr(position)
 	},
 	minify(value: string) {
-		if (!string.is(value)) return value;
+		if (!value) return value;
 		value = value.replace(/[^a-zA-Z ]/g, ' ').replace(/\s\s+/g, ' ').toLowerCase().trim()
 		return value.split(' ').filter(v => STOP_WORDS.indexOf(v) == -1).join(' ').trim()
 	},
 	tags(value: string, input = [] as string[]) {
-		if (!string.is(value)) return value;
+		if (!value) return value;
 		let tags = string.minify(value).split(' ')
 		input.forEach(v => tags.push(...string.minify(v).split(' ')))
 		return _.uniq(_.compact(tags)).filter(v => v && v.length > 2 && STOP_WORDS.indexOf(v) == -1)
 	},
 	id(value: string) {
-		if (!string.is(value)) return value;
+		if (!value) return value;
 		return string.hash(string.minify(value).replace(/\s/g, '').trim())
 	},
 	hash(value: string) {
@@ -125,16 +125,16 @@ export const string = {
 		return Math.abs(hash).toString()
 	},
 	alphanumeric(value: string) {
-		if (!string.is(value)) return value;
+		if (!value) return value;
 		return value.replace(/\W+/g, '').trim()
 	},
 	clean(value: string) {
-		if (!string.is(value)) return value;
+		if (!value) return value;
 		return value.replace(/[^a-zA-Z0-9-_. ]/g, ' ').replace(/\s\s+/g, ' ').trim()
 	},
 	capitalize(value: string) {
-		if (!string.is(value)) return value;
-		return value.split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ').trim()
+		if (!value) return value;
+		return value.trim().replace(/\s\s+/g, ' ').split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ').trim()
 	},
 	leven(a: string, b: string) {
 		return leven(a, b) as number

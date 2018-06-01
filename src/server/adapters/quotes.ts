@@ -39,6 +39,7 @@ export async function syncAllQuotes(resets = false) {
 			return ['hmset', rkey, initquote(all, resets) as any]
 		}))
 	}), { concurrency: 1 })
+	if (process.env.DEVELOPMENT) console.info('syncAllQuotes done ->');
 }
 
 
@@ -68,9 +69,9 @@ export function initquote(
 		sharesFloat: _.round(core.fallback(wbquote.outstandingShares, iexitem.float)),
 	} as Quotes.Quote)
 
-	quote.name = core.fallback(iexitem.companyName, instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name)
-	quote.tinyName = core.fallback(instrument.simple_name, yhquote.shortName, quote.name)
-	quote.fullName = core.fallback(instrument.name, yhquote.longName, wbticker.name)
+	quote.name = core.string.capitalize(core.fallback(iexitem.companyName, instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name))
+	quote.tinyName = core.string.capitalize(core.fallback(instrument.simple_name, yhquote.shortName, quote.name))
+	quote.fullName = core.string.capitalize(core.fallback(instrument.name, yhquote.longName, wbticker.name))
 
 	quote.avgVolume10Day = _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day))
 	quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))

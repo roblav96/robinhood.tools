@@ -16,7 +16,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 module.exports = {
 
 	outputDir: 'dist/client',
-	compiler: true,
+	runtimeCompiler: true,
 
 	configureWebpack: function(config) {
 		// console.log('configureWebpack config ->', config)
