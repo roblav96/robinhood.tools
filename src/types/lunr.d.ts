@@ -9,6 +9,19 @@ declare module 'lunr' {
 	interface Builder {
 		field(field: string, opts?: Partial<FieldOptions>): void
 	}
+	namespace Query {
+		enum presence {
+			OPTIONAL,
+			PROHIBITED,
+			REQUIRED,
+		}
+		interface Clause {
+			presence: number
+		}
+	}
+	interface Query {
+		term(term: string, options: Partial<Query.Clause>): Query
+	}
 }
 
 

@@ -20,34 +20,34 @@ export default class extends Mixins(VMixin) {
 	query = ''
 	results = [] as Quotes.Quote[]
 
-	oninput = _.debounce(this.syncQuery, 300)
-	syncQuery() {
-		if (!this.query) return this.syncRecents();
+	oninput = _.debounce(this.syncquery, 300)
+	syncquery() {
+		if (!this.query) return this.syncrecents();
 		this.busy = true
 		return http.get('/search', {
 			query: { query: this.query },
 		}).then(results => {
 			this.results = results
 		}).catch(error => {
-			console.error('syncQuery Error ->', error)
+			console.error('syncquery Error ->', error)
 		}).finally(() => this.busy = false)
 	}
 
-	syncRecents() {
+	syncrecents() {
 		this.busy = true
 		return http.post('/recents', {
 			symbols: this.recents.map(v => v.symbol),
 		}).then(results => {
 			this.results = results
 		}).catch(error => {
-			console.error('syncRecents Error ->', error)
+			console.error('syncrecents Error ->', error)
 		}).finally(() => this.busy = false)
 	}
 
 	onfocus(event: Event) {
 		let el = event.target as HTMLInputElement
 		el.setSelectionRange(0, el.value.length)
-		this.syncQuery()
+		this.syncquery()
 	}
 	onblur(event: Event) {
 
@@ -56,10 +56,11 @@ export default class extends Mixins(VMixin) {
 	onselect(result: Quotes.Quote) {
 		let name = this.$route.name.includes('symbol.') ? this.$route.name : 'symbol'
 		this.$router.push({ name, params: { symbol: result.symbol } })
-		setTimeout(() => {
-			this.searchbar.$el.querySelector('input').blur()
-			this.results.splice(0)
-		}, 100)
+		this.searchbar.$el.querySelector('input').blur()
+		// setTimeout(() => {
+		// 	this.searchbar.$el.querySelector('input').blur()
+		// 	this.results.splice(0)
+		// }, 100)
 	}
 
 }

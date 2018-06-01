@@ -77,7 +77,6 @@
 		"vue-property-decorator": "latest",
 		"vue-router": "latest",
 		"vuex": "latest",
-		"wade": "latest",
 		"zousan": "latest"
 	},
 	"devDependencies": {

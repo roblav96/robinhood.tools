@@ -22,9 +22,12 @@ div.searchbar a.dropdown-item:hover .title {
 </style>
 
 <template>
-	<b-autocomplete class="searchbar" ref="searchbar_input" open-on-focus keep-first type="search" placeholder="Search anything..."
+	<b-autocomplete class="searchbar" ref="searchbar_input" open-on-focus keep-first type="search" placeholder="Search..."
 	    icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur" v-on:input="oninput"
 	    v-on:select="onselect">
+		<template slot="header">
+			<p>Recently viewed symbols:</p>
+		</template>
 		<template slot-scope="props">
 			<div class="columns is-mobile is-gapless">
 				<div class="column is-narrow self-center mr-4">

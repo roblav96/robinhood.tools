@@ -1,5 +1,6 @@
 // 
 
+import * as lunr from 'lunr'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
@@ -13,11 +14,14 @@ import polka from './polka'
 
 async function getQuotes(symbols: string[]) {
 	let ikeys = ['symbol', 'name'] as KeysOf<Quotes.Quote>
-	let quotes = (await redis.main.coms(symbols.map(symbol => {
+	let resolved = await redis.main.coms(symbols.map(symbol => {
 		return ['hmget', `${rkeys.QUOTES}:${symbol}`].concat(ikeys)
-	}))).map(v => redis.fixHmget(v, ikeys)) as Quotes.Quote[]
-	quotes.forEach(core.fix)
-	return quotes
+	}))
+	return resolved.map((v: Quotes.Quote) => {
+		v = redis.fixHmget(v, ikeys)
+		core.fix(v)
+		return v
+	})
 }
 
 polka.route({
@@ -27,11 +31,10 @@ polka.route({
 		query: { query: 'string' },
 	},
 	async handler(req, res) {
-		let query = req.query.query as string
+		let query = core.string.clean(req.query.query)
 		if (!query) return [];
-		let symbols = await radio.invoke({}, 'search.query', query)
-		let quotes = await getQuotes(symbols)
-		return quotes
+		let symbols = await radio.invoke({}, 'search.query', query.toLowerCase()) as string[]
+		return getQuotes(symbols)
 	}
 })
 
@@ -45,8 +48,7 @@ polka.route({
 	},
 	async handler(req, res) {
 		let symbols = req.body.symbols as string[]
-		let quotes = await getQuotes(symbols)
-		return quotes
+		return getQuotes(symbols)
 	}
 })
 
