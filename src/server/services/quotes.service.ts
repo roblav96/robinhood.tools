@@ -32,8 +32,8 @@ const QUOTES = {} as Dict<Quotes.Calc>
 const LIVES = {} as Dict<Quotes.Calc>
 const EMITS = {} as Dict<Quotes.Calc>
 
-radio.once('symbols.ready', start)
-radio.emit('symbols.start')
+radio.once('symbols.start', start)
+radio.emit('symbols.ready')
 
 Rx.subscription(hours.rxstate).subscribe(state => {
 	let states = ['PREPRE', 'CLOSED'] as Hours.State[]

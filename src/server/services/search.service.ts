@@ -3,20 +3,27 @@
 import '../main'
 import * as lunr from 'lunr'
 import * as _ from '../../common/lodash'
+import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
 import * as utils from '../adapters/utils'
+import * as hours from '../adapters/hours'
 import radio from '../adapters/radio'
 
 
 
 let INDEX = lunr(_.noop)
 
-radio.once('symbols.ready', onready)
-radio.emit('symbols.start')
+radio.once('symbols.start', start)
+radio.emit('symbols.ready')
 
-async function onready() {
+Rx.subscription(hours.rxstate).subscribe(state => {
+	if (state == 'PREPRE') start();
+})
+
+async function start() {
+	console.info('start ->')
 
 	let keys = await redis.main.keys(`${rkeys.QUOTES}:*`)
 	let ikeys = ['symbol', 'name'] as KeysOf<Quotes.Quote>

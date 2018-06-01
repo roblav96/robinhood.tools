@@ -20,8 +20,8 @@ import radio from '../adapters/radio'
 
 
 let ready = false
-radio.on('symbols.start', function() {
-	if (ready) radio.emit('symbols.ready');
+radio.on('symbols.ready', function() {
+	if (ready) radio.emit('symbols.start');
 })
 
 async function start() {
@@ -37,7 +37,7 @@ async function start() {
 	if (_.sum(exists) != keys.length) await syncEverything();
 
 	ready = true
-	radio.emit('symbols.ready')
+	radio.emit('symbols.start')
 
 } start().catch(error => console.error(`start Error ->`, error))
 
