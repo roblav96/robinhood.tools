@@ -18,7 +18,13 @@ async function syncHours() {
 	let today = dayjs().format('YYYY-MM-DD')
 	let url = 'https://api.robinhood.com/markets/XNYS/hours/' + today + '/'
 	let rhours = await http.get(url, { retries: 6, retryTick: '10s', silent: true }) as Robinhood.Hours
-	let hhours = { openToday: rhours.is_open, date: rhours.date } as Hours
+	let hhours = {
+		openToday: rhours.is_open,
+		date: rhours.date,
+		prepre: null, pre: null,
+		opens: null, closes: null,
+		post: null, postpost: null,
+	} as Hours
 	if (hhours.openToday) {
 		hhours.prepre = dayjs(new Date(rhours.opens_at)).subtract(5, 'hour').subtract(30, 'minute').valueOf()
 		hhours.pre = dayjs(new Date(rhours.extended_opens_at)).valueOf()

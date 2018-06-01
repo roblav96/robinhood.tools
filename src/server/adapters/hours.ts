@@ -21,7 +21,7 @@ schedule.scheduleJob('* * * * *', syncHours).invoke()
 
 async function syncHours() {
 	let rhours = await redis.main.hgetall(rkeys.HR.HOURS) as Hours
-	if (_.isEmpty(rhours)) return;
+	if (Object.keys(rhours).length == 0) return;
 	core.fix(rhours)
 	if (!_.isEqual(rxhours.value, rhours)) rxhours.next(rhours);
 	let state = hours.getState(rxhours.value)

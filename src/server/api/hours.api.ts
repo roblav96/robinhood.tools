@@ -10,7 +10,9 @@ import polka from './polka'
 polka.route({
 	method: 'GET',
 	url: '/api/hours',
-	handler(req, res) { return { hours: hours.rxhours.value, state: hours.rxstate.value } }
+	handler(req, res) {
+		return { hours: hours.rxhours.value, state: hours.rxstate.value }
+	}
 })
 
 

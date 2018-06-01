@@ -13,6 +13,7 @@ export {
 	mapTo,
 	scan,
 	take,
+	skip,
 } from 'rxjs/operators'
 
 export {
@@ -22,6 +23,13 @@ export {
 import * as Rx from './rxjs'
 
 
+
+export function subscription<T>(observable: T) {
+	return (((observable as any) as Rx.Observable<any>).pipe(
+		Rx.filter(v => !!v),
+		Rx.skip(1),
+	) as any) as T
+}
 
 export class ReadySubject {
 

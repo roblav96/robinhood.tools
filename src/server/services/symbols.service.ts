@@ -51,7 +51,6 @@ async function syncEverything(resets = false) {
 	await syncForex()
 	await syncIndexes()
 	await quotes.syncAllQuotes(resets)
-	radio.emit('symbols.reset')
 }
 
 

@@ -2,6 +2,7 @@
 
 import '../main'
 import * as _ from '../../common/lodash'
+import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as pretty from '../../common/pretty'
@@ -18,6 +19,7 @@ import radio from '../adapters/radio'
 
 
 
+declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: TypeofSymbols } } }
 const emitter = new Emitter<'data'>()
 const MQTTS = [] as WebullMqttClient[]
 const SYMBOLS = [] as string[]
@@ -32,25 +34,23 @@ const EMITS = {} as Dict<Quotes.Calc>
 
 radio.once('symbols.ready', start)
 radio.emit('symbols.start')
-if (process.env.SYMBOLS == 'STOCKS') {
-	radio.on('symbols.reset', start)
-}
-declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: TypeofSymbols } } }
 
-function stop() {
+Rx.subscription(hours.rxstate).subscribe(state => {
+	let states = ['PREPRE', 'CLOSED'] as Hours.State[]
+	if (states.includes(state)) start();
+})
+
+async function start() {
+
 	clock.offListener(ontick)
-	MQTTS.remove(v => !v.destroy())
+	MQTTS.remove(v => { v.destroy(); return true })
 	core.nullify(SYMBOLS)
 	core.nullify(WB_QUOTES); core.nullify(WB_SAVES); core.nullify(WB_EMITS);
 	core.nullify(QUOTES); core.nullify(LIVES); core.nullify(EMITS);
-}
-hours.rxstate.subscribe(state => {
-	console.log(`state ->`, state)
-})
 
-async function start(event: Radio.Event) {
-
-	stop()
+	if (hours.rxstate.value == 'CLOSED') {
+		if (process.env.PRODUCTION) return;
+	}
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
@@ -93,10 +93,6 @@ async function start(event: Radio.Event) {
 	}, emitter)))
 
 	clock.on('1s', ontick)
-
-	if (event.name == 'symbols.reset') {
-		radio.emit('quotes.ready')
-	}
 
 }
 
