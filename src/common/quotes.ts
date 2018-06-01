@@ -33,11 +33,15 @@ export function getConverted<T>(quote: T, qkeys: string[]) {
 
 
 
+const string = ''
+const number = 0
+const boolean = false
+
 declare global { namespace Quotes { type ITiny = typeof TINY; interface Tiny extends ITiny { } } }
 const TINY = {
-	symbol: '',
-	price: 0,
-	timestamp: 0,
+	symbol: string,
+	price: number,
+	timestamp: number,
 }
 export const TINY_KEYS = Object.keys(TINY).sort() as (keyof typeof TINY)[]
 export const ALL_TINY_KEYS = TINY_KEYS.sort() as (keyof Quotes.Tiny)[]
@@ -47,44 +51,44 @@ core.nullify(TINY)
 
 declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Tiny { } } }
 const LIVE = {
-	status: '',
-	statusTimestamp: 0,
+	status: string,
+	statusTimestamp: number,
 	// 
-	liveCount: 0,
-	liveStamp: 0,
+	liveCount: number,
+	liveStamp: number,
 	// 
-	open: 0,
-	high: 0,
-	low: 0,
-	close: 0,
+	open: number,
+	high: number,
+	low: number,
+	close: number,
 	// 
-	dayHigh: 0,
-	dayLow: 0,
+	dayHigh: number,
+	dayLow: number,
 	// 
-	bidSpread: 0,
-	askSpread: 0,
-	bidSize: 0,
-	askSize: 0,
-	bidVolume: 0,
-	askVolume: 0,
+	bidSpread: number,
+	askSpread: number,
+	bidSize: number,
+	askSize: number,
+	bidVolume: number,
+	askVolume: number,
 	// 
-	size: 0,
-	volume: 0,
+	size: number,
+	volume: number,
 	// 
-	dealCount: 0,
-	dealSize: 0,
-	dealVolume: 0,
-	dealFlowVolume: 0,
-	dealFlowSize: 0,
+	dealCount: number,
+	dealSize: number,
+	dealVolume: number,
+	dealFlowVolume: number,
+	dealFlowSize: number,
 	// 
-	buySize: 0,
-	sellSize: 0,
-	buyVolume: 0,
-	sellVolume: 0,
+	buySize: number,
+	sellSize: number,
+	buyVolume: number,
+	sellVolume: number,
 	// 
-	turnoverRate: 0,
-	vibrateRatio: 0,
-	yield: 0,
+	turnoverRate: number,
+	vibrateRatio: number,
+	yield: number,
 }
 export const LIVE_KEYS = Object.keys(LIVE).sort() as (keyof typeof LIVE)[]
 export const ALL_LIVE_KEYS = LIVE_KEYS.concat(ALL_TINY_KEYS as any).sort() as (keyof Quotes.Live)[]
@@ -94,46 +98,46 @@ core.nullify(LIVE)
 
 declare global { namespace Quotes { type ICalc = typeof CALC; interface Calc extends ICalc, Live { } } }
 const CALC = {
-	change: 0,
-	percent: 0,
-	startPrice: 0,
-	openPrice: 0,
-	closePrice: 0,
-	prevClose: 0,
-	yearHigh: 0,
-	yearLow: 0,
+	change: number,
+	percent: number,
+	startPrice: number,
+	openPrice: number,
+	closePrice: number,
+	prevClose: number,
+	yearHigh: number,
+	yearLow: number,
 	// 
-	spread: 0,
-	bid: 0,
-	ask: 0,
-	bids: 0,
-	asks: 0,
+	spread: number,
+	bid: number,
+	ask: number,
+	bids: number,
+	asks: number,
 	// 
-	avgVolume: 0,
-	avgVolume10Day: 0,
-	avgVolume3Month: 0,
-	sharesOutstanding: 0,
-	sharesFloat: 0,
-	marketCap: 0,
+	avgVolume: number,
+	avgVolume10Day: number,
+	avgVolume3Month: number,
+	sharesOutstanding: number,
+	sharesFloat: number,
+	marketCap: number,
 	// 
-	typeof: '' as TypeofSymbols,
-	quoteMaker: '',
-	quoteMakerAddress: '',
+	typeof: string as TypeofSymbols,
+	quoteMaker: string,
+	quoteMakerAddress: string,
 	// 
-	prePrice: 0,
-	preChange: 0,
-	prePercent: 0,
-	preTimestamp: 0,
+	prePrice: number,
+	preChange: number,
+	prePercent: number,
+	preTimestamp: number,
 	// 
-	regPrice: 0,
-	regChange: 0,
-	regPercent: 0,
-	regTimestamp: 0,
+	regPrice: number,
+	regChange: number,
+	regPercent: number,
+	regTimestamp: number,
 	// 
-	postPrice: 0,
-	postChange: 0,
-	postPercent: 0,
-	postTimestamp: 0,
+	postPrice: number,
+	postChange: number,
+	postPercent: number,
+	postTimestamp: number,
 }
 export const CALC_KEYS = Object.keys(CALC).sort() as (keyof typeof CALC)[]
 export const ALL_CALC_KEYS = CALC_KEYS.concat(ALL_LIVE_KEYS as any).sort() as (keyof Quotes.Calc)[]
@@ -143,23 +147,23 @@ core.nullify(CALC)
 
 declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
 const FULL = {
-	tickerId: 0,
-	alive: false,
-	name: '',
-	tinyName: '',
-	fullName: '',
-	description: '',
-	mic: '',
-	acronym: '',
-	exchange: '',
-	country: '',
-	timezone: '',
-	issueType: '',
-	currency: '',
-	sector: '',
-	industry: '',
-	website: '',
-	listDate: 0,
+	tickerId: number,
+	alive: boolean,
+	name: string,
+	tinyName: string,
+	fullName: string,
+	description: string,
+	mic: string,
+	acronym: string,
+	exchange: string,
+	country: string,
+	timezone: string,
+	issueType: string,
+	currency: string,
+	sector: string,
+	industry: string,
+	website: string,
+	listDate: number,
 }
 export const FULL_KEYS = Object.keys(FULL).sort() as (keyof typeof FULL)[]
 export const ALL_FULL_KEYS = FULL_KEYS.concat(ALL_CALC_KEYS as any).sort() as (keyof Quotes.Full)[]
@@ -169,11 +173,11 @@ core.nullify(FULL)
 
 declare global { namespace Quotes { type IDeal = typeof DEAL; interface Deal extends IDeal { } } }
 const DEAL = {
-	symbol: '',
-	price: 0,
-	size: 0,
-	side: '' as 'N' | 'B' | 'S',
-	timestamp: 0,
+	symbol: string,
+	price: number,
+	size: number,
+	flag: string as 'N' | 'B' | 'S',
+	timestamp: number,
 }
 export const DEAL_KEYS = Object.keys(DEAL).sort() as (keyof Quotes.Deal)[]
 core.nullify(DEAL)

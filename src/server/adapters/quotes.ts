@@ -127,7 +127,7 @@ export function resetquote(quote: Quotes.Calc) {
 export function todeal(wbdeal: Webull.Deal) {
 	return {
 		price: wbdeal.deal,
-		side: wbdeal.tradeBsFlag,
+		flag: wbdeal.tradeBsFlag,
 		size: wbdeal.volume,
 		symbol: wbdeal.symbol,
 		timestamp: wbdeal.tradeTime,
@@ -148,11 +148,11 @@ export function applydeal(quote: Quotes.Live, deal: Quotes.Deal, toquote = {} as
 	toquote.dealVolume = quote.dealVolume + deal.size
 
 	let flow = 0
-	if (deal.side == 'B') {
+	if (deal.flag == 'B') {
 		toquote.buySize = quote.buySize + deal.size
 		toquote.buyVolume = quote.buyVolume + deal.size
 		flow = deal.size
-	} else if (deal.side == 'S') {
+	} else if (deal.flag == 'S') {
 		toquote.sellSize = quote.sellSize + deal.size
 		toquote.sellVolume = quote.sellVolume + deal.size
 		flow = -deal.size
