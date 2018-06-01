@@ -28,8 +28,11 @@ export async function getAlls(symbols: string[], allkeys = Object.keys(quotes.AL
 
 export async function syncAllQuotes(resets = false) {
 	let symbols = await utils.getAllSymbols()
-	// let coms = symbols.map(v => ['hdel', `${rkeys.QUOTES}:${v}`, 'description', 'name', 'fullName', 'tinyName', 'nameLong'])
+
+	// let ikeys = ['bidSize', 'bidVolume', 'bidSpread', 'askSize', 'askVolume', 'askSpread'] as KeysOf<Quotes.Quote>
+	// let coms = symbols.map(v => ['hdel', `${rkeys.QUOTES}:${v}`].concat(ikeys))
 	// await redis.main.coms(coms)
+
 	let chunks = core.array.chunks(symbols, _.ceil(symbols.length / 256))
 	await pAll(chunks.map((chunk, i) => async () => {
 		if (process.env.DEVELOPMENT) console.log('syncAllQuotes ->', `${_.round((i / chunks.length) * 100)}%`);
@@ -95,25 +98,24 @@ export function initquote(
 export function resetlive(quote: Quotes.Calc) {
 	return {
 		size: 0,
+		dealSize: 0, dealFlowSize: 0,
 		buySize: 0, sellSize: 0,
-		dealSize: 0,
-		// dealFlowSize: 0,
+		bidSize: 0, askSize: 0,
 		open: quote.price, high: quote.price, low: quote.price, close: quote.price,
-		// bidSpread: quote.bidPrice, askSpread: quote.askPrice,
+		bidSpread: quote.bid, askSpread: quote.ask,
 	} as Quotes.Calc
 }
 
 export function resetquote(quote: Quotes.Calc) {
 	let reset = resetlive(quote)
-	reset.volume = 0
-	// Object.keys(reset).forEach(key => {
-	// 	if (key.indexOf('Size') == -1) return;
-	// 	reset[key.replace('Size', 'Volume')] = 0
-	// })
 	core.object.merge(reset, {
+		volume: 0,
+		dealVolume: 0, dealFlowVolume: 0,
+		buyVolume: 0, sellVolume: 0,
+		bidVolume: 0, askVolume: 0,
+		liveCount: 0, dealCount: 0,
 		startPrice: quote.price,
 		dayHigh: quote.price, dayLow: quote.price,
-		liveCount: 0, dealCount: 0,
 	} as Quotes.Calc)
 	return reset
 }
@@ -158,28 +160,50 @@ export function applydeal(quote: Quotes.Live, deal: Quotes.Deal, toquote = {} as
 
 
 
-export function applybidask(quote: Quotes.Live, wbquote: Webull.Quote, toquote = {} as Quotes.Live) {
+export function applybidask(quote: Quotes.Calc, wbquote: Webull.Quote, toquote = {} as Quotes.Calc) {
 
-	let keymap = [
-		{ key: 'bid', fn: 'min' },
-		{ key: 'ask', fn: 'max' },
-	]
-	keymap.forEach(({ key, fn }) => {
-		let kprice = `${key}Price`
-		let kspread = `${key}Spread`
-		if (wbquote[key] && wbquote[key] > 0) {
-			toquote[kspread] = _[fn]([quote[kspread], quote[key], wbquote[key]])
-			toquote[kprice] = wbquote[key]
-		}
-		let ksize = `${key}Size`
-		let klot = `${key}Lot`
-		let kvolume = `${key}Volume`
-		if (wbquote[ksize]) {
-			toquote[klot] = wbquote[ksize]
-			toquote[ksize] = quote[ksize] + wbquote[ksize]
-			toquote[kvolume] = quote[kvolume] + wbquote[ksize]
-		}
-	})
+	if (Number.isFinite(wbquote.bid)) {
+		toquote.bid = wbquote.bid
+		toquote.bidSpread = Math.min(quote.bidSpread || Infinity, quote.bid || Infinity, wbquote.bid || Infinity)
+	}
+	if (Number.isFinite(wbquote.ask)) {
+		toquote.ask = wbquote.ask
+		toquote.askSpread = Math.max(quote.askSpread || -Infinity, quote.ask || -Infinity, wbquote.ask || -Infinity)
+	}
+
+	if (Number.isFinite(wbquote.bidSize)) {
+		toquote.bids = wbquote.bidSize
+		toquote.bidSize = quote.bidSize + toquote.bids
+		toquote.bidVolume = quote.bidVolume + toquote.bids
+	}
+	if (Number.isFinite(wbquote.askSize)) {
+		toquote.asks = wbquote.askSize
+		toquote.askSize = quote.askSize + toquote.asks
+		toquote.askVolume = quote.askVolume + toquote.asks
+	}
+
+	console.log(`toquote ->`, toquote)
+
+	// let keymap = [
+	// 	{ key: 'bid', fn: 'min' },
+	// 	{ key: 'ask', fn: 'max' },
+	// ]
+	// keymap.forEach(({ key, fn }) => {
+	// 	let kprice = `${key}Price`
+	// 	let kspread = `${key}Spread`
+	// 	if (wbquote[key] && wbquote[key] > 0) {
+	// 		toquote[kspread] = _[fn]([quote[kspread], quote[key], wbquote[key]])
+	// 		toquote[kprice] = wbquote[key]
+	// 	}
+	// 	let ksize = `${key}Size`
+	// 	let klot = `${key}Lot`
+	// 	let kvolume = `${key}Volume`
+	// 	if (wbquote[ksize]) {
+	// 		toquote[klot] = wbquote[ksize]
+	// 		toquote[ksize] = quote[ksize] + wbquote[ksize]
+	// 		toquote[kvolume] = quote[kvolume] + wbquote[ksize]
+	// 	}
+	// })
 
 	return toquote
 }
@@ -300,10 +324,6 @@ export function applycalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 		if (quote.sharesOutstanding) {
 			toquote.marketCap = _.round(quote.price * quote.sharesOutstanding)
 		}
-	}
-
-	if (toquote.askPrice || toquote.bidPrice) {
-		// toquote.spread = quote.askPrice - quote.bidPrice
 	}
 
 	return toquote

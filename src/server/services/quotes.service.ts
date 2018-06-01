@@ -180,15 +180,15 @@ function ontick(i: number) {
 			let fquote = LIVES[symbol]
 			let diff = core.object.difference(fquote, quote)
 			if (Object.keys(diff).length > 0) {
-
-				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diff as any])
 				if (diff.timestamp && quote.timestamp > fquote.timestamp) {
 
 					quote.liveCount++
+					quote.liveStamp = Date.now()
 
 					let lkey = `${rkeys.LIVES}:${symbol}:${quote.timestamp}`
 					let lquote = quotes.getConformed(quote, quotes.LIVE_KEYS_ALL)
 					coms.push(['hmset', lkey, lquote as any])
+					core.object.merge(diff, lquote)
 
 					let zkey = `${rkeys.LIVES}:${symbol}`
 					coms.push(['zadd', zkey, quote.timestamp as any, lkey])
@@ -197,7 +197,9 @@ function ontick(i: number) {
 
 					core.object.merge(quote, quotes.resetlive(quote))
 					core.object.merge(LIVES[symbol], quote)
+
 				}
+				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diff as any])
 			}
 		}
 
@@ -212,9 +214,18 @@ function ontick(i: number) {
 
 
 // import * as benchmark from '../../common/benchmark'
-// benchmark.simple('calc.percent', [
-// 	function calcpercent() {
-// 		core.calc.percent(123,1234)
+// benchmark.simple('math', [
+// 	function mathmin() {
+// 		Math.min(1, 2, 3, 4, 5)
+// 	},
+// 	function _min() {
+// 		_.min([1, 2, 3, 4, 5])
+// 	},
+// 	function mathmax() {
+// 		Math.max(1, 2, 3, 4, 5)
+// 	},
+// 	function _max() {
+// 		_.max([1, 2, 3, 4, 5])
 // 	},
 // ])
 

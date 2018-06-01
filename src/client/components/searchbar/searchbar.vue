@@ -19,15 +19,20 @@ div.searchbar a.dropdown-item:hover .title {
 	color: var(--primary);
 }
 
+div.searchbar div.dropdown-item:empty {
+	display: none;
+}
+
 </style>
 
 <template>
 	<b-autocomplete class="searchbar" ref="searchbar_input" open-on-focus keep-first type="search" placeholder="Search..."
 	    icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur" v-on:input="oninput"
 	    v-on:select="onselect">
-		<template v-if="false" slot="header">
-			<p class="mb-2 font-medium">Recently viewed symbols:</p>
+		<template v-if="!query" slot="header">
+			<p class="mb-2 leading-none font-medium is-size-6">Recently viewed symbols:</p>
 		</template>
+		<template slot="empty">No results found...</template>
 		<template slot-scope="props">
 			<div class="columns is-mobile is-gapless">
 				<div class="column is-narrow self-center mr-4">

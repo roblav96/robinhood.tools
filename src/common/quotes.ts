@@ -38,7 +38,6 @@ declare global { namespace Quotes { type ITiny = typeof TINY; interface Tiny ext
 const TINY = {
 	symbol: '',
 	price: 0,
-	size: 0,
 	timestamp: 0,
 }
 export const TINY_KEYS = Object.keys(TINY).sort() as (keyof typeof TINY)[]
@@ -52,8 +51,8 @@ const LIVE = {
 	status: '',
 	statusTimestamp: 0,
 	// 
-	// liveStamp: 0,
 	liveCount: 0,
+	liveStamp: 0,
 	// 
 	open: 0,
 	high: 0,
@@ -63,32 +62,26 @@ const LIVE = {
 	dayHigh: 0,
 	dayLow: 0,
 	// 
-	bidPrice: 0,
-	askPrice: 0,
+	bidSpread: 0,
+	askSpread: 0,
 	bidSize: 0,
 	askSize: 0,
+	bidVolume: 0,
+	askVolume: 0,
 	// 
-	// spread: 0,
-	// bidSpread: 0,
-	// askSpread: 0,
-	// bidSizeAccum: 0,
-	// askSizeAccum: 0,
-	// bidSize: 0,
-	// askSize: 0,
-	// bidVolume: 0,
-	// askVolume: 0,
-	// 
+	size: 0,
 	volume: 0,
+	// 
 	dealCount: 0,
 	dealSize: 0,
 	dealVolume: 0,
+	dealFlowVolume: 0,
+	dealFlowSize: 0,
+	// 
 	buySize: 0,
 	sellSize: 0,
 	buyVolume: 0,
 	sellVolume: 0,
-	// 
-	// dealFlowVolume: 0,
-	// dealFlowSize: 0,
 	// 
 	turnoverRate: 0,
 	vibrateRatio: 0,
@@ -110,6 +103,12 @@ const CALC = {
 	prevClose: 0,
 	yearHigh: 0,
 	yearLow: 0,
+	// 
+	spread: 0,
+	bid: 0,
+	ask: 0,
+	bids: 0,
+	asks: 0,
 	// 
 	avgVolume: 0,
 	avgVolume10Day: 0,
