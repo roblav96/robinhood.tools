@@ -4,7 +4,7 @@
 <style>
 /**/
 
-section.symbol-route div.bidask .progress::-webkit-progress-bar {
+section.symbol-route table.bidask .progress::-webkit-progress-bar {
 	background-color: white;
 	border: 1px solid var(--border);
 }
@@ -29,14 +29,14 @@ section.symbol-route div.bidask .progress::-webkit-progress-bar {
 					</div>
 
 					<div class="column flex">
-						<div class="box h-12 flex px-5">
+						<div class="box h-12 flex py-0 px-5">
 							<p class="self-center title mr-4 whitespace-no-wrap">{{symbol}}</p>
 							<p class="self-center is-size-6">{{breakpoints.widescreenAndUp?all.quote.name:all.quote.tinyName}}</p>
 						</div>
 					</div>
 
 					<div class="column is-narrow">
-						<div class="box h-12 flex px-5 whitespace-no-wrap font-mono">
+						<div class="box h-12 flex py-0 px-5 whitespace-no-wrap font-mono">
 							<number-ticker :number="all.quote.price" class="self-center title mr-4"></number-ticker>
 							<p class="self-center is-size-6 font-medium" v-bull-bear="all.quote.change">
 								<span>{{vnumber(all.quote.change,{plusminus:true})}}</span>
@@ -46,7 +46,77 @@ section.symbol-route div.bidask .progress::-webkit-progress-bar {
 						</div>
 					</div>
 
+
+
 					<div class="column is-narrow">
+						<div class="box h-12 flex py-0">
+							<table class="table is-narrowest is-middle is-nowrap is-borderless self-center is-size-6">
+								<tbody>
+									<tr>
+										<td class="font-semibold">{{vnumber(all.quote.volume,{compact:true})}}</td>
+										<td class="">Vol</td>
+									</tr>
+									<tr>
+										<td class="font-semibold">{{vnumber(all.quote.avgVolume,{compact:true})}}</td>
+										<td class="">Avg</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+
+
+					<div class="column is-narrow">
+						<div class="box h-12 flex py-0">
+							<table class="bidask table is-paddingless is-middle is-nowrap is-borderless self-center is-size-6">
+								<tbody>
+									<tr>
+										<td class="has-text-danger has-text-right">
+											<b-tooltip label="Bid Price">
+												<p>{{vnumber(all.quote.bid)}}</p>
+											</b-tooltip>
+										</td>
+										<td width="30%">
+											<progress class="progress is-danger is-small rounded-none pr-2" :value="bidask.bid.price" :min="0" :max="100"
+											    style="transform: rotate(180deg);"></progress>
+										</td>
+										<td width="30%">
+											<progress class="progress is-success is-small rounded-none pr-2" :value="bidask.ask.price" :min="0" :max="100"></progress>
+										</td>
+										<td class="has-text-success has-text-left">
+											<b-tooltip label="Ask Price">
+												<p>{{vnumber(all.quote.ask)}}</p>
+											</b-tooltip>
+										</td>
+									</tr>
+									<tr>
+										<td class="has-text-success has-text-right">
+											<b-tooltip label="Bid Size" position="is-bottom">
+												<p>{{vnumber(all.quote.bids,{precision:0})}}</p>
+											</b-tooltip>
+										</td>
+										<td width="30%">
+											<progress class="progress is-success is-small rounded-none pr-2" :value="bidask.bid.size" :min="0" :max="100"
+											    style="transform: rotate(180deg);"></progress>
+										</td>
+										<td width="30%">
+											<progress class="progress is-danger is-small rounded-none pr-2" :value="bidask.ask.size" :min="0" :max="100"></progress>
+										</td>
+										<td class="has-text-danger has-text-left">
+											<b-tooltip label="Ask Size" position="is-bottom">
+												<p>{{vnumber(all.quote.asks,{precision:0})}}</p>
+											</b-tooltip>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+
+
+					<!-- <div class="column is-narrow">
 						<div class="box h-12 flex">
 							<p class="self-center is-size-4 mr-2 font-medium whitespace-no-wrap">
 								{{vnumber(all.quote.volume,{compact:true})}}
@@ -71,7 +141,7 @@ section.symbol-route div.bidask .progress::-webkit-progress-bar {
 							</p>
 							<p class="self-center is-size-6">Market Cap</p>
 						</div>
-					</div>
+					</div> -->
 
 				</div>
 			</div>
@@ -100,9 +170,9 @@ section.symbol-route div.bidask .progress::-webkit-progress-bar {
 
 
 
-			<transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+			<!-- <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
 				<symbol-ticker v-if="showticker" class="pb-0"></symbol-ticker>
-			</transition>
+			</transition> -->
 
 
 

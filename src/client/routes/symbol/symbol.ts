@@ -9,6 +9,7 @@ import * as core from '@/common/core'
 import * as rkeys from '@/common/rkeys'
 import * as quotes from '@/common/quotes'
 import * as http from '@/client/adapters/http'
+import * as utils from '@/client/adapters/utils'
 import clock from '@/common/clock'
 import socket from '@/client/adapters/socket'
 
@@ -34,7 +35,6 @@ export default class VSymbol extends Mixins(VMixin) {
 	get routes() { return this.$router.options.routes.find(v => v.name == 'symbol').children.filter(v => v.icon) }
 
 	busy = true
-	showticker = false
 	all = core.array.dict(Object.keys(quotes.ALL_RKEYS), {} as any) as Quotes.All
 
 	@Vts.Watch('all.quote.price', { immediate: true }) w_price(price: number) {
@@ -65,9 +65,10 @@ export default class VSymbol extends Mixins(VMixin) {
 		core.object.merge(this.all.quote, quote)
 	}
 
+	get bidask() { return utils.bidask(this.all.quote) }
+
 	// @Vts.Watch('$route.name') w_$routename(name: string) {
 	// 	if (!name.includes('symbol.')) return;
-	// 	this.showticker = false
 	// }
 
 }

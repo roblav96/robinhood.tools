@@ -73,6 +73,13 @@ div.is-scroll > div.table-wrapper {
 	margin-bottom: 4px;
 }*/
 
+table.table.is-paddingless th,
+.b-table.is-paddingless table.table th,
+table.table.is-paddingless td,
+.b-table.is-paddingless table.table td {
+	padding: 0px;
+}
+
 table.table.is-middle th,
 .b-table.is-middle table.table th,
 table.table.is-middle td,
@@ -104,13 +111,11 @@ table.table.is-narrow td,
 
 table.table.is-narrower td,
 .b-table.is-narrower table.table td {
-	line-height: 1.125;
 	padding: 0.125rem 0.5rem;
 }
 
 table.table.is-narrowest td,
 .b-table.is-narrowest table.table td {
-	line-height: 1.125;
 	padding: 0rem 0.25rem;
 }
 

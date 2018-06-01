@@ -82,6 +82,24 @@ export function vfromnow(stamp: number, opts = {} as Partial<VFromNowOpts>) {
 
 
 
+export function bidask(quote: Quotes.Quote) {
+	let bidask = { bid: { price: 0, size: 0 }, ask: { price: 0, size: 0 } }
+	if (Object.keys(quote).length == 0) return bidask;
+	{
+		let max = quote.ask - quote.bid
+		bidask.bid.price = core.calc.slider(quote.price - quote.bid, 0, max)
+		bidask.ask.price = core.calc.slider(quote.ask - quote.price, 0, max)
+	}
+	{
+		let max = quote.bids + quote.asks
+		bidask.bid.size = core.calc.slider(quote.bids, 0, max)
+		bidask.ask.size = core.calc.slider(quote.asks, 0, max)
+	}
+	return bidask
+}
+
+
+
 export function randomPrice(price: number) {
 	return _.round(price + _.random(-1, 1, true), 2)
 }
