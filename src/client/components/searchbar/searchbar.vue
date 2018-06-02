@@ -21,6 +21,8 @@ div.searchbar a.dropdown-item:hover .title {
 
 div.searchbar div.dropdown-item {
 	border-bottom: 2px solid var(--border);
+	padding: 0px 1rem;
+	padding-bottom: 0.5rem;
 }
 
 div.searchbar div.dropdown-item:empty {
@@ -34,7 +36,8 @@ div.searchbar div.dropdown-item:empty {
 	    icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur" v-on:input="oninput"
 	    v-on:select="onselect">
 		<template v-if="!query" slot="header">
-			<p class="mb-2 leading-none font-bold is-size-6">Recently Viewed</p>
+			<b-icon class="align-middle mr-4" icon="history" size="is-32x32"></b-icon>
+			<span class="align-middle font-bold is-size-6">Recently Viewed</span>
 		</template>
 		<template slot="empty">No results found...</template>
 		<template slot-scope="props">
