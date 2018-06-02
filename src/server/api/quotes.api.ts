@@ -8,6 +8,7 @@ import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
 import * as quotes from '../adapters/quotes'
+import * as hours from '../adapters/hours'
 import polka from './polka'
 
 
@@ -70,16 +71,22 @@ polka.route({
 	schema: {
 		body: {
 			symbols: { type: 'array', items: 'string' },
-			start: { type: 'number', optional: true },
-			end: { type: 'number', optional: true },
+			range: { type: 'array', items: 'number', optional: true },
 		},
 	},
 	async handler(req, res) {
 		let symbols = req.body.symbols as string[]
-		console.log('symbols ->', symbols)
-		
-		
-		
+		let range = req.body.range as number[]
+		if (!Array.isArray(range)) {
+			let now = Date.now()
+			let rxhours = hours.rxhours.value
+
+		}
+		// let start = range[0]
+		// let end = range[1]
+
+
+
 	}
 })
 

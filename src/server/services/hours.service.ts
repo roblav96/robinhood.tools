@@ -18,22 +18,13 @@ async function syncHours() {
 	let today = dayjs().format('YYYY-MM-DD')
 	let url = 'https://api.robinhood.com/markets/XNYS/hours/' + today + '/'
 	let rhours = await http.get(url, { retries: 6, retryTick: '10s', silent: true }) as Robinhood.Hours
-	let hhours = {
-		openToday: rhours.is_open,
-		date: rhours.date,
-		prepre: null, pre: null,
-		opens: null, closes: null,
-		post: null, postpost: null,
-	} as Hours
-	if (hhours.openToday) {
-		hhours.prepre = dayjs(new Date(rhours.opens_at)).subtract(5, 'hour').subtract(30, 'minute').valueOf()
-		hhours.pre = dayjs(new Date(rhours.extended_opens_at)).valueOf()
-		hhours.opens = dayjs(new Date(rhours.opens_at)).valueOf()
-		hhours.closes = dayjs(new Date(rhours.closes_at)).valueOf()
-		hhours.post = dayjs(new Date(rhours.extended_closes_at)).valueOf()
-		hhours.postpost = dayjs(new Date(rhours.closes_at)).add(4, 'hour').valueOf()
-	}
-	await redis.main.hmset(rkeys.HR.HOURS, hhours)
+	let prevhours = await http.get(rhours.previous_open_hours, { retries: 6, retryTick: '10s', silent: true }) as Robinhood.Hours
+	let nexthours = await http.get(rhours.next_open_hours, { retries: 6, retryTick: '10s', silent: true }) as Robinhood.Hours
+	await redis.main.coms([
+		['hmset', rkeys.HR.HOURS, hours.toHours(rhours) as any],
+		['hmset', rkeys.HR.PREV_HOURS, hours.toHours(prevhours) as any],
+		['hmset', rkeys.HR.NEXT_HOURS, hours.toHours(nexthours) as any],
+	])
 	radio.emit('syncHours')
 }
 
@@ -42,6 +33,12 @@ hours.rxhours.subscribe(function(rhours) {
 })
 hours.rxstate.subscribe(function(state) {
 	if (state) socket.emit(rkeys.HR.STATE, state);
+})
+hours.rxprevhours.subscribe(function(prevhours) {
+	if (prevhours) socket.emit(rkeys.HR.PREV_HOURS, prevhours);
+})
+hours.rxnexthours.subscribe(function(nexthours) {
+	if (nexthours) socket.emit(rkeys.HR.NEXT_HOURS, nexthours);
 })
 
 

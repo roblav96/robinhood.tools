@@ -1,10 +1,14 @@
 // 
 
+import dayjs from './dayjs'
+
 
 
 export const HR = {
 	HOURS: 'hours:hours',
 	STATE: 'hours:state',
+	PREV_HOURS: 'hours:hours:prev',
+	NEXT_HOURS: 'hours:hours:next',
 }
 
 
@@ -17,6 +21,27 @@ export function getState(hours: Hours, stamp = Date.now()): Hours.State {
 	if (stamp >= hours.closes && stamp < hours.post) return 'POST';
 	if (stamp >= hours.post && stamp < hours.postpost) return 'POSTPOST';
 	return 'CLOSED'
+}
+
+
+
+export function toHours(rhours: Robinhood.Hours) {
+	let hhours = {
+		openToday: rhours.is_open,
+		date: rhours.date,
+		prepre: null, pre: null,
+		opens: null, closes: null,
+		post: null, postpost: null,
+	} as Hours
+	if (hhours.openToday) {
+		hhours.prepre = dayjs(new Date(rhours.opens_at)).subtract(5, 'hour').subtract(30, 'minute').valueOf()
+		hhours.pre = dayjs(new Date(rhours.extended_opens_at)).valueOf()
+		hhours.opens = dayjs(new Date(rhours.opens_at)).valueOf()
+		hhours.closes = dayjs(new Date(rhours.closes_at)).valueOf()
+		hhours.post = dayjs(new Date(rhours.extended_closes_at)).valueOf()
+		hhours.postpost = dayjs(new Date(rhours.closes_at)).add(4, 'hour').valueOf()
+	}
+	return hhours
 }
 
 
