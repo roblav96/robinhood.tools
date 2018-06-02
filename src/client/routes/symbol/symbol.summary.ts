@@ -30,7 +30,7 @@ export default class extends Mixins(VMixin) {
 		{
 			name: 'Definition', icon: 'book-open',
 			defs: [
-				{ key: 'fullName' },
+				{ key: 'fullName', title: 'Official Name' },
 				{ key: 'issueType' },
 				{ key: 'currency' },
 				{ key: 'country' },

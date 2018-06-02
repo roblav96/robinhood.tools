@@ -35,9 +35,10 @@ async function start() {
 	builder.field('symbol')
 	builder.field('name')
 	alls.forEach(all => {
-		all.quote.symbol = all.symbol.toLowerCase()
-		all.quote.name = core.string.clean(all.quote.name).toLowerCase()
-		builder.add(all.quote)
+		builder.add({
+			symbol: all.symbol.toLowerCase(),
+			name: core.string.clean(all.quote.name).toLowerCase(),
+		} as Quotes.Quote)
 	})
 	INDEX = builder.build()
 
