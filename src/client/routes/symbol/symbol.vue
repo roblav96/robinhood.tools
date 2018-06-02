@@ -21,7 +21,7 @@
 		<section class="section has-background-white-ter pb-0">
 			<div class="container">
 
-				<div class="columns is-mobile flex-wrap desktop:flex-no-wrap">
+				<div class="columns is-mobile is-variable flex-wrap desktop:flex-no-wrap">
 
 					<div class="column is-narrow">
 						<symbol-logo class="is-48x48 shadow" :symbol="symbol"></symbol-logo>
