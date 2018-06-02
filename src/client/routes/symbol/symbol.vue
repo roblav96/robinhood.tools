@@ -105,11 +105,11 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 								<tbody>
 									<tr>
 										<td class="font-semibold has-text-right pr-2">{{vnumber(all.quote.volume,{compact:true})}}</td>
-										<td class="text-sm leading-none">Volume</td>
+										<td>Volume</td>
 									</tr>
 									<tr>
 										<td class="font-semibold has-text-right pr-2">{{vnumber(all.quote.avgVolume,{compact:true})}}</td>
-										<td class="text-sm leading-none">Avg Volume</td>
+										<td>Avg Volume</td>
 									</tr>
 								</tbody>
 							</table>
@@ -124,13 +124,13 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 								<tbody>
 									<tr>
 										<td class="font-semibold has-text-right pr-2">{{vnumber(all.quote.marketCap,{compact:true})}}</td>
-										<td class="text-sm leading-none">Market Cap</td>
+										<td>Market Cap</td>
 									</tr>
 									<tr>
 										<td class="font-semibold has-text-right pr-2" v-bull-bear="all.quote.dealFlowVolume">
 											{{vnumber(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
 										</td>
-										<td class="text-sm leading-none">Capital Flow</td>
+										<td>Capital Flow</td>
 									</tr>
 								</tbody>
 							</table>

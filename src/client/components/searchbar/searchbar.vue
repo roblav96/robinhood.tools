@@ -19,6 +19,10 @@ div.searchbar a.dropdown-item:hover .title {
 	color: var(--primary);
 }
 
+div.searchbar div.dropdown-item {
+	border-bottom: 2px solid var(--border);
+}
+
 div.searchbar div.dropdown-item:empty {
 	display: none;
 }
@@ -30,7 +34,7 @@ div.searchbar div.dropdown-item:empty {
 	    icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur" v-on:input="oninput"
 	    v-on:select="onselect">
 		<template v-if="!query" slot="header">
-			<p class="mb-2 leading-none font-medium is-size-6">Recently viewed symbols:</p>
+			<p class="mb-2 leading-none font-bold is-size-6">Recently Viewed</p>
 		</template>
 		<template slot="empty">No results found...</template>
 		<template slot-scope="props">
