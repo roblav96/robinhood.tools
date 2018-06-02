@@ -40,6 +40,7 @@ class VSymbolEChart extends Vue {
 		this.echart.dispose()
 		this.echart = null
 		window.removeEventListener('resize', this.onresize)
+		console.log(`windodw -> %O`, window, window)
 	}
 	
 	destroyed() {
