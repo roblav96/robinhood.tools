@@ -9,9 +9,10 @@
 	border: 1px solid var(--border);
 }
 
-#symbol_route nav.tabs li > a {
-	border-bottom-width: 2px;
-}
+/*#symbol_route nav.tabs li.is-active {
+	background: rgb(255, 255, 255);
+	background: linear-gradient(0deg, white 0%, #F1F5F8 100%);
+}*/
 
 </style>
 
@@ -21,10 +22,10 @@
 		<section class="section has-background-white-ter pb-0">
 			<div class="container">
 
-				<div class="columns is-mobile is-variable flex-wrap desktop:flex-no-wrap">
+				<div class="columns is-mobile flex-wrap desktop:flex-no-wrap mb-0">
 
 					<div class="column is-narrow">
-						<symbol-logo class="is-48x48 shadow" :symbol="symbol"></symbol-logo>
+						<symbol-logo class="is-48x48 card is-light" :symbol="symbol"></symbol-logo>
 					</div>
 
 					<div class="column flex">
@@ -132,7 +133,7 @@
 
 				</div>
 
-				<nav class="tabs is-inverted is-boxed is-centered is-fullwidth mb-0">
+				<nav class="tabs is-centered is-fullwidth mb-0">
 					<div class="container">
 						<ul>
 							<router-link tag="li" class="is-dark" v-for="route in routes" :key="route.name" :to="{name:route.name}">
@@ -148,7 +149,7 @@
 		</section>
 
 		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-			<router-view class="flex-1"></router-view>
+			<router-view class=""></router-view>
 		</transition>
 
 	</div>

@@ -25,8 +25,8 @@ class VSymbolEChart extends Vue {
 	dims: Partial<echarts.InitOptions>
 
 	mounted() {
-		this.onresize()
-		// this.echart = echarts.init(this.$el, null, this.dims)
+		this.resize()
+		this.echart = echarts.init(this.$el, null, this.dims)
 		window.addEventListener('resize', this.onresize.bind(this))
 	}
 
@@ -40,7 +40,7 @@ class VSymbolEChart extends Vue {
 	onresize = _.debounce(this.resize, 100, { leading: false, trailing: true })
 	resize() {
 		this.dims = { width: this.$el.offsetWidth, height: this.$el.offsetHeight }
-		
+		console.log('this.dims ->', this.dims)
 	}
 
 }

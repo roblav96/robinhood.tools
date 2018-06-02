@@ -7,8 +7,7 @@
 </style>
 
 <template>
-	<div class="min-h-full has-background-dark">
-		<div class="h-full">haii</div>
-		<!-- <v-symbol-echart class="h-full"></v-symbol-echart> -->
+	<div class="flex-1 has-background-white">
+		<v-symbol-echart></v-symbol-echart>
 	</div>
 </template>

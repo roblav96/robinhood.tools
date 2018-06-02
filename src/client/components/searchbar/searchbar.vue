@@ -36,10 +36,8 @@ div.searchbar div.dropdown-item:empty {
 	    icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur" v-on:input="oninput"
 	    v-on:select="onselect">
 		<template v-if="!query" slot="header">
-			<p>
-				<b-icon class="align-middle mr-5 ml-1" icon="history"></b-icon>
-				<span class="align-middle font-bold is-size-6">Recently Viewed</span>
-			</p>
+			<b-icon class="align-middle mr-5 ml-1" icon="history"></b-icon>
+			<span class="align-middle font-700 is-size-6">Recently Viewed</span>
 		</template>
 		<template slot="empty">No results found...</template>
 		<template slot-scope="props">

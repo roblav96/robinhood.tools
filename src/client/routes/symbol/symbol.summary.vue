@@ -12,7 +12,7 @@
 
 
 
-			<div class="columns is-multiline is-mobile">
+			<div class="columns is-multiline is-mobile is-variable is-4">
 				<div class="column" v-for="schema in schemas" :key="schema.name">
 					<table class="table is-middle is-fullwidth is-borderless card border">
 						<thead>

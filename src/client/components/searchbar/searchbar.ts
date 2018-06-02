@@ -15,6 +15,11 @@ import * as recents from '@/client/stores/recents'
 export default class extends Mixins(VMixin) {
 
 	get searchbar() { return this.$refs.searchbar_input as Vue }
+	get scroll() { return this.searchbar.$el.querySelector('div.dropdown-menu > div.dropdown-content') as HTMLElement }
+	scrolltop() {
+		console.log(`this.scroll -> %O`, this.scroll, this.scroll)
+		this.scroll.scrollTo({ top: 0, behavior: 'smooth' })
+	}
 
 	busy = false
 	query = ''
@@ -28,6 +33,7 @@ export default class extends Mixins(VMixin) {
 			query: { query: this.query },
 		}).then(results => {
 			this.results = results
+			this.scrolltop()
 		}).catch(error => {
 			console.error('syncquery Error ->', error)
 		}).finally(() => this.busy = false)
@@ -39,6 +45,7 @@ export default class extends Mixins(VMixin) {
 			symbols: this.recents.map(v => v.symbol),
 		}).then(results => {
 			this.results = results
+			this.scrolltop()
 		}).catch(error => {
 			console.error('syncrecents Error ->', error)
 		}).finally(() => this.busy = false)
