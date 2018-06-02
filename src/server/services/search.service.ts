@@ -35,7 +35,8 @@ async function start() {
 	builder.field('symbol')
 	builder.field('name')
 	alls.forEach(all => {
-		all.quote.symbol = all.symbol
+		all.quote.symbol = all.symbol.toLowerCase()
+		all.quote.name = core.string.clean(all.quote.name).toLowerCase()
 		builder.add(all.quote)
 	})
 	INDEX = builder.build()
@@ -46,36 +47,75 @@ async function start() {
 
 const MAX = 20
 radio.reply('search.query', async function onquery(query: string) {
+	let words = query.split(' ')
 	let results = INDEX.query(function(q) {
-		q.term(query, {
-			fields: ['symbol'],
-			boost: 100000,
-		})
-		q.term(`${query}*`, {
-			fields: ['symbol'],
-			boost: 10000,
-		})
-		q.term(`*${query}*`, {
-			fields: ['symbol'],
-			boost: 1000,
-		})
-		q.term(`*${query}*`, {
-			fields: ['name'],
-			boost: 100,
-		})
-		q.term(query, {
-			fields: ['symbol'],
-			boost: 10,
-			editDistance: 1,
-		})
-		q.term(query, {
-			fields: ['name'],
-			boost: 1,
-			editDistance: 2,
+		if (words.length == 1) {
+			q.term(query, {
+				fields: ['symbol'],
+				boost: 1000000,
+			})
+			q.term(query, {
+				fields: ['symbol'],
+				boost: 100000,
+				wildcard: lunr.Query.wildcard.TRAILING,
+			})
+			q.term(query, {
+				fields: ['symbol'],
+				boost: 10000,
+				wildcard: lunr.Query.wildcard.LEADING | lunr.Query.wildcard.TRAILING,
+			})
+			q.term(query, {
+				fields: ['symbol'],
+				boost: 1000,
+				editDistance: 1,
+			})
+		}
+		words.forEach(word => {
+			q.term(word, {
+				fields: ['name'],
+				boost: 1000,
+			})
+			q.term(word, {
+				fields: ['name'],
+				boost: 100,
+				wildcard: lunr.Query.wildcard.TRAILING,
+			})
+			q.term(word, {
+				fields: ['name'],
+				boost: 10,
+				wildcard: lunr.Query.wildcard.LEADING | lunr.Query.wildcard.TRAILING,
+			})
+			q.term(word, {
+				fields: ['name'],
+				boost: 1,
+				editDistance: 1,
+			})
 		})
 	})
 	results.splice(MAX)
 	return results.map(v => v.ref.toUpperCase())
 })
+
+
+
+
+
+// let searches = [] as string[]
+// if (!query.includes(' ')) {
+// 	searches.push(...[
+// 		`symbol:${query}^10000000`,
+// 		`symbol:${query}*^1000000`,
+// 		`symbol:*${query}*^100000`,
+// 		`symbol:${query}~1^10000`,
+// 	])
+// }
+// searches.push(...[
+// 	`name:${query}^1000`,
+// 	`name:${query}*^100`,
+// 	`name:*${query}*^10`,
+// 	`name:${query}~1`,
+// ])
+// console.log(`searches ->`, searches)
+// let results = INDEX.search(searches.join(' '))
 
 

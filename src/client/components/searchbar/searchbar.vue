@@ -43,8 +43,8 @@ div.searchbar div.dropdown-item:empty {
 					<symbol-logo class="is-32x32 shadow" :symbol="props.option.symbol"></symbol-logo>
 				</div>
 				<div class="column">
-					<p class="title is-size-5 mr-1">{{ props.option.symbol }}</p>
-					<p class="subtitle is-size-6">{{ props.option.name }}</p>
+					<p class="title is-size-5 mr-1">{{props.option.symbol}}</p>
+					<p class="subtitle is-size-6">{{vtruncate(props.option.name)}}</p>
 				</div>
 			</div>
 		</template>

@@ -130,7 +130,7 @@ export const string = {
 	},
 	clean(value: string) {
 		if (!value) return value;
-		return value.replace(/[^a-zA-Z0-9-_. ]/g, ' ').replace(/\s\s+/g, ' ').trim()
+		return value.replace(/[^a-zA-Z0-9-_. ]/g, '').replace(/\s\s+/g, ' ').trim()
 	},
 	capitalize(value: string) {
 		if (!value) return value;

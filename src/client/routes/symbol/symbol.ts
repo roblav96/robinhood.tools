@@ -51,12 +51,14 @@ export default class VSymbol extends Mixins(VMixin) {
 		return http.post('/quotes/alls', { symbols: [this.symbol] }).then((response: Quotes.All[]) => {
 			console.log(this.symbol, '/quotes/alls response ->', JSON.parse(JSON.stringify(response)))
 			this.reset()
-			core.object.merge(this.all, _.omit(response[0], ['symbol']) as any)
-			socket.on(`${rkeys.QUOTES}:${this.symbol}`, this.onquote, this)
+			return this.$nextTick(() => {
+				core.object.merge(this.all, _.omit(response[0], ['symbol']) as any)
+				socket.on(`${rkeys.QUOTES}:${this.symbol}`, this.onquote, this)
+			})
 		}).catch(error => {
 			console.error('w_symbol Error ->', error)
 		}).finally(() => {
-			this.busy = false
+			return this.$nextTick(() => this.busy = false)
 		})
 	}
 
