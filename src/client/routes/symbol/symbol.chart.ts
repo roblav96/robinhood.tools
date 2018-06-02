@@ -15,32 +15,42 @@ import * as http from '@/client/adapters/http'
 
 
 @Vts.Component({
-	template: `<div></div>`,
+	template: `<div class="flex-col-full w-full h-full"></div>`,
 })
 class VSymbolEChart extends Vue {
 	$parent: VSymbolChart
 	symbol = this.$parent.symbol
 
 	echart: echarts.ECharts
-	dims: Partial<echarts.InitOptions>
+	dims = {} as echarts.Dims
+
+	created() {
+
+	}
 
 	mounted() {
+		this.echart = echarts.init(this.$el)
+		window.addEventListener('resize', this.onresize.bind(this), { passive: true })
 		this.resize()
-		this.echart = echarts.init(this.$el, null, this.dims)
-		window.addEventListener('resize', this.onresize.bind(this))
 	}
 
 	beforeDestroy() {
+		console.warn(`beforeDestroy`)
 		this.echart.clear()
 		this.echart.dispose()
 		this.echart = null
 		window.removeEventListener('resize', this.onresize)
 	}
+	
+	destroyed() {
+		console.warn(`destroyeddd`)
+	}
 
 	onresize = _.debounce(this.resize, 100, { leading: false, trailing: true })
 	resize() {
 		this.dims = { width: this.$el.offsetWidth, height: this.$el.offsetHeight }
-		console.log('this.dims ->', this.dims)
+		console.log(`this.dims ->`, JSON.parse(JSON.stringify(this.dims)))
+		this.echart.resize(this.dims)
 	}
 
 }

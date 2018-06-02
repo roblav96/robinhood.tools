@@ -9,6 +9,7 @@
 	border: 1px solid var(--border);
 }
 
+
 /*#symbol_route nav.tabs li.is-active {
 	background: rgb(255, 255, 255);
 	background: linear-gradient(0deg, white 0%, #F1F5F8 100%);
@@ -148,9 +149,11 @@
 			</div>
 		</section>
 
+		<!-- <section class="section flex-col-full"> -->
 		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-			<router-view class=""></router-view>
+			<router-view></router-view>
 		</transition>
+		<!-- </section> -->
 
 	</div>
 </template>

@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<div class="flex-1 has-background-white">
-		<v-symbol-echart></v-symbol-echart>
-	</div>
+	<section class="section flex-col-full">
+		<v-symbol-echart class="has-background-dark"></v-symbol-echart>
+	</section>
 </template>

@@ -4,11 +4,13 @@ declare namespace ECharts {
 
 	const graphic: any
 
-	interface InitOptions {
-		devicePixelRatio: number
-		renderer: 'canvas' | 'svg'
+	interface Dims {
 		width: number | string
 		height: number | string
+	}
+	interface InitOptions extends Dims {
+		devicePixelRatio: number
+		renderer: 'canvas' | 'svg'
 	}
 	function init(el: HTMLElement, theme?: object, opts?: Partial<InitOptions>): ECharts
 
@@ -24,6 +26,7 @@ declare namespace ECharts {
 		on(eventName: string, handler: (...args: any[]) => void, context?: any): void
 		one(eventName: string, handler: (...args: any[]) => void, context?: any): void
 		off(eventName: string, handler?: (...args: any[]) => void): void
+		resize(dims: Dims): void
 
 		group: string
 		setOption(option: Options, notMerge?: boolean, lazyUpdate?: boolean, silent?: boolean): void
@@ -31,7 +34,6 @@ declare namespace ECharts {
 		getHeight(): number
 		getDom(): HTMLElement
 		getOption(): Options
-		resize(opts: { width: number, height: number }): void
 		dispatchAction(payload: any): void
 		showLoading(type: string, opts: object): void
 		hideLoading(): void

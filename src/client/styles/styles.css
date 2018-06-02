@@ -4,6 +4,23 @@
 	display: none !important;
 }
 
+.flex-row,
+.flex-col {
+	display: flex;
+}
+
+.flex-row-full {
+	display: flex;
+	flex-direction: row;
+	flex: 1;
+}
+
+.flex-col-full {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
 .box.is-border,
 .card.is-border {
 	box-shadow: 0 0 0 1px var(--border);
