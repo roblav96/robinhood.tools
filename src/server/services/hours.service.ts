@@ -17,14 +17,14 @@ schedule.scheduleJob('00 * * * *', syncHours).invoke()
 async function syncHours() {
 	let today = dayjs().format('YYYY-MM-DD')
 	let url = 'https://api.robinhood.com/markets/XNYS/hours/' + today + '/'
-	let rhours = await http.get(url, { retries: 6, retryTick: '10s', silent: true }) as Robinhood.Hours
-	let prevhours = await http.get(rhours.previous_open_hours, { retries: 6, retryTick: '10s', silent: true }) as Robinhood.Hours
-	let nexthours = await http.get(rhours.next_open_hours, { retries: 6, retryTick: '10s', silent: true }) as Robinhood.Hours
-	await redis.main.coms([
-		['hmset', rkeys.HR.HOURS, hours.toHours(rhours) as any],
-		['hmset', rkeys.HR.PREV_HOURS, hours.toHours(prevhours) as any],
-		['hmset', rkeys.HR.NEXT_HOURS, hours.toHours(nexthours) as any],
-	])
+	let config = { retries: 6, retryTick: '10s', silent: true } as Http.Config
+	let rhours = await http.get(url, config) as Robinhood.Hours
+	let previous = await http.get(rhours.previous_open_hours, config) as Robinhood.Hours
+	let next = await http.get(rhours.next_open_hours, config) as Robinhood.Hours
+	let hhours = hours.toHours(rhours)
+	hhours.previous = JSON.stringify(hours.toHours(previous)) as any
+	hhours.next = JSON.stringify(hours.toHours(next)) as any
+	await redis.main.hmset(rkeys.HR.HOURS, hhours)
 	radio.emit('syncHours')
 }
 
@@ -33,12 +33,6 @@ hours.rxhours.subscribe(function(rhours) {
 })
 hours.rxstate.subscribe(function(state) {
 	if (state) socket.emit(rkeys.HR.STATE, state);
-})
-hours.rxprevhours.subscribe(function(prevhours) {
-	if (prevhours) socket.emit(rkeys.HR.PREV_HOURS, prevhours);
-})
-hours.rxnexthours.subscribe(function(nexthours) {
-	if (nexthours) socket.emit(rkeys.HR.NEXT_HOURS, nexthours);
 })
 
 

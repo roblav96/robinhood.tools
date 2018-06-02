@@ -7,8 +7,6 @@ import dayjs from './dayjs'
 export const HR = {
 	HOURS: 'hours:hours',
 	STATE: 'hours:state',
-	PREV_HOURS: 'hours:hours:prev',
-	NEXT_HOURS: 'hours:hours:next',
 }
 
 
@@ -61,6 +59,8 @@ declare global {
 		closes: number
 		post: number
 		postpost: number
+		previous: Hours
+		next: Hours
 	}
 }
 
