@@ -57,19 +57,12 @@ function update() {
 		widescreenOnly, widescreenAndDown, widescreenAndUp,
 		mobileOnly, fullhdOnly,
 	})
-	console.log('state ->', JSON.parse(JSON.stringify(state)))
+	// console.log('state ->', JSON.parse(JSON.stringify(state)))
 
 }
 update()
 
-const handler = _.debounce(update, 100, { leading: false, trailing: true })
-// window.addEventListener('resize', handler, { passive: true })
-utils.wemitter.on('resize', handler)
-// console.log(`Object.keys(utils.wemitter._events) ->`, Object.keys(utils.wemitter._events))
-setTimeout(function() {
-	utils.wemitter.offAll('resize')
-	// console.log(`Object.keys(utils.wemitter._events) ->`, Object.keys(utils.wemitter._events))
-}, 3000)
+utils.wemitter.on('resize', _.debounce(update, 100, { leading: false, trailing: true }))
 
 store.register('breakpoints', state)
 declare global { namespace Store { interface State { breakpoints: typeof state } } }

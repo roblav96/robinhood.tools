@@ -11,6 +11,7 @@ import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as rkeys from '@/common/rkeys'
 import * as http from '@/client/adapters/http'
+import * as utils from '@/client/adapters/utils'
 
 
 
@@ -30,21 +31,16 @@ class VSymbolEChart extends Vue {
 
 	mounted() {
 		this.echart = echarts.init(this.$el)
-		window.addEventListener('resize', this.onresize.bind(this), { passive: true })
+		utils.wemitter.on('resize', this.onresize, this)
 		this.resize()
 	}
 
 	beforeDestroy() {
-		console.warn(`beforeDestroy`)
+		utils.wemitter.off('resize', this.onresize, this)
+		this.onresize.cancel()
 		this.echart.clear()
 		this.echart.dispose()
 		this.echart = null
-		window.removeEventListener('resize', this.onresize)
-		console.log(`windodw -> %O`, window, window)
-	}
-	
-	destroyed() {
-		console.warn(`destroyeddd`)
 	}
 
 	onresize = _.debounce(this.resize, 100, { leading: false, trailing: true })

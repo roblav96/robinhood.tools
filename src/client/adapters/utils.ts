@@ -9,79 +9,29 @@ import clock from '@/common/clock'
 
 
 
-export const wemitter = new class UtilsEmitter extends Emitter<keyof WindowEventMap, Event> {
+export const wemitter = new class WEmitter extends Emitter<keyof WindowEventMap, Event> {
+	private static PASSIVES = ['mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'mousewheel', 'resize', 'scroll', 'touchend', 'touchenter', 'touchleave', 'touchmove', 'touchstart', 'wheel'] as (keyof WindowEventMap)[]
 	private subs = [] as string[]
 	constructor() {
 		super()
 		return proxy.observe(this, key => {
-			// console.log(`method ->`, method, `property ->`, property)
-			// console.log(`key ->`, key)
-			if (key != '_eventsCount') return;
 			let subs = Object.keys(this._events)
-			console.log(`subs ->`, JSON.parse(JSON.stringify(subs)))
 			if (JSON.stringify(this.subs) === JSON.stringify(subs)) return;
-			console.warn(`subs ->`, JSON.parse(JSON.stringify(subs)))
+			_.difference(subs, this.subs).forEach(name => {
+				if (WEmitter.PASSIVES.includes(name as any)) {
+					window.addEventListener(name, this, { passive: true, capture: false })
+				} else window.addEventListener(name, this, false)
+			})
+			_.difference(this.subs, subs).forEach(name => window.removeEventListener(name, this, false))
 			this.subs = subs
+			console.log(`Object.keys(this._events) ->`, JSON.parse(JSON.stringify(Object.keys(this._events))))
 		})
-		// clock.on('1s', this.sync, this)
 	}
-	// private sync() {
-	// 	let subs = this.eventNames()
-	// 	if (this.subs == JSON.stringify(subs)) return;
-	// 	this.subs = subs
-	// }
 	handleEvent(event: Event) {
-		console.log(`event ->`, event)
+		this.emit(event.type as any, event)
 	}
 }
-
-// wemitter.addListener('scroll', function (event) {
-// 	console.log(`event ->`, event)
-// })
-
-// let handlers = {}
-// export const wemitter = proxy.observe(new Emitter<keyof WindowEventMap, Event>(), function onproxy(key) {
-// 	if (key != '_events') return;
-// 	let events = 
-// })
-
 // let wevents = ['blur', 'click', 'dblclick', 'ended', 'error', 'focus', 'keydown', 'keypress', 'keyup', 'load', 'readystatechange', 'resize', 'scroll', 'suspend', 'unload', 'wheel'] as (keyof WindowEventMap)[]
-// let wevents = ['click', 'dblclick', 'keydown', 'keypress', 'keyup', 'resize'] as (keyof WindowEventMap)[]
-// wevents.forEach(name => {
-// 	let opts = {} as AddEventListenerOptions
-// 	if (name == 'resize') opts.passive = true;
-// 	console.log(`opts ->`, opts)
-// 	window.addEventListener(name, event => wemitter.emit(name, event), opts)
-// })
-// export const wemitter = new Emitter<keyof WindowEventMap, Event>()
-// clock.on('1s', i => {
-// 	let events = 
-// })
-
-// return proxy.observe(this, key => {
-// 	// if (key != '_events') return;
-// 	let subs = this.eventNames()
-// 	console.log('subs ->', subs)
-// 	if (JSON.stringify(this.subs) === JSON.stringify(subs)) return;
-// 	console.warn(`subs ->`, JSON.parse(JSON.stringify(subs)))
-// 	this.subs = subs
-// })
-
-// const passives = ['mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'mousewheel', 'scroll', 'touchend', 'touchenter', 'touchleave', 'touchmove', 'touchstart', 'wheel']
-// class WEmitter extends Emitter<keyof WindowEventMap, Event> {
-// 	constructor() {
-// 		super()
-// 		clock.on('1s', this.sync, this)
-// 	}
-// 	private subs = ''
-// 	private sync() {
-// 		let subs = this.eventNames()
-// 		if (this.subs == JSON.stringify(subs)) return;
-// 		this.subs = subs
-
-// 	}
-// }
-// export const wemitter = new WEmitter()
 
 
 
