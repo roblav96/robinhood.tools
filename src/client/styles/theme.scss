@@ -78,8 +78,8 @@ $table-color: $text;
 $table-head-cell-color: $text;
 // 
 $section-padding: 1.5rem 1.5rem;
-$section-padding-medium: 3rem 1.5rem;
-$section-padding-large: 6rem 1.5rem;
+$section-padding-medium: 2rem 1.5rem;
+$section-padding-large: 3rem 1.5rem;
 // 
 $link-visited: $pink;
 $link-focus-border: $link;
@@ -101,6 +101,12 @@ $hr-margin: 0px;
 // 
 $box-padding: 1rem;
 $box-radius: $radius;
+// 
+$tabs-boxed-link-hover-background-color: $white;
+$tabs-boxed-link-hover-border-bottom-color: $primary;
+$tabs-boxed-link-active-background-color: $white;
+$tabs-boxed-link-active-border-color: $border;
+$tabs-boxed-link-active-border-bottom-color: $primary;
 // 
 // $tooltip-arrow-size: 10px;
 // $tooltip-arrow-margin: 4px;

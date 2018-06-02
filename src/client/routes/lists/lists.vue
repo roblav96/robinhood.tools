@@ -12,7 +12,6 @@
 		<section v-visible="!busy" class="section" v-for="list in lists" :key="list.name">
 			<div class="container">
 				<p class="is-size-3 font-semibold has-text-dark mb-1">{{list.name}}</p>
-				<!-- <hr class="mb-3 h-1 has-background-dar"> -->
 				<b-table class="card is-middle is-nowrap is-borderless is-scroll" hoverable :data="tabledata(list.symbols)" :opened-detailed="defaultOpenedDetails"
 				    detailed detail-key="symbol">
 					<template slot-scope="props">

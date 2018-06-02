@@ -14,7 +14,7 @@ span.navbar-burger.burger > span {
 }
 
 nav.navbar {
-	border-bottom: 1px solid var(--grey-lightest);
+	border-bottom: 1px solid var(--border);
 }
 
 nav.navbar div.navbar-item.field {
@@ -34,7 +34,7 @@ nav.navbar div.dropdown-content a > span.icon {
 </style>
 
 <template>
-	<nav id="navbar" class="navbar is-fixed-top shadow is-unselectable" role="navigation" aria-label="main navigation">
+	<nav id="navbar" class="navbar is-fixed-top is-unselectable" role="navigation" aria-label="main navigation">
 		<div class="container">
 
 			<div class="navbar-brand">

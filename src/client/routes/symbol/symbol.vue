@@ -4,34 +4,38 @@
 <style>
 /**/
 
-section.symbol-route table.bidask .progress::-webkit-progress-bar {
+#symbol_route table.bidask .progress::-webkit-progress-bar {
 	background-color: white;
 	border: 1px solid var(--border);
+}
+
+#symbol_route nav.tabs li > a {
+	border-bottom-width: 2px;
 }
 
 </style>
 
 <template>
-	<section class="symbol-route">
+	<div id="symbol_route">
 
-		<section class="section has-background-white-ter">
+		<section class="section has-background-white-ter pb-0">
 			<div class="container">
 
 				<div class="columns is-mobile flex-wrap desktop:flex-no-wrap">
 
 					<div class="column is-narrow">
-						<symbol-logo class="is-48x48 card" :symbol="symbol"></symbol-logo>
+						<symbol-logo class="is-48x48 shadow" :symbol="symbol"></symbol-logo>
 					</div>
 
 					<div class="column flex">
-						<div class="box h-12 flex py-0 px-5">
+						<div class="box is-light h-12 flex py-0 px-5">
 							<p class="self-center title mr-4 whitespace-no-wrap">{{symbol}}</p>
 							<p class="self-center is-size-6">{{breakpoints.widescreenAndUp?all.quote.name:all.quote.tinyName}}</p>
 						</div>
 					</div>
 
 					<div class="column is-narrow">
-						<div class="box h-12 flex py-0 px-5 whitespace-no-wrap">
+						<div class="box is-light h-12 flex py-0 px-5 whitespace-no-wrap">
 							<number-ticker :number="all.quote.price" class="self-center title mr-4 font-mono"></number-ticker>
 							<p class="self-center is-size-6 font-medium" v-bull-bear="all.quote.change">
 								<span>{{vnumber(all.quote.change,{plusminus:true})}}</span>
@@ -41,10 +45,8 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 						</div>
 					</div>
 
-
-
 					<div class="column is-narrow">
-						<div class="box h-12 flex py-0">
+						<div class="box is-light h-12 flex py-0">
 							<table class="bidask table is-paddingless is-middle is-nowrap is-borderless self-center is-size-6">
 								<tbody>
 									<tr>
@@ -92,8 +94,6 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 						</div>
 					</div>
 
-
-
 					<div class="column is-narrow widescreen:flex hidden">
 						<div class="box h-12 flex py-0">
 							<table class="table is-paddingless is-middle is-nowrap is-borderless self-center is-size-6">
@@ -110,8 +110,6 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 							</table>
 						</div>
 					</div>
-
-
 
 					<div v-if="all.quote.marketCap && all.quote.dealFlowVolume" class="column is-narrow fullhd:flex hidden">
 						<div class="box h-12 flex py-0">
@@ -132,79 +130,30 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 						</div>
 					</div>
 
+				</div>
 
-
-					<!-- <div v-if="all.quote.marketCap" class="column is-narrow widescreen:flex hidden">
-						<div class="box h-12 flex">
-							<p class="self-center is-size-4 mr-2 font-medium whitespace-no-wrap">
-								{{vnumber(all.quote.marketCap,{compact:true})}}
-							</p>
-							<p class="self-center is-size-6">Market Cap</p>
-						</div>
-					</div> -->
-
-
-
-					<!-- <div class="column is-narrow">
-						<div class="box h-12 flex">
-							<p class="self-center is-size-4 mr-2 font-medium whitespace-no-wrap">
-								{{vnumber(all.quote.volume,{compact:true})}}
-							</p>
-							<p class="self-center is-size-6">Volume</p>
-						</div>
+				<nav class="tabs is-inverted is-boxed is-centered is-fullwidth mb-0">
+					<div class="container">
+						<ul>
+							<router-link tag="li" class="is-dark" v-for="route in routes" :key="route.name" :to="{name:route.name}">
+								<a class="is-dark no-underline">
+									<b-icon :icon="route.icon"></b-icon>
+									<span>{{vcapitalize(route.path)}}</span>
+								</a>
+							</router-link>
+						</ul>
 					</div>
-
-					<div v-show="all.quote.avgVolume" class="column is-narrow fullhd:flex hidden">
-						<div class="box h-12 flex">
-							<p class="self-center is-size-4 mr-2 font-medium whitespace-no-wrap">
-								{{vnumber(all.quote.avgVolume,{compact:true})}}
-							</p>
-							<p class="self-center is-size-6">Avg Volume</p>
-						</div>
-					</div> -->
-
-				</div>
+				</nav>
 			</div>
-
-		</section>
-		<section class="has-background-white-ter pb-6">
-
-			<nav class="tabs is-toggle is-centered is-fullwidth mb-0">
-				<div class="container px-6 desktop:px-0">
-					<ul class="has-background-white rounded">
-						<!-- <li :class="{'is-active':showticker}">
-							<a class="no-underline" v-on:click="showticker = !showticker">
-								<b-icon :icon="showticker?'chevron-double-up':'chevron-double-down'"></b-icon>
-								<span>Ticker</span>
-							</a>
-						</li> -->
-						<router-link tag="li" v-for="route in routes" :key="route.name" :to="{name:route.name}">
-							<a class="no-underline">
-								<b-icon :icon="route.icon"></b-icon>
-								<span>{{vcapitalize(route.path)}}</span>
-							</a>
-						</router-link>
-					</ul>
-				</div>
-			</nav>
-
-
-
-			<!-- <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-				<v-symbol-ticker v-if="showticker" class="pb-0"></v-symbol-ticker>
-			</transition> -->
-
-
-
 		</section>
 
-		<hr class="h-px my-0">
+		<!-- <hr class="h-px my-0"> -->
 
-		<!-- <section class="section has-background-white-bis"> -->
+		<!-- <section class="section"> -->
 		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-			<router-view class="has-background-white-bis"></router-view>
+			<router-view class="flex-1"></router-view>
 		</transition>
 		<!-- </section> -->
 
-	</section>
+	</div>
 </template>

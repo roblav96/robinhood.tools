@@ -37,7 +37,7 @@ div.searchbar div.dropdown-item:empty {
 	    v-on:select="onselect">
 		<template v-if="!query" slot="header">
 			<p>
-				<b-icon class="align-middle mr-4" icon="history" size="is-32x32"></b-icon>
+				<b-icon class="align-middle mr-5 ml-1" icon="history"></b-icon>
 				<span class="align-middle font-bold is-size-6">Recently Viewed</span>
 			</p>
 		</template>

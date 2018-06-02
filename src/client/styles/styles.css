@@ -1,12 +1,17 @@
 /**/
 
-
-/*section.router-view {
-	background-color: var(--white-bis);
-}*/
-
 *[style*="display: none"] {
 	display: none !important;
+}
+
+.box.is-border,
+.card.is-border {
+	box-shadow: 0 0 0 1px var(--border);
+}
+
+.box.is-light,
+.card.is-light {
+	box-shadow: 0 0 0 1px var(--grey-lightest);
 }
 
 .is-clickable {
@@ -67,6 +72,7 @@ div.is-scroll > div.table-wrapper {
 /*table.table th {
 	vertical-align: bottom;
 }*/
+
 
 /*table.table tr > th:last-child > span.icon {
 	margin-top: 4px;

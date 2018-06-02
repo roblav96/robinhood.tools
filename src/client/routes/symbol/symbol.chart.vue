@@ -7,7 +7,8 @@
 </style>
 
 <template>
-	<section class="section has-background-primary">
-		<v-symbol-echart class="has-background-grey-"></v-symbol-echart>
-	</section>
+	<div class="min-h-full has-background-dark">
+		<div class="h-full">haii</div>
+		<!-- <v-symbol-echart class="h-full"></v-symbol-echart> -->
+	</div>
 </template>

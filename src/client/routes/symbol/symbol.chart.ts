@@ -15,7 +15,7 @@ import * as http from '@/client/adapters/http'
 
 
 @Vts.Component({
-	template: `<div>loading...</div>`,
+	template: `<div></div>`,
 })
 class VSymbolEChart extends Vue {
 	$parent: VSymbolChart
@@ -26,7 +26,7 @@ class VSymbolEChart extends Vue {
 
 	mounted() {
 		this.onresize()
-		this.echart = echarts.init(this.$el, null, this.dims)
+		// this.echart = echarts.init(this.$el, null, this.dims)
 		window.addEventListener('resize', this.onresize.bind(this))
 	}
 

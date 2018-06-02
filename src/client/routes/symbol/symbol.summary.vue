@@ -12,9 +12,9 @@
 
 
 
-			<div class="columns is-multiline is-mobile">
+			<div class="columns is-multiline is-mobile is-variable is-4">
 				<div class="column" v-for="schema in schemas" :key="schema.name">
-					<table class="table is-middle is-fullwidth is-borderless card">
+					<table class="table is-middle is-fullwidth is-borderless card border">
 						<thead>
 							<tr>
 								<th class="whitespace-no-wrap">{{schema.name}}</th>
@@ -34,7 +34,7 @@
 					</table>
 				</div>
 				<div class="column">
-					<table class="table is-middle is-fullwidth is-borderless card">
+					<table class="table is-middle is-fullwidth is-borderless card border">
 						<thead>
 							<tr>
 								<th class="whitespace-no-wrap">Description</th>

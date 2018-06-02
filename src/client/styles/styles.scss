@@ -61,8 +61,8 @@ $shade in $shades {
 // 
 // ████  NAVBAR  ████
 // 
-html.has-navbar-fixed-top section.router-view.is-fullheight,
-html.has-navbar-fixed-top section.hero.is-fullheight {
+html.has-navbar-fixed-top .router-view.is-fullheight,
+html.has-navbar-fixed-top .hero.is-fullheight {
 	min-height: calc(100vh - #{$navbar-height});
 }
 
