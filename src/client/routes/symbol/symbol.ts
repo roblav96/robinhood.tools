@@ -42,21 +42,21 @@ export default class VSymbol extends Mixins(VMixin) {
 	}
 
 	reset() {
-		this.busy = true
 		socket.offListener(this.onquote, this)
 		core.nullify(this.all)
 	}
 
 	@Vts.Watch('symbol', { immediate: true }) w_symbol(to: string, from: string) {
-		this.reset()
+		this.busy = true
 		return http.post('/quotes/alls', { symbols: [this.symbol] }).then((response: Quotes.All[]) => {
 			console.log(this.symbol, '/quotes/alls response ->', JSON.parse(JSON.stringify(response)))
+			this.reset()
 			core.object.merge(this.all, _.omit(response[0], ['symbol']) as any)
+			socket.on(`${rkeys.QUOTES}:${this.symbol}`, this.onquote, this)
 		}).catch(error => {
 			console.error('w_symbol Error ->', error)
 		}).finally(() => {
 			this.busy = false
-			socket.on(`${rkeys.QUOTES}:${this.symbol}`, this.onquote, this)
 		})
 	}
 

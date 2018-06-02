@@ -36,8 +36,8 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 					</div>
 
 					<div class="column is-narrow">
-						<div class="box h-12 flex py-0 px-5 whitespace-no-wrap font-mono">
-							<number-ticker :number="all.quote.price" class="self-center title mr-4"></number-ticker>
+						<div class="box h-12 flex py-0 px-5 whitespace-no-wrap">
+							<number-ticker :number="all.quote.price" class="self-center title mr-4 font-mono"></number-ticker>
 							<p class="self-center is-size-6 font-medium" v-bull-bear="all.quote.change">
 								<span>{{vnumber(all.quote.change,{plusminus:true})}}</span>
 								<br>
