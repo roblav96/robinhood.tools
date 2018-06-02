@@ -95,7 +95,7 @@
 					</div>
 
 					<div class="column is-narrow widescreen:flex hidden">
-						<div class="box h-12 flex py-0">
+						<div class="box is-light h-12 flex py-0">
 							<table class="table is-paddingless is-middle is-nowrap is-borderless self-center is-size-6">
 								<tbody>
 									<tr>
@@ -112,7 +112,7 @@
 					</div>
 
 					<div v-if="all.quote.marketCap && all.quote.dealFlowVolume" class="column is-narrow fullhd:flex hidden">
-						<div class="box h-12 flex py-0">
+						<div class="box is-light h-12 flex py-0">
 							<table class="table is-paddingless is-middle is-nowrap is-borderless self-center is-size-6">
 								<tbody>
 									<tr>
@@ -147,13 +147,9 @@
 			</div>
 		</section>
 
-		<!-- <hr class="h-px my-0"> -->
-
-		<!-- <section class="section"> -->
 		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
 			<router-view class="flex-1"></router-view>
 		</transition>
-		<!-- </section> -->
 
 	</div>
 </template>

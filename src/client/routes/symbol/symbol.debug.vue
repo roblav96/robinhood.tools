@@ -9,7 +9,7 @@
 <template>
 	<section class="section is-medium">
 		<div class="container">
-			<div class="columns is-multiline is-mobile">
+			<div v-is:fullhd.is-6 class="columns is-multiline is-mobile is-variable ">
 				<div class="column" v-for="allkey in allkeys" :key="allkey">
 					<table class="table is-middle is-fullwidth card">
 						<thead>
