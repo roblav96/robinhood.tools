@@ -53,7 +53,7 @@ export async function syncAllQuotes(resets = false) {
 		let alls = await getAlls(chunk)
 		await redis.main.coms(alls.map(all => {
 			let rkey = `${rkeys.QUOTES}:${all.symbol}`
-			return ['hmset', rkey, initquote(all, resets) as any]
+			return ['hmset', rkey, fullquote(all, resets) as any]
 		}))
 	}), { concurrency: 1 })
 	if (process.env.DEVELOPMENT) console.info('syncAllQuotes done ->');
@@ -61,7 +61,7 @@ export async function syncAllQuotes(resets = false) {
 
 
 
-export function initquote(
+export function fullquote(
 	{ symbol, quote, wbticker, wbquote, instrument, yhquote, iexitem }: Quotes.All,
 	resets = false,
 ) {
@@ -95,14 +95,15 @@ export function initquote(
 	quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))
 	quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, _.round(quote.avgVolume10Day, quote.avgVolume3Month)))
 
-	core.object.repair(quote, applywbquote(quote, wbquote))
-	core.object.repair(quote, applybidask(quote, wbquote))
-
+	let toquote = { symbol } as Quotes.Quote
+	applywbquote(quote, wbquote, toquote)
+	applybidask(quote, wbquote, toquote)
+	applylives(quote, quote, toquote)
+	resets ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote)
 	let reset = resetquote(quote)
 	resets ? core.object.merge(quote, reset) : core.object.repair(quote, reset)
-
-	applylives(quote, quote, quote)
 	applycalcs(quote)
+
 	core.object.clean(quote)
 
 	return quote

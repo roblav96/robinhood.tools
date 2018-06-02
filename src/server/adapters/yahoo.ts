@@ -36,7 +36,15 @@ export async function getQuotes(symbols: string[]): Promise<Yahoo.Quote[]> {
 	}
 
 	response.quoteResponse.result.remove(v => !v)
-	response.quoteResponse.result.forEach(v => v.symbol = v.symbol.toUpperCase())
+	response.quoteResponse.result.forEach(v => {
+		Object.keys(v).forEach(k => {
+			let value = v[k]
+			if (core.number.isFinite(value) && k.toLowerCase().includes('time')) {
+				v[k] = value * 1000
+			}
+		})
+		v.symbol = v.symbol.toUpperCase()
+	})
 	return response.quoteResponse.result
 
 }
