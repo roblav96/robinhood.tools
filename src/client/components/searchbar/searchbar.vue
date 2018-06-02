@@ -19,7 +19,7 @@ div.searchbar a.dropdown-item:hover .title {
 	color: var(--primary);
 }
 
-div.searchbar div.dropdown-item {
+div.searchbar div.dropdown-item:not(.is-disabled) {
 	border-bottom: 2px solid var(--border);
 	padding: 0px 1rem;
 	padding-bottom: 0.5rem;

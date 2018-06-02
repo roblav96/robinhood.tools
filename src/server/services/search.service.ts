@@ -49,51 +49,54 @@ async function start() {
 const MAX = 20
 radio.reply('search.query', async function onquery(query: string) {
 	let words = query.split(' ')
+	console.time(`search.query`)
 	let results = INDEX.query(function(q) {
 		if (words.length == 1) {
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 1000000,
+				boost: 10000,
 			})
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 100000,
+				boost: 750,
 				wildcard: lunr.Query.wildcard.TRAILING,
 			})
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 10000,
+				boost: 500,
 				wildcard: lunr.Query.wildcard.LEADING | lunr.Query.wildcard.TRAILING,
 			})
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 1000,
+				boost: 250,
 				editDistance: 1,
 			})
 		}
 		words.forEach(word => {
 			q.term(word, {
 				fields: ['name'],
-				boost: 1000,
+				boost: 100,
 			})
 			q.term(word, {
 				fields: ['name'],
-				boost: 100,
+				boost: 75,
 				wildcard: lunr.Query.wildcard.TRAILING,
 			})
 			q.term(word, {
 				fields: ['name'],
-				boost: 10,
+				boost: 50,
 				wildcard: lunr.Query.wildcard.LEADING | lunr.Query.wildcard.TRAILING,
 			})
 			q.term(word, {
 				fields: ['name'],
-				boost: 1,
+				boost: 25,
 				editDistance: 1,
 			})
 		})
 	})
+	console.timeEnd(`search.query`)
 	results.splice(MAX)
+	// console.log('results ->', results)
 	return results.map(v => v.ref.toUpperCase())
 })
 

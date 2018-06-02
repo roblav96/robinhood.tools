@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<section class="content">
-		<h1>im a chart</h1>
-	</section>
+	<div>
+		<div id="chart_div" class="has-background-grey-lightest">hi</div>
+	</div>
 </template>

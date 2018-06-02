@@ -64,6 +64,27 @@ polka.route({
 
 
 
+polka.route({
+	method: 'POST',
+	url: '/api/quotes/lives',
+	schema: {
+		body: {
+			symbols: { type: 'array', items: 'string' },
+			start: { type: 'number', optional: true },
+			end: { type: 'number', optional: true },
+		},
+	},
+	async handler(req, res) {
+		let symbols = req.body.symbols as string[]
+		console.log('symbols ->', symbols)
+		
+		
+		
+	}
+})
+
+
+
 // polka.route({
 // 	method: 'POST',
 // 	url: '/api/symbols/instruments',

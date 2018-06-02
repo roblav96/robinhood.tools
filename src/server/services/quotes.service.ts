@@ -38,8 +38,6 @@ radio.emit('symbols.ready')
 
 Rx.subscription(hours.rxstate).subscribe(state => {
 	if (state == 'PREPRE') start();
-	// let states = ['PREPRE', 'CLOSED'] as Hours.State[]
-	// if (states.includes(state)) start();
 })
 
 async function start() {
@@ -117,17 +115,6 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		if (from == null) { from = to; quote[key] = to; towbquote[key] = to }
 		let keymap = quotes.KEY_MAP[key]
 		quotes.applykeymap(keymap, towbquote, key, to, from)
-		// if (keymap && (keymap.time || keymap.greater)) {
-		// 	if (keymap.time) {
-		// 		if (to > from) towbquote[k] = to;
-		// 	} else if (keymap.greater) {
-		// 		if (to < from) {
-		// 			if (core.calc.percent(to, from) < -10) towbquote[k] = to;
-		// 		} else if (to > from) towbquote[k] = to;
-		// 	}
-		// } else if (to != from) {
-		// 	towbquote[k] = to
-		// }
 	})
 
 	let tokeys = Object.keys(towbquote)

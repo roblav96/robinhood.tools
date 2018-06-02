@@ -20,7 +20,7 @@ export default class extends Mixins(VMixin) {
 	query = ''
 	results = [] as Quotes.Quote[]
 
-	oninput = _.debounce(this.syncquery, 300)
+	oninput = _.debounce(this.syncquery, 100)
 	syncquery() {
 		if (!this.query) return this.syncrecents();
 		this.busy = true
