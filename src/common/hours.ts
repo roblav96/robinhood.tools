@@ -12,7 +12,7 @@ export const HR = {
 
 
 export function getState(hours: Hours, stamp = Date.now()): Hours.State {
-	if (hours.openToday == false) return 'CLOSED';
+	if (hours.isOpenToday == false) return 'CLOSED';
 	if (stamp >= hours.prepre && stamp < hours.pre) return 'PREPRE';
 	if (stamp >= hours.pre && stamp < hours.opens) return 'PRE';
 	if (stamp >= hours.opens && stamp < hours.closes) return 'REGULAR';
@@ -25,13 +25,13 @@ export function getState(hours: Hours, stamp = Date.now()): Hours.State {
 
 export function toHours(rhours: Robinhood.Hours) {
 	let hhours = {
-		openToday: rhours.is_open,
+		isOpenToday: rhours.is_open,
 		date: rhours.date,
 		prepre: null, pre: null,
 		opens: null, closes: null,
 		post: null, postpost: null,
 	} as Hours
-	if (hhours.openToday) {
+	if (hhours.isOpenToday) {
 		hhours.prepre = dayjs(new Date(rhours.opens_at)).subtract(5, 'hour').subtract(30, 'minute').valueOf()
 		hhours.pre = dayjs(new Date(rhours.extended_opens_at)).valueOf()
 		hhours.opens = dayjs(new Date(rhours.opens_at)).valueOf()
@@ -51,7 +51,7 @@ declare global {
 		type State = 'PREPRE' | 'PRE' | 'REGULAR' | 'POST' | 'POSTPOST' | 'CLOSED'
 	}
 	interface Hours {
-		openToday: boolean
+		isOpenToday: boolean
 		date: string
 		prepre: number
 		pre: number

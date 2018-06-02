@@ -14,9 +14,9 @@ if (process.env.DEVELOPMENT) {
 
 import 'modern-normalize'
 import 'animate.css'
-import '@/client/styles/tailwind.css'
 import '@/client/styles/vendors.scss'
 import '@/client/styles/theme.scss'
+import '@/client/styles/tailwind.css'
 import '@/client/styles/styles.css'
 
 import Vue from 'vue'

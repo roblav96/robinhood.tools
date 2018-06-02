@@ -3,16 +3,15 @@
 declare namespace ECharts {
 
 	const graphic: any
-	function init(
-		el: HTMLElement,
-		theme?: object | string,
-		opts?: {
-			devicePixelRatio: number
-			renderer: string
-			width: number
-			height: number
-		}
-	): ECharts
+
+	interface InitOptions {
+		devicePixelRatio: number
+		renderer: 'canvas' | 'svg'
+		width: number | string
+		height: number | string
+	}
+	function init(el: HTMLElement, theme?: object, opts?: Partial<InitOptions>): ECharts
+
 	function connect(group: string | string[]): void
 	function disConnect(group: string): void
 	function dispose(target: ECharts | HTMLElement): void
@@ -22,6 +21,10 @@ declare namespace ECharts {
 
 	class ECharts {
 		_model: { option: ECharts.Options }
+		on(eventName: string, handler: (...args: any[]) => void, context?: any): void
+		one(eventName: string, handler: (...args: any[]) => void, context?: any): void
+		off(eventName: string, handler?: (...args: any[]) => void): void
+
 		group: string
 		setOption(option: Options, notMerge?: boolean, lazyUpdate?: boolean, silent?: boolean): void
 		getWidth(): number
@@ -30,8 +33,6 @@ declare namespace ECharts {
 		getOption(): Options
 		resize(opts: { width: number, height: number }): void
 		dispatchAction(payload: any): void
-		on(eventName: string, handler: Function, context: object): void
-		off(eventName: string, handler: Function): void
 		showLoading(type: string, opts: object): void
 		hideLoading(): void
 		getDataURL(opts: {

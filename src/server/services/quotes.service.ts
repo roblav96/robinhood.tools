@@ -6,7 +6,6 @@ import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as pretty from '../../common/pretty'
-import * as benchmark from '../../common/benchmark'
 import * as utils from '../adapters/utils'
 import * as redis from '../adapters/redis'
 import * as socket from '../adapters/socket'
@@ -204,7 +203,100 @@ function ontick(i: number) {
 
 
 
+// const mock = {
+// 	"bidSpread": 58.74,
+// 	"close": 58.88,
+// 	"avgVolume": 73876134,
+// 	"tinyName": "Micron Technology",
+// 	"acronym": "NASDAQ",
+// 	"sharesOutstanding": 1159764549,
+// 	"price": 58.88,
+// 	"yearLow": 26.85,
+// 	"issueType": "Common Stock",
+// 	"size": 960,
+// 	"bid": 58.84,
+// 	"tradeTime": 1527878148000,
+// 	"alive": true,
+// 	"industry": "Semiconductors",
+// 	"exchange": "Nasdaq Global Select",
+// 	"fullName": "Micron Technology, Inc. Common Stock",
+// 	"yearHigh": 64.66,
+// 	"bidLot": 500,
+// 	"dealFlowVolume": -33426,
+// 	"currency": "USD",
+// 	"liveCount": 833,
+// 	"postTimestamp": 1527897589000,
+// 	"sector": "Technology",
+// 	"bidPrice": 58.72,
+// 	"marketCap": 68286936645,
+// 	"website": "http://www.micron.com",
+// 	"buySize": 88228,
+// 	"listDate": 631238400000,
+// 	"regPercent": -0.15306122448978965,
+// 	"postChange": 0.14000000000000057,
+// 	"country": "US",
+// 	"low": 58.87,
+// 	"tickerId": 913324077,
+// 	"bidSize": 200,
+// 	"dealSize": 685,
+// 	"mic": "XNAS",
+// 	"regChange": -0.0899999999999963,
+// 	"openPrice": 58.81,
+// 	"dayHigh": 62.52,
+// 	"liveStamp": 1527880300003,
+// 	"symbol": "MU",
+// 	"description": "Micron Technology Inc along with its subsidiaries provide memory and storage solutions. Its product portfolio consists of memory and storage technologies such as DRAM, NAND, NOR and 3D XPoint memory.",
+// 	"dayLow": 58.08,
+// 	"turnoverRate": 0.0674,
+// 	"volume": 74761515,
+// 	"timestamp": 1527897589000,
+// 	"buyVolume": 16393881,
+// 	"askPrice": 58.74,
+// 	"timezone": "America/New_York",
+// 	"regPrice": 58.71,
+// 	"mktradeTime": 1527878148000,
+// 	"statusTimestamp": 1527918727003,
+// 	"sellSize": 26903,
+// 	"vibrateRatio": 0.0427,
+// 	"sharesFloat": 1108479925,
+// 	"bidVolume": 6714519,
+// 	"dealVolume": 34281976,
+// 	"high": 58.88,
+// 	"prevClose": 57.59,
+// 	"regTimestamp": 1527883199000,
+// 	"sellVolume": 16986969,
+// 	"askSpread": 58.93,
+// 	"avgVolume10Day": 80689169,
+// 	"typeof": "STOCKS",
+// 	"dealFlowSize": 61325,
+// 	"askSize": 250,
+// 	"startPrice": 62.41,
+// 	"avgVolume3Month": 59060874,
+// 	"postPercent": 0.23833844058563255,
+// 	"ask": 58.93,
+// 	"name": "Micron Technology Inc.",
+// 	"status": "CLOSED",
+// 	"closePrice": 58.74,
+// 	"change": -3.529999999999994,
+// 	"percent": -5.656144848581949,
+// 	"open": 58.18,
+// 	"askVolume": 7467125,
+// 	"asks": 250,
+// 	"postPrice": 58.88,
+// 	"dealCount": 194714,
+// 	"bids": 200,
+// 	"askLot": 350
+// }
 
+// import * as benchmark from '../../common/benchmark'
+// benchmark.simple('fix', [
+// 	function fastfix() {
+// 		core.fastfix(JSON.parse(JSON.stringify(mock)))
+// 	},
+// 	function corefix() {
+// 		core.fix(JSON.parse(JSON.stringify(mock)))
+// 	},
+// ])
 
 
 

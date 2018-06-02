@@ -17,7 +17,7 @@ import socket from '@/client/adapters/socket'
 
 @Vts.Component({
 	components: {
-		'symbol-ticker': () => import('@/client/routes/symbol/symbol.ticker'),
+		'v-symbol-ticker': () => import('@/client/routes/symbol/symbol.ticker'),
 	},
 })
 export default class VSymbol extends Mixins(VMixin) {

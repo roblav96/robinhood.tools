@@ -1,14 +1,17 @@
 // 
 
-import * as boom from 'boom'
-import * as pAll from 'p-all'
+import dayjs from '../../common/dayjs'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
+import * as pretty from '../../common/pretty'
 import * as redis from '../adapters/redis'
 import * as http from '../adapters/http'
+import * as webull from '../adapters/webull'
 import * as quotes from '../adapters/quotes'
 import * as hours from '../adapters/hours'
+import * as boom from 'boom'
+import * as pAll from 'p-all'
 import polka from './polka'
 
 
@@ -78,14 +81,23 @@ polka.route({
 		let symbols = req.body.symbols as string[]
 		let range = req.body.range as number[]
 		if (!Array.isArray(range)) {
-			let now = Date.now()
-			let rxhours = hours.rxhours.value
-
+			let hhours = hours.rxhours.value
+			if (!hhours.isOpenToday || dayjs().isBefore(dayjs(hhours.prepre))) hhours = hours.rxhours.value.previous;
+			range = [hhours.prepre, hhours.postpost]
 		}
-		// let start = range[0]
-		// let end = range[1]
 
+		let zkeys = await redis.main.coms(symbols.map(v => {
+			return ['zrangebyscore', `${rkeys.LIVES}:${v}`, range[0] as any, range[1] as any]
+		})) as string[][]
+		let lives = await redis.main.coms(_.flatten(zkeys.map((keys, i) => {
+			return keys.map(key => ['hgetall', key])
+		}))) as Quotes.Live[]
+		lives.forEach(core.fix)
 
+		let ii = 0
+		return zkeys.map(keys => {
+			return keys.map(() => lives[ii++]).sort((a, b) => a.timestamp - b.timestamp)
+		})
 
 	}
 })

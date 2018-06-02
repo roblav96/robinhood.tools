@@ -49,7 +49,6 @@ async function start() {
 const MAX = 20
 radio.reply('search.query', async function onquery(query: string) {
 	let words = query.split(' ')
-	console.time(`search.query`)
 	let results = INDEX.query(function(q) {
 		if (words.length == 1) {
 			q.term(query, {
@@ -94,32 +93,8 @@ radio.reply('search.query', async function onquery(query: string) {
 			})
 		})
 	})
-	console.timeEnd(`search.query`)
 	results.splice(MAX)
-	// console.log('results ->', results)
 	return results.map(v => v.ref.toUpperCase())
 })
-
-
-
-
-
-// let searches = [] as string[]
-// if (!query.includes(' ')) {
-// 	searches.push(...[
-// 		`symbol:${query}^10000000`,
-// 		`symbol:${query}*^1000000`,
-// 		`symbol:*${query}*^100000`,
-// 		`symbol:${query}~1^10000`,
-// 	])
-// }
-// searches.push(...[
-// 	`name:${query}^1000`,
-// 	`name:${query}*^100`,
-// 	`name:*${query}*^10`,
-// 	`name:${query}~1`,
-// ])
-// console.log(`searches ->`, searches)
-// let results = INDEX.search(searches.join(' '))
 
 

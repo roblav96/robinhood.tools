@@ -9,11 +9,6 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 	border: 1px solid var(--border);
 }
 
-
-/*section.symbol-route div.hero-body:first-of-type div.box {
-	padding: 0.5rem 1rem;
-}*/
-
 </style>
 
 <template>
@@ -196,7 +191,7 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 
 
 			<!-- <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-				<symbol-ticker v-if="showticker" class="pb-0"></symbol-ticker>
+				<v-symbol-ticker v-if="showticker" class="pb-0"></v-symbol-ticker>
 			</transition> -->
 
 
@@ -205,11 +200,11 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 
 		<hr class="h-px my-0">
 
-		<section class="section has-background-white-bis">
-			<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-				<router-view></router-view>
-			</transition>
-		</section>
+		<!-- <section class="section has-background-white-bis"> -->
+		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+			<router-view class="has-background-white-bis"></router-view>
+		</transition>
+		<!-- </section> -->
 
 	</section>
 </template>
