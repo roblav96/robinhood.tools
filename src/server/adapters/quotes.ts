@@ -290,15 +290,6 @@ export function applywbquote(quote: Quotes.Live, wbquote: Webull.Quote, toquote 
 
 		applykeymap(keymap, toquote, qkey, wbvalue, qvalue)
 
-		// if (keymap.time || keymap.greater) {
-		// 	if (wbvalue > qvalue) {
-		// 		toquote[qkey] = wbvalue
-		// 	}
-		// }
-		// else if (wbvalue != qvalue) {
-		// 	toquote[qkey] = wbvalue
-		// }
-
 	})
 
 	if (toquote.status) {

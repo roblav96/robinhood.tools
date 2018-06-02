@@ -7,6 +7,7 @@ import VMixin from '@/client/mixins/v.mixin'
 import * as _ from '@/common/lodash'
 import * as rkeys from '@/common/rkeys'
 import * as http from '@/client/adapters/http'
+import * as utils from '@/client/adapters/utils'
 import * as recents from '@/client/stores/recents'
 
 
@@ -14,7 +15,26 @@ import * as recents from '@/client/stores/recents'
 @Vts.Component
 export default class extends Mixins(VMixin) {
 
+	mounted() {
+		utils.wemitter.on('keyup', this.onkeyup, this)
+	}
+	beforeDestroy() {
+		utils.wemitter.off('keyup', this.onkeyup, this)
+	}
+	onkeyup(event: KeyboardEvent) {
+		if (event.metaKey || event.shiftKey || event.ctrlKey || event.altKey) return;
+		if (['Escape'].includes(event.key)) {
+			if (document.activeElement.outerHTML != this.inputfield.outerHTML) return;
+			this.inputfield.blur()
+		}
+		if (['f', 't', '/'].includes(event.key)) {
+			if (document.activeElement.tagName == 'INPUT') return;
+			this.searchbar.$el.querySelector('input').focus()
+		}
+	}
+
 	get searchbar() { return this.$refs.searchbar_input as Vue }
+	get inputfield() { return this.searchbar.$el.querySelector('input') }
 	scrolltop(behavior = 'smooth' as ScrollBehavior) {
 		let el = this.searchbar.$el.querySelector('div.dropdown-menu > div.dropdown-content') as HTMLElement
 		el.scrollTo({ top: 0, behavior })
@@ -51,7 +71,7 @@ export default class extends Mixins(VMixin) {
 	onselect(result: Quotes.Quote) {
 		let name = this.$route.name.includes('symbol.') ? this.$route.name : 'symbol'
 		this.$router.push({ name, params: { symbol: result.symbol } })
-		this.searchbar.$el.querySelector('input').blur()
+		this.inputfield.blur()
 	}
 
 }

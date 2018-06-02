@@ -9,6 +9,21 @@ import clock from '@/common/clock'
 
 
 
+export function screen() {
+	let screen = {
+		width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || window.screen.width,
+		wpixels: 0,
+		height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || window.screen.height,
+		hpixels: 0,
+	}
+	screen.wpixels = window.devicePixelRatio * screen.width
+	screen.hpixels = window.devicePixelRatio * screen.height
+	return screen
+}
+
+
+
+// let wevents = ['blur', 'click', 'dblclick', 'ended', 'error', 'focus', 'keydown', 'keypress', 'keyup', 'load', 'readystatechange', 'resize', 'scroll', 'suspend', 'unload', 'wheel'] as (keyof WindowEventMap)[]
 export const wemitter = new class WEmitter extends Emitter<keyof WindowEventMap, Event> {
 	private static PASSIVES = ['mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'mousewheel', 'resize', 'scroll', 'touchend', 'touchenter', 'touchleave', 'touchmove', 'touchstart', 'wheel'] as (keyof WindowEventMap)[]
 	private subs = [] as string[]
@@ -24,14 +39,11 @@ export const wemitter = new class WEmitter extends Emitter<keyof WindowEventMap,
 			})
 			_.difference(this.subs, subs).forEach(name => window.removeEventListener(name, this, false))
 			this.subs = subs
-			console.log(`Object.keys(this._events) ->`, JSON.parse(JSON.stringify(Object.keys(this._events))))
+			// console.log(`Object.keys(this._events) ->`, JSON.parse(JSON.stringify(Object.keys(this._events))))
 		})
 	}
-	handleEvent(event: Event) {
-		this.emit(event.type as any, event)
-	}
+	handleEvent(event: Event) { this.emit(event.type as any, event) }
 }
-// let wevents = ['blur', 'click', 'dblclick', 'ended', 'error', 'focus', 'keydown', 'keypress', 'keyup', 'load', 'readystatechange', 'resize', 'scroll', 'suspend', 'unload', 'wheel'] as (keyof WindowEventMap)[]
 
 
 

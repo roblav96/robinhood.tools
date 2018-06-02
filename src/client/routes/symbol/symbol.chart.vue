@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<section class="section flex-col-full">
-		<v-symbol-echart class="has-background-dark"></v-symbol-echart>
+	<section class="flex-col-full">
+		<v-symbol-echart ref="symbol_echart"></v-symbol-echart>
 	</section>
 </template>
