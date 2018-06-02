@@ -15,46 +15,34 @@ import * as recents from '@/client/stores/recents'
 export default class extends Mixins(VMixin) {
 
 	get searchbar() { return this.$refs.searchbar_input as Vue }
-	get scroll() { return this.searchbar.$el.querySelector('div.dropdown-menu > div.dropdown-content') as HTMLElement }
-	scrolltop() {
-		console.log(`this.scroll -> %O`, this.scroll, this.scroll)
-		this.scroll.scrollTo({ top: 0, behavior: 'smooth' })
+	scrolltop(behavior = 'smooth' as ScrollBehavior) {
+		let el = this.searchbar.$el.querySelector('div.dropdown-menu > div.dropdown-content') as HTMLElement
+		el.scrollTo({ top: 0, behavior })
 	}
 
-	busy = false
 	query = ''
 	results = [] as Quotes.Quote[]
 
-	oninput = _.debounce(this.syncquery, 100)
-	syncquery() {
-		if (!this.query) return this.syncrecents();
-		this.busy = true
-		return http.get('/search', {
-			query: { query: this.query },
+	oninput = _.debounce(this.sync, 100)
+	sync() {
+		return Promise.resolve().then(() => {
+			if (!this.query) return http.post('/recents', { symbols: this.recents.map(v => v.symbol) });
+			return http.get('/search', { query: { query: this.query } })
 		}).then(results => {
 			this.results = results
-			this.scrolltop()
+			return this.$nextTick()
 		}).catch(error => {
-			console.error('syncquery Error ->', error)
-		}).finally(() => this.busy = false)
-	}
-
-	syncrecents() {
-		this.busy = true
-		return http.post('/recents', {
-			symbols: this.recents.map(v => v.symbol),
-		}).then(results => {
-			this.results = results
+			console.error('sync Error ->', error)
+		}).finally(() => {
 			this.scrolltop()
-		}).catch(error => {
-			console.error('syncrecents Error ->', error)
-		}).finally(() => this.busy = false)
+		})
 	}
 
 	onfocus(event: Event) {
+		this.$nextTick(() => this.scrolltop('instant'))
 		let el = event.target as HTMLInputElement
 		el.setSelectionRange(0, el.value.length)
-		this.syncquery()
+		this.sync()
 	}
 	onblur(event: Event) {
 
@@ -63,10 +51,7 @@ export default class extends Mixins(VMixin) {
 	onselect(result: Quotes.Quote) {
 		let name = this.$route.name.includes('symbol.') ? this.$route.name : 'symbol'
 		this.$router.push({ name, params: { symbol: result.symbol } })
-		setTimeout(() => {
-			this.searchbar.$el.querySelector('input').blur()
-			this.results.splice(0)
-		}, 100)
+		this.searchbar.$el.querySelector('input').blur()
 	}
 
 }
