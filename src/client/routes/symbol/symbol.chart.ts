@@ -11,6 +11,7 @@ import * as _ from '@/common/lodash'
 import * as core from '@/common/core'
 import * as rkeys from '@/common/rkeys'
 import * as quotes from '@/common/quotes'
+import * as yahoo from '@/common/yahoo'
 import * as http from '@/client/adapters/http'
 import * as utils from '@/client/adapters/utils'
 
@@ -159,12 +160,13 @@ class VSymbolEChart extends Vue {
 @Vts.Component({
 	components: { 'v-symbol-echart': VSymbolEChart },
 })
-export default class VSymbolChart extends Vue {
+export default class VSymbolChart extends Mixins(VMixin) {
 	$parent: Symbol
 	vechart: VSymbolEChart
 
 	created() {
-		this.getlives()
+		// this.getlives()
+		this.gethistoricals()
 	}
 
 	mounted() {
@@ -185,14 +187,21 @@ export default class VSymbolChart extends Vue {
 			this.vechart.syncdataset(response[0])
 			return this.$nextTick()
 		}).catch(function(error) {
-			console.error(`getlives Error -> %O`, error)
+			console.error(`getlives Error ->`, error)
 		}).finally(() => {
 			this.busy = false
 		})
 	}
 
 	gethistoricals() {
-		return
+		console.time(`gethistoricals`)
+		let url = yahoo.chartRequest(this.symbol, { range: '1mo', interval: '1h' }, this.hours.hours)
+		return http.get(url, { proxify: true }).then(yahoo.chartResponse).then(response => {
+			// console.log(`response ->`, JSON.parse(JSON.stringify(response)))
+			console.timeEnd(`gethistoricals`)
+		}).catch(function(error) {
+			console.error(`gethistoricals Error ->`, error)
+		})
 	}
 
 }

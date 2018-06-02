@@ -1,5 +1,11 @@
 // 
 
+import * as qs from 'querystring'
+import * as boom from 'boom'
+import * as _ from './lodash'
+import * as hours from './hours'
+import dayjs from './dayjs'
+
 
 
 export const YH = {
@@ -7,68 +13,6 @@ export const YH = {
 }
 
 
-
-// export const FIELDS = [
-// 	'ask',
-// 	'askSize',
-// 	'averageDailyVolume10Day',
-// 	'averageDailyVolume3Month',
-// 	'bid',
-// 	'bidSize',
-// 	'currency',
-// 	'esgPopulated',
-// 	'exchange',
-// 	'exchangeDataDelayedBy',
-// 	'exchangeTimezoneName',
-// 	'exchangeTimezoneShortName',
-// 	'fiftyDayAverage',
-// 	'fiftyDayAverageChange',
-// 	'fiftyDayAverageChangePercent',
-// 	'fiftyTwoWeekHigh',
-// 	'fiftyTwoWeekHighChange',
-// 	'fiftyTwoWeekHighChangePercent',
-// 	'fiftyTwoWeekLow',
-// 	'fiftyTwoWeekLowChange',
-// 	'fiftyTwoWeekLowChangePercent',
-// 	'fiftyTwoWeekRange',
-// 	'financialCurrency',
-// 	'fullExchangeName',
-// 	'gmtOffSetMilliseconds',
-// 	'language',
-// 	'longName',
-// 	'market',
-// 	'marketCap',
-// 	'marketState',
-// 	'messageBoardId',
-// 	'preMarketChange',
-// 	'preMarketChangePercent',
-// 	'preMarketPrice',
-// 	'preMarketTime',
-// 	'priceHint',
-// 	'quoteSourceName',
-// 	'quoteType',
-// 	'regularMarketChange',
-// 	'regularMarketChangePercent',
-// 	'regularMarketDayHigh',
-// 	'regularMarketDayLow',
-// 	'regularMarketDayRange',
-// 	'regularMarketOpen',
-// 	'regularMarketPreviousClose',
-// 	'regularMarketPrice',
-// 	'regularMarketTime',
-// 	'regularMarketVolume',
-// 	'sharesOutstanding',
-// 	'shortName',
-// 	'sourceInterval',
-// 	'symbol',
-// 	'tradeable',
-// 	// 'trailingThreeMonthNavReturns',
-// 	// 'trailingThreeMonthReturns',
-// 	'twoHundredDayAverage',
-// 	'twoHundredDayAverageChange',
-// 	'twoHundredDayAverageChangePercent',
-// 	// 'ytdReturn',
-// ]
 
 export const SUMMARY_MODULES = [
 	// stocks
@@ -84,11 +28,65 @@ export const SUMMARY_MODULES = [
 
 
 
+export function chartRequest(
+	symbol: string,
+	params: Partial<{ range: string, interval: string, includePrePost: boolean, period1: number, period2: number }>,
+	hhours: Hours
+) {
+	let state = hours.getState(hhours)
+	if (params.range == '1d' && state.indexOf('PRE') == 0) {
+		delete params.range
+		if (dayjs(hhours.date).day() == 1) {
+			params.period1 = dayjs(hhours.prepre).subtract(3, 'day').unix()
+		} else params.period1 = dayjs(hhours.prepre).subtract(1, 'day').unix();
+		params.period2 = dayjs(hhours.postpost).unix()
+	}
+	return `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?${qs.stringify(params)}`
+}
+
+export function chartResponse(response: Yahoo.ApiChart) {
+	let error = _.get(response, 'chart.error') as Yahoo.ApiError
+	if (error) throw boom.badRequest(JSON.stringify(response.chart.error));
+	let lquotes = [] as Quotes.Live[]
+	let result = response.chart.result[0]
+	let stamps = result.timestamp
+	if (!stamps) return lquotes;
+	let hquotes = result.indicators.quote[0]
+	lquotes = stamps.filter((v, i) => {
+		return Number.isFinite(hquotes.close[i])
+	}).map((stamp, i) => ({
+		open: hquotes.open[i], close: hquotes.close[i],
+		high: hquotes.high[i], low: hquotes.low[i],
+		volume: hquotes.volume[i], timestamp: stamp * 1000,
+	} as Quotes.Live))
+	lquotes.sort((a, b) => a.timestamp - b.timestamp)
+	lquotes.forEach(function(lquote, i) {
+		lquote.size = lquote.volume
+		let prev = lquotes[i - 1] ? lquotes[i - 1].volume : 0
+		lquote.volume = prev + lquote.size
+		lquote.price = lquote.close
+	})
+	return lquotes
+}
+
+
+
 
 
 declare global {
 	namespace Yahoo {
 
+		interface ApiError {
+			code: string
+			description: string
+		}
+
+		interface ApiQuote {
+			quoteResponse: {
+				result: Quote[]
+				error: ApiError
+			}
+		}
 		interface Quote {
 			ask: number
 			askSize: number
@@ -150,26 +148,71 @@ declare global {
 			twoHundredDayAverageChangePercent: number
 			ytdReturn: number
 		}
-		interface ApiQuote {
-			quoteResponse: {
-				result: Quote[]
-				error: ApiError
-			}
-		}
 
-		interface Summary {
-			symbol: string
-		}
 		interface ApiSummary {
 			quoteSummary: {
 				result: Summary[]
 				error: ApiError
 			}
 		}
+		interface Summary {
+			symbol: string
+		}
 
-		interface ApiError {
-			code: string
-			description: string
+		interface ApiChart {
+			chart: {
+				result: ChartResult[]
+				error: ApiError
+			}
+		}
+		interface ChartResult {
+			meta: {
+				currency: string
+				symbol: string
+				exchangeName: string
+				instrumentType: string
+				firstTradeDate: number
+				gmtoffset: number
+				timezone: string
+				previousClose: number
+				scale: number
+				currentTradingPeriod: {
+					pre: ChartTradingPeriod
+					regular: ChartTradingPeriod
+					post: ChartTradingPeriod
+				}
+				tradingPeriods: ChartTradingPeriod[]
+				dataGranularity: string
+				validRanges: string[]
+			}
+			timestamp: number[]
+			indicators: {
+				quote: ChartQuote[]
+			}
+		}
+		interface ChartTradingPeriod {
+			timezone: string
+			end: number
+			start: number
+			gmtoffset: number
+		}
+		interface ChartQuote {
+			open: number[]
+			close: number[]
+			high: number[]
+			low: number[]
+			volume: number[]
+		}
+
+		interface ApiSparks {
+			spark: {
+				result: SparkResult[]
+				error: ApiError
+			}
+		}
+		interface SparkResult {
+			symbol: string
+			response: ChartResult[]
 		}
 
 	}

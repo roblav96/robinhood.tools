@@ -1,26 +1,35 @@
 // 
 
 import * as _ from './lodash'
+import * as core from './core'
 import * as qs from 'querystring'
 import * as fastjsonparse from 'fast-json-parse'
+import * as proxify from 'proxify-url'
 import * as simple from 'simple-get'
 import * as boom from 'boom'
 import clock from './clock'
 
 
 
+const HttpConfig = {
+	headers: {},
+	verbose: false,
+	silent: false,
+	debug: false,
+	proxify: false,
+	timeout: 10000,
+	retries: process.env.CLIENT ? 0 : 3,
+	retryTick: '3s' as Clock.Tick,
+	maxRedirects: 10,
+	rhtoken: '',
+	wbauth: false,
+	query: undefined as any,
+}
+Object.keys(HttpConfig).forEach(k => { if (!HttpConfig[k]) delete HttpConfig[k]; })
+
 export function config(config: Partial<Http.Config>) {
 
-	_.defaults(config, {
-		headers: {},
-		verbose: false,
-		silent: false,
-		debug: false,
-		timeout: 10000,
-		retries: process.env.CLIENT ? 0 : 3,
-		retryTick: '3s',
-		maxRedirects: 10,
-	} as Http.Config)
+	core.object.repair(config, core.clone(HttpConfig))
 
 	if (process.env.CLIENT && config.retries == Infinity) config.retryTick = '1s';
 
@@ -32,6 +41,10 @@ export function config(config: Partial<Http.Config>) {
 	if (config.query) {
 		config.url += `?${qs.stringify(config.query)}`
 		delete config.query
+	}
+
+	if (config.proxify) {
+		config.url = proxify(config.url)
 	}
 
 	if (config.body) {
@@ -79,6 +92,11 @@ export function send(config: Http.Config) {
 				}))
 			}
 
+			if (config.proxify) {
+				let results = _.get(data, 'query.results')
+				if (results != null) data = results;
+			}
+
 			if (config.verbose || config.debug) {
 				let ending = (config.query || config.body) ? ' <- ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
 				console.info('<- ' + config.method + ' ' + config.url + ending);
@@ -103,25 +121,7 @@ export function send(config: Http.Config) {
 
 
 
-import { IncomingHttpHeaders } from 'http'
-declare global {
-	namespace Http {
-		interface Headers extends IncomingHttpHeaders {
-			[key: string]: any
-		}
-		interface Config extends simple.RequestOptions {
-			headers: Headers
-			query: any
-			retries: number
-			retryTick: Clock.Tick
-			verbose: boolean
-			silent: boolean
-			debug: boolean
-			isProxy: boolean
-			rhtoken: string
-			wbauth: boolean
-		}
-	}
-}
+declare module 'simple-get' { interface RequestOptions extends Partial<typeof HttpConfig> { } }
+declare global { namespace Http { interface Config extends simple.RequestOptions { } } }
 
 

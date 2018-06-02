@@ -17,12 +17,6 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 		http.config(config)
 
-		if (config.isProxy) {
-			config.body = core.clone(config)
-			config.method = 'POST'
-			config.url = '/proxy'
-		}
-
 		if (config.url[0] == '/') {
 			let protocol = process.env.DEVELOPMENT ? 'http://' : 'https://'
 			config.url = protocol + process.env.DOMAIN + '/api' + config.url

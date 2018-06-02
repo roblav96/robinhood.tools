@@ -11,13 +11,13 @@ export const HR = {
 
 
 
-export function getState(hours: Hours, stamp = Date.now()): Hours.State {
-	if (hours.isOpenToday == false) return 'CLOSED';
-	if (stamp >= hours.prepre && stamp < hours.pre) return 'PREPRE';
-	if (stamp >= hours.pre && stamp < hours.opens) return 'PRE';
-	if (stamp >= hours.opens && stamp < hours.closes) return 'REGULAR';
-	if (stamp >= hours.closes && stamp < hours.post) return 'POST';
-	if (stamp >= hours.post && stamp < hours.postpost) return 'POSTPOST';
+export function getState(hhours: Hours, stamp = Date.now()): Hours.State {
+	if (hhours.isOpenToday == false) return 'CLOSED';
+	if (stamp >= hhours.prepre && stamp < hhours.pre) return 'PREPRE';
+	if (stamp >= hhours.pre && stamp < hhours.opens) return 'PRE';
+	if (stamp >= hhours.opens && stamp < hhours.closes) return 'REGULAR';
+	if (stamp >= hhours.closes && stamp < hhours.post) return 'POST';
+	if (stamp >= hhours.post && stamp < hhours.postpost) return 'POSTPOST';
 	return 'CLOSED'
 }
 

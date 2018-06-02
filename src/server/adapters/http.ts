@@ -13,9 +13,7 @@ export function request(config: Partial<Http.Config>): Promise<any> {
 
 		http.config(config)
 
-		if (config.isProxy) return config;
-
-		let { host } = url.parse(config.url)
+		let host = url.parse(config.url).host
 		// if (config.hHost) config.headers['Host'] = host;
 		// if (config.hOrigin) config.headers['Origin'] = `${protocol}//${host}`;
 		// if (config.hReferer) config.headers['Referer'] = `${protocol}//${host}`;

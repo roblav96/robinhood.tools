@@ -3,10 +3,11 @@
 declare module 'simple-get' {
 	import * as http from 'http'
 
-	namespace simpleget {
+	namespace SimpleGet {
+		interface Headers extends http.IncomingHttpHeaders { [key: string]: any }
 		interface RequestOptions extends http.RequestOptions {
 			method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'HEAD' | 'DELETE'
-			headers: { [header: string]: string }
+			headers: Headers
 			url: string
 			body: any
 			form: any
@@ -23,8 +24,8 @@ declare module 'simple-get' {
 		function post(opts: Partial<RequestOptions>, cb: ResponseCallback): void
 		function put(opts: Partial<RequestOptions>, cb: ResponseCallback): void
 	}
-	function simpleget(opts: Partial<simpleget.RequestOptions>, cb: simpleget.ResponseCallback): void
-	export = simpleget
+	function SimpleGet(opts: Partial<SimpleGet.RequestOptions>, cb: SimpleGet.ResponseCallback): void
+	export = SimpleGet
 
 }
 
