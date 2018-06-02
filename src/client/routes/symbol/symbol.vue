@@ -22,7 +22,7 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 		<section class="section has-background-white-ter">
 			<div class="container">
 
-				<div class="columns is-multiline is-mobile">
+				<div class="columns is-mobile flex-wrap desktop:flex-no-wrap">
 
 					<div class="column is-narrow">
 						<symbol-logo class="is-48x48 card" :symbol="symbol"></symbol-logo>
@@ -50,25 +50,6 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 
 					<div class="column is-narrow">
 						<div class="box h-12 flex py-0">
-							<table class="table is-narrowest is-middle is-nowrap is-borderless self-center is-size-6">
-								<tbody>
-									<tr>
-										<td class="font-semibold">{{vnumber(all.quote.volume,{compact:true})}}</td>
-										<td class="">Vol</td>
-									</tr>
-									<tr>
-										<td class="font-semibold">{{vnumber(all.quote.avgVolume,{compact:true})}}</td>
-										<td class="">Avg</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-
-
-
-					<div class="column is-narrow">
-						<div class="box h-12 flex py-0">
 							<table class="bidask table is-paddingless is-middle is-nowrap is-borderless self-center is-size-6">
 								<tbody>
 									<tr>
@@ -77,12 +58,13 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 												<p>{{vnumber(all.quote.bid)}}</p>
 											</b-tooltip>
 										</td>
-										<td width="30%">
-											<progress class="progress is-danger is-small rounded-none pr-2" :value="bidask.bid.price" :min="0" :max="100"
-											    style="transform: rotate(180deg);"></progress>
+										<td>
+											<progress class="progress w-16 is-danger is-small rounded-none pr-2" :value="bidask.bid.price" :min="0"
+											    :max="100" style="transform: rotate(180deg);"></progress>
 										</td>
-										<td width="30%">
-											<progress class="progress is-success is-small rounded-none pr-2" :value="bidask.ask.price" :min="0" :max="100"></progress>
+										<td>
+											<progress class="progress w-16 is-success is-small rounded-none pr-2" :value="bidask.ask.price" :min="0"
+											    :max="100"></progress>
 										</td>
 										<td class="has-text-success has-text-left">
 											<b-tooltip label="Ask Price">
@@ -96,12 +78,13 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 												<p>{{vnumber(all.quote.bids,{precision:0})}}</p>
 											</b-tooltip>
 										</td>
-										<td width="30%">
-											<progress class="progress is-success is-small rounded-none pr-2" :value="bidask.bid.size" :min="0" :max="100"
-											    style="transform: rotate(180deg);"></progress>
+										<td>
+											<progress class="progress w-16 is-success is-small rounded-none pr-2" :value="bidask.bid.size" :min="0"
+											    :max="100" style="transform: rotate(180deg);"></progress>
 										</td>
-										<td width="30%">
-											<progress class="progress is-danger is-small rounded-none pr-2" :value="bidask.ask.size" :min="0" :max="100"></progress>
+										<td>
+											<progress class="progress w-16 is-danger is-small rounded-none pr-2" :value="bidask.ask.size" :min="0"
+											    :max="100"></progress>
 										</td>
 										<td class="has-text-danger has-text-left">
 											<b-tooltip label="Ask Size" position="is-bottom">
@@ -113,6 +96,57 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 							</table>
 						</div>
 					</div>
+
+
+
+					<div class="column is-narrow widescreen:flex hidden">
+						<div class="box h-12 flex py-0">
+							<table class="table is-paddingless is-middle is-nowrap is-borderless self-center is-size-6">
+								<tbody>
+									<tr>
+										<td class="font-semibold has-text-right pr-2">{{vnumber(all.quote.volume,{compact:true})}}</td>
+										<td class="text-sm leading-none">Volume</td>
+									</tr>
+									<tr>
+										<td class="font-semibold has-text-right pr-2">{{vnumber(all.quote.avgVolume,{compact:true})}}</td>
+										<td class="text-sm leading-none">Avg Volume</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+
+
+					<div v-if="all.quote.marketCap && all.quote.dealFlowVolume" class="column is-narrow fullhd:flex hidden">
+						<div class="box h-12 flex py-0">
+							<table class="table is-paddingless is-middle is-nowrap is-borderless self-center is-size-6">
+								<tbody>
+									<tr>
+										<td class="font-semibold has-text-right pr-2">{{vnumber(all.quote.marketCap,{compact:true})}}</td>
+										<td class="text-sm leading-none">Market Cap</td>
+									</tr>
+									<tr>
+										<td class="font-semibold has-text-right pr-2" v-bull-bear="all.quote.dealFlowVolume">
+											{{vnumber(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
+										</td>
+										<td class="text-sm leading-none">Capital Flow</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+
+
+					<!-- <div v-if="all.quote.marketCap" class="column is-narrow widescreen:flex hidden">
+						<div class="box h-12 flex">
+							<p class="self-center is-size-4 mr-2 font-medium whitespace-no-wrap">
+								{{vnumber(all.quote.marketCap,{compact:true})}}
+							</p>
+							<p class="self-center is-size-6">Market Cap</p>
+						</div>
+					</div> -->
 
 
 
@@ -131,15 +165,6 @@ section.symbol-route table.bidask .progress::-webkit-progress-bar {
 								{{vnumber(all.quote.avgVolume,{compact:true})}}
 							</p>
 							<p class="self-center is-size-6">Avg Volume</p>
-						</div>
-					</div>
-
-					<div v-show="all.quote.marketCap" class="column is-narrow desktop:flex hidden">
-						<div class="box h-12 flex">
-							<p class="self-center is-size-4 mr-2 font-medium whitespace-no-wrap">
-								{{vnumber(all.quote.marketCap,{compact:true})}}
-							</p>
-							<p class="self-center is-size-6">Market Cap</p>
 						</div>
 					</div> -->
 
