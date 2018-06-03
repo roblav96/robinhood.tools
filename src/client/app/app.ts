@@ -3,14 +3,14 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
-import VMixin from '@/client/mixins/v.mixin'
-import * as _ from '@/common/lodash'
+import VMixin from '../mixins/v.mixin'
+import * as _ from '../../common/lodash'
 
 
 
 @Vts.Component({
 	components: {
-		'v-navbar': () => import('@/client/components/navbar/navbar'),
+		'v-navbar': () => import('../components/navbar/navbar'),
 	},
 })
 export default class extends Mixins(VMixin) {

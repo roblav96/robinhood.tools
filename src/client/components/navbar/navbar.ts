@@ -3,19 +3,19 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
-import VMixin from '@/client/mixins/v.mixin'
-import RHMixin from '@/client/mixins/robinhood.mixin'
-import * as _ from '@/common/lodash'
-import * as pretty from '@/common/pretty'
-import * as utils from '@/client/adapters/utils'
-import dayjs from '@/common/dayjs'
-import clock from '@/common/clock'
+import VMixin from '../../mixins/v.mixin'
+import RHMixin from '../../mixins/robinhood.mixin'
+import * as _ from '../../../common/lodash'
+import * as pretty from '../../../common/pretty'
+import * as utils from '../../adapters/utils'
+import dayjs from '../../../common/dayjs'
+import clock from '../../../common/clock'
 
 
 
 @Vts.Component({
 	components: {
-		'v-searchbar': () => import('@/client/components/searchbar/searchbar'),
+		'v-searchbar': () => import('../../components/searchbar/searchbar'),
 	},
 })
 export default class extends Mixins(VMixin, RHMixin) {

@@ -2,10 +2,10 @@
 
 import Vue, { DirectiveOptions } from 'vue'
 import * as anime from 'animejs'
-import * as core from '@/common/core'
-import * as pretty from '@/common/pretty'
-import * as utils from '@/client/adapters/utils'
-import clock from '@/common/clock'
+import * as core from '../../common/core'
+import * as pretty from '../../common/pretty'
+import * as utils from '../adapters/utils'
+import clock from '../../common/clock'
 
 
 

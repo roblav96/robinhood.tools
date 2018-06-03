@@ -4,15 +4,15 @@ global.Promise = require('zousan/src/zousan')
 global.Zousan.suppressUncaughtRejectionError = true
 
 import Vue from 'vue'
-import '@/common/clock'
-import '@/client/ui/directives'
-import '@/client/ui/components'
-import '@/client/adapters/robinhood'
-import * as security from '@/client/adapters/security'
-import socket from '@/client/adapters/socket'
-import router from '@/client/router'
-import store from '@/client/store'
-import App from '@/client/app/app'
+import '../common/clock'
+import './ui/directives'
+import './ui/components'
+import './adapters/robinhood'
+import * as security from './adapters/security'
+import socket from './adapters/socket'
+import router from './router'
+import store from './store'
+import App from './app/app'
 
 
 

@@ -3,12 +3,12 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
-import VMixin from '@/client/mixins/v.mixin'
-import * as _ from '@/common/lodash'
-import * as rkeys from '@/common/rkeys'
-import * as http from '@/client/adapters/http'
-import * as utils from '@/client/adapters/utils'
-import * as recents from '@/client/stores/recents'
+import VMixin from '../../mixins/v.mixin'
+import * as _ from '../../../common/lodash'
+import * as rkeys from '../../../common/rkeys'
+import * as http from '../../adapters/http'
+import * as utils from '../../adapters/utils'
+import * as recents from '../../stores/recents'
 
 
 

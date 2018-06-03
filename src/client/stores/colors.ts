@@ -2,8 +2,8 @@
 
 import Vue from 'vue'
 import Vuex, { Store } from 'vuex'
-import store from '@/client/store'
-import { colors } from '@/client/styles/tailwind.js'
+import store from '../store'
+import { colors } from '../styles/tailwind.js'
 
 
 

@@ -3,13 +3,13 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
-import VMixin from '@/client/mixins/v.mixin'
+import VMixin from '../../mixins/v.mixin'
 import Symbol from './symbol'
-import dayjs from '@/common/dayjs'
-import * as core from '@/common/core'
-import * as rkeys from '@/common/rkeys'
-import * as utils from '@/client/adapters/utils'
-import * as http from '@/client/adapters/http'
+import dayjs from '../../../common/dayjs'
+import * as core from '../../../common/core'
+import * as rkeys from '../../../common/rkeys'
+import * as utils from '../../adapters/utils'
+import * as http from '../../adapters/http'
 
 
 

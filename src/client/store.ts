@@ -2,7 +2,7 @@
 
 import Vue, { ComponentOptions } from 'vue'
 import Vuex, { Store } from 'vuex'
-import * as core from '@/common/core'
+import * as core from '../common/core'
 
 
 

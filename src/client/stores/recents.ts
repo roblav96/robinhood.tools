@@ -2,9 +2,9 @@
 
 import Vuex, { Store } from 'vuex'
 import lockr from 'lockr'
-import * as _ from '@/common/lodash'
-import store from '@/client/store'
-import router from '@/client/router'
+import * as _ from '../../common/lodash'
+import store from '../store'
+import router from '../router'
 
 
 

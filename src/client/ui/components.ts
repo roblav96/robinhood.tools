@@ -3,10 +3,10 @@
 import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
 import * as anime from 'animejs'
-import * as _ from '@/common/lodash'
-import * as core from '@/common/core'
-import * as utils from '@/client/adapters/utils'
-import clock from '@/common/clock'
+import * as _ from '../../common/lodash'
+import * as core from '../../common/core'
+import * as utils from '../adapters/utils'
+import clock from '../../common/clock'
 
 
 
