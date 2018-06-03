@@ -8,7 +8,7 @@ import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as yahoo from '../../common/yahoo'
 import * as redis from './redis'
-import * as http from './http'
+import * as http from '../../common/http'
 
 
 

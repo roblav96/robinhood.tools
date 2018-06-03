@@ -1,7 +1,7 @@
 // 
 
 import * as lockr from 'lockr'
-import * as http from '../adapters/http'
+import * as http from '../../common/http'
 import * as rkeys from '../../common/rkeys'
 import store from '../store'
 import socket from '../adapters/socket'

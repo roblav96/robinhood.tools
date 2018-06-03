@@ -3,7 +3,7 @@
 import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
 import * as _ from '../../../common/lodash'
-import * as http from '../../adapters/http'
+import * as http from '../../../common/http'
 import * as robinhood from '../../adapters/robinhood'
 import * as alert from '../../adapters/alert'
 import store from '../../store'

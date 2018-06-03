@@ -5,7 +5,7 @@ import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import * as core from '../../../common/core'
 import * as rkeys from '../../../common/rkeys'
-import * as http from '../../adapters/http'
+import * as http from '../../../common/http'
 
 
 

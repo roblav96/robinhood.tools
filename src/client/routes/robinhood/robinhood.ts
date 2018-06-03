@@ -11,7 +11,7 @@ import * as pretty from '../../../common/pretty'
 import * as rkeys from '../../../common/rkeys'
 import * as robinhood from '../../adapters/robinhood'
 import * as security from '../../adapters/security'
-import * as http from '../../adapters/http'
+import * as http from '../../../common/http'
 import store from '../../store'
 import socket from '../../adapters/socket'
 

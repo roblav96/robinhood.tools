@@ -10,7 +10,7 @@ import lockr from 'lockr'
 import Fingerprint2 from 'fingerprintjs2'
 import clock from '../../common/clock'
 import store from '../store'
-import * as http from '../adapters/http'
+import * as http from '../../common/http'
 
 
 
@@ -45,6 +45,7 @@ export function cookies() {
 	document.cookie = cookie.serialize('x-uuid', `${doc.uuid}.${Date.now()}`, copts)
 	document.cookie = cookie.serialize('x-finger', doc.finger, copts)
 }
+global.cookies = cookies
 
 
 

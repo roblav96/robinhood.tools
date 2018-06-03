@@ -3,7 +3,7 @@
 import lockr from 'lockr'
 import store from '../store'
 import socket from '../adapters/socket'
-import * as http from '../adapters/http'
+import * as http from '../../common/http'
 import * as rkeys from '../../common/rkeys'
 
 

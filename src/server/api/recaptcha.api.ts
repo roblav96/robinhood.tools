@@ -2,7 +2,7 @@
 
 import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
-import * as http from '../adapters/http'
+import * as http from '../../common/http'
 import * as boom from 'boom'
 import polka from './polka'
 

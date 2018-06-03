@@ -12,7 +12,7 @@ import * as core from '../../../common/core'
 import * as rkeys from '../../../common/rkeys'
 import * as quotes from '../../../common/quotes'
 import * as yahoo from '../../../common/yahoo'
-import * as http from '../../adapters/http'
+import * as http from '../../../common/http'
 import * as utils from '../../adapters/utils'
 
 
