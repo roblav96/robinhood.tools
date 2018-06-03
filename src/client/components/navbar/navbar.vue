@@ -39,7 +39,7 @@ nav.navbar div.dropdown-content a > span.icon {
 
 			<div class="navbar-brand">
 				<router-link class="navbar-item" :to="{name:'home'}" active-class exact-active-class>
-					<img src="@/assets/logo-primary.svg" alt="Robinhood Tools">
+					<img src="../../../assets/logo-primary.svg" alt="Robinhood Tools">
 				</router-link>
 
 				<div class="is-hidden-mobile navbar-item py-0 flex flex-col self-center">
@@ -71,7 +71,7 @@ nav.navbar div.dropdown-content a > span.icon {
 					</b-tooltip>
 					<b-tooltip v-if="!rhusername" label="Robinhood Login" :active="breakpoints.desktopAndUp" position="is-bottom">
 						<router-link class="navbar-item flex items-center h-full" :to="{name:'login'}" active-class exact-active-class>
-							<img class="image is-28x28 mx-1" src="@/assets/robinhood-logo.svg" alt="Robinhood Login">
+							<img class="image is-28x28 mx-1" src="../../../assets/robinhood-logo.svg" alt="Robinhood Login">
 							<span class="is-hidden-desktop ml-2">Login</span>
 						</router-link>
 					</b-tooltip>
@@ -83,7 +83,7 @@ nav.navbar div.dropdown-content a > span.icon {
 
 					<router-link v-if="rhusername" class="navbar-item flex items-center desktop:py-0" :to="{ name: 'robinhood' }"
 					    active-class exact-active-class>
-						<img class="image is-28x28 mr-3 touch:ml-1" src="@/assets/robinhood-logo.svg" alt="Robinhood">
+						<img class="image is-28x28 mr-3 touch:ml-1" src="../../../assets/robinhood-logo.svg" alt="Robinhood">
 						<div class="flex flex-col self-center">
 							<p class="leading-tight font-medium font-mono">
 								{{vnumber(equityvalue,{dollar:true,precision:2})}}

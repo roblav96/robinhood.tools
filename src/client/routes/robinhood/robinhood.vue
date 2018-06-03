@@ -13,7 +13,7 @@
 				<div class="columns">
 					<!-- <div class="column">
 						<div class="box">
-							<img class="image w-64 mb-4" src="@/assets/robinhood-banner.png">
+							<img class="image w-64 mb-4" src="../../../assets/robinhood-banner.png">
 							<p class="subtitle font-medium">{{rh.user.first_name}} {{rh.user.last_name}}</p>
 							<p class="">{{rh.user.username}}</p>
 						</div>

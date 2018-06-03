@@ -12,7 +12,7 @@
 		<section class="hero is-small">
 			<div class="hero-body">
 				<div class="container">
-					<img class="image w-64" src="@/assets/robinhood-banner.png">
+					<img class="image w-64" src="../../../assets/robinhood-banner.png">
 				</div>
 			</div>
 			<div class="hero-foot">

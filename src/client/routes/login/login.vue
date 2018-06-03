@@ -13,7 +13,7 @@
 				<div class="column is-narrow">
 					<form class="box" style="max-width: 335px;" v-on:submit.prevent="submit">
 						<figure class="image mb-4 w-2/3">
-							<img src="@/assets/robinhood-banner.png">
+							<img src="../../../assets/robinhood-banner.png">
 						</figure>
 						<b-field class="mb-2" label="Email or Username">
 							<b-input ref="username_input" type="text" icon="account" v-model="username" required :disabled="busy || ismfa"></b-input>

@@ -12,11 +12,11 @@
 		<section class="hero is-primary is-bold">
 			<div class="hero-body">
 				<div class="container has-text-centered">
-					<img class="max-w-ns mb-8" width="33%" src="@/assets/logo-white.svg" alt="Robinhood Tools">
+					<img class="max-w-ns mb-8" width="33%" src="../../../assets/logo-white.svg" alt="Robinhood Tools">
 					<h1 class="title is-size-2">Robinhood Tools</h1>
 					<h2 class="subtitle is-size-4">Advanced trading tools and resources for Robinhood Web.</h2>
 					<router-link class="button is-large is-rhgreen font-medium" :to="{name:'login'}">
-						<img class="image is-28x28 mr-2" src="@/assets/robinhood-logo-white.svg" alt="Robinhood Login">
+						<img class="image is-28x28 mr-2" src="../../../assets/robinhood-logo-white.svg" alt="Robinhood Login">
 						<span>Login Now</span>
 					</router-link>
 				</div>
