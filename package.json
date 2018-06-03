@@ -121,8 +121,6 @@
 		"node-sass": "latest",
 		"npm-run-all": "latest",
 		"onchange": "latest",
-		"parcel-bundler": "latest",
-		"parcel-plugin-typescript": "^0.7.1",
 		"replace-x": "latest",
 		"rimraf": "latest",
 		"sass-loader": "latest",
@@ -136,5 +134,10 @@
 		"webpack": "latest",
 		"webpack-bundle-analyzer": "latest",
 		"webpack-cli": "latest"
+	},
+	"babel": {
+		"presets": [
+			"@vue/app"
+		]
 	}
 }
