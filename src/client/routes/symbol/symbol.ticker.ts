@@ -3,14 +3,14 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
-import VMixin from '@/client/mixins/v.mixin'
 import Symbol from './symbol'
-import * as _ from '@/common/lodash'
-import * as core from '@/common/core'
-import * as rkeys from '@/common/rkeys'
-import * as http from '@/client/adapters/http'
-import * as utils from '@/client/adapters/utils'
-import socket from '@/client/adapters/socket'
+import VMixin from '../../mixins/v.mixin'
+import * as _ from '../../../common/lodash'
+import * as core from '../../../common/core'
+import * as rkeys from '../../../common/rkeys'
+import * as http from '../../adapters/http'
+import * as utils from '../../adapters/utils'
+import socket from '../../adapters/socket'
 
 
 

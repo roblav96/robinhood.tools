@@ -1,23 +1,23 @@
 // 
 
-require('@/common/polyfills')
+require('../common/polyfills')
 
-global.Promise = require('zousan/src/zousan')
+global.Promise = require('zousan')
 global.Zousan.suppressUncaughtRejectionError = true
 
 Object.assign(console, { dtsgen: function() { } })
 if (process.env.DEVELOPMENT) {
-	// console.dtsgen = require('@/common/dtsgen').default
-	Object.assign(window, require('@/common/core'))
-	// Object.assign(window, require('@/common/pretty'))
+	// console.dtsgen = require('../common/dtsgen').default
+	Object.assign(window, require('../common/core'))
+	// Object.assign(window, require('../common/pretty'))
 }
 
-import 'modern-normalize'
-import 'animate.css'
-import '@/client/styles/vendors.scss'
-import '@/client/styles/theme.scss'
-import '@/client/styles/tailwind.css'
-import '@/client/styles/styles.css'
+// import 'modern-normalize'
+// import 'animate.css'
+// import './styles/vendors.scss'
+// import './styles/theme.scss'
+// import './styles/tailwind.css'
+// import './styles/styles.css'
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
@@ -40,6 +40,6 @@ Vue.use(Buefy, {
 	defaultDialogCancelText: 'Cancel',
 } as BuefyConfig)
 
-require('@/client/vm')
+require('./vm')
 
 

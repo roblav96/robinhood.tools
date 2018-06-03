@@ -1,11 +1,11 @@
 // 
 
-export * from '@/common/http'
-import * as _ from '@/common/lodash'
-import * as core from '@/common/core'
-import * as http from '@/common/http'
-import * as security from '@/client/adapters/security'
-import * as alert from '@/client/adapters/alert'
+export * from '../../common/http'
+import * as _ from '../../common/lodash'
+import * as core from '../../common/core'
+import * as http from '../../common/http'
+import * as security from '../adapters/security'
+import * as alert from '../adapters/alert'
 import * as proxify from 'proxify-url'
 import * as boom from 'boom'
 import url from 'url'

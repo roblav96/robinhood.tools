@@ -3,21 +3,21 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
-import VMixin from '@/client/mixins/v.mixin'
-import * as _ from '@/common/lodash'
-import * as core from '@/common/core'
-import * as rkeys from '@/common/rkeys'
-import * as quotes from '@/common/quotes'
-import * as http from '@/client/adapters/http'
-import * as utils from '@/client/adapters/utils'
-import clock from '@/common/clock'
-import socket from '@/client/adapters/socket'
+import VMixin from '../../mixins/v.mixin'
+import * as _ from '../../../common/lodash'
+import * as core from '../../../common/core'
+import * as rkeys from '../../../common/rkeys'
+import * as quotes from '../../../common/quotes'
+import * as http from '../../adapters/http'
+import * as utils from '../../adapters/utils'
+import clock from '../../../common/clock'
+import socket from '../../adapters/socket'
 
 
 
 @Vts.Component({
 	components: {
-		'v-symbol-ticker': () => import('@/client/routes/symbol/symbol.ticker'),
+		'v-symbol-ticker': () => import('./symbol.ticker'),
 	},
 })
 export default class VSymbol extends Mixins(VMixin) {

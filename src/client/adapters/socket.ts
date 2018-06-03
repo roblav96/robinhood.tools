@@ -1,15 +1,15 @@
 // 
 
-export * from '@/common/socket'
-import * as _ from '@/common/lodash'
-import * as core from '@/common/core'
-import * as security from '@/client/adapters/security'
-import * as http from '@/client/adapters/http'
+export * from '../../common/socket'
+import * as _ from '../../common/lodash'
+import * as core from '../../common/core'
+import * as security from '../adapters/security'
+import * as http from '../adapters/http'
 import * as qs from 'querystring'
 import Sockette from 'sockette'
-import WebSocketClient from '@/common/websocket.client'
-import Emitter from '@/common/emitter'
-import clock from '@/common/clock'
+import WebSocketClient from '../../common/websocket.client'
+import Emitter from '../../common/emitter'
+import clock from '../../common/clock'
 
 
 

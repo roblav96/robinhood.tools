@@ -2,9 +2,9 @@
 
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import * as _ from '@/common/lodash'
-import * as core from '@/common/core'
-import store from '@/client/store'
+import * as _ from '../common/lodash'
+import * as core from '../common/core'
+import store from './store'
 
 
 
@@ -12,13 +12,13 @@ export const routes = [
 
 	{
 		name: 'home', path: '/',
-		component: () => import('@/client/routes/home/home'),
+		component: () => import('./routes/home/home'),
 	},
 
 	{
 		title: 'My Lists', icon: 'format-list-bulleted',
 		name: 'lists', path: '/lists',
-		component: () => import('@/client/routes/lists/lists'),
+		component: () => import('./routes/lists/lists'),
 	},
 
 	{
@@ -53,27 +53,27 @@ export const routes = [
 
 	{
 		name: 'symbol', path: '/symbol/:symbol',
-		component: () => import('@/client/routes/symbol/symbol'),
+		component: () => import('./routes/symbol/symbol'),
 		children: [
 			{
 				name: 'symbol.summary', path: 'summary', icon: 'bulletin-board',
-				component: () => import('@/client/routes/symbol/symbol.summary'),
+				component: () => import('./routes/symbol/symbol.summary'),
 			},
 			{
 				name: 'symbol.chart', path: 'chart', icon: 'chart-line',
-				component: () => import('@/client/routes/symbol/symbol.chart'),
+				component: () => import('./routes/symbol/symbol.chart'),
 			},
 			{
 				name: 'symbol.news', path: 'news', icon: 'newspaper',
-				component: () => import('@/client/routes/symbol/symbol.news'),
+				component: () => import('./routes/symbol/symbol.news'),
 			},
 			{
 				name: 'symbol.history', path: 'history', icon: 'calendar-clock',
-				component: () => import('@/client/routes/symbol/symbol.history'),
+				component: () => import('./routes/symbol/symbol.history'),
 			},
 			{
 				name: 'symbol.debug', path: 'debug', icon: 'bug',
-				component: () => import('@/client/routes/symbol/symbol.debug'),
+				component: () => import('./routes/symbol/symbol.debug'),
 			},
 			{ path: '*', redirect: { name: 'symbol' } },
 		],
@@ -81,26 +81,26 @@ export const routes = [
 
 	{
 		name: 'login', path: '/login',
-		component: () => import('@/client/routes/login/login'),
+		component: () => import('./routes/login/login'),
 	},
 	{
 		name: 'robinhood', path: '/robinhood',
-		component: () => import('@/client/routes/robinhood/robinhood'),
+		component: () => import('./routes/robinhood/robinhood'),
 		children: [
 			{
 				title: 'Accounts', icon: 'earth',
 				name: 'robinhood.accounts', path: 'accounts',
-				component: () => import('@/client/routes/robinhood/robinhood.accounts'),
+				component: () => import('./routes/robinhood/robinhood.accounts'),
 			},
 			{
 				title: 'Banking', icon: 'bank',
 				name: 'robinhood.banking', path: 'banking',
-				// component: () => import('@/client/routes/robinhood/robinhood.banking'),
+				// component: () => import('./routes/robinhood/robinhood.banking'),
 			},
 			{
 				title: 'Order Book', icon: 'book-open-variant',
 				name: 'robinhood.orders', path: 'orders',
-				// component: () => import('@/client/routes/robinhood/robinhood.banking'),
+				// component: () => import('./routes/robinhood/robinhood.banking'),
 			},
 			// {
 			// 	name: 'symbol', path: '', redirect: { name: 'robinhood.index' }
@@ -112,7 +112,7 @@ export const routes = [
 	},
 	// {
 	// 	name: 'accounts', path: '/accounts',
-	// 	component: () => import('@/client/routes/accounts/accounts'),
+	// 	component: () => import('./routes/accounts/accounts'),
 	// },
 	// {
 	// 	title: 'Portfolio', icon: 'chart-pie',
@@ -121,7 +121,7 @@ export const routes = [
 
 	{
 		name: 'styleguide', path: '/styleguide',
-		component: () => import('@/client/routes/styleguide/styleguide'),
+		component: () => import('./routes/styleguide/styleguide'),
 	},
 
 	{ path: '*', redirect: { name: 'home' } },

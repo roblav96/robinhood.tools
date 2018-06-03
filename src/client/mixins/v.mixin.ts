@@ -3,10 +3,10 @@
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
-import * as _ from '@/common/lodash'
-import * as core from '@/common/core'
-import * as pretty from '@/common/pretty'
-import * as utils from '@/client/adapters/utils'
+import * as _ from '../../common/lodash'
+import * as core from '../../common/core'
+import * as pretty from '../../common/pretty'
+import * as utils from '../adapters/utils'
 
 
 

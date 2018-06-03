@@ -1,16 +1,16 @@
 // 
 
-export * from '@/common/robinhood'
-import * as _ from '@/common/lodash'
-import * as core from '@/common/core'
-import * as rkeys from '@/common/rkeys'
-import * as robinhood from '@/common/robinhood'
-import * as security from '@/client/adapters/security'
-import * as http from '@/client/adapters/http'
+export * from '../../common/robinhood'
+import * as _ from '../../common/lodash'
+import * as core from '../../common/core'
+import * as rkeys from '../../common/rkeys'
+import * as robinhood from '../../common/robinhood'
+import * as security from '../adapters/security'
+import * as http from '../adapters/http'
 import * as lockr from 'lockr'
-import socket from '@/client/adapters/socket'
-import store from '@/client/store'
-import clock from '@/common/clock'
+import socket from '../adapters/socket'
+import store from '../store'
+import clock from '../../common/clock'
 
 
 

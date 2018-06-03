@@ -2,9 +2,9 @@
 
 import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
-import Emitter from '@/common/emitter'
-import * as alert from '@/client/adapters/alert'
-import * as http from '@/client/adapters/http'
+import Emitter from '../../common/emitter'
+import * as alert from '../adapters/alert'
+import * as http from '../adapters/http'
 
 
 

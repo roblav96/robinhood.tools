@@ -2,18 +2,18 @@
 
 import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
-import * as _ from '@/common/lodash'
-import * as http from '@/client/adapters/http'
-import * as robinhood from '@/client/adapters/robinhood'
-import * as alert from '@/client/adapters/alert'
-import store from '@/client/store'
-import socket from '@/client/adapters/socket'
+import * as _ from '../../../common/lodash'
+import * as http from '../../adapters/http'
+import * as robinhood from '../../adapters/robinhood'
+import * as alert from '../../adapters/alert'
+import store from '../../store'
+import socket from '../../adapters/socket'
 
 
 
 @Vts.Component({
 	components: {
-		'v-grecaptcha': () => import('@/client/components/grecaptcha'),
+		'v-grecaptcha': () => import('../../components/grecaptcha'),
 	},
 	beforeRouteEnter(to, from, next) {
 		if (!store.state.security.rhusername) return next();

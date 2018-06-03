@@ -1,10 +1,10 @@
 // 
 
 import * as lockr from 'lockr'
-import * as http from '@/client/adapters/http'
-import * as rkeys from '@/common/rkeys'
-import store from '@/client/store'
-import socket from '@/client/adapters/socket'
+import * as http from '../adapters/http'
+import * as rkeys from '../../common/rkeys'
+import store from '../store'
+import socket from '../adapters/socket'
 
 
 

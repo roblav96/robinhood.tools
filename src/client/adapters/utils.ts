@@ -1,11 +1,11 @@
 // 
 
 import * as prettyms from 'pretty-ms'
-import * as _ from '@/common/lodash'
-import * as core from '@/common/core'
-import * as proxy from '@/common/proxy'
-import Emitter from '@/common/emitter'
-import clock from '@/common/clock'
+import * as _ from '../../common/lodash'
+import * as core from '../../common/core'
+import * as proxy from '../../common/proxy'
+import Emitter from '../../common/emitter'
+import clock from '../../common/clock'
 
 
 
