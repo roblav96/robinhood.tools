@@ -12,5 +12,6 @@ procfile.js
 *.idea
 *.heapsnapshot
 
+*.cache
 *.log
 *.DS_STORE

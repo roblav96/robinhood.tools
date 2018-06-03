@@ -122,6 +122,7 @@
 		"npm-run-all": "latest",
 		"onchange": "latest",
 		"parcel-bundler": "latest",
+		"parcel-plugin-typescript": "^0.7.1",
 		"replace-x": "latest",
 		"rimraf": "latest",
 		"sass-loader": "latest",
