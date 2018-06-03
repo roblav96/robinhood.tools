@@ -7,7 +7,95 @@ import * as fastjsonparse from 'fast-json-parse'
 import * as proxify from 'proxify-url'
 import * as simple from 'simple-get'
 import * as boom from 'boom'
+import * as url from 'url'
 import clock from './clock'
+
+
+
+export function request(config = {} as Partial<Http.Config>) {
+	return Promise.resolve().then(function() {
+
+		applyconfig(config)
+
+		if (process.env.CLIENT) {
+			if (config.url[0] == '/') {
+				let protocol = process.env.DEVELOPMENT ? 'http://' : 'https://'
+				config.url = protocol + process.env.DOMAIN + '/api' + config.url
+				security.cookies()
+			}
+		}
+
+		if (process.env.SERVER) {
+			let host = url.parse(config.url).host
+			if (host.includes('robinhood.com')) {
+				config.headers['x-robinhood-api-version'] = '1.212.3'
+				config.headers['origin'] = 'https://robinhood.com'
+				config.headers['referer'] = 'https://robinhood.com/'
+				if (config.rhtoken) {
+					config.headers['authorization'] = `Bearer ${config.rhtoken}`
+				}
+			}
+			if (host.includes('webull.com') || host.includes('stocks666.com')) {
+				Object.assign(config.headers, {
+					host,
+					origin: 'https://app.webull.com',
+					referer: 'https://app.webull.com',
+					ver: '1.8.4',
+					app: 'desktop',
+					os: 'web',
+					osv: 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)',
+					dnt: '1', hl: 'en', locale: 'eng', tz: 'America/New_York',
+					pragma: 'no-cache',
+					'cache-control': 'no-cache',
+				})
+				config.headers['user-agent'] = config.headers['osv']
+				if (config.wbauth) {
+					if (process.env.WEBULL_DID) config.headers['did'] = process.env.WEBULL_DID;
+					if (process.env.WEBULL_TOKEN) config.headers['access_token'] = process.env.WEBULL_TOKEN;
+				}
+			}
+		}
+
+		return config
+
+	}).then(send).catch(function(error: boom) {
+
+		if (process.env.SERVER) {
+			return Promise.reject(error)
+		}
+
+		if (error.isBoom && _.get(error, 'data.data.isBoom')) {
+			Object.assign(error.output.payload, error.data.data)
+		}
+
+		let message = error.message
+		let payload = _.get(error, 'output.payload') as boom.Payload
+		if (payload) {
+			message = payload.error
+			if (message != payload.message) message += ` ➤ "${payload.message}"`;
+		}
+
+		let endpoint = `[${config.method}] ${config.url.replace(process.env.DOMAIN, '')}`
+		console.log('%c◀ ' + endpoint, 'color: red; font-weight: bolder;', message)
+		// alert.toast({ message: endpoint + ' ➤ ' + message, type: 'is-danger' })
+
+		return Promise.reject(error)
+	})
+
+}
+
+export function get<T = any>(url: string, config = {} as Partial<Http.Config>): Promise<T> {
+	config.url = url
+	config.method = 'GET'
+	return request(config)
+}
+
+export function post<B = any, T = any>(url: string, body?: B, config = {} as Partial<Http.Config>): Promise<T> {
+	config.url = url
+	config.method = 'POST'
+	if (body) config.body = body;
+	return request(config)
+}
 
 
 
@@ -27,7 +115,7 @@ const HttpConfig = {
 }
 Object.keys(HttpConfig).forEach(k => { if (!HttpConfig[k]) delete HttpConfig[k]; })
 
-export function config(config: Partial<Http.Config>) {
+export function applyconfig(config: Partial<Http.Config>) {
 
 	core.object.repair(config, core.clone(HttpConfig))
 
@@ -58,7 +146,7 @@ export function config(config: Partial<Http.Config>) {
 
 
 
-export function send(config: Http.Config) {
+function send(config: Http.Config) {
 	if (config.debug) console.log('config ->', config);
 	return new Promise(function(resolve, reject) {
 		simple.concat(config, function(error, res, data: any) {

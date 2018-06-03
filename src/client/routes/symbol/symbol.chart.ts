@@ -194,13 +194,15 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	}
 
 	gethistoricals() {
-		console.time(`gethistoricals`)
-		let url = yahoo.chartRequest(this.symbol, { range: '1mo', interval: '1h' }, this.hours.hours)
+		let url = yahoo.chartRequest(this.symbol, { range: '6mo', interval: '1h' }, this.hours.hours)
 		return http.get(url, { proxify: true }).then(yahoo.chartResponse).then(response => {
 			// console.log(`response ->`, JSON.parse(JSON.stringify(response)))
-			console.timeEnd(`gethistoricals`)
+			this.vechart.syncdataset(response)
+			return this.$nextTick()
 		}).catch(function(error) {
 			console.error(`gethistoricals Error ->`, error)
+		}).finally(() => {
+			this.busy = false
 		})
 	}
 

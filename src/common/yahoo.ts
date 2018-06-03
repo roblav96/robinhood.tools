@@ -26,6 +26,25 @@ export const SUMMARY_MODULES = [
 	'fundProfile', 'topHoldings', 'fundPerformance',
 ]
 
+// export const RANGES = ['1d', '5d', '1mo', '3mo', '6mo', 'ytd', '1y', '2y', '5y', '10y', 'max']
+export const RANGES = ['1d', '5d', '1mo', '3mo', '1y', '5y', 'max']
+// export const INTERVALS = ['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo']
+export const INTERVALS = ['1m', '2m', '5m', '15m', '30m', '1h', '1d']
+
+export const FRAMES = {
+	'1d': '1m',
+	'5d': '15m',
+	'1mo': '1h',
+	'3mo': '1d',
+	'6mo': '1d',
+	'ytd': '1d',
+	'1y': '1d',
+	'2y': '1wk',
+	'5y': '1wk',
+	'10y': '1mo',
+	'max': '1mo',
+}
+
 
 
 export function chartRequest(
