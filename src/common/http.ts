@@ -21,7 +21,7 @@ export function request(config = {} as Partial<Http.Config>) {
 			if (config.url[0] == '/') {
 				let protocol = process.env.DEVELOPMENT ? 'http://' : 'https://'
 				config.url = protocol + process.env.DOMAIN + '/api' + config.url
-				applycookies()
+				global.cookies()
 			}
 		}
 
@@ -210,6 +210,9 @@ function send(config: Http.Config) {
 
 
 declare module 'simple-get' { interface RequestOptions extends Partial<typeof HttpConfig> { } }
-declare global { namespace Http { interface Config extends simple.RequestOptions { } } }
+declare global {
+	namespace NodeJS { interface Global { cookies(): void } }
+	namespace Http { interface Config extends simple.RequestOptions { } }
+}
 
 

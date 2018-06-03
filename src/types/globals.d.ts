@@ -2,13 +2,8 @@
 
 
 
-declare function applycookies(): void
-
 declare namespace NodeJS {
-	interface Global {
-		cookies(): void
-		Zousan: any
-	}
+	interface Global { Zousan: any }
 	interface ProcessEnv {
 		NODE_ENV: 'development' | 'production'
 		DEVELOPMENT: any
