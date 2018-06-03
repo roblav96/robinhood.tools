@@ -1,10 +1,15 @@
 // 
 
-const webpack = require('webpack')
+const _ = require('lodash')
 const path = require('path')
+const webpack = require('webpack')
 const package = require('./package.json')
 
 
+
+const wpconfig = require('@vue/cli-service/webpack.config')
+
+module.exports = _.merge()
 
 module.exports = {
 	context: process.cwd(),
@@ -14,7 +19,7 @@ module.exports = {
 	},
 	entry: {
 		vendors: [
-			'animejs',
+			// 'animejs',
 			// 'boom',
 			// 'buefy',
 			// 'bulma',
@@ -22,15 +27,15 @@ module.exports = {
 			// 'mdi',
 			// 'modern-normalize',
 			'lodash',
-			'node-forge',
-			'simple-get',
-			'sockjs-client',
-			'vue',
-			'vue-class-component',
-			'vue-property-decorator',
-			'vue-router',
-			'vuex',
-			'zousan',
+			// 'node-forge',
+			// 'simple-get',
+			// 'sockjs-client',
+			// 'vue',
+			// 'vue-class-component',
+			// 'vue-property-decorator',
+			// 'vue-router',
+			// 'vuex',
+			// 'zousan',
 			// '____',
 			// '____',
 			// '____',

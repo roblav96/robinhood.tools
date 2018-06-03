@@ -107,7 +107,7 @@ export function requireDir(dirName: string, fileName: string, filter?: (file: st
 	fs.readdirSync(dirName).filter(v => {
 		return v != fileName && !v.endsWith('.map')
 	}).forEach(function(file) {
-		let full = path.join(dirName, file)
+		let full = path.resolve(dirName, file)
 		let src = sourcemaps.retrieveSourceMap(full).url
 		if (src.endsWith('.map')) src = src.slice(0, -4);
 		src = src.replace('/dist/', '/src/').replace('.js', '.ts')

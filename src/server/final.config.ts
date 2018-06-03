@@ -50,7 +50,7 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 function Application(application: Partial<final.Application>) {
 	_.defaults(application.env, app.env)
 	_.defaults(application, app)
-	application.run = path.join(__dirname, `${application.run}.js`)
+	application.run = path.resolve(__dirname, `${application.run}.js`)
 	applications.push(JSON.parse(JSON.stringify(application)))
 }
 

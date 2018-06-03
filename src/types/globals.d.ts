@@ -12,6 +12,7 @@ declare namespace NodeJS {
 		DOMAIN: any
 		CLIENT: any
 		SERVER: any
+		DLL: any
 	}
 }
 

@@ -1,15 +1,91 @@
 // 
+
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const DEVELOPMENT = process.env.NODE_ENV == 'development'
 const PRODUCTION = process.env.NODE_ENV == 'production'
-// 
 
-const webpack = require('webpack')
+const DEBUG = true
+if (DEBUG) {
+	const inspector = require('inspector')
+	inspector.open(+process.debugPort - 1)
+	console.clear()
+	require('exit-hook')(inspector.close)
+}
+
+const fs = require('fs')
 const path = require('path')
 const _ = require('lodash')
 const dotenv = require('dotenv')
+const webpack = require('webpack')
 const package = require('./package.json')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+
+
+
+if (process.env.DLL) {
+	module.exports = {
+		outputDir: 'dist/client',
+		runtimeCompiler: true,
+		configureWebpack: function(config) {
+			if (DEBUG) console.log('configure config ->', config);
+			config.entry = {
+				vendors: [
+					path.resolve(__dirname, 'src/client/styles/tailwind.css'),
+					path.resolve(__dirname, 'src/client/styles/vendors.scss'),
+					'animate.css',
+					'asn1.js',
+					'bn.js',
+					'buefy',
+					'core-js',
+					'echarts',
+					'echarts-stat',
+					'elliptic',
+					'fingerprintjs2',
+					'hash.js',
+					'html-entities',
+					'lodash',
+					'modern-normalize',
+					'node-forge',
+					'simple-get',
+					'sockjs-client',
+					'vue',
+					'vue-class-component',
+					'vue-property-decorator',
+					'vue-router',
+					'vuex',
+					'zousan',
+					'zrender',
+					// '____',
+					// '____',
+					// '____',
+					// '____',
+				],
+			}
+			config.output = {
+				filename: '[name].dll.js',
+				path: path.resolve(__dirname, 'dist/client'),
+				library: '[name]',
+			}
+			config.plugins.push(new webpack.DllPlugin({
+				name: '[name]',
+				path: path.resolve(__dirname, 'dist/client/[name].json'),
+			}))
+			config.plugins.push(new BundleAnalyzerPlugin())
+		},
+		chainWebpack: function(config) {
+			if (DEBUG) console.log('chain config ->', config);
+			config.entry('app').clear()
+			config.resolve.alias.store.delete('@')
+			config.plugins.delete('fork-ts-checker')
+			config.plugins.delete('no-emit-on-errors')
+			config.plugin('friendly-errors').tap(function(args) {
+				args[0].clearConsole = false
+				return args
+			})
+		},
+	}
+	return
+}
 
 
 
@@ -19,7 +95,7 @@ module.exports = {
 	runtimeCompiler: true,
 
 	configureWebpack: function(config) {
-		// console.log('configureWebpack config ->', config)
+		if (DEBUG) console.log('configure config ->', config);
 
 		// config.output.filename = '[name].bundle.js'
 		// config.output.chunkFilename = '[name].chunk.js'
@@ -34,17 +110,22 @@ module.exports = {
 			})
 		}
 
-		// config.plugins.push(new webpack.DllReferencePlugin({
-		// 	context: __dirname,
-		// 	manifest: require(path.resolve(__dirname, 'dist/client/vendors.json'))
-		// }))
+		let manifest = path.resolve(__dirname, 'dist/client/vendors.json')
+		let dll = fs.existsSync(manifest)
+		if (DEBUG) console.warn(`dll ->`, dll);
+		if (dll) {
+			config.plugins.push(new webpack.DllReferencePlugin({
+				context: __dirname,
+				manifest: require(manifest),
+			}))
+		}
 
-		// config.plugins.push(new BundleAnalyzerPlugin())
+		config.plugins.push(new BundleAnalyzerPlugin())
 
 	},
 
 	chainWebpack: function(config) {
-		// console.log('chainWebpack config ->', config)
+		if (DEBUG) console.log('chain config ->', config);
 
 		let main = path.resolve(__dirname, 'src/client/main.ts')
 		config.entry('app').clear().add(main)
@@ -68,21 +149,13 @@ module.exports = {
 		})
 
 		config.plugins.delete('no-emit-on-errors')
-
-		// config.plugin('friendly-errors').tap(function(args) {
-		// 	args[0].clearConsole = false
-		// 	return args
-		// })
+		config.plugin('friendly-errors').tap(function(args) {
+			args[0].clearConsole = false
+			return args
+		})
 
 	},
 
 }
-
-
-
-// const inspector = require('inspector')
-// inspector.open(+process.debugPort - 1)
-// console.clear()
-// require('exit-hook')(inspector.close)
 
 

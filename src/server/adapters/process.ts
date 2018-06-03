@@ -20,7 +20,7 @@ process.on('unhandledRejection', function(error) {
 import * as path from 'path'
 import * as pkgup from 'pkg-up'
 let project = path.dirname(pkgup.sync())
-let pkgjson = require(path.join(project, 'package.json'))
+let pkgjson = require(path.resolve(project, 'package.json'))
 process.env.VERSION = pkgjson.version
 process.env.DOMAIN = (process.env.DEVELOPMENT ? 'dev.' : '') + pkgjson.domain
 process.env.NAME = process.env.NAME || pkgjson.name

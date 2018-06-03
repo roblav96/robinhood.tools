@@ -4,7 +4,7 @@ node_modules
 dist
 
 *tailwind*.css
-procfile.js
+*.dll
 *.env
 *.env.*
 *.local
