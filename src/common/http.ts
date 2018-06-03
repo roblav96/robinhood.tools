@@ -21,7 +21,7 @@ export function request(config = {} as Partial<Http.Config>) {
 			if (config.url[0] == '/') {
 				let protocol = process.env.DEVELOPMENT ? 'http://' : 'https://'
 				config.url = protocol + process.env.DOMAIN + '/api' + config.url
-				security.cookies()
+				applycookies()
 			}
 		}
 
