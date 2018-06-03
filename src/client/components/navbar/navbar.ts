@@ -15,7 +15,8 @@ import clock from '../../../common/clock'
 
 @Vts.Component({
 	components: {
-		'v-searchbar': () => import('../../components/searchbar/searchbar'),
+		'v-searchbar': () => import('../searchbar/searchbar'),
+		'v-devmenu': () => import('../devmenu/devmenu'),
 	},
 })
 export default class extends Mixins(VMixin, RHMixin) {

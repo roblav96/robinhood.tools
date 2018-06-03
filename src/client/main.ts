@@ -12,12 +12,12 @@ if (process.env.DEVELOPMENT) {
 	// Object.assign(window, require('../common/pretty'))
 }
 
-// import 'modern-normalize'
-// import 'animate.css'
-// import './styles/vendors.scss'
-// import './styles/theme.scss'
-// import './styles/tailwind.css'
-// import './styles/styles.css'
+import 'modern-normalize'
+import 'animate.css'
+import './styles/vendors.scss'
+import './styles/theme.scss'
+import './styles/tailwind.css'
+import './styles/styles.css'
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'

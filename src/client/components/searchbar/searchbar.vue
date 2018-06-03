@@ -20,7 +20,7 @@ div.searchbar a.dropdown-item:hover .title {
 }
 
 div.searchbar div.dropdown-item:not(.is-disabled) {
-	/*border-bottom: 1px solid var(--border);*/
+	border-bottom: 1px solid var(--grey-lightest);
 	padding: 0px 1rem;
 	padding-bottom: 0.5rem;
 }
@@ -32,12 +32,11 @@ div.searchbar div.dropdown-item:empty {
 </style>
 
 <template>
-	<b-autocomplete class="searchbar" ref="searchbar_input" open-on-focus keep-first type="search" placeholder="Search..."
+	<b-autocomplete class="searchbar" ref="searchbar_input" open-on-focus :keep-first="query" type="search" placeholder="Search..."
 	    icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur" v-on:input="oninput"
 	    v-on:select="onselect">
 		<template v-if="!query" slot="header">
-			<b-icon class="align-middle mr-5 ml-1" icon="history"></b-icon>
-			<span class="align-middle is-size-6">Recently Viewed:</span>
+			<span class="align-middle font-700 is-size-6">Recently Viewed:</span>
 		</template>
 		<template slot="empty">No results found...</template>
 		<template slot-scope="props">

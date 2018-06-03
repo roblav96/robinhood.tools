@@ -21,8 +21,8 @@ module.exports = {
 	configureWebpack: function(config) {
 		// console.log('configureWebpack config ->', config)
 
-		config.output.filename = '[name].bundle.js'
-		config.output.chunkFilename = '[name].chunk.js'
+		// config.output.filename = '[name].bundle.js'
+		// config.output.chunkFilename = '[name].chunk.js'
 
 		if (DEVELOPMENT) {
 			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/, /env/]))
@@ -48,6 +48,7 @@ module.exports = {
 
 		let main = path.resolve(__dirname, 'src/client/main.ts')
 		config.entry('app').clear().add(main)
+		config.resolve.alias.store.delete('@')
 
 		config.plugin('define').tap(function(args) {
 			args[0]['process.env'].CLIENT = `"${true}"`

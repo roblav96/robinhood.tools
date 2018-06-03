@@ -79,55 +79,7 @@ nav.navbar div.dropdown-content a > span.icon {
 
 				<div class="navbar-end">
 
-					<!-- <b-dropdown v-if="rhusername && breakpoints.desktopAndUp" hoverable position="is-bottom-left">
-						<router-link class="navbar-item flex items-center hover-rhgreen" :to="{ name: 'robinhood' }" slot="trigger" active-class
-						    exact-active-class>
-							<img class="image is-28x28 mr-3 touch:ml-1" src="@/assets/robinhood-logo.svg" alt="Robinhood">
-							<span class="leading-tight font-medium font-mono">
-								{{vnumber(equityvalue,{dollar:true,precision:2})}}
-							</span>
-						</router-link>
-
-						<b-dropdown-item custom>
-							Logged as <b>Rafael Beraldo</b>
-						</b-dropdown-item>
-						<hr class="dropdown-divider">
-						<b-dropdown-item value="home">
-							<b-icon icon="home"></b-icon>
-							Home
-						</b-dropdown-item>
-						<b-dropdown-item has-link>
-							<a href="https://google.com" target="_blank">
-								<b-icon icon="link"></b-icon>
-								Google (link)
-							</a>
-						</b-dropdown-item>
-						<b-dropdown-item value="products">
-							<b-icon icon="cart"></b-icon>
-							Products
-						</b-dropdown-item>
-						<b-dropdown-item value="blog" disabled>
-							<b-icon icon="book-open"></b-icon>
-							Blog
-						</b-dropdown-item>
-						<hr class="dropdown-divider">
-						<b-dropdown-item value="settings">
-							<b-icon icon="settings"></b-icon>
-							Settings
-						</b-dropdown-item>
-						<b-dropdown-item value="logout">
-							<b-icon icon="logout"></b-icon>
-							Logout
-						</b-dropdown-item>
-					</b-dropdown> -->
-
-					<!-- <router-link v-else-if="rhusername" class="navbar-item flex items-center hover-rhgreen" :to="{ name: 'robinhood' }"
-					    active-class exact-active-class>
-						<img class="image is-28x28 mr-3 touch:ml-1" src="@/assets/robinhood-logo.svg" alt="Robinhood">
-						<span class="leading-tight font-medium font-mono">
-							{{vnumber(equityvalue,{dollar:true,precision:2})}}
-						</span>
-					</router-link> -->
+					<v-devmenu class="is-hidden-touch"></v-devmenu>
 
 					<router-link v-if="rhusername" class="navbar-item flex items-center desktop:py-0" :to="{ name: 'robinhood' }"
 					    active-class exact-active-class>

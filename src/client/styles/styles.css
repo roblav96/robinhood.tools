@@ -21,6 +21,10 @@
 	flex: 1;
 }
 
+.box.is-narrow {
+	padding: 0.75rem;
+}
+
 .box.is-border,
 .card.is-border {
 	box-shadow: 0 0 0 1px var(--border);
@@ -56,8 +60,31 @@ span.tooltip:after {
 	font-weight: 500;
 }
 
-div.box.is-narrow {
-	padding: 0.75rem;
+
+/**/
+
+.cursor-help {
+	cursor: help;
+}
+
+.cursor-crosshair {
+	cursor: crosshair;
+}
+
+.cursor-grab {
+	cursor: grab;
+}
+
+.cursor-grabbing {
+	cursor: grabbing;
+}
+
+.cursor-zoom-in {
+	cursor: zoom-in;
+}
+
+.cursor-zoom-out {
+	cursor: zoom-out;
 }
 
 
