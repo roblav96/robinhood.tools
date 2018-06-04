@@ -76,12 +76,12 @@ async function start() {
 
 	})
 
-	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
-	MQTTS.splice(0, Infinity, ...chunks.map((chunk, i) => new WebullMqttClient({
-		fsymbols: _.fromPairs(chunk),
-		topics: process.env.SYMBOLS,
-		verbose: true,
-	}, emitter)))
+	// let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
+	// MQTTS.splice(0, Infinity, ...chunks.map((chunk, i) => new WebullMqttClient({
+	// 	fsymbols: _.fromPairs(chunk),
+	// 	topics: process.env.SYMBOLS,
+	// 	verbose: true,
+	// }, emitter)))
 
 	clock.on('1s', ontick)
 
@@ -133,7 +133,10 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 
 function ontick(i: number) {
-	let live = i % 10 == 0
+	// console.time(`ontick`)
+	let live = i % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
+
+	console.log(`1s ->`, i)
 
 	let coms = [] as Redis.Coms
 	SYMBOLS.forEach(symbol => {
@@ -152,10 +155,11 @@ function ontick(i: number) {
 			Object.assign(WB_EMITS, { [symbol]: {} })
 		}
 
+		quotes.applylives(quote, LIVES[symbol], toquote)
+		quotes.applycalcs(quote, toquote)
+		core.object.merge(quote, toquote)
+
 		if (Object.keys(toquote).length > 0) {
-			quotes.applylives(quote, LIVES[symbol], toquote)
-			quotes.applycalcs(quote, toquote)
-			core.object.merge(quote, toquote)
 			toquote.symbol = symbol
 			socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
 			Object.assign(EMITS, { [symbol]: {} })
@@ -193,8 +197,9 @@ function ontick(i: number) {
 
 	})
 
-	redis.main.coms(coms)
+	// console.timeEnd(`ontick`)
 
+	redis.main.coms(coms)
 }
 
 

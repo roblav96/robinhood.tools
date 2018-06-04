@@ -349,8 +349,8 @@ export const json = {
 
 
 export const math = {
-	dispersed(value: number, index: number, max: number) {
-		return Math.round(Math.max(index, 0) * (value / Math.max(max, 1)))
+	dispersed(value: number, index: number, max: number, method = 'round' as keyof Math) {
+		return Math[method as any](Math.max(index, 0) * (value / Math.max(max, 1)))
 	},
 	random(min: number, max: number) {
 		return Math.floor(Math.random() * (max - min + 1)) + min
@@ -360,9 +360,7 @@ export const math = {
 
 
 export const promise = {
-	delay(ms: number) {
-		return new Promise<void>(r => _.delay(r, ms))
-	},
+	delay(ms: number) { return new Promise<void>(r => setTimeout(r, ms)) },
 }
 
 

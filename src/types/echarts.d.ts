@@ -140,7 +140,7 @@ declare module 'echarts' {
 			backgroundColor: string
 			brush: any[]
 			color: string[]
-			dataset: Partial<Dataset>
+			dataset: Partial<Dataset> | Partial<Dataset>[]
 			dataZoom: Partial<DataZoom> | Partial<DataZoom>[]
 			grid: Partial<Grid> | Partial<Grid>[]
 			hoverLayerThreshold: number
@@ -471,6 +471,7 @@ declare module 'echarts' {
 			color: string
 			emphasis: Partial<StyleOptions>
 			itemStyle: Partial<StyleOptions>
+			label: Partial<StyleOptions>
 			length2: number
 			length: number
 			lineStyle: Partial<StyleOptions>
@@ -495,63 +496,72 @@ declare module 'echarts' {
 			x: (number | string) | (number | string)[]
 			y: (number | string) | (number | string)[]
 			tooltip: (number | string) | (number | string)[]
+			seriesName: (number | string) | (number | string)[]
+			itemId: (number | string) | (number | string)[]
+			itemName: (number | string) | (number | string)[]
+			radius: (number | string) | (number | string)[]
+			angle: (number | string) | (number | string)[]
+			lng: (number | string) | (number | string)[]
+			lat: (number | string) | (number | string)[]
+			value: (number | string) | (number | string)[]
 		}
 		interface Series {
-			connectNulls: boolean
-			symbolSize: number
-			symbol: string
-			symbolRotate: number
-			symbolOffset: any[]
-			smooth: boolean
-			step: string
-			smoothMonotone: string
-			sampling: string
-			silent: boolean
-			stack: string
-			large: boolean
-			dimensions: string[] | Dimension[]
-			encode: Partial<Encode>
-			largeThreshold: number
-			progressive: number
-			progressiveThreshold: number
-			progressiveChunkMode: string
-			showAllSymbol: boolean
-			showSymbol: boolean
 			animation: boolean
-			tooltip: Partial<Tooltip>
-			data: Partial<DataPoint>[][]
-			xAxisIndex: number
-			yAxisIndex: number
-			animationType: string
 			animationDelay: number
 			animationDuration: number
 			animationEasing: string
+			animationType: string
 			animationUpdate: boolean
+			areaStyle: Partial<Style>
+			barCategoryGap: string
+			barGap: any
 			barMaxWidth: any
 			barWidth: any
-			barGap: any
-			barCategoryGap: string
-			coordinateSystem: string
-			hoverAnimation: boolean
-			areaStyle: Partial<Style>
-			lineStyle: Partial<Style>
-			clipOverflow: boolean
-			markPoint: Partial<MarkPoint>
-			markLine: Partial<MarkLine>
-			markArea: Partial<MarkArea>
-			itemStyle: Partial<Style>
-			emphasis: Partial<StyleOptions>
-			layout: string
-			legendHoverLink: boolean
-			name: string
-			uuid: string
-			type: string
-			radius: any
 			center: any[]
-			roseType: string
+			clipOverflow: boolean
+			connectNulls: boolean
+			coordinateSystem: string
+			data: Partial<DataPoint>[][]
+			datasetIndex: number
+			dimensions: string[] | Dimension[]
+			emphasis: Partial<StyleOptions>
+			encode: Partial<Encode>
+			hoverAnimation: boolean
+			id: string
+			itemStyle: Partial<Style>
 			label: Partial<Style>
 			labelLine: Partial<Style>
-			id: string
+			large: boolean
+			largeThreshold: number
+			layout: string
+			legendHoverLink: boolean
+			lineStyle: Partial<Style>
+			markArea: Partial<MarkArea>
+			markLine: Partial<MarkLine>
+			markPoint: Partial<MarkPoint>
+			name: string
+			progressive: number
+			progressiveChunkMode: string
+			progressiveThreshold: number
+			radius: any
+			roseType: string
+			sampling: string
+			showAllSymbol: boolean
+			showSymbol: boolean
+			silent: boolean
+			smooth: boolean
+			smoothMonotone: string
+			stack: string
+			step: string
+			symbol: string
+			symbolOffset: any[]
+			symbolRotate: number
+			symbolSize: number
+			tooltip: Partial<Tooltip>
+			type: string
+			uuid: string
+			xAxisIndex: number
+			yAxisIndex: number
 			z: number
 			zlevel: number
 		}

@@ -63,6 +63,13 @@ export default class extends Mixins(VMixin) {
 		return value
 	}
 
+	states = [
+		{ name: '4am to 8pm', icon: 'theme-light-dark', key: '', calc: 'startPrice', tip: 'Price at start of day (4:00am)' },
+		{ name: 'Pre Market', icon: 'weather-sunset-up', key: 'pre', calc: 'startPrice', tip: 'Price at start of day (4:00am)' },
+		{ name: 'Regular', icon: 'weather-sunny', key: 'reg', calc: 'openPrice', tip: 'Price at market open (9:30am)' },
+		{ name: 'After Hours', icon: 'weather-sunset-down', key: 'post', calc: 'closePrice', tip: 'Price at market close (4:00pm)' },
+	]
+
 }
 
 interface Schema {

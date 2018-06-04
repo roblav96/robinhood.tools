@@ -23,7 +23,7 @@
 		"rs": "npm run server:dev",
 		"server:dev": "rimraf dist && npm run k && run-p server:logs server:onchange server:watch cli:focus",
 		"server:logs": "final-pm log --follow",
-		"server:onchange": "sleep 2 && onchange 'dist/server/**/*.js' --killSignal SIGKILL --delay 300 -- npm run server:start",
+		"server:onchange": "sleep 2 && onchange 'dist/server/**/*.js' 'dist/common/**/*.js' --killSignal SIGKILL --delay 300 -- npm run server:start",
 		"server:start": "final-pm kill all && final-pm delete all && final-pm --config dist/server/final.config.js start all",
 		"rw": "tsc --project .server.tsconfig.json --watch --noEmit",
 		"server:watch": "tsc --project .server.tsconfig.json --watch",

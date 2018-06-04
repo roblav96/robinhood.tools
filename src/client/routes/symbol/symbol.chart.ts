@@ -51,13 +51,12 @@ class VSymbolEChart extends Vue {
 	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
 	onresize = _.debounce(this.resize, 300)
 	resize() {
+		let dims = this.dims()
 		// let navbar = document.getElementById('navbar')
 		// let header = document.getElementById('symbol_route').firstChild as HTMLElement
 		// let screen = utils.screen()
-		let dims = this.dims()
 		// dims.height = screen.height - navbar.offsetHeight - header.offsetHeight
 		this.echart.resize(dims)
-		console.log(`this.colors ->`, JSON.stringify(this.colors, null, 4))
 	}
 
 	syncdataset(lquotes: Quotes.Live[]) {
@@ -67,11 +66,6 @@ class VSymbolEChart extends Vue {
 		let bones = {
 			animation: false,
 			backgroundColor: 'white',
-			dataset: {
-				// dimensions: ['timestamp',''],
-				source: lquotes,
-				// source: data,
-			},
 			grid: [{
 				top: 10,
 				bottom: 125,
@@ -126,6 +120,11 @@ class VSymbolEChart extends Vue {
 				bottom: 10,
 				handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
 			}],
+			dataset: {
+				// dimensions: ['timestamp',''],
+				source: lquotes,
+				// source: data,
+			},
 			series: [{
 				name: 'OHLC',
 				type: 'candlestick',
@@ -134,20 +133,15 @@ class VSymbolEChart extends Vue {
 				large: true,
 				// largeThreshold: 100,
 				// progressive: 100,
-				dimensions: [
-					{ name: 'open' },
-					{ name: 'close' },
-					{ name: 'open' },
-					{ name: 'highest' }
-				],
-				// encode: {
-				// 	x: 'date',
-				// 	y: ['open', 'close', 'highest', 'lowest']
-				// },
+				// dimensions: ['timestamp', 'open', 'close', 'high', 'low'],
 				encode: {
-					x: 0,
-					y: [1, 4, 3, 2],
+					x: 'timestamp',
+					y: ['open', 'close', 'high', 'low']
 				},
+				// encode: {
+				// 	x: 0,
+				// 	y: [1, 4, 3, 2],
+				// },
 				itemStyle: {
 					color: this.colors.success,
 					color0: this.colors.danger,
@@ -163,8 +157,8 @@ class VSymbolEChart extends Vue {
 				// largeThreshold: 100,
 				// progressive: 100,
 				encode: {
-					x: 0,
-					y: 5,
+					x: 'timestamp',
+					y: 'size',
 				},
 				itemStyle: {
 					color: 'grey',

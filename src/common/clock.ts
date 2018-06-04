@@ -1,7 +1,7 @@
 // 
 
 import * as ci from 'correcting-interval'
-import { delay } from 'lodash'
+import { defer } from 'lodash'
 import { array, math } from './core'
 import dayjs from './dayjs'
 import Emitter from './emitter'
@@ -52,11 +52,11 @@ function tickGenesis(tick: Clock.Tick) {
 	let ims = process.env.CLIENT ? 0 : math.dispersed(ms, +process.env.INSTANCE, +process.env.SCALE)
 	let msdelay = (from + ims) - now
 	if (msdelay <= 0) msdelay = (to + ims) - now;
-	delay(startTicking, msdelay, tick, ms)
+	setTimeout(startTicking, msdelay, tick, ms)
 }
 
-delay(function clockGenesis() {
+setTimeout(function clockGenesis() {
 	clock.ticks.forEach(tickGenesis)
-}, 1000)
+}, 100 * ((+process.env.INSTANCE || 0) + 1))
 
 
