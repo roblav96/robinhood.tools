@@ -42,7 +42,7 @@ const server = turbo.createServer(polka.handler)
 const port = +process.env.PORT + +process.env.INSTANCE
 server.listen(port, process.env.HOST, function onlisten() {
 	let address = server.address()
-	console.info('api listening ->', address.port)
+	// console.info('api listening ->', address.port)
 })
 
 exithook(function onexit() {

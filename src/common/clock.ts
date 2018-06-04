@@ -1,8 +1,8 @@
 // 
 
 import * as ci from 'correcting-interval'
-import { defer } from 'lodash'
-import { array, math } from './core'
+import * as _ from './lodash'
+import * as core from './core'
 import dayjs from './dayjs'
 import Emitter from './emitter'
 
@@ -20,7 +20,7 @@ declare global { namespace Clock { type Tick = keyof typeof TICKS } }
 
 class Clock extends Emitter<Clock.Tick, number> {
 	ticks = Object.keys(TICKS).filter(isNaN as any) as Clock.Tick[]
-	tocks = array.dict(this.ticks, 0)
+	tocks = core.array.dict(this.ticks, 0)
 }
 
 const clock = new Clock()
@@ -45,18 +45,21 @@ function tickGenesis(tick: Clock.Tick) {
 	let qty = Number.parseInt(tick)
 	let unit = tick.substr(qty.toString().length)
 	let ms = unit == 'ms' ? qty : dayjs(0).add(qty, unit as any).valueOf()
-	// console.warn('tick ->', tick, '\n', 'qty ->', qty, '\n', 'unit ->', unit, '\n', 'ms ->', ms)
+	// if (process.env.PRIMARY) console.log('tick ->', tick, '\n', 'qty ->', qty, '\n', 'unit ->', unit, '\n', 'ms ->', ms)
 	let now = Date.now()
 	let from = now - (now % ms)
 	let to = from + ms
-	let ims = process.env.CLIENT ? 0 : math.dispersed(ms, +process.env.INSTANCE, +process.env.SCALE)
+	let ims = process.env.CLIENT ? 0 : core.math.dispersed(ms, +process.env.INSTANCE, +process.env.SCALE)
 	let msdelay = (from + ims) - now
 	if (msdelay <= 0) msdelay = (to + ims) - now;
 	setTimeout(startTicking, msdelay, tick, ms)
 }
 
 setTimeout(function clockGenesis() {
-	clock.ticks.forEach(tickGenesis)
-}, 100 * ((+process.env.INSTANCE || 0) + 1))
+	// clock.ticks.forEach(tickGenesis)
+	clock.ticks.forEach(function(tick, i) {
+		setTimeout(tickGenesis, i * 100, tick)
+	})
+}, 3000)
 
 

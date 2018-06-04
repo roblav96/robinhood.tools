@@ -10,6 +10,7 @@ import * as os from 'os'
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const DEVELOPMENT = process.env.NODE_ENV == 'development'
 
+const cpus = os.cpus().length
 const applications = [] as final.Application[]
 const app = {
 	'env': {
@@ -28,17 +29,19 @@ declare global { namespace NodeJS { interface ProcessEnv { HOST: any; PORT: any 
 
 if (DEVELOPMENT) app.env.DEBUGGER = true;
 
+let instances = cpus
 {
-
 	Application({ name: 'radio', run: 'services/radio.service' })
-	Application({ name: 'api', run: 'api/api', instances: 2 })
+
+	if (DEVELOPMENT) instances = 2;
+	Application({ name: 'api', run: 'api/api', instances })
 
 	Application({ name: 'symbols', run: 'services/symbols.service' })
 	Application({ name: 'search', run: 'services/search.service' })
 	Application({ name: 'hours', run: 'services/hours.service' })
 	// Application({ name: 'robinhood', run: 'services/robinhood.service' })
 
-	let instances = os.cpus().length
+	instances = cpus
 	// if (DEVELOPMENT) instances = 1;
 	Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
 	// Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
