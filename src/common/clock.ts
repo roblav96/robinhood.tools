@@ -36,8 +36,7 @@ function onTick(tick: Clock.Tick) {
 	clock.tocks[tick]++
 	clock.emit(tick, clock.tocks[tick])
 }
-
-function startTicking(tick: Clock.Tick, ms: number, timer?: NanoTimer) {
+function startTick(tick: Clock.Tick, ms: number, timer?: NanoTimer) {
 	const tock = tick
 	ci.setCorrectingInterval(function ticking() { onTick(tock) }, ms)
 	onTick(tick)
@@ -46,34 +45,28 @@ function startTicking(tick: Clock.Tick, ms: number, timer?: NanoTimer) {
 
 const geneses = clock.ticks.map(tick => {
 	let qty = Number.parseInt(tick)
-	let unit = tick.substr(Number.parseInt(tick).toString().length)
+	let unit = tick.substr(qty.toString().length)
 	let ms = unit == 'ms' ? qty : dayjs(0).add(qty, unit as any).valueOf()
 	let ims = process.env.CLIENT ? 0 : core.math.dispersed(ms, +process.env.INSTANCE, +process.env.SCALE)
-	// let div = process.env.SCALE ? 1000 / +process.env.SCALE : 1000
-	// if (LOG) console.log('div ->', div);
-	return { tick, qty, unit, ms, ims }
+	let div = process.env.SCALE ? Math.round(ms / +process.env.SCALE) : ms
+	return { tick, qty, unit, ms, ims, div }
 })
 
+let ready = 0
 schedule.scheduleJob('* * * * * *', function onjob(this: schedule.Job, date) {
-	if (Date.now() - date.valueOf() > 5) return;
+	if (Date.now() - date.valueOf() > 5 || ready++ < 3) return;
 	let second = date.getSeconds()
 	// let drifts = []
-	geneses.remove(({ ims, ms, qty, tick, unit }) => {
+	geneses.remove(({ div, ims, ms, qty, tick, unit }) => {
 		if (second % qty) return false;
-		// let now = Date.now()
-		// let from = now - (now % ms)
-		// let to = from + ms
-		// let delay = (from + ims) - now
-		// if (delay <= 0) delay = (to + ims) - now;
-		if (unit.endsWith('s')) {
-			let timer = new NanoTimer()
-			timer.setTimeout(startTicking, [tick, ms, timer], `${ims}m`)
-		} else {
-			setTimeout(startTicking, ims, tick, ms)
-		}
+		// if (unit.endsWith('s')) {
+		// 	let timer = new NanoTimer()
+		// 	timer.setTimeout(startTick, [tick, ms, timer], `${ims}m`)
+		// } else {
+		setTimeout(startTick, ims, tick, ms)
+		// }
 		// let drift = Date.now() - date.valueOf()
-		// drifts.push({ delay, ims, ms, qty, tick, unit })
-		// genesis.ims == 0 ? startTicking(genesis.tick, genesis.ms) : setTimeout(startTicking, genesis.ims, genesis.tick, genesis.ms)
+		// drifts.push({ div, drift, ims, ms, qty, tick, unit })
 		return true
 	})
 	// if (LOG) console.log(`drifts ->`, drifts);
@@ -96,7 +89,7 @@ schedule.scheduleJob('* * * * * *', function onjob(this: schedule.Job, date) {
 // 		let delay = (from + ims) - now
 // 		if (delay <= 0) delay = (to + ims) - now;
 // 		let timer = new NanoTimer()
-// 		timer.setTimeout(startTicking, [tick, ms, timer], `${delay}m`)
+// 		timer.setTimeout(startTick, [tick, ms, timer], `${delay}m`)
 // 		drift = Date.now() - date.valueOf()
 // 		drifts.push({ drift, delay, ims, ms, qty, tick, unit })
 // 	})
@@ -156,7 +149,7 @@ schedule.scheduleJob('* * * * * *', function onjob(this: schedule.Job, date) {
 // 	}
 // 	// let msdelay = (from + ims) - now
 // 	// if (msdelay <= 0) msdelay = (to + ims) - now;
-// 	setTimeout(startTicking, ims, tick, ms)
+// 	setTimeout(startTick, ims, tick, ms)
 // }
 
 // setTimeout(function clockGenesis() {

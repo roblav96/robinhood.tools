@@ -137,6 +137,7 @@ function ontick(i: number) {
 	let live = i % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
 
 	console.log(`1s ->`, i)
+	return
 	// console.log(`1s ->`, utils.cpuUsage())
 
 	let coms = [] as Redis.Coms
