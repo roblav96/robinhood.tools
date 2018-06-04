@@ -26,23 +26,29 @@
 				<div class="columns is-mobile flex-wrap desktop:flex-no-wrap mb-0">
 
 					<div class="column is-narrow">
-						<symbol-logo class="is-48x48 card is-light" :symbol="symbol"></symbol-logo>
+						<v-symbol-logo class="is-48x48 card is-light" :symbol="symbol"></v-symbol-logo>
 					</div>
 
 					<div class="column flex">
 						<div class="box is-light h-12 flex py-0 px-5">
 							<p class="self-center title mr-4 whitespace-no-wrap">{{symbol}}</p>
-							<p class="self-center is-size-6">{{breakpoints.widescreenAndUp?all.quote.name:all.quote.tinyName}}</p>
+							<p class="self-center is-size-6">
+								{{breakpoints.widescreenAndUp?all.quote.name:all.quote.tinyName}}
+							</p>
 						</div>
 					</div>
 
 					<div class="column is-narrow">
 						<div class="box is-light h-12 flex py-0 px-5 whitespace-no-wrap">
-							<number-ticker :number="all.quote.price" class="self-center title mr-4 font-mono"></number-ticker>
-							<p class="self-center is-size-6 font-medium" v-bull-bear="all.quote.change">
-								<span>{{vnumber(all.quote.change,{plusminus:true})}}</span>
+							<p class="self-center title font-mono mr-4">
+								<v-number-ticker :number="all.quote.price"></v-number-ticker>
+							</p>
+							<p class="self-center">
+								<span class="is-size-6 font-semibold" v-bull-bear="all.quote.change">
+									{{vnumber(all.quote.change,{plusminus:true})}} ({{vnumber(all.quote.percent,{plusminus:true,percent:true,precision:2})}})
+								</span>
 								<br>
-								<span>{{vnumber(all.quote.percent,{plusminus:true,percent:true,precision:2})}}</span>
+								<v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp>
 							</p>
 						</div>
 					</div>

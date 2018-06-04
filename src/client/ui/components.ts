@@ -31,7 +31,7 @@ class Timestamp extends Vue {
 		this.fromnow = utils.vfromnow(this.value, opts)
 	}
 }
-Vue.component('timestamp', Timestamp)
+Vue.component('v-timestamp', Timestamp)
 
 
 
@@ -39,7 +39,7 @@ Vue.component('timestamp', Timestamp)
 
 @Vts.Component({
 	template: `
-		<p><span v-digit="digit" v-for="(digit,i) in digits" :key="i">{{digit}}</span></p>
+		<span><span v-digit="digit" v-for="(digit,i) in digits" :key="i">{{digit}}</span></span>
 	`,
 	directives: {
 		digit: {
@@ -74,7 +74,7 @@ class NumberTicker extends Vue {
 		return Number.isFinite(this.number) ? utils.vnumber(this.number).split('') : []
 	}
 }
-Vue.component('number-ticker', NumberTicker)
+Vue.component('v-number-ticker', NumberTicker)
 
 
 
@@ -97,7 +97,7 @@ class SymbolLogo extends Vue {
 		el.src = src
 	}
 }
-Vue.component('symbol-logo', SymbolLogo)
+Vue.component('v-symbol-logo', SymbolLogo)
 
 
 

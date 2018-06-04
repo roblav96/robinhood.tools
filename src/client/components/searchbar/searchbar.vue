@@ -20,7 +20,7 @@ div.searchbar a.dropdown-item:hover .title {
 }
 
 div.searchbar div.dropdown-item:not(.is-disabled) {
-	border-bottom: 1px solid var(--grey-lightest);
+	/*border-bottom: 1px solid var(--grey-lightest);*/
 	padding: 0px 1rem;
 	padding-bottom: 0.5rem;
 }
@@ -42,7 +42,7 @@ div.searchbar div.dropdown-item:empty {
 		<template slot-scope="props">
 			<div class="columns is-mobile is-gapless">
 				<div class="column is-narrow self-center mr-4">
-					<symbol-logo class="is-32x32 shadow" :symbol="props.option.symbol"></symbol-logo>
+					<v-symbol-logo class="is-32x32 shadow" :symbol="props.option.symbol"></v-symbol-logo>
 				</div>
 				<div class="column">
 					<p class="title is-size-5 mr-1">{{props.option.symbol}}</p>

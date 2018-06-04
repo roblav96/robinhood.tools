@@ -54,7 +54,7 @@
 							<tr>
 								<td>Updated</td>
 								<td class="has-text-right font-medium">
-									<timestamp :value="all.quote[vcamel(`${state.key}Timestamp`)]"></timestamp>
+									<v-timestamp :value="all.quote[vcamel(`${state.key}Timestamp`)]"></v-timestamp>
 									<!-- {{vfromnow(all.quote[vcamel(`${state.key}Timestamp`)],{max:1})}} -->
 								</td>
 							</tr>

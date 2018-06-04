@@ -61,7 +61,7 @@ class VSymbolEChart extends Vue {
 
 	syncdataset(lquotes: Quotes.Live[]) {
 		let data = lquotes.map(v => {
-			return [v.timestamp, v.open, v.high, v.low, v.close, v.volume]
+			return [v.timestamp, v.open, v.high, v.low, v.close, v.size]
 		})
 		let bones = {
 			animation: false,
@@ -71,7 +71,7 @@ class VSymbolEChart extends Vue {
 			},
 			grid: [{
 				top: 10,
-				bottom: 120,
+				bottom: 125,
 				left: 50,
 				right: 50,
 			}, {

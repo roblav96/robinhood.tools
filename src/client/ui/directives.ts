@@ -84,7 +84,7 @@ Vue.directive('bg-bull-bear', function(el, { value, oldValue, arg }) {
 
 
 
-// Vue.directive('number-ticker', function(el, { oldValue, value }: { oldValue: number, value: number }) {
+// Vue.directive('v-number-ticker', function(el, { oldValue, value }: { oldValue: number, value: number }) {
 // 	if (value == oldValue) return;
 // 	if (!Number.isFinite(value)) return;
 // 	let direction = value > oldValue ? 'up' : 'down' as 'up' | 'down'

@@ -16,7 +16,7 @@
 				    detailed detail-key="symbol">
 					<template slot-scope="props">
 						<b-table-column label="" width="1">
-							<symbol-logo class="shadow is-32x32" :symbol="props.row.symbol"></symbol-logo>
+							<v-symbol-logo class="shadow is-32x32" :symbol="props.row.symbol"></v-symbol-logo>
 						</b-table-column>
 						<b-table-column label="Symbol" width="1">
 							<button class="button is-size-5 font-semibold leading-none w-full h-initial" v-on:click="gotosymbol(props.row.symbol)">
@@ -28,7 +28,7 @@
 						</b-table-column>
 						<b-table-column label="Price" class="text-lg font-semibold font-mono" numeric>
 							<!-- {{vnumber(props.row.price,{precision:2})}} -->
-							<number-ticker :number="props.row.price"></number-ticker>
+							<v-number-ticker :number="props.row.price"></v-number-ticker>
 						</b-table-column>
 						<b-table-column label="Change" class="font-mono" numeric v-bull-bear="props.row.change">
 							{{vnumber(props.row.change,{plusminus:true})}} ({{vnumber(props.row.percent,{plusminus:true,percent:true,precision:2})}})
