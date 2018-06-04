@@ -136,7 +136,7 @@ function ontick(i: number) {
 	// console.time(`ontick`)
 	let live = i % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
 
-	console.log(`1s ->`, i)
+	// console.log(`1s ->`, i)
 
 	let coms = [] as Redis.Coms
 	SYMBOLS.forEach(symbol => {
