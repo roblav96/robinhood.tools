@@ -11,20 +11,20 @@ import polka from './polka'
 
 
 const PORTS = [] as number[]
-radio.on('set.socket.listening', function onlistening(event) {
+radio.on('socket.listening', function onlistening(event) {
 	let port = event.data as number
 	if (Number.isFinite(port) && !PORTS.includes(port)) {
 		PORTS.push(port)
 	}
 })
+radio.emit('sockets.listening')
 
 polka.route({
 	method: 'GET',
 	url: '/api/websocket/discover',
 	async handler(req, res) {
-		radio.emit('get.socket.listening')
+		radio.emit('sockets.listening')
 		await new Promise(r => _.delay(r, 100))
-		// if (PORTS.length == 0) throw boom.badGateway('socket.listening');
 		let protocol = process.env.DEVELOPMENT ? 'ws' : 'wss'
 		return PORTS.map(port => `${protocol}://${process.env.DOMAIN}/websocket/${port}`)
 	}

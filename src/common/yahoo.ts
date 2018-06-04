@@ -4,6 +4,7 @@ import * as qs from 'querystring'
 import * as boom from 'boom'
 import * as _ from './lodash'
 import * as hours from './hours'
+import * as http from './http'
 import dayjs from './dayjs'
 
 
@@ -26,11 +27,10 @@ export const SUMMARY_MODULES = [
 	'fundProfile', 'topHoldings', 'fundPerformance',
 ]
 
-// export const RANGES = ['1d', '5d', '1mo', '3mo', '6mo', 'ytd', '1y', '2y', '5y', '10y', 'max']
-export const RANGES = ['1d', '5d', '1mo', '3mo', '1y', '5y', 'max']
-// export const INTERVALS = ['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo']
-export const INTERVALS = ['1m', '2m', '5m', '15m', '30m', '1h', '1d']
 
+
+export const RANGES = ['1d', '5d', '1mo', '3mo', '6mo', 'ytd', '1y', '5y', '10y', 'max']
+export const INTERVALS = ['1m', '2m', '5m', '15m', '30m', '1h', '1d', '1wk', '1mo']
 export const FRAMES = {
 	'1d': '1m',
 	'5d': '15m',
@@ -45,12 +45,10 @@ export const FRAMES = {
 	'max': '1mo',
 }
 
-
-
-export function chartRequest(
+export function getChart(
 	symbol: string,
 	params: Partial<{ range: string, interval: string, includePrePost: boolean, period1: number, period2: number }>,
-	hhours: Hours
+	hhours: Hours,
 ) {
 	let state = hours.getState(hhours)
 	if (params.range == '1d' && state.indexOf('PRE') == 0) {
@@ -60,32 +58,34 @@ export function chartRequest(
 		} else params.period1 = dayjs(hhours.prepre).subtract(1, 'day').unix();
 		params.period2 = dayjs(hhours.postpost).unix()
 	}
-	return `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?${qs.stringify(params)}`
-}
-
-export function chartResponse(response: Yahoo.ApiChart) {
-	let error = _.get(response, 'chart.error') as Yahoo.ApiError
-	if (error) throw boom.badRequest(JSON.stringify(response.chart.error));
-	let lquotes = [] as Quotes.Live[]
-	let result = response.chart.result[0]
-	let stamps = result.timestamp
-	if (!stamps) return lquotes;
-	let hquotes = result.indicators.quote[0]
-	lquotes = stamps.filter((v, i) => {
-		return Number.isFinite(hquotes.close[i])
-	}).map((stamp, i) => ({
-		open: hquotes.open[i], close: hquotes.close[i],
-		high: hquotes.high[i], low: hquotes.low[i],
-		volume: hquotes.volume[i], timestamp: stamp * 1000,
-	} as Quotes.Live))
-	lquotes.sort((a, b) => a.timestamp - b.timestamp)
-	lquotes.forEach(function(lquote, i) {
-		lquote.size = lquote.volume
-		let prev = lquotes[i - 1] ? lquotes[i - 1].volume : 0
-		lquote.volume = prev + lquote.size
-		lquote.price = lquote.close
+	let url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + symbol
+	return http.get(url, {
+		query: params, proxify: !!process.env.CLIENT,
+	}).then(function(response: Yahoo.ApiChart) {
+		let error = _.get(response, 'chart.error') as Yahoo.ApiError
+		if (error) throw boom.badRequest(JSON.stringify(response.chart.error));
+		let lquotes = [] as Quotes.Live[]
+		let result = response.chart.result[0]
+		let stamps = result.timestamp
+		if (!stamps) return lquotes;
+		let hquotes = result.indicators.quote[0]
+		stamps.forEach((stamp, i) => {
+			if (!Number.isFinite(hquotes.close[i])) return;
+			let prev = lquotes[i - 1] ? lquotes[i - 1].volume : 0
+			lquotes.push({
+				open: hquotes.open[i], close: hquotes.close[i],
+				high: hquotes.high[i], low: hquotes.low[i],
+				size: hquotes.volume[i], timestamp: stamp * 1000,
+			} as Quotes.Live)
+		})
+		lquotes.sort((a, b) => a.timestamp - b.timestamp)
+		lquotes.forEach((lquote, i) => {
+			lquote.price = lquote.close
+			let prev = lquotes[i - 1] ? lquotes[i - 1].volume : lquote.size
+			lquote.volume = prev + lquote.size
+		})
+		return lquotes
 	})
-	return lquotes
 }
 
 

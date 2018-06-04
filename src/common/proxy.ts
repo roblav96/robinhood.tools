@@ -1,11 +1,11 @@
 // 
 
-
+import * as _ from './lodash'
 
 export function observe<T>(target: T, handler: (key: keyof T) => void): T {
 	return new Proxy(target as any, {
 		get(target, property, receiver) {
-			setTimeout(handler, 0, property)
+			_.defer(handler, property)
 			return Reflect.get(target, property, receiver)
 		},
 	})

@@ -20,8 +20,8 @@ import radio from './radio'
 
 
 const port = +process.env.PORT + +process.env.OFFSET + +process.env.INSTANCE
-radio.on('get.socket.listening', function(event) {
-	radio.emit('set.socket.listening', port)
+radio.on('sockets.listening', function(event) {
+	radio.emit('socket.listening', port)
 })
 
 export const wss = new uws.Server({
@@ -67,9 +67,8 @@ wss.on('error', function onerror(error) {
 })
 
 wss.on('listening', function onlistening() {
-	let address = wss.httpServer.address() as AddressInfo
-	console.info('socket listening ->', address.port)
-	radio.emit('set.socket.listening', address.port)
+	console.info('socket listening ->', port)
+	radio.emit('socket.listening', port)
 })
 
 wss.on('connection', onconnection)

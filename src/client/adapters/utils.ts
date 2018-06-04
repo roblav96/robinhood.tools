@@ -39,7 +39,6 @@ export const wemitter = new class WEmitter extends Emitter<keyof WindowEventMap,
 			})
 			_.difference(this.subs, subs).forEach(name => window.removeEventListener(name, this, false))
 			this.subs = subs
-			// console.log(`Object.keys(this._events) ->`, JSON.parse(JSON.stringify(Object.keys(this._events))))
 		})
 	}
 	handleEvent(event: Event) { this.emit(event.type as any, event) }

@@ -7,7 +7,6 @@ import * as security from '../adapters/security'
 import * as http from '../../common/http'
 import * as qs from 'querystring'
 import Sockette from 'sockette'
-import WebSocketClient from '../../common/websocket.client'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
 

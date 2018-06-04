@@ -147,13 +147,14 @@ declare module 'echarts' {
 			markPoint: Partial<MarkPoint>[]
 			progressive: number
 			progressiveThreshold: number
+			progressiveChunkMode: string
 			series: Partial<Series>[]
 			textStyle: Partial<TextStyle>
 			title: any
 			toolbox: any
 			tooltip: Partial<Tooltip>
 			useUTC: boolean
-			visualMap: any[]
+			visualMap: any | any[]
 			xAxis: Partial<Axis> | Partial<Axis>[]
 			yAxis: Partial<Axis> | Partial<Axis>[]
 		}
@@ -163,13 +164,13 @@ declare module 'echarts' {
 			borderColor: string
 			borderWidth: number
 			containLabel: boolean
-			height: any
-			top: any
-			bottom: any
-			left: any
-			right: any
+			height: number | string
+			top: number | string
+			bottom: number | string
+			left: number | string
+			right: number | string
 			show: boolean
-			width: any
+			width: number | string
 			z: number
 			zlevel: number
 			tooltip: Tooltip
@@ -479,7 +480,7 @@ declare module 'echarts' {
 			textStyle: Partial<StyleOptions>
 			lineStyle: Partial<StyleOptions>
 		}
-		interface Style {
+		interface Style extends Partial<StyleOptions> {
 			normal: Partial<StyleOptions>
 			emphasis: Partial<StyleOptions>
 		}
@@ -499,6 +500,9 @@ declare module 'echarts' {
 			large: boolean
 			encode: any
 			largeThreshold: number
+			progressive: number
+			progressiveThreshold: number
+			progressiveChunkMode: string
 			showAllSymbol: boolean
 			showSymbol: boolean
 			animation: boolean
