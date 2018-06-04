@@ -4,7 +4,6 @@ declare module 'echarts' {
 	namespace ECharts {
 
 		type EventNames = 'click' | 'dblclick' | 'mouseover' | 'mouseout' | 'mousemove' | 'mousedown' | 'mouseup' | 'globalout' | 'contextmenu'
-
 		interface EventParam {
 			$vars: string[]
 			axisDim: string
@@ -118,10 +117,15 @@ declare module 'echarts' {
 			areaStyle: Partial<Style>
 		}
 
+		interface Dimension {
+			name: string
+			type: string
+			displayName: string
+		}
 		interface Dataset {
 			id: string
-			source: any[][]
-			dimensions: string[]
+			source: any[] | any[][] | { [key: string]: any[] }
+			dimensions: string[] | Dimension[]
 			sourceHeader: boolean
 		}
 
@@ -460,31 +464,38 @@ declare module 'echarts' {
 		}
 
 		interface StyleOptions {
-			borderColor: string
 			borderColor0: string
+			borderColor: string
 			borderWidth: number
-			shadowColor: string
+			color0: string
+			color: string
+			emphasis: Partial<StyleOptions>
+			itemStyle: Partial<StyleOptions>
+			length2: number
+			length: number
+			lineStyle: Partial<StyleOptions>
+			opacity: number
+			position: string
 			shadowBlur: number
+			shadowColor: string
 			shadowOffsetX: number
 			shadowOffsetY: number
-			color: string
-			color0: string
-			position: string
-			type: string
-			width: number
-			opacity: number
 			show: boolean
 			smooth: number
-			length: number
-			length2: number
 			textStyle: Partial<StyleOptions>
-			lineStyle: Partial<StyleOptions>
+			type: string
+			width: number
 		}
 		interface Style extends Partial<StyleOptions> {
 			normal: Partial<StyleOptions>
 			emphasis: Partial<StyleOptions>
 		}
 
+		interface Encode {
+			x: (number | string) | (number | string)[]
+			y: (number | string) | (number | string)[]
+			tooltip: (number | string) | (number | string)[]
+		}
 		interface Series {
 			connectNulls: boolean
 			symbolSize: number
@@ -498,7 +509,8 @@ declare module 'echarts' {
 			silent: boolean
 			stack: string
 			large: boolean
-			encode: any
+			dimensions: string[] | Dimension[]
+			encode: Partial<Encode>
 			largeThreshold: number
 			progressive: number
 			progressiveThreshold: number
@@ -528,6 +540,7 @@ declare module 'echarts' {
 			markLine: Partial<MarkLine>
 			markArea: Partial<MarkArea>
 			itemStyle: Partial<Style>
+			emphasis: Partial<StyleOptions>
 			layout: string
 			legendHoverLink: boolean
 			name: string
