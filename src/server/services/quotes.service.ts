@@ -132,12 +132,14 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 
 
-function ontick(i: number) {
-	console.time(`ontick`)
-	let live = i % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
+const avgs = {
+	emits: 0,
+	lives: 0,
+}
 
-	// console.log(`1s ->`, i)
-	// console.log(`1s ->`, utils.cpuUsage())
+function ontick(i: number) {
+	let t = Date.now()
+	let live = new Date().getSeconds() % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
 
 	let coms = [] as Redis.Coms
 	SYMBOLS.forEach(symbol => {
@@ -149,8 +151,6 @@ function ontick(i: number) {
 		if (Object.keys(towbquote).length > 0) {
 			core.object.merge(WB_SAVES[symbol], towbquote)
 			quotes.applywbquote(quote, towbquote, toquote)
-			quotes.applylives(quote, LIVES[symbol], toquote)
-			core.object.merge(quote, toquote)
 			towbquote.symbol = symbol
 			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, towbquote)
 			Object.assign(WB_EMITS, { [symbol]: {} })
@@ -173,11 +173,11 @@ function ontick(i: number) {
 				Object.assign(WB_SAVES, { [symbol]: {} })
 			}
 
-			let fquote = LIVES[symbol]
-			let diff = core.object.difference(fquote, quote)
+			let flquote = LIVES[symbol]
+			let diff = core.object.difference(flquote, quote)
 			if (Object.keys(diff).length > 0) {
 				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diff as any])
-				if (diff.timestamp && quote.timestamp > fquote.timestamp) {
+				if (diff.timestamp && quote.timestamp > flquote.timestamp) {
 
 					quote.liveCount++
 					quote.liveStamp = Date.now()
@@ -190,7 +190,7 @@ function ontick(i: number) {
 					socket.emit(`${rkeys.LIVES}:${symbol}`, lquote)
 
 					core.object.merge(quote, quotes.resetlive(quote))
-					core.object.merge(fquote, quote)
+					core.object.merge(flquote, quote)
 
 				}
 			}
@@ -198,9 +198,13 @@ function ontick(i: number) {
 
 	})
 
-	console.timeEnd(`ontick`)
+	let tdiff = Date.now() - t
+	let key = live ? 'lives' : 'emits'
+	avgs[key] = avgs[key] ? _.round(_.mean([avgs[key], tdiff]), 2) : tdiff
+	console.log(`avgs ->`, avgs)
 
 	redis.main.coms(coms)
+
 }
 
 
