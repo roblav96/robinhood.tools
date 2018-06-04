@@ -118,8 +118,8 @@ export function resetlive(quote: Quotes.Calc) {
 		dealSize: 0, dealFlowSize: 0,
 		buySize: 0, sellSize: 0,
 		bidSize: 0, askSize: 0,
-		open: quote.price, high: quote.price, low: quote.price, close: quote.price,
 		bidSpread: quote.bid, askSpread: quote.ask,
+		open: quote.price, high: quote.price, low: quote.price, close: quote.price,
 	} as Quotes.Calc
 }
 

@@ -80,7 +80,7 @@
 									<tr>
 										<td class="has-text-success has-text-right">
 											<b-tooltip label="Bid Size" position="is-bottom">
-												<p>{{vnumber(all.quote.bids,{precision:0})}}</p>
+												<p>{{vnumber(all.quote.bids,{precision:1,compact:true})}}</p>
 											</b-tooltip>
 										</td>
 										<td>
@@ -93,7 +93,7 @@
 										</td>
 										<td class="has-text-danger has-text-left">
 											<b-tooltip label="Ask Size" position="is-bottom">
-												<p>{{vnumber(all.quote.asks,{precision:0})}}</p>
+												<p>{{vnumber(all.quote.asks,{precision:1,compact:true})}}</p>
 											</b-tooltip>
 										</td>
 									</tr>
