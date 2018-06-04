@@ -5,6 +5,9 @@ require('../common/polyfills')
 global.Promise = require('zousan')
 global.Zousan.suppressUncaughtRejectionError = true
 
+process.version = 'v9.11.1'
+process.hrtime = require('browser-process-hrtime')
+
 Object.assign(console, { dtsgen: function() { } })
 if (process.env.DEVELOPMENT) {
 	// console.dtsgen = require('../common/dtsgen').default

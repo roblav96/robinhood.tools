@@ -14,9 +14,9 @@ const LOG = process.env.NAME == 'stocks'
 
 enum TICKS {
 	// '100ms', '250ms', '500ms',
-	'1s', '2s', '3s', '5s', '10s', '15s', '30s', '60s',
-	// '1m', '5m', '10m', '15m', '30m',
-	// '1h', '2h', '3h', '6h', '12h',
+	'1s', '2s', '3s', '5s', '10s', '15s', '30s',
+	'1m', '5m', '10m', '15m', '30m',
+	'1h', '2h', '3h', '6h', '12h',
 }
 declare global { namespace Clock { type Tick = keyof typeof TICKS } }
 
@@ -38,10 +38,8 @@ function onTick(tick: Clock.Tick) {
 }
 
 function startTicking(tick: Clock.Tick, ms: number, timer?: NanoTimer) {
-	ci.setCorrectingInterval(function tickingInterval() {
-		onTick(tock)
-	}, ms)
 	const tock = tick
+	ci.setCorrectingInterval(function ticking() { onTick(tock) }, ms)
 	onTick(tick)
 	if (timer) timer.clearTimeout();
 }
@@ -51,23 +49,30 @@ const geneses = clock.ticks.map(tick => {
 	let unit = tick.substr(Number.parseInt(tick).toString().length)
 	let ms = unit == 'ms' ? qty : dayjs(0).add(qty, unit as any).valueOf()
 	let ims = process.env.CLIENT ? 0 : core.math.dispersed(ms, +process.env.INSTANCE, +process.env.SCALE)
+	// let div = process.env.SCALE ? 1000 / +process.env.SCALE : 1000
+	// if (LOG) console.log('div ->', div);
 	return { tick, qty, unit, ms, ims }
 })
 
 schedule.scheduleJob('* * * * * *', function onjob(this: schedule.Job, date) {
-	let drift = Date.now() - date.valueOf()
-	if (drift > 5) return;
+	if (Date.now() - date.valueOf() > 5) return;
 	let second = date.getSeconds()
-	geneses.remove(genesis => {
-		if (second % genesis.qty) return false;
-		let drift = Date.now() - date.valueOf()
-		if (drift > (5 * genesis.qty)) return false;
-		if (genesis.ims == 0) {
-			startTicking(genesis.tick, genesis.ms)
-		} else {
+	// let drifts = []
+	geneses.remove(({ ims, ms, qty, tick, unit }) => {
+		if (second % qty) return false;
+		// let now = Date.now()
+		// let from = now - (now % ms)
+		// let to = from + ms
+		// let delay = (from + ims) - now
+		// if (delay <= 0) delay = (to + ims) - now;
+		if (unit.endsWith('s')) {
 			let timer = new NanoTimer()
-			timer.setTimeout(startTicking, [genesis.tick, genesis.ms, timer], `${genesis.ims}m`)
+			timer.setTimeout(startTicking, [tick, ms, timer], `${ims}m`)
+		} else {
+			setTimeout(startTicking, ims, tick, ms)
 		}
+		// let drift = Date.now() - date.valueOf()
+		// drifts.push({ delay, ims, ms, qty, tick, unit })
 		// genesis.ims == 0 ? startTicking(genesis.tick, genesis.ms) : setTimeout(startTicking, genesis.ims, genesis.tick, genesis.ms)
 		return true
 	})
@@ -77,13 +82,55 @@ schedule.scheduleJob('* * * * * *', function onjob(this: schedule.Job, date) {
 
 
 
+
+
+// schedule.scheduleJob('* * * * * *', function onjob(this: schedule.Job, date) {
+// 	let drift = Date.now() - date.valueOf()
+// 	if (drift > 5) return;
+// 	let second = date.getSeconds()
+// 	let now = date.valueOf()
+// 	let drifts = []
+// 	geneses.forEach(({ ims, ms, qty, tick, unit }) => {
+// 		let from = now - (now % ms)
+// 		let to = from + ms
+// 		let delay = (from + ims) - now
+// 		if (delay <= 0) delay = (to + ims) - now;
+// 		let timer = new NanoTimer()
+// 		timer.setTimeout(startTicking, [tick, ms, timer], `${delay}m`)
+// 		drift = Date.now() - date.valueOf()
+// 		drifts.push({ drift, delay, ims, ms, qty, tick, unit })
+// 	})
+// 	if (LOG) {
+// 		console.log(`drifts ->`, drifts)
+// 	}
+// 	this.cancel()
+// })
+
+// if (LOG && process.env.PRIMARY) {
+// 	let then = new Date()
+// 	console.log('then ->', then)
+// 	let date = dayjs(then).add(3, 'second').toDate()
+// 	schedule.scheduleJob(date, function onjob(this: schedule.Job, date) {
+// 		let drift = Date.now() - date.valueOf()
+// 		console.log(`drift ->`, drift)
+// 	})
+// }
+
+
+
+
+
+// clock.on('1s', function (i) {
+// 	console.log(`1s ->`, i)
+// })
+
+
+
 // if (LOG) {
 // 	clock.on('60s', function(i) {
 // 		console.log(`60s ->`, i)
 // 	})
 // }
-
-
 
 
 

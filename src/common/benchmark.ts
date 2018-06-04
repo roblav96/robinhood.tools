@@ -1,7 +1,6 @@
 // 
 
 import { isBrowser, isNodeJS } from './core'
-if (isBrowser) process.hrtime = require('browser-process-hrtime');
 import * as Benchmarkify from 'benchmarkify'
 
 
