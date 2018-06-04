@@ -24,25 +24,28 @@ export function screen() {
 
 
 // let wevents = ['blur', 'click', 'dblclick', 'ended', 'error', 'focus', 'keydown', 'keypress', 'keyup', 'load', 'readystatechange', 'resize', 'scroll', 'suspend', 'unload', 'wheel'] as (keyof WindowEventMap)[]
-export const wemitter = new class WEmitter extends Emitter<keyof WindowEventMap, Event> {
+class UEmitter extends Emitter<keyof WindowEventMap, Event> {
 	private static PASSIVES = ['mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'mousewheel', 'resize', 'scroll', 'touchend', 'touchenter', 'touchleave', 'touchmove', 'touchstart', 'wheel'] as (keyof WindowEventMap)[]
 	private subs = [] as string[]
-	constructor() {
+	get emitter() { return global[this.ctor] as WindowEventHandlers }
+	constructor(private ctor: string) {
 		super()
 		return proxy.observe(this, key => {
 			let subs = Object.keys(this._events)
 			if (JSON.stringify(this.subs) === JSON.stringify(subs)) return;
 			_.difference(subs, this.subs).forEach(name => {
-				if (WEmitter.PASSIVES.includes(name as any)) {
-					window.addEventListener(name, this, { passive: true, capture: false })
-				} else window.addEventListener(name, this, false)
+				if (UEmitter.PASSIVES.includes(name as any)) {
+					this.emitter.addEventListener(name, this, { passive: true, capture: false })
+				} else this.emitter.addEventListener(name, this, false)
 			})
-			_.difference(this.subs, subs).forEach(name => window.removeEventListener(name, this, false))
+			_.difference(this.subs, subs).forEach(name => this.emitter.removeEventListener(name, this, false))
 			this.subs = subs
 		})
 	}
 	handleEvent(event: Event) { this.emit(event.type as any, event) }
 }
+export const wemitter = new UEmitter('window')
+// export const docemitter = new UEmitter('document')
 
 
 

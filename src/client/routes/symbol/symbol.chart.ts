@@ -57,6 +57,7 @@ class VSymbolEChart extends Vue {
 		let dims = this.dims()
 		// dims.height = screen.height - navbar.offsetHeight - header.offsetHeight
 		this.echart.resize(dims)
+		console.log(`this.colors ->`, JSON.stringify(this.colors, null, 4))
 	}
 
 	syncdataset(lquotes: Quotes.Live[]) {

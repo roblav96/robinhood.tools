@@ -7,8 +7,6 @@
 		$name: nth($color, 1);
 		$hex: nth($color, 2);
 		--#{$name}: #{nth($hex, 1)};
-		--#{$name}-inverse: #{nth($hex, 2)};
-		--js-#{$i}: #{$name};
 	}
 	@each $name,
 	$shade in $shades {
