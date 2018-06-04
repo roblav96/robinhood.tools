@@ -59,7 +59,6 @@
 		"modern-normalize": "latest",
 		"mqtt": "latest",
 		"mqtt-connection": "latest",
-		"nanotimer": "latest",
 		"node-forge": "latest",
 		"node-schedule": "latest",
 		"p-all": "latest",

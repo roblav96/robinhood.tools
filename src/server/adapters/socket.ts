@@ -67,7 +67,7 @@ wss.on('error', function onerror(error) {
 })
 
 wss.on('listening', function onlistening() {
-	// console.info('socket listening ->', port)
+	console.info('socket listening ->', port)
 	radio.emit('socket.listening', port)
 })
 
