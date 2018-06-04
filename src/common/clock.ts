@@ -57,7 +57,7 @@ schedule.scheduleJob('* * * * * *', function onjob(this: schedule.Job, date) {
 	waiting.remove(wait => {
 		if (second % wait.qty) return false;
 		let drift = Date.now() - date.valueOf()
-		if (drift > 10) return false;
+		if (drift > 5) return false;
 		wait.ims == 0 ? startTicking(wait.tick, wait.ms) : setTimeout(startTicking, wait.ims, wait.tick, wait.ms)
 		return true
 	})
