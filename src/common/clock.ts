@@ -1,6 +1,7 @@
 // 
 
 import * as schedule from 'node-schedule'
+import * as NanoTimer from 'nanotimer'
 import * as ci from 'correcting-interval'
 import * as _ from './lodash'
 import * as core from './core'
@@ -8,6 +9,8 @@ import dayjs from './dayjs'
 import Emitter from './emitter'
 
 
+
+const LOG = process.env.NAME == 'stocks'
 
 enum TICKS {
 	// '100ms', '250ms', '500ms',
@@ -34,15 +37,16 @@ function onTick(tick: Clock.Tick) {
 	clock.emit(tick, clock.tocks[tick])
 }
 
-function startTicking(tick: Clock.Tick, ms: number) {
-	onTick(tick)
-	const tock = tick
+function startTicking(tick: Clock.Tick, ms: number, timer?: NanoTimer) {
 	ci.setCorrectingInterval(function tickingInterval() {
 		onTick(tock)
 	}, ms)
+	const tock = tick
+	onTick(tick)
+	if (timer) timer.clearTimeout();
 }
 
-const waiting = clock.ticks.map(tick => {
+const geneses = clock.ticks.map(tick => {
 	let qty = Number.parseInt(tick)
 	let unit = tick.substr(Number.parseInt(tick).toString().length)
 	let ms = unit == 'ms' ? qty : dayjs(0).add(qty, unit as any).valueOf()
@@ -54,14 +58,21 @@ schedule.scheduleJob('* * * * * *', function onjob(this: schedule.Job, date) {
 	let drift = Date.now() - date.valueOf()
 	if (drift > 5) return;
 	let second = date.getSeconds()
-	waiting.remove(wait => {
-		if (second % wait.qty) return false;
+	geneses.remove(genesis => {
+		if (second % genesis.qty) return false;
 		let drift = Date.now() - date.valueOf()
-		if (drift > 5) return false;
-		wait.ims == 0 ? startTicking(wait.tick, wait.ms) : setTimeout(startTicking, wait.ims, wait.tick, wait.ms)
+		if (drift > (5 * genesis.qty)) return false;
+		if (genesis.ims == 0) {
+			startTicking(genesis.tick, genesis.ms)
+		} else {
+			let timer = new NanoTimer()
+			timer.setTimeout(startTicking, [genesis.tick, genesis.ms, timer], `${genesis.ims}m`)
+		}
+		// genesis.ims == 0 ? startTicking(genesis.tick, genesis.ms) : setTimeout(startTicking, genesis.ims, genesis.tick, genesis.ms)
 		return true
 	})
-	if (waiting.length == 0) this.cancel();
+	// if (LOG) console.log(`drifts ->`, drifts);
+	if (geneses.length == 0) this.cancel();
 })
 
 

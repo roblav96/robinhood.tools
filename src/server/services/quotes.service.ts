@@ -76,12 +76,12 @@ async function start() {
 
 	})
 
-	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
-	MQTTS.splice(0, Infinity, ...chunks.map((chunk, i) => new WebullMqttClient({
-		fsymbols: _.fromPairs(chunk),
-		topics: process.env.SYMBOLS,
-		verbose: true,
-	}, emitter)))
+	// let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
+	// MQTTS.splice(0, Infinity, ...chunks.map((chunk, i) => new WebullMqttClient({
+	// 	fsymbols: _.fromPairs(chunk),
+	// 	topics: process.env.SYMBOLS,
+	// 	verbose: true,
+	// }, emitter)))
 
 	clock.on('1s', ontick)
 
@@ -137,6 +137,7 @@ function ontick(i: number) {
 	let live = i % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
 
 	console.log(`1s ->`, i)
+	// console.log(`1s ->`, utils.cpuUsage())
 
 	let coms = [] as Redis.Coms
 	SYMBOLS.forEach(symbol => {
