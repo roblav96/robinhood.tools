@@ -9,8 +9,6 @@ import Emitter from './emitter'
 
 
 
-const LOG = process.env.NAME == 'stocks'
-
 enum TICKS {
 	// '100ms', '250ms', '500ms',
 	'1s', '2s', '3s', '5s', '10s', '15s', '30s', '60s',
@@ -55,34 +53,12 @@ const waiting = clock.ticks.map(tick => {
 schedule.scheduleJob('* * * * * *', function onjob(this: schedule.Job, date) {
 	let drift = Date.now() - date.valueOf()
 	if (drift > 5) return;
-
 	let second = date.getSeconds()
 	waiting.remove(wait => {
 		if (second % wait.qty) return false;
 		let drift = Date.now() - date.valueOf()
 		if (drift > 10) return false;
 		wait.ims == 0 ? startTicking(wait.tick, wait.ms) : setTimeout(startTicking, wait.ims, wait.tick, wait.ms)
-		if (LOG) {
-			console.log(`wait ->`, wait, `drift ->`, drift)
-		}
-
-		// let unit = tick.substr(qty.toString().length)
-		// let ms = unit == 'ms' ? qty : dayjs(0).add(qty, unit as any).valueOf()
-		// let ims = process.env.CLIENT ? 0 : core.math.dispersed(ms, +process.env.INSTANCE, +process.env.SCALE)
-		// let drift = Date.now() - date.valueOf()
-		// if (drift > (qty * 10)) return false;
-		// // ims = Math.max(ims - drift, 0)
-		// ims == 0 ? startTicking(tick, ms) : setTimeout(startTicking, ims, tick, ms)
-		// if (LOG) {
-		// 	console.log('tick ->', tick,
-		// 		'\nqty ->', qty,
-		// 		'\nunit ->', unit,
-		// 		'\nms ->', ms,
-		// 		'\nims ->', ims,
-		// 		'\ndrift ->', drift,
-		// 	)
-		// }
-
 		return true
 	})
 	if (waiting.length == 0) this.cancel();
