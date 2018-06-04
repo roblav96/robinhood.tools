@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"domain": "robinhood.tools",
 	"scripts": {
-		"postinstall": "run-p patch:* client:tailwind --silent",
+		"postinstall": "run-p patch:* client:vendors client:tailwind --silent",
 		"patch:tsc": "tsc-wtf",
 		"patch:vuex": "rimraf node_modules/vuex/types/vue.d.ts",
 		"patch:echarts-stat": "rimraf node_modules/echarts-stat/src/ecStat.d.ts",

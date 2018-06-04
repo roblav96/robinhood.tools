@@ -30,8 +30,8 @@ module.exports = {
 	configureWebpack: function(config) {
 		if (DEBUG) console.log('configure config ->', config);
 
-		// config.output.filename = '[name].bundle.js'
-		// config.output.chunkFilename = '[name].chunk.js'
+		config.output.filename = '[name].bundle.js'
+		config.output.chunkFilename = '[name].chunk.js'
 
 		if (DEVELOPMENT) {
 			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /env/]))
