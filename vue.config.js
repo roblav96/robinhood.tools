@@ -4,7 +4,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const DEVELOPMENT = process.env.NODE_ENV == 'development'
 const PRODUCTION = process.env.NODE_ENV == 'production'
 
-const DEBUG = true
+const DEBUG = false
 if (DEBUG) {
 	const inspector = require('inspector')
 	inspector.open(+process.debugPort - 1)
@@ -22,73 +22,6 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 
 
-if (process.env.DLL) {
-	module.exports = {
-		outputDir: 'dist/client',
-		runtimeCompiler: true,
-		configureWebpack: function(config) {
-			if (DEBUG) console.log('configure config ->', config);
-			config.entry = {
-				vendors: [
-					path.resolve(__dirname, 'src/client/styles/tailwind.css'),
-					path.resolve(__dirname, 'src/client/styles/vendors.scss'),
-					'animate.css',
-					'asn1.js',
-					'bn.js',
-					'buefy',
-					'core-js',
-					'echarts',
-					'echarts-stat',
-					'elliptic',
-					'fingerprintjs2',
-					'hash.js',
-					'html-entities',
-					'lodash',
-					'modern-normalize',
-					'node-forge',
-					'simple-get',
-					'sockjs-client',
-					'vue',
-					'vue-class-component',
-					'vue-property-decorator',
-					'vue-router',
-					'vuex',
-					'zousan',
-					'zrender',
-					// '____',
-					// '____',
-					// '____',
-					// '____',
-				],
-			}
-			config.output = {
-				filename: '[name].dll.js',
-				path: path.resolve(__dirname, 'dist/client'),
-				library: '[name]',
-			}
-			config.plugins.push(new webpack.DllPlugin({
-				name: '[name]',
-				path: path.resolve(__dirname, 'dist/client/[name].json'),
-			}))
-			config.plugins.push(new BundleAnalyzerPlugin())
-		},
-		chainWebpack: function(config) {
-			if (DEBUG) console.log('chain config ->', config);
-			config.entry('app').clear()
-			config.resolve.alias.store.delete('@')
-			config.plugins.delete('fork-ts-checker')
-			config.plugins.delete('no-emit-on-errors')
-			config.plugin('friendly-errors').tap(function(args) {
-				args[0].clearConsole = false
-				return args
-			})
-		},
-	}
-	return
-}
-
-
-
 module.exports = {
 
 	outputDir: 'dist/client',
@@ -101,7 +34,7 @@ module.exports = {
 		// config.output.chunkFilename = '[name].chunk.js'
 
 		if (DEVELOPMENT) {
-			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /config/, /env/]))
+			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /env/]))
 			config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
 				rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
 					use.loader = 'file-loader'
@@ -110,17 +43,15 @@ module.exports = {
 			})
 		}
 
-		let manifest = path.resolve(__dirname, 'dist/client/vendors.json')
-		let dll = fs.existsSync(manifest)
-		if (DEBUG) console.warn(`dll ->`, dll);
-		if (dll) {
+		let manifest = path.resolve(__dirname, 'public/vendors.json')
+		if (fs.existsSync(manifest)) {
 			config.plugins.push(new webpack.DllReferencePlugin({
 				context: __dirname,
 				manifest: require(manifest),
 			}))
 		}
 
-		config.plugins.push(new BundleAnalyzerPlugin())
+		// config.plugins.push(new BundleAnalyzerPlugin())
 
 	},
 
@@ -149,10 +80,10 @@ module.exports = {
 		})
 
 		config.plugins.delete('no-emit-on-errors')
-		config.plugin('friendly-errors').tap(function(args) {
-			args[0].clearConsole = false
-			return args
-		})
+		// config.plugin('friendly-errors').tap(function(args) {
+		// 	args[0].clearConsole = false
+		// 	return args
+		// })
 
 	},
 

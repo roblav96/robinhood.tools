@@ -18,7 +18,7 @@
 		"client:watch": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
 		"client:build": "rimraf dist/client && cross-env NODE_ENV=production vue-cli-service build --mode production",
 		"client:tailwind": "tailwind build node_modules/tailwindcss/utilities.css --config src/client/styles/tailwind.js --output src/client/styles/tailwind.css",
-		"client:vendors": "rimraf dist/client && cross-env DLL=true NODE_ENV=development vue-cli-service build --mode development",
+		"client:vendors": "rimraf public/vendors* && webpack --config vendors.config.js --mode development",
 		"k": "final-pm --kill --force",
 		"rs": "npm run server:dev",
 		"server:dev": "rimraf dist && npm run k && run-p server:logs server:onchange server:watch cli:focus",

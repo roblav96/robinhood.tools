@@ -3,6 +3,7 @@
 node_modules
 dist
 
+public/*vendors*
 *tailwind*.css
 *.dll
 *.env
