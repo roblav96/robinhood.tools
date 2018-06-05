@@ -23,7 +23,7 @@
 		"client:prod": "cross-env NODE_ENV=production run-s client:prod:vendors client:prod:watch",
 		"client:prod:vendors": "rimraf public/vendors* && webpack --config vendors.config.js --mode production",
 		"client:prod:watch": "vue-cli-service serve --mode production",
-		"logs": "final-pm log --follow --lines 10",
+		"logs": "final-pm log --follow --lines 32",
 		"k": "final-pm --kill --force",
 		"rs": "npm run server:dev",
 		"server:dev": "rimraf dist && npm run k && run-p logs server:onchange server:watch cli:focus",
