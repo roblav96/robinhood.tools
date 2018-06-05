@@ -34,7 +34,9 @@ module.exports = {
 		config.output.filename = '[name].bundle.js'
 		config.output.chunkFilename = '[name].chunk.js'
 
+		process.env.VUE_APP_DLL = ''
 		if (DEVELOPMENT) {
+			process.env.VUE_APP_DLL = `<script src='/vendors.dll.js'></script>`
 			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /env/]))
 			config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
 				rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
@@ -42,14 +44,13 @@ module.exports = {
 					delete use.options.limit
 				})
 			})
-		}
-
-		let manifest = path.resolve(__dirname, 'public/vendors.json')
-		if (fs.existsSync(manifest)) {
-			config.plugins.push(new webpack.DllReferencePlugin({
-				context: __dirname,
-				manifest: require(manifest),
-			}))
+			let manifest = path.resolve(__dirname, 'public/vendors.json')
+			if (fs.existsSync(manifest)) {
+				config.plugins.push(new webpack.DllReferencePlugin({
+					context: __dirname,
+					manifest: require(manifest),
+				}))
+			}
 		}
 
 		// config.plugins.push(new BundleAnalyzerPlugin())
