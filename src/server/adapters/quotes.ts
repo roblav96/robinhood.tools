@@ -97,12 +97,10 @@ export function initFullQuote(
 
 	let toquote = { symbol } as Quotes.Quote
 	applyWbQuote(quote, wbquote, toquote)
-	applyBidAsk(quote, wbquote, toquote)
-	applyLives(quote, quote, toquote)
 	resets ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote)
 	let reset = resetFull(quote)
 	resets ? core.object.merge(quote, reset) : core.object.repair(quote, reset)
-	applyCalcs(quote)
+	mergeCalcs(quote)
 
 	core.object.clean(quote)
 
@@ -153,11 +151,11 @@ export function toDeal(wbdeal: Webull.Deal) {
 	} as Quotes.Deal
 }
 
-export function applyDeal(quote: Quotes.Live, deal: Quotes.Deal, toquote = {} as Quotes.Live) {
+export function applyDeal(quote: Quotes.Calc, deal: Quotes.Deal, toquote = {} as Quotes.Calc) {
 
-	if (deal.timestamp > quote.timestamp) {
+	if (quote.timestamp < deal.timestamp) {
 		toquote.timestamp = deal.timestamp
-		if (deal.price != quote.price) {
+		if (quote.price != deal.price) {
 			toquote.price = deal.price
 		}
 	}
@@ -173,48 +171,16 @@ export function applyDeal(quote: Quotes.Live, deal: Quotes.Deal, toquote = {} as
 		toquote.sellSize = quote.sellSize + deal.size
 		toquote.sellVolume = quote.sellVolume + deal.size
 	} else {
+		toquote.size = quote.size + deal.size
 		toquote.volume = quote.volume + deal.size
 	}
-	// toquote.dealFlowSize = quote.buySize - quote.sellSize
-	// toquote.dealFlowVolume = quote.dealFlowVolume + flow
 
 	return toquote
 }
 
 
 
-export function applyBidAsk(quote: Quotes.Calc, wbquote: Webull.Quote, toquote = {} as Quotes.Calc) {
-	let keymap = [
-		{ key: 'bid', fn: 'min', inf: Infinity },
-		{ key: 'ask', fn: 'max', inf: -Infinity },
-	]
-	keymap.forEach(({ key, fn, inf }) => {
-		let baprice = wbquote[key] as number
-		if (Number.isFinite(baprice)) {
-			toquote[key] = baprice
-			let kspread = `${key}Spread`
-			toquote[kspread] = Math[fn](quote[kspread] || inf, quote[key] || inf, baprice || inf)
-		}
-		let ksize = `${key}Size`
-		let basize = wbquote[ksize] as number
-		if (Number.isFinite(basize)) {
-			let ks = `${key}s`
-			toquote[ks] = basize
-			toquote[ksize] = (quote[ksize] || 0) + basize
-			let kvolume = `${key}Volume`
-			toquote[kvolume] = (quote[kvolume] || 0) + basize
-		}
-	})
-
-	return toquote
-}
-
-
-
-interface KeyMapValue {
-	key: keyof Quotes.Calc
-	time: boolean, greater: boolean,
-}
+interface KeyMapValue { key: keyof Quotes.Calc, time: boolean, greater: boolean }
 export const KEY_MAP = (({
 	'faStatus': ({ key: 'status' } as KeyMapValue) as any,
 	'status': ({ key: 'status' } as KeyMapValue) as any,
@@ -228,10 +194,10 @@ export const KEY_MAP = (({
 	'fiftyTwoWkHigh': ({ key: 'yearHigh' } as KeyMapValue) as any,
 	'fiftyTwoWkLow': ({ key: 'yearLow' } as KeyMapValue) as any,
 	// 
-	// 'bid': ({ key: 'bidPrice' } as KeyMapValue) as any,
-	// 'ask': ({ key: 'askPrice' } as KeyMapValue) as any,
-	// 'bidSize': ({ key: 'bidLot' } as KeyMapValue) as any,
-	// 'askSize': ({ key: 'askLot' } as KeyMapValue) as any,
+	'bid': ({ key: 'bid' } as KeyMapValue) as any,
+	'ask': ({ key: 'ask' } as KeyMapValue) as any,
+	'bidSize': ({ key: 'bids' } as KeyMapValue) as any,
+	'askSize': ({ key: 'asks' } as KeyMapValue) as any,
 	// 
 	'quoteMaker': ({ key: 'quoteMaker' } as KeyMapValue) as any,
 	'quoteMakerAddress': ({ key: 'quoteMakerAddress' } as KeyMapValue) as any,
@@ -253,19 +219,15 @@ export const KEY_MAP = (({
 	// '____': ({ key: '____' } as KeyMapValue) as any,
 } as Webull.Quote) as any) as Dict<KeyMapValue>
 
-
-
 export function applyKeyMap(keymap: KeyMapValue, toquote: any, tokey: string, to: any, from: any) {
-	if (keymap && (keymap.time || keymap.greater)) {
-		if (keymap.time) {
-			if (to > from) toquote[tokey] = to;
+	if (keymap && keymap.time) {
+		if (to > from) toquote[tokey] = to;
+	}
+	else if (keymap && keymap.greater) {
+		if (to < from) {
+			if (core.calc.percent(to, from) < -10) toquote[tokey] = to;
 		}
-		else if (keymap.greater) {
-			if (to < from) {
-				if (core.calc.percent(to, from) < -10) toquote[tokey] = to;
-			}
-			else if (to > from) toquote[tokey] = to;
-		}
+		else if (to > from) toquote[tokey] = to;
 	}
 	else if (to != from) {
 		toquote[tokey] = to
@@ -274,7 +236,7 @@ export function applyKeyMap(keymap: KeyMapValue, toquote: any, tokey: string, to
 
 
 
-export function applyWbQuote(quote: Quotes.Live, wbquote: Webull.Quote, toquote = {} as Quotes.Live) {
+export function applyWbQuote(quote: Quotes.Calc, wbquote: Webull.Quote, toquote = {} as Quotes.Calc) {
 
 	Object.keys(wbquote).forEach(key => {
 		let wbvalue = wbquote[key]
@@ -289,10 +251,6 @@ export function applyWbQuote(quote: Quotes.Live, wbquote: Webull.Quote, toquote 
 
 	})
 
-	if (toquote.status) {
-		toquote.statusTimestamp = Date.now()
-	}
-
 	if (toquote.timestamp) {
 		if (wbquote.mktradeTime == toquote.timestamp && wbquote.price && wbquote.price != quote.price) {
 			toquote.price = wbquote.price
@@ -302,62 +260,87 @@ export function applyWbQuote(quote: Quotes.Live, wbquote: Webull.Quote, toquote 
 		}
 	}
 
-	return toquote
-}
-
-
-
-export function applyLives(quote: Quotes.Calc, lquote: Quotes.Live, toquote: Quotes.Live) {
-	if (toquote.price) {
-		toquote.high = Math.max(quote.high || -Infinity, toquote.price)
-		toquote.low = Math.min(quote.low || Infinity, toquote.price)
-		toquote.close = quote.price
-		toquote.dayHigh = Math.max(quote.dayHigh || -Infinity, toquote.price)
-		toquote.dayLow = Math.min(quote.dayLow || Infinity, toquote.price)
-	}
 	if (toquote.volume) {
-		toquote.size = toquote.volume - lquote.volume
+		toquote.size = quote.size + (toquote.volume - quote.volume)
 	}
+
+	if (toquote.bid) {
+		toquote.bidSpread = core.math.min(quote.bidSpread, quote.bid, toquote.bid)
+	}
+	if (toquote.ask) {
+		toquote.askSpread = core.math.max(quote.askSpread, quote.ask, toquote.ask)
+	}
+	if (toquote.bids) {
+		toquote.bidSize = quote.bidSize + toquote.bids
+		toquote.bidVolume = quote.bidVolume + toquote.bids
+	}
+	if (toquote.asks) {
+		toquote.askSize = quote.askSize + toquote.asks
+		toquote.askVolume = quote.askVolume + toquote.asks
+	}
+
+	if (toquote.status) {
+		toquote.statusTimestamp = Date.now()
+	}
+
 	return toquote
 }
 
 
 
-export function applyCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
+export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 	if (toquote) {
+
+		if (toquote.price) {
+			toquote.high = core.math.max(quote.high, quote.price, toquote.price)
+			toquote.low = core.math.min(quote.low, quote.price, toquote.price)
+			toquote.dayHigh = core.math.max(quote.dayHigh, quote.price, toquote.price)
+			toquote.dayLow = core.math.min(quote.dayLow, quote.price, toquote.price)
+		}
+
 		core.object.merge(quote, toquote)
 	} else {
 		toquote = quote
 	}
 
 	if (toquote.price) {
-		toquote.change = quote.price - quote.startPrice
-		toquote.percent = core.calc.percent(quote.price, quote.startPrice)
+		quote.close = quote.price
+		quote.change = quote.price - quote.startPrice
+		quote.percent = core.calc.percent(quote.price, quote.startPrice)
 
 		let state = hours.getState(hours.rxhours.value, quote.timestamp)
 		if (state.indexOf('PRE') == 0) {
-			toquote.prePrice = quote.price
-			toquote.preChange = quote.price - quote.startPrice
-			toquote.prePercent = core.calc.percent(quote.price, quote.startPrice)
-			toquote.preTimestamp = quote.timestamp
+			quote.prePrice = quote.price
+			quote.preChange = quote.price - quote.startPrice
+			quote.prePercent = core.calc.percent(quote.price, quote.startPrice)
+			quote.preTimestamp = quote.timestamp
 		} else if (state == 'REGULAR') {
-			toquote.regPrice = quote.price
-			toquote.regChange = quote.price - quote.openPrice
-			toquote.regPercent = core.calc.percent(quote.price, quote.openPrice)
-			toquote.regTimestamp = quote.timestamp
+			quote.regPrice = quote.price
+			quote.regChange = quote.price - quote.openPrice
+			quote.regPercent = core.calc.percent(quote.price, quote.openPrice)
+			quote.regTimestamp = quote.timestamp
 		} else if (state.indexOf('POST') == 0) {
-			toquote.postPrice = quote.price
-			toquote.postChange = quote.price - quote.closePrice
-			toquote.postPercent = core.calc.percent(quote.price, quote.closePrice)
-			toquote.postTimestamp = quote.timestamp
+			quote.postPrice = quote.price
+			quote.postChange = quote.price - quote.closePrice
+			quote.postPercent = core.calc.percent(quote.price, quote.closePrice)
+			quote.postTimestamp = quote.timestamp
 		}
 
 		if (quote.sharesOutstanding) {
-			toquote.marketCap = _.round(quote.price * quote.sharesOutstanding)
+			quote.marketCap = _.round(quote.price * quote.sharesOutstanding)
 		}
 	}
 
-	return toquote
+	if (toquote.bid || toquote.ask) {
+		quote.spread = quote.ask - quote.bid
+	}
+
+	if (toquote.buySize || toquote.sellSize) {
+		quote.dealFlowSize = quote.buySize - quote.sellSize
+		quote.dealFlowVolume = quote.buyVolume - quote.sellVolume
+	}
+
+	// return toquote
 }
 
 

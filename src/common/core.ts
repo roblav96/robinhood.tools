@@ -168,9 +168,6 @@ export const number = {
 	float(value: string) {
 		return Number.parseFloat(value.replace(/[^0-9\.]/g, ''))
 	},
-	round(value: number, precision = 0) {
-		return +(Math.round(value + 'e+' + precision as any) + 'e-' + precision)
-	},
 	WORDS: {
 		0: 'zero', 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine',
 		10: 'ten', 11: 'eleven', 12: 'twelve', 13: 'thirteen', 14: 'fourteen', 15: 'fifteen', 16: 'sixteen',
@@ -349,11 +346,26 @@ export const json = {
 
 
 export const math = {
+	clamp(n: number, a: number, b: number) {
+		return Math.min(Math.max(n, a), b)
+	},
 	dispersed(value: number, index: number, max: number, method = 'round' as keyof Math) {
 		return Math[method as any](Math.max(index, 0) * (value / Math.max(max, 1)))
 	},
+	max(a = -Infinity, b = -Infinity, c = -Infinity) {
+		return Math.max(a, b, c)
+	},
+	min(a = Infinity, b = Infinity, c = Infinity) {
+		return Math.min(a, b, c)
+	},
 	random(min: number, max: number) {
 		return Math.floor(Math.random() * (max - min + 1)) + min
+	},
+	round(value: number, precision = 0) {
+		return +(Math.round(value + 'e+' + precision as any) + 'e-' + precision)
+	},
+	sum(a = 0, b = 0, c = 0) {
+		return a + b + c
 	},
 }
 

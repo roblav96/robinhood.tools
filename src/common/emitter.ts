@@ -1,6 +1,5 @@
 // 
 
-export { Event, Listener } from 'eventemitter3'
 import * as EventEmitter3 from 'eventemitter3'
 import * as pEvent from 'p-event'
 
@@ -35,6 +34,15 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 					}
 				}
 			}
+		}
+		return false
+	}
+
+	isListening<Name extends Names>(name: Name, listener: EventEmitter3.Listener<Data>) {
+		let listeners = this.listeners(name)
+		let i: number, len = listeners.length
+		for (i = 0; i < len; i++) {
+			if (listener == listeners[i]) return true;
 		}
 		return false
 	}

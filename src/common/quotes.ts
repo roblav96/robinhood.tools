@@ -78,8 +78,6 @@ const LIVE = {
 	dealCount: number,
 	dealSize: number,
 	dealVolume: number,
-	dealFlowVolume: number,
-	dealFlowSize: number,
 	// 
 	buySize: number,
 	sellSize: number,
@@ -107,11 +105,14 @@ const CALC = {
 	yearHigh: number,
 	yearLow: number,
 	// 
-	spread: number,
 	bid: number,
 	ask: number,
 	bids: number,
 	asks: number,
+	spread: number,
+	// 
+	dealFlowVolume: number,
+	dealFlowSize: number,
 	// 
 	avgVolume: number,
 	avgVolume10Day: number,

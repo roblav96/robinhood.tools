@@ -144,6 +144,7 @@ export default class WebullMqttClient {
 			if (this.options.verbose) console.warn('disconnect');
 			this.alive = false
 			// this.destroy()
+			return
 		}
 
 		if (packet.cmd == 'publish') {

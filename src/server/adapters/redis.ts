@@ -80,7 +80,7 @@ export function toHset(from: any): any {
 	Object.keys(from).forEach(function(key) {
 		let value = from[key]
 		if (value == null) value = null;
-		if (Number.isFinite(value)) value = core.number.round(value, 8);
+		if (Number.isFinite(value)) value = core.math.round(value, 8);
 		to[key] = JSON.stringify(value)
 	})
 	return to
