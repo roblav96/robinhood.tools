@@ -44,8 +44,8 @@ let instances = cpus
 	instances = cpus
 	if (DEVELOPMENT) instances = 1;
 	Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
-	// Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
-	// Application({ name: 'indexes', run: 'services/quotes.service', env: { SYMBOLS: 'INDEXES' } })
+	Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
+	Application({ name: 'indexes', run: 'services/quotes.service', env: { SYMBOLS: 'INDEXES' } })
 
 }
 

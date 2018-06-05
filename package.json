@@ -26,6 +26,7 @@
 		"server:logs": "final-pm log --follow",
 		"server:onchange": "sleep 2 && onchange 'dist/server/**/*.js' 'dist/common/**/*.js' --killSignal SIGKILL --delay 300 -- run-p server:start",
 		"server:start": "final-pm kill all && final-pm delete all && final-pm --config dist/server/final.config.js start all",
+		"server:prod": "rimraf dist && cross-env NODE_ENV=production run-s server:build server:start server:logs",
 		"rw": "tsc --project .server.tsconfig.json --watch --noEmit",
 		"server:watch": "tsc --project .server.tsconfig.json --watch",
 		"server:build": "tsc --project .server.tsconfig.json",

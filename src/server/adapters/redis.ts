@@ -9,7 +9,7 @@ import * as IORedis from 'ioredis'
 class Redis extends IORedis {
 
 	private static opts(name: string, offset: number) {
-		const opts = {
+		let opts = {
 			host: process.env.REDIS_HOST || '127.0.0.1',
 			port: (Number.parseInt(process.env.REDIS_PORT) || 6379) + offset,
 			password: process.env.REDIS_PASSWORD,
@@ -19,7 +19,7 @@ class Redis extends IORedis {
 
 		if (process.env.PRODUCTION) {
 			opts.path = '/var/run/redis_' + opts.port + '.sock'
-			delete opts.host; delete opts.port
+			opts = _.omit(opts, ['host', 'port'])
 		}
 
 		return opts
