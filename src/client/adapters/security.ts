@@ -39,9 +39,10 @@ export const doc = {
 // }
 
 const copts = {
-	domain: core.HOSTNAME, path: '/', sameSite: true,
+	// domain: core.HOSTNAME,
+	domain: process.env.DOMAIN,
+	path: '/', sameSite: true,
 } as cookie.CookieSerializeOptions
-console.log(`copts ->`, copts)
 
 export function cookies() {
 	document.cookie = cookie.serialize('x-uuid', `${doc.uuid}.${Date.now()}`, copts)
