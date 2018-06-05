@@ -8,8 +8,8 @@ declare namespace NodeJS {
 		NODE_ENV: 'development' | 'production'
 		DEVELOPMENT: any
 		PRODUCTION: any
-		VERSION: any
-		DOMAIN: any
+		VERSION: string
+		DOMAIN: string
 		CLIENT: any
 		SERVER: any
 	}

@@ -113,7 +113,13 @@ class Socket extends Emitter {
 	}
 
 	discover() {
-		return http.get('/websocket/discover', { retries: Infinity }).then((addresses: string[]) => {
+		let proms = [http.get('/websocket/discover', { retries: Infinity })]
+		if (process.env.DEVELOPMENT) {
+			proms.push(http.get(`https://${core.HOSTNAME}/websocket/discover`, { retries: Infinity }))
+		}
+		return Promise.all(proms).then(resolved => {
+			let addresses = _.flatten(resolved) as string[]
+			console.log('addresses ->', addresses)
 			security.cookies()
 			this.clients.forEach(v => v.destroy())
 			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {

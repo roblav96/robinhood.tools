@@ -6,6 +6,7 @@ import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as boom from 'boom'
 import * as cookie from 'cookie'
+import * as url from 'url'
 import lockr from 'lockr'
 import Fingerprint2 from 'fingerprintjs2'
 import clock from '../../common/clock'
@@ -38,8 +39,9 @@ export const doc = {
 // }
 
 const copts = {
-	domain: process.env.DOMAIN, path: '/', sameSite: true,
+	domain: core.HOSTNAME, path: '/', sameSite: true,
 } as cookie.CookieSerializeOptions
+console.log(`copts ->`, copts)
 
 export function cookies() {
 	document.cookie = cookie.serialize('x-uuid', `${doc.uuid}.${Date.now()}`, copts)

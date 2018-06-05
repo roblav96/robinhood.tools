@@ -2,11 +2,13 @@
 
 import { CookieSerializeOptions } from 'cookie'
 import * as _ from '../../common/lodash'
+import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
 import * as security from '../adapters/security'
 import * as robinhood from '../adapters/robinhood'
 import * as boom from 'boom'
+import * as url from 'url'
 import polka from './polka'
 
 
@@ -23,7 +25,7 @@ polka.route({
 		let response = { ishuman: resolved.pop() == 'true' } as Security.Doc
 
 		let cookie = {
-			domain: process.env.DOMAIN,
+			domain: core.HOSTNAME,
 			path: '/', sameSite: true, httpOnly: true,
 			secure: !!process.env.PRODUCTION,
 		} as CookieSerializeOptions

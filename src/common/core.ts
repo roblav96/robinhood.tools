@@ -5,6 +5,8 @@ import * as leven from 'leven'
 
 
 
+export const HOSTNAME = process.env.DOMAIN.split('.').slice(-2).join('.')
+
 export function noop() { }
 
 export function isJunk(value: any) {

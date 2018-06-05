@@ -191,7 +191,9 @@ function ontick(i: number) {
 		}
 	})
 
-	redis.main.coms(coms)
+	if (process.env.PRODUCTION) {
+		redis.main.coms(coms)
+	}
 
 	// let tdiff = Date.now() - t
 	// let key = live ? 'lives' : 'emits'

@@ -15,7 +15,7 @@
 		"rm": "rimraf public/vendors* dist node_modules",
 		"rv": "npm run client:vendors",
 		"rc": "npm run client:dev",
-		"client:dev": "onchange 'vue.config.js' --initial --killSignal SIGKILL --delay 300 -- run-p client:tailwind client:watch cli:focus",
+		"client:dev": "run-s client:vendors && onchange 'vue.config.js' --initial --killSignal SIGKILL --delay 300 -- run-p client:tailwind client:watch cli:focus",
 		"client:watch": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
 		"client:tailwind": "tailwind build node_modules/tailwindcss/utilities.css --config src/client/styles/tailwind.js --output src/client/styles/tailwind.css",
 		"client:vendors": "rimraf public/vendors* && webpack --config vendors.config.js --mode development",
