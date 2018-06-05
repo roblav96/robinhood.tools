@@ -13,6 +13,7 @@ if (process.env.DEVELOPMENT) {
 	// console.dtsgen = require('../common/dtsgen').default
 	Object.assign(window, require('../common/core'))
 	// Object.assign(window, require('../common/pretty'))
+	// require('echarts')
 }
 
 import 'echarts'

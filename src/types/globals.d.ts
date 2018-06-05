@@ -42,15 +42,15 @@ interface HotNodeModule {
 	active: boolean
 	data: any
 	accept(dep: any, callback: any): void
-	addDisposeHandler(callback: any): void
-	addStatusHandler(l: any): void
+	addDisposeHandler(fn: (data: object) => void): void
+	addStatusHandler(fn: (status: string) => void): void
 	apply(options: any): any
 	check(apply: any): any
 	decline(dep: any): void
-	dispose(callback: any): void
-	removeDisposeHandler(callback: any): void
-	removeStatusHandler(l: any): void
-	status(l: any): any
+	dispose(fn: (data: object) => void): void
+	removeDisposeHandler(fn: (data: object) => void): void
+	removeStatusHandler(fn: (status: string) => void): void
+	status(fn: (status: string) => void): void
 }
 
 
