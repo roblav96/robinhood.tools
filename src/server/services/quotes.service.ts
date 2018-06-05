@@ -69,10 +69,10 @@ async function start() {
 	alls.forEach(({ symbol, quote, wbquote }) => {
 
 		let toquote = quotes.resetFull(quote)
-		core.object.merge(toquote, quote)
-		quotes.applyWbQuote(toquote, wbquote, toquote)
+		quotes.applyWbQuote(quote, wbquote, toquote)
 		quotes.mergeCalcs(toquote)
 		core.object.repair(quote, toquote)
+		core.object.clean(quote)
 
 		socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
 		Object.assign(WB.QUOTES, { [symbol]: core.clone(wbquote) })
