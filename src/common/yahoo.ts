@@ -63,9 +63,10 @@ export function getChart(
 		query: params, proxify: !!process.env.CLIENT,
 	}).then(function(response: Yahoo.ApiChart) {
 		let error = _.get(response, 'chart.error') as Yahoo.ApiError
-		if (error) throw boom.badRequest(JSON.stringify(response.chart.error));
+		if (error) throw boom.badRequest('chart.error', response);
+		let result = _.get(response, 'chart.result[0]') as Yahoo.ChartResult
+		if (!result) throw boom.expectationFailed('!result', response);
 		let lquotes = [] as Quotes.Live[]
-		let result = response.chart.result[0]
 		let stamps = result.timestamp
 		if (!stamps) return lquotes;
 		let hquotes = result.indicators.quote[0]

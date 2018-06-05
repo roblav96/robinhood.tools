@@ -25,6 +25,7 @@ class VSymbolEChart extends Vue {
 	$parent: VSymbolChart
 	echart: echarts.ECharts
 	colors = this.$store.state.colors
+	quote = this.$parent.quote
 
 	mounted() {
 		this.echart = echarts.init(this.$el)
@@ -52,6 +53,7 @@ class VSymbolEChart extends Vue {
 	onresize = _.debounce(this.resize, 300)
 	resize() {
 		let dims = this.dims()
+		console.log('dimss ->', dims)
 		// let navbar = document.getElementById('navbar')
 		// let header = document.getElementById('symbol_route').firstChild as HTMLElement
 		// let screen = utils.screen()
@@ -60,6 +62,7 @@ class VSymbolEChart extends Vue {
 	}
 
 	syncdataset(lquotes: Quotes.Live[]) {
+		console.log('syncdataset ->', lquotes.length)
 		// let data = lquotes.map(v => {
 		// 	return [v.timestamp, v.open, v.high, v.low, v.close, v.size]
 		// })
@@ -131,7 +134,7 @@ class VSymbolEChart extends Vue {
 				xAxisIndex: 0,
 				yAxisIndex: 0,
 				large: true,
-				// largeThreshold: 100,
+				largeThreshold: 200,
 				// progressive: 100,
 				// dimensions: ['timestamp', 'open', 'close', 'high', 'low'],
 				encode: {
@@ -180,8 +183,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	vechart: VSymbolEChart
 
 	created() {
-		// this.getlives()
-		this.gethistoricals()
+
 	}
 
 	mounted() {
@@ -192,34 +194,42 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	busy = true
 	symbol = this.$parent.symbol
 	quote = this.$parent.all.quote
-	lquotes = [] as Quotes.Live[]
 
-	getlives() {
+	@Vts.Watch('$parent.symbol', { immediate: true }) w_symbol(symbol: string) {
+		this.symbol = symbol
 		this.busy = true
-		return http.post('/quotes/lives', { symbols: [this.symbol] }).then((response: Quotes.Live[][]) => {
-			// console.log(`response ->`, JSON.parse(JSON.stringify(response)))
-			// this.lquotes = response[0]
-			this.vechart.syncdataset(response[0])
+		return Promise.resolve().then(() => {
+			// return this.getlives()
+			return this.gethistoricals()
+		}).then(lquotes => {
+			this.vechart.syncdataset(lquotes)
 			return this.$nextTick()
-		}).catch(function(error) {
-			console.error(`getlives Error ->`, error)
+		}).catch(error => {
+			console.error(`watch symbol Error -> %O`, error)
 		}).finally(() => {
 			this.busy = false
+		})
+	}
+
+	getlives() {
+		return http.post('/quotes/lives', { symbols: [this.symbol] }).then((response: Quotes.Live[][]) => {
+			return response[0]
+			// console.log(`response ->`, JSON.parse(JSON.stringify(response)))
+			// this.vechart.syncdataset(response[0])
+			// return this.$nextTick()
 		})
 	}
 
 	gethistoricals() {
 		return yahoo.getChart(this.symbol, {
 			range: '1y', interval: '1h',
-		}, this.hours.hours).then(response => {
-			// console.log(`response ->`, JSON.parse(JSON.stringify(response)))
-			this.vechart.syncdataset(response)
-			return this.$nextTick()
-		}).catch(function(error) {
-			console.error(`gethistoricals Error ->`, error)
-		}).finally(() => {
-			this.busy = false
-		})
+		}, this.hours.hours)
+		// .then(response => {
+		// 	return response
+		// console.log(`response ->`, JSON.parse(JSON.stringify(response)))
+		// this.vechart.syncdataset(response)
+		// return this.$nextTick()
+		// })
 	}
 
 }

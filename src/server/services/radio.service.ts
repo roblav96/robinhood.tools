@@ -24,8 +24,7 @@ wss.on('error', function onerror(error) {
 })
 
 wss.on('listening', function onlistening() {
-	let address = wss.httpServer.address() as AddressInfo
-	// console.info('radio listening ->', address)
+	// console.info('radio listening ->', port)
 })
 
 clock.on('5s', function onping() {

@@ -132,11 +132,6 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 
 
-const avgs = {
-	emits: 0,
-	lives: 0,
-}
-
 function ontick(i: number) {
 	let t = Date.now()
 	let live = new Date().getSeconds() % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
@@ -198,14 +193,19 @@ function ontick(i: number) {
 
 	})
 
-	let tdiff = Date.now() - t
-	let key = live ? 'lives' : 'emits'
-	avgs[key] = avgs[key] ? _.round(_.mean([avgs[key], tdiff]), 2) : tdiff
-	console.log(`avgs ->`, avgs)
-
 	redis.main.coms(coms)
 
+	// let tdiff = Date.now() - t
+	// let key = live ? 'lives' : 'emits'
+	// avgs[key] = avgs[key] ? _.round(_.mean([avgs[key], tdiff]), 2) : tdiff
+	// console.log(`avgs ->`, avgs)
+
 }
+
+// const avgs = {
+// 	emits: 0,
+// 	lives: 0,
+// }
 
 
 

@@ -181,8 +181,9 @@ function send(config: Http.Config) {
 			}
 
 			if (config.proxify) {
-				let results = _.get(data, 'query.results')
-				if (results != null) data = results;
+				data = _.get(data, 'query.results')
+				// let results = _.get(data, 'query.results')
+				// if (results != null) data = results;
 			}
 
 			if (config.verbose || config.debug) {

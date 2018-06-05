@@ -42,7 +42,7 @@ let instances = cpus
 	// Application({ name: 'robinhood', run: 'services/robinhood.service' })
 
 	instances = cpus
-	// if (DEVELOPMENT) instances = 1;
+	if (DEVELOPMENT) instances = 1;
 	Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
 	// Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
 	// Application({ name: 'indexes', run: 'services/quotes.service', env: { SYMBOLS: 'INDEXES' } })

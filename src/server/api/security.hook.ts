@@ -13,7 +13,7 @@ import polka from './polka'
 
 polka.use(function securityhook(req, res, next) {
 	req.authed = false
-
+	
 	let doc = {
 		ip: security.ip(req.headers),
 		uuid: req.cookies['x-uuid'],

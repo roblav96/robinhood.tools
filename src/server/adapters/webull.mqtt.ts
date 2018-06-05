@@ -38,7 +38,7 @@ export default class WebullMqttClient {
 	}
 
 	constructor(
-		public options = {} as Partial<typeof WebullMqttClient.options>,
+		private options = {} as Partial<typeof WebullMqttClient.options>,
 		private emitter: Emitter,
 	) {
 		_.defaults(this.options, WebullMqttClient.options)
@@ -47,7 +47,6 @@ export default class WebullMqttClient {
 	}
 
 	alive = false
-	started = false
 	dsymbols: Dict<string>
 	client: MqttConnection
 
@@ -77,7 +76,7 @@ export default class WebullMqttClient {
 			return
 		}
 		clearTimeout(this.timeout)
-		this.timeout = _.delay(this.ontimeout, _.random(0, mqtts * 100))
+		this.timeout = _.delay(this.ontimeout, 100 + _.random(0, mqtts * 100))
 	}
 
 	private connect() {
@@ -87,17 +86,16 @@ export default class WebullMqttClient {
 		this.client.connect({
 			username: process.env.WEBULL_DID,
 			password: process.env.WEBULL_TOKEN,
-			clientId: 'mqtt_' + Math.random().toString(),
+			clientId: 'mqtt_' + this.nextId(),
 			protocolId: 'MQTT',
 			protocolVersion: 4,
-			keepalive: 60,
+			keepalive: 30,
 			clean: true,
 		})
 		this.client.on('data', this.ondata)
 		this.client.on('close', this.onclose)
 		this.client.on('error', this.onerror)
-		if (!this.started) {
-			this.started = true
+		if (!clock.hasListener(this.reconnect, this)) {
 			clock.on(this.options.heartbeat, this.reconnect, this)
 		} else console.log('connect reconnecting');
 	}
@@ -145,7 +143,7 @@ export default class WebullMqttClient {
 		if (packet.cmd == 'disconnect') {
 			if (this.options.verbose) console.warn('disconnect');
 			this.alive = false
-			this.destroy()
+			// this.destroy()
 		}
 
 		if (packet.cmd == 'publish') {
