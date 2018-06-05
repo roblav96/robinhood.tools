@@ -20,7 +20,7 @@
 		"client:tailwind": "tailwind build node_modules/tailwindcss/utilities.css --config src/client/styles/tailwind.js --output src/client/styles/tailwind.css",
 		"client:vendors": "rimraf public/vendors* && webpack --config vendors.config.js --mode development",
 		"client:build": "rimraf dist/client public/vendors* && cross-env NODE_ENV=development vue-cli-service build --mode development",
-		"client:deploy": "run-s client:tailwind client:build && sudo rm -rf /var/www/robinhood.tools && sudo mkdir /var/www/robinhood.tools && sudo cp -rf dist/client /var/www/robnhood.tools && sudo chown -Rf www-data:www-data /var/www/robinhood.tools && sudo chmod -Rf 755 /var/www/robinhood.tools",
+		"client:deploy": "run-s client:tailwind client:build && sudo rm -rf /var/www/robinhood.tools && sudo mkdir /var/www/robinhood.tools && sudo cp -rf dist/client /var/www/robnhood.tools && sudo chown -R www-data:www-data /var/www/robinhood.tools && sudo chmod -R 755 /var/www/robinhood.tools",
 		"logs": "final-pm log --follow --lines 32",
 		"k": "final-pm --kill --force",
 		"rs": "npm run server:dev",
