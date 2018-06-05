@@ -18,7 +18,6 @@ polka.use(function securityhook(req, res, next) {
 		ip: security.ip(req.headers),
 		uuid: req.cookies['x-uuid'],
 		finger: req.cookies['x-finger'],
-		hostname: req.headers['hostname'],
 		useragent: req.headers['user-agent'],
 		bits: req.cookies['x-bits'],
 		token: req.cookies['x-token'],

@@ -41,7 +41,6 @@ export const wss = new uws.Server({
 				ip: security.ip(req.headers),
 				uuid: parsed['x-uuid'],
 				finger: parsed['x-finger'],
-				hostname: req.headers['hostname'],
 				useragent: req.headers['user-agent'],
 				bits: parsed['x-bits'],
 				token: parsed['x-token']

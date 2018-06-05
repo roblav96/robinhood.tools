@@ -11,7 +11,7 @@ import { PolkaRequest } from '../api/polka.request'
 
 export function isDoc(
 	doc: Security.Doc,
-	required = ['ip', 'uuid', 'finger', 'hostname', 'useragent'] as KeysOf<Security.Doc>,
+	required = ['ip', 'uuid', 'finger', 'useragent'] as KeysOf<Security.Doc>,
 ) {
 	let i: number, len = required.length
 	for (i = 0; i < len; i++) {
@@ -62,7 +62,7 @@ export async function reqDoc(req: PolkaRequest, rhdoc = false): Promise<any> {
 }
 
 export function token(doc: Security.Doc, prime: string) {
-	return security.hmac256(doc.uuid + doc.finger + doc.bits + doc.useragent + doc.hostname, prime)
+	return security.hmac256(doc.uuid + doc.finger + doc.bits + doc.useragent, prime)
 }
 
 export function ip(headers: Dict<string>) {

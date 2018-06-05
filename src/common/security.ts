@@ -108,7 +108,6 @@ declare global {
 			finger: string
 			bits: string
 			token: string
-			hostname: string
 			useragent: string
 			stamp: number
 			prime: string
