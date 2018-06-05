@@ -53,7 +53,7 @@ export async function syncAllQuotes(resets = false) {
 		let alls = await getAlls(chunk)
 		await redis.main.coms(alls.map(all => {
 			let rkey = `${rkeys.QUOTES}:${all.symbol}`
-			return ['hmset', rkey, fullquote(all, resets) as any]
+			return ['hmset', rkey, initFullQuote(all, resets) as any]
 		}))
 	}), { concurrency: 1 })
 	if (process.env.DEVELOPMENT) console.info('syncAllQuotes done ->');
@@ -61,7 +61,7 @@ export async function syncAllQuotes(resets = false) {
 
 
 
-export function fullquote(
+export function initFullQuote(
 	{ symbol, quote, wbticker, wbquote, instrument, yhquote, iexitem }: Quotes.All,
 	resets = false,
 ) {
@@ -96,13 +96,13 @@ export function fullquote(
 	quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, _.round(quote.avgVolume10Day, quote.avgVolume3Month)))
 
 	let toquote = { symbol } as Quotes.Quote
-	applywbquote(quote, wbquote, toquote)
-	applybidask(quote, wbquote, toquote)
-	applylives(quote, quote, toquote)
+	applyWbQuote(quote, wbquote, toquote)
+	applyBidAsk(quote, wbquote, toquote)
+	applyLives(quote, quote, toquote)
 	resets ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote)
-	let reset = resetquote(quote)
+	let reset = resetFull(quote)
 	resets ? core.object.merge(quote, reset) : core.object.repair(quote, reset)
-	applycalcs(quote)
+	applyCalcs(quote)
 
 	core.object.clean(quote)
 
@@ -112,7 +112,7 @@ export function fullquote(
 
 
 
-export function resetlive(quote: Quotes.Calc) {
+export function resetLive(quote: Quotes.Calc) {
 	return {
 		size: 0,
 		dealSize: 0, dealFlowSize: 0,
@@ -123,14 +123,14 @@ export function resetlive(quote: Quotes.Calc) {
 	} as Quotes.Calc
 }
 
-export function resetquote(quote: Quotes.Calc) {
-	let toquote = resetlive(quote)
+export function resetFull(quote: Quotes.Calc) {
+	let toquote = resetLive(quote)
 	Object.keys(toquote).forEach(key => {
-		if (key.indexOf('size') >= 0) {
-			return toquote[key.replace('size', 'volume')] = 0
+		if (key.includes('size')) {
+			toquote[key.replace('size', 'volume')] = 0
 		}
-		if (key.indexOf('Size') >= 0) {
-			return toquote[key.replace('Size', 'Volume')] = 0
+		else if (key.includes('Size')) {
+			toquote[key.replace('Size', 'Volume')] = 0
 		}
 	})
 	core.object.merge(toquote, {
@@ -143,7 +143,7 @@ export function resetquote(quote: Quotes.Calc) {
 
 
 
-export function todeal(wbdeal: Webull.Deal) {
+export function toDeal(wbdeal: Webull.Deal) {
 	return {
 		price: wbdeal.deal,
 		flag: wbdeal.tradeBsFlag,
@@ -153,7 +153,7 @@ export function todeal(wbdeal: Webull.Deal) {
 	} as Quotes.Deal
 }
 
-export function applydeal(quote: Quotes.Live, deal: Quotes.Deal, toquote = {} as Quotes.Live) {
+export function applyDeal(quote: Quotes.Live, deal: Quotes.Deal, toquote = {} as Quotes.Live) {
 
 	if (deal.timestamp > quote.timestamp) {
 		toquote.timestamp = deal.timestamp
@@ -166,46 +166,43 @@ export function applydeal(quote: Quotes.Live, deal: Quotes.Deal, toquote = {} as
 	toquote.dealSize = quote.dealSize + deal.size
 	toquote.dealVolume = quote.dealVolume + deal.size
 
-	let flow = 0
 	if (deal.flag == 'B') {
 		toquote.buySize = quote.buySize + deal.size
 		toquote.buyVolume = quote.buyVolume + deal.size
-		flow = deal.size
 	} else if (deal.flag == 'S') {
 		toquote.sellSize = quote.sellSize + deal.size
 		toquote.sellVolume = quote.sellVolume + deal.size
-		flow = -deal.size
 	} else {
 		toquote.volume = quote.volume + deal.size
 	}
-	if (flow) {
-		toquote.dealFlowSize = quote.dealFlowSize + flow
-		toquote.dealFlowVolume = quote.dealFlowVolume + flow
-	}
+	// toquote.dealFlowSize = quote.buySize - quote.sellSize
+	// toquote.dealFlowVolume = quote.dealFlowVolume + flow
 
 	return toquote
 }
 
 
 
-export function applybidask(quote: Quotes.Calc, wbquote: Webull.Quote, toquote = {} as Quotes.Calc) {
+export function applyBidAsk(quote: Quotes.Calc, wbquote: Webull.Quote, toquote = {} as Quotes.Calc) {
 	let keymap = [
-		{ key: 'bid', fn: 'min', infinity: Infinity },
-		{ key: 'ask', fn: 'max', infinity: -Infinity },
+		{ key: 'bid', fn: 'min', inf: Infinity },
+		{ key: 'ask', fn: 'max', inf: -Infinity },
 	]
-	keymap.forEach(({ key, fn, infinity }) => {
-		if (Number.isFinite(wbquote[key])) {
-			toquote[key] = wbquote[key]
+	keymap.forEach(({ key, fn, inf }) => {
+		let baprice = wbquote[key] as number
+		if (Number.isFinite(baprice)) {
+			toquote[key] = baprice
 			let kspread = `${key}Spread`
-			toquote[kspread] = Math[fn](quote[kspread] || infinity, quote[key] || infinity, wbquote[key] || infinity)
+			toquote[kspread] = Math[fn](quote[kspread] || inf, quote[key] || inf, baprice || inf)
 		}
 		let ksize = `${key}Size`
-		if (Number.isFinite(wbquote[ksize])) {
+		let basize = wbquote[ksize] as number
+		if (Number.isFinite(basize)) {
 			let ks = `${key}s`
-			toquote[ks] = wbquote[ksize]
-			toquote[ksize] = (quote[ksize] || 0) + wbquote[ksize]
+			toquote[ks] = basize
+			toquote[ksize] = (quote[ksize] || 0) + basize
 			let kvolume = `${key}Volume`
-			toquote[kvolume] = (quote[kvolume] || 0) + wbquote[ksize]
+			toquote[kvolume] = (quote[kvolume] || 0) + basize
 		}
 	})
 
@@ -258,7 +255,7 @@ export const KEY_MAP = (({
 
 
 
-export function applykeymap(keymap: KeyMapValue, toquote: any, tokey: string, to: any, from: any) {
+export function applyKeyMap(keymap: KeyMapValue, toquote: any, tokey: string, to: any, from: any) {
 	if (keymap && (keymap.time || keymap.greater)) {
 		if (keymap.time) {
 			if (to > from) toquote[tokey] = to;
@@ -277,7 +274,7 @@ export function applykeymap(keymap: KeyMapValue, toquote: any, tokey: string, to
 
 
 
-export function applywbquote(quote: Quotes.Live, wbquote: Webull.Quote, toquote = {} as Quotes.Live) {
+export function applyWbQuote(quote: Quotes.Live, wbquote: Webull.Quote, toquote = {} as Quotes.Live) {
 
 	Object.keys(wbquote).forEach(key => {
 		let wbvalue = wbquote[key]
@@ -288,7 +285,7 @@ export function applywbquote(quote: Quotes.Live, wbquote: Webull.Quote, toquote 
 		let qvalue = quote[qkey]
 		if (qvalue == null) { qvalue = wbvalue; quote[qkey] = wbvalue; toquote[qkey] = wbvalue }
 
-		applykeymap(keymap, toquote, qkey, wbvalue, qvalue)
+		applyKeyMap(keymap, toquote, qkey, wbvalue, qvalue)
 
 	})
 
@@ -310,7 +307,7 @@ export function applywbquote(quote: Quotes.Live, wbquote: Webull.Quote, toquote 
 
 
 
-export function applylives(quote: Quotes.Calc, lquote: Quotes.Live, toquote: Quotes.Live) {
+export function applyLives(quote: Quotes.Calc, lquote: Quotes.Live, toquote: Quotes.Live) {
 	if (toquote.price) {
 		toquote.high = Math.max(quote.high || -Infinity, toquote.price)
 		toquote.low = Math.min(quote.low || Infinity, toquote.price)
@@ -326,8 +323,12 @@ export function applylives(quote: Quotes.Calc, lquote: Quotes.Live, toquote: Quo
 
 
 
-export function applycalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
-	if (!toquote) { toquote = quote } else { core.object.merge(quote, toquote) };
+export function applyCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
+	if (toquote) {
+		core.object.merge(quote, toquote)
+	} else {
+		toquote = quote
+	}
 
 	if (toquote.price) {
 		toquote.change = quote.price - quote.startPrice

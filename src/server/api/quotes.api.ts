@@ -61,7 +61,7 @@ polka.route({
 
 		return resolved.map(v => v.map(vv => {
 			core.fix(vv)
-			return quotes.todeal(vv)
+			return quotes.toDeal(vv)
 		}).sort((a, b) => b.timestamp - a.timestamp))
 	}
 })

@@ -94,11 +94,11 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 	if (!symbol) return console.warn(`!symbol ->`, webull.mqtt_topics[topic], wbquote);
 
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
-		let deal = quotes.todeal(wbquote)
+		let deal = quotes.toDeal(wbquote)
 		socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
 		let quote = QUOTES[symbol]
-		let toquote = quotes.applydeal(quote, deal)
-		quotes.applylives(quote, LIVES[symbol], toquote)
+		let toquote = quotes.applyDeal(quote, deal)
+		quotes.applyLives(quote, LIVES[symbol], toquote)
 		core.object.mergeAll([quote, EMITS[symbol]], toquote)
 		return
 	}
@@ -113,7 +113,7 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 		let from = quote[key]
 		if (from == null) { from = to; quote[key] = to; towbquote[key] = to }
 		let keymap = quotes.KEY_MAP[key]
-		quotes.applykeymap(keymap, towbquote, key, to, from)
+		quotes.applyKeyMap(keymap, towbquote, key, to, from)
 	})
 
 	let tokeys = Object.keys(towbquote)
@@ -123,8 +123,8 @@ emitter.on('data', function ondata(topic: number, wbquote: Webull.Quote) {
 
 		if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
 			let quote = QUOTES[symbol]
-			let toquote = quotes.applybidask(quote, towbquote)
-			quotes.applylives(quote, LIVES[symbol], toquote)
+			let toquote = quotes.applyBidAsk(quote, towbquote)
+			quotes.applyLives(quote, LIVES[symbol], toquote)
 			core.object.mergeAll([quote, EMITS[symbol]], toquote)
 		}
 	}
@@ -145,14 +145,14 @@ function ontick(i: number) {
 
 		if (Object.keys(towbquote).length > 0) {
 			core.object.merge(WB_SAVES[symbol], towbquote)
-			quotes.applywbquote(quote, towbquote, toquote)
+			quotes.applyWbQuote(quote, towbquote, toquote)
 			towbquote.symbol = symbol
 			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, towbquote)
 			Object.assign(WB_EMITS, { [symbol]: {} })
 		}
 
-		quotes.applylives(quote, LIVES[symbol], toquote)
-		quotes.applycalcs(quote, toquote)
+		quotes.applyLives(quote, LIVES[symbol], toquote)
+		quotes.applyCalcs(quote, toquote)
 		core.object.merge(quote, toquote)
 
 		if (Object.keys(toquote).length > 0) {
@@ -184,7 +184,7 @@ function ontick(i: number) {
 					coms.push(['zadd', zkey, quote.timestamp as any, lkey])
 					socket.emit(`${rkeys.LIVES}:${symbol}`, lquote)
 
-					core.object.merge(quote, quotes.resetlive(quote))
+					core.object.merge(quote, quotes.resetLive(quote))
 					core.object.merge(flquote, quote)
 
 				}
