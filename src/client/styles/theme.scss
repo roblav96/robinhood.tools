@@ -53,7 +53,7 @@ $desktop: 992px;
 $widescreen: 1200px;
 $fullhd: 1408px;
 // 
-// $column-gap: 1rem;
+$column-gap: 1rem;
 $dimensions: 16 20 24 28 32 40 48 56 64 72 80 88 96 104 112 120;
 // 
 $speed: 100ms;
@@ -102,14 +102,16 @@ $hr-margin: 0px;
 $box-padding: 1rem;
 $box-radius: $radius;
 // 
-$tabs-border-bottom-width: 2px;
-$tabs-link-hover-border-bottom-color: $border;
+// $tabs-border-bottom-width: 2px;
+$tabs-link-hover-border-bottom-color: $primary;
 $tabs-link-hover-color: $primary;
-// $tabs-boxed-link-hover-background-color: $white;
-// $tabs-boxed-link-hover-border-bottom-color: $primary;
-// $tabs-boxed-link-active-background-color: $white;
-// $tabs-boxed-link-active-border-color: $border;
-// $tabs-boxed-link-active-border-bottom-color: $primary;
+$tabs-link-active-border-bottom-color: $link;
+// 
+$tabs-boxed-link-hover-background-color: $white;
+$tabs-boxed-link-hover-border-bottom-color: $primary;
+$tabs-boxed-link-active-background-color: $white;
+$tabs-boxed-link-active-border-color: $primary;
+$tabs-boxed-link-active-border-bottom-color: $primary;
 // 
 // $tooltip-arrow-size: 10px;
 // $tooltip-arrow-margin: 4px;

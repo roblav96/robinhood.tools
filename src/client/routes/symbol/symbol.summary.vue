@@ -7,12 +7,12 @@
 </style>
 
 <template>
-	<section class="section is-medium">
+	<section class="section">
 		<div class="container">
 
 
 
-			<div class="columns is-multiline is-mobile is-variable is-4">
+			<div class="columns is-multiline is-mobile mb-3">
 				<div class="column" v-for="schema in schemas" :key="schema.name">
 					<table class="table is-middle is-fullwidth is-borderless card border">
 						<thead>
@@ -51,8 +51,6 @@
 					</table>
 				</div>
 			</div>
-
-
 
 			<div v-if="development" class="columns is-multiline is-mobile">
 				<div class="column" v-for="state in states" :key="state.name">

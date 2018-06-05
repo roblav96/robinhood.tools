@@ -140,7 +140,7 @@
 
 				</div>
 
-				<nav class="tabs is-centered is-fullwidth mb-0">
+				<nav class="tabs is-boxed is-centered is-fullwidth mb-0">
 					<div class="container">
 						<ul>
 							<router-link tag="li" class="is-dark" v-for="route in routes" :key="route.name" :to="{name:route.name}">
