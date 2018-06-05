@@ -41,11 +41,10 @@ let instances = cpus
 	Application({ name: 'hours', run: 'services/hours.service' })
 	// Application({ name: 'robinhood', run: 'services/robinhood.service' })
 
-	instances = cpus
-	if (DEVELOPMENT) instances = 1;
-	Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances })
-
-	if (!DEVELOPMENT) {
+	if (DEVELOPMENT) {
+		// Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances: 1 })
+	} else {
+		Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances: cpus })
 		Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
 		Application({ name: 'indexes', run: 'services/quotes.service', env: { SYMBOLS: 'INDEXES' } })
 	}
