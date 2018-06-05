@@ -6,6 +6,8 @@ import * as MqttConnection from 'mqtt-connection'
 import * as qs from 'querystring'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
+import * as rkeys from '../../common/rkeys'
+import * as redis from './redis'
 import * as webull from './webull'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
@@ -167,6 +169,13 @@ export default class WebullMqttClient {
 
 			let tid = Number.parseInt(topic.tid)
 			let symbol = this.dsymbols[topic.tid]
+
+			if (!symbol) {
+				console.warn(tid, `!symbol`)
+				return redis.main.hget(rkeys.WB.TIDS, topic.tid).then(symbol => {
+					this.dsymbols[topic.tid] = symbol
+				})
+			}
 
 			let i: number, len = payload.data.length
 			for (i = 0; i < len; i++) {

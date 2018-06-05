@@ -155,11 +155,6 @@ function ontick(i: number) {
 		}
 
 		let ediff = core.object.difference(QUOTES.EMITS[symbol], quote)
-		if (Object.keys(ediff).length > 0) {
-			ediff.symbol = symbol
-			socket.emit(`${rkeys.QUOTES}:${symbol}`, ediff)
-			Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
-		}
 
 		if (live) {
 			let wbsaves = WB.SAVES[symbol]
@@ -184,7 +179,7 @@ function ontick(i: number) {
 				core.object.merge(quote, quotes.resetLive(quote))
 
 				ldiff = core.object.difference(flquote, quote)
-				socket.emit(`${rkeys.QUOTES}:${symbol}`, ldiff)
+				core.object.merge(ediff, ldiff)
 
 				core.object.merge(flquote, quote)
 			}
@@ -192,6 +187,12 @@ function ontick(i: number) {
 			if (Object.keys(ldiff).length > 0) {
 				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, ldiff as any])
 			}
+		}
+
+		if (Object.keys(ediff).length > 0) {
+			ediff.symbol = symbol
+			socket.emit(`${rkeys.QUOTES}:${symbol}`, ediff)
+			Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
 		}
 	})
 
