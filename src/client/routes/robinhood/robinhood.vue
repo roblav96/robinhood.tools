@@ -26,19 +26,19 @@
 					</div>
 					<div class="column">
 						<div class="p-4 card">
-							<p class="title is-size-4 font-medium font-mono">{{vnumber(equityvalue,{precision:2,dollar:true})}}</p>
+							<p class="title is-size-4 font-medium font-mono">{{nformat(equityvalue,{precision:2,dollar:true})}}</p>
 							<p class="subtitle is-size-6">Equity Value</p>
 						</div>
 					</div>
 					<div class="column">
 						<div class="p-4 card">
-							<p class="title is-size-4 font-medium font-mono">{{vnumber(marketvalue,{precision:2,dollar:true})}}</p>
+							<p class="title is-size-4 font-medium font-mono">{{nformat(marketvalue,{precision:2,dollar:true})}}</p>
 							<p class="subtitle is-size-6">Market Value</p>
 						</div>
 					</div>
 					<div class="column">
 						<div class="p-4 card">
-							<p class="title is-size-4 font-medium font-mono">{{vnumber(buyingpower,{precision:2,dollar:true})}}</p>
+							<p class="title is-size-4 font-medium font-mono">{{nformat(buyingpower,{precision:2,dollar:true})}}</p>
 							<p class="subtitle is-size-6">Buying Power</p>
 						</div>
 					</div>

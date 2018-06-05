@@ -49,6 +49,7 @@ export function getChart(
 	symbol: string,
 	params: Partial<{ range: string, interval: string, includePrePost: boolean, period1: number, period2: number }>,
 	hhours: Hours,
+	retries = 3,
 ) {
 	let state = hours.getState(hhours)
 	if (params.range == '1d' && state.indexOf('PRE') == 0) {
@@ -65,7 +66,10 @@ export function getChart(
 		let error = _.get(response, 'chart.error') as Yahoo.ApiError
 		if (error) throw boom.badRequest('chart.error', response);
 		let result = _.get(response, 'chart.result[0]') as Yahoo.ChartResult
-		if (!result) throw boom.expectationFailed('!result', response);
+		// if (!result) throw boom.expectationFailed('!result', response);
+		if (!result && retries >= 0) {
+			return getChart(symbol, params, hhours, retries--)
+		}
 		let lquotes = [] as Quotes.Live[]
 		let stamps = result.timestamp
 		if (!stamps) return lquotes;

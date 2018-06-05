@@ -30,7 +30,7 @@ export default class extends Mixins(VMixin) {
 		{
 			name: 'Definition', icon: 'book-open',
 			defs: [
-				{ key: 'fullName', title: 'Official Name' },
+				{ key: 'fullName' },
 				{ key: 'issueType' },
 				{ key: 'currency' },
 				{ key: 'country' },
@@ -57,7 +57,7 @@ export default class extends Mixins(VMixin) {
 			if (key == 'website') return url.parse(value as any).host;
 			if (key == 'listDate') return dayjs(value).format('MMMM DD, YYYY');
 		}
-		if (core.number.isFinite(value)) return utils.vnumber(value);
+		if (core.number.isFinite(value)) return utils.nFormat(value);
 		// if (core.string.is(value)) return _.startCase(value);
 		if (core.boolean.is(value)) return !value ? 'No' : 'Yes';
 		return value

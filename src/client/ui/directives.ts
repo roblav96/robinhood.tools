@@ -60,7 +60,7 @@ Vue.directive('bg-bull-bear', function(el, { value, oldValue, arg }) {
 // Vue.directive('timestamp', {
 // 	update(el, binding, vnode, oldVnode) {
 // 		if (!binding.value) return binding.def.unbind(el, binding, vnode, oldVnode);
-// 		el.innerHTML = utils.vfromnow(binding.value, binding.modifiers)
+// 		el.innerHTML = utils.tformat(binding.value, binding.modifiers)
 // 		clock.offContext('1s', el)
 // 		clock.once('1s', () => binding.def.update(el, binding, vnode, oldVnode), el)
 // 	},
@@ -88,10 +88,10 @@ Vue.directive('bg-bull-bear', function(el, { value, oldValue, arg }) {
 // 	if (value == oldValue) return;
 // 	if (!Number.isFinite(value)) return;
 // 	let direction = value > oldValue ? 'up' : 'down' as 'up' | 'down'
-// 	let voldValue = Number.isFinite(oldValue) ? utils.vnumber(oldValue) : ''
+// 	let voldValue = Number.isFinite(oldValue) ? utils.nformat(oldValue) : ''
 // 	let olddigits = voldValue.split('')
 // 	console.log('olddigits ->', olddigits)
-// 	let vvalue = utils.vnumber(value)
+// 	let vvalue = utils.nformat(value)
 // 	let digits = vvalue.split('')
 // 	console.log('digits ->', digits)
 // 	digits.forEach((digit, i) => {

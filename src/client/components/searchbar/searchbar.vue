@@ -20,7 +20,7 @@ div.searchbar a.dropdown-item:hover .title {
 }
 
 div.searchbar div.dropdown-item:not(.is-disabled) {
-	/*border-bottom: 1px solid var(--grey-lightest);*/
+	border-bottom: 1px solid var(--grey-lightest);
 	padding: 0px 1rem;
 	padding-bottom: 0.5rem;
 }

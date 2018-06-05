@@ -31,8 +31,8 @@ export default class extends Vue {
 	vtruncate(value: string, length = 64) { if (!value) return value; return _.truncate(value, { length }) }
 	vcapitalize(value: string) { if (!value) return value; return core.string.capitalize(value) }
 	vstamp(stamp: number) { if (!stamp) return stamp; return pretty.stamp(stamp) }
-	vfromnow(stamp: number, opts?: Partial<VFromNowOpts>) { if (!stamp) return stamp; return utils.vfromnow(stamp, opts) }
-	vnumber(value: number, opts?: Partial<VNumberOpts>) { if (!Number.isFinite(value)) return value; return utils.vnumber(value, opts) }
+	tformat(stamp: number, opts?: Partial<TimeFormatOptions>) { if (!stamp) return stamp; return utils.tFormat(stamp, opts) }
+	nformat(value: number, opts?: Partial<NumberFormatOptions>) { if (!Number.isFinite(value)) return value; return utils.nFormat(value, opts) }
 	vpercent(to: number, from: number) { if (!to || !from) return NaN; return core.calc.percent(to, from) }
 	vslider(value: number, min: number, max: number) { if (!value) return NaN; return core.calc.slider(value, min, max) }
 

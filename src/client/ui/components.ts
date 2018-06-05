@@ -16,7 +16,7 @@ import clock from '../../common/clock'
 class Timestamp extends Vue {
 	fromnow = ''
 	@Vts.Prop() value: number
-	@Vts.Prop() opts: VFromNowOpts
+	@Vts.Prop() opts: TimeFormatOptions
 	@Vts.Watch('value') w_value() { this.sync() }
 	mounted() {
 		this.sync();
@@ -28,7 +28,7 @@ class Timestamp extends Vue {
 	sync() {
 		if (!Number.isFinite(this.value)) return this.fromnow = '';
 		let opts = this.opts ? core.clone(this.opts) : {}
-		this.fromnow = utils.vfromnow(this.value, opts)
+		this.fromnow = utils.tFormat(this.value, opts)
 	}
 }
 Vue.component('v-timestamp', Timestamp)
@@ -71,7 +71,7 @@ class NumberTicker extends Vue {
 	}
 	get colors() { return this.$store.state.colors }
 	get digits() {
-		return Number.isFinite(this.number) ? utils.vnumber(this.number).split('') : []
+		return Number.isFinite(this.number) ? utils.nFormat(this.number).split('') : []
 	}
 }
 Vue.component('v-number-ticker', NumberTicker)

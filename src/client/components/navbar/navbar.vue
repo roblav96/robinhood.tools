@@ -86,10 +86,10 @@ nav.navbar div.dropdown-content a > span.icon {
 						<img class="image is-28x28 mr-3 touch:ml-1" src="../../../assets/robinhood-logo.svg" alt="Robinhood">
 						<div class="flex flex-col self-center">
 							<p class="leading-tight font-medium font-mono">
-								{{vnumber(equityvalue,{dollar:true,precision:2})}}
+								{{nformat(equityvalue,{dollar:true,precision:2})}}
 							</p>
 							<p class="text-sm font-medium" v-bull-bear="equitychange">
-								{{vnumber(equitychange,{dollar:true,precision:2,plusminus:true})}} ({{vnumber(equitypercent,{precision:2,plusminus:true,percent:true})}})
+								{{nformat(equitychange,{dollar:true,precision:2,plusminus:true})}} ({{nformat(equitypercent,{precision:2,plusminus:true,percent:true})}})
 							</p>
 						</div>
 					</router-link>

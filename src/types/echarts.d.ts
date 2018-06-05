@@ -306,7 +306,7 @@ declare module 'echarts' {
 			inside: boolean
 			interval: number
 			margin: number
-			formatter: (value: number) => string
+			formatter: (value: number, index: number) => string
 			rotate: number
 			show: boolean
 			showMaxLabel: any

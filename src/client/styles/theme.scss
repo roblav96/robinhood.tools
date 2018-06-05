@@ -53,7 +53,7 @@ $desktop: 992px;
 $widescreen: 1200px;
 $fullhd: 1408px;
 // 
-$column-gap: 1rem;
+// $column-gap: 1rem;
 $dimensions: 16 20 24 28 32 40 48 56 64 72 80 88 96 104 112 120;
 // 
 $speed: 100ms;
@@ -112,6 +112,9 @@ $tabs-boxed-link-hover-border-bottom-color: $primary;
 $tabs-boxed-link-active-background-color: $white;
 $tabs-boxed-link-active-border-color: $primary;
 $tabs-boxed-link-active-border-bottom-color: $primary;
+// 
+// $table-cell-border: 1px solid $grey-lightest;
+$table-head-cell-border-width: 0 0 1px;
 // 
 // $tooltip-arrow-size: 10px;
 // $tooltip-arrow-margin: 4px;

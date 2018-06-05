@@ -15,6 +15,7 @@ if (process.env.DEVELOPMENT) {
 	// Object.assign(window, require('../common/pretty'))
 }
 
+import 'echarts'
 import 'modern-normalize'
 import 'animate.css'
 import './styles/vendors.scss'

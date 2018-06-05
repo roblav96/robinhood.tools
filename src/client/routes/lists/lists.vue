@@ -27,26 +27,26 @@
 							{{props.row.tinyName}}
 						</b-table-column>
 						<b-table-column label="Price" class="text-lg font-semibold font-mono" numeric>
-							<!-- {{vnumber(props.row.price,{precision:2})}} -->
+							<!-- {{nformat(props.row.price,{precision:2})}} -->
 							<v-number-ticker :number="props.row.price"></v-number-ticker>
 						</b-table-column>
 						<b-table-column label="Change" class="font-mono" numeric v-bull-bear="props.row.change">
-							{{vnumber(props.row.change,{plusminus:true})}} ({{vnumber(props.row.percent,{plusminus:true,percent:true,precision:2})}})
+							{{nformat(props.row.change,{plusminus:true})}} ({{nformat(props.row.percent,{plusminus:true,percent:true,precision:2})}})
 						</b-table-column>
 						<b-table-column label="Volume" class="font-mono" numeric>
-							{{vnumber(props.row.volume,{compact:true,precision:2})}}
+							{{nformat(props.row.volume,{compact:true,precision:2})}}
 						</b-table-column>
 						<b-table-column label="Avg Volume" class="font-mono" numeric>
-							{{vnumber(props.row.avgVolume,{compact:true,precision:2})}}
+							{{nformat(props.row.avgVolume,{compact:true,precision:2})}}
 						</b-table-column>
 						<!-- <b-table-column label="10day Volume" class="font-mono" numeric>
-							{{vnumber(props.row.avgVolume10Day,{compact:true,precision:2})}}
+							{{nformat(props.row.avgVolume10Day,{compact:true,precision:2})}}
 						</b-table-column>
 						<b-table-column label="3mo Volume" class="font-mono" numeric>
-							{{vnumber(props.row.avgVolume3Month,{compact:true,precision:2})}}
+							{{nformat(props.row.avgVolume3Month,{compact:true,precision:2})}}
 						</b-table-column> -->
 						<b-table-column label="Market Cap" class="font-mono" numeric>
-							{{vnumber(props.row.marketCap,{compact:true,precision:2})}}
+							{{nformat(props.row.marketCap,{compact:true,precision:2})}}
 						</b-table-column>
 						<!-- <b-table-column label="Updated" class="" numeric>
 							<span v-timestamp="props.row.timestamp"></span>

@@ -37,9 +37,9 @@ export default class extends Mixins(VMixin) {
 		let k = key.toLowerCase()
 		if (core.number.isFinite(value)) {
 			if (k.includes('time') || k.includes('date')) {
-				return utils.vfromnow(value, { verbose: true })
+				return utils.tFormat(value, { verbose: true })
 			}
-			return utils.vnumber(value, { nozeros: true })
+			return utils.nFormat(value, { nozeros: true })
 		}
 		if (core.boolean.is(value)) {
 			if (core.boolean.is(value)) return !value ? 'No' : 'Yes';

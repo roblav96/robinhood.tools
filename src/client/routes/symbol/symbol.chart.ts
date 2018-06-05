@@ -63,20 +63,14 @@ class VSymbolEChart extends Vue {
 	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
 	onresize = _.debounce(this.resize, 300)
 	resize() {
-		let dims = this.dims()
-		console.log('dimss ->', dims)
-		// let navbar = document.getElementById('navbar')
-		// let header = document.getElementById('symbol_route').firstChild as HTMLElement
-		// let screen = utils.screen()
-		// dims.height = screen.height - navbar.offsetHeight - header.offsetHeight
-		this.echart.resize(dims)
+		this.echart.resize(this.dims())
 	}
 
 	syncdataset(lquotes: Quotes.Live[]) {
 		let bones = {
 			animation: false,
-			backgroundColor: this.colors.white,
-			color: Object.values(this.colors),
+			// backgroundColor: this.colors.white,
+			// color: Object.values(this.colors),
 			dataset: {
 				// dimensions: ['timestamp',''],
 				source: lquotes,
@@ -104,21 +98,27 @@ class VSymbolEChart extends Vue {
 			// 	}]
 			// },
 			grid: [{
-				top: 20,
+				top: 10,
 				left: 50,
 				right: 50,
-				bottom: 75,
+				bottom: 60,
+				show: true,
+				backgroundColor: this.colors.white,
+				borderColor: this.colors['grey-lightest'],
 			}, {
 				height: 50,
 				left: 50,
 				right: 50,
-				bottom: 75,
+				bottom: 60,
 			}],
 			xAxis: [{
 				type: 'category',
 				scale: true,
 				boundaryGap: false,
-				axisLabel: { textStyle: { color: this.colors.dark } },
+				axisLabel: {
+					textStyle: { color: this.colors.dark },
+					formatter: v => utils.tFormat(v, { verbose: true }),
+				},
 				axisLine: { lineStyle: { color: this.colors.dark } },
 			}, {
 				type: 'category',
@@ -149,14 +149,13 @@ class VSymbolEChart extends Vue {
 			dataZoom: [{
 				type: 'inside',
 				xAxisIndex: [0, 1],
-				zoomOnMouseWheel: false,
-				moveOnMouseMove: false,
 			}, {
 				show: true,
 				xAxisIndex: [0, 1],
 				type: 'slider',
-				bottom: 10,
-				handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+				height: 30,
+				bottom: 0,
+				// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
 			}],
 			series: [{
 				name: 'OHLC',
@@ -193,6 +192,7 @@ class VSymbolEChart extends Vue {
 		} as echarts.Options
 		this.echart.setOption(bones)
 		console.log(`this.echart.getOption() ->`, this.echart.getOption().series[1])
+		this.resize()
 	}
 
 }

@@ -7,14 +7,14 @@
 </style>
 
 <template>
-	<section class="section is-medium">
+	<section class="section">
 		<div class="container">
 
 
 
-			<div class="columns is-multiline is-mobile mb-4">
+			<div class="columns is-multiline is-mobile">
 				<div class="column" v-for="schema in schemas" :key="schema.name">
-					<table class="table is-middle is-fullwidth is-borderless card border">
+					<table class="table is-middle is-hoverable is-fullwidth  is-borderless card is-light">
 						<thead>
 							<tr>
 								<th class="whitespace-no-wrap">{{schema.name}}</th>
@@ -33,8 +33,8 @@
 						</tbody>
 					</table>
 				</div>
-				<div class="column">
-					<table class="table is-middle is-fullwidth is-borderless card border">
+				<div class="column min-w-xs">
+					<table class="table is-middle is-hoverable is-fullwidth card is-light">
 						<thead>
 							<tr>
 								<th class="whitespace-no-wrap">Description</th>
@@ -54,7 +54,7 @@
 
 			<div v-if="development" class="columns is-multiline is-mobile">
 				<div class="column" v-for="state in states" :key="state.name">
-					<table class="table is-middle is-fullwidth is-nowrap is-borderless card">
+					<table class="table is-middle is-hoverable is-fullwidth is-nowrap is-borderless card is-light">
 						<thead>
 							<tr>
 								<th class="whitespace-no-wrap">{{state.name}}</th>
@@ -69,25 +69,25 @@
 									<td>{{vscase(state.calc)}}</td>
 								</b-tooltip>
 								<td class="has-text-right font-medium font-mono">
-									{{vnumber(all.quote[state.calc])}}
+									{{nformat(all.quote[state.calc])}}
 								</td>
 							</tr>
 							<tr>
 								<td>{{vscase(`${state.key}Price`)}}</td>
 								<td class="has-text-right font-medium font-mono">
-									{{vnumber(all.quote[vcamel(`${state.key}Price`)])}}
+									{{nformat(all.quote[vcamel(`${state.key}Price`)])}}
 								</td>
 							</tr>
 							<tr>
 								<td>{{vscase(`${state.key}Change`)}}</td>
 								<td class="has-text-right font-medium font-mono" v-bull-bear="all.quote[vcamel(`${state.key}Change`)]">
-									{{vnumber(all.quote[vcamel(`${state.key}Change`)],{nozeros:true,plusminus:true})}}
+									{{nformat(all.quote[vcamel(`${state.key}Change`)],{nozeros:true,plusminus:true})}}
 								</td>
 							</tr>
 							<tr>
 								<td>{{vscase(`${state.key}Percent`)}}</td>
 								<td class="has-text-right font-medium font-mono" v-bull-bear="all.quote[vcamel(`${state.key}Percent`)]">
-									{{vnumber(all.quote[vcamel(`${state.key}Percent`)],{nozeros:true,plusminus:true,percent:true})}}
+									{{nformat(all.quote[vcamel(`${state.key}Percent`)],{nozeros:true,plusminus:true,percent:true})}}
 								</td>
 							</tr>
 							<tr>

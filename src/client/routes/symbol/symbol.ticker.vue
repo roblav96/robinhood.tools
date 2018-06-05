@@ -30,32 +30,32 @@
 									<td>{{vscase(state.calc)}}</td>
 								</b-tooltip>
 								<td class="has-text-right font-medium font-mono">
-									{{vnumber(all.quote[state.calc])}}
+									{{nformat(all.quote[state.calc])}}
 								</td>
 							</tr>
 							<tr>
 								<td>{{vscase(`${state.key}Price`)}}</td>
 								<td class="has-text-right font-medium font-mono">
-									{{vnumber(all.quote[vcamel(`${state.key}Price`)])}}
+									{{nformat(all.quote[vcamel(`${state.key}Price`)])}}
 								</td>
 							</tr>
 							<tr>
 								<td>{{vscase(`${state.key}Change`)}}</td>
 								<td class="has-text-right font-medium font-mono" v-bull-bear="all.quote[vcamel(`${state.key}Change`)]">
-									{{vnumber(all.quote[vcamel(`${state.key}Change`)],{nozeros:true,plusminus:true})}}
+									{{nformat(all.quote[vcamel(`${state.key}Change`)],{nozeros:true,plusminus:true})}}
 								</td>
 							</tr>
 							<tr>
 								<td>{{vscase(`${state.key}Percent`)}}</td>
 								<td class="has-text-right font-medium font-mono" v-bull-bear="all.quote[vcamel(`${state.key}Percent`)]">
-									{{vnumber(all.quote[vcamel(`${state.key}Percent`)],{nozeros:true,plusminus:true,percent:true})}}
+									{{nformat(all.quote[vcamel(`${state.key}Percent`)],{nozeros:true,plusminus:true,percent:true})}}
 								</td>
 							</tr>
 							<tr>
 								<td>Updated</td>
 								<td class="has-text-right font-medium">
 									<v-timestamp :value="all.quote[vcamel(`${state.key}Timestamp`)]"></v-timestamp>
-									<!-- {{vfromnow(all.quote[vcamel(`${state.key}Timestamp`)],{max:1})}} -->
+									<!-- {{tformat(all.quote[vcamel(`${state.key}Timestamp`)],{max:1})}} -->
 								</td>
 							</tr>
 						</tbody>
@@ -78,9 +78,9 @@
 								</div>
 							</div>
 							<div class="columns is-mobile is-gapless mb-1">
-								<p class="column is-narrow has-text-danger">{{vnumber(all.quote.bidPrice)}}</p>
-								<p class="column has-text-centered">{{vnumber(vpercent(all.quote.askPrice, all.quote.bidPrice),{percent:true})}}</p>
-								<p class="column is-narrow has-text-success">{{vnumber(all.quote.askPrice)}}</p>
+								<p class="column is-narrow has-text-danger">{{nformat(all.quote.bidPrice)}}</p>
+								<p class="column has-text-centered">{{nformat(vpercent(all.quote.askPrice, all.quote.bidPrice),{percent:true})}}</p>
+								<p class="column is-narrow has-text-success">{{nformat(all.quote.askPrice)}}</p>
 							</div>
 							<div class="columns is-mobile is-gapless mb-0">
 								<div class="column is-6">
@@ -92,9 +92,9 @@
 								</div>
 							</div>
 							<div class="columns is-mobile is-gapless mb-0">
-								<p class="column has-text-success">{{vnumber(all.quote.bidLot,{precision:0})}}</p>
+								<p class="column has-text-success">{{nformat(all.quote.bidLot,{precision:0})}}</p>
 								<p class="column has-text-centered"></p>
-								<p class="column has-text-danger has-text-right">{{vnumber(all.quote.askLot,{precision:0})}}</p>
+								<p class="column has-text-danger has-text-right">{{nformat(all.quote.askLot,{precision:0})}}</p>
 							</div> -->
 
 			</div>

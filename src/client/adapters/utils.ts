@@ -50,8 +50,8 @@ export const wemitter = new UEmitter('window')
 
 
 const UNITS = ['K', 'M', 'B', 'T']
-declare global { interface VNumberOpts { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } }
-export function vnumber(value: number, { precision, compact, plusminus, percent, dollar, nozeros } = {} as Partial<VNumberOpts>) {
+declare global { interface NumberFormatOptions { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } }
+export function nFormat(value: number, { precision, compact, plusminus, percent, dollar, nozeros } = {} as Partial<NumberFormatOptions>) {
 	if (!Number.isFinite(precision)) {
 		if (compact) precision = 0;
 		else {
@@ -110,17 +110,17 @@ export function vnumber(value: number, { precision, compact, plusminus, percent,
 
 	return fixed
 }
-if (process.env.DEVELOPMENT) Object.assign(window, { vnumber });
+if (process.env.DEVELOPMENT) Object.assign(window, { nFormat });
 
 
 
-declare global { interface VFromNowOpts extends prettyms.PrettyMsOptions { max: number, keepDecimalsOnWholeSeconds: boolean } }
-export function vfromnow(stamp: number, opts = {} as Partial<VFromNowOpts>) {
-	if (!Number.isFinite(opts.secDecimalDigits)) opts.secDecimalDigits = 0;
-	if (!Number.isFinite(opts.max)) opts.max = 1;
-	let ms = prettyms(Math.max(Date.now() - stamp, 1001), opts)
+declare global { interface TimeFormatOptions extends prettyms.PrettyMsOptions { max: number, showms: boolean, ago: boolean, keepDecimalsOnWholeSeconds: boolean } }
+export function tFormat(stamp: number, opts = {} as Partial<TimeFormatOptions>) {
+	opts.secDecimalDigits = opts.secDecimalDigits || 0
+	opts.max = opts.max || 1
+	let ms = prettyms(Math.max(Date.now() - stamp, opts.showms ? 0 : 1001), opts)
 	ms = ms.split(' ').splice(0, opts.verbose ? opts.max * 2 : opts.max).join(' ')
-	return ms + ' ago'
+	return opts.ago == false ? ms : ms + ' ago'
 }
 
 
@@ -170,6 +170,18 @@ export function marketcapCategory(marketcap: number) {
 
 
 
+// import * as benchmark from '../../common/benchmark'
+// benchmark.simple('formats', [
+// 	function nformat() {
+// 		nFormat(Date.now())
+// 	},
+// 	function tformat() {
+// 		tFormat(Date.now())
+// 	},
+// 	function tformatverbose() {
+// 		tFormat(Date.now())
+// 	},
+// ])
 
 
 

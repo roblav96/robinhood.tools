@@ -38,7 +38,7 @@ export default class VSymbol extends Mixins(VMixin) {
 	all = core.array.dict(Object.keys(quotes.ALL_RKEYS), {} as any) as Quotes.All
 
 	@Vts.Watch('all.quote.price', { immediate: true }) w_price(price: number) {
-		document.title = `${this.symbol} ${this.vnumber(price)} (${this.vnumber(this.all.quote.percent, { plusminus: true, percent: true })})`
+		document.title = `${this.symbol} ${this.nformat(price)} (${this.nformat(this.all.quote.percent, { plusminus: true, percent: true })})`
 	}
 
 	reset() {
