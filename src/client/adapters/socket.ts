@@ -115,7 +115,7 @@ class Socket extends Emitter {
 	discover() {
 		let proms = [http.get('/websocket/discover', { retries: Infinity })]
 		if (process.env.DEVELOPMENT) {
-			proms.push(http.get(`https://${core.HOSTNAME}/websocket/discover`, { retries: Infinity }))
+			proms.push(http.get(`https://${core.HOSTNAME}/api/websocket/discover`, { retries: Infinity }))
 		}
 		return Promise.all(proms).then(resolved => {
 			let addresses = _.flatten(resolved) as string[]

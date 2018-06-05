@@ -15,15 +15,13 @@ const ALLOW_HEADERS = [
 
 polka.use(function corshook(req, res, next) {
 
-	console.log(`req.headers ->`, req.headers)
 	let origin = req.headers['origin']
-	console.log('origin ->', origin)
-	// if (!origin || !origin.includes(ORIGIN)) {
-	// 	if (req.method == 'OPTIONS') {
-	// 		return res.end()
-	// 	}
-	// 	return next()
-	// }
+	if (!origin || !origin.includes(ORIGIN)) {
+		if (req.method == 'OPTIONS') {
+			return res.end()
+		}
+		return next()
+	}
 	res.setHeader('access-control-allow-origin', origin)
 
 	if (req.method != 'OPTIONS') return next();
