@@ -23,7 +23,7 @@ polka.use(function securityhook(req, res, next) {
 		token: req.cookies['x-token'],
 	} as Security.Doc
 	
-	console.log(`doc ->`, doc)
+	// console.log(`doc ->`, doc)
 
 	let failed = security.isDoc(doc)
 	if (failed) return next(boom.preconditionFailed(failed, { hook: 'security' }));

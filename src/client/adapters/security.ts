@@ -40,8 +40,7 @@ export const doc = {
 
 const copts = {
 	domain: core.HOSTNAME,
-	path: '/',
-	// sameSite: true,
+	path: '/', sameSite: true,
 } as cookie.CookieSerializeOptions
 
 export function cookies() {
