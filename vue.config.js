@@ -4,7 +4,8 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const DEVELOPMENT = process.env.NODE_ENV == 'development'
 const PRODUCTION = process.env.NODE_ENV == 'production'
 
-const DEBUG = false
+let DEBUG = false
+if (PRODUCTION) DEBUG = false;
 if (DEBUG) {
 	const inspector = require('inspector')
 	inspector.open(+process.debugPort - 1)
