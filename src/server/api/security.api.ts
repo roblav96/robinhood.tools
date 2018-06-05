@@ -26,8 +26,8 @@ polka.route({
 
 		let cookie = {
 			domain: core.HOSTNAME,
-			path: '/', sameSite: false, httpOnly: true,
-			secure: !!process.env.PRODUCTION,
+			path: '/', sameSite: true, httpOnly: true,
+			// secure: !!process.env.PRODUCTION,
 		} as CookieSerializeOptions
 		req.doc.bits = security.randomBits(security.LENGTHS.bits)
 		res.setCookie('x-bits', req.doc.bits, cookie)
