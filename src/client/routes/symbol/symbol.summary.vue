@@ -7,12 +7,12 @@
 </style>
 
 <template>
-	<section class="section">
+	<section class="section is-medium">
 		<div class="container">
 
 
 
-			<div class="columns is-multiline is-mobile mb-3">
+			<div class="columns is-multiline is-mobile mb-4">
 				<div class="column" v-for="schema in schemas" :key="schema.name">
 					<table class="table is-middle is-fullwidth is-borderless card border">
 						<thead>
