@@ -95,14 +95,15 @@ export function initFullQuote(
 	quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))
 	quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, _.round(quote.avgVolume10Day, quote.avgVolume3Month)))
 
-	let toquote = { symbol } as Quotes.Quote
-	applyWbQuote(quote, wbquote, toquote)
-	resets ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote)
-	let reset = resetFull(quote)
-	resets ? core.object.merge(quote, reset) : core.object.repair(quote, reset)
+	{
+		let toquote = applyWbQuote(quote, wbquote)
+		resets ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote)
+	}
+	{
+		let toquote = resetFull(quote)
+		resets ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote)
+	}
 	mergeCalcs(quote)
-
-	core.object.clean(quote)
 
 	return quote
 
@@ -116,6 +117,7 @@ export function resetLive(quote: Quotes.Calc) {
 		dealSize: 0, dealFlowSize: 0,
 		buySize: 0, sellSize: 0,
 		bidSize: 0, askSize: 0,
+		spreadFlowSize: 0,
 		bidSpread: quote.bid, askSpread: quote.ask,
 		open: quote.price, high: quote.price, low: quote.price, close: quote.price,
 	} as Quotes.Calc
@@ -133,6 +135,7 @@ export function resetFull(quote: Quotes.Calc) {
 	})
 	core.object.merge(toquote, {
 		liveCount: 0, dealCount: 0,
+		turnoverRate: 0, vibrateRatio: 0, yield: 0,
 		startPrice: quote.price,
 		dayHigh: quote.price, dayLow: quote.price,
 	} as Quotes.Calc)
@@ -160,19 +163,19 @@ export function applyDeal(quote: Quotes.Calc, deal: Quotes.Deal, toquote = {} as
 		}
 	}
 
-	toquote.dealCount = quote.dealCount + 1
-	toquote.dealSize = quote.dealSize + deal.size
-	toquote.dealVolume = quote.dealVolume + deal.size
+	toquote.dealCount = core.math.sum(quote.dealCount, 1)
+	toquote.dealSize = core.math.sum(quote.dealSize, deal.size)
+	toquote.dealVolume = core.math.sum(quote.dealVolume, deal.size)
 
 	if (deal.flag == 'B') {
-		toquote.buySize = quote.buySize + deal.size
-		toquote.buyVolume = quote.buyVolume + deal.size
+		toquote.buySize = core.math.sum(quote.buySize, deal.size)
+		toquote.buyVolume = core.math.sum(quote.buyVolume, deal.size)
 	} else if (deal.flag == 'S') {
-		toquote.sellSize = quote.sellSize + deal.size
-		toquote.sellVolume = quote.sellVolume + deal.size
+		toquote.sellSize = core.math.sum(quote.sellSize, deal.size)
+		toquote.sellVolume = core.math.sum(quote.sellVolume, deal.size)
 	} else {
-		toquote.size = quote.size + deal.size
-		toquote.volume = quote.volume + deal.size
+		toquote.size = core.math.sum(quote.size, deal.size)
+		toquote.volume = core.math.sum(quote.volume, deal.size)
 	}
 
 	return toquote
@@ -271,12 +274,12 @@ export function applyWbQuote(quote: Quotes.Calc, wbquote: Webull.Quote, toquote 
 		toquote.askSpread = core.math.max(quote.askSpread, quote.ask, toquote.ask)
 	}
 	if (toquote.bids) {
-		toquote.bidSize = quote.bidSize + toquote.bids
-		toquote.bidVolume = quote.bidVolume + toquote.bids
+		toquote.bidSize = core.math.sum(quote.bidSize, toquote.bids)
+		toquote.bidVolume = core.math.sum(quote.bidVolume, toquote.bids)
 	}
 	if (toquote.asks) {
-		toquote.askSize = quote.askSize + toquote.asks
-		toquote.askVolume = quote.askVolume + toquote.asks
+		toquote.askSize = core.math.sum(quote.askSize, toquote.asks)
+		toquote.askVolume = core.math.sum(quote.askVolume, toquote.asks)
 	}
 
 	if (toquote.status) {
@@ -292,10 +295,10 @@ export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 	if (toquote) {
 
 		if (toquote.price) {
-			toquote.high = core.math.max(quote.high, quote.price, toquote.price)
-			toquote.low = core.math.min(quote.low, quote.price, toquote.price)
-			toquote.dayHigh = core.math.max(quote.dayHigh, quote.price, toquote.price)
-			toquote.dayLow = core.math.min(quote.dayLow, quote.price, toquote.price)
+			quote.high = core.math.max(quote.high, quote.price, toquote.price)
+			quote.low = core.math.min(quote.low, quote.price, toquote.price)
+			quote.dayHigh = core.math.max(quote.dayHigh, quote.price, toquote.price)
+			quote.dayLow = core.math.min(quote.dayLow, quote.price, toquote.price)
 		}
 
 		core.object.merge(quote, toquote)
@@ -303,44 +306,58 @@ export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 		toquote = quote
 	}
 
-	if (toquote.price) {
-		quote.close = quote.price
-		quote.change = quote.price - quote.startPrice
-		quote.percent = core.calc.percent(quote.price, quote.startPrice)
-
+	if (toquote.price || toquote.timestamp) {
 		let state = hours.getState(hours.rxhours.value, quote.timestamp)
-		if (state.indexOf('PRE') == 0) {
-			quote.prePrice = quote.price
-			quote.preChange = quote.price - quote.startPrice
-			quote.prePercent = core.calc.percent(quote.price, quote.startPrice)
-			quote.preTimestamp = quote.timestamp
-		} else if (state == 'REGULAR') {
-			quote.regPrice = quote.price
-			quote.regChange = quote.price - quote.openPrice
-			quote.regPercent = core.calc.percent(quote.price, quote.openPrice)
-			quote.regTimestamp = quote.timestamp
-		} else if (state.indexOf('POST') == 0) {
-			quote.postPrice = quote.price
-			quote.postChange = quote.price - quote.closePrice
-			quote.postPercent = core.calc.percent(quote.price, quote.closePrice)
-			quote.postTimestamp = quote.timestamp
+
+		if (toquote.price) {
+			quote.close = quote.price
+			quote.change = core.math.sum(quote.price, -quote.startPrice)
+			quote.percent = core.calc.percent(quote.price, quote.startPrice)
+
+			if (state.indexOf('PRE') == 0) {
+				quote.prePrice = quote.price
+				quote.preChange = core.math.sum(quote.price, -quote.startPrice)
+				quote.prePercent = core.calc.percent(quote.price, quote.startPrice)
+			} else if (state == 'REGULAR') {
+				quote.regPrice = quote.price
+				quote.regChange = core.math.sum(quote.price, -quote.openPrice)
+				quote.regPercent = core.calc.percent(quote.price, quote.openPrice)
+			} else if (state.indexOf('POST') == 0) {
+				quote.postPrice = quote.price
+				quote.postChange = core.math.sum(quote.price, -quote.closePrice)
+				quote.postPercent = core.calc.percent(quote.price, quote.closePrice)
+			}
+
+			if (quote.sharesOutstanding) {
+				quote.marketCap = core.math.round(quote.price * quote.sharesOutstanding)
+			}
 		}
 
-		if (quote.sharesOutstanding) {
-			quote.marketCap = _.round(quote.price * quote.sharesOutstanding)
+		if (toquote.timestamp) {
+			if (state.indexOf('PRE') == 0) {
+				quote.preTimestamp = quote.timestamp
+			} else if (state == 'REGULAR') {
+				quote.regTimestamp = quote.timestamp
+			} else if (state.indexOf('POST') == 0) {
+				quote.postTimestamp = quote.timestamp
+			}
 		}
 	}
 
 	if (toquote.bid || toquote.ask) {
-		quote.spread = quote.ask - quote.bid
+		quote.spread = core.math.sum(quote.ask, -quote.bid)
+	}
+	if (toquote.bidSize || toquote.askSize) {
+		quote.spreadFlowSize = core.math.sum(quote.bidSize, -quote.askSize)
+		quote.spreadFlowVolume = core.math.sum(quote.bidVolume, -quote.askVolume)
 	}
 
 	if (toquote.buySize || toquote.sellSize) {
-		quote.dealFlowSize = quote.buySize - quote.sellSize
-		quote.dealFlowVolume = quote.buyVolume - quote.sellVolume
+		quote.dealFlowSize = core.math.sum(quote.buySize, -quote.sellSize)
+		quote.dealFlowVolume = core.math.sum(quote.buyVolume, -quote.sellVolume)
 	}
 
-	// return toquote
+	return quote
 }
 
 

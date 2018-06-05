@@ -110,6 +110,8 @@ const CALC = {
 	bids: number,
 	asks: number,
 	spread: number,
+	spreadFlowSize: number,
+	spreadFlowVolume: number,
 	// 
 	dealFlowVolume: number,
 	dealFlowSize: number,

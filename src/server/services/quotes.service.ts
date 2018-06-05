@@ -111,12 +111,6 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 	let wbquote = WB.QUOTES[symbol]
 	if (!wbquote) return console.warn(symbol, webull.mqtt_topics[topic], `!wbquote ->\nwbdata ->`, wbdata);
 
-	if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
-		let quote = QUOTES.CALCS[symbol]
-		quotes.mergeCalcs(quote, quotes.applyWbQuote(quote, wbdata))
-		// quotes.mergeCalcs(quote, quotes.applyBidAsk(quote, wbdata))
-	}
-
 	Object.keys(wbdata).forEach(key => {
 		let to = wbdata[key]
 		let from = wbquote[key]
@@ -129,6 +123,11 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 	if (tokeys.length > 0) {
 		// console.info(symbol, webull.mqtt_topics[topic], '->\ntowbquote ->', towbquote)
 		core.object.mergeAll([WB.QUOTES[symbol], WB.EMITS[symbol]], towbquote, tokeys)
+
+		if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
+			let quote = QUOTES.CALCS[symbol]
+			quotes.mergeCalcs(quote, quotes.applyWbQuote(quote, towbquote))
+		}
 	}
 })
 
@@ -140,25 +139,22 @@ function ontick(i: number) {
 
 	let coms = [] as Redis.Coms
 	SYMBOLS.forEach(symbol => {
-
 		let quote = QUOTES.CALCS[symbol]
-		let toquote = QUOTES.EMITS[symbol]
-		let towbquote = WB.EMITS[symbol]
 
+		let towbquote = WB.EMITS[symbol]
 		if (Object.keys(towbquote).length > 0) {
 			core.object.merge(WB.SAVES[symbol], towbquote)
-			quotes.applyWbQuote(quote, towbquote, toquote)
+			quotes.mergeCalcs(quote, quotes.applyWbQuote(quote, towbquote))
 			towbquote.symbol = symbol
 			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, towbquote)
 			Object.assign(WB.EMITS, { [symbol]: {} })
 		}
 
-		quotes.mergeCalcs(quote, toquote)
-
-		if (Object.keys(toquote).length > 0) {
-			toquote.symbol = symbol
-			socket.emit(`${rkeys.QUOTES}:${symbol}`, toquote)
-			Object.assign(QUOTES.EMITS, { [symbol]: {} })
+		let ediff = core.object.difference(QUOTES.EMITS[symbol], quote)
+		if (Object.keys(ediff).length > 0) {
+			ediff.symbol = symbol
+			socket.emit(`${rkeys.QUOTES}:${symbol}`, ediff)
+			Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
 		}
 
 		if (live) {
@@ -169,28 +165,30 @@ function ontick(i: number) {
 			}
 
 			let flquote = QUOTES.LIVES[symbol]
-			let diff = core.object.difference(flquote, quote)
-			if (Object.keys(diff).length > 0) {
-				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diff as any])
-				if (diff.timestamp && quote.timestamp > flquote.timestamp) {
+			let ldiff = core.object.difference(flquote, quote)
+			if (quote.timestamp > flquote.timestamp) {
+				quote.liveCount++
+				quote.liveStamp = Date.now()
 
-					quote.liveCount++
-					quote.liveStamp = Date.now()
+				let lkey = `${rkeys.LIVES}:${symbol}:${quote.timestamp}`
+				let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
+				coms.push(['hmset', lkey, lquote as any])
+				let zkey = `${rkeys.LIVES}:${symbol}`
+				coms.push(['zadd', zkey, quote.timestamp as any, lkey])
+				socket.emit(`${rkeys.LIVES}:${symbol}`, lquote)
 
-					let lkey = `${rkeys.LIVES}:${symbol}:${quote.timestamp}`
-					let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
-					coms.push(['hmset', lkey, lquote as any])
-					let zkey = `${rkeys.LIVES}:${symbol}`
-					coms.push(['zadd', zkey, quote.timestamp as any, lkey])
-					socket.emit(`${rkeys.LIVES}:${symbol}`, lquote)
+				core.object.merge(quote, quotes.resetLive(quote))
 
-					core.object.merge(quote, quotes.resetLive(quote))
-					core.object.merge(flquote, quote)
+				ldiff = core.object.difference(flquote, quote)
+				socket.emit(`${rkeys.QUOTES}:${symbol}`, ldiff)
 
-				}
+				core.object.merge(flquote, quote)
+			}
+
+			if (Object.keys(ldiff).length > 0) {
+				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, ldiff as any])
 			}
 		}
-
 	})
 
 	redis.main.coms(coms)
@@ -202,10 +200,10 @@ function ontick(i: number) {
 
 }
 
-// const avgs = {
-// 	emits: 0,
-// 	lives: 0,
-// }
+const avgs = {
+	emits: 0,
+	lives: 0,
+}
 
 
 
@@ -299,12 +297,15 @@ function ontick(i: number) {
 // }
 
 // import * as benchmark from '../../common/benchmark'
-// benchmark.simple('fix', [
-// 	function fastfix() {
-// 		core.fastfix(JSON.parse(JSON.stringify(mock)))
+// benchmark.simple('sum', [
+// 	function nativeadd() {
+// 		123 + 123
 // 	},
-// 	function corefix() {
-// 		core.fix(JSON.parse(JSON.stringify(mock)))
+// 	function coresum() {
+// 		core.math.sum(123, 123)
+// 	},
+// 	function lodashsum() {
+// 		_.sum([123, 123])
 // 	},
 // ])
 
