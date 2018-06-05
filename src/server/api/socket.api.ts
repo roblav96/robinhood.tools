@@ -37,7 +37,7 @@ polka.route({
 		let addresses = PORTS.map(port => `${protocol}://${process.env.DOMAIN}/websocket/${port}`)
 		if (process.env.PRODUCTION) return addresses;
 		let discover = await redis.main.smembers(rkeys.WS.DISCOVER) as string[]
-		return addresses.concat(discover.map(port => `https://${core.HOSTNAME}/websocket/${port}`))
+		return addresses.concat(discover.map(port => `wss://${core.HOSTNAME}/websocket/${port}`))
 	}
 })
 
