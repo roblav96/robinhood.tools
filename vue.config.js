@@ -30,6 +30,8 @@ module.exports = {
 
 	configureWebpack: function(config) {
 		if (DEBUG) console.log('configure config ->', config);
+		
+		delete config.node.process
 
 		config.output.filename = '[name].bundle.js'
 		config.output.chunkFilename = '[name].chunk.js'
