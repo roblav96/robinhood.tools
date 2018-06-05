@@ -19,13 +19,11 @@ import * as utils from '../../adapters/utils'
 
 @Vts.Component({
 	template: `
-		<div class="flex-col-full">
-			<div 
-				class="absolute"
-				v-on:dblclick="ondblclick"
-				v-on:mousewheel="onmousewheel"
-			></div>
-		</div>
+		<div class=""><div 
+			class="absolute"
+			v-on:dblclick="ondblclick"
+			v-on:mousewheel="onmousewheel"
+		></div></div>
 	`,
 })
 class VSymbolEChart extends Vue {

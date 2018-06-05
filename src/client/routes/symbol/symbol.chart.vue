@@ -8,6 +8,6 @@
 
 <template>
 	<section class="section flex-col-full">
-		<v-symbol-echart ref="symbol_echart"></v-symbol-echart>
+		<v-symbol-echart class="flex-col-full" ref="symbol_echart"></v-symbol-echart>
 	</section>
 </template>

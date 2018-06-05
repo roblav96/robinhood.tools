@@ -13,13 +13,8 @@ import polka from './polka'
 const PORTS = [] as number[]
 radio.on('socket.listening', function onlistening(event) {
 	let port = event.data as number
-	if (!Number.isFinite(port)) return;
-	if (!PORTS.includes(port)) {
-		PORTS.push(port)
-	}
-	if (process.env.PRODUCTION) {
-		redis.main.sadd(rkeys.WS.DISCOVER, port)
-	}
+	if (!Number.isFinite(port) || PORTS.includes(port)) return;
+	PORTS.push(port)
 })
 radio.emit('sockets.listening')
 

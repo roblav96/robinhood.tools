@@ -71,11 +71,13 @@ wss.on('error', function onerror(error) {
 wss.on('listening', function onlistening() {
 	console.info('socket listening ->', port)
 	radio.emit('socket.listening', port)
+	redis.main.sadd(rkeys.WS.DISCOVER, port)
 })
 
 wss.on('connection', onconnection)
 
 exithook(function onexit() {
+	redis.main.srem(rkeys.WS.DISCOVER, port)
 	wss.httpServer.close()
 	wss.close()
 })
