@@ -46,7 +46,7 @@ declare module 'echarts' {
 		}
 
 		const graphic: any
-		function init(el: HTMLElement, theme?: object, opts?: Partial<InitOptions>): ECharts
+		function init(el: HTMLElement, theme?: string | object, opts?: Partial<InitOptions>): ECharts
 		function connect(group: string | string[]): void
 		function disConnect(group: string): void
 		function dispose(target: ECharts | HTMLElement): void
@@ -464,11 +464,11 @@ declare module 'echarts' {
 		}
 
 		interface StyleOptions {
-			borderColor0: string
-			borderColor: string
+			borderColor0: string | ((param: EventParam) => string)
+			borderColor: string | ((param: EventParam) => string)
 			borderWidth: number
-			color0: string
-			color: string
+			color0: string | ((param: EventParam) => string)
+			color: string | ((param: EventParam) => string)
 			emphasis: Partial<StyleOptions>
 			itemStyle: Partial<StyleOptions>
 			label: Partial<StyleOptions>

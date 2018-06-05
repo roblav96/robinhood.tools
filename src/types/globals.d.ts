@@ -35,5 +35,22 @@ interface WebpackRequireContext {
 interface NodeRequire {
 	context: (path: string, descending: boolean, regex: RegExp) => WebpackRequireContext
 }
+interface NodeModule {
+	hot: HotNodeModule
+}
+interface HotNodeModule {
+	active: boolean
+	data: any
+	accept(dep: any, callback: any): void
+	addDisposeHandler(callback: any): void
+	addStatusHandler(l: any): void
+	apply(options: any): any
+	check(apply: any): any
+	decline(dep: any): void
+	dispose(callback: any): void
+	removeDisposeHandler(callback: any): void
+	removeStatusHandler(l: any): void
+	status(l: any): any
+}
 
 

@@ -1,6 +1,7 @@
 // 
 
 import * as Vts from 'vue-property-decorator'
+import * as Vcc from 'vue-class-component'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import * as _ from '../../common/lodash'
@@ -10,12 +11,20 @@ import * as utils from '../adapters/utils'
 
 
 
+const NoCache = Vcc.createDecorator((options, key) => {
+	(options.computed[key] as any).cache = false
+})
+
 @Vts.Component
 export default class extends Vue {
 
 	env = process.env.NODE_ENV
 	development = !!process.env.DEVELOPMENT
 	production = !!process.env.PRODUCTION
+
+	@NoCache
+	get $destroyed() { return this._isDestroyed }
+	$safety() { if (this.$destroyed) throw new Error('$safety'); }
 
 	vcamel(value: string) { return _.camelCase(value) }
 	vscase(value: string) { return _.startCase(value) }

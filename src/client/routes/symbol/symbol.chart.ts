@@ -18,7 +18,15 @@ import * as utils from '../../adapters/utils'
 
 
 @Vts.Component({
-	template: `<div class="flex-col-full"></div>`,
+	template: `
+		<div class="flex-col-full">
+			<div 
+				class="absolute"
+				v-on:dblclick="ondblclick"
+				v-on:mousewheel="onmousewheel"
+			></div>
+		</div>
+	`,
 })
 class VSymbolEChart extends Vue {
 
@@ -28,9 +36,7 @@ class VSymbolEChart extends Vue {
 	quote = this.$parent.quote
 
 	mounted() {
-		this.echart = echarts.init(this.$el)
-		this.echart.on('click', this.onevent)
-		this.echart.on('dblclick', this.onevent)
+		this.echart = echarts.init(this.$el.firstChild as HTMLElement)
 		utils.wemitter.on('resize', this.onresize, this)
 		this.resize()
 	}
@@ -38,8 +44,6 @@ class VSymbolEChart extends Vue {
 	beforeDestroy() {
 		utils.wemitter.off('resize', this.onresize, this)
 		this.onresize.cancel()
-		this.echart.off('click')
-		this.echart.off('dblclick')
 		this.echart.clear()
 		this.echart.dispose()
 		this.echart = null
@@ -47,6 +51,15 @@ class VSymbolEChart extends Vue {
 
 	onevent(param: echarts.EventParam) {
 		console.log(`param ->`, param)
+	}
+
+	onmousewheel(event: MouseEvent) {
+		console.log(`event ->`, event)
+	}
+
+	ondblclick(event: MouseEvent) {
+		let contains = this.echart.containPixel({ gridIndex: [0, 1] }, [event.offsetX, event.offsetY])
+		if (contains) this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 });
 	}
 
 	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
@@ -62,34 +75,53 @@ class VSymbolEChart extends Vue {
 	}
 
 	syncdataset(lquotes: Quotes.Live[]) {
-		console.log('syncdataset ->', lquotes.length)
-		// let data = lquotes.map(v => {
-		// 	return [v.timestamp, v.open, v.high, v.low, v.close, v.size]
-		// })
 		let bones = {
 			animation: false,
-			backgroundColor: 'white',
-			grid: [{
-				top: 10,
-				bottom: 125,
-				left: 50,
-				right: 50,
-			}, {
-				height: 50,
-				left: 50,
-				right: 50,
-				bottom: 50,
-			}],
+			backgroundColor: this.colors.white,
+			color: Object.values(this.colors),
+			dataset: {
+				// dimensions: ['timestamp',''],
+				source: lquotes,
+				// source: data,
+			},
 			tooltip: {
 				trigger: 'axis',
 				axisPointer: {
 					type: 'line',
 				},
 			},
+			// visualMap: {
+			// 	show: false,
+			// 	seriesIndex: 1,
+			// 	// dimension: 1,
+			// 	pieces: [{
+			// 		value: 1,
+			// 		color: this.colors.danger,
+			// 	}, {
+			// 		value: 0,
+			// 		color: this.colors.warning,
+			// 	}, {
+			// 		value: -1,
+			// 		color: this.colors.success,
+			// 	}]
+			// },
+			grid: [{
+				top: 20,
+				left: 50,
+				right: 50,
+				bottom: 75,
+			}, {
+				height: 50,
+				left: 50,
+				right: 50,
+				bottom: 75,
+			}],
 			xAxis: [{
 				type: 'category',
 				scale: true,
 				boundaryGap: false,
+				axisLabel: { textStyle: { color: this.colors.dark } },
+				axisLine: { lineStyle: { color: this.colors.dark } },
 			}, {
 				type: 'category',
 				gridIndex: 1,
@@ -104,6 +136,9 @@ class VSymbolEChart extends Vue {
 			yAxis: [{
 				scale: true,
 				splitArea: { show: false },
+				axisLabel: { textStyle: { color: this.colors.dark } },
+				axisLine: { lineStyle: { color: this.colors.dark } },
+				splitLine: { lineStyle: { color: this.colors['grey-lightest'] } },
 			}, {
 				scale: true,
 				gridIndex: 1,
@@ -116,6 +151,8 @@ class VSymbolEChart extends Vue {
 			dataZoom: [{
 				type: 'inside',
 				xAxisIndex: [0, 1],
+				zoomOnMouseWheel: false,
+				moveOnMouseMove: false,
 			}, {
 				show: true,
 				xAxisIndex: [0, 1],
@@ -123,11 +160,6 @@ class VSymbolEChart extends Vue {
 				bottom: 10,
 				handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
 			}],
-			dataset: {
-				// dimensions: ['timestamp',''],
-				source: lquotes,
-				// source: data,
-			},
 			series: [{
 				name: 'OHLC',
 				type: 'candlestick',
@@ -135,7 +167,6 @@ class VSymbolEChart extends Vue {
 				yAxisIndex: 0,
 				large: true,
 				largeThreshold: 200,
-				// progressive: 100,
 				// dimensions: ['timestamp', 'open', 'close', 'high', 'low'],
 				encode: {
 					x: 'timestamp',
@@ -157,18 +188,13 @@ class VSymbolEChart extends Vue {
 				xAxisIndex: 1,
 				yAxisIndex: 1,
 				large: true,
-				// largeThreshold: 100,
-				// progressive: 100,
-				encode: {
-					x: 'timestamp',
-					y: 'size',
-				},
-				itemStyle: {
-					color: 'grey',
-				},
+				largeThreshold: 200,
+				encode: { x: 'timestamp', y: 'size' },
+				itemStyle: { color: this.colors.border },
 			}],
 		} as echarts.Options
 		this.echart.setOption(bones)
+		console.log(`this.echart.getOption() ->`, this.echart.getOption().series[1])
 	}
 
 }
@@ -202,6 +228,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			// return this.getlives()
 			return this.gethistoricals()
 		}).then(lquotes => {
+			this.$safety()
 			this.vechart.syncdataset(lquotes)
 			return this.$nextTick()
 		}).catch(error => {
@@ -222,7 +249,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 
 	gethistoricals() {
 		return yahoo.getChart(this.symbol, {
-			range: '1y', interval: '1h',
+			range: '6mo', interval: '1h',
 		}, this.hours.hours)
 		// .then(response => {
 		// 	return response

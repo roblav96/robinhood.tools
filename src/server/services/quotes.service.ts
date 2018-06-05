@@ -65,14 +65,20 @@ async function start() {
 	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
 	SYMBOLS.push(...Object.keys(fsymbols))
 
+	let coms = [] as Redis.Coms
 	let alls = await quotes.getAlls(SYMBOLS, ['quote', 'wbquote'])
 	alls.forEach(({ symbol, quote, wbquote }) => {
 
+		let fquote = core.clone(quote)
 		let toquote = quotes.resetFull(quote)
 		quotes.applyWbQuote(quote, wbquote, toquote)
 		quotes.mergeCalcs(toquote)
 		core.object.repair(quote, toquote)
 		core.object.clean(quote)
+		let diff = core.object.difference(fquote, quote)
+		if (Object.keys(diff).length > 0) {
+			coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diff as any])
+		}
 
 		socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
 		Object.assign(WB.QUOTES, { [symbol]: core.clone(wbquote) })
@@ -86,6 +92,8 @@ async function start() {
 		Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
 
 	})
+	
+	await redis.main.coms(coms)
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
 	MQTTS.splice(0, Infinity, ...chunks.map((chunk, i) => new WebullMqttClient({
