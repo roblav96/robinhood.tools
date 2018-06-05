@@ -32,8 +32,9 @@ export const wss = new uws.Server({
 		// if (process.env.DEVELOPMENT) return next(true);
 		Promise.resolve().then(function() {
 			req.authed = false
-			
-			console.log(`req.headers ->`, req.headers)
+
+			if (!req.headers.origin.includes(core.HOSTNAME)) return next(false, 412, `Precondition Failed: "origin"`);
+			if (!req.headers.host.includes(core.HOSTNAME)) return next(false, 412, `Precondition Failed: "host"`);
 
 			let cookies = req.headers.cookie
 			if (!cookies) return next(false, 412, `Precondition Failed: "cookies"`);

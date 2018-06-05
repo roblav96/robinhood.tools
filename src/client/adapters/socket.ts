@@ -115,8 +115,9 @@ class Socket extends Emitter {
 	discover() {
 		// let proms = [http.get('/websocket/discover', { retries: Infinity })]
 		// if (process.env.DEVELOPMENT) {
-		// 	// proms.push(http.get(`https://${core.HOSTNAME}/api/websocket/discover`, { retries: Infinity }))
+		// 	proms.push(http.get(`https://${core.HOSTNAME}/api/websocket/discover`, { retries: Infinity }))
 		// }
+		// return Promise.all(proms).then((addresses: string[]) => {
 		return http.get('/websocket/discover', { retries: Infinity }).then((addresses: string[]) => {
 			addresses.push('wss://robinhood.tools/websocket/12336')
 			console.log('addresses ->', addresses)
