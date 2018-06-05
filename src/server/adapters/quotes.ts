@@ -53,7 +53,7 @@ export async function syncAllQuotes(resets = false) {
 		let alls = await getAlls(chunk)
 		await redis.main.coms(alls.map(all => {
 			let rkey = `${rkeys.QUOTES}:${all.symbol}`
-			return ['hmset', rkey, initFullQuote(all, resets) as any]
+			return ['hmset', rkey, applyFull(all, resets) as any]
 		}))
 	}), { concurrency: 1 })
 	if (process.env.DEVELOPMENT) console.info('syncAllQuotes done ->');
@@ -61,8 +61,8 @@ export async function syncAllQuotes(resets = false) {
 
 
 
-export function initFullQuote(
-	{ symbol, quote, wbticker, wbquote, instrument, yhquote, iexitem }: Quotes.All,
+export function applyFull(
+	{ symbol, quote, wbticker, wbquote, instrument, yhquote, iexitem }: Partial<Quotes.All>,
 	resets = false,
 ) {
 
@@ -104,6 +104,8 @@ export function initFullQuote(
 		resets ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote)
 	}
 	mergeCalcs(quote)
+
+	core.object.clean(quote)
 
 	return quote
 
