@@ -69,6 +69,8 @@ async function start() {
 	alls.forEach(({ symbol, quote, wbquote }) => {
 
 		let toquote = quotes.resetFull(quote)
+		core.object.merge(toquote, quote)
+		quotes.applyWbQuote(toquote, wbquote, toquote)
 		quotes.mergeCalcs(toquote)
 		core.object.repair(quote, toquote)
 
