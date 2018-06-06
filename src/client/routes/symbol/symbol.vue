@@ -9,29 +9,28 @@
 	border: 1px solid var(--border);
 }
 
-
-/*#symbol_route nav.tabs li.is-active {
-	background: rgb(255, 255, 255);
-	background: linear-gradient(0deg, white 0%, #F1F5F8 100%);
-}*/
+#symbol_route > section:first-child .tags,
+#symbol_route > section:first-child .tag {
+	margin-bottom: 0px;
+}
 
 </style>
 
 <template>
 	<div id="symbol_route" class="">
 
-		<section class="px-4 has-background-white border border-b-1">
+		<section class="has-background-white border border-b-1 touch:px-6">
 			<div class="container">
 
-				<div class="columns is-mobile my-0 items-center flex-wrap desktop:flex-no-wrap">
+				<div class="columns is-mobile is-variable is-4 my-0 items-center flex-wrap desktop:flex-no-wrap">
 
-					<div class="column is-narrow">
+					<div class="column is-narrow pr-0">
 						<v-symbol-logo class="is-48x48 card" :symbol="symbol"></v-symbol-logo>
 					</div>
 
-					<div class="column leading-none">
+					<div class="column">
 						<p class="title font-bold leading-none whitespace-no-wrap">{{symbol}}</p>
-						<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
+						<p class="leading-none">{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
 					</div>
 
 					<div class="column is-narrow leading-none has-text-right">
@@ -43,13 +42,13 @@
 						</p>
 					</div>
 
-					<div class="column is-narrow font-medium has-text-left is-size-5" v-bull-bear="all.quote.change">
-						<p>{{nformat(all.quote.percent,{plusminus:true,percent:true,precision:2})}}</p>
-						<p>{{nformat(all.quote.change,{plusminus:true})}}</p>
+					<div class="column is-narrow has-text-right" v-bull-bear="all.quote.change">
+						<p class="is-size-3 font-light font-mono">{{nformat(all.quote.percent,{plusminus:true,percent:true,precision:2})}}</p>
+						<p class="">{{nformat(all.quote.change,{plusminus:true})}}</p>
 					</div>
-					
+
 					<div class="column is-narrow">
-						<table class="table is-paddingless is-middle is-nowrap is-borderless font-medium">
+						<table class="table is-paddingless is-middle is-nowrap is-borderless">
 							<tbody>
 								<tr>
 									<td class="has-text-danger has-text-right">

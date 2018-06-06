@@ -64,7 +64,7 @@ export const format = {
 				if (compact === undefined && abs >= 10000) compact = true;
 				else if (abs >= 10000) precision = 0;
 				else if (abs >= 2000) precision = 1;
-				else if (abs < 3) precision = 3;
+				else if (abs < 2) precision = 3;
 				// if (plusminus && abs >= 1) precision = Math.min(precision, 2);
 			}
 		} else { nozeros = false }

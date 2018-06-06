@@ -43,6 +43,7 @@ export default class VSymbol extends Mixins(VMixin) {
 
 	reset() {
 		socket.offListener(this.onquote, this)
+		// socket.offListener(this.ondeal, this)
 		core.nullify(this.all)
 	}
 
@@ -54,6 +55,7 @@ export default class VSymbol extends Mixins(VMixin) {
 			return this.$nextTick(() => {
 				core.object.merge(this.all, _.omit(response[0], ['symbol']) as any)
 				socket.on(`${rkeys.QUOTES}:${this.symbol}`, this.onquote, this)
+				// socket.on(`${rkeys.DEALS}:${this.symbol}`, this.ondeal, this)
 			})
 		}).catch(error => {
 			console.error('w_symbol Error ->', error)
@@ -63,8 +65,11 @@ export default class VSymbol extends Mixins(VMixin) {
 	}
 
 	onquote(quote: Quotes.Quote) {
-		console.log(`quote ->`, JSON.stringify(quote, null, 4))
+		// console.log(`quote ->`, JSON.stringify(quote, null, 4))
 		core.object.merge(this.all.quote, quote)
+	}
+	ondeal(deal: Quotes.Deal) {
+		console.log(`deal ->`, JSON.stringify(deal, null, 4))
 	}
 
 	get bidask() { return utils.bidask(this.all.quote) }

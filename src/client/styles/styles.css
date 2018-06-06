@@ -131,7 +131,10 @@ span.tooltip.is-large:after {
 
 /**/
 
-.border-debug {
+.debug,
+.debug-layout,
+.border-debug,
+.debug-border {
 	border: 1px solid red !important;
 }
 
