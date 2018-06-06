@@ -19,11 +19,14 @@ import * as utils from '../../adapters/utils'
 
 @Vts.Component({
 	template: `
-		<div class=""><div 
-			class="absolute"
-			v-on:dblclick="ondblclick"
-			v-on:mousewheel="onmousewheel"
-		></div></div>
+		<div>
+			<div
+				v-show="ready"
+				class="absolute"
+				v-on:dblclick="ondblclick"
+				v-on:mousewheel="onmousewheel"
+			></div>
+		</div>
 	`,
 })
 class VSymbolEChart extends Vue {
@@ -32,16 +35,17 @@ class VSymbolEChart extends Vue {
 	echart: echarts.ECharts
 	colors = this.$store.state.colors
 	quote = this.$parent.quote
+	ready = false
 
 	mounted() {
 		this.echart = echarts.init(this.$el.firstChild as HTMLElement)
 		utils.wemitter.on('resize', this.onresize, this)
-		module.hot.addStatusHandler(this.onresize)
+		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize);
 		this.resize()
 	}
 
 	beforeDestroy() {
-		module.hot.removeStatusHandler(this.onresize)
+		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize);
 		utils.wemitter.off('resize', this.onresize, this)
 		this.onresize.cancel()
 		this.echart.clear()
@@ -119,7 +123,7 @@ class VSymbolEChart extends Vue {
 				boundaryGap: false,
 				axisLabel: {
 					textStyle: { color: this.colors.dark },
-					formatter: v => utils.tFormat(v, { verbose: true }),
+					formatter: v => utils.format.time(v, { verbose: true }),
 				},
 				axisLine: { lineStyle: { color: this.colors.dark } },
 			}, {
@@ -193,8 +197,8 @@ class VSymbolEChart extends Vue {
 			}],
 		} as echarts.Options
 		this.echart.setOption(bones)
-		console.log(`this.echart.getOption() ->`, this.echart.getOption().series[1])
-		this.resize()
+		// console.log(`this.echart.getOption() ->`, this.echart.getOption().series[1])
+		if (!this.ready) this.$nextTick(() => this.ready = true);
 	}
 
 }
@@ -206,20 +210,28 @@ class VSymbolEChart extends Vue {
 })
 export default class VSymbolChart extends Mixins(VMixin) {
 	$parent: VSymbol
-	vechart: VSymbolEChart
 
 	created() {
 
 	}
 
+	vechart: VSymbolEChart
 	mounted() {
-		this.vechart = this.$refs['symbol_echart'] as any
-		let el = this.$el.querySelector('#chart_div') as HTMLElement
+		this.vechart = (this.$refs as any)['symbol_echart']
 	}
 
 	busy = true
 	symbol = this.$parent.symbol
 	quote = this.$parent.all.quote
+
+	range = '1d'
+	ranges = core.clone(yahoo.RANGES).reverse()
+	vrange(range: string) { return utils.format.range(range) }
+	rangehover = true
+	onrange() {
+		setTimeout(() => this.rangehover = false, 100)
+		setTimeout(() => this.rangehover = true, 300)
+	}
 
 	@Vts.Watch('$parent.symbol', { immediate: true }) w_symbol(symbol: string) {
 		this.symbol = symbol

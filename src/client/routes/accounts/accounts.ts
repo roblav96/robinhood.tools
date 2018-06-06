@@ -84,10 +84,10 @@ function filterkey(key: string, value: any) {
 
 function tovalue(key: string, value: any) {
 	if (['created_at', 'updated_at'].includes(key)) {
-		value = utils.tFormat(new Date(value).valueOf(), { verbose: true })
+		value = utils.format.time(new Date(value).valueOf(), { verbose: true })
 	}
 	else if (core.number.isFinite(value)) {
-		value = utils.nFormat(value, { precision: 2 })
+		value = utils.format.number(value, { precision: 2 })
 	}
 	else if (core.boolean.is(value)) {
 		value = _.startCase(value as any)

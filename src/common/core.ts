@@ -164,10 +164,10 @@ export const string = {
 export const number = {
 	is(value: any): value is number { return typeof value == 'number' },
 	isFinite(value: any): value is number { return Number.isFinite(value) },
-	integer(value: string) {
+	parseInt(value: string) {
 		return Number.parseInt(value.replace(/[^0-9\.]/g, ''))
 	},
-	float(value: string) {
+	parseFloat(value: string) {
 		return Number.parseFloat(value.replace(/[^0-9\.]/g, ''))
 	},
 	WORDS: {

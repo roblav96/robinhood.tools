@@ -73,7 +73,7 @@ html.has-navbar-fixed-top .hero.is-fullheight {
 // ████  ANIMATION  ████
 // 
 @each $key,
-$value in (('', $speed), ('-slow', $speed-slow), ('-slower', $speed-slower), ('-slowest', 500ms), ('-1s', 1s), ('-2s', 2s), ('-3s', 3s)) {
+$value in (('', $speed), ('-slow', $speed-slow), ('-slower', $speed-slower), ('-slowest', 500ms), ('-1s', 1s), ('-2s', 2s), ('-3s', 3s), ('-debug', 3s)) {
 	.animated#{$key} {
 		animation-duration: $value !important;
 		animation-fill-mode: both;

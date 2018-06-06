@@ -28,7 +28,7 @@ class Timestamp extends Vue {
 	sync() {
 		if (!Number.isFinite(this.value)) return this.fromnow = '';
 		let opts = this.opts ? core.clone(this.opts) : {}
-		this.fromnow = utils.tFormat(this.value, opts)
+		this.fromnow = utils.format.time(this.value, opts)
 	}
 }
 Vue.component('v-timestamp', Timestamp)
@@ -71,7 +71,7 @@ class NumberTicker extends Vue {
 	}
 	get colors() { return this.$store.state.colors }
 	get digits() {
-		return Number.isFinite(this.number) ? utils.nFormat(this.number).split('') : []
+		return Number.isFinite(this.number) ? utils.format.number(this.number).split('') : []
 	}
 }
 Vue.component('v-number-ticker', NumberTicker)

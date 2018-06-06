@@ -57,7 +57,7 @@ export default class extends Mixins(VMixin) {
 			if (key == 'website') return url.parse(value as any).host;
 			if (key == 'listDate') return dayjs(value).format('MMMM DD, YYYY');
 		}
-		if (core.number.isFinite(value)) return utils.nFormat(value);
+		if (core.number.isFinite(value)) return utils.format.number(value);
 		// if (core.string.is(value)) return _.startCase(value);
 		if (core.boolean.is(value)) return !value ? 'No' : 'Yes';
 		return value

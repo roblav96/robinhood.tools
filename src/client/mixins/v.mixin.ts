@@ -27,12 +27,12 @@ export default class extends Vue {
 	$safety() { if (this.$destroyed) throw new Error('$safety'); }
 
 	vcamel(value: string) { return _.camelCase(value) }
-	vscase(value: string) { return _.startCase(value) }
+	vstcase(value: string) { return _.startCase(value) }
 	vtruncate(value: string, length = 64) { if (!value) return value; return _.truncate(value, { length }) }
 	vcapitalize(value: string) { if (!value) return value; return core.string.capitalize(value) }
 	vstamp(stamp: number) { if (!stamp) return stamp; return pretty.stamp(stamp) }
-	tformat(stamp: number, opts?: Partial<TimeFormatOptions>) { if (!stamp) return stamp; return utils.tFormat(stamp, opts) }
-	nformat(value: number, opts?: Partial<NumberFormatOptions>) { if (!Number.isFinite(value)) return value; return utils.nFormat(value, opts) }
+	tformat(stamp: number, opts?: Partial<TimeFormatOptions>) { if (!stamp) return stamp; return utils.format.time(stamp, opts) }
+	nformat(value: number, opts?: Partial<NumberFormatOptions>) { if (!Number.isFinite(value)) return value; return utils.format.number(value, opts) }
 	vpercent(to: number, from: number) { if (!to || !from) return NaN; return core.calc.percent(to, from) }
 	vslider(value: number, min: number, max: number) { if (!value) return NaN; return core.calc.slider(value, min, max) }
 

@@ -25,7 +25,7 @@
 						</thead>
 						<tbody>
 							<tr v-for="def in schema.defs" :key="def.key">
-								<td class="whitespace-no-wrap">{{!def.title?vscase(def.key):def.title}}</td>
+								<td class="whitespace-no-wrap">{{!def.title?vstcase(def.key):def.title}}</td>
 								<td class="has-text-right font-medium">
 									{{vvalue(def.key)}}
 								</td>
@@ -66,26 +66,26 @@
 						<tbody>
 							<tr>
 								<b-tooltip :label="state.tip" position="is-top" size="is-small" multilined>
-									<td>{{vscase(state.calc)}}</td>
+									<td>{{vstcase(state.calc)}}</td>
 								</b-tooltip>
 								<td class="has-text-right font-medium font-mono">
 									{{nformat(all.quote[state.calc])}}
 								</td>
 							</tr>
 							<tr>
-								<td>{{vscase(`${state.key}Price`)}}</td>
+								<td>{{vstcase(`${state.key}Price`)}}</td>
 								<td class="has-text-right font-medium font-mono">
 									{{nformat(all.quote[vcamel(`${state.key}Price`)])}}
 								</td>
 							</tr>
 							<tr>
-								<td>{{vscase(`${state.key}Change`)}}</td>
+								<td>{{vstcase(`${state.key}Change`)}}</td>
 								<td class="has-text-right font-medium font-mono" v-bull-bear="all.quote[vcamel(`${state.key}Change`)]">
 									{{nformat(all.quote[vcamel(`${state.key}Change`)],{nozeros:true,plusminus:true})}}
 								</td>
 							</tr>
 							<tr>
-								<td>{{vscase(`${state.key}Percent`)}}</td>
+								<td>{{vstcase(`${state.key}Percent`)}}</td>
 								<td class="has-text-right font-medium font-mono" v-bull-bear="all.quote[vcamel(`${state.key}Percent`)]">
 									{{nformat(all.quote[vcamel(`${state.key}Percent`)],{nozeros:true,plusminus:true,percent:true})}}
 								</td>

@@ -30,16 +30,16 @@ export default class extends Mixins(VMixin) {
 	}
 
 	vrowkey(key: string) {
-		return this.vcapitalize(this.vscase(key))
+		return this.vcapitalize(this.vstcase(key))
 	}
 
 	vrowvalue(value: any, key: string) {
 		let k = key.toLowerCase()
 		if (core.number.isFinite(value)) {
 			if (k.includes('time') || k.includes('date')) {
-				return utils.tFormat(value, { verbose: true })
+				return utils.format.time(value, { verbose: true })
 			}
-			return utils.nFormat(value, { nozeros: true })
+			return utils.format.number(value, { nozeros: true })
 		}
 		if (core.boolean.is(value)) {
 			if (core.boolean.is(value)) return !value ? 'No' : 'Yes';

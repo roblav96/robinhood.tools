@@ -49,79 +49,92 @@ export const wemitter = new UEmitter('window')
 
 
 
-const UNITS = ['K', 'M', 'B', 'T']
 declare global { interface NumberFormatOptions { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } }
-export function nFormat(value: number, { precision, compact, plusminus, percent, dollar, nozeros } = {} as Partial<NumberFormatOptions>) {
-	if (!Number.isFinite(precision)) {
-		if (compact) precision = 0;
-		else {
-			precision = 2
-			let abs = Math.abs(value)
-			if (compact === undefined && abs >= 10000) compact = true;
-			else if (abs >= 10000) precision = 0;
-			else if (abs >= 2000) precision = 1;
-			else if (abs < 3) precision = 3;
-			// if (plusminus && abs >= 1) precision = Math.min(precision, 2);
+declare global { interface TimeFormatOptions extends prettyms.PrettyMsOptions { max: number, showms: boolean, ago: boolean, keepDecimalsOnWholeSeconds: boolean } }
+export const format = {
+
+	UNITS: ['K', 'M', 'B', 'T'],
+	number(value: number, { precision, compact, plusminus, percent, dollar, nozeros } = {} as Partial<NumberFormatOptions>) {
+		if (!Number.isFinite(precision)) {
+			if (compact) precision = 0;
+			else {
+				precision = 2
+				let abs = Math.abs(value)
+				if (compact === undefined && abs >= 10000) compact = true;
+				else if (abs >= 10000) precision = 0;
+				else if (abs >= 2000) precision = 1;
+				else if (abs < 3) precision = 3;
+				// if (plusminus && abs >= 1) precision = Math.min(precision, 2);
+			}
+		} else { nozeros = false }
+		if (plusminus || percent) precision = Math.min(precision, 2);
+
+		let unit = -1
+		if (compact) {
+			while (value >= 1000) { value = value / 1000; unit++ }
 		}
-	} else { nozeros = false }
-	if (plusminus || percent) precision = Math.min(precision, 2);
 
-	let unit = -1
-	if (compact) {
-		while (value >= 1000) { value = value / 1000; unit++ }
-	}
-
-	let split = value.toString().split('.')
-	let int = split[0]
-	let fixed = int.slice(-3)
-	{
-		let n: number, i = 1
-		for (n = 1000; n <= value; n *= 1000) {
-			let from = i * 3
-			i++
-			let to = i * 3
-			fixed = int.slice(-to, -from) + ',' + fixed
-		}
-	}
-
-	if (precision > 0 && !(compact && unit == -1)) {
-		let end = split[1] || ''
-		if (!nozeros || !Number.isNaN(Number.parseInt(end))) {
-			fixed += '.'
-			let i: number, len = precision
-			for (i = 0; i < len; i++) {
-				fixed += end[i] || '0'
+		let split = value.toString().split('.')
+		let int = split[0]
+		let fixed = int.slice(-3)
+		{
+			let n: number, i = 1
+			for (n = 1000; n <= value; n *= 1000) {
+				let from = i * 3
+				i++
+				let to = i * 3
+				fixed = int.slice(-to, -from) + ',' + fixed
 			}
 		}
-	}
 
-	if (compact) fixed += UNITS[unit] || '';
+		if (precision > 0 && !(compact && unit == -1)) {
+			let end = split[1] || ''
+			if (!nozeros || !Number.isNaN(Number.parseInt(end))) {
+				fixed += '.'
+				let i: number, len = precision
+				for (i = 0; i < len; i++) {
+					fixed += end[i] || '0'
+				}
+			}
+		}
 
-	let cash = dollar ? '$' : ''
-	if (plusminus && value > 0) {
-		fixed = '+' + cash + fixed
-	}
-	else if (plusminus && value < 0) {
-		fixed = fixed.substr(1)
-		fixed = '–' + cash + fixed
-	}
-	else { fixed = cash + fixed };
-	if (percent) fixed += '%';
+		if (compact) fixed += format.UNITS[unit] || '';
 
-	return fixed
+		let cash = dollar ? '$' : ''
+		if (plusminus && value > 0) {
+			fixed = '+' + cash + fixed
+		}
+		else if (plusminus && value < 0) {
+			fixed = fixed.substr(1)
+			fixed = '–' + cash + fixed
+		}
+		else { fixed = cash + fixed };
+		if (percent) fixed += '%';
+
+		return fixed
+	},
+
+	time(stamp: number, opts = {} as Partial<TimeFormatOptions>) {
+		opts.secDecimalDigits = opts.secDecimalDigits || 0
+		opts.max = opts.max || 1
+		let ms = prettyms(Math.max(Date.now() - stamp, opts.showms ? 0 : 1001), opts)
+		ms = ms.split(' ').splice(0, opts.verbose ? opts.max * 2 : opts.max).join(' ')
+		return opts.ago == false ? ms : ms + ' ago'
+	},
+
+	RANGES: { m: 'minute', h: 'hour', d: 'day', wk: 'week', mo: 'month', y: 'year', ytd: 'YTD' },
+	range(range: string, opts = { plural: false }) {
+		let s = range.replace(/[0-9]/g, '')
+		s = format.RANGES[s] || s
+		s = s.charAt(0).toUpperCase() + s.substr(1)
+		let n = Number.parseInt(range)
+		if (!Number.isFinite(n)) return s;
+		if (opts.plural && n > 1) s = s + 's';
+		return n + ' ' + s
+	},
+
 }
-if (process.env.DEVELOPMENT) Object.assign(window, { nFormat });
-
-
-
-declare global { interface TimeFormatOptions extends prettyms.PrettyMsOptions { max: number, showms: boolean, ago: boolean, keepDecimalsOnWholeSeconds: boolean } }
-export function tFormat(stamp: number, opts = {} as Partial<TimeFormatOptions>) {
-	opts.secDecimalDigits = opts.secDecimalDigits || 0
-	opts.max = opts.max || 1
-	let ms = prettyms(Math.max(Date.now() - stamp, opts.showms ? 0 : 1001), opts)
-	ms = ms.split(' ').splice(0, opts.verbose ? opts.max * 2 : opts.max).join(' ')
-	return opts.ago == false ? ms : ms + ' ago'
-}
+if (process.env.DEVELOPMENT) Object.assign(window, { format });
 
 
 
