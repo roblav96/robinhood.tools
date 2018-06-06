@@ -1,7 +1,7 @@
 // 
 
 import '../main'
-import dayjs from '../../common/dayjs'
+import * as dayjs from 'dayjs'
 import * as schedule from 'node-schedule'
 import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'

@@ -8,7 +8,7 @@ Object.assign(util.inspect.styles, { string: 'green', regexp: 'green', date: 'gr
 
 
 
-import dayjs from '../../common/dayjs'
+import * as dayjs from 'dayjs'
 import * as clc from 'cli-color'
 import * as StackTracey from 'stacktracey'
 const _console = {} as typeof console

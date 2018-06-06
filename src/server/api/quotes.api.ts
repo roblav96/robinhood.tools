@@ -1,6 +1,5 @@
 // 
 
-import dayjs from '../../common/dayjs'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
@@ -10,6 +9,7 @@ import * as http from '../../common/http'
 import * as webull from '../adapters/webull'
 import * as quotes from '../adapters/quotes'
 import * as hours from '../adapters/hours'
+import * as dayjs from 'dayjs'
 import * as boom from 'boom'
 import * as pAll from 'p-all'
 import polka from './polka'

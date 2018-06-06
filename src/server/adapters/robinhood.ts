@@ -10,7 +10,7 @@ import * as http from '../../common/http'
 import * as boom from 'boom'
 import * as pAll from 'p-all'
 import * as pForever from 'p-forever'
-import dayjs from '../../common/dayjs'
+import * as dayjs from 'dayjs'
 
 
 

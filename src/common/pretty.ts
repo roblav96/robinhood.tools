@@ -3,7 +3,7 @@
 import * as prettyms from 'pretty-ms'
 import * as prettybytes from 'pretty-bytes'
 import * as humanize from 'humanize-plus'
-import dayjs from './dayjs'
+import * as dayjs from 'dayjs'
 
 
 

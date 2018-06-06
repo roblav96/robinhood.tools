@@ -7,6 +7,7 @@ import VMixin from '../../mixins/v.mixin'
 import VSymbol from './symbol'
 import * as echarts from 'echarts'
 import * as ecstat from 'echarts-stat'
+import * as lockr from 'lockr'
 import * as _ from '../../../common/lodash'
 import * as core from '../../../common/core'
 import * as rkeys from '../../../common/rkeys'
@@ -14,6 +15,7 @@ import * as quotes from '../../../common/quotes'
 import * as yahoo from '../../../common/yahoo'
 import * as http from '../../../common/http'
 import * as utils from '../../adapters/utils'
+import dayjs from '../../../common/dayjs'
 
 
 
@@ -104,18 +106,18 @@ class VSymbolEChart extends Vue {
 			// 	}]
 			// },
 			grid: [{
-				top: 20,
-				left: 50,
-				right: 50,
-				bottom: 70,
+				top: 16,
+				left: 52,
+				right: 52,
+				bottom: 80,
 				show: true,
 				backgroundColor: this.colors.white,
 				borderColor: this.colors['grey-lightest'],
 			}, {
-				height: 50,
-				left: 50,
-				right: 50,
-				bottom: 70,
+				height: 64,
+				left: 52,
+				right: 52,
+				bottom: 80,
 			}],
 			xAxis: [{
 				type: 'category',
@@ -155,13 +157,20 @@ class VSymbolEChart extends Vue {
 			dataZoom: [{
 				type: 'inside',
 				xAxisIndex: [0, 1],
+				preventDefaultMouseMove: false,
 			}, {
 				show: true,
 				xAxisIndex: [0, 1],
 				type: 'slider',
-				height: 30,
-				bottom: 0,
-				handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+				height: 32,
+				bottom: 16,
+				backgroundColor: this.colors.white,
+				dataBackground: {
+					areaStyle: { color: this.colors['white-ter'], opacity: 1 },
+					lineStyle: { color: this.colors['grey-light'], opacity: 1 },
+				},
+				borderColor: this.colors['grey-lightest'],
+				// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
 			}],
 			series: [{
 				name: 'OHLC',
@@ -218,33 +227,37 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	vechart: VSymbolEChart
 	mounted() {
 		this.vechart = (this.$refs as any)['symbol_echart']
+		this.resync()
 	}
 
 	busy = true
 	symbol = this.$parent.symbol
 	quote = this.$parent.all.quote
 
-	range = '1d'
+	range = lockr.get('symbol.chart.range', '5d')
 	ranges = yahoo.RANGES
 	vrange(range: string) { return utils.format.range(range) }
-	rangehover = true
-	onrange() {
-		setTimeout(() => this.rangehover = false, 100)
-		setTimeout(() => this.rangehover = true, 300)
+
+	@Vts.Watch('range') w_range(range: string) {
+		lockr.set('symbol.chart.range', range)
+		this.resync()
+	}
+	@Vts.Watch('$parent.symbol') w_symbol(symbol: string) {
+		this.symbol = symbol
+		this.resync()
 	}
 
-	@Vts.Watch('$parent.symbol', { immediate: true }) w_symbol(symbol: string) {
-		this.symbol = symbol
+	resync() {
 		this.busy = true
 		return Promise.resolve().then(() => {
-			// return this.getlives()
 			return this.gethistoricals()
+			// return this.getlives()
 		}).then(lquotes => {
 			this.$safety()
 			this.vechart.syncdataset(lquotes)
 			return this.$nextTick()
 		}).catch(error => {
-			console.error(`watch symbol Error -> %O`, error)
+			console.error(`resync Error -> %O`, error)
 		}).finally(() => {
 			this.busy = false
 		})
@@ -260,9 +273,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	}
 
 	gethistoricals() {
-		return yahoo.getChart(this.symbol, {
-			range: '6mo', interval: '1h',
-		}, this.hours.hours)
+		return yahoo.getChart(this.symbol, { range: this.range }, this.hours.hours)
 		// .then(response => {
 		// 	return response
 		// console.log(`response ->`, JSON.parse(JSON.stringify(response)))

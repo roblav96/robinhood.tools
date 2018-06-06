@@ -2,8 +2,8 @@
 
 import * as schedule from 'node-schedule'
 import * as ci from 'correcting-interval'
+import * as dayjs from 'dayjs'
 import * as core from './core'
-import dayjs from './dayjs'
 import Emitter from './emitter'
 
 

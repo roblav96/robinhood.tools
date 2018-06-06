@@ -200,6 +200,7 @@ declare module 'echarts' {
 			height: any
 			angleAxisIndex: number[]
 			disabled: boolean
+			preventDefaultMouseMove: boolean
 			moveOnMouseMove: string
 			zoomOnMouseWheel: string
 			end: number

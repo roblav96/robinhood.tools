@@ -2,10 +2,10 @@
 
 import * as qs from 'querystring'
 import * as boom from 'boom'
+import * as dayjs from 'dayjs'
 import * as _ from './lodash'
 import * as hours from './hours'
 import * as http from './http'
-import dayjs from './dayjs'
 
 
 
@@ -54,11 +54,14 @@ export function getChart(
 ) {
 	let state = hours.getState(hhours)
 	if (params.range == '1d' && state.indexOf('PRE') == 0) {
+		params.includePrePost = true
 		delete params.range
 		if (dayjs(hhours.date).day() == 1) {
 			params.period1 = dayjs(hhours.prepre).subtract(3, 'day').unix()
 		} else params.period1 = dayjs(hhours.prepre).subtract(1, 'day').unix();
 		params.period2 = dayjs(hhours.postpost).unix()
+	} else if (!params.interval) {
+		params.interval = FRAMES[params.range]
 	}
 	let url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + symbol
 	return http.get(url, {
