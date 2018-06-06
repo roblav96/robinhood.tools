@@ -7,14 +7,15 @@ import * as schedule from 'node-schedule'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
-import * as redis from '../adapters/redis'
 import * as http from '../../common/http'
+import * as redis from '../adapters/redis'
 import * as robinhood from '../adapters/robinhood'
 import * as utils from '../adapters/utils'
 import * as webull from '../adapters/webull'
 import * as yahoo from '../adapters/yahoo'
 import * as iex from '../adapters/iex'
 import * as quotes from '../adapters/quotes'
+import * as hours from '../adapters/hours'
 import radio from '../adapters/radio'
 
 
@@ -45,6 +46,10 @@ async function start() {
 
 schedule.scheduleJob('55 3 * * 1-5', () => syncEverything(true))
 async function syncEverything(resets = false) {
+	if (!hours.rxhours.value.isOpenToday) {
+		console.warn(`!isOpenToday -> return`, JSON.stringify(hours.rxhours.value))
+		return
+	}
 	radio.emit('symbols.pause')
 	await syncInstruments()
 	await syncTickers()
