@@ -13,10 +13,6 @@ span.navbar-burger.burger > span {
 	height: 2px;
 }
 
-nav.navbar {
-	border-bottom: 1px solid var(--border);
-}
-
 nav.navbar div.navbar-item.field {
 	margin-bottom: 0px;
 }
@@ -34,7 +30,7 @@ nav.navbar div.dropdown-content a > span.icon {
 </style>
 
 <template>
-	<nav id="navbar" class="navbar is-fixed-top is-unselectable" role="navigation" aria-label="main navigation">
+	<nav id="navbar" class="navbar is-fixed-top is-unselectable shadow" role="navigation" aria-label="main navigation">
 		<div class="container">
 
 			<div class="navbar-brand">
@@ -42,9 +38,9 @@ nav.navbar div.dropdown-content a > span.icon {
 					<img src="../../../assets/logo-primary.svg" alt="Robinhood Tools">
 				</router-link>
 
-				<div class="is-hidden-mobile navbar-item py-0 flex flex-col self-center">
-					<p class="leading-tight font-medium font-mono">{{time}}</p>
-					<p class="text-sm font-medium" :class="scolor">{{state}}</p>
+				<div class="is-hidden-mobile navbar-item py-0 flex flex-col self-center font-medium">
+					<p class="leading-tight font-mono">{{time}}</p>
+					<p class="text-sm" :class="scolor">{{state}}</p>
 				</div>
 
 				<b-field class="navbar-item">
@@ -69,19 +65,19 @@ nav.navbar div.dropdown-content a > span.icon {
 							</span>
 						</router-link>
 					</b-tooltip>
-					<b-tooltip v-if="!rhusername" label="Robinhood Login" :active="breakpoints.desktopAndUp" position="is-bottom">
+					<!-- <b-tooltip v-if="!rhusername" label="Robinhood Login" :active="breakpoints.desktopAndUp" position="is-bottom">
 						<router-link class="navbar-item flex items-center h-full" :to="{name:'login'}" active-class exact-active-class>
 							<img class="image is-28x28 mx-1" src="../../../assets/robinhood-logo.svg" alt="Robinhood Login">
 							<span class="is-hidden-desktop ml-2">Login</span>
 						</router-link>
-					</b-tooltip>
+					</b-tooltip> -->
 				</div>
 
-				<div class="navbar-end">
+				<!-- <div class="navbar-end"> -->
 
-					<v-devmenu class="is-hidden-touch"></v-devmenu>
+				<!-- <v-devmenu class="is-hidden-touch"></v-devmenu> -->
 
-					<router-link v-if="rhusername" class="navbar-item flex items-center desktop:py-0" :to="{ name: 'robinhood' }"
+				<!-- <router-link v-if="rhusername" class="navbar-item flex items-center desktop:py-0" :to="{ name: 'robinhood' }"
 					    active-class exact-active-class>
 						<img class="image is-28x28 mr-3 touch:ml-1" src="../../../assets/robinhood-logo.svg" alt="Robinhood">
 						<div class="flex flex-col self-center">
@@ -92,9 +88,9 @@ nav.navbar div.dropdown-content a > span.icon {
 								{{nformat(equitychange,{dollar:true,precision:2,plusminus:true})}} ({{nformat(equitypercent,{precision:2,plusminus:true,percent:true})}})
 							</p>
 						</div>
-					</router-link>
+					</router-link> -->
 
-				</div>
+				<!-- </div> -->
 
 			</div>
 

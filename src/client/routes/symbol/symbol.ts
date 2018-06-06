@@ -63,7 +63,7 @@ export default class VSymbol extends Mixins(VMixin) {
 	}
 
 	onquote(quote: Quotes.Quote) {
-		// console.log(`quote ->`, JSON.stringify(quote, null, 4))
+		console.log(`quote ->`, JSON.stringify(quote, null, 4))
 		core.object.merge(this.all.quote, quote)
 	}
 

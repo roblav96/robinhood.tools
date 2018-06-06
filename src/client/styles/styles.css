@@ -35,6 +35,11 @@
 
 /* bulma fixes */
 
+.columns.is-variable .column {
+	padding-top: var(--columnGap);
+	padding-bottom: var(--columnGap);
+}
+
 .box.is-narrow {
 	padding: 0.75rem;
 }
@@ -76,7 +81,6 @@ span.tooltip:after {
 }
 
 span.tooltip.is-small:after {
-	padding: 4px 8px;
 	font-size: 12px;
 	font-weight: 500;
 }

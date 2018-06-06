@@ -7,19 +7,19 @@
 </style>
 
 <template>
-	<section class="section">
+	<section class="section is-medium mb-8">
 		<div class="container">
 
 
 
-			<div class="columns is-multiline is-mobile">
-				<div class="column" v-for="schema in schemas" :key="schema.name">
+			<div class="columns is-variable is-4">
+				<div class="column " v-for="schema in schemas" :key="schema.name">
 					<table class="table is-middle is-hoverable is-fullwidth  is-borderless card is-light">
 						<thead>
 							<tr>
-								<th class="whitespace-no-wrap">{{schema.name}}</th>
-								<th class="py-1 has-text-right">
-									<b-icon size="is-24x24" :icon="schema.icon"></b-icon>
+								<th class="is-size-5 whitespace-no-wrap">{{schema.name}}</th>
+								<th class="has-text-right py-2">
+									<b-icon size="is-32x32" :icon="schema.icon"></b-icon>
 								</th>
 							</tr>
 						</thead>
@@ -33,13 +33,16 @@
 						</tbody>
 					</table>
 				</div>
-				<div class="column min-w-xs">
+			</div>
+
+			<div class="columns is-variable is-4">
+				<div class="column">
 					<table class="table is-middle is-hoverable is-fullwidth card is-light">
 						<thead>
 							<tr>
-								<th class="whitespace-no-wrap">Description</th>
-								<th class="py-1 has-text-right">
-									<b-icon size="is-24x24" icon="book-open-variant"></b-icon>
+								<th class="is-size-5 whitespace-no-wrap">Synopsis</th>
+								<th class="has-text-right py-2">
+									<b-icon size="is-32x32" icon="book-open-variant"></b-icon>
 								</th>
 							</tr>
 							<tr>
@@ -52,7 +55,7 @@
 				</div>
 			</div>
 
-			<div v-if="development" class="columns is-multiline is-mobile">
+			<div class="columns is-multiline is-mobile is-variable is-4">
 				<div class="column" v-for="state in states" :key="state.name">
 					<table class="table is-middle is-hoverable is-fullwidth is-nowrap is-borderless card is-light">
 						<thead>

@@ -28,13 +28,13 @@ export default class extends Mixins(VMixin) {
 
 	schemas = [
 		{
-			name: 'Definition', icon: 'book-open',
+			name: 'Documentation', icon: 'book-open',
 			defs: [
-				{ key: 'fullName' },
+				{ key: 'fullName', title: 'Official Name' },
 				{ key: 'issueType' },
 				{ key: 'currency' },
 				{ key: 'country' },
-				{ key: 'timezone' },
+				// { key: 'timezone' },
 				{ key: 'website' },
 			],
 		},
@@ -46,7 +46,7 @@ export default class extends Mixins(VMixin) {
 				{ key: 'mic', title: 'Operating MIC' },
 				{ key: 'listDate' },
 				{ key: 'status' },
-				{ key: 'alive', title: 'Tradable' },
+				// { key: 'alive', title: 'Tradable' },
 			],
 		},
 	] as Schema[]

@@ -19,7 +19,7 @@ import socket from '../../adapters/socket'
 
 @Vts.Component({
 	beforeRouteEnter(to, from, next) {
-		console.log(`to ->`, to)
+		// console.log(`to ->`, to)
 		return next()
 	},
 })

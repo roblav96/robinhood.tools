@@ -4,7 +4,7 @@
 <style>
 /**/
 
-#symbol_route table.bidask .progress::-webkit-progress-bar {
+#symbol_route table .progress::-webkit-progress-bar {
 	background-color: white;
 	border: 1px solid var(--border);
 }
@@ -18,94 +18,86 @@
 </style>
 
 <template>
-	<div id="symbol_route">
+	<div id="symbol_route" class="">
 
-		<section class="section has-background-white-ter pb-0 border border-b-1">
+		<section class="px-4 has-background-white border border-b-1">
 			<div class="container">
 
-				<div class="columns is-mobile flex-wrap desktop:flex-no-wrap">
+				<div class="columns is-mobile my-0 items-center flex-wrap desktop:flex-no-wrap">
 
 					<div class="column is-narrow">
-						<v-symbol-logo class="is-48x48 card is-light" :symbol="symbol"></v-symbol-logo>
+						<v-symbol-logo class="is-48x48 card" :symbol="symbol"></v-symbol-logo>
 					</div>
 
-					<div class="column flex">
-						<div class="box is-light h-12 flex py-0 px-5">
-							<p class="self-center title whitespace-no-wrap">{{symbol}}</p>
-							<p class="self-center ml-4 is-size-6">{{all.quote.tinyName||all.quote.name}}</p>
-						</div>
+					<div class="column leading-none">
+						<p class="title font-bold leading-none whitespace-no-wrap">{{symbol}}</p>
+						<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
 					</div>
 
-					<div class="column is-narrow flex">
-						<div class="box is-light h-12 flex py-0 px-5 whitespace-no-wrap">
-							<p class="self-center title font-mono mr-4">
-								<v-number-ticker :number="all.quote.price"></v-number-ticker>
-							</p>
-							<p class="self-center">
-								<span class="is-size-6 font-semibold" v-bull-bear="all.quote.change">
-									{{nformat(all.quote.change,{plusminus:true})}} ({{nformat(all.quote.percent,{plusminus:true,percent:true,precision:2})}})
-								</span>
-								<br>
-								<v-tooltip :label="vtime(all.quote.timestamp,{full:true})" animated always>
-									<span>{{all.quote.timestamp}}</span>
-								</v-tooltip>
-								<!-- <v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp> -->
-							</p>
-						</div>
+					<div class="column is-narrow leading-none has-text-right">
+						<p class="title font-bold leading-none font-mono">
+							<v-number-ticker :number="all.quote.price"></v-number-ticker>
+						</p>
+						<p>
+							<v-timestamp :value="all.quote.timestamp" :opts="{verbose:false}"></v-timestamp>
+						</p>
 					</div>
 
+					<div class="column is-narrow font-medium has-text-left is-size-5" v-bull-bear="all.quote.change">
+						<p>{{nformat(all.quote.percent,{plusminus:true,percent:true,precision:2})}}</p>
+						<p>{{nformat(all.quote.change,{plusminus:true})}}</p>
+					</div>
+					
 					<div class="column is-narrow">
-						<div class="box is-light h-12 flex py-0">
-							<table class="bidask table is-paddingless is-middle is-nowrap is-borderless self-center is-size-6">
-								<tbody>
-									<tr>
-										<td class="has-text-danger has-text-right">
-											<b-tooltip label="Bid Price" position="is-left" size="is-small" animated>
-												<p>{{nformat(all.quote.bid)}}</p>
-											</b-tooltip>
-										</td>
-										<td>
-											<progress class="progress w-16 is-danger is-small rounded-none pr-2" :value="bidask.bid.price" :min="0"
-											    :max="100" style="transform: rotate(180deg);"></progress>
-										</td>
-										<td>
-											<progress class="progress w-16 is-success is-small rounded-none pr-2" :value="bidask.ask.price" :min="0"
-											    :max="100"></progress>
-										</td>
-										<td class="has-text-success has-text-left">
-											<b-tooltip label="Ask Price" position="is-right" size="is-small" animated>
-												<p>{{nformat(all.quote.ask)}}</p>
-											</b-tooltip>
-										</td>
-									</tr>
-									<tr>
-										<td class="has-text-success has-text-right">
-											<b-tooltip label="Bid Size" position="is-left" size="is-small" animated>
-												<p>{{nformat(all.quote.bids,{precision:1,compact:true})}}</p>
-											</b-tooltip>
-										</td>
-										<td>
-											<progress class="progress w-16 is-success is-small rounded-none pr-2" :value="bidask.bid.size" :min="0"
-											    :max="100" style="transform: rotate(180deg);"></progress>
-										</td>
-										<td>
-											<progress class="progress w-16 is-danger is-small rounded-none pr-2" :value="bidask.ask.size" :min="0"
-											    :max="100"></progress>
-										</td>
-										<td class="has-text-danger has-text-left">
-											<b-tooltip label="Ask Size" position="is-right" size="is-small" animated>
-												<p>{{nformat(all.quote.asks,{precision:1,compact:true})}}</p>
-											</b-tooltip>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
+						<table class="table is-paddingless is-middle is-nowrap is-borderless font-medium">
+							<tbody>
+								<tr>
+									<td class="has-text-danger has-text-right">
+										<b-tooltip label="Bid Price" position="is-left" size="is-small" animated>
+											<p>{{nformat(all.quote.bid)}}</p>
+										</b-tooltip>
+									</td>
+									<td>
+										<progress class="progress w-16 is-danger is-small rounded-none pr-2" :value="bidask.bid.price" :min="0"
+										    :max="100" style="transform: rotate(180deg);"></progress>
+									</td>
+									<td>
+										<progress class="progress w-16 is-success is-small rounded-none pr-2" :value="bidask.ask.price" :min="0"
+										    :max="100"></progress>
+									</td>
+									<td class="has-text-success has-text-left">
+										<b-tooltip label="Ask Price" position="is-right" size="is-small" animated>
+											<p>{{nformat(all.quote.ask)}}</p>
+										</b-tooltip>
+									</td>
+								</tr>
+								<tr>
+									<td class="has-text-success has-text-right">
+										<b-tooltip label="Bid Size" position="is-left" size="is-small" animated>
+											<p>{{nformat(all.quote.bids,{precision:1,compact:true})}}</p>
+										</b-tooltip>
+									</td>
+									<td>
+										<progress class="progress w-16 is-success is-small rounded-none pr-2" :value="bidask.bid.size" :min="0"
+										    :max="100" style="transform: rotate(180deg);"></progress>
+									</td>
+									<td>
+										<progress class="progress w-16 is-danger is-small rounded-none pr-2" :value="bidask.ask.size" :min="0"
+										    :max="100"></progress>
+									</td>
+									<td class="has-text-danger has-text-left">
+										<b-tooltip label="Ask Size" position="is-right" size="is-small" animated>
+											<p>{{nformat(all.quote.asks,{precision:1,compact:true})}}</p>
+										</b-tooltip>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 
 					<div class="column is-narrow widescreen:flex hidden">
-						<div class="box is-light h-12 flex py-0">
-							<table class="table is-paddingless is-middle is-nowrap is-borderless self-center is-size-6">
+						<div class="flex py-0">
+							<table class="table is-paddingless is-middle is-nowrap is-borderless">
 								<tbody>
 									<tr>
 										<td class="font-semibold has-text-right pr-2">{{nformat(all.quote.volume,{compact:true})}}</td>
@@ -121,8 +113,8 @@
 					</div>
 
 					<div v-if="all.quote.marketCap && all.quote.dealFlowVolume" class="column is-narrow fullhd:flex hidden">
-						<div class="box is-light h-12 flex py-0">
-							<table class="table is-paddingless is-middle is-nowrap is-borderless self-center is-size-6">
+						<div class="flex py-0">
+							<table class="table is-paddingless is-middle is-nowrap is-borderless">
 								<tbody>
 									<tr>
 										<td class="font-semibold has-text-right pr-2">{{nformat(all.quote.marketCap,{compact:true})}}</td>
