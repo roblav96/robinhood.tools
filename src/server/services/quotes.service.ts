@@ -1,6 +1,7 @@
 // 
 
 import '../main'
+import * as schedule from 'node-schedule'
 import * as _ from '../../common/lodash'
 import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
@@ -19,6 +20,7 @@ import radio from '../adapters/radio'
 
 
 
+declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: TypeOfSymbols } } }
 const emitter = new Emitter<'data'>()
 const MQTTS = [] as WebullMqttClient[]
 
@@ -34,27 +36,23 @@ const QUOTES = {
 	EMITS: {} as Dict<Quotes.Calc>,
 }
 
-declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: TypeOfSymbols } } }
-if (process.env.SYMBOLS == 'STOCKS') {
-	Rx.subscription(hours.rxstate).subscribe(state => {
-		if (state == 'PREPRE') start();
-	})
-}
 
+
+radio.on('symbols.pause', destroy)
+radio.on('symbols.resume', start)
 radio.once('symbols.start', start)
 radio.emit('symbols.ready')
 
-async function start() {
-
+function destroy() {
 	clock.offListener(ontick)
 	MQTTS.remove(v => v.destroy() || true)
 	core.nullify(SYMBOLS)
 	core.nullify(WB)
 	core.nullify(QUOTES)
+}
 
-	// if (hours.rxstate.value == 'CLOSED') {
-	// 	if (process.env.PRODUCTION) return;
-	// }
+async function start() {
+	destroy()
 
 	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
 		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :

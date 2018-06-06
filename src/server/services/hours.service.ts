@@ -12,8 +12,12 @@ import radio from '../adapters/radio'
 
 
 
-schedule.scheduleJob('00 * * * *', syncHours).invoke()
+// let resetjob: schedule.Job
+// function onreset(date: Date) {
+// 	console.log(`date ->`, date)
+// }
 
+schedule.scheduleJob('00 * * * *', syncHours).invoke()
 async function syncHours() {
 	let today = dayjs().format('YYYY-MM-DD')
 	let url = 'https://api.robinhood.com/markets/XNYS/hours/' + today + '/'
@@ -26,6 +30,8 @@ async function syncHours() {
 	hhours.next = JSON.stringify(hours.toHours(next)) as any
 	await redis.main.hmset(rkeys.HR.HOURS, hhours)
 	radio.emit('syncHours')
+	// let day = dayjs(hhours.prepre).subtract(1,)
+	// schedule.scheduleJob('00 * * * *', syncHours)
 }
 
 hours.rxhours.subscribe(function(rhours) {

@@ -45,12 +45,14 @@ async function start() {
 
 schedule.scheduleJob('55 3 * * 1-5', () => syncEverything(true))
 async function syncEverything(resets = false) {
+	radio.emit('symbols.pause')
 	await syncInstruments()
 	await syncTickers()
 	await syncStocks()
 	await syncForex()
 	await syncIndexes()
 	await quotes.syncAllQuotes(resets)
+	_.defer(() => radio.emit('symbols.resume'))
 }
 
 
