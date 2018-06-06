@@ -97,7 +97,7 @@ class Client extends Emitter<'open' | 'close' | 'error' | 'message'> {
 
 }
 
-
+// 
 
 class Socket extends Emitter {
 
@@ -114,6 +114,7 @@ class Socket extends Emitter {
 
 	discover() {
 		return http.get('/websocket/discover', { retries: Infinity }).then((addresses: string[]) => {
+			// console.log('addresses ->', addresses)
 			security.cookies()
 			this.clients.forEach(v => v.destroy())
 			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
