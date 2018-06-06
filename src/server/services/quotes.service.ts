@@ -92,7 +92,7 @@ async function start() {
 		Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
 
 	})
-	
+
 	await redis.main.coms(coms)
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
@@ -149,9 +149,9 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 
 function ontick(i: number) {
 	let t = Date.now()
+	let coms = [] as Redis.Coms
 	let live = new Date().getSeconds() % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
 
-	let coms = [] as Redis.Coms
 	SYMBOLS.forEach(symbol => {
 		let quote = QUOTES.CALCS[symbol]
 
@@ -217,10 +217,10 @@ function ontick(i: number) {
 
 }
 
-const avgs = {
-	emits: 0,
-	lives: 0,
-}
+// const avgs = {
+// 	emits: 0,
+// 	lives: 0,
+// }
 
 
 

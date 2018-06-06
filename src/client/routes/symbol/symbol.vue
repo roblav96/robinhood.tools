@@ -20,26 +20,23 @@
 <template>
 	<div id="symbol_route">
 
-		<section class="section has-background-white-ter pt-4 pb-0">
+		<section class="section has-background-white-ter pb-0 border border-b-1">
 			<div class="container">
 
-				<div class="columns is-mobile flex-wrap desktop:flex-no-wrap mb-1 is-variable is-2">
+				<div class="columns is-mobile flex-wrap desktop:flex-no-wrap">
 
 					<div class="column is-narrow">
 						<v-symbol-logo class="is-48x48 card is-light" :symbol="symbol"></v-symbol-logo>
 					</div>
 
-					<div class="column is-narrow flex">
+					<div class="column flex">
 						<div class="box is-light h-12 flex py-0 px-5">
 							<p class="self-center title whitespace-no-wrap">{{symbol}}</p>
-							<p class="self-center ml-4 is-size-6">
-								<!-- <span>{{all.quote.acronym}}</span> -->
-								<span>{{breakpoints.widescreenAndUp?all.quote.name:all.quote.tinyName}}</span>
-							</p>
+							<p class="self-center ml-4 is-size-6">{{all.quote.tinyName||all.quote.name}}</p>
 						</div>
 					</div>
 
-					<div class="column flex">
+					<div class="column is-narrow flex">
 						<div class="box is-light h-12 flex py-0 px-5 whitespace-no-wrap">
 							<p class="self-center title font-mono mr-4">
 								<v-number-ticker :number="all.quote.price"></v-number-ticker>
@@ -49,7 +46,10 @@
 									{{nformat(all.quote.change,{plusminus:true})}} ({{nformat(all.quote.percent,{plusminus:true,percent:true,precision:2})}})
 								</span>
 								<br>
-								<v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp>
+								<v-tooltip :label="vtime(all.quote.timestamp,{full:true})" animated always>
+									<span>{{all.quote.timestamp}}</span>
+								</v-tooltip>
+								<!-- <v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp> -->
 							</p>
 						</div>
 					</div>
@@ -60,7 +60,7 @@
 								<tbody>
 									<tr>
 										<td class="has-text-danger has-text-right">
-											<b-tooltip label="Bid Price">
+											<b-tooltip label="Bid Price" position="is-left" size="is-small" animated>
 												<p>{{nformat(all.quote.bid)}}</p>
 											</b-tooltip>
 										</td>
@@ -73,14 +73,14 @@
 											    :max="100"></progress>
 										</td>
 										<td class="has-text-success has-text-left">
-											<b-tooltip label="Ask Price">
+											<b-tooltip label="Ask Price" position="is-right" size="is-small" animated>
 												<p>{{nformat(all.quote.ask)}}</p>
 											</b-tooltip>
 										</td>
 									</tr>
 									<tr>
 										<td class="has-text-success has-text-right">
-											<b-tooltip label="Bid Size" position="is-bottom">
+											<b-tooltip label="Bid Size" position="is-left" size="is-small" animated>
 												<p>{{nformat(all.quote.bids,{precision:1,compact:true})}}</p>
 											</b-tooltip>
 										</td>
@@ -93,7 +93,7 @@
 											    :max="100"></progress>
 										</td>
 										<td class="has-text-danger has-text-left">
-											<b-tooltip label="Ask Size" position="is-bottom">
+											<b-tooltip label="Ask Size" position="is-right" size="is-small" animated>
 												<p>{{nformat(all.quote.asks,{precision:1,compact:true})}}</p>
 											</b-tooltip>
 										</td>
@@ -156,11 +156,9 @@
 			</div>
 		</section>
 
-		<!-- <section class="section flex-col-full"> -->
 		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
 			<router-view></router-view>
 		</transition>
-		<!-- </section> -->
 
 	</div>
 </template>

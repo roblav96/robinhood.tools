@@ -1,9 +1,6 @@
 // 
 @import '~bulma/sass/utilities/initial-variables';
 // 
-// $black: #22292F;
-// $black-bis: #3D4852;
-// $black-ter: #606F7B;
 $grey-darker: #22292F;
 $grey-dark: #3D4852;
 $grey: #606F7B;
@@ -102,16 +99,16 @@ $hr-margin: 0px;
 $box-padding: 1rem;
 $box-radius: $radius;
 // 
-// $tabs-border-bottom-width: 2px;
+$tabs-border-bottom-width: 0px;
 $tabs-link-hover-border-bottom-color: $primary;
 $tabs-link-hover-color: $primary;
 $tabs-link-active-border-bottom-color: $link;
 // 
 $tabs-boxed-link-hover-background-color: $white;
-$tabs-boxed-link-hover-border-bottom-color: $primary;
+$tabs-boxed-link-hover-border-bottom-color: transparent;
 $tabs-boxed-link-active-background-color: $white;
 $tabs-boxed-link-active-border-color: $primary;
-$tabs-boxed-link-active-border-bottom-color: $primary;
+$tabs-boxed-link-active-border-bottom-color: transparent;
 // 
 // $table-cell-border: 1px solid $grey-lightest;
 $table-head-cell-border-width: 0 0 1px;

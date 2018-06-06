@@ -60,7 +60,7 @@ Vue.directive('bg-bull-bear', function(el, { value, oldValue, arg }) {
 // Vue.directive('timestamp', {
 // 	update(el, binding, vnode, oldVnode) {
 // 		if (!binding.value) return binding.def.unbind(el, binding, vnode, oldVnode);
-// 		el.innerHTML = utils.tformat(binding.value, binding.modifiers)
+// 		el.innerHTML = utils.vtime(binding.value, binding.modifiers)
 // 		clock.offContext('1s', el)
 // 		clock.once('1s', () => binding.def.update(el, binding, vnode, oldVnode), el)
 // 	},

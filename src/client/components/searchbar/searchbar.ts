@@ -27,7 +27,7 @@ export default class extends Mixins(VMixin) {
 			if (document.activeElement.outerHTML != this.inputfield.outerHTML) return;
 			this.inputfield.blur()
 		}
-		if (['f', 't', '/'].includes(event.key)) {
+		if (['f', 'l', 't', '/'].includes(event.key)) {
 			if (document.activeElement.tagName == 'INPUT') return;
 			this.searchbar.$el.querySelector('input').focus()
 		}

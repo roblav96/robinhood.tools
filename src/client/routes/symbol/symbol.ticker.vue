@@ -55,7 +55,7 @@
 								<td>Updated</td>
 								<td class="has-text-right font-medium">
 									<v-timestamp :value="all.quote[vcamel(`${state.key}Timestamp`)]"></v-timestamp>
-									<!-- {{tformat(all.quote[vcamel(`${state.key}Timestamp`)],{max:1})}} -->
+									<!-- {{vtime(all.quote[vcamel(`${state.key}Timestamp`)],{max:1})}} -->
 								</td>
 							</tr>
 						</tbody>

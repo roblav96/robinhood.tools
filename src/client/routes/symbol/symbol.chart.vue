@@ -7,21 +7,21 @@
 </style>
 
 <template>
-	<section class="flex-col-full pb-4">
+	<div class="flex-col-full">
+
+		<section class="section pb-0">
+			<div class="columns items-center">
+				<div class="column">
+					<b-field>
+						<b-radio-button v-model="range" type="is-primary" v-for="v in ranges" :native-value="v" :key="v">
+							<span>{{vrange(v)}}</span>
+						</b-radio-button>
+					</b-field>
+				</div>
+			</div>
+		</section>
 
 		<v-symbol-echart class="flex-col-full" ref="symbol_echart"></v-symbol-echart>
-
-		<div class="columns items-center">
-
-			<div class="column">
-				<b-field>
-					<b-radio-button v-model="range" type="is-primary" v-for="v in ranges" :native-value="v" :key="v">
-						<span>{{vrange(v)}}</span>
-					</b-radio-button>
-				</b-field>
-			</div>
-
-		</div>
 
 
 
@@ -67,5 +67,5 @@
 
 
 		<!-- </div> -->
-	</section>
+	</div>
 </template>

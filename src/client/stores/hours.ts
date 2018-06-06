@@ -3,6 +3,7 @@
 import lockr from 'lockr'
 import store from '../store'
 import socket from '../adapters/socket'
+import * as _ from '../../common/lodash'
 import * as http from '../../common/http'
 import * as rkeys from '../../common/rkeys'
 
@@ -16,7 +17,7 @@ Object.assign(state, lockr.get('hours', state))
 store.register('hours', state)
 declare global { namespace Store { interface State { hours: typeof state } } }
 
-setImmediate(function() {
+_.defer(function() {
 
 	store.watch(function(state) { return state.security.ready }, function(ready) {
 		http.get('/hours', { retries: Infinity }).then(function(response: typeof state) {

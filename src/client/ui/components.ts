@@ -1,7 +1,9 @@
 // 
 
 import * as Vts from 'vue-property-decorator'
+import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
+import Buefy from 'buefy'
 import * as anime from 'animejs'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
@@ -10,10 +12,15 @@ import clock from '../../common/clock'
 
 
 
-
-
-@Vts.Component({ template: `<span>{{fromnow}}</span>` })
+@Vts.Component({
+	template: `
+	<b-tooltip :label="tip" position="is-right" animated>
+		<span>{{fromnow}}</span>
+	</b-tooltip>
+	`,
+})
 class Timestamp extends Vue {
+	tip = ''
 	fromnow = ''
 	@Vts.Prop() value: number
 	@Vts.Prop() opts: TimeFormatOptions
@@ -29,11 +36,10 @@ class Timestamp extends Vue {
 		if (!Number.isFinite(this.value)) return this.fromnow = '';
 		let opts = this.opts ? core.clone(this.opts) : {}
 		this.fromnow = utils.format.time(this.value, opts)
+		this.tip = utils.format.time(this.value, { full: true })
 	}
 }
 Vue.component('v-timestamp', Timestamp)
-
-
 
 
 
@@ -78,8 +84,6 @@ Vue.component('v-number-ticker', NumberTicker)
 
 
 
-
-
 @Vts.Component({
 	template: `
 		<figure class="image flex bg-white rounded">
@@ -98,6 +102,37 @@ class SymbolLogo extends Vue {
 	}
 }
 Vue.component('v-symbol-logo', SymbolLogo)
+
+
+
+
+
+// @Vts.Component
+// class Tooltip extends Mixins((Buefy as any).Tooltip) {
+// 	active: boolean
+// 	@Vts.Prop({ default: 'is-right' })
+// 	position: string
+// 	mounted() {
+// 		this.$el.addEventListener('pointerenter', this.onenter)
+// 	}
+// 	beforeDestroy() {
+// 		this.$el.removeEventListener('pointerenter', this.onenter)
+// 	}
+// 	onenter(event: PointerEvent) {
+// 		let el = event.target as HTMLElement
+		
+// 		// let style = window.getComputedStyle(el, ':after')
+// 		// let box = style.getBoundingClientRect()
+// 		// console.log('box ->', box)
+		
+// 		let n = parseInt(window.getComputedStyle(el, ':before').getPropertyValue('margin-left'), 10)
+// 		console.log(`n ->`, n)
+		
+// 		// let found = el.offsetParent.querySelector(':after')
+// 		// console.log(`found -> %O`, found, found)
+// 	}
+// }
+// Vue.component('v-tooltip', Tooltip)
 
 
 

@@ -1,5 +1,6 @@
 // 
 
+import * as dayjs from 'dayjs'
 import * as prettyms from 'pretty-ms'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
@@ -50,7 +51,7 @@ export const wemitter = new UEmitter('window')
 
 
 declare global { interface NumberFormatOptions { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } }
-declare global { interface TimeFormatOptions extends prettyms.PrettyMsOptions { max: number, showms: boolean, ago: boolean, keepDecimalsOnWholeSeconds: boolean } }
+declare global { interface TimeFormatOptions extends prettyms.PrettyMsOptions { max: number, showms: boolean, ago: boolean, full: boolean, keepDecimalsOnWholeSeconds: boolean } }
 export const format = {
 
 	UNITS: ['K', 'M', 'B', 'T'],
@@ -115,6 +116,7 @@ export const format = {
 	},
 
 	time(stamp: number, opts = {} as Partial<TimeFormatOptions>) {
+		if (opts.full) return dayjs(stamp).format('dddd, MMM DD YYYY, hh:mm:ssa');
 		opts.secDecimalDigits = opts.secDecimalDigits || 0
 		opts.max = opts.max || 1
 		let ms = prettyms(Math.max(Date.now() - stamp, opts.showms ? 0 : 1001), opts)
@@ -178,23 +180,6 @@ export function marketcapCategory(marketcap: number) {
 	if (marketcap > (50 * 1000 * 1000)) return 'micro';
 	return 'nano'
 }
-
-
-
-
-
-// import * as benchmark from '../../common/benchmark'
-// benchmark.simple('formats', [
-// 	function nformat() {
-// 		nFormat(Date.now())
-// 	},
-// 	function tformat() {
-// 		tFormat(Date.now())
-// 	},
-// 	function tformatverbose() {
-// 		tFormat(Date.now())
-// 	},
-// ])
 
 
 

@@ -65,7 +65,7 @@
 						</thead>
 						<tbody>
 							<tr>
-								<b-tooltip :label="state.tip" position="is-top" size="is-small" multilined>
+								<b-tooltip :label="state.tip" position="is-right" size="is-small" animated>
 									<td>{{vstcase(state.calc)}}</td>
 								</b-tooltip>
 								<td class="has-text-right font-medium font-mono">

@@ -5,10 +5,10 @@ import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import VMixin from '../../mixins/v.mixin'
 import RHMixin from '../../mixins/robinhood.mixin'
+import * as dayjs from 'dayjs'
 import * as _ from '../../../common/lodash'
 import * as pretty from '../../../common/pretty'
 import * as utils from '../../adapters/utils'
-import dayjs from '../../../common/dayjs'
 import clock from '../../../common/clock'
 
 

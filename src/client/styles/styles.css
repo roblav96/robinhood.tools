@@ -1,7 +1,18 @@
 /**/
 
+
+/* vue fixes */
+
 *[style*="display: none"] {
 	display: none !important;
+}
+
+
+/* tailwind fixes */
+
+.border {
+	border-style: solid;
+	border-color: var(--border);
 }
 
 .flex-row,
@@ -20,6 +31,9 @@
 	flex-direction: column;
 	flex: 1;
 }
+
+
+/* bulma fixes */
 
 .box.is-narrow {
 	padding: 0.75rem;
@@ -56,8 +70,20 @@ img.is-png {
 }
 
 span.tooltip:after {
-	font-size: 1rem;
+	padding: 6px 12px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+span.tooltip.is-small:after {
+	padding: 4px 8px;
+	font-size: 12px;
 	font-weight: 500;
+}
+
+span.tooltip.is-large:after {
+	padding: 8px 16px;
+	font-size: 18px;
 }
 
 
@@ -228,13 +254,6 @@ span.icon.is-xxlarge,
 span.icon.is-xxlarge > i.mdi,
 span.icon.is-xxlarge > i.mdi::before {
 	font-size: 5rem;
-}
-
-
-/**/
-
-.animated-loading {
-	animation-duration: 3s !important;
 }
 
 

@@ -6,12 +6,12 @@ import Vue from 'vue'
 import VMixin from '../../mixins/v.mixin'
 import Symbol from './symbol'
 import * as url from 'url'
+import * as dayjs from 'dayjs'
 import * as _ from '../../../common/lodash'
 import * as core from '../../../common/core'
 import * as rkeys from '../../../common/rkeys'
 import * as http from '../../../common/http'
 import * as utils from '../../adapters/utils'
-import dayjs from '../../../common/dayjs'
 import socket from '../../adapters/socket'
 
 
@@ -55,7 +55,7 @@ export default class extends Mixins(VMixin) {
 		let value = this.all.quote[key]
 		if (value) {
 			if (key == 'website') return url.parse(value as any).host;
-			if (key == 'listDate') return dayjs(value).format('MMMM DD, YYYY');
+			if (key == 'listDate') return dayjs(value as any).format('MMMM DD, YYYY');
 		}
 		if (core.number.isFinite(value)) return utils.format.number(value);
 		// if (core.string.is(value)) return _.startCase(value);
