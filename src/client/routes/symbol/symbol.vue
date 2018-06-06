@@ -33,18 +33,18 @@
 						<p class="leading-none">{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
 					</div>
 
-					<div class="column is-narrow leading-none has-text-right">
+					<div class="column is-narrow has-text-right">
 						<p class="title font-bold leading-none font-mono">
 							<v-number-ticker :number="all.quote.price"></v-number-ticker>
 						</p>
-						<p>
+						<p class="leading-none">
 							<v-timestamp :value="all.quote.timestamp" :opts="{verbose:false}"></v-timestamp>
 						</p>
 					</div>
 
 					<div class="column is-narrow has-text-right" v-bull-bear="all.quote.change">
-						<p class="is-size-3 font-light font-mono">{{nformat(all.quote.percent,{plusminus:true,percent:true,precision:2})}}</p>
-						<p class="">{{nformat(all.quote.change,{plusminus:true})}}</p>
+						<p class="is-size-3 font-light leading-none">{{nformat(all.quote.percent,{plusminus:true,percent:true,precision:2})}}</p>
+						<p class="leading-none">{{nformat(all.quote.change,{plusminus:true})}}</p>
 					</div>
 
 					<div class="column is-narrow">
