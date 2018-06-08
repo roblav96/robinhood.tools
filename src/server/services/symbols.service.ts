@@ -32,7 +32,7 @@ async function start() {
 		Rx.subscription(hours.rxhours).pipe(Rx.take(1)).subscribe(resolve)
 	})
 
-	// await syncEverything()
+	await syncEverything()
 	// await quotes.syncAllQuotes()
 
 	let keys = [
