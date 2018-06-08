@@ -24,12 +24,12 @@ import * as Rx from './rxjs'
 
 
 
-export function subscription<T>(observable: T) {
-	return (((observable as any) as Rx.Observable<any>).pipe(
-		Rx.skip(1),
-		Rx.filter(v => !(v == null)),
-	) as any) as T
-}
+// export function subscription<T>(observable: T) {
+// 	return (((observable as any) as Rx.Observable<any>).pipe(
+// 		Rx.skip(1),
+// 		Rx.filter(v => !(v == null)),
+// 	) as any) as T
+// }
 
 // export function promise<T>(observable: T) {
 // 	return (((observable as any) as Rx.Observable<any>).pipe(

@@ -16,12 +16,9 @@ import radio from '../adapters/radio'
 
 let INDEX = lunr(_.noop)
 
+radio.on('symbols.resume', start)
 radio.once('symbols.start', start)
 radio.emit('symbols.ready')
-
-Rx.subscription(hours.rxstate).subscribe(state => {
-	if (state == 'PREPRE') start();
-})
 
 async function start() {
 

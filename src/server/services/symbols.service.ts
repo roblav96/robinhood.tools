@@ -29,7 +29,7 @@ radio.on('symbols.ready', function() {
 
 async function start() {
 	await new Promise(function(resolve) {
-		Rx.subscription(hours.rxhours).pipe(Rx.take(1)).subscribe(resolve)
+		hours.rxhours.pipe(Rx.filter(v => !!v), Rx.take(1)).subscribe(resolve)
 	})
 
 	await syncEverything()
