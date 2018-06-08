@@ -45,6 +45,7 @@ export async function reqDoc(req: PolkaRequest, rhdoc = false): Promise<any> {
 	if (prime) {
 		req.authed = req.doc.token == token(req.doc, prime)
 		if (!req.authed) {
+			await redis.main.hdel(req.doc.rkey, 'prime')
 			let message = 'doc.token != req.token'
 			if (process.env.DEVELOPMENT) {
 				throw new boom(message, { message, statusCode: 401, data: { doc: req.doc } })
@@ -52,7 +53,7 @@ export async function reqDoc(req: PolkaRequest, rhdoc = false): Promise<any> {
 			throw boom.unauthorized(message)
 		}
 	}
-	if (rhdoc) {
+	if (rhdoc && req.authed) {
 		let ikeys = ['rhusername', 'rhtoken'] as KeysOf<Security.Doc>
 		let rdoc = await redis.main.hmget(req.doc.rkey, ...ikeys) as Security.Doc
 		rdoc = redis.fixHmget(rdoc, ikeys)
