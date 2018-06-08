@@ -31,7 +31,7 @@
 							<v-number-ticker :number="props.row.price"></v-number-ticker>
 						</b-table-column>
 						<b-table-column label="Change" class="font-mono" numeric v-bull-bear="props.row.change">
-							{{nformat(props.row.change,{plusminus:true})}} ({{nformat(props.row.percent,{plusminus:true,percent:true,precision:2})}})
+							{{nformat(props.row.change,{plusminus:true})}} ({{nformat(props.row.percent,{plusminus:true,percent:true})}})
 						</b-table-column>
 						<b-table-column label="Volume" class="font-mono" numeric>
 							{{nformat(props.row.volume,{compact:true,precision:2})}}

@@ -136,7 +136,7 @@ export const string = {
 	},
 	capitalize(value: string) {
 		if (!value) return value;
-		return value.trim().replace(/\s\s+/g, ' ').split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ').trim()
+		return value.trim().replace(/\s\s+/g, ' ').toLowerCase().split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ').trim()
 	},
 	leven(a: string, b: string) {
 		return leven(a, b) as number

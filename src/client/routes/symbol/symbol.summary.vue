@@ -7,53 +7,58 @@
 </style>
 
 <template>
-	<section class="section is-medium mb-8">
+	<section class="section">
 		<div class="container">
 
 
 
 			<div class="columns is-variable is-4">
-				<div class="column " v-for="schema in schemas" :key="schema.name">
-					<table class="table is-middle is-hoverable is-fullwidth  is-borderless card is-light">
-						<thead>
-							<tr>
-								<th class="is-size-5 whitespace-no-wrap">{{schema.name}}</th>
-								<th class="has-text-right py-2">
-									<b-icon size="is-32x32" :icon="schema.icon"></b-icon>
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr v-for="def in schema.defs" :key="def.key">
-								<td class="whitespace-no-wrap">{{!def.title?vstcase(def.key):def.title}}</td>
-								<td class="has-text-right font-medium">
-									{{vvalue(def.key)}}
-								</td>
-							</tr>
-						</tbody>
-					</table>
+				<div class="column flex-col-full" v-for="schema in schemas" :key="schema.name">
+					<article class="message flex-col-full">
+						<div class="message-header py-0 justify-start">
+							<b-icon class="mr-3" size="is-24x24" :icon="schema.icon"></b-icon>
+							<p class="py-3 text-lg font-semibold">{{schema.name}}</p>
+						</div>
+						<div class="flex-col-full message-body p-1 pt-0 has-background-grey-lightest">
+							<table class="h-full table is-middle is-hoverable is-fullwidth is-borderless is-striped">
+								<tbody>
+									<tr v-for="def in schema.defs" :key="def.key">
+										<td class="font-semibold whitespace-no-wrap">{{!def.title?vstcase(def.key):def.title}}</td>
+										<td class="has-text-right">
+											{{vvalue(def.key)}}
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</article>
 				</div>
 			</div>
 
+
+
 			<div class="columns is-variable is-4">
-				<div class="column">
-					<table class="table is-middle is-hoverable is-fullwidth card is-light">
-						<thead>
-							<tr>
-								<th class="is-size-5 whitespace-no-wrap">Synopsis</th>
-								<th class="has-text-right py-2">
-									<b-icon size="is-32x32" icon="book-open-variant"></b-icon>
-								</th>
-							</tr>
-							<tr>
-								<th class="font-normal border-0 content" colspan="2">
-									<p>{{all.quote.description}}</p>
-								</th>
-							</tr>
-						</thead>
-					</table>
+				<div class="column flex-col-full">
+					<article class="message">
+						<div class="message-header py-0 justify-start">
+							<b-icon class="mr-3" size="is-24x24" icon="book-open-variant"></b-icon>
+							<p class="py-3 text-lg font-semibold flex-none">Description</p>
+							<div class="flex-grow"></div>
+							<a class="button is-white is-small is-outlined font-medium" :href="all.quote.website" target="_blank">
+								<b-icon size="is-16x16" icon="web"></b-icon>
+								<span>{{website}}</span>
+							</a>
+						</div>
+						<div class="message-body p-1 pt-0 has-background-grey-lightest">
+							<p class="has-background-white p-3">
+								{{all.quote.description}}
+							</p>
+						</div>
+					</article>
 				</div>
 			</div>
+
+
 
 			<div class="columns is-multiline is-mobile is-variable is-4">
 				<div class="column" v-for="state in states" :key="state.name">

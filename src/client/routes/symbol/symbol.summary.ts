@@ -23,19 +23,18 @@ export default class extends Mixins(VMixin) {
 	all = this.$parent.all
 
 	created() {
-
+		console.log(`this.all ->`, this.all)
 	}
 
 	schemas = [
 		{
-			name: 'Documentation', icon: 'book-open',
+			name: 'Instrument', icon: 'coin',
 			defs: [
-				{ key: 'fullName', title: 'Official Name' },
+				{ key: 'fullName', title: 'Name' },
 				{ key: 'issueType' },
-				{ key: 'currency' },
 				{ key: 'country' },
-				// { key: 'timezone' },
-				{ key: 'website' },
+				{ key: 'timezone' },
+				{ key: 'currency' },
 			],
 		},
 		{
@@ -43,25 +42,28 @@ export default class extends Mixins(VMixin) {
 			defs: [
 				{ key: 'exchange', title: 'Name' },
 				{ key: 'acronym' },
-				{ key: 'mic', title: 'Operating MIC' },
 				{ key: 'listDate' },
 				{ key: 'status' },
-				// { key: 'alive', title: 'Tradable' },
+				{ key: 'statusTimestamp', title: 'Status Updated' },
 			],
 		},
 	] as Schema[]
 
 	vvalue(key: keyof Quotes.Quote) {
 		let value = this.all.quote[key]
-		if (value) {
-			if (key == 'website') return url.parse(value as any).host;
-			if (key == 'listDate') return dayjs(value as any).format('MMMM DD, YYYY');
-		}
+		if (value == null) return value;
+		if (key == 'statusTimestamp') return utils.format.time(value as any, { verbose: true });
+		if (key == 'listDate') return dayjs(value as any).format('MMMM DD, YYYY');
 		if (core.number.isFinite(value)) return utils.format.number(value);
-		// if (core.string.is(value)) return _.startCase(value);
-		if (core.boolean.is(value)) return !value ? 'No' : 'Yes';
+		if (core.boolean.is(value)) return value ? 'Yes' : 'No';
+		if (core.string.is(value)) {
+			let ikeys = ['timezone', 'status'] as KeysOf<Quotes.Quote>
+			if (ikeys.includes(key)) return core.string.capitalize(_.startCase(value));
+		}
 		return value
 	}
+
+	get website() { return url.parse(this.all.quote.website).host }
 
 	states = [
 		{ name: '4am to 8pm', icon: 'theme-light-dark', key: '', calc: 'startPrice', tip: 'Price at start of day (4:00am)' },

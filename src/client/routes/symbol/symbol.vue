@@ -9,11 +9,6 @@
 	border: 1px solid var(--border);
 }
 
-#symbol_route > section:first-child .tags,
-#symbol_route > section:first-child .tag {
-	margin-bottom: 0px;
-}
-
 </style>
 
 <template>
@@ -22,29 +17,31 @@
 		<section class="has-background-white border border-b-1 touch:px-6">
 			<div class="container">
 
-				<div class="columns is-mobile is-variable is-4 my-0 items-center flex-wrap desktop:flex-no-wrap">
+				<div class="columns is-mobile is-variable is-4 my-0 items-center touch:flex-wrap">
 
 					<div class="column is-narrow pr-0">
-						<v-symbol-logo class="is-48x48 card" :symbol="symbol"></v-symbol-logo>
+						<v-symbol-logo class="is-48x48 shadow" :symbol="symbol"></v-symbol-logo>
 					</div>
 
-					<div class="column">
+					<div class="column py-0">
 						<p class="title font-bold leading-none whitespace-no-wrap">{{symbol}}</p>
-						<p class="leading-none">{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
+						<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
 					</div>
 
 					<div class="column is-narrow has-text-right">
 						<p class="title font-bold leading-none font-mono">
 							<v-number-ticker :number="all.quote.price"></v-number-ticker>
 						</p>
-						<p class="leading-none">
-							<v-timestamp :value="all.quote.timestamp" :opts="{verbose:false}"></v-timestamp>
+						<p>
+							<v-timestamp :value="all.quote.timestamp"></v-timestamp>
 						</p>
 					</div>
 
-					<div class="column is-narrow has-text-right" v-bull-bear="all.quote.change">
-						<p class="is-size-3 font-light leading-none">{{nformat(all.quote.percent,{plusminus:true,percent:true,precision:2})}}</p>
-						<p class="leading-none">{{nformat(all.quote.change,{plusminus:true})}}</p>
+					<div class="column is-narrow has-text-right">
+						<p class="is-size-3 leading-none" v-bull-bear="all.quote.percent">
+							{{nformat(all.quote.percent,{plusminus:true,percent:true})}}
+						</p>
+						<p>{{nformat(all.quote.change,{plusminus:true,dollar:true})}}</p>
 					</div>
 
 					<div class="column is-narrow">
@@ -94,7 +91,7 @@
 						</table>
 					</div>
 
-					<div class="column is-narrow widescreen:flex hidden">
+					<div class="column is-narrow desktop:flex hidden">
 						<div class="flex py-0">
 							<table class="table is-paddingless is-middle is-nowrap is-borderless">
 								<tbody>

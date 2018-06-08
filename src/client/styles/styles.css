@@ -60,8 +60,8 @@
 }
 
 .button .icon:first-child:not(:last-child) {
-	margin-left: -0.25rem;
-	margin-right: 0.25rem;
+	margin-left: 0px;
+	margin-right: 0.5rem;
 }
 
 figure.image > img {

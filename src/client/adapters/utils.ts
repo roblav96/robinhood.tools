@@ -57,9 +57,14 @@ export const format = {
 	UNITS: ['K', 'M', 'B', 'T'],
 	number(value: number, { precision, compact, plusminus, percent, dollar, nozeros } = {} as Partial<NumberFormatOptions>) {
 		if (!Number.isFinite(precision)) {
-			if (compact) precision = 0;
+			precision = 2
+			if (plusminus && percent) {
+				let abs = Math.abs(value)
+				if (abs >= 1000) precision = 0;
+				else if (abs >= 10) precision = 1;
+			}
+			else if (compact) precision = 0;
 			else {
-				precision = 2
 				let abs = Math.abs(value)
 				if (compact === undefined && abs >= 10000) compact = true;
 				else if (abs >= 10000) precision = 0;
