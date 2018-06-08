@@ -56,20 +56,21 @@ export const format = {
 
 	UNITS: ['K', 'M', 'B', 'T'],
 	number(value: number, { precision, compact, plusminus, percent, dollar, nozeros } = {} as Partial<NumberFormatOptions>) {
+		let negative = value < 0
+		if (negative) value = Math.abs(value);
+
 		if (!Number.isFinite(precision)) {
 			precision = 2
 			if (plusminus && percent) {
-				let abs = Math.abs(value)
-				if (abs >= 1000) precision = 0;
-				else if (abs >= 10) precision = 1;
+				if (value >= 1000) precision = 0;
+				else if (value >= 10) precision = 1;
 			}
 			else if (compact) precision = 0;
 			else {
-				let abs = Math.abs(value)
-				if (compact === undefined && abs >= 10000) compact = true;
-				else if (abs >= 10000) precision = 0;
-				else if (abs >= 2000) precision = 1;
-				else if (abs < 2) precision = 3;
+				if (compact === undefined && value >= 10000) compact = true;
+				else if (value >= 10000) precision = 0;
+				else if (value >= 2000) precision = 1;
+				else if (value < 2) precision = 3;
 			}
 		} else { nozeros = false }
 		if (plusminus || percent) precision = Math.min(precision, 2);
@@ -104,12 +105,13 @@ export const format = {
 		}
 
 		if (compact) fixed += format.UNITS[unit] || '';
+		if (negative) fixed = '-' + fixed;
 
 		let cash = dollar ? '$' : ''
-		if (plusminus && value > 0) {
+		if (plusminus && !negative) {
 			fixed = '+' + cash + fixed
 		}
-		else if (plusminus && value < 0) {
+		else if (plusminus && negative) {
 			fixed = '–' + cash + fixed.replace('-', '')
 		}
 		else { fixed = cash + fixed };

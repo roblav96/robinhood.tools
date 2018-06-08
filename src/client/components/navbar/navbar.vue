@@ -38,9 +38,9 @@ nav.navbar div.dropdown-content a > span.icon {
 					<img src="../../../assets/logo-primary.svg" alt="Robinhood Tools">
 				</router-link>
 
-				<div class="navbar-item py-0 flex-col is-hidden-mobile">
+				<div class="navbar-item font-medium py-0 flex-col is-hidden-mobile">
 					<p class="leading-tight font-mono">{{time}}</p>
-					<p class="is-size-7 font-medium" :class="scolor">{{state}}</p>
+					<p class="is-size-7" :class="scolor">{{state}}</p>
 				</div>
 
 				<b-field class="navbar-item">

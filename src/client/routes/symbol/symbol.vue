@@ -48,13 +48,13 @@
 					
 					<div class="column is-narrow has-text-centered">
 						<p class="is-size-3 leading-none">
-							{{nformat(all.quote.volume,{compact:true,precision:1})}}
+							{{nformat(all.quote.volume,{compact:true})}}
 						</p>
 						<p>Volume</p>
 					</div>
 					<div class="column is-narrow has-text-centered">
 						<p class="is-size-3 leading-none">
-							{{nformat(all.quote.avgVolume,{compact:true,precision:1})}}
+							{{nformat(all.quote.avgVolume,{compact:true})}}
 						</p>
 						<p>Avg Volume</p>
 					</div>
@@ -64,9 +64,9 @@
 						</p>
 						<p>Market Cap</p>
 					</div>
-					<div class="column is-narrow has-text-centered widescreen:block hidden">
+					<div class="column is-narrow has-text-centered">
 						<p class="is-size-3 leading-none" v-bull-bear="all.quote.dealFlowVolume">
-							{{nformat(all.quote.dealFlowVolume,{compact:true,precision:1,plusminus:true})}}
+							{{nformat(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
 						</p>
 						<p>Captial Flow</p>
 					</div>

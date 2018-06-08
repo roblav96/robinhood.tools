@@ -20,7 +20,7 @@
 							<p class="py-3 text-lg font-semibold">{{schema.name}}</p>
 						</div>
 						<div class="message-body p-1 pt-0 has-background-grey-lightest">
-							<table class="table is-middle is-hoverable is-fullwidth is-borderless is-striped">
+							<table class="table is-middle is-hoverable is-fullwidth is-borderless">
 								<tbody>
 									<tr v-for="def in schema.defs" :key="def.key">
 										<td class="font-semibold whitespace-no-wrap">{{!def.title?vstcase(def.key):def.title}}</td>
