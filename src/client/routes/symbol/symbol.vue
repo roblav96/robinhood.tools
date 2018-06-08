@@ -23,7 +23,7 @@
 						<v-symbol-logo class="is-48x48 shadow" :symbol="symbol"></v-symbol-logo>
 					</div>
 
-					<div class="column is-narrow py-0">
+					<div class="column py-0">
 						<p class="title leading-none whitespace-no-wrap">{{symbol}}</p>
 						<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
 					</div>
@@ -139,7 +139,7 @@
 
 				</div>
 
-				<nav class="tabs is-toggle mb-0">
+				<nav class="tabs is-boxed is-fullwidth is-centered mb-0">
 					<div class="container">
 						<ul>
 							<router-link tag="li" class="is-dark" v-for="route in routes" :key="route.name" :to="{name:route.name}">

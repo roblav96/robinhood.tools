@@ -128,12 +128,10 @@ export function resetLive(quote: Quotes.Calc) {
 export function resetFull(quote: Quotes.Calc) {
 	let toquote = resetLive(quote)
 	Object.keys(toquote).forEach(key => {
-		if (key.includes('size')) {
-			toquote[key.replace('size', 'volume')] = 0
-		}
-		else if (key.includes('Size')) {
-			toquote[key.replace('Size', 'Volume')] = 0
-		}
+		let tokey: string
+		if (key.includes('size')) tokey = key.replace('size', 'volume');
+		if (key.includes('Size')) tokey = key.replace('Size', 'Volume');
+		if (tokey && quotes.ALL_FULL_KEYS.includes(tokey as any)) toquote[tokey] = 0;
 	})
 	core.object.merge(toquote, {
 		liveCount: 0, dealCount: 0,
