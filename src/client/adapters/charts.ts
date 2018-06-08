@@ -10,16 +10,10 @@ import * as utils from './utils'
 
 
 
-export function root() {
-
-}
-
-
-
 const frames = [
 	{ id: 'hour', ms: 0, utils: true },
-	{ id: 'day', ms: 0, format: 'hh:mm:ssa' },
-	{ id: 'week', ms: 0, format: 'dddd, hh:mm:ssa' },
+	{ id: 'day', ms: 0, format: 'h:mm:ssa' },
+	{ id: 'week', ms: 0, format: 'dddd, h:mm:ssa' },
 	{ id: 'month', ms: 0, format: 'MMM DD' },
 	{ id: 'quarter', ms: 0, format: 'MMM DD' },
 	{ id: 'year', ms: 0, format: 'MMM DD YYYY' },

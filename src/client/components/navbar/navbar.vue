@@ -39,7 +39,7 @@ nav.navbar div.dropdown-content a > span.icon {
 				</router-link>
 
 				<div class="navbar-item font-medium py-0 flex-col is-hidden-mobile">
-					<p class="leading-tight font-mono">{{time}}</p>
+					<p class="leading-tighter font-mono">{{time}}</p>
 					<p class="is-size-7" :class="scolor">{{state}}</p>
 				</div>
 
