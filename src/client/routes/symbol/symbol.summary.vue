@@ -7,13 +7,13 @@
 </style>
 
 <template>
-	<section class="section is-medium">
+	<section class="section">
 		<div class="container">
 
 
 
-			<div class="columns is-variable is-4 ">
-				<div class="column" v-for="schema in schemas" :key="schema.name">
+			<div class="columns is-multiline">
+				<div class="column is-6 is-4-widescreen" v-for="schema in schemas" :key="schema.name">
 					<article class="message">
 						<div class="message-header py-0 justify-start">
 							<b-icon class="mr-2" size="is-24x24" :icon="schema.icon"></b-icon>
@@ -33,11 +33,29 @@
 						</div>
 					</article>
 				</div>
+				<div class="column">
+					<article class="message">
+						<div class="message-header py-0 justify-start">
+							<b-icon class="mr-2" size="is-24x24" icon="book-open-variant"></b-icon>
+							<p class="py-3 text-lg font-semibold">Description</p>
+							<div class="flex-grow"></div>
+							<a class="button is-white is-small is-outlined font-medium" :href="all.quote.website" target="_blank">
+								<b-icon size="is-16x16" icon="web"></b-icon>
+								<span>{{website}}</span>
+							</a>
+						</div>
+						<div class="message-body p-1 pt-0 has-background-grey-lightest">
+							<p class="has-background-white p-3">
+								{{all.quote.description}}
+							</p>
+						</div>
+					</article>
+				</div>
 			</div>
 
 
 
-			<div class="columns is-variable is-4">
+			<!-- <div class="columns">
 				<div class="column">
 					<article class="message">
 						<div class="message-header py-0 justify-start">
@@ -56,7 +74,7 @@
 						</div>
 					</article>
 				</div>
-			</div>
+			</div> -->
 
 
 
