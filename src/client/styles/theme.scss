@@ -1,6 +1,9 @@
 // 
 @import '~bulma/sass/utilities/initial-variables';
 // 
+$black: #0a0a0a;
+$black-bis: #121212;
+$black-ter: #242424;
 $grey-darker: #22292F;
 $grey-dark: #3D4852;
 $grey: #606F7B;
@@ -23,8 +26,6 @@ $blue: #3490DC;
 $purple: #9561E2;
 $red: #E3342F;
 $pink: #F66D9B;
-$rhgreen: #21CE99;
-$rhred: #F45531;
 // 
 $primary: $purple;
 $secondary: $cyan;
@@ -38,8 +39,8 @@ $link: $primary;
 $warning-invert: $white;
 $link-invert: $white;
 // 
-// $border: $grey-lighter;
-// $border-hover: $grey-light;
+$border: $grey-lighter;
+$border-hover: $grey-light;
 // 
 $family-sans-serif: ('IBM Plex Sans', system-ui, BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif);
 $family-monospace: ('IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace);
@@ -65,8 +66,6 @@ $colors: map-merge($colors, ('text':($text, $white)));
 $colors: map-merge($colors, ('text-strong':($text-strong, $white)));
 $colors: map-merge($colors, ('secondary':($secondary, $white)));
 $colors: map-merge($colors, ('accent':($accent, $white)));
-$colors: map-merge($colors, ('rhgreen':($rhgreen, $white)));
-$colors: map-merge($colors, ('rhred':($rhred, $white)));
 // 
 $body-line-height: 1.25;
 $body-background-color: $white;

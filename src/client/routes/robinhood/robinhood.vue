@@ -19,7 +19,7 @@
 						</div>
 					</div> -->
 					<div class="column">
-						<div class="p-4 card border-rhgreen border-0 border-l-4">
+						<div class="p-4 card border-success border-0 border-l-4">
 							<p class="title is-size-4 font-medium">{{rh.user.first_name}} {{rh.user.last_name}}</p>
 							<p class="subtitle is-size-6">{{rh.user.username}}</p>
 						</div>

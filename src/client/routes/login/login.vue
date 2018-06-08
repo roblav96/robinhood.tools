@@ -25,7 +25,7 @@
 						<b-field v-show="ismfa" class="mb-4" label="Two-Factor Authentication">
 							<b-input ref="mfa_input" type="number" icon="phone-locked" v-model="mfa" :disabled="busy"></b-input>
 						</b-field>
-						<button class="button w-full is-rhgreen" type="submit" :disabled="!ready || busy" :class="{ 'is-loading': busy }">
+						<button class="button w-full is-success" type="submit" :disabled="!ready || busy" :class="{ 'is-loading': busy }">
 							Login
 						</button>
 					</form>

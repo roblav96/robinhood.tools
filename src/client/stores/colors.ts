@@ -13,7 +13,7 @@ let state = {} as Colors
 store.register('colors', state)
 declare global { namespace Store { interface State { colors: Colors } } }
 
-let theme = ['accent', 'black', 'black-bis', 'black-ter', 'border', 'danger', 'dark', 'grey', 'grey-dark', 'grey-darker', 'grey-light', 'grey-lighter', 'grey-lightest', 'info', 'light', 'link', 'primary', 'rhgreen', 'rhred', 'secondary', 'success', 'text', 'text-strong', 'warning', 'white', 'white-bis', 'white-ter']
+let theme = ['accent', 'black', 'black-bis', 'black-ter', 'border', 'danger', 'dark', 'grey', 'grey-dark', 'grey-darker', 'grey-light', 'grey-lighter', 'grey-lightest', 'info', 'light', 'link', 'primary', 'secondary', 'success', 'text', 'text-strong', 'warning', 'white', 'white-bis', 'white-ter']
 function getcolors(event: Event) {
 	event.target.removeEventListener('DOMContentLoaded', getcolors)
 	let style = window.getComputedStyle(document.documentElement)
@@ -50,8 +50,6 @@ declare global {
 		'light': string
 		'link': string
 		'primary': string
-		'rhgreen': string
-		'rhred': string
 		'secondary': string
 		'success': string
 		'warning': string

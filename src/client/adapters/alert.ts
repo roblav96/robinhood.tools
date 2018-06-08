@@ -23,7 +23,7 @@ export function snackbar(opts: string | buefy.SnackbarConfig) {
 	_.defaults(opts, {
 		position: 'is-top',
 		actionText: 'Okay',
-		type: 'is-rhgreen',
+		type: 'is-success',
 	} as buefy.SnackbarConfig)
 	return vm.$snackbar.open(opts as any)
 	// if (!opts.toPromise) return vm.$snackbar.open(opts as any);
