@@ -68,8 +68,8 @@ async function start() {
 	alls.forEach(({ symbol, quote, wbquote }) => {
 
 		let fquote = core.clone(quote)
-		let toquote = quotes.resetFull(quote)
-		quotes.applyWbQuote(quote, wbquote, toquote)
+		let toquote = quotes.applyWbQuote(quote, wbquote)
+		core.object.repair(toquote, quotes.resetFull(quote))
 		quotes.mergeCalcs(toquote)
 		core.object.repair(quote, toquote)
 		core.object.clean(quote)
@@ -91,7 +91,9 @@ async function start() {
 
 	})
 
-	await redis.main.coms(coms)
+	if (process.env.PRODUCTION) {
+		await redis.main.coms(coms)
+	}
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
 	MQTTS.splice(0, Infinity, ...chunks.map((chunk, i) => new WebullMqttClient({

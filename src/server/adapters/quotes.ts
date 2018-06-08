@@ -254,6 +254,9 @@ export function applyWbQuote(quote: Quotes.Calc, wbquote: Webull.Quote, toquote 
 
 	})
 
+	if (!quote.timestamp) quote.timestamp = wbquote.tradeTime;
+	if (!quote.price) quote.price = wbquote.price;
+	
 	if (toquote.timestamp) {
 		if (wbquote.mktradeTime == toquote.timestamp && wbquote.price && wbquote.price != quote.price) {
 			toquote.price = wbquote.price
