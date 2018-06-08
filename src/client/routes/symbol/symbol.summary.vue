@@ -45,7 +45,7 @@
 							</a>
 						</div>
 						<div class="message-body p-1 pt-0 has-background-grey-lightest">
-							<p class="has-background-white p-3">
+							<p class="content has-background-white px-3 py-2">
 								{{all.quote.description}}
 							</p>
 						</div>
