@@ -56,36 +56,35 @@ export const format = {
 
 	UNITS: ['K', 'M', 'B', 'T'],
 	number(value: number, { precision, compact, plusminus, percent, dollar, nozeros } = {} as Partial<NumberFormatOptions>) {
-		let negative = value < 0
-		if (negative) value = Math.abs(value);
+		let abs = Math.abs(value)
 
 		if (!Number.isFinite(precision)) {
 			precision = 2
 			if (plusminus && percent) {
-				if (value >= 1000) precision = 0;
-				else if (value >= 10) precision = 1;
+				if (abs >= 1000) precision = 0;
+				else if (abs >= 10) precision = 1;
 			}
 			else if (compact) precision = 0;
 			else {
-				if (compact === undefined && value >= 10000) compact = true;
-				else if (value >= 10000) precision = 0;
-				else if (value >= 2000) precision = 1;
-				else if (value < 2) precision = 3;
+				if (compact === undefined && abs >= 10000) compact = true;
+				else if (abs >= 10000) precision = 0;
+				else if (abs >= 2000) precision = 1;
+				else if (abs < 2) precision = 3;
 			}
 		} else { nozeros = false }
 		if (plusminus || percent) precision = Math.min(precision, 2);
 
 		let unit = -1
 		if (compact) {
-			while (value >= 1000) { value = value / 1000; unit++ }
+			while (abs >= 1000) { abs = abs / 1000; unit++ }
 		}
 
-		let split = value.toString().split('.')
+		let split = abs.toString().split('.')
 		let int = split[0]
 		let fixed = int.slice(-3)
 		{
 			let n: number, i = 1
-			for (n = 1000; n <= value; n *= 1000) {
+			for (n = 1000; n <= abs; n *= 1000) {
 				let from = i * 3
 				i++
 				let to = i * 3
@@ -105,13 +104,13 @@ export const format = {
 		}
 
 		if (compact) fixed += format.UNITS[unit] || '';
-		if (negative) fixed = '-' + fixed;
+		if (value < 0) fixed = '-' + fixed;
 
 		let cash = dollar ? '$' : ''
-		if (plusminus && !negative) {
+		if (plusminus && value > 0) {
 			fixed = '+' + cash + fixed
 		}
-		else if (plusminus && negative) {
+		else if (plusminus && value < 0) {
 			fixed = '–' + cash + fixed.replace('-', '')
 		}
 		else { fixed = cash + fixed };

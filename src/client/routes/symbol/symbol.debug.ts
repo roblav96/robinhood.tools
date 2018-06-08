@@ -35,7 +35,7 @@ export default class extends Mixins(VMixin) {
 	vrowvalue(value: any, key: string) {
 		let k = key.toLowerCase()
 		if (core.number.isFinite(value)) {
-			if (k.includes('time') || k.includes('date')) {
+			if (k.includes('time') || k.includes('date') || k.includes('stamp')) {
 				return utils.format.time(value, { verbose: true })
 			}
 			return utils.format.number(value, { nozeros: true })
