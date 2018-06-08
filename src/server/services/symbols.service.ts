@@ -176,12 +176,15 @@ async function syncStocks() {
 		['set', rkeys.SYMBOLS.STOCKS, JSON.stringify(Object.keys(fsymbols))],
 		['set', rkeys.FSYMBOLS.STOCKS, JSON.stringify(fsymbols)],
 	] as Redis.Coms
-	let chunks = core.array.chunks(pairs, +process.env.CPUS)
-	chunks.forEach(function(chunk, i) {
-		let symbols = JSON.stringify(chunk.map(v => v[0]))
-		coms.push(['set', `${rkeys.SYMBOLS.STOCKS}:${process.env.CPUS}:${i}`, symbols])
-		let fpairs = JSON.stringify(_.fromPairs(chunk))
-		coms.push(['set', `${rkeys.FSYMBOLS.STOCKS}:${process.env.CPUS}:${i}`, fpairs])
+	let allcpus = [8, 16]
+	allcpus.forEach(function(cpus) {
+		let chunks = core.array.chunks(pairs, cpus)
+		chunks.forEach(function(chunk, i) {
+			let symbols = JSON.stringify(chunk.map(v => v[0]))
+			coms.push(['set', `${rkeys.SYMBOLS.STOCKS}:${cpus}:${i}`, symbols])
+			let fpairs = JSON.stringify(_.fromPairs(chunk))
+			coms.push(['set', `${rkeys.FSYMBOLS.STOCKS}:${cpus}:${i}`, fpairs])
+		})
 	})
 	await redis.main.coms(coms)
 	if (process.env.DEVELOPMENT) console.info('syncStocks done ->', Object.keys(fsymbols).length);
