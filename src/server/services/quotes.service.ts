@@ -67,16 +67,16 @@ async function start() {
 	let alls = await quotes.getAlls(SYMBOLS, ['quote', 'wbquote'])
 	alls.forEach(({ symbol, quote, wbquote }) => {
 
-		let fquote = core.clone(quote)
-		let toquote = quotes.resetFull(quote)
-		quotes.applyWbQuote(quote, wbquote, toquote)
-		quotes.mergeCalcs(toquote)
-		core.object.repair(quote, toquote)
-		core.object.clean(quote)
-		let diff = core.object.difference(fquote, quote)
-		if (Object.keys(diff).length > 0) {
-			coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diff as any])
-		}
+		// let fquote = core.clone(quote)
+		// let toquote = quotes.resetFull(quote)
+		// quotes.applyWbQuote(quote, wbquote, toquote)
+		// quotes.mergeCalcs(toquote)
+		// core.object.repair(quote, toquote)
+		// core.object.clean(quote)
+		// let diff = core.object.difference(fquote, quote)
+		// if (Object.keys(diff).length > 0) {
+		// 	coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diff as any])
+		// }
 
 		socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
 		Object.assign(WB.QUOTES, { [symbol]: core.clone(wbquote) })

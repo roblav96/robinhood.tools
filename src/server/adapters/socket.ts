@@ -57,7 +57,7 @@ export const wss = new uws.Server({
 			return security.reqDoc(req, true).then(() => next(true))
 
 		}).catch(function(error) {
-			console.error('verifyClient Error ->', error)
+			console.error('verifyClient Error ->', error, req.doc)
 			next(false, 500, 'Internal Server Error')
 		})
 	}

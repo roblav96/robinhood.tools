@@ -17,13 +17,13 @@
 		<section class="has-background-white border border-b-1 touch:px-6">
 			<div class="container">
 
-				<div class="columns is-mobile py-1 my-0 items-center touch:flex-wrap">
+				<div class="columns is-mobile my-0 items-center touch:flex-wrap">
 
-					<div class="column is-narrow pr-0">
+					<div class="column is-narrow">
 						<v-symbol-logo class="is-48x48 shadow" :symbol="symbol"></v-symbol-logo>
 					</div>
 
-					<div class="column py-0">
+					<div class="column is-narrow py-0">
 						<p class="title leading-none whitespace-no-wrap">{{symbol}}</p>
 						<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
 					</div>
@@ -45,26 +45,26 @@
 							{{nformat(all.quote.change,{plusminus:true})}}
 						</p>
 					</div>
-					
-					<div class="column is-narrow has-text-centered">
+
+					<div v-if="all.quote.volume" class="column is-narrow has-text-centered">
 						<p class="is-size-4 font-medium">
 							{{nformat(all.quote.volume,{compact:true})}}
 						</p>
 						<p>Volume</p>
 					</div>
-					<div class="column is-narrow has-text-centered">
+					<div v-if="all.quote.avgVolume" class="column is-narrow has-text-centered">
 						<p class="is-size-4 font-medium">
 							{{nformat(all.quote.avgVolume,{compact:true})}}
 						</p>
 						<p>Avg Volume</p>
 					</div>
-					<div class="column is-narrow has-text-centered">
+					<div v-if="all.quote.marketCap" class="column is-narrow has-text-centered">
 						<p class="is-size-4 font-medium">
 							{{nformat(all.quote.marketCap,{compact:true})}}
 						</p>
 						<p>Market Cap</p>
 					</div>
-					<div class="column is-narrow has-text-centered">
+					<div v-if="all.quote.dealFlowVolume" class="column is-narrow has-text-centered">
 						<p class="is-size-4 font-medium" v-bull-bear="all.quote.dealFlowVolume">
 							{{nformat(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
 						</p>
@@ -139,7 +139,7 @@
 
 				</div>
 
-				<nav class="tabs is-boxed is-centered is-fullwidth mb-0">
+				<nav class="tabs is-toggle mb-0">
 					<div class="container">
 						<ul>
 							<router-link tag="li" class="is-dark" v-for="route in routes" :key="route.name" :to="{name:route.name}">

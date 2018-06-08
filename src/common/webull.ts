@@ -246,6 +246,7 @@ declare global {
 			limitUp: number
 			lotSize: number
 			low: number
+			marketOpenTime: string
 			marketValue: number
 			mktradeTime: number
 			monthHigh: number
@@ -280,6 +281,7 @@ declare global {
 			settlDate: string
 			settlement: number
 			status: string
+			status0: string
 			symbol: string
 			targetPrice: number
 			tickerId: number

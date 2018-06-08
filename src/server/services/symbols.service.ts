@@ -4,7 +4,9 @@ import '../main'
 import * as pAll from 'p-all'
 import * as pForever from 'p-forever'
 import * as schedule from 'node-schedule'
+import * as dayjs from 'dayjs'
 import * as _ from '../../common/lodash'
+import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as http from '../../common/http'
@@ -26,8 +28,11 @@ radio.on('symbols.ready', function() {
 })
 
 async function start() {
+	await new Promise(function(resolve) {
+		Rx.subscription(hours.rxhours).pipe(Rx.take(1)).subscribe(resolve)
+	})
 
-	// await syncEverything(true)
+	// await syncEverything()
 	// await quotes.syncAllQuotes()
 
 	let keys = [
@@ -57,7 +62,7 @@ async function syncEverything(resets = false) {
 	await syncForex()
 	await syncIndexes()
 	await quotes.syncAllQuotes(resets)
-	_.defer(() => radio.emit('symbols.resume'))
+	radio.emit('symbols.resume')
 }
 
 
@@ -103,6 +108,14 @@ async function syncTickers() {
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
 			query: { pageSize: 9999, hl: 'en' },
 		}),
+		// ipos
+		http.get('https://securitiesapi.webull.com/api/securities/calendar/recently/regions/ipo', {
+			query: {
+				regionIds: 6,
+				startDate: dayjs().subtract(3, 'month').format('YYYY-MM-DD'),
+				endDate: dayjs().format('YYYY-MM-DD'),
+			},
+		}).then(response => response[0].newStockList),
 	]) as Webull.Ticker[]
 	tickers = _.flatten(tickers)
 	tickers.remove(v => Array.isArray(v.disSymbol.match(utils.regxSymbol)))
@@ -110,6 +123,7 @@ async function syncTickers() {
 		webull.fix(v)
 		v.disSymbol = webull.fixSymbol(v.disSymbol)
 	})
+	tickers = _.uniqBy(tickers, 'disSymbol')
 
 	if (process.env.DEVELOPMENT) console.log('webull valids ->');
 	let tids = tickers.map(v => v.tickerId).filter(Number.isFinite)
