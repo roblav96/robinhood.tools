@@ -12,7 +12,7 @@ export const HR = {
 
 
 export function getState(hhours: Hours, stamp = Date.now()): Hours.State {
-	if (hhours.isOpenToday == false) return 'CLOSED';
+	if (!hhours || hhours.isOpenToday == false) return 'CLOSED';
 	if (stamp >= hhours.prepre && stamp < hhours.pre) return 'PREPRE';
 	if (stamp >= hhours.pre && stamp < hhours.opens) return 'PRE';
 	if (stamp >= hhours.opens && stamp < hhours.closes) return 'REGULAR';

@@ -4,7 +4,7 @@ declare module 'echarts' {
 	namespace ECharts {
 
 		type EventNames = 'click' | 'dblclick' | 'mouseover' | 'mouseout' | 'mousemove' | 'mousedown' | 'mouseup' | 'globalout' | 'contextmenu'
-		interface EventParam {
+		interface EventParam<T = any> {
 			$vars: string[]
 			axisDim: string
 			axisId: string
@@ -15,18 +15,18 @@ declare module 'echarts' {
 			color: string
 			componentSubType: string
 			componentType: string
-			data: number[]
+			data: T
 			dataIndex: number
 			dataType: any
 			event: Event
 			marker: string
-			name: string
+			name: number | string
 			seriesId: string
 			seriesIndex: number
 			seriesName: string
 			seriesType: string
 			type: string
-			value: number[]
+			value: T
 		}
 
 		interface DataUrlOptions {
@@ -325,6 +325,10 @@ declare module 'echarts' {
 			opacity: number
 		}
 
+		interface AxisPointerParams<T = any> {
+			seriesData: EventParam<T>[]
+			value: number
+		}
 		interface AxisPointer {
 			animation: any
 			animationDurationUpdate: number
@@ -344,7 +348,7 @@ declare module 'echarts' {
 				backgroundColor: string
 				borderColor: any
 				borderWidth: number
-				formatter: (...params: any[]) => string
+				formatter: (params: AxisPointerParams) => string
 				margin: number
 				padding: number[]
 				precision: string
@@ -396,29 +400,6 @@ declare module 'echarts' {
 			triggerOn: string
 			z: number
 			zlevel: number
-		}
-
-		interface TooltipPositionParams {
-			$vars: string
-			axisDim: string
-			axisId: string
-			axisIndex: number
-			axisType: string
-			axisValue: number
-			axisValueLabel: string
-			color: string
-			componentSubType: string
-			componentType: string
-			data: any[]
-			dataIndex: number
-			dataType: string
-			name: string
-			percent: number
-			seriesId: string
-			seriesIndex: number
-			seriesName: string
-			seriesType: string
-			value: number[]
 		}
 
 		interface MarkArea {

@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<section class="section">
+	<section class="section is-medium">
 		<div class="container">
 
 

@@ -54,7 +54,7 @@ export function getChart(
 	params: Partial<{ range: string, interval: string, includePrePost: boolean, period1: number, period2: number }>,
 	hhours: Hours,
 	retries = 3,
-) {
+): Promise<Quotes.Live[]> {
 	let state = hours.getState(hhours)
 	if (params.range == '1d' && state.indexOf('PRE') == 0) {
 		params.includePrePost = true

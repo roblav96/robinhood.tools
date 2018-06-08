@@ -130,6 +130,7 @@ export const format = {
 
 	RANGES: { m: 'minute', h: 'hour', d: 'day', wk: 'week', mo: 'month', y: 'year', ytd: 'YTD' },
 	range(range: string, opts = { plural: false }) {
+		if (!range) return range;
 		let s = range.replace(/[0-9]/g, '')
 		s = format.RANGES[s] || s
 		s = s.charAt(0).toUpperCase() + s.substr(1)

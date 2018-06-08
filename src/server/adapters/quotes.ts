@@ -79,7 +79,7 @@ export function applyFull(
 		mic: instrument.mic,
 		acronym: instrument.acronym,
 		description: iexitem.description,
-		issueType: iex.ISSUE_TYPES[iexitem.issueType],
+		issueType: iex.issueType(iexitem.issueType),
 		listDate: new Date(instrument.list_date).valueOf(),
 		country: core.fallback(instrument.country, wbquote.countryISOCode, wbquote.regionAlias, wbticker.regionIsoCode),
 		exchange: core.fallback(iexitem.exchange, iexitem.primaryExchange, wbticker.exchangeCode, wbticker.disExchangeCode),
@@ -256,7 +256,7 @@ export function applyWbQuote(quote: Quotes.Calc, wbquote: Webull.Quote, toquote 
 
 	if (!quote.timestamp) quote.timestamp = wbquote.tradeTime;
 	if (!quote.price) quote.price = wbquote.price;
-	
+
 	if (toquote.timestamp) {
 		if (wbquote.mktradeTime == toquote.timestamp && wbquote.price && wbquote.price != quote.price) {
 			toquote.price = wbquote.price
