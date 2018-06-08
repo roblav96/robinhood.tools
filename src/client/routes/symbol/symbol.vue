@@ -24,12 +24,12 @@
 					</div>
 
 					<div class="column py-0">
-						<p class="title font-bold leading-none whitespace-no-wrap">{{symbol}}</p>
+						<p class="title leading-none whitespace-no-wrap">{{symbol}}</p>
 						<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
 					</div>
 
-					<div class="column is-narrow has-text-right">
-						<p class="title font-bold leading-none font-mono">
+					<div class="column is-narrow has-text-centered">
+						<p class="title leading-none">
 							<v-number-ticker :number="all.quote.price"></v-number-ticker>
 						</p>
 						<p>
@@ -37,13 +37,38 @@
 						</p>
 					</div>
 
-					<div class="column is-narrow has-text-right">
-						<p class="is-size-3 leading-none" v-bull-bear="all.quote.percent">
+					<div class="column is-narrow has-text-centered">
+						<p class="is-size-3 font-semibold leading-none" v-bull-bear="all.quote.percent">
 							{{nformat(all.quote.percent,{plusminus:true,percent:true})}}
 						</p>
-						<p v-bull-bear="all.quote.change">
-							{{nformat(all.quote.change,{plusminus:true,dollar:true})}}
+						<p class="" v-bull-bear="all.quote.change">
+							{{nformat(all.quote.change,{plusminus:true})}}
 						</p>
+					</div>
+					
+					<div class="column is-narrow has-text-centered">
+						<p class="is-size-3 leading-none">
+							{{nformat(all.quote.volume,{compact:true,precision:1})}}
+						</p>
+						<p>Volume</p>
+					</div>
+					<div class="column is-narrow has-text-centered">
+						<p class="is-size-3 leading-none">
+							{{nformat(all.quote.avgVolume,{compact:true,precision:1})}}
+						</p>
+						<p>Avg Volume</p>
+					</div>
+					<div class="column is-narrow has-text-centered">
+						<p class="is-size-3 leading-none">
+							{{nformat(all.quote.marketCap,{compact:true})}}
+						</p>
+						<p>Market Cap</p>
+					</div>
+					<div class="column is-narrow has-text-centered widescreen:block hidden">
+						<p class="is-size-3 leading-none" v-bull-bear="all.quote.dealFlowVolume">
+							{{nformat(all.quote.dealFlowVolume,{compact:true,precision:1,plusminus:true})}}
+						</p>
+						<p>Captial Flow</p>
 					</div>
 
 					<!-- <div class="column is-narrow">
@@ -93,24 +118,7 @@
 						</table>
 					</div> -->
 
-					<div class="column is-narrow desktop:flex hidden">
-						<div class="flex py-0">
-							<table class="table is-paddingless is-middle is-nowrap is-borderless">
-								<tbody>
-									<tr>
-										<td class="font-semibold has-text-right pr-2">{{nformat(all.quote.volume,{compact:true})}}</td>
-										<td>Volume</td>
-									</tr>
-									<tr>
-										<td class="font-semibold has-text-right pr-2">{{nformat(all.quote.avgVolume,{compact:true})}}</td>
-										<td>Avg Volume</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-
-					<div v-if="all.quote.marketCap && all.quote.dealFlowVolume" class="column is-narrow fullhd:flex hidden">
+					<!-- <div v-if="all.quote.marketCap && all.quote.dealFlowVolume" class="column is-narrow desktop:flex hidden">
 						<div class="flex py-0">
 							<table class="table is-paddingless is-middle is-nowrap is-borderless">
 								<tbody>
@@ -127,7 +135,7 @@
 								</tbody>
 							</table>
 						</div>
-					</div>
+					</div> -->
 
 				</div>
 

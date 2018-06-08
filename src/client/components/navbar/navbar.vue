@@ -30,7 +30,7 @@ nav.navbar div.dropdown-content a > span.icon {
 </style>
 
 <template>
-	<nav id="navbar" class="navbar is-fixed-top has-background-white is-unselectable shadow" role="navigation" aria-label="main navigation">
+	<nav id="navbar" class="navbar is-fixed-top has-background-white is-unselectable border border-b-1" role="navigation" aria-label="main navigation">
 		<div class="container">
 
 			<div class="navbar-brand items-center">

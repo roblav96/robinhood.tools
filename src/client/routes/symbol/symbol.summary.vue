@@ -74,33 +74,33 @@
 						<tbody>
 							<tr>
 								<b-tooltip :label="state.tip" position="is-right" size="is-small" animated>
-									<td>{{vstcase(state.calc)}}</td>
+									<td class="font-medium">{{vstcase(state.calc)}}</td>
 								</b-tooltip>
-								<td class="has-text-right font-medium font-mono">
+								<td class="has-text-right">
 									{{nformat(all.quote[state.calc])}}
 								</td>
 							</tr>
 							<tr>
-								<td>{{vstcase(`${state.key}Price`)}}</td>
-								<td class="has-text-right font-medium font-mono">
+								<td class="font-medium">{{vstcase(`${state.key}Price`)}}</td>
+								<td class="has-text-right">
 									{{nformat(all.quote[vcamel(`${state.key}Price`)])}}
 								</td>
 							</tr>
 							<tr>
-								<td>{{vstcase(`${state.key}Change`)}}</td>
-								<td class="has-text-right font-medium font-mono" v-bull-bear="all.quote[vcamel(`${state.key}Change`)]">
+								<td class="font-medium">{{vstcase(`${state.key}Change`)}}</td>
+								<td class="has-text-right" v-bull-bear="all.quote[vcamel(`${state.key}Change`)]">
 									{{nformat(all.quote[vcamel(`${state.key}Change`)],{nozeros:true,plusminus:true})}}
 								</td>
 							</tr>
 							<tr>
-								<td>{{vstcase(`${state.key}Percent`)}}</td>
-								<td class="has-text-right font-medium font-mono" v-bull-bear="all.quote[vcamel(`${state.key}Percent`)]">
+								<td class="font-medium">{{vstcase(`${state.key}Percent`)}}</td>
+								<td class="has-text-right" v-bull-bear="all.quote[vcamel(`${state.key}Percent`)]">
 									{{nformat(all.quote[vcamel(`${state.key}Percent`)],{nozeros:true,plusminus:true,percent:true})}}
 								</td>
 							</tr>
 							<tr>
-								<td>Updated</td>
-								<td class="has-text-right font-medium">
+								<td class="font-medium">Updated</td>
+								<td class="has-text-right">
 									<v-timestamp :value="all.quote[vcamel(`${state.key}Timestamp`)]"></v-timestamp>
 								</td>
 							</tr>

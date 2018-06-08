@@ -70,7 +70,6 @@ export const format = {
 				else if (abs >= 10000) precision = 0;
 				else if (abs >= 2000) precision = 1;
 				else if (abs < 2) precision = 3;
-				// if (plusminus && abs >= 1) precision = Math.min(precision, 2);
 			}
 		} else { nozeros = false }
 		if (plusminus || percent) precision = Math.min(precision, 2);
@@ -111,8 +110,7 @@ export const format = {
 			fixed = '+' + cash + fixed
 		}
 		else if (plusminus && value < 0) {
-			fixed = fixed.substr(1)
-			fixed = '–' + cash + fixed
+			fixed = '–' + cash + fixed.replace('-', '')
 		}
 		else { fixed = cash + fixed };
 		if (percent) fixed += '%';
