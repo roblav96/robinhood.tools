@@ -33,11 +33,11 @@ export const wss = new uws.Server({
 		Promise.resolve().then(function() {
 			req.authed = false
 
-			if (!req.headers.origin.includes(core.HOSTNAME)) return next(false, 412, `Precondition Failed: "origin"`);
-			if (!req.headers.host.includes(core.HOSTNAME)) return next(false, 412, `Precondition Failed: "host"`);
+			if (!req.headers.origin.includes(core.HOSTNAME)) return next(true); // next(false, 412, `Precondition Failed: "origin"`);
+			if (!req.headers.host.includes(core.HOSTNAME)) return next(true); // next(false, 412, `Precondition Failed: "host"`);
 
 			let cookies = req.headers.cookie
-			if (!cookies) return next(false, 412, `Precondition Failed: "cookies"`);
+			if (!cookies) return next(true); // next(false, 412, `Precondition Failed: "cookies"`);
 
 			let parsed = cookie.parse(cookies)
 			let doc = {
@@ -50,7 +50,7 @@ export const wss = new uws.Server({
 			} as Security.Doc
 
 			let failed = security.isDoc(doc)
-			if (failed) return next(false, 412, `Precondition Failed: "${failed}"`);
+			if (failed) return next(true); // next(false, 412, `Precondition Failed: "${failed}"`);
 			req.doc = doc
 
 			if (!req.doc.token) return next(true);
@@ -58,7 +58,8 @@ export const wss = new uws.Server({
 
 		}).catch(function(error) {
 			console.error('verifyClient Error ->', error, req.doc)
-			next(false, 500, 'Internal Server Error')
+			return next(true)
+			// next(false, 500, 'Internal Server Error')
 		})
 	}
 
