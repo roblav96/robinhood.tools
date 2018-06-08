@@ -23,7 +23,7 @@ export default class extends Mixins(VMixin) {
 	all = this.$parent.all
 
 	created() {
-		console.log(`this.all ->`, this.all)
+
 	}
 
 	schemas = [
@@ -63,7 +63,9 @@ export default class extends Mixins(VMixin) {
 		return value
 	}
 
-	get website() { return url.parse(this.all.quote.website).host }
+	get website() {
+		return this.all.quote.website ? url.parse(this.all.quote.website).host : this.all.quote.website
+	}
 
 	states = [
 		{ name: '4am to 8pm', icon: 'theme-light-dark', key: '', calc: 'startPrice', tip: 'Price at start of day (4:00am)' },
