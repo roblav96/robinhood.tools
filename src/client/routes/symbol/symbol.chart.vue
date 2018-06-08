@@ -14,7 +14,7 @@
 				<div class="column">
 					<b-field>
 						<b-radio-button v-model="range" type="is-primary" v-for="v in ranges" :native-value="v" :key="v">
-							<span>{{v}}</span>
+							<span>{{vrange(v)}}</span>
 						</b-radio-button>
 					</b-field>
 				</div>

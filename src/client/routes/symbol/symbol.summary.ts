@@ -53,7 +53,7 @@ export default class extends Mixins(VMixin) {
 		let value = this.all.quote[key]
 		if (value == null) return value;
 		if (key == 'statusTimestamp') return utils.format.time(value as any, { verbose: true });
-		if (key == 'listDate') return dayjs(value as any).format('MMMM DD, YYYY');
+		if (key == 'listDate') return dayjs(value as any).format('MMMM D, YYYY');
 		if (core.number.isFinite(value)) return utils.format.number(value);
 		if (core.boolean.is(value)) return value ? 'Yes' : 'No';
 		if (core.string.is(value)) {

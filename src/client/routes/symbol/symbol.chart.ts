@@ -129,7 +129,7 @@ class VSymbolEChart extends Vue {
 				scale: true,
 				boundaryGap: false,
 				axisLabel: {
-					textStyle: { color: this.colors.dark },
+					textStyle: { color: this.colors.dark, fontSize: 14 },
 					formatter: v => charts.xformat(v),
 					// formatter: v => utils.format.time(v, {}),
 				},
@@ -148,7 +148,7 @@ class VSymbolEChart extends Vue {
 			yAxis: [{
 				scale: true,
 				splitArea: { show: false },
-				axisLabel: { textStyle: { color: this.colors.dark } },
+				axisLabel: { textStyle: { color: this.colors.dark, fontSize: 14 } },
 				axisLine: { lineStyle: { color: this.colors.dark } },
 				splitLine: { lineStyle: { color: this.colors['grey-lightest'] } },
 			}, {
@@ -170,6 +170,7 @@ class VSymbolEChart extends Vue {
 				type: 'slider',
 				height: 32,
 				bottom: 24,
+				showDetail: false,
 				backgroundColor: this.colors.white,
 				dataBackground: {
 					areaStyle: { color: this.colors['white-ter'], opacity: 1 },

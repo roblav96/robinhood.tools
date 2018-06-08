@@ -17,7 +17,7 @@
 		<section class="has-background-white border border-b-1 touch:px-6">
 			<div class="container">
 
-				<div class="columns is-mobile is-variable is-4 my-0 items-center touch:flex-wrap">
+				<div class="columns is-mobile py-1 my-0 items-center touch:flex-wrap">
 
 					<div class="column is-narrow pr-0">
 						<v-symbol-logo class="is-48x48 shadow" :symbol="symbol"></v-symbol-logo>
@@ -47,25 +47,25 @@
 					</div>
 					
 					<div class="column is-narrow has-text-centered">
-						<p class="is-size-3 leading-none">
+						<p class="is-size-4 font-medium">
 							{{nformat(all.quote.volume,{compact:true})}}
 						</p>
 						<p>Volume</p>
 					</div>
 					<div class="column is-narrow has-text-centered">
-						<p class="is-size-3 leading-none">
+						<p class="is-size-4 font-medium">
 							{{nformat(all.quote.avgVolume,{compact:true})}}
 						</p>
 						<p>Avg Volume</p>
 					</div>
 					<div class="column is-narrow has-text-centered">
-						<p class="is-size-3 leading-none">
+						<p class="is-size-4 font-medium">
 							{{nformat(all.quote.marketCap,{compact:true})}}
 						</p>
 						<p>Market Cap</p>
 					</div>
 					<div class="column is-narrow has-text-centered">
-						<p class="is-size-3 leading-none" v-bull-bear="all.quote.dealFlowVolume">
+						<p class="is-size-4 font-medium" v-bull-bear="all.quote.dealFlowVolume">
 							{{nformat(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
 						</p>
 						<p>Captial Flow</p>

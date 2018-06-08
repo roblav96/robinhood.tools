@@ -224,7 +224,7 @@ declare module 'echarts' {
 			zAxisIndex: number[]
 			zlevel: number
 			zoomLock: boolean
-			labelFormatter: (...params: any[]) => string
+			labelFormatter: (...params: number[]) => string
 		}
 
 		interface Axis {
