@@ -4,28 +4,28 @@
 $black: #0a0a0a;
 $black-bis: #121212;
 $black-ter: #242424;
-$grey-darker: #22292F;
-$grey-dark: #3D4852;
-$grey: #606F7B;
-$grey-light: #8795A1;
-$grey-lighter: #B8C2CC;
-$grey-lightest: #DAE1E7;
-$white-ter: #F1F5F8;
-$white-bis: #F8FAFC;
+$grey-darker: #272d33;
+$grey-dark: #152934;
+$grey: #5a6872;
+$grey-light: #8897a2;
+$grey-lighter: #cdd1d4;
+$grey-lightest: #dfe3e6;
+$white-ter: #ebf0f7;
+$white-bis: #f5f7fa;
 $white: #FFFFFF;
+// 
+$orange: #ffb000;
+$yellow: #FFED4A;
+$green: #34bc6e;
+$turquoise: #4DC0B5;
+$cyan: #6574CD;
+$blue: #5392ff;
+$purple: #975AD1;
+$red: #e62325;
+$pink: #F66D9B;
 // 
 $light: $white-ter;
 $dark: $grey-dark;
-// 
-$orange: #F6993F;
-$yellow: #FFED4A;
-$green: #38C172;
-$turquoise: #4DC0B5;
-$cyan: #6574CD;
-$blue: #3490DC;
-$purple: #9561E2;
-$red: #E3342F;
-$pink: #F66D9B;
 // 
 $primary: $purple;
 $secondary: $cyan;
@@ -38,6 +38,10 @@ $link: $primary;
 // 
 $warning-invert: $white;
 $link-invert: $white;
+// 
+$text: $grey-dark;
+$text-light: $grey;
+$text-strong: $grey-darker;
 // 
 $border: $grey-lighter;
 $border-hover: $grey-light;

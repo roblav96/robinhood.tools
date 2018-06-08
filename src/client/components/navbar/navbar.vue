@@ -30,11 +30,11 @@ nav.navbar div.dropdown-content a > span.icon {
 </style>
 
 <template>
-	<nav id="navbar" class="navbar is-fixed-top has-background-white is-unselectable border border-b-1" role="navigation" aria-label="main navigation">
+	<nav id="navbar" class="navbar is-fixed-top is-unselectable border border-b-1" role="navigation" aria-label="main navigation">
 		<div class="container">
 
 			<div class="navbar-brand items-center">
-				<router-link class="navbar-item" :to="{name:'home'}" active-class exact-active-class>
+				<router-link class="navbar-item h-full" :to="{name:'home'}" active-class exact-active-class>
 					<img src="../../../assets/logo-primary.svg" alt="Robinhood Tools">
 				</router-link>
 
