@@ -30,7 +30,7 @@ export default class extends Mixins(VMixin) {
 		{
 			name: 'Instrument', icon: 'coin',
 			defs: [
-				{ key: 'fullName', title: 'Name' },
+				{ key: 'fullName' },
 				{ key: 'issueType' },
 				{ key: 'country' },
 				{ key: 'timezone' },

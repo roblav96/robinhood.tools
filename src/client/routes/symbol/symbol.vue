@@ -41,10 +41,12 @@
 						<p class="is-size-3 leading-none" v-bull-bear="all.quote.percent">
 							{{nformat(all.quote.percent,{plusminus:true,percent:true})}}
 						</p>
-						<p>{{nformat(all.quote.change,{plusminus:true,dollar:true})}}</p>
+						<p v-bull-bear="all.quote.change">
+							{{nformat(all.quote.change,{plusminus:true,dollar:true})}}
+						</p>
 					</div>
 
-					<div class="column is-narrow">
+					<!-- <div class="column is-narrow">
 						<table class="table is-paddingless is-middle is-nowrap is-borderless">
 							<tbody>
 								<tr>
@@ -89,7 +91,7 @@
 								</tr>
 							</tbody>
 						</table>
-					</div>
+					</div> -->
 
 					<div class="column is-narrow desktop:flex hidden">
 						<div class="flex py-0">

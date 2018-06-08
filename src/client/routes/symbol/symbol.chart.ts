@@ -211,7 +211,7 @@ class VSymbolEChart extends Vue {
 				large: true,
 				largeThreshold: 200,
 				encode: { x: 'timestamp', y: 'size' },
-				itemStyle: { color: this.colors['grey-lighter'] },
+				itemStyle: { color: this.colors['grey-lightest'] },
 			}],
 		} as echarts.Options
 		this.echart.setOption(bones)

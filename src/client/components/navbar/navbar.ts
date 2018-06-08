@@ -16,7 +16,6 @@ import clock from '../../../common/clock'
 @Vts.Component({
 	components: {
 		'v-searchbar': () => import('../searchbar/searchbar'),
-		'v-devmenu': () => import('../devmenu/devmenu'),
 	},
 })
 export default class extends Mixins(VMixin, RHMixin) {
@@ -54,28 +53,13 @@ export default class extends Mixins(VMixin, RHMixin) {
 
 	time = ''
 	onsec() { this.time = dayjs().format('h:mm:ssa') }
-	get state() { return utils.marketState(this.$store.state.hours.state) }
+	get state() { return utils.marketState(this.hours.state) }
 	get scolor() {
-		let state = this.$store.state.hours.state
-		if (!state) return 'has-text-grey';
+		let state = this.hours.state || ''
 		if (state == 'REGULAR') return 'has-text-success';
 		if (state.includes('PRE') || state.includes('POST')) return 'has-text-warning';
-		return 'has-text-grey'
+		return 'has-text-grey-light'
 	}
-
-	// get routes() {
-	// let routes = [] as VueRouteConfig[]
-	// this.$router.options.routes.forEach(function(route) {
-	// 	if (Array.isArray(route.children)) {
-	// 		if (route.name == 'robinhood') {
-	// 			routes.push(route.children.find(v => v.name == 'robinhood.orders'))
-	// 		}
-	// 	}
-	// 	if (route.title && route.icon) routes.push(route);
-	// })
-	// // routes.push({ title: 'Order Book', icon: 'book-open-variant', name: 'robinhood.orders' } as VueRouteConfig)
-	// return routes
-	// }
 
 }
 

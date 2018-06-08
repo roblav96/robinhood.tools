@@ -30,17 +30,17 @@ nav.navbar div.dropdown-content a > span.icon {
 </style>
 
 <template>
-	<nav id="navbar" class="navbar is-fixed-top is-unselectable border border-b-1" role="navigation" aria-label="main navigation">
+	<nav id="navbar" class="navbar is-fixed-top has-background-white is-unselectable shadow" role="navigation" aria-label="main navigation">
 		<div class="container">
 
-			<div class="navbar-brand">
+			<div class="navbar-brand items-center">
 				<router-link class="navbar-item" :to="{name:'home'}" active-class exact-active-class>
 					<img src="../../../assets/logo-primary.svg" alt="Robinhood Tools">
 				</router-link>
 
-				<div class="is-hidden-mobile navbar-item py-0 flex flex-col self-center font-medium">
+				<div class="navbar-item py-0 flex-col is-hidden-mobile">
 					<p class="leading-tight font-mono">{{time}}</p>
-					<p class="text-sm" :class="scolor">{{state}}</p>
+					<p class="is-size-7 font-medium" :class="scolor">{{state}}</p>
 				</div>
 
 				<b-field class="navbar-item">

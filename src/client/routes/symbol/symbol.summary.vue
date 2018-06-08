@@ -12,15 +12,15 @@
 
 
 
-			<div class="columns is-variable is-4">
-				<div class="column flex-col-full" v-for="schema in schemas" :key="schema.name">
-					<article class="message flex-col-full">
+			<div class="columns is-variable is-4 ">
+				<div class="column" v-for="schema in schemas" :key="schema.name">
+					<article class="message">
 						<div class="message-header py-0 justify-start">
-							<b-icon class="mr-3" size="is-24x24" :icon="schema.icon"></b-icon>
+							<b-icon class="mr-2" size="is-24x24" :icon="schema.icon"></b-icon>
 							<p class="py-3 text-lg font-semibold">{{schema.name}}</p>
 						</div>
-						<div class="flex-col-full message-body p-1 pt-0 has-background-grey-lightest">
-							<table class="h-full table is-middle is-hoverable is-fullwidth is-borderless is-striped">
+						<div class="message-body p-1 pt-0 has-background-grey-lightest">
+							<table class="table is-middle is-hoverable is-fullwidth is-borderless is-striped">
 								<tbody>
 									<tr v-for="def in schema.defs" :key="def.key">
 										<td class="font-semibold whitespace-no-wrap">{{!def.title?vstcase(def.key):def.title}}</td>
@@ -38,11 +38,11 @@
 
 
 			<div class="columns is-variable is-4">
-				<div class="column flex-col-full">
+				<div class="column">
 					<article class="message">
 						<div class="message-header py-0 justify-start">
-							<b-icon class="mr-3" size="is-24x24" icon="book-open-variant"></b-icon>
-							<p class="py-3 text-lg font-semibold flex-none">Description</p>
+							<b-icon class="mr-2" size="is-24x24" icon="book-open-variant"></b-icon>
+							<p class="py-3 text-lg font-semibold">Description</p>
 							<div class="flex-grow"></div>
 							<a class="button is-white is-small is-outlined font-medium" :href="all.quote.website" target="_blank">
 								<b-icon size="is-16x16" icon="web"></b-icon>
