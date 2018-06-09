@@ -141,7 +141,7 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 
 
 
-function ontick(i: number) {
+function ontick() {
 	let t = Date.now()
 	let coms = [] as Redis.Coms
 	let live = new Date().getSeconds() % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)

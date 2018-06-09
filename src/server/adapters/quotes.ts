@@ -110,16 +110,11 @@ export function applyFull(
 	quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))
 	quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, _.round(quote.avgVolume10Day, quote.avgVolume3Month)))
 
-	{
-		let toquote = applyWbQuote(quote, wbquote)
-		resets ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote)
-	}
-	{
-		let toquote = resetFull(quote)
-		resets ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote)
-	}
+	let toquote = applyWbQuote(quote, wbquote)
+	resets ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote)
 	mergeCalcs(quote)
-
+	let requote = resetFull(quote)
+	resets ? core.object.merge(quote, requote) : core.object.repair(quote, requote)
 	core.object.clean(quote)
 
 	return quote
@@ -253,11 +248,11 @@ export function applyKeyMap(keymap: KeyMapValue, toquote: any, tokey: string, to
 		if (to > from) toquote[tokey] = to;
 	}
 	else if (keymap && keymap.greater) {
-		if (to > from) toquote[tokey] = to;
-		// if (to < from) {
-		// 	if (core.calc.percent(to, from) < -10) toquote[tokey] = to;
-		// }
-		// else if (to > from) toquote[tokey] = to;
+		// if (to > from) toquote[tokey] = to;
+		if (to < from) {
+			if (core.calc.percent(to, from) < -50) toquote[tokey] = to;
+		}
+		else if (to > from) toquote[tokey] = to;
 	}
 	else if (to != from) {
 		toquote[tokey] = to
@@ -299,7 +294,7 @@ export function applyWbQuote(quote: Quotes.Calc, wbquote: Webull.Quote, toquote 
 	}
 
 	if (toquote.volume) {
-		toquote.size = quote.size + (toquote.volume - quote.volume)
+		toquote.size = quote.size + core.math.sum0(toquote.volume, -quote.volume)
 	}
 
 	if (toquote.bid) {

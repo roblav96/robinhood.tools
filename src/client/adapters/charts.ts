@@ -78,7 +78,9 @@ export const RANGES = Object.keys(FRAMES)
 export function getChart(symbol: string, tid: number, range: string) {
 	return Promise.resolve().then(function() {
 		if (range == RANGES[0]) return get1Day(symbol, tid);
-		return yahoo.getChart(symbol, { range })
+		let params = { range, interval: yahoo.FRAMES[range] } as Yahoo.ChartParams
+		// if (yahoo.RANGES.indexOf(range) <= 1) params.includePrePost = true;
+		return yahoo.getChart(symbol, params)
 		// let proms = [http.get(`https://quoteapi.webull.com/api/quote/v2/tickerKDatas/${tid}`, {
 		// 	query: { kDataType: FRAMES[range] },
 		// })]

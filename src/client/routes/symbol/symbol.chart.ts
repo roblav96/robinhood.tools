@@ -77,8 +77,7 @@ class VSymbolEChart extends Vue {
 	}
 
 	onquotes(lquotes: Quotes.Live[]) {
-		// console.log('onquotes ->', lquotes.length)
-		console.log(`lquotes ->`, JSON.parse(JSON.stringify(lquotes)))
+		console.log('onquotes ->', lquotes.length)
 		let bones = {
 			animation: false,
 			color: [this.colors['grey-lighter']],
