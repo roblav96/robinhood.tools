@@ -93,39 +93,60 @@ class VSymbolEChart extends Vue {
 				// showContent: !process.env.DEVELOPMENT,
 				alwaysShowContent: !!process.env.DEVELOPMENT,
 				trigger: 'axis',
-				axisPointer: { type: 'cross' },
-				confine: true,
-				enterable: false,
+				axisPointer: {
+					animation: false,
+					type: 'cross',
+					link: { xAxisIndex: 'all' },
+					lineStyle: { color: this.colors['grey-lighter'] },
+					crossStyle: { color: this.colors['grey-light'] },
+					shadowStyle: { shadowBlur: 0 },
+					label: {
+						shadowBlur: 0,
+						textStyle: { color: this.colors.white, lineHeight: 1, fontSize: 14, borderRadius: 2 },
+						backgroundColor: this.colors.dark,
+						formatter: params => utils.format.number(params.value),
+					},
+				},
+				// confine: true,
+				// enterable: false,
 				showDelay: 0,
 				hideDelay: 1,
-				padding: [4, 8],
-				transitionDuration: 0.1,
+				padding: 0,
+				transitionDuration: 0,
 				backgroundColor: this.colors['grey-dark'],
-				extraCssText: 'margin: 2rem;',
+				borderRadius: 0,
+				extraCssText: 'padding: 2rem 1rem; background-color: transparent; pointer-events: none;',
 				formatter: (params, ticket, callback) => {
-					return 'haii'
+					let html = `
+						<div class="px-2 py-1 font-sans has-background-dark rounded">
+							haii haii haii haii haii haii haii haii haii 
+						</div>
+					`
+					return html
 				},
 				// textStyle: { color: this.colors.white, lineHeight: 1, fontSize: 14 },
 			},
-			axisPointer: {
-				animation: false,
-				link: [{ xAxisIndex: 'all' }],
-				lineStyle: { color: this.colors['grey-lighter'] },
-				crossStyle: { color: this.colors['grey-light'] },
-				label: {
-					textStyle: { color: this.colors.white, lineHeight: 1, fontSize: 14 },
-					backgroundColor: this.colors.dark,
-					formatter: params => utils.format.number(params.value),
-				},
-				// }, {
-				// 	animation: false,
-				// 	link: [{ xAxisIndex: 'all' }],
-				// 	lineStyle: { color: this.colors['grey-lighter'] },
-				// 	crossStyle: { color: this.colors['grey-light'] },
-				// 	label: {
-				// 		formatter: params => charts.format.xlabel(params.value),
-				// 	},
-			},
+			// axisPointer: {
+			// animation: false,
+			// link: [{ xAxisIndex: 'all' }],
+			// lineStyle: { color: this.colors['grey-lighter'] },
+			// crossStyle: { color: this.colors['grey-light'] },
+			// shadowStyle: { shadowBlur: 0 },
+			// label: {
+			// 	shadowBlur: 0,
+			// 	textStyle: { color: this.colors.white, lineHeight: 1, fontSize: 14, borderRadius: 2 },
+			// 	backgroundColor: this.colors.dark,
+			// 	formatter: params => utils.format.number(params.value),
+			// },
+			// }, {
+			// 	animation: false,
+			// 	link: [{ xAxisIndex: 'all' }],
+			// 	lineStyle: { color: this.colors['grey-lighter'] },
+			// 	crossStyle: { color: this.colors['grey-light'] },
+			// 	label: {
+			// 		formatter: params => charts.format.xlabel(params.value),
+			// 	},
+			// },
 			grid: [{
 				top: 24,
 				left: 64,
@@ -164,7 +185,7 @@ class VSymbolEChart extends Vue {
 				// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
 			}],
 			xAxis: [{
-				type: 'time',
+				type: 'category',
 				boundaryGap: false,
 				axisLabel: {
 					textStyle: { color: this.colors.dark, lineHeight: 1, fontSize: 14 },
@@ -179,7 +200,7 @@ class VSymbolEChart extends Vue {
 					},
 				},
 			}, {
-				type: 'time',
+				type: 'category',
 				boundaryGap: false,
 				gridIndex: 1,
 				axisLabel: { show: false },
@@ -188,6 +209,7 @@ class VSymbolEChart extends Vue {
 				splitLine: { show: false },
 				splitArea: { show: false },
 				axisPointer: { show: false },
+				// axisPointer: { label: { show: false } },
 			}],
 			yAxis: [{
 				scale: true,

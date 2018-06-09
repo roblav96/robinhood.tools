@@ -384,7 +384,7 @@ declare module 'echarts' {
 
 		interface Tooltip {
 			formatter: string | ((params: EventParam[], ticket?: number, callback?: (ticket: number, tooltip: string) => void) => string)
-			position: (pos, params, el, elRect, size) => any
+			position: number | string | (number | string)[] | ((pos, params, el, elRect, size) => any)
 			alwaysShowContent: boolean
 			axisPointer: AxisPointer
 			backgroundColor: string
@@ -396,7 +396,7 @@ declare module 'echarts' {
 			enterable: boolean
 			extraCssText: string
 			hideDelay: number
-			padding: number | number[]
+			padding: number | string | (number | string)[]
 			show: boolean
 			showContent: boolean
 			showDelay: number
@@ -444,18 +444,24 @@ declare module 'echarts' {
 		}
 
 		interface TextStyle extends Dims {
-			color: string
 			fontFamily: string
 			fontSize: number
 			fontStyle: string
 			fontWeight: string
 			lineHeight: number
+			borderColor0: string | ((param: EventParam) => string)
+			borderColor: string | ((param: EventParam) => string)
+			borderWidth: number
+			borderRadius: number
+			color0: string | ((param: EventParam) => string)
+			color: string | ((param: EventParam) => string)
 		}
 
 		interface StyleOptions {
 			borderColor0: string | ((param: EventParam) => string)
 			borderColor: string | ((param: EventParam) => string)
 			borderWidth: number
+			borderRadius: number
 			color0: string | ((param: EventParam) => string)
 			color: string | ((param: EventParam) => string)
 			emphasis: Partial<StyleOptions>
