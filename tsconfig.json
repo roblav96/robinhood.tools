@@ -8,8 +8,7 @@
 		"emitDecoratorMetadata": true,
 		"allowSyntheticDefaultImports": true,
 		"noImplicitThis": true,
-		"inlineSourceMap": true,
-		"pretty": true,
+		"sourceMap": true,
 		"outDir": "dist"
 	},
 	"include": ["src/**/*.ts"],

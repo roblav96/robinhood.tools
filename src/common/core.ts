@@ -2,6 +2,8 @@
 
 import * as _ from './lodash'
 import * as leven from 'leven'
+import * as dayjs from 'dayjs'
+dayjs.extend(require('dayjs/plugin/relativeTime'))
 
 
 
@@ -209,12 +211,11 @@ export const array = {
 			return previous
 		}, {})
 	},
-	// dict<T = any>(value: T[], key: string): Dict<T> {
-	// 	return value.reduce(function(previous, current, i) {
-	// 		previous[current[key]] = current
-	// 		return previous
-	// 	}, {})
-	// },
+	closest(value: number[], find: number, favor = 'min' as 'min' | 'max') {
+		let index = value.map(n => Math.abs(n - find))
+		let near = Math[favor].apply(Math, index)
+		return index.indexOf(near)
+	},
 }
 
 export const sort = {

@@ -77,54 +77,51 @@ class VSymbolEChart extends Vue {
 	}
 
 	onquotes(lquotes: Quotes.Live[]) {
-		console.log('lquotes ->', lquotes.length)
+		console.log('onquotes ->', lquotes.length)
 		let bones = {
 			animation: false,
-			// backgroundColor: this.colors['grey-lightest'],
+			color: [this.colors['grey-lighter']],
+			// color: ['#0a0a0a', '#ffb000', '#fed500', '#34bc6e', '#4dc0b5', '#009bef', '#5392ff', '#9753e1', '#e62325', '#ff509e', '#ffffff'],
 			// color: Object.values(this.colors),
+			textStyle: { color: this.colors.dark, fontSize: 14, lineHeight: 1 },
 			dataset: {
 				// dimensions: ['timestamp',''],
 				source: lquotes,
 				// source: data,
 			},
 			tooltip: {
+				// alwaysShowContent: !!process.env.DEVELOPMENT,
+				showContent: false,
 				trigger: 'axis',
 				axisPointer: { type: 'cross' },
-				transitionDuration: 0.2,
+				transitionDuration: 0.1,
 				showDelay: 0,
 				hideDelay: 1,
 				padding: [4, 8],
 				backgroundColor: this.colors.dark,
-				formatter: '{a}: {b}: {c}: {d}',
-				textStyle: {color:this.colors.white},
+				extraCssText: 'margin: 1rem 2rem;',
+				// formatter: '{a}: {b}: {c}: {d}',
+				// textStyle: { color: this.colors.white, lineHeight: 1, fontSize: 14 },
 			},
-			axisPointer: {
+			axisPointer: [{
 				animation: false,
-				link: { xAxisIndex: 'all' },
+				link: [{ xAxisIndex: 'all' }],
 				lineStyle: { color: this.colors['grey-lighter'] },
 				crossStyle: { color: this.colors['grey-light'] },
 				label: {
-					textStyle: { fontSize: 14 },
-					formatter: (params: echarts.AxisPointerParams<Quotes.Live>) => {
-						return utils.format.time(params.value, { verbose: true })
-					},
+					textStyle: { color: this.colors.white, lineHeight: 1, fontSize: 14 },
+					backgroundColor: this.colors.dark,
+					formatter: params => utils.format.number(params.value),
 				},
-			},
-			// visualMap: {
-			// 	show: false,
-			// 	seriesIndex: 1,
-			// 	// dimension: 1,
-			// 	pieces: [{
-			// 		value: 1,
-			// 		color: this.colors.danger,
-			// 	}, {
-			// 		value: 0,
-			// 		color: this.colors.warning,
-			// 	}, {
-			// 		value: -1,
-			// 		color: this.colors.success,
-			// 	}]
-			// },
+				// }, {
+				// 	animation: false,
+				// 	link: [{ xAxisIndex: 'all' }],
+				// 	lineStyle: { color: this.colors['grey-lighter'] },
+				// 	crossStyle: { color: this.colors['grey-light'] },
+				// 	label: {
+				// 		formatter: params => charts.format.xlabel(params.value),
+				// 	},
+			}],
 			grid: [{
 				top: 24,
 				left: 64,
@@ -142,6 +139,7 @@ class VSymbolEChart extends Vue {
 			dataZoom: [{
 				type: 'inside',
 				xAxisIndex: [0, 1],
+				rangeMode: ['value', 'percent'],
 				// preventDefaultMouseMove: false,
 			}, {
 				show: true,
@@ -157,7 +155,7 @@ class VSymbolEChart extends Vue {
 				},
 				borderColor: this.colors['grey-lightest'],
 				fillerColor: 'rgba(184,194,204,0.33)',
-				textStyle: { color: this.colors.dark },
+				// textStyle: { color: this.colors.dark },
 				handleStyle: { color: this.colors['grey-lighter'] },
 				// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
 			}],
@@ -165,11 +163,17 @@ class VSymbolEChart extends Vue {
 				type: 'category',
 				boundaryGap: false,
 				axisLabel: {
-					textStyle: { color: this.colors.dark, fontSize: 14 },
-					formatter: v => charts.xformat(v),
+					textStyle: { color: this.colors.dark, lineHeight: 1, fontSize: 14 },
+					formatter: v => charts.format.xlabel(v),
 				},
 				axisLine: { lineStyle: { color: this.colors.dark } },
 				splitLine: { show: false },
+				axisPointer: {
+					label: {
+						textStyle: { color: this.colors.white, lineHeight: 1, fontSize: 14 },
+						formatter: params => charts.format.xlabel(params.value),
+					},
+				},
 			}, {
 				type: 'category',
 				boundaryGap: false,
@@ -179,20 +183,17 @@ class VSymbolEChart extends Vue {
 				axisTick: { show: false },
 				splitLine: { show: false },
 				splitArea: { show: false },
+				axisPointer: { label: { show: false }, },
 			}],
 			yAxis: [{
 				scale: true,
 				splitArea: { show: false },
-				axisLabel: { textStyle: { color: this.colors.dark, fontSize: 14 } },
+				axisLabel: {
+					textStyle: { color: this.colors.dark, lineHeight: 1, fontSize: 14 },
+					formatter: value => { return utils.format.number(value) },
+				},
 				axisLine: { lineStyle: { color: this.colors.dark } },
 				splitLine: { lineStyle: { color: this.colors['grey-lightest'] } },
-				axisPointer: {
-					label: {
-						formatter: (params: echarts.AxisPointerParams) => {
-							return utils.format.number(params.value)
-						},
-					},
-				},
 			}, {
 				scale: true,
 				gridIndex: 1,
@@ -209,6 +210,9 @@ class VSymbolEChart extends Vue {
 				yAxisIndex: 0,
 				large: true,
 				largeThreshold: 200,
+				animation: false,
+				hoverAnimation: false,
+				legendHoverLink: false,
 				// dimensions: ['timestamp', 'open', 'close', 'high', 'low'],
 				encode: {
 					x: 'timestamp',
@@ -217,25 +221,34 @@ class VSymbolEChart extends Vue {
 				itemStyle: {
 					color: this.colors.success,
 					color0: this.colors.danger,
-					borderColor: this.colors.success,
-					borderColor0: this.colors.danger,
+					borderColor: null,
+					borderColor0: null,
 				},
-				emphasis: {},
+				emphasis: null,
+				tooltip: {
+					formatter: '{a}: {b}: {c}: {d}',
+				},
 			}, {
-				name: 'Volume',
+				name: 'Size',
 				type: 'bar',
-				stack: 'stack',
-				barGap: '-100%',
 				xAxisIndex: 1,
 				yAxisIndex: 1,
 				large: true,
 				largeThreshold: 200,
+				animation: false,
+				hoverAnimation: false,
+				legendHoverLink: false,
 				encode: { x: 'timestamp', y: 'size' },
-				itemStyle: { color: this.colors['grey-lightest'] },
+				itemStyle: {
+					// color: this.colors.success,
+					// borderColor: this.colors['grey-light'],
+					// borderWidth: 0.5,
+				},
+				emphasis: null,
 			}],
 		} as echarts.Options
 		this.echart.setOption(bones)
-		// console.log(`this.echart.getOption() ->`, this.echart.getOption().series[1])
+		console.log(`this.echart.getOption() ->`, this.echart.getOption())
 	}
 
 }
@@ -265,10 +278,10 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		this.resync()
 	}
 
-	range = lockr.get('symbol.chart.range', yahoo.RANGES[1])
-	ranges = ['live'].concat(yahoo.RANGES)
+	range = lockr.get('symbol.chart.range', charts.RANGES[1])
+	ranges = ['live'].concat(charts.RANGES)
 	get rangeindex() { return this.ranges.indexOf(this.range) }
-	vrange(range: string) { return utils.format.range(range) }
+	vrange(range: string) { return charts.format.range(range) }
 	@Vts.Watch('range') w_range(range: string) {
 		lockr.set('symbol.chart.range', range)
 		this.resync()
@@ -284,7 +297,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			this.vechart.onquotes(lquotes)
 			return this.$nextTick().then(() => this.vechart.resetZoom())
 		}).catch(error => {
-			console.error(`resync Error -> %O`, error)
+			console.error(`resync Error ->`, error)
 		}).finally(() => {
 			this.busy = false
 		})

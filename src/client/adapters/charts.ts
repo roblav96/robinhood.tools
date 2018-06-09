@@ -13,81 +13,131 @@ import * as utils from './utils'
 
 
 
-const frames = [
-	{ id: 'hour', ms: 0, utils: true },
-	{ id: 'day', ms: 0, format: 'h:mm:ssa' },
-	{ id: 'week', ms: 0, format: 'dddd, h:mm:ssa' },
-	{ id: 'month', ms: 0, format: 'MMM DD' },
-	{ id: 'quarter', ms: 0, format: 'MMM DD' },
-	{ id: 'year', ms: 0, format: 'MMM DD YYYY' },
-]
-frames.forEach(v => v.ms = dayjs(0).add(1, v.id as any).valueOf())
+export const format = {
 
-let midnight = dayjs().startOf('day').valueOf()
-export function xformat(value: number) {
-	let now = Date.now()
-	let i: number, len = frames.length
-	for (i = 0; i < len; i++) {
-		let frame = frames[i]
-		if (value > (now - frame.ms)) {
-			if (frame.utils) {
-				return utils.format.time(value, { verbose: true })
+	UNITS: { m: 'minute', h: 'hour', d: 'day', wk: 'week', mo: 'month', y: 'year' },
+	range(range: string, opts = { plural: false }) {
+		if (!range) return range;
+		let s = range.replace(/[0-9]/g, '')
+		s = format.UNITS[s] || s
+		s = s.charAt(0).toUpperCase() + s.substr(1)
+		let n = Number.parseInt(range)
+		if (!Number.isFinite(n)) return s;
+		if (opts.plural && n > 1) s = s + 's';
+		return n + ' ' + s
+	},
+
+	FRAMES: [
+		{ id: 'second', ms: 0, format: 'hh:mm:ssa', ago: true },
+		{ id: 'hour', ms: 0, format: 'dddd hh:mm:ssa', ago: true },
+		{ id: 'day', ms: 0, format: 'dddd MMM DD, hh:mma', ago: true },
+		{ id: 'week', ms: 0, format: 'dddd MMM DD, hh:mma', ago: true },
+		{ id: 'month', ms: 0, format: 'MMM DD YYYY, hh:mma' },
+		{ id: 'year', ms: 0, format: 'MMM DD YYYY' },
+	],
+	xlabel(stamp: number) {
+		let now = Date.now()
+		let i: number, len = format.FRAMES.length
+		for (i = 0; i < len; i++) {
+			if (stamp > (now - format.FRAMES[i].ms)) {
+				let frame = format.FRAMES[i - 1]
+				let label = dayjs(stamp).format(frame.format)
+				if (frame.format.endsWith('ssa')) {
+					if (label.includes(':00')) label = label.replace(':00', '');
+				}
+				if (frame.format.endsWith('mma')) {
+					if (label.includes(', 12:00am')) label = label.replace(', 12:00am', '');
+				}
+				if (frame.format.startsWith('dddd')) {
+					let day = label.split(' ')[0]
+					label = label.replace(day, `${day.substring(0, 3)},`)
+				}
+				if (frame.ago) label += ` (${utils.format.time(stamp)})`
+				return label
 			}
-			let day = dayjs(value).format(frame.format)
-			if (frame.format.endsWith('ssa') && day.includes(':00')) {
-				day = day.replace(':00', '')
-			}
-			return day
 		}
-	}
-	return dayjs(value).format(frames[frames.length - 1].format)
+		return dayjs(stamp).format(format.FRAMES[format.FRAMES.length - 1].format)
+	},
+
 }
+format.FRAMES.forEach(v => v.ms = dayjs(0).add(1, v.id as any).valueOf())
 
 
+
+export const FRAMES = {
+	'1d': 'm1',
+	'5d': 'm5',
+	'1mo': 'm60',
+	'3mo': 'd',
+	'1y': 'd',
+	'5y': 'w',
+	'max': 'm',
+}
+export const RANGES = Object.keys(FRAMES)
 
 export function getChart(symbol: string, tid: number, range: string) {
-	if (range == yahoo.RANGES[0]) return get1Day(symbol, tid);
-	return []
+	return Promise.resolve().then(function() {
+		if (range == RANGES[0]) return get1Day(symbol, tid);
+		let url = `https://quoteapi.webull.com/api/quote/v2/tickerKDatas/${tid}`
+		return http.get(url, { query: { kDataType: FRAMES[range] } }).then(function(response: Webull.KDatasChart) {
+			let lquotes = webull.toKDatasLives(response)
+			// if (range == 'max') return lquotes;
+			// let unit = format.UNITS[range.replace(/[0-9]/g, '')]
+			// let ms = dayjs(0).add(Number.parseInt(range), unit).valueOf()
+			// console.log('ms ->', ms)
+			// lquotes.remove(v => {
+			// 	return 
+			// })
+			return lquotes
+		})
+	}).then(function(lquotes) {
+		lquotes.sort((a, b) => a.timestamp - b.timestamp)
+		lquotes.forEach((lquote, i) => {
+			lquote.price = lquote.close
+			let prev = lquotes[i - 1] ? lquotes[i - 1].volume : lquote.size
+			lquote.volume = prev + lquote.size
+		})
+		return lquotes
+	})
 }
 
 function get1Day(symbol: string, tid: number) {
-	let query = { minuteType: 'm1' }
 	return Promise.all([
-		http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/F`, { query }),
-		http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/A`, { query }),
-	]).then(function(resolved: Webull.MinuteChart[]) {
-		let wlquotes = resolved.map(v => webull.parseMinuteLives(v)).flatten()
-		let tstamps = wlquotes.map(v => v.timestamp)
+		http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/F`, { query: { minuteType: 'm1' } }),
+		http.get(`https://quoteapi.webull.com/api/quote/v2/tickerKDatas/${tid}`, { query: { kDataType: 'm1' } }),
+		http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/A`, { query: { minuteType: 'm1' } }),
+	]).then(function(resolved) {
+		let kdatas = resolved.splice(1, 1).pop() as Webull.KDatasChart
+		kdatas.tickerKDatas.forEach(v => core.fix(v, true))
+		let klquotes = webull.toKDatasLives(kdatas)
+
+		let mlquotes = resolved.map(v => webull.toMinutesLives(v)).flatten()
+		let mlrange = { min: mlquotes[0].timestamp, max: mlquotes[mlquotes.length - 1].timestamp }
+		// klquotes.remove(v => v.timestamp < mlrange.min)
+		let klrange = { min: klquotes[0].timestamp, max: klquotes[klquotes.length - 1].timestamp }
+
 		return yahoo.getChart(symbol, {
 			interval: '1m',
 			includePrePost: true,
-			period1: dayjs(Math.min(...tstamps)).unix(),
-			period2: dayjs(Math.max(...tstamps)).unix(),
-		}).then(function(lquotes) {
-			// console.log(`wlquotes ->`, JSON.parse(JSON.stringify(wlquotes)))
-			// console.log(`lquotes ->`, JSON.parse(JSON.stringify(lquotes)))
-			lquotes.forEach(lquote => {
-				let wlquote = wlquotes.find(v => v.timestamp == lquote.timestamp)
-				if (wlquote) return lquote.size += wlquote.size;
+			period1: dayjs(mlrange.min).unix(),
+			period2: dayjs(mlrange.max).unix(),
+		}).then(function(ylquotes) {
+			let findex = core.array.closest(ylquotes.map(v => v.timestamp), klrange.min)
+			core.object.merge(klquotes[0], _.pick(ylquotes[findex], ['open', 'high', 'low', 'close']))
+
+			ylquotes.remove(v => v.timestamp >= klrange.min && v.timestamp <= klrange.max)
+			let ystamps = ylquotes.map(v => { v.size = 0; return v.timestamp })
+
+			mlquotes.forEach(mlquote => {
+				let ylquote = ylquotes.find(v => v.timestamp == mlquote.timestamp)
+				if (ylquote) return ylquote.size += mlquote.size;
+				let index = core.array.closest(ystamps, mlquote.timestamp)
+				if (index >= 0) ylquotes[index].size += mlquote.size;
 			})
-			// wlquotes.forEach(wlquote => {
-			// 	wlquote.high = 15
-			// 	wlquote.low = 5
-			// 	lquotes.push(wlquote)
-			// })
-			lquotes.sort((a, b) => a.timestamp - b.timestamp)
-			lquotes.forEach((lquote, i) => {
-				lquote.price = lquote.close
-				let prev = lquotes[i - 1] ? lquotes[i - 1].volume : lquote.size
-				lquote.volume = prev + lquote.size
-			})
-			console.log(`lquotes ->`, JSON.parse(JSON.stringify(lquotes)))
-			return lquotes
+
+			return ylquotes.concat(klquotes)
 		})
 	})
-	// return getMinutes(tid, yahoo.RANGES[0]).then(function(lquotes) {
-
-	// })
 }
 
 
@@ -133,19 +183,15 @@ function get1Day(symbol: string, tid: number) {
 
 
 
-
-
 // import * as benchmark from '../../common/benchmark'
 // benchmark.simple('formats', [
 // 	function formattime() {
 // 		prettyms(Date.now() - (Math.round(Math.random() * 1000000)))
 // 	},
-// 	function formatnumber() {
-// 		fromnow(Date.now() - (Math.round(Math.random() * 1000000)))
+// 	function fromnowdayjs() {
+// 		dayjs(Date.now() - (Math.round(Math.random() * 1000000))).fromNow()
 // 	},
 // 	function formatdayjs() {
 // 		dayjs(Date.now() - (Math.round(Math.random() * 1000000))).format('dddd, MMM DD YYYY, hh:mm:ssa')
 // 	},
 // ])
-
-

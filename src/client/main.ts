@@ -5,6 +5,8 @@ require('../common/polyfills')
 global.Promise = require('zousan')
 global.Zousan.suppressUncaughtRejectionError = true
 
+// require('source-map-support/register')
+
 process.version = 'v9.11.1'
 process.hrtime = require('browser-process-hrtime')
 

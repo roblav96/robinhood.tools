@@ -61,20 +61,13 @@ export function getChart(symbol: string, params: Partial<Yahoo.ChartParams>) {
 		let hquotes = result.indicators.quote[0]
 		stamps.forEach((stamp, i) => {
 			if (!Number.isFinite(hquotes.close[i])) return;
-			let prev = lquotes[i - 1] ? lquotes[i - 1].volume : 0
 			lquotes.push({
 				open: hquotes.open[i], close: hquotes.close[i],
 				high: hquotes.high[i], low: hquotes.low[i],
 				size: hquotes.volume[i], timestamp: stamp * 1000,
 			} as Quotes.Live)
 		})
-		lquotes.sort((a, b) => a.timestamp - b.timestamp)
-		// lquotes.forEach((lquote, i) => {
-		// 	lquote.price = lquote.close
-		// 	let prev = lquotes[i - 1] ? lquotes[i - 1].volume : lquote.size
-		// 	lquote.volume = prev + lquote.size
-		// })
-		return lquotes
+		return lquotes.sort((a, b) => a.timestamp - b.timestamp)
 	})
 }
 

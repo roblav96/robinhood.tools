@@ -116,6 +116,7 @@ export const format = {
 		else { fixed = cash + fixed };
 		if (percent) fixed += '%';
 
+		// return fixed == '0.000' ? '0' : fixed
 		return fixed
 	},
 
@@ -126,18 +127,6 @@ export const format = {
 		let ms = prettyms(Math.max(Date.now() - stamp, opts.showms ? 0 : 1001), opts)
 		ms = ms.split(' ').splice(0, opts.verbose ? opts.max * 2 : opts.max).join(' ')
 		return opts.ago == false ? ms : ms + ' ago'
-	},
-
-	RANGES: { m: 'minute', h: 'hour', d: 'day', wk: 'week', mo: 'month', y: 'year', ytd: 'YTD' },
-	range(range: string, opts = { plural: false }) {
-		if (!range) return range;
-		let s = range.replace(/[0-9]/g, '')
-		s = format.RANGES[s] || s
-		s = s.charAt(0).toUpperCase() + s.substr(1)
-		let n = Number.parseInt(range)
-		if (!Number.isFinite(n)) return s;
-		if (opts.plural && n > 1) s = s + 's';
-		return n + ' ' + s
 	},
 
 }

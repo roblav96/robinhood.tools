@@ -136,7 +136,7 @@ declare module 'echarts' {
 			animationEasing: string
 			animationEasingUpdate: string
 			animationThreshold: number
-			axisPointer: Partial<AxisPointer>
+			axisPointer: Partial<AxisPointer> | Partial<AxisPointer>[]
 			backgroundColor: string
 			brush: any[]
 			color: string[]
@@ -187,17 +187,19 @@ declare module 'echarts' {
 				lineStyle: Partial<StyleOptions>
 				areaStyle: Partial<StyleOptions>
 			}
-			top: any
+			top: number | string
 			handleSize: string
 			minSpan: number
 			maxSpan: number
-			bottom: any
+			minValueSpan: number | string | Date
+			maxValueSpan: number | string | Date
+			bottom: number | string
 			handleIcon: string
 			showDetail: boolean
 			showDataShadow: boolean
-			left: any
-			right: any
-			height: any
+			left: number | string
+			right: number | string
+			height: number | string
 			angleAxisIndex: number[]
 			disabled: boolean
 			preventDefaultMouseMove: boolean
@@ -218,6 +220,7 @@ declare module 'echarts' {
 			type: string
 			show: boolean
 			realtime: boolean
+			rangeMode: string[]
 			xAxisIndex: number[]
 			yAxisIndex: number[]
 			z: number
@@ -265,6 +268,7 @@ declare module 'echarts' {
 			rangeStart: any
 			show: boolean
 			scale: boolean
+			logBase: number
 			position: string
 			silent: boolean
 			splitArea: {
@@ -307,7 +311,7 @@ declare module 'echarts' {
 			inside: boolean
 			interval: number
 			margin: number
-			formatter: (value: number, index: number) => string
+			formatter: (value: number, index?: number) => string
 			rotate: number
 			show: boolean
 			showMaxLabel: any
