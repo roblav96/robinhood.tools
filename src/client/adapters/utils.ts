@@ -51,7 +51,7 @@ export const wemitter = new UEmitter('window')
 
 
 declare global { interface NumberFormatOptions { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } }
-declare global { interface TimeFormatOptions extends prettyms.PrettyMsOptions { max: number, showms: boolean, ago: boolean, full: boolean, keepDecimalsOnWholeSeconds: boolean } }
+declare global { interface TimeFormatOptions extends prettyms.PrettyMsOptions { max: number, showms: boolean, ago: boolean, keepDecimalsOnWholeSeconds: boolean } }
 export const format = {
 
 	UNITS: ['K', 'M', 'B', 'T'],
@@ -120,8 +120,8 @@ export const format = {
 		return fixed
 	},
 
+	stamp(stamp: number) { return dayjs(stamp).format('dddd, MMM DD YYYY, hh:mm:ssa') },
 	time(stamp: number, opts = {} as Partial<TimeFormatOptions>) {
-		if (opts.full) return dayjs(stamp).format('dddd, MMM DD YYYY, hh:mm:ssa');
 		opts.secDecimalDigits = opts.secDecimalDigits || 0
 		opts.max = opts.max || 1
 		let ms = prettyms(Math.max(Date.now() - stamp, opts.showms ? 0 : 1001), opts)

@@ -31,7 +31,7 @@ export const format = {
 		{ id: 'second', ms: 0, format: 'hh:mm:ssa', ago: true },
 		{ id: 'hour', ms: 0, format: 'dddd hh:mm:ssa', ago: true },
 		{ id: 'day', ms: 0, format: 'dddd MMM DD, hh:mma', ago: true },
-		{ id: 'week', ms: 0, format: 'dddd MMM DD, hh:mma', ago: true },
+		{ id: 'week', ms: 0, format: 'MMM DD, hh:mma', ago: true },
 		{ id: 'month', ms: 0, format: 'MMM DD YYYY, hh:mma' },
 		{ id: 'year', ms: 0, format: 'MMM DD YYYY' },
 	],
@@ -81,10 +81,10 @@ export function getChart(symbol: string, tid: number, range: string) {
 		let url = `https://quoteapi.webull.com/api/quote/v2/tickerKDatas/${tid}`
 		return http.get(url, { query: { kDataType: FRAMES[range] } }).then(function(response: Webull.KDatasChart) {
 			let lquotes = webull.toKDatasLives(response)
-			// if (range == 'max') return lquotes;
-			// let unit = format.UNITS[range.replace(/[0-9]/g, '')]
-			// let ms = dayjs(0).add(Number.parseInt(range), unit).valueOf()
-			// console.log('ms ->', ms)
+			if (range == 'max') return lquotes;
+			let unit = format.UNITS[range.replace(/[0-9]/g, '')]
+			let ms = dayjs(0).add(Number.parseInt(range), unit).valueOf()
+			console.log('ms ->', ms)
 			// lquotes.remove(v => {
 			// 	return 
 			// })
@@ -106,15 +106,23 @@ function get1Day(symbol: string, tid: number) {
 		http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/F`, { query: { minuteType: 'm1' } }),
 		http.get(`https://quoteapi.webull.com/api/quote/v2/tickerKDatas/${tid}`, { query: { kDataType: 'm1' } }),
 		http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/A`, { query: { minuteType: 'm1' } }),
-	]).then(function(resolved) {
-		let kdatas = resolved.splice(1, 1).pop() as Webull.KDatasChart
+	]).then(function(resolved: Webull.MinuteChart[]) {
+
+		let kdatas = (resolved.splice(1, 1).pop() as any) as Webull.KDatasChart
 		kdatas.tickerKDatas.forEach(v => core.fix(v, true))
 		let klquotes = webull.toKDatasLives(kdatas)
 
+		resolved.forEach(v => { core.fix(v, true); core.fix(v.data[0], true) })
 		let mlquotes = resolved.map(v => webull.toMinutesLives(v)).flatten()
-		let mlrange = { min: mlquotes[0].timestamp, max: mlquotes[mlquotes.length - 1].timestamp }
-		// klquotes.remove(v => v.timestamp < mlrange.min)
-		let klrange = { min: klquotes[0].timestamp, max: klquotes[klquotes.length - 1].timestamp }
+		let mlrange = {
+			min: resolved[0].data[0].dates[0].start * 1000,
+			max: resolved[1].data[0].dates[0].end * 1000,
+		}
+		let klrange = {
+			min: resolved[0].data[0].dates[0].end * 1000,
+			max: resolved[1].data[0].dates[0].start * 1000,
+		}
+		klquotes.remove(v => v.timestamp < mlrange.min)
 
 		return yahoo.getChart(symbol, {
 			interval: '1m',
@@ -122,12 +130,10 @@ function get1Day(symbol: string, tid: number) {
 			period1: dayjs(mlrange.min).unix(),
 			period2: dayjs(mlrange.max).unix(),
 		}).then(function(ylquotes) {
-			let findex = core.array.closest(ylquotes.map(v => v.timestamp), klrange.min)
-			core.object.merge(klquotes[0], _.pick(ylquotes[findex], ['open', 'high', 'low', 'close']))
+			let removed = _.remove(ylquotes, v => v.timestamp > klrange.min && v.timestamp < klrange.max)
+			if (removed[0]) core.object.merge(klquotes[0], _.pick(removed[0], ['open', 'high', 'low', 'close']));
 
-			ylquotes.remove(v => v.timestamp >= klrange.min && v.timestamp <= klrange.max)
 			let ystamps = ylquotes.map(v => { v.size = 0; return v.timestamp })
-
 			mlquotes.forEach(mlquote => {
 				let ylquote = ylquotes.find(v => v.timestamp == mlquote.timestamp)
 				if (ylquote) return ylquote.size += mlquote.size;

@@ -37,6 +37,7 @@ module.exports = {
 		config.output.chunkFilename = '[name].chunk.js'
 
 		if (DEVELOPMENT) {
+			// config.devtool = 'source-map'
 			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /env/]))
 			// config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
 			// 	rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {

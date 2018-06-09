@@ -332,8 +332,8 @@ declare global {
 			}
 			interface Date {
 				avgShow: boolean
-				end: string
-				start: string
+				end: number
+				start: number
 				type: string
 			}
 		}
@@ -343,7 +343,7 @@ declare global {
 			code: number
 			data: MinuteChart.Data[]
 			pVol: number
-			preClose: string
+			preClose: number
 			regionId: number
 			status: string
 			tickerType: number

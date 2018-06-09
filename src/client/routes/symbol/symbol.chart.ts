@@ -54,11 +54,11 @@ class VSymbolEChart extends Vue {
 	}
 
 	onevent(param: echarts.EventParam) {
-		console.log(`param ->`, param)
+		// console.log(`param ->`, param)
 	}
 
 	onmousewheel(event: MouseEvent) {
-		console.log(`event ->`, event)
+		// console.log(`event ->`, event)
 	}
 
 	ondblclick(event: MouseEvent) {
@@ -77,7 +77,7 @@ class VSymbolEChart extends Vue {
 	}
 
 	onquotes(lquotes: Quotes.Live[]) {
-		console.log('onquotes ->', lquotes.length)
+		// console.log('onquotes ->', lquotes.length)
 		let bones = {
 			animation: false,
 			color: [this.colors['grey-lighter']],
@@ -248,7 +248,7 @@ class VSymbolEChart extends Vue {
 			}],
 		} as echarts.Options
 		this.echart.setOption(bones)
-		console.log(`this.echart.getOption() ->`, this.echart.getOption())
+		// console.log(`this.echart.getOption() ->`, this.echart.getOption())
 	}
 
 }

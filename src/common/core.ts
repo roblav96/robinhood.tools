@@ -31,10 +31,11 @@ export function fix(target: any, deep?: any) {
 		let value = target[key]
 		if (value == null) return;
 		else if (key == 'symbol') return;
-		else if (deep === true && Array.isArray(value)) return value.forEach(fix);
+		else if (deep === true && Array.isArray(value)) return value.forEach(v => fix(v));
 		else if (deep === true && object.is(value)) return fix(value);
 		else if (!string.is(value)) return;
 		else if (value === '') delete target[key];
+		else if (!isNaN(key as any)) return;
 		else if (!isNaN(value as any)) target[key] = Number.parseFloat(value);
 		else if (value === 'NaN') target[key] = NaN;
 		else if (value === 'null') target[key] = null;

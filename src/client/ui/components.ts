@@ -36,7 +36,7 @@ class Timestamp extends Vue {
 		if (!Number.isFinite(this.value)) return this.fromnow = '';
 		let opts = this.opts ? core.clone(this.opts) : {}
 		this.fromnow = utils.format.time(this.value, opts)
-		this.tip = utils.format.time(this.value, { full: true })
+		this.tip = utils.format.stamp(this.value)
 	}
 }
 Vue.component('v-timestamp', Timestamp)
