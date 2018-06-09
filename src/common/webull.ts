@@ -108,6 +108,21 @@ export function fixSymbol(symbol: string) {
 	return start + middle + end.slice(-1)
 }
 
+export function parseMinuteLives(response: Webull.MinuteChart) {
+	let lquotes = [] as Quotes.Live[]
+	response.data.forEach(data => {
+		data.tickerMinutes.forEach(minute => {
+			let msplit = minute.split(',').map(Number.parseFloat)
+			lquotes.push({
+				price: msplit[1], size: msplit[2],
+				timestamp: msplit[0] * 1000,
+			} as Quotes.Live)
+		})
+	})
+	lquotes.sort((a, b) => a.timestamp - b.timestamp)
+	return lquotes
+}
+
 
 
 
@@ -299,6 +314,31 @@ declare global {
 			yield: number
 			yrHigh: number
 			yrLow: number
+		}
+
+		namespace MinuteChart {
+			interface Data {
+				dates: Date[]
+				tickerMinutes: string[]
+			}
+			interface Date {
+				avgShow: boolean
+				end: string
+				start: string
+				type: string
+			}
+		}
+		interface MinuteChart {
+			cleanDuration: number
+			cleanTime: number
+			code: number
+			data: MinuteChart.Data[]
+			pVol: number
+			preClose: string
+			regionId: number
+			status: string
+			tickerType: number
+			timeZone: string
 		}
 
 	}

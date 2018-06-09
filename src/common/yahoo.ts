@@ -35,51 +35,26 @@ export const ALL_INTERVALS = ['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h'
 export const INTERVALS = ['1m', '2m', '5m', '15m', '30m', '1h', '1d', '1wk', '1mo']
 export const FRAMES = {
 	'1d': '1m',
-	'5d': '15m',
+	'5d': '5m',
 	'1mo': '1h',
 	'3mo': '1d',
-	'6mo': '1d',
 	'ytd': '1d',
 	'1y': '1d',
 	'5y': '1wk',
-	'10y': '1mo',
 	'max': '1mo',
 }
 export const RANGES = Object.keys(FRAMES)
 
 
 
-export function getChart(
-	symbol: string,
-	params: Partial<{ range: string, interval: string, includePrePost: boolean, period1: number, period2: number }>,
-	hhours: Hours,
-	retries = 3,
-): Promise<Quotes.Live[]> {
-	let state = hours.getState(hhours)
-	if (params.range == '1d' && state.indexOf('PRE') == 0) {
-		params.includePrePost = true
-		delete params.range
-		if (dayjs(hhours.date).day() == 1) {
-			params.period1 = dayjs(hhours.prepre).subtract(3, 'day').unix()
-		} else params.period1 = dayjs(hhours.prepre).subtract(1, 'day').unix();
-		params.period2 = dayjs(hhours.postpost).unix()
-	} else if (!params.interval) {
-		params.interval = FRAMES[params.range]
-	}
-	if (params.includePrePost == null && params.interval.endsWith('m')) {
-		params.includePrePost = true
-	}
-	let url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + symbol
-	return http.get(url, {
-		query: params, proxify: !!process.env.CLIENT,
+export function getChart(symbol: string, params: Partial<Yahoo.ChartParams>) {
+	return http.get(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`, {
+		query: params, proxify: !!process.env.CLIENT, retries: 3,
 	}).then(function(response: Yahoo.ApiChart) {
 		let error = _.get(response, 'chart.error') as Yahoo.ApiError
 		if (error) throw boom.badRequest('chart.error', response);
 		let result = _.get(response, 'chart.result[0]') as Yahoo.ChartResult
-		// if (!result) throw boom.expectationFailed('!result', response);
-		if (!result && retries >= 0) {
-			return getChart(symbol, params, hhours, retries--)
-		}
+		if (!result) throw boom.expectationFailed('!result', response);
 		let lquotes = [] as Quotes.Live[]
 		let stamps = result.timestamp
 		if (!stamps) return lquotes;
@@ -94,11 +69,11 @@ export function getChart(
 			} as Quotes.Live)
 		})
 		lquotes.sort((a, b) => a.timestamp - b.timestamp)
-		lquotes.forEach((lquote, i) => {
-			lquote.price = lquote.close
-			let prev = lquotes[i - 1] ? lquotes[i - 1].volume : lquote.size
-			lquote.volume = prev + lquote.size
-		})
+		// lquotes.forEach((lquote, i) => {
+		// 	lquote.price = lquote.close
+		// 	let prev = lquotes[i - 1] ? lquotes[i - 1].volume : lquote.size
+		// 	lquote.volume = prev + lquote.size
+		// })
 		return lquotes
 	})
 }
@@ -193,6 +168,13 @@ declare global {
 			symbol: string
 		}
 
+		interface ChartParams {
+			range: string
+			interval: string
+			includePrePost: boolean
+			period1: number
+			period2: number
+		}
 		interface ApiChart {
 			chart: {
 				result: ChartResult[]

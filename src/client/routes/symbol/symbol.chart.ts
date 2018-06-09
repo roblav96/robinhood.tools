@@ -63,7 +63,7 @@ class VSymbolEChart extends Vue {
 
 	ondblclick(event: MouseEvent) {
 		let contains = this.echart.containPixel({ gridIndex: [0, 1] }, [event.offsetX, event.offsetY])
-		if (contains) this.resetzoom();
+		if (contains) this.resetZoom();
 	}
 
 	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
@@ -72,11 +72,11 @@ class VSymbolEChart extends Vue {
 		this.echart.resize(this.dims())
 	}
 
-	resetzoom() {
+	resetZoom() {
 		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
 	}
 
-	syncdataset(lquotes: Quotes.Live[]) {
+	onquotes(lquotes: Quotes.Live[]) {
 		console.log('lquotes ->', lquotes.length)
 		let bones = {
 			animation: false,
@@ -249,6 +249,8 @@ class VSymbolEChart extends Vue {
 })
 export default class VSymbolChart extends Mixins(VMixin) {
 	$parent: VSymbol
+	@Vts.Prop() symbol: string
+	@Vts.Prop() quote: Quotes.Quote
 
 	created() {
 
@@ -261,31 +263,28 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	}
 
 	busy = true
-	symbol = this.$parent.symbol
-	quote = this.$parent.all.quote
+	@Vts.Watch('quote.tickerId') w_tickerId(tickerId: number) {
+		this.resync()
+	}
 
-	range = lockr.get('symbol.chart.range', '5d')
+	range = lockr.get('symbol.chart.range', yahoo.RANGES[1])
 	ranges = ['live'].concat(yahoo.RANGES)
 	get rangeindex() { return this.ranges.indexOf(this.range) }
 	vrange(range: string) { return utils.format.range(range) }
-
 	@Vts.Watch('range') w_range(range: string) {
 		lockr.set('symbol.chart.range', range)
 		this.resync()
 	}
-	@Vts.Watch('$parent.symbol') w_symbol(symbol: string) {
-		this.symbol = symbol
-		this.resync()
-	}
 
 	resync() {
+		if (!Number.isFinite(this.quote.tickerId)) return;
 		this.busy = true
 		return Promise.resolve().then(() => {
-			return this.range == 'live' ? this.getlives() : this.gethistoricals()
+			return this.range == 'live' ? this.getLives() : this.getHistoricals()
 		}).then(lquotes => {
 			this.$safety()
-			this.vechart.syncdataset(lquotes)
-			return this.$nextTick().then(() => this.vechart.resetzoom())
+			this.vechart.onquotes(lquotes)
+			return this.$nextTick().then(() => this.vechart.resetZoom())
 		}).catch(error => {
 			console.error(`resync Error -> %O`, error)
 		}).finally(() => {
@@ -293,7 +292,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		})
 	}
 
-	getlives() {
+	getLives() {
 		return http.post('/quotes/lives', { symbols: [this.symbol] }).then((response: Quotes.Live[][]) => {
 			return response[0]
 			// console.log(`response ->`, JSON.parse(JSON.stringify(response)))
@@ -302,8 +301,9 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		})
 	}
 
-	gethistoricals() {
-		return yahoo.getChart(this.symbol, { range: this.range }, this.hours.hours)
+	getHistoricals() {
+		return charts.getChart(this.symbol, this.quote.tickerId, this.range)
+		// return yahoo.getChart(this.symbol, { range: this.range }, this.hours.hours)
 		// .then(response => {
 		// 	return response
 		// console.log(`response ->`, JSON.parse(JSON.stringify(response)))

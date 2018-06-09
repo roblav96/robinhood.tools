@@ -155,7 +155,7 @@
 		</section>
 
 		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-			<router-view></router-view>
+			<router-view :symbol="symbol" :quote="all.quote"></router-view>
 		</transition>
 
 	</div>

@@ -7,6 +7,8 @@ import * as ecstat from 'echarts-stat'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as http from '../../common/http'
+import * as webull from '../../common/webull'
+import * as yahoo from '../../common/yahoo'
 import * as utils from './utils'
 
 
@@ -45,20 +47,81 @@ export function xformat(value: number) {
 
 
 
-// https://quoteapi.webull.com/api/quote/v3/tickerMinutes/913254235/F?minuteType=m1
-// https://quoteapi.webull.com/api/quote/v3/tickerMinutes/913254235?minuteType=m1
-// https://quoteapi.webull.com/api/quote/v3/tickerMinutes/913254235/A?minuteType=m1
-// https://quoteapi.webull.com/api/quote/v2/tickerMinutes/913254235?minuteType=m5
-// https://quoteapi.webull.com/api/quote/v2/tickerTrends/913254235?trendType=m1
-// https://quoteapi.webull.com/api/quote/v2/tickerTrends/913254235?trendType=m3
-// https://quoteapi.webull.com/api/quote/v2/tickerTrends/913254235?trendType=y1
-// https://quoteapi.webull.com/api/quote/v2/tickerTrends/913254235?trendType=y5
-// https://quoteapi.webull.com/api/quote/v2/tickerTrends/913254235?trendType=all
-
-export const RANGES = ['1d']
-export function getChart(range: string) {
-
+export function getChart(symbol: string, tid: number, range: string) {
+	if (range == yahoo.RANGES[0]) return get1Day(symbol, tid);
+	return []
 }
+
+function get1Day(symbol: string, tid: number) {
+	let query = { minuteType: 'm1' }
+	return Promise.all([
+		http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/F`, { query }),
+		http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/A`, { query }),
+	]).then(function(resolved: Webull.MinuteChart[]) {
+		let wlquotes = resolved.map(v => webull.parseMinuteLives(v)).flatten()
+		let tstamps = wlquotes.map(v => v.timestamp)
+		return yahoo.getChart(symbol, {
+			interval: '1m',
+			includePrePost: true,
+			period1: dayjs(Math.min(...tstamps)).unix(),
+			period2: dayjs(Math.max(...tstamps)).unix(),
+		}).then(function(ylquotes) {
+			ylquotes.forEach(ylquote => {
+				if (ylquote.size > 0) return;
+				let i = wlquotes.findIndex(v => v.timestamp == ylquote.timestamp)
+				if (i >= 0) ylquote.size = wlquotes.splice(i, 1)[0].size
+			})
+			wlquotes.forEach(wlquote => {
+				
+			})
+			// console.log(`wlquotes ->`, JSON.parse(JSON.stringify(wlquotes)))
+			// console.log(`ylquotes ->`, JSON.parse(JSON.stringify(ylquotes)))
+			return []
+		})
+	})
+	// return getMinutes(tid, yahoo.RANGES[0]).then(function(lquotes) {
+
+	// })
+}
+
+
+
+// export function getMinutes(tid: number, range: string) {
+// 	return Promise.resolve().then(function() {
+// 		let proms = []
+// 		if (range == '1d') {
+// 			let query = { minuteType: 'm1' }
+// 			proms.push(http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/F`, { query }))
+// 			proms.push(http.get(`https://quoteapi.webull.com/api/quote/v2/tickerMinutes/${tid}`, { query }))
+// 			proms.push(http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/A`, { query }))
+// 		}
+// 		if (range == '5d') {
+// 			let query = { minuteType: 'm5' }
+// 			proms.push(http.get(`https://quoteapi.webull.com/api/quote/v2/tickerMinutes/${tid}`, { query }))
+// 		}
+// 		return Promise.all(proms)
+// 	}).then(function(resolved: Webull.MinuteChart[]) {
+// 		let lquotes = [] as Quotes.Live[]
+// 		resolved.forEach(response => {
+// 			response.data.forEach(data => {
+// 				data.tickerMinutes.forEach(minute => {
+// 					let msplit = minute.split(',').map(Number.parseFloat)
+// 					lquotes.push({
+// 						price: msplit[1], size: msplit[2],
+// 						timestamp: msplit[0] * 1000,
+// 					} as Quotes.Live)
+// 				})
+// 			})
+// 		})
+// 		lquotes.sort((a, b) => a.timestamp - b.timestamp)
+// 		// lquotes.forEach((lquote, i) => {
+// 		// 	lquote.price = lquote.close
+// 		// 	let prev = lquotes[i - 1] ? lquotes[i - 1].volume : lquote.size
+// 		// 	lquote.volume = prev + lquote.size
+// 		// })
+// 		return lquotes
+// 	})
+// }
 
 
 

@@ -100,6 +100,10 @@ Array.prototype.remove = function remove(fn, arg) {
 }
 declare global { interface Array<T> { remove(fn: (value: T, index: number, array: Array<T>) => boolean, thisArg?: any): void } }
 
+Array.prototype.flatten = function flatten(this: any[]) {
+	return [].concat(...this)
+}
+
 
 
 const isBrowser = !new Function('try { return this === global; } catch(e) { return false }')()
