@@ -28,14 +28,15 @@ async function start() {
 
 	let builder = new lunr.Builder()
 	// builder.metadataWhitelist = ['position']
-	builder.ref('symbol')
+	builder.ref('_symbol')
 	builder.field('symbol')
 	builder.field('name')
 	alls.forEach(all => {
 		builder.add({
+			_symbol: all.symbol,
 			symbol: all.symbol.toLowerCase(),
 			name: core.string.clean(all.quote.name).toLowerCase(),
-		} as Quotes.Quote)
+		})
 	})
 	INDEX = builder.build()
 
@@ -91,7 +92,7 @@ radio.reply('search.query', async function onquery(query: string) {
 		})
 	})
 	results.splice(MAX)
-	return results.map(v => v.ref.toUpperCase())
+	return results.map(v => v.ref)
 })
 
 
