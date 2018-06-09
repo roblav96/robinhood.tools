@@ -93,6 +93,7 @@ class VSymbolEChart extends Vue {
 					animation: false,
 					type: 'cross',
 					lineStyle: { color: this.colors['grey-lighter'] },
+					crossStyle: { color: this.colors['grey-light'] },
 				},
 			},
 			// visualMap: {

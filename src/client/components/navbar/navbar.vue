@@ -31,7 +31,7 @@ nav.navbar div.dropdown-content a > span.icon {
 
 <template>
 	<nav id="navbar" class="navbar is-fixed-top is-unselectable border border-b-1" role="navigation" aria-label="main navigation">
-		<div class="container">
+		<div class="container is-fluid">
 
 			<div class="navbar-brand items-center">
 				<router-link class="navbar-item h-full" :to="{name:'home'}" active-class exact-active-class>

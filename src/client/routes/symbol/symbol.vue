@@ -14,7 +14,7 @@
 <template>
 	<div id="symbol_route" class="">
 
-		<section class="has-background-white border border-b-2 touch:px-6">
+		<section class="has-background-white border border-b-1 touch:px-6">
 			<div class="container">
 
 				<div class="columns is-mobile my-0 items-center touch:flex-wrap">
@@ -24,12 +24,12 @@
 					</div>
 
 					<div class="column py-0">
-						<p class="is-size-3 font-semibold leading-none whitespace-no-wrap">{{symbol}}</p>
+						<p class="title leading-none whitespace-no-wrap">{{symbol}}</p>
 						<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
 					</div>
 
 					<div class="column is-narrow has-text-centered">
-						<p class="is-size-3 font-semibold leading-none">
+						<p class="title leading-none">
 							<v-number-ticker :number="all.quote.price"></v-number-ticker>
 						</p>
 						<p>

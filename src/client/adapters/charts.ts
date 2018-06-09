@@ -6,6 +6,7 @@ import * as echarts from 'echarts'
 import * as ecstat from 'echarts-stat'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
+import * as http from '../../common/http'
 import * as utils from './utils'
 
 
@@ -38,6 +39,25 @@ export function xformat(value: number) {
 		}
 	}
 	return dayjs(value).format(frames[frames.length - 1].format)
+}
+
+
+
+
+
+// https://quoteapi.webull.com/api/quote/v3/tickerMinutes/913254235/F?minuteType=m1
+// https://quoteapi.webull.com/api/quote/v3/tickerMinutes/913254235?minuteType=m1
+// https://quoteapi.webull.com/api/quote/v3/tickerMinutes/913254235/A?minuteType=m1
+// https://quoteapi.webull.com/api/quote/v2/tickerMinutes/913254235?minuteType=m5
+// https://quoteapi.webull.com/api/quote/v2/tickerTrends/913254235?trendType=m1
+// https://quoteapi.webull.com/api/quote/v2/tickerTrends/913254235?trendType=m3
+// https://quoteapi.webull.com/api/quote/v2/tickerTrends/913254235?trendType=y1
+// https://quoteapi.webull.com/api/quote/v2/tickerTrends/913254235?trendType=y5
+// https://quoteapi.webull.com/api/quote/v2/tickerTrends/913254235?trendType=all
+
+export const RANGES = ['1d']
+export function getChart(range: string) {
+
 }
 
 

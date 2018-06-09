@@ -15,14 +15,14 @@
 					<div class="field has-addons">
 						<p class="control">
 							<b-tooltip :active="!busy&&!!ranges[rangeindex-1]" :label="vrange(ranges[rangeindex-1])" size="is-small" animated>
-								<button class="button is-outlined" v-on:click="range=ranges[rangeindex-1]" :disabled="busy||!ranges[rangeindex-1]">
+								<button class="button" v-on:click="range=ranges[rangeindex-1]" :disabled="busy||!ranges[rangeindex-1]">
 									<b-icon icon="chevron-left"></b-icon>
 								</button>
 							</b-tooltip>
 						</p>
 						<p class="control">
 							<b-dropdown v-model="range" :disabled="busy">
-								<button class="button w-32" :class="{'is-loading':busy}" type="button" slot="trigger">
+								<button class="button" style="width: 7rem;" :class="{'is-loading':busy}" type="button" slot="trigger">
 									<b-icon icon="calendar-range"></b-icon>
 									<span>{{vrange(range)}}</span>
 								</button>
@@ -35,7 +35,7 @@
 						</p>
 						<p class="control">
 							<b-tooltip :active="!busy&&!!ranges[rangeindex+1]" :label="vrange(ranges[rangeindex+1])" size="is-small" animated>
-								<button class="button is-outlined" v-on:click="range=ranges[rangeindex+1]" :disabled="busy||!ranges[rangeindex+1]">
+								<button class="button" v-on:click="range=ranges[rangeindex+1]" :disabled="busy||!ranges[rangeindex+1]">
 									<b-icon icon="chevron-right"></b-icon>
 								</button>
 							</b-tooltip>

@@ -329,6 +329,12 @@ declare module 'echarts' {
 			seriesData: EventParam<T>[]
 			value: number
 		}
+		interface AxisPointerStyle {
+			color: string
+			type: string
+			width: number
+			opacity: number
+		}
 		interface AxisPointer {
 			animation: any
 			animationDurationUpdate: number
@@ -357,12 +363,8 @@ declare module 'echarts' {
 				show: boolean
 				textStyle: Partial<TextStyle>
 			}
-			lineStyle: {
-				color: string
-				type: string
-				width: number
-				opacity: number
-			}
+			lineStyle: AxisPointerStyle
+			crossStyle: AxisPointerStyle
 			link: any
 			shadowStyle: Partial<ShadowOpts>
 			show: boolean
