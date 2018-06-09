@@ -7,7 +7,7 @@ $black-ter: #272727;
 $grey-darker: #343334;
 $grey-dark: #424747;
 $grey: #6f7878;
-$grey-light: #9fa7a7;
+$grey-light: #8c9696;
 $grey-lighter: #b8c1c1;
 $grey-lightest: #e3ecec;
 $white-ter: #f0f4f4;
@@ -74,6 +74,7 @@ $colors: map-merge($colors, ('accent':($accent, $white)));
 $body-line-height: 1.25;
 $body-background-color: $white;
 $footer-background-color: $white-ter;
+// $button-disabled-opacity: 0.33;
 // 
 $table-color: $text;
 $table-head-cell-color: $text;
