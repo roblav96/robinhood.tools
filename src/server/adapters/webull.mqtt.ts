@@ -11,22 +11,16 @@ import * as redis from './redis'
 import * as webull from './webull'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
-import radio from './radio'
 
 
-
-let mqtts = 0
-radio.on('webull.mqtts', function onmqtt(event: Radio.Event<number>) {
-	mqtts += event.data
-})
 
 type Topics = (keyof typeof webull.mqtt_topics)[]
 export default class WebullMqttClient {
 
 	private static topics = {
 		STOCKS: ['TICKER', 'TICKER_DEAL_DETAILS', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as Topics,
-		FOREX: ['FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as Topics,
 		INDEXES: ['TICKER_MARKET_INDEX', 'FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as Topics,
+		FOREX: ['FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as Topics,
 	}
 
 	private static get options() {
@@ -44,8 +38,7 @@ export default class WebullMqttClient {
 		private emitter: Emitter,
 	) {
 		_.defaults(this.options, WebullMqttClient.options)
-		_.delay(() => this.reconnect(), 100)
-		radio.emit('webull.mqtts', 1)
+		this.reconnect()
 	}
 
 	alive = false
@@ -57,7 +50,6 @@ export default class WebullMqttClient {
 	destroy() {
 		this.terminate()
 		clock.offListener(this.reconnect, this)
-		radio.emit('webull.mqtts', -1)
 	}
 
 	terminate() {
@@ -69,7 +61,7 @@ export default class WebullMqttClient {
 		}
 	}
 
-	private timeout: number
+	private timeout: NodeJS.Timer
 	private ontimeout = () => this.connect()
 	private reconnect() {
 		if (this.alive) {
@@ -78,11 +70,12 @@ export default class WebullMqttClient {
 			return
 		}
 		clearTimeout(this.timeout)
-		this.timeout = _.delay(this.ontimeout, 100 + _.random(0, mqtts * 100))
+		let ms = 300 + _.random(0, +process.env.SCALE * 300)
+		this.timeout = setTimeout(this.ontimeout, ms)
 	}
 
 	private connect() {
-		if (this.alive) return;
+		// if (this.alive) return;
 		this.terminate()
 		this.client = new MqttConnection(net.createConnection(this.options.port, this.options.host))
 		this.client.connect({
@@ -91,7 +84,7 @@ export default class WebullMqttClient {
 			clientId: 'mqtt_' + this.nextId(),
 			protocolId: 'MQTT',
 			protocolVersion: 4,
-			keepalive: 30,
+			keepalive: 60,
 			clean: true,
 		})
 		this.client.on('data', this.ondata)
@@ -99,7 +92,7 @@ export default class WebullMqttClient {
 		this.client.on('error', this.onerror)
 		if (!clock.hasListener(this.reconnect, this)) {
 			clock.on(this.options.heartbeat, this.reconnect, this)
-		} else console.log('connect reconnecting');
+		} else console.log('reconnecting...');
 	}
 
 	private ondata = (packet: Mqtt.Packet) => {

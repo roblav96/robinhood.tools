@@ -82,7 +82,9 @@ polka.route({
 		let range = req.body.range as number[]
 		if (!Array.isArray(range)) {
 			let hhours = hours.rxhours.value
-			if (!hhours.isOpenToday || dayjs().isBefore(dayjs(hhours.prepre))) hhours = hours.rxhours.value.previous;
+			if (!hhours.isOpenToday || dayjs().isBefore(dayjs(hhours.prepre))) {
+				hhours = hours.rxhours.value.previous
+			}
 			range = [hhours.prepre, hhours.postpost]
 		}
 

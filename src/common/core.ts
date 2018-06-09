@@ -356,20 +356,25 @@ export const math = {
 	dispersed(value: number, index: number, max: number, method = 'round' as keyof Math) {
 		return Math[method as any](Math.max(index, 0) * (value / Math.max(max, 1)))
 	},
+	random(min: number, max: number) {
+		if (!Number.isFinite(max)) { max = min; min = 0 }
+		return Math.floor(Math.random() * (max - min + 1)) + min
+	},
+	round(value: number, precision?: number) {
+		if (!Number.isFinite(precision)) return Math.round(value);
+		return +(Math.round(value + 'e+' + precision as any) + 'e-' + precision)
+	},
 	max(a = -Infinity, b = -Infinity, c = -Infinity) {
 		return Math.max(a, b, c)
 	},
 	min(a = Infinity, b = Infinity, c = Infinity) {
 		return Math.min(a, b, c)
 	},
-	random(min: number, max: number) {
-		return Math.floor(Math.random() * (max - min + 1)) + min
-	},
-	round(value: number, precision = 0) {
-		return +(Math.round(value + 'e+' + precision as any) + 'e-' + precision)
-	},
 	sum(a = 0, b = 0, c = 0) {
 		return a + b + c
+	},
+	sum0(a = 0, b = 0, c = 0) {
+		return Math.max(a + b + c, 0)
 	},
 }
 

@@ -48,6 +48,7 @@ export const RANGES = Object.keys(FRAMES)
 
 
 export function getChart(symbol: string, params: Partial<Yahoo.ChartParams>) {
+	if (params.range && !params.interval) params.interval = FRAMES[params.range];
 	return http.get(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`, {
 		query: params, proxify: !!process.env.CLIENT, retries: 3,
 	}).then(function(response: Yahoo.ApiChart) {

@@ -14,6 +14,7 @@ Object.assign(console, { dtsgen: function() { } })
 if (process.env.DEVELOPMENT) {
 	// console.dtsgen = require('../common/dtsgen').default
 	Object.assign(window, require('../common/core'))
+	Object.assign(window, { dayjs: require('dayjs') })
 	// Object.assign(window, require('../common/pretty'))
 	// require('echarts')
 }

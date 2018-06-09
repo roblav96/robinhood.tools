@@ -67,15 +67,9 @@ async function start() {
 	let alls = await quotes.getAlls(SYMBOLS, ['quote', 'wbquote'])
 	alls.forEach(({ symbol, quote, wbquote }) => {
 
-		let fquote = core.clone(quote)
-		let toquote = quotes.applyWbQuote(quote, wbquote)
-		core.object.repair(toquote, quotes.resetFull(quote))
-		quotes.mergeCalcs(toquote)
-		core.object.repair(quote, toquote)
-		core.object.clean(quote)
-		let diff = core.object.difference(fquote, quote)
-		if (Object.keys(diff).length > 0) {
-			coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, diff as any])
+		let repaired = quotes.repaired(quote, wbquote)
+		if (Object.keys(repaired).length > 0) {
+			coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, repaired as any])
 		}
 
 		socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
@@ -341,6 +335,22 @@ function ontick(i: number) {
 // 	},
 // 	function _max() {
 // 		_.max([1, 2, 3, 4, 5])
+// 	},
+// ])
+
+
+
+// import * as benchmark from '../../common/benchmark'
+// let state = 'PREPRE' as Hours.State
+// benchmark.simple('indexof', [
+// 	function indexof() {
+// 		state.indexOf('PRE')
+// 	},
+// 	function indexof() {
+// 		state.includes('PRE')
+// 	},
+// 	function datenow() {
+// 		Date.now()
 // 	},
 // ])
 

@@ -78,18 +78,21 @@ export const RANGES = Object.keys(FRAMES)
 export function getChart(symbol: string, tid: number, range: string) {
 	return Promise.resolve().then(function() {
 		if (range == RANGES[0]) return get1Day(symbol, tid);
-		let url = `https://quoteapi.webull.com/api/quote/v2/tickerKDatas/${tid}`
-		return http.get(url, { query: { kDataType: FRAMES[range] } }).then(function(response: Webull.KDatasChart) {
-			let lquotes = webull.toKDatasLives(response)
-			if (range == 'max') return lquotes;
-			let unit = format.UNITS[range.replace(/[0-9]/g, '')]
-			let ms = dayjs(0).add(Number.parseInt(range), unit).valueOf()
-			console.log('ms ->', ms)
-			// lquotes.remove(v => {
-			// 	return 
-			// })
-			return lquotes
-		})
+		return yahoo.getChart(symbol, { range })
+		// let proms = [http.get(`https://quoteapi.webull.com/api/quote/v2/tickerKDatas/${tid}`, {
+		// 	query: { kDataType: FRAMES[range] },
+		// })]
+		// if (range != 'max') proms.push(yahoo.getChart(symbol, { range, interval: '1d' }));
+		// return Promise.all(proms).then(function(resolved) {
+		// 	let lquotes = webull.toKDatasLives(resolved.shift())
+		// 	if (range == 'max') return lquotes;
+		// 	let ylquotes = resolved.shift() as Quotes.Live[]
+
+		// 	// let unit = format.UNITS[range.replace(/[0-9]/g, '')]
+		// 	// let ms = dayjs(0).add(Number.parseInt(range), unit).valueOf()
+		// 	// lquotes.remove(v => v.timestamp < min)
+		// 	return lquotes
+		// })
 	}).then(function(lquotes) {
 		lquotes.sort((a, b) => a.timestamp - b.timestamp)
 		lquotes.forEach((lquote, i) => {

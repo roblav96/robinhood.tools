@@ -23,6 +23,7 @@ export function fix(quote: Partial<Webull.Ticker & Webull.Quote>) {
 
 	Object.keys(quote).forEach(key => {
 		let value = quote[key]
+		if (key == 'symbol' || value == null) return;
 		if (core.string.is(value) && !isNaN(value as any)) {
 			quote[key] = Number.parseFloat(value)
 		}

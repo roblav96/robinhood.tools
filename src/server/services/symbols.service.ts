@@ -5,6 +5,7 @@ import * as pAll from 'p-all'
 import * as pForever from 'p-forever'
 import * as schedule from 'node-schedule'
 import * as dayjs from 'dayjs'
+import * as prettyms from 'pretty-ms'
 import * as _ from '../../common/lodash'
 import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
@@ -52,6 +53,9 @@ async function start() {
 
 schedule.scheduleJob('55 3 * * 1-5', () => syncEverything(true))
 async function syncEverything(resets = false) {
+	if (resets && process.env.DEVELOPMENT) return;
+	let t = Date.now()
+	console.warn(`syncEverything -> start`)
 	if (!hours.rxhours.value.isOpenToday) {
 		console.warn(`!isOpenToday -> return`, JSON.stringify(hours.rxhours.value))
 		return
@@ -64,12 +68,13 @@ async function syncEverything(resets = false) {
 	await syncIndexes()
 	await quotes.syncAllQuotes(resets)
 	radio.emit('symbols.resume')
+	console.warn(`syncEverything -> done`, prettyms(Date.now() - t, { verbose: true }))
 }
 
 
 
 async function syncInstruments() {
-	/*if (process.env.DEVELOPMENT)*/ console.log('syncInstruments start ->');
+	/*if (process.env.DEVELOPMENT)*/ console.log('syncInstruments -> start');
 	await pForever(async function getInstruments(url) {
 		let { results, next } = await http.get(url) as Robinhood.Api.Paginated<Robinhood.Instrument>
 		results.remove(v => Array.isArray(v.symbol.match(utils.regxSymbol)))
@@ -94,11 +99,11 @@ async function syncInstruments() {
 		return next || pForever.end
 
 	}, 'https://api.robinhood.com/instruments/')
-	/*if (process.env.DEVELOPMENT)*/ console.info('syncInstruments done ->');
+	/*if (process.env.DEVELOPMENT)*/ console.info('syncInstruments -> done');
 }
 
 async function syncTickers() {
-	/*if (process.env.DEVELOPMENT)*/ console.log('syncTickers start ->');
+	/*if (process.env.DEVELOPMENT)*/ console.log('syncTickers -> start');
 
 	let tickers = await Promise.all([
 		// stocks
@@ -161,13 +166,13 @@ async function syncTickers() {
 	/*if (process.env.DEVELOPMENT)*/ console.log('iex.syncItems ->');
 	await iex.syncItems(symbols)
 
-	/*if (process.env.DEVELOPMENT)*/ console.info('syncTickers done ->', symbols.length);
+	/*if (process.env.DEVELOPMENT)*/ console.info('syncTickers -> done', symbols.length);
 }
 
 
 
 async function syncStocks() {
-	/*if (process.env.DEVELOPMENT)*/ console.log('syncStocks start ->');
+	/*if (process.env.DEVELOPMENT)*/ console.log('syncStocks -> start');
 	let symbols = await redis.main.smembers(rkeys.WB.SYMBOLS) as string[]
 	let tids = await redis.main.hgetall(rkeys.WB.TIDS) as Dict<number>
 	tids = _.mapValues(tids, v => Number.parseInt(v as any))
@@ -189,11 +194,11 @@ async function syncStocks() {
 		})
 	}
 	await redis.main.coms(coms)
-	/*if (process.env.DEVELOPMENT)*/ console.info('syncStocks done ->', Object.keys(fsymbols).length);
+	/*if (process.env.DEVELOPMENT)*/ console.info('syncStocks -> done', Object.keys(fsymbols).length);
 }
 
 async function syncForex() {
-	/*if (process.env.DEVELOPMENT)*/ console.log('syncForex start ->');
+	/*if (process.env.DEVELOPMENT)*/ console.log('syncForex -> start');
 	let symbols = core.clone(webull.forex)
 	webull.fiats.forEach(v => webull.fiats.forEach(vv => {
 		if (v == vv) return;
@@ -204,11 +209,11 @@ async function syncForex() {
 	}), { concurrency: 2 })
 	tickers.remove(v => !v)
 	await finishSync('FOREX', tickers)
-	/*if (process.env.DEVELOPMENT)*/ console.info('syncForex done ->', tickers.length);
+	/*if (process.env.DEVELOPMENT)*/ console.info('syncForex -> done', tickers.length);
 }
 
 async function syncIndexes() {
-	/*if (process.env.DEVELOPMENT)*/ console.log('syncIndexes start ->');
+	/*if (process.env.DEVELOPMENT)*/ console.log('syncIndexes -> start');
 	let symbols = core.clone(webull.indexes)
 	let tickers = await pAll(symbols.map(symbol => {
 		return () => getTicker(symbol, 1).then(function(ticker) {
@@ -219,7 +224,7 @@ async function syncIndexes() {
 	response.forEach(v => v.marketIndexList.forEach(vv => tickers.push(vv)))
 	tickers.remove(v => !v || (v.secType && v.secType.includes(52)) || ['IBEX', 'STI'].includes(v.disSymbol))
 	await finishSync('INDEXES', tickers)
-	/*if (process.env.DEVELOPMENT)*/ console.info('syncIndexes done ->', tickers.length);
+	/*if (process.env.DEVELOPMENT)*/ console.info('syncIndexes -> done', tickers.length);
 }
 
 async function finishSync(type: keyof typeof rkeys.SYMBOLS, tickers: Webull.Ticker[]) {
