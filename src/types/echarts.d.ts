@@ -237,7 +237,7 @@ declare module 'echarts' {
 			axisLine: Partial<AxisLine>
 			axisPointer: Partial<AxisPointer>
 			axisTick: Partial<AxisTick>
-			boundaryGap: boolean
+			boundaryGap: boolean | (number | string)[]
 			inverse: boolean
 			name: string
 			uuid: string
@@ -379,7 +379,7 @@ declare module 'echarts' {
 		}
 
 		interface Tooltip {
-			formatter: (...params: any[]) => string
+			formatter: string | ((params: EventParam[], ticket?: number, callback?: (ticket: number, tooltip: string) => void) => string)
 			position: (pos, params, el, elRect, size) => any
 			alwaysShowContent: boolean
 			axisPointer: AxisPointer
@@ -392,7 +392,7 @@ declare module 'echarts' {
 			enterable: boolean
 			extraCssText: string
 			hideDelay: number
-			padding: number
+			padding: number | number[]
 			show: boolean
 			showContent: boolean
 			showDelay: number
@@ -439,12 +439,13 @@ declare module 'echarts' {
 			zlevel: number
 		}
 
-		interface TextStyle {
+		interface TextStyle extends Dims {
 			color: string
 			fontFamily: string
 			fontSize: number
 			fontStyle: string
 			fontWeight: string
+			lineHeight: number
 		}
 
 		interface StyleOptions {

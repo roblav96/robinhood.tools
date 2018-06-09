@@ -114,8 +114,8 @@ export function parseMinuteLives(response: Webull.MinuteChart) {
 		data.tickerMinutes.forEach(minute => {
 			let msplit = minute.split(',').map(Number.parseFloat)
 			lquotes.push({
-				price: msplit[1], size: msplit[2],
-				timestamp: msplit[0] * 1000,
+				close: msplit[1], price: msplit[1],
+				size: msplit[2], timestamp: msplit[0] * 1000,
 			} as Quotes.Live)
 		})
 	})

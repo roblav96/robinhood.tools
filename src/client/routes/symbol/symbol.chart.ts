@@ -89,11 +89,25 @@ class VSymbolEChart extends Vue {
 			},
 			tooltip: {
 				trigger: 'axis',
-				axisPointer: {
-					animation: false,
-					type: 'cross',
-					lineStyle: { color: this.colors['grey-lighter'] },
-					crossStyle: { color: this.colors['grey-light'] },
+				axisPointer: { type: 'cross' },
+				transitionDuration: 0.2,
+				showDelay: 0,
+				hideDelay: 1,
+				padding: [4, 8],
+				backgroundColor: this.colors.dark,
+				formatter: '{a}: {b}: {c}: {d}',
+				textStyle: {color:this.colors.white},
+			},
+			axisPointer: {
+				animation: false,
+				link: { xAxisIndex: 'all' },
+				lineStyle: { color: this.colors['grey-lighter'] },
+				crossStyle: { color: this.colors['grey-light'] },
+				label: {
+					textStyle: { fontSize: 14 },
+					formatter: (params: echarts.AxisPointerParams<Quotes.Live>) => {
+						return utils.format.time(params.value, { verbose: true })
+					},
 				},
 			},
 			// visualMap: {
@@ -113,73 +127,17 @@ class VSymbolEChart extends Vue {
 			// },
 			grid: [{
 				top: 24,
-				left: 56,
-				right: 56,
+				left: 64,
+				right: 64,
 				bottom: 92,
 				show: true,
 				backgroundColor: this.colors.white,
 				borderColor: this.colors['grey-lightest'],
 			}, {
 				height: 64,
-				left: 56,
-				right: 56,
+				left: 64,
+				right: 64,
 				bottom: 92,
-			}],
-			xAxis: [{
-				type: 'category',
-				scale: true,
-				boundaryGap: false,
-				axisLabel: {
-					textStyle: { color: this.colors.dark, fontSize: 14 },
-					formatter: v => charts.xformat(v),
-				},
-				axisLine: { lineStyle: { color: this.colors.dark } },
-				axisPointer: {
-					label: {
-						formatter: (params: echarts.AxisPointerParams<Quotes.Live>) => {
-							return utils.format.time(params.value, { verbose: true })
-						}
-					}
-				},
-			}, {
-				type: 'category',
-				gridIndex: 1,
-				scale: true,
-				boundaryGap: false,
-				axisLabel: { show: false },
-				axisLine: { show: false },
-				axisTick: { show: false },
-				splitLine: { show: false },
-				splitArea: { show: false },
-				axisPointer: {
-					label: {
-						formatter: (params: echarts.AxisPointerParams<Quotes.Live>) => {
-							return utils.format.time(params.value, { verbose: true })
-						}
-					}
-				},
-			}],
-			yAxis: [{
-				scale: true,
-				splitArea: { show: false },
-				axisLabel: { textStyle: { color: this.colors.dark, fontSize: 14 } },
-				axisLine: { lineStyle: { color: this.colors.dark } },
-				splitLine: { lineStyle: { color: this.colors['grey-lightest'] } },
-				axisPointer: {
-					label: {
-						formatter: (params: echarts.AxisPointerParams<Quotes.Live>) => {
-							return utils.format.number(params.value)
-						}
-					}
-				},
-			}, {
-				scale: true,
-				gridIndex: 1,
-				axisLabel: { show: false },
-				axisLine: { show: false },
-				axisTick: { show: false },
-				splitLine: { show: false },
-				splitArea: { show: false },
 			}],
 			dataZoom: [{
 				type: 'inside',
@@ -203,6 +161,47 @@ class VSymbolEChart extends Vue {
 				handleStyle: { color: this.colors['grey-lighter'] },
 				// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
 			}],
+			xAxis: [{
+				type: 'category',
+				boundaryGap: false,
+				axisLabel: {
+					textStyle: { color: this.colors.dark, fontSize: 14 },
+					formatter: v => charts.xformat(v),
+				},
+				axisLine: { lineStyle: { color: this.colors.dark } },
+				splitLine: { show: false },
+			}, {
+				type: 'category',
+				boundaryGap: false,
+				gridIndex: 1,
+				axisLabel: { show: false },
+				axisLine: { show: false },
+				axisTick: { show: false },
+				splitLine: { show: false },
+				splitArea: { show: false },
+			}],
+			yAxis: [{
+				scale: true,
+				splitArea: { show: false },
+				axisLabel: { textStyle: { color: this.colors.dark, fontSize: 14 } },
+				axisLine: { lineStyle: { color: this.colors.dark } },
+				splitLine: { lineStyle: { color: this.colors['grey-lightest'] } },
+				axisPointer: {
+					label: {
+						formatter: (params: echarts.AxisPointerParams) => {
+							return utils.format.number(params.value)
+						},
+					},
+				},
+			}, {
+				scale: true,
+				gridIndex: 1,
+				axisLabel: { show: false },
+				axisLine: { show: false },
+				axisTick: { show: false },
+				splitLine: { show: false },
+				splitArea: { show: false },
+			}],
 			series: [{
 				name: 'OHLC',
 				type: 'candlestick',
@@ -215,19 +214,18 @@ class VSymbolEChart extends Vue {
 					x: 'timestamp',
 					y: ['open', 'close', 'high', 'low'],
 				},
-				// encode: {
-				// 	x: 0,
-				// 	y: [1, 4, 3, 2],
-				// },
 				itemStyle: {
 					color: this.colors.success,
 					color0: this.colors.danger,
 					borderColor: this.colors.success,
 					borderColor0: this.colors.danger,
 				},
+				emphasis: {},
 			}, {
 				name: 'Volume',
 				type: 'bar',
+				stack: 'stack',
+				barGap: '-100%',
 				xAxisIndex: 1,
 				yAxisIndex: 1,
 				large: true,

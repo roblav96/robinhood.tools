@@ -45,8 +45,6 @@ export function xformat(value: number) {
 
 
 
-
-
 export function getChart(symbol: string, tid: number, range: string) {
 	if (range == yahoo.RANGES[0]) return get1Day(symbol, tid);
 	return []
@@ -65,24 +63,34 @@ function get1Day(symbol: string, tid: number) {
 			includePrePost: true,
 			period1: dayjs(Math.min(...tstamps)).unix(),
 			period2: dayjs(Math.max(...tstamps)).unix(),
-		}).then(function(ylquotes) {
-			ylquotes.forEach(ylquote => {
-				if (ylquote.size > 0) return;
-				let i = wlquotes.findIndex(v => v.timestamp == ylquote.timestamp)
-				if (i >= 0) ylquote.size = wlquotes.splice(i, 1)[0].size
-			})
-			wlquotes.forEach(wlquote => {
-				
-			})
+		}).then(function(lquotes) {
 			// console.log(`wlquotes ->`, JSON.parse(JSON.stringify(wlquotes)))
-			// console.log(`ylquotes ->`, JSON.parse(JSON.stringify(ylquotes)))
-			return []
+			// console.log(`lquotes ->`, JSON.parse(JSON.stringify(lquotes)))
+			lquotes.forEach(lquote => {
+				let wlquote = wlquotes.find(v => v.timestamp == lquote.timestamp)
+				if (wlquote) return lquote.size += wlquote.size;
+			})
+			// wlquotes.forEach(wlquote => {
+			// 	wlquote.high = 15
+			// 	wlquote.low = 5
+			// 	lquotes.push(wlquote)
+			// })
+			lquotes.sort((a, b) => a.timestamp - b.timestamp)
+			lquotes.forEach((lquote, i) => {
+				lquote.price = lquote.close
+				let prev = lquotes[i - 1] ? lquotes[i - 1].volume : lquote.size
+				lquote.volume = prev + lquote.size
+			})
+			console.log(`lquotes ->`, JSON.parse(JSON.stringify(lquotes)))
+			return lquotes
 		})
 	})
 	// return getMinutes(tid, yahoo.RANGES[0]).then(function(lquotes) {
 
 	// })
 }
+
+
 
 
 
