@@ -90,20 +90,24 @@ class VSymbolEChart extends Vue {
 				// source: data,
 			},
 			tooltip: {
-				// alwaysShowContent: !!process.env.DEVELOPMENT,
-				showContent: false,
+				// showContent: !process.env.DEVELOPMENT,
+				alwaysShowContent: !!process.env.DEVELOPMENT,
 				trigger: 'axis',
 				axisPointer: { type: 'cross' },
-				transitionDuration: 0.1,
+				confine: true,
+				enterable: false,
 				showDelay: 0,
 				hideDelay: 1,
 				padding: [4, 8],
-				backgroundColor: this.colors.dark,
-				extraCssText: 'margin: 1rem 2rem;',
-				// formatter: '{a}: {b}: {c}: {d}',
+				transitionDuration: 0.1,
+				backgroundColor: this.colors['grey-dark'],
+				extraCssText: 'margin: 2rem;',
+				formatter: (params, ticket, callback) => {
+					return 'haii'
+				},
 				// textStyle: { color: this.colors.white, lineHeight: 1, fontSize: 14 },
 			},
-			axisPointer: [{
+			axisPointer: {
 				animation: false,
 				link: [{ xAxisIndex: 'all' }],
 				lineStyle: { color: this.colors['grey-lighter'] },
@@ -121,7 +125,7 @@ class VSymbolEChart extends Vue {
 				// 	label: {
 				// 		formatter: params => charts.format.xlabel(params.value),
 				// 	},
-			}],
+			},
 			grid: [{
 				top: 24,
 				left: 64,
@@ -160,7 +164,7 @@ class VSymbolEChart extends Vue {
 				// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
 			}],
 			xAxis: [{
-				type: 'category',
+				type: 'time',
 				boundaryGap: false,
 				axisLabel: {
 					textStyle: { color: this.colors.dark, lineHeight: 1, fontSize: 14 },
@@ -175,7 +179,7 @@ class VSymbolEChart extends Vue {
 					},
 				},
 			}, {
-				type: 'category',
+				type: 'time',
 				boundaryGap: false,
 				gridIndex: 1,
 				axisLabel: { show: false },
@@ -183,7 +187,7 @@ class VSymbolEChart extends Vue {
 				axisTick: { show: false },
 				splitLine: { show: false },
 				splitArea: { show: false },
-				axisPointer: { label: { show: false }, },
+				axisPointer: { show: false },
 			}],
 			yAxis: [{
 				scale: true,

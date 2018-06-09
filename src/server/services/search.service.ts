@@ -14,7 +14,7 @@ import radio from '../adapters/radio'
 
 
 
-let INDEX = lunr(_.noop)
+let search = lunr(_.noop)
 
 radio.on('symbols.resume', start)
 radio.once('symbols.start', start)
@@ -38,7 +38,7 @@ async function start() {
 			name: core.string.clean(all.quote.name).toLowerCase(),
 		})
 	})
-	INDEX = builder.build()
+	search = builder.build()
 
 }
 
@@ -47,7 +47,7 @@ async function start() {
 const MAX = 20
 radio.reply('search.query', async function onquery(query: string) {
 	let words = query.split(' ')
-	let results = INDEX.query(function(q) {
+	let results = search.query(function(q) {
 		if (words.length == 1) {
 			q.term(query, {
 				fields: ['symbol'],

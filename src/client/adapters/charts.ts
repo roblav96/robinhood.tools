@@ -28,7 +28,7 @@ export const format = {
 	},
 
 	FRAMES: [
-		{ id: 'second', ms: 0, format: 'hh:mm:ssa', ago: true },
+		{ id: 'millisecond', ms: 0, format: 'hh:mm:ssa', ago: true },
 		{ id: 'hour', ms: 0, format: 'dddd hh:mm:ssa', ago: true },
 		{ id: 'day', ms: 0, format: 'dddd MMM DD, hh:mma', ago: true },
 		{ id: 'week', ms: 0, format: 'MMM DD, hh:mma', ago: true },
@@ -40,7 +40,7 @@ export const format = {
 		let i: number, len = format.FRAMES.length
 		for (i = 0; i < len; i++) {
 			if (stamp > (now - format.FRAMES[i].ms)) {
-				let frame = format.FRAMES[i - 1]
+				let frame = format.FRAMES[Math.max(i - 1, 0)]
 				let label = dayjs(stamp).format(frame.format)
 				if (frame.format.endsWith('ssa')) {
 					if (label.includes(':00')) label = label.replace(':00', '');
@@ -78,9 +78,7 @@ export const RANGES = Object.keys(FRAMES)
 export function getChart(symbol: string, tid: number, range: string) {
 	return Promise.resolve().then(function() {
 		if (range == RANGES[0]) return get1Day(symbol, tid);
-		let params = { range, interval: yahoo.FRAMES[range] } as Yahoo.ChartParams
-		// if (yahoo.RANGES.indexOf(range) <= 1) params.includePrePost = true;
-		return yahoo.getChart(symbol, params)
+		return yahoo.getChart(symbol, { range, interval: yahoo.FRAMES[range] })
 		// let proms = [http.get(`https://quoteapi.webull.com/api/quote/v2/tickerKDatas/${tid}`, {
 		// 	query: { kDataType: FRAMES[range] },
 		// })]
@@ -205,4 +203,9 @@ function get1Day(symbol: string, tid: number) {
 // 	function formatdayjs() {
 // 		dayjs(Date.now() - (Math.round(Math.random() * 1000000))).format('dddd, MMM DD YYYY, hh:mm:ssa')
 // 	},
+// 	function xlabel() {
+// 		format.xlabel(Date.now() - (Math.round(Math.random() * 1000000)))
+// 	},
 // ])
+
+
