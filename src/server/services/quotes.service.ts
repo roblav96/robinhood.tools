@@ -92,7 +92,6 @@ async function start() {
 	})
 
 	if (process.env.PRODUCTION) {
-		console.log(`coms ->`, coms)
 		await redis.main.coms(coms)
 	}
 
