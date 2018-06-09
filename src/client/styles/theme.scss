@@ -3,15 +3,15 @@
 // 
 $black: #0a0a0a;
 $black-bis: #121212;
-$black-ter: #242424;
-$grey-darker: #272d33;
-$grey-dark: #152934;
-$grey: #5a6872;
-$grey-light: #8897a2;
-$grey-lighter: #cdd1d4;
-$grey-lightest: #dfe3e6;
-$white-ter: #ebf0f7;
-$white-bis: #f5f7fa;
+$black-ter: #272727;
+$grey-darker: #343334;
+$grey-dark: #424747;
+$grey: #6f7878;
+$grey-light: #9fa7a7;
+$grey-lighter: #d0dada;
+$grey-lightest: #e3ecec;
+$white-ter: #f0f4f4;
+$white-bis: #fbfcfc;
 $white: #FFFFFF;
 // 
 $orange: #ffb000;
@@ -20,9 +20,9 @@ $green: #34bc6e;
 $turquoise: #4DC0B5;
 $cyan: #6574CD;
 $blue: #5392ff;
-$purple: #975AD1;
+$purple: #9753e1;
 $red: #e62325;
-$pink: #F66D9B;
+$pink: #ff509e;
 // 
 $light: $white-ter;
 $dark: $grey-dark;
@@ -74,7 +74,6 @@ $colors: map-merge($colors, ('accent':($accent, $white)));
 $body-line-height: 1.25;
 $body-background-color: $white;
 $footer-background-color: $white-ter;
-$button-disabled-opacity: 0.33;
 // 
 $table-color: $text;
 $table-head-cell-color: $text;

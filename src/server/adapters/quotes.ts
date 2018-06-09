@@ -33,7 +33,7 @@ export async function getAlls(symbols: string[], allrkeys = Object.keys(quotes.A
 			if (Array.isArray(ikeys)) {
 				resolve = redis.fixHmget(resolve, ikeys)
 			}
-			core.fix(resolve)
+			core.fix(resolve || {})
 			all[k] = resolve
 		})
 		return all
@@ -70,7 +70,7 @@ export function applyFull(
 		symbol,
 		tickerId: wbticker.tickerId,
 		typeof: wbquote.typeof,
-		timezone: wbquote.utcOffset,
+		timezone: wbquote.utcOffset || wbquote.timeZone,
 		currency: wbquote.currency,
 		sector: iexitem.sector,
 		industry: iexitem.industry,

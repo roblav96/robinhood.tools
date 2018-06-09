@@ -22,6 +22,8 @@ export const fiats = [
 ]
 
 export const indexes = [
+	'ESc1', '1YMc1', 'NQc1', // futures
+	'CLc2', 'GCc2', 'SIc2', 'HGc2', // continuations
 	'RUI', 'RUT', // russell 2000
 	'FVX', 'TNX', 'TYX', // treasury bonds
 	'SRVIX', 'VIX', // volatility

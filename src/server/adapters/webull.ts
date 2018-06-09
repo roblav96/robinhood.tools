@@ -14,6 +14,7 @@ import * as http from '../../common/http'
 
 export function fix(quote: Partial<Webull.Ticker & Webull.Quote>) {
 	if (quote.faStatus) quote.faStatus = webull.ticker_status[quote.faStatus];
+	if (quote.status0) quote.status0 = webull.ticker_status[quote.status0];
 	if (quote.status) quote.status = webull.ticker_status[quote.status];
 
 	if (quote.faTradeTime) quote.faTradeTime = new Date(quote.faTradeTime).valueOf();
@@ -29,7 +30,7 @@ export function fix(quote: Partial<Webull.Ticker & Webull.Quote>) {
 
 	let bakeys = ['bid', 'ask']
 	bakeys.forEach(key => {
-		if (!quote[key]) delete quote[key];
+		if (!Number.isFinite(quote[key])) delete quote[key];
 		let lkey = `${key}List`
 		let list = quote[lkey] as Webull.BidAsk[]
 		if (Array.isArray(list)) {
@@ -66,7 +67,6 @@ export async function syncTickersQuotes(fsymbols: Dict<number>, type: keyof type
 			let coms = []
 			resolved.forEach((items, i) => {
 				items.forEach(item => {
-					core.fix(item)
 					fix(item)
 					item.symbol = inverse[item.tickerId]
 					if (i == 0) coms.push(['hmset', `${rkeys.WB.TICKERS}:${item.symbol}`, item]);

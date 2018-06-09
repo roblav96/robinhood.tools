@@ -31,7 +31,7 @@
 					<hr class="mb-2">
 					<button class="button is-large is-white has-background-grey-lightest">grey-lightest</button>
 					<button class="button is-large is-white has-background-grey-lighter">grey-lighter</button>
-					<button class="button is-large is-black has-background-grey-light">grey-light</button>
+					<button class="button is-large is-white has-background-grey-light">grey-light</button>
 					<button class="button is-large is-black has-background-grey">grey</button>
 					<hr class="mb-2">
 					<button class="button is-large is-black has-background-grey-dark">grey-dark</button>

@@ -21,7 +21,7 @@ for (i = 0; i < len; i++) {
 		[method](...args: any[]) {
 			let stack = new StackTracey()
 			let site = stack[1]
-			let stamp = dayjs().format('hh:mm:ss:SSS')
+			let stamp = dayjs().format(process.env.PRODUCTION ? 'hh:mm:ss:SSSa @ dddd, MMM DD YYYY' : 'hh:mm:ss:SSS')
 			let colors = { log: 'blue', info: 'green', warn: 'yellow', error: 'red' }
 			let color = (colors[method] || 'magenta') as string
 			let square = clc[color + 'Bright']('█') as string
