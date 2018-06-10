@@ -13,6 +13,26 @@ import * as utils from './utils'
 
 
 
+let ector = echarts.init(document.createElement('div'))
+{ (echarts as any).ECharts = ector.constructor }
+ector.clear(); ector.dispose(); ector = null;
+
+const ecpatch = {
+	updateOption(options, notMerge, lazyUpdate, silent) {
+		console.log('options ->', options)
+		let bones = this.getOption()
+		console.log(`bones ->`, JSON.parse(JSON.stringify(bones)))
+		core.object.assign(bones, options, true)
+		console.log(`bones ->`, JSON.parse(JSON.stringify(bones)))
+		this.setOption(bones, notMerge, lazyUpdate, silent)
+	},
+} as echarts.ECharts
+
+if (echarts.ECharts && echarts.ECharts.constructor) Object.assign(echarts.ECharts.prototype, ecpatch);
+declare module 'echarts' { interface ECharts { updateOption: typeof echarts.ECharts.prototype.setOption } }
+
+
+
 export const format = {
 
 	UNITS: { m: 'minute', h: 'hour', d: 'day', wk: 'week', mo: 'month', y: 'year' },
@@ -36,6 +56,7 @@ export const format = {
 		{ id: 'year', ms: 0, format: 'MMM DD YYYY' },
 	],
 	xlabel(stamp: number) {
+		if (!Number.isFinite(stamp)) return '';
 		let now = Date.now()
 		let i: number, len = format.FRAMES.length
 		for (i = 0; i < len; i++) {

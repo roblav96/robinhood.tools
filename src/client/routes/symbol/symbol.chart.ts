@@ -8,6 +8,7 @@ import VSymbol from './symbol'
 import * as echarts from 'echarts'
 import * as ecstat from 'echarts-stat'
 import * as lockr from 'lockr'
+import * as Hammer from 'hammerjs'
 import * as _ from '../../../common/lodash'
 import * as core from '../../../common/core'
 import * as rkeys from '../../../common/rkeys'
@@ -24,21 +25,72 @@ import * as charts from '../../adapters/charts'
 		<div>
 			<div
 				class="absolute"
-				v-on:dblclick="ondblclick"
-				v-on:mousewheel="onmousewheel"
 			></div>
 		</div>
 	`,
 })
 class VSymbolEChart extends Vue {
 
+
+
+	// let el = this.$el.firstChild as HTMLElement
+	// let hammer = new Hammer(el, { recognizers: [] })
+	// var tap = new Hammer.Tap()
+	// var doubleTap = new Hammer.Tap({ event: 'doubleTap', taps: 2 })
+	// var tripleTap = new Hammer.Tap({ event: 'tripleTap', taps: 3 })
+
+	// hammer.add([tripleTap, doubleTap, tap])
+
+	// tripleTap.recognizeWith([doubleTap, tap])
+	// doubleTap.recognizeWith(tap)
+
+	// doubleTap.requireFailure(tripleTap)
+	// tap.requireFailure([tripleTap, doubleTap])
+
+	// hammer.on('tap', function() {
+	// 	console.log(`tap`)
+	// })
+	// hammer.on('doubleTap', function() {
+	// 	console.log(`doubleTap`)
+	// })
+	// hammer.on('tripleTap', function() {
+	// 	console.log(`tripleTap`)
+	// })
+	// ontap(event: MouseEvent) {
+	// 	console.warn(`ontap event.tapCount ->`, event.tapCount)
+	// 	return
+	// 	let contains = this.echart.containPixel({ gridIndex: [0] }, [event.offsetX, event.offsetY])
+	// 	console.log('contains ->', contains)
+	// 	if (contains) {
+	// 		this.echart.setOption({
+	// 			backgroundColor: this.focused ? this.colors.dark : this.colors.white,
+	// 			// dataZoom: [{ type: 'inside', zoomOnMouseWheel: this.focused }],
+	// 		})
+	// 	}
+	// }
+	// ondoubletap(event: MouseEvent) {
+	// 	console.warn(`ondoubletap event ->`, event)
+	// 	return
+	// 	let contains = this.echart.containPixel({ gridIndex: [0, 1] }, [event.offsetX, event.offsetY])
+	// 	if (contains) this.resetZoom();
+	// }
+	// ontripletap(event: MouseEvent) {
+	// 	console.error(`ontripletap event ->`, event)
+	// 	return
+	// 	let contains = this.echart.containPixel({ gridIndex: [0, 1] }, [event.offsetX, event.offsetY])
+	// 	if (contains) this.resetZoom();
+	// }
+
+
+
 	$parent: VSymbolChart
 	echart: echarts.ECharts
+	@Vts.Prop() quote: Quotes.Quote
 	colors = this.$store.state.colors
-	quote = this.$parent.quote
 
 	mounted() {
-		this.echart = echarts.init(this.$el.firstChild as HTMLElement)
+		// this.echart = echarts.init(document.createElement('div'))
+		this.echart = echarts.init(this.$el.firstChild)
 		utils.wemitter.on('resize', this.onresize, this)
 		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize);
 		this.resize()
@@ -53,17 +105,13 @@ class VSymbolEChart extends Vue {
 		this.echart = null
 	}
 
-	onevent(param: echarts.EventParam) {
-		// console.log(`param ->`, param)
-	}
-
-	onmousewheel(event: MouseEvent) {
-		// console.log(`event ->`, event)
-	}
-
+	focused = false
 	ondblclick(event: MouseEvent) {
 		let contains = this.echart.containPixel({ gridIndex: [0, 1] }, [event.offsetX, event.offsetY])
 		if (contains) this.resetZoom();
+	}
+	onmousewheel(event: MouseEvent) {
+		// console.log(`event ->`, event)
 	}
 
 	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
@@ -81,9 +129,10 @@ class VSymbolEChart extends Vue {
 		let bones = {
 			animation: false,
 			color: [this.colors['grey-lighter']],
+			// backgroundColor: this.colors.light,
 			// color: ['#0a0a0a', '#ffb000', '#fed500', '#34bc6e', '#4dc0b5', '#009bef', '#5392ff', '#9753e1', '#e62325', '#ff509e', '#ffffff'],
 			// color: Object.values(this.colors),
-			textStyle: { color: this.colors.dark, fontSize: 14, lineHeight: 1 },
+			textStyle: { color: this.colors.dark, fontSize: 14 },
 			dataset: {
 				// dimensions: ['timestamp',''],
 				source: lquotes,
@@ -91,62 +140,38 @@ class VSymbolEChart extends Vue {
 			},
 			tooltip: {
 				// showContent: !process.env.DEVELOPMENT,
-				alwaysShowContent: !!process.env.DEVELOPMENT,
+				// alwaysShowContent: !!process.env.DEVELOPMENT,
 				trigger: 'axis',
 				axisPointer: {
-					animation: false,
-					type: 'cross',
 					link: { xAxisIndex: 'all' },
+					animation: false, type: 'cross',
 					lineStyle: { color: this.colors['grey-lighter'] },
 					crossStyle: { color: this.colors['grey-light'] },
-					shadowStyle: { shadowBlur: 0 },
 					label: {
-						shadowBlur: 0,
-						textStyle: { color: this.colors.white, lineHeight: 1, fontSize: 14, borderRadius: 2 },
-						backgroundColor: this.colors.dark,
+						backgroundColor: this.colors.dark, shadowBlur: 0,
+						textStyle: { color: this.colors.white, fontSize: 14, padding: [6, 8] },
 						formatter: params => utils.format.number(params.value),
 					},
 				},
 				// confine: true,
 				// enterable: false,
-				showDelay: 0,
-				hideDelay: 1,
-				padding: 0,
+				// extraCssText: 'border: 1px solid #b8c1c1;',
+				showDelay: 0, hideDelay: 1,
+				padding: [32, 0, 0, 32],
 				transitionDuration: 0,
-				backgroundColor: this.colors['grey-dark'],
-				borderRadius: 0,
-				extraCssText: 'padding: 2rem 1rem; background-color: transparent; pointer-events: none;',
-				formatter: (params, ticket, callback) => {
-					let html = `
-						<div class="px-2 py-1 font-sans has-background-dark rounded">
-							haii haii haii haii haii haii haii haii haii 
-						</div>
-					`
-					return html
+				backgroundColor: 'transparent',
+				formatter: (params: echarts.EventParam<Quotes.Live>[]) => {
+					// console.log('params ->', params)
+					let param = params[0]
+					let lquote = param.value
+					Object.keys(lquote).forEach(k => lquote[k] = utils.format.number(lquote[k]))
+
+					let html = ''
+					html += `<p>OHLC: ${lquote.open} ${lquote.high} ${lquote.low} ${lquote.close}</p>`
+
+					return `<div class="px-2 py-1 font-sans has-background-dark has-text-white rounded-sm">${html}</div>`
 				},
-				// textStyle: { color: this.colors.white, lineHeight: 1, fontSize: 14 },
 			},
-			// axisPointer: {
-			// animation: false,
-			// link: [{ xAxisIndex: 'all' }],
-			// lineStyle: { color: this.colors['grey-lighter'] },
-			// crossStyle: { color: this.colors['grey-light'] },
-			// shadowStyle: { shadowBlur: 0 },
-			// label: {
-			// 	shadowBlur: 0,
-			// 	textStyle: { color: this.colors.white, lineHeight: 1, fontSize: 14, borderRadius: 2 },
-			// 	backgroundColor: this.colors.dark,
-			// 	formatter: params => utils.format.number(params.value),
-			// },
-			// }, {
-			// 	animation: false,
-			// 	link: [{ xAxisIndex: 'all' }],
-			// 	lineStyle: { color: this.colors['grey-lighter'] },
-			// 	crossStyle: { color: this.colors['grey-light'] },
-			// 	label: {
-			// 		formatter: params => charts.format.xlabel(params.value),
-			// 	},
-			// },
 			grid: [{
 				top: 24,
 				left: 64,
@@ -164,8 +189,9 @@ class VSymbolEChart extends Vue {
 			dataZoom: [{
 				type: 'inside',
 				xAxisIndex: [0, 1],
-				rangeMode: ['value', 'percent'],
-				// preventDefaultMouseMove: false,
+				// rangeMode: ['value', 'percent'],
+				zoomOnMouseWheel: false,
+				// preventDefaultMouseMove: true,
 			}, {
 				show: true,
 				xAxisIndex: [0, 1],
@@ -188,14 +214,13 @@ class VSymbolEChart extends Vue {
 				type: 'category',
 				boundaryGap: false,
 				axisLabel: {
-					textStyle: { color: this.colors.dark, lineHeight: 1, fontSize: 14 },
+					textStyle: { color: this.colors.dark, fontSize: 14 },
 					formatter: v => charts.format.xlabel(v),
 				},
 				axisLine: { lineStyle: { color: this.colors.dark } },
 				splitLine: { show: false },
 				axisPointer: {
 					label: {
-						textStyle: { color: this.colors.white, lineHeight: 1, fontSize: 14 },
 						formatter: params => charts.format.xlabel(params.value),
 					},
 				},
@@ -215,7 +240,7 @@ class VSymbolEChart extends Vue {
 				scale: true,
 				splitArea: { show: false },
 				axisLabel: {
-					textStyle: { color: this.colors.dark, lineHeight: 1, fontSize: 14 },
+					textStyle: { color: this.colors.dark, fontSize: 14 },
 					formatter: value => { return utils.format.number(value) },
 				},
 				axisLine: { lineStyle: { color: this.colors.dark } },
@@ -245,15 +270,10 @@ class VSymbolEChart extends Vue {
 					y: ['open', 'close', 'high', 'low'],
 				},
 				itemStyle: {
-					color: this.colors.success,
-					color0: this.colors.danger,
-					borderColor: null,
-					borderColor0: null,
+					borderColor: null, borderColor0: null,
+					color: this.colors.success, color0: this.colors.danger,
 				},
 				emphasis: null,
-				tooltip: {
-					formatter: '{a}: {b}: {c}: {d}',
-				},
 			}, {
 				name: 'Size',
 				type: 'bar',
@@ -265,11 +285,6 @@ class VSymbolEChart extends Vue {
 				hoverAnimation: false,
 				legendHoverLink: false,
 				encode: { x: 'timestamp', y: 'size' },
-				itemStyle: {
-					// color: this.colors.success,
-					// borderColor: this.colors['grey-light'],
-					// borderWidth: 0.5,
-				},
 				emphasis: null,
 			}],
 		} as echarts.Options
@@ -285,7 +300,7 @@ class VSymbolEChart extends Vue {
 	components: { 'v-symbol-echart': VSymbolEChart },
 })
 export default class VSymbolChart extends Mixins(VMixin) {
-	$parent: VSymbol
+	// $parent: VSymbol
 	@Vts.Prop() symbol: string
 	@Vts.Prop() quote: Quotes.Quote
 
@@ -324,8 +339,8 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			return this.$nextTick().then(() => this.vechart.resetZoom())
 		}).catch(error => {
 			console.error(`resync Error ->`, error)
-		}).finally(() => {
-			this.busy = false
+			// }).finally(() => {
+			// 	this.busy = false
 		})
 	}
 

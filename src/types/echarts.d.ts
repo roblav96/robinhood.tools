@@ -36,8 +36,8 @@ declare module 'echarts' {
 		}
 
 		interface Dims {
-			width: number | string
-			height: number | string
+			width: number // | string
+			height: number // | string
 		}
 
 		interface InitOptions extends Dims {
@@ -46,11 +46,11 @@ declare module 'echarts' {
 		}
 
 		const graphic: any
-		function init(el: HTMLElement, theme?: string | object, opts?: Partial<InitOptions>): ECharts
+		function init(el: HTMLElement | Node, theme?: string | object, opts?: Partial<InitOptions>): ECharts
 		function connect(group: string | string[]): void
 		function disConnect(group: string): void
-		function dispose(target: ECharts | HTMLElement): void
-		function getInstanceByDom(target: HTMLElement): void
+		function dispose(target: ECharts | HTMLElement | Node): void
+		function getInstanceByDom(target: HTMLElement | Node): void
 		function registerMap(mapName: string, geoJson: object, specialAreas: object): void
 		function registerTheme(themeName: string, theme: object): void
 
@@ -61,15 +61,15 @@ declare module 'echarts' {
 			one(eventName: EventNames, handler: (...params: any[]) => void, context?: any): void
 			off(eventName: EventNames, handler?: (...params: any[]) => void): void
 			resize(dims: Dims): void
-			getDataURL(opts: Partial<DataUrlOptions>): string
-			getConnectedDataURL(opts: Partial<DataUrlOptions>): string
+			getDataURL(options: Partial<DataUrlOptions>): string
+			getConnectedDataURL(options: Partial<DataUrlOptions>): string
 			setOption(option: Partial<Options>, notMerge?: boolean, lazyUpdate?: boolean, silent?: boolean): void
 			getWidth(): number
 			getHeight(): number
-			getDom(): HTMLElement
+			getDom(): HTMLElement | Node
 			getOption(): Options
 			dispatchAction(payload: any): void
-			showLoading(type: string, opts: object): void
+			showLoading(type: string, options: object): void
 			hideLoading(): void
 			clear(): void
 			isDisposed(): boolean
@@ -203,8 +203,8 @@ declare module 'echarts' {
 			angleAxisIndex: number[]
 			disabled: boolean
 			preventDefaultMouseMove: boolean
-			moveOnMouseMove: string
-			zoomOnMouseWheel: string
+			moveOnMouseMove: boolean | string
+			zoomOnMouseWheel: boolean | string
 			end: number
 			endValue: number
 			filterMode: string
@@ -453,6 +453,7 @@ declare module 'echarts' {
 			borderColor: string | ((param: EventParam) => string)
 			borderWidth: number
 			borderRadius: number
+			padding: number | string | (number | string)[]
 			color0: string | ((param: EventParam) => string)
 			color: string | ((param: EventParam) => string)
 		}

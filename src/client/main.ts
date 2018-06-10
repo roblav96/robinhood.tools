@@ -6,6 +6,7 @@ global.Promise = require('zousan')
 global.Zousan.suppressUncaughtRejectionError = true
 
 // require('source-map-support/register')
+// Object.assign(require('hammer-touchemulator'), { template: function() { } })()
 
 process.version = 'v9.11.1'
 process.hrtime = require('browser-process-hrtime')
@@ -28,16 +29,47 @@ import './styles/tailwind.css'
 import './styles/styles.css'
 
 import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Vuex from 'vuex'
-import Buefy, { BuefyConfig } from 'buefy'
-
 Vue.config.productionTip = false
 Vue.config.performance = false
 Vue.config.devtools = false
 
+// import * as Vts from 'vue-property-decorator'
+// @Vts.Component
+// class VTouchPatch extends Vue {
+// 	recognizers: Dict<Recognizer>
+// 	mounted() { this.$nextTick(this.requireFailure) }
+// 	requireFailure() {
+// 		console.log('requireFailure ->')
+// 		let tap = this.recognizers['tap']
+// 		let singletap = this.recognizers['singletap']
+// 		let doubletap = this.recognizers['doubletap']
+// 		let tripletap = this.recognizers['tripletap']
+// 		if (tap && doubletap && tripletap) {
+// 			console.warn('requireFailure ->')
+// 			// tap.requireFailure(doubletap)
+// 			// tripletap.recognizeWith(doubletap)
+// 			// tripletap.recognizeWith(tap)
+// 			// doubletap.recognizeWith(tap)
+// 			// doubletap.requireFailure(tripletap)
+// 			// tap.requireFailure(tripletap)
+// 			// tap.requireFailure(doubletap)
+// 		}
+// 	}
+// }
+// import VueTouch from 'vue-touch'
+// VueTouch.component.mixins = [VTouchPatch]
+// // VueTouch.registerCustomEvent('singletap', { type: 'tap', taps: 1 })
+// VueTouch.registerCustomEvent('doubletap', { type: 'tap', taps: 2 })
+// VueTouch.registerCustomEvent('tripletap', { type: 'tap', taps: 3 })
+// Vue.use(VueTouch)
+
+import VueRouter from 'vue-router'
 Vue.use(VueRouter)
+
+import Vuex from 'vuex'
 Vue.use(Vuex)
+
+import Buefy, { BuefyConfig } from 'buefy'
 Vue.use(Buefy, {
 	defaultNoticeQueue: false,
 	defaultSnackbarDuration: 5000,

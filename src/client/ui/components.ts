@@ -120,14 +120,14 @@ Vue.component('v-symbol-logo', SymbolLogo)
 // 	}
 // 	onenter(event: PointerEvent) {
 // 		let el = event.target as HTMLElement
-		
+
 // 		// let style = window.getComputedStyle(el, ':after')
 // 		// let box = style.getBoundingClientRect()
 // 		// console.log('box ->', box)
-		
+
 // 		let n = parseInt(window.getComputedStyle(el, ':before').getPropertyValue('margin-left'), 10)
 // 		console.log(`n ->`, n)
-		
+
 // 		// let found = el.offsetParent.querySelector(':after')
 // 		// console.log(`found -> %O`, found, found)
 // 	}

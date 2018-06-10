@@ -236,6 +236,9 @@ export const sort = {
 export const object = {
 	// is<T = object>(value: T): value is T { return _.isPlainObject(value) },
 	is<T = object>(value: T): value is T { return value && typeof value == 'object' && value.constructor == Object },
+	sortKeys<T = object>(target: T): T {
+		return _.fromPairs(_.sortBy(_.toPairs(target as any))) as any
+	},
 	assign<T = object>(target: T, source: T, deep = false) {
 		Object.keys(source).forEach(function assignEach(key) {
 			let tvalue = target[key]
@@ -322,9 +325,14 @@ export const object = {
 		}
 		return diff
 	},
-	sortKeys<T = object>(target: T): T {
-		return _.fromPairs(_.sortBy(_.toPairs(target as any))) as any
-	},
+	// shrink<T = object>(target: T) {
+	// 	Object.keys(target).forEach(k => {
+	// 		let v = target[k]
+	// 		if (number.isFinite(v)) {
+	// 			target[k] = math.round(v, 4)
+	// 		}
+	// 	})
+	// },
 	// empty<T = object>(target: T) {
 	// 	Object.keys(target).forEach(function(key) {
 	// 		let value = target[key]

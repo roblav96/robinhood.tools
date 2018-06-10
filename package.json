@@ -52,6 +52,7 @@
 		"fast-json-parse": "latest",
 		"fastest-validator": "latest",
 		"fingerprintjs2": "latest",
+		"hammerjs": "latest",
 		"humanize-plus": "latest",
 		"ioredis": "latest",
 		"leven": "latest",
@@ -84,6 +85,7 @@
 		"vue-class-component": "latest",
 		"vue-property-decorator": "latest",
 		"vue-router": "latest",
+		"vue-touch": "next",
 		"vuex": "latest",
 		"zousan": "latest"
 	},
@@ -95,6 +97,7 @@
 		"@types/dotenv": "latest",
 		"@types/execa": "latest",
 		"@types/fingerprintjs2": "latest",
+		"@types/hammerjs": "latest",
 		"@types/humanize-plus": "latest",
 		"@types/ioredis": "latest",
 		"@types/lockr": "latest",

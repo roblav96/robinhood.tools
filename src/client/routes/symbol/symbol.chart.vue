@@ -14,7 +14,8 @@
 				<div class="column is-narrow">
 					<div class="field has-addons">
 						<p class="control">
-							<b-tooltip :active="!busy&&!!ranges[rangeindex-1]" :label="vrange(ranges[rangeindex-1])" size="is-small" animated>
+							<b-tooltip :active="!busy&&!!ranges[rangeindex-1]" :label="vrange(ranges[rangeindex-1])" size="is-small"
+							    animated>
 								<button class="button" v-on:click="range=ranges[rangeindex-1]" :disabled="busy||!ranges[rangeindex-1]">
 									<b-icon icon="chevron-left"></b-icon>
 								</button>
@@ -34,7 +35,8 @@
 							</b-dropdown>
 						</p>
 						<p class="control">
-							<b-tooltip :active="!busy&&!!ranges[rangeindex+1]" :label="vrange(ranges[rangeindex+1])" size="is-small" animated>
+							<b-tooltip :active="!busy&&!!ranges[rangeindex+1]" :label="vrange(ranges[rangeindex+1])" size="is-small"
+							    animated>
 								<button class="button" v-on:click="range=ranges[rangeindex+1]" :disabled="busy||!ranges[rangeindex+1]">
 									<b-icon icon="chevron-right"></b-icon>
 								</button>
@@ -52,7 +54,7 @@
 			</div>
 		</section>
 
-		<v-symbol-echart class="flex-col-full" ref="symbol_echart"></v-symbol-echart>
+		<v-symbol-echart class="flex-col-full min-h-sm" ref="symbol_echart" :quote="quote"></v-symbol-echart>
 
 
 
