@@ -24,7 +24,10 @@ import * as charts from '../../adapters/charts'
 	template: `
 		<div class="min-h-sm">
 			<v-touch tag="div" class="absolute"
-				v-on:doubletap="showItem(item)"
+				v-on:tap="ontap"
+				v-on:singletap="onsingletap"
+				v-on:doubletap="ondoubletap"
+				v-on:tripletap="ontripletap"
 			></v-touch>
 		</div>
 	`,
@@ -32,6 +35,29 @@ import * as charts from '../../adapters/charts'
 class VSymbolEChart extends Vue {
 	$parent: VSymbolChart
 	colors = this.$store.state.colors
+
+
+
+	ontap(event: HammerEvent) {
+		console.log(`TAP tapCount ->`, event.tapCount)
+		let contains = this.echart.containPixel({ gridIndex: [0] }, [event.srcEvent.offsetX, event.srcEvent.offsetY])
+		console.warn('contains ->', contains)
+		if (contains) {
+			this.echart.setOption({
+				backgroundColor: this.focused ? this.colors.dark : this.colors.white,
+				// dataZoom: [{ type: 'inside', zoomOnMouseWheel: this.focused }],
+			})
+		}
+	}
+	onsingletap(event: HammerEvent) {
+		console.log(`SINGLE tapCount ->`, event.tapCount)
+	}
+	ondoubletap(event: HammerEvent) {
+		console.warn(`DOUBLE tapCount ->`, event.tapCount)
+	}
+	ontripletap(event: HammerEvent) {
+		console.error(`TRIPLE tapCount ->`, event.tapCount)
+	}
 
 
 
@@ -58,33 +84,10 @@ class VSymbolEChart extends Vue {
 	// hammer.on('tripleTap', function() {
 	// 	console.log(`tripleTap`)
 	// })
-	// ontap(event: MouseEvent) {
-	// 	console.warn(`ontap event.tapCount ->`, event.tapCount)
-	// 	return
-	// 	let contains = this.echart.containPixel({ gridIndex: [0] }, [event.offsetX, event.offsetY])
-	// 	console.log('contains ->', contains)
-	// 	if (contains) {
-	// 		this.echart.setOption({
-	// 			backgroundColor: this.focused ? this.colors.dark : this.colors.white,
-	// 			// dataZoom: [{ type: 'inside', zoomOnMouseWheel: this.focused }],
-	// 		})
-	// 	}
-	// }
-	// ondoubletap(event: MouseEvent) {
-	// 	console.warn(`ondoubletap event ->`, event)
-	// 	return
-	// 	let contains = this.echart.containPixel({ gridIndex: [0, 1] }, [event.offsetX, event.offsetY])
-	// 	if (contains) this.resetZoom();
-	// }
-	// ontripletap(event: MouseEvent) {
-	// 	console.error(`ontripletap event ->`, event)
-	// 	return
-	// 	let contains = this.echart.containPixel({ gridIndex: [0, 1] }, [event.offsetX, event.offsetY])
-	// 	if (contains) this.resetZoom();
-	// }
 
 
 
+	focused = false
 	echart: echarts.ECharts
 
 	mounted() {
@@ -103,14 +106,13 @@ class VSymbolEChart extends Vue {
 		this.echart = null
 	}
 
-	focused = false
-	ondblclick(event: MouseEvent) {
-		let contains = this.echart.containPixel({ gridIndex: [0, 1] }, [event.offsetX, event.offsetY])
-		if (contains) this.resetZoom();
-	}
-	onmousewheel(event: MouseEvent) {
-		// console.log(`event ->`, event)
-	}
+	// ondoubletap(event: HammerEvent) {
+	// 	let contains = this.echart.containPixel({ gridIndex: [0, 1] }, [event.srcEvent.offsetX, event.srcEvent.offsetY])
+	// 	if (contains) this.resetZoom();
+	// }
+	// onmousewheel(event: MouseEvent) {
+	// 	// console.log(`event ->`, event)
+	// }
 
 	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
 	onresize = _.debounce(this.resize, 100)
