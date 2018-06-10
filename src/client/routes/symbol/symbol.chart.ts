@@ -22,14 +22,16 @@ import * as charts from '../../adapters/charts'
 
 @Vts.Component({
 	template: `
-		<div>
-			<div
-				class="absolute"
-			></div>
+		<div class="min-h-sm">
+			<v-touch tag="div" class="absolute"
+				v-on:doubletap="showItem(item)"
+			></v-touch>
 		</div>
 	`,
 })
 class VSymbolEChart extends Vue {
+	$parent: VSymbolChart
+	colors = this.$store.state.colors
 
 
 
@@ -83,13 +85,9 @@ class VSymbolEChart extends Vue {
 
 
 
-	$parent: VSymbolChart
 	echart: echarts.ECharts
-	@Vts.Prop() quote: Quotes.Quote
-	colors = this.$store.state.colors
 
 	mounted() {
-		// this.echart = echarts.init(document.createElement('div'))
 		this.echart = echarts.init(this.$el.firstChild)
 		utils.wemitter.on('resize', this.onresize, this)
 		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize);
@@ -300,7 +298,7 @@ class VSymbolEChart extends Vue {
 	components: { 'v-symbol-echart': VSymbolEChart },
 })
 export default class VSymbolChart extends Mixins(VMixin) {
-	// $parent: VSymbol
+	$parent: VSymbol
 	@Vts.Prop() symbol: string
 	@Vts.Prop() quote: Quotes.Quote
 

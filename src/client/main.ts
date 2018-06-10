@@ -10,9 +10,9 @@ if (process.env.DEVELOPMENT) {
 	// console.dtsgen = require('../common/dtsgen').default
 	Object.assign(window, require('../common/core'))
 	Object.assign(window, { dayjs: require('dayjs') })
+	require('echarts')
 }
 
-import 'echarts'
 import 'modern-normalize'
 import 'animate.css'
 import './styles/vendors.scss'

@@ -54,7 +54,7 @@
 			</div>
 		</section>
 
-		<v-symbol-echart class="flex-col-full min-h-sm" ref="symbol_echart" :quote="quote"></v-symbol-echart>
+		<v-symbol-echart class="flex-col-full" ref="symbol_echart"></v-symbol-echart>
 
 
 

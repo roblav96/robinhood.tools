@@ -14,9 +14,9 @@ import clock from '../../common/clock'
 
 @Vts.Component({
 	template: `
-	<b-tooltip :label="tip" position="is-right" size="is-small" animated>
-		<span>{{fromnow}}</span>
-	</b-tooltip>
+		<b-tooltip :label="tip" position="is-right" size="is-small" animated>
+			<span>{{fromnow}}</span>
+		</b-tooltip>
 	`,
 })
 class Timestamp extends Vue {
