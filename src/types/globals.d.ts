@@ -3,7 +3,6 @@
 
 
 declare namespace NodeJS {
-	interface Global { Zousan: any }
 	interface ProcessEnv {
 		NODE_ENV: 'development' | 'production'
 		DEVELOPMENT: any
@@ -18,7 +17,6 @@ declare namespace NodeJS {
 
 
 type KeysOf<T> = (keyof T)[]
-
 interface Dict<T = any> {
 	[key: string]: T
 }

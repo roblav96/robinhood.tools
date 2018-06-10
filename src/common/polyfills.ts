@@ -4,6 +4,13 @@ export { }
 
 
 
+global.Zousan.suppressUncaughtRejectionError = true
+
+global.noop = function noop() { }
+declare global { namespace NodeJS { interface Global { noop: any } } }
+
+
+
 Array.prototype.forEach = function forEach(fn, arg) {
 	let array = this
 	let len = array.length

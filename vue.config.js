@@ -4,14 +4,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const DEVELOPMENT = process.env.NODE_ENV == 'development'
 const PRODUCTION = process.env.NODE_ENV == 'production'
 
-let DEBUG = false
-if (PRODUCTION) DEBUG = false;
-if (DEBUG) {
-	const inspector = require('inspector')
-	inspector.open(+process.debugPort - 1)
-	console.clear()
-	require('exit-hook')(inspector.close)
-}
+const DEBUG = false
 
 const fs = require('fs')
 const path = require('path')
@@ -45,14 +38,9 @@ module.exports = {
 			// 		delete use.options.limit
 			// 	})
 			// })
-			// let manifest = path.resolve(__dirname, 'public/vendors.json')
-			// if (fs.existsSync(manifest)) {
-			// 	config.plugins.push(new webpack.DllReferencePlugin({
-			// 		context: __dirname,
-			// 		manifest: require(manifest),
-			// 	}))
-			// }
 		}
+
+		config.plugins.push(new webpack.ProvidePlugin({ Promise: 'zousan' }))
 
 		// config.plugins.push(new BundleAnalyzerPlugin())
 
@@ -93,6 +81,15 @@ module.exports = {
 
 	},
 
+}
+
+
+
+if (DEBUG && !PRODUCTION) {
+	const inspector = require('inspector')
+	inspector.open(+process.debugPort - 1)
+	console.clear()
+	require('exit-hook')(inspector.close)
 }
 
 
