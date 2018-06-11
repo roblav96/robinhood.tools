@@ -12,7 +12,7 @@ import clock from '../../common/clock'
 
 Vue.directive('hammer', {
 	inserted(el, binding, vnode) {
-		vnode
+		
 	},
 	update(el, binding, vnode) {
 
