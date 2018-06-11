@@ -43,7 +43,7 @@ export default class extends Mixins(VMixin) {
 	query = ''
 	results = [] as Quotes.Quote[]
 
-	oninput = _.debounce(this.sync, 100)
+	oninput = _.debounce(this.sync, 100, { leading: false, trailing: true })
 	sync() {
 		return Promise.resolve().then(() => {
 			if (!this.query) return http.post('/recents', { symbols: this.recents.map(v => v.symbol) });

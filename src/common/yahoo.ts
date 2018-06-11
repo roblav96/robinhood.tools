@@ -10,7 +10,7 @@ import * as http from './http'
 
 
 export const YH = {
-	QUOTES: 'yh:quotes',
+	QUOTES: 'yh:quotes'
 }
 
 
@@ -24,7 +24,7 @@ export const SUMMARY_MODULES = [
 	'institutionOwnership', 'majorDirectHolders', 'majorHoldersBreakdown', 'netSharePurchaseActivity', 'price', 'quoteType',
 	'recommendationTrend', 'secFilings', 'sectorTrend', 'summaryDetail', 'summaryProfile', 'symbol', 'upgradeDowngradeHistory',
 	// funds
-	'fundProfile', 'topHoldings', 'fundPerformance',
+	'fundProfile', 'topHoldings', 'fundPerformance'
 ]
 
 
@@ -41,7 +41,7 @@ export const FRAMES = {
 	'ytd': '1d',
 	'1y': '1d',
 	'5y': '1wk',
-	'max': '1mo',
+	'max': '1mo'
 }
 export const RANGES = Object.keys(FRAMES)
 
@@ -49,10 +49,10 @@ export const RANGES = Object.keys(FRAMES)
 
 export function getChart(symbol: string, params: Partial<Yahoo.ChartParams>) {
 	return http.get(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`, {
-		query: params, proxify: !!process.env.CLIENT, retries: 3,
+		query: params, proxify: !!process.env.CLIENT, retries: 3
 	}).then(function(response: Yahoo.ApiChart) {
 		let error = _.get(response, 'chart.error') as Yahoo.ApiError
-		if (error) throw boom.badRequest('chart.error', response);
+		if (error) throw boom.badRequest(JSON.stringify(error), response);
 		let result = _.get(response, 'chart.result[0]') as Yahoo.ChartResult
 		if (!result) throw boom.expectationFailed('!result', response);
 		let lquotes = [] as Quotes.Live[]
@@ -64,7 +64,7 @@ export function getChart(symbol: string, params: Partial<Yahoo.ChartParams>) {
 			lquotes.push({
 				open: hquotes.open[i], close: hquotes.close[i],
 				high: hquotes.high[i], low: hquotes.low[i],
-				size: hquotes.volume[i], timestamp: stamp * 1000,
+				size: hquotes.volume[i], timestamp: stamp * 1000
 			} as Quotes.Live)
 		})
 		return lquotes.sort((a, b) => a.timestamp - b.timestamp)

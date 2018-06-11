@@ -2,6 +2,7 @@
 
 import Vue, { DirectiveOptions } from 'vue'
 import * as anime from 'animejs'
+import * as Hammer from 'hammerjs'
 import * as core from '../../common/core'
 import * as pretty from '../../common/pretty'
 import * as utils from '../adapters/utils'
@@ -9,25 +10,24 @@ import clock from '../../common/clock'
 
 
 
+Vue.directive('hammer', {
+	inserted(el, binding, vnode) {
+		vnode
+	},
+	update(el, binding, vnode) {
+
+	},
+	unbind(el, binding, vnode) {
+
+	},
+})
+
+
+
 Vue.directive('visible', function(el, { value, oldValue }) {
 	if (value === oldValue || !core.boolean.is(value)) return;
 	el.classList.toggle('invisible', !value)
-	// anime.remove(el)
-	// if (value == true) {
-	// 	let t = Date.now()
-	// 	Vue.nextTick(() => {
-	// 		let smooth = ((Date.now() - t) * 3)
-	// 		anime({
-	// 			targets: el,
-	// 			easing: 'easeInQuad',
-	// 			delay: smooth > 10 ? smooth : 0,
-	// 			opacity: [
-	// 				{ value: 0, duration: 0 },
-	// 				{ value: 1, duration: 50 + smooth },
-	// 			],
-	// 		})
-	// 	})
-	// }
+	// anime.remove(el) // if (value == true) {// 	let t = Date.now() // 	Vue.nextTick(() => {// 		let smooth = ((Date.now() - t) * 3) // 		anime({// 			targets: el, // 			easing: 'easeInQuad', // 			delay: smooth > 10 ? smooth : 0, // 			opacity: [// 				{ value: 0, duration: 0 }, // 				{ value: 1, duration: 50 + smooth }, // 			], // 		}) // 	}) // }
 })
 
 
@@ -54,6 +54,20 @@ Vue.directive('bg-bull-bear', function(el, { value, oldValue, arg }) {
 	el.classList.toggle('bg-bullish', value > 0)
 	el.classList.toggle('bg-bearish', value < 0)
 })
+
+
+
+
+
+declare module 'vue/types/vnode' {
+	export interface VNodeDirective {
+		readonly rawName: string
+		readonly def: DirectiveOptions
+	}
+}
+declare global { interface VNodeDirectiveDef extends DirectiveOptions { [key: string]: any } }
+
+
 
 
 
@@ -105,18 +119,6 @@ Vue.directive('bg-bull-bear', function(el, { value, oldValue, arg }) {
 // 		el.appendChild(span)
 // 	})
 // })
-
-
-
-
-
-declare module 'vue/types/vnode' {
-	export interface VNodeDirective {
-		readonly rawName: string
-		readonly def: DirectiveOptions
-	}
-	interface VNodeDirectiveDef extends DirectiveOptions { [key: string]: any }
-}
 
 
 

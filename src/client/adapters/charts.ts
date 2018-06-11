@@ -1,5 +1,6 @@
 // 
 
+import deepmerge from 'deepmerge'
 import * as dayjs from 'dayjs'
 import * as prettyms from 'pretty-ms'
 import * as echarts from 'echarts'
@@ -17,18 +18,11 @@ let ector = echarts.init(document.createElement('div'))
 { (echarts as any).ECharts = ector.constructor }
 ector.clear(); ector.dispose(); ector = null;
 
-const ecpatch = {
-	updateOption(options, notMerge, lazyUpdate, silent) {
-		console.log('options ->', options)
-		let bones = this.getOption()
-		console.log(`bones ->`, JSON.parse(JSON.stringify(bones)))
-		core.object.assign(bones, options, true)
-		console.log(`bones ->`, JSON.parse(JSON.stringify(bones)))
-		this.setOption(bones, notMerge, lazyUpdate, silent)
+Object.assign(echarts.ECharts.prototype, {
+	updateOption(option, notMerge, lazyUpdate, silent) {
+		this.setOption(deepmerge(this.getOption(), option), notMerge, lazyUpdate, silent)
 	},
-} as echarts.ECharts
-
-if (echarts.ECharts && echarts.ECharts.constructor) Object.assign(echarts.ECharts.prototype, ecpatch);
+} as echarts.ECharts)
 declare module 'echarts' { interface ECharts { updateOption: typeof echarts.ECharts.prototype.setOption } }
 
 
@@ -49,8 +43,8 @@ export const format = {
 
 	FRAMES: [
 		{ id: 'millisecond', ms: 0, format: 'hh:mm:ssa', ago: true },
-		{ id: 'hour', ms: 0, format: 'dddd hh:mm:ssa', ago: true },
-		{ id: 'day', ms: 0, format: 'dddd MMM DD, hh:mma', ago: true },
+		{ id: 'hour', ms: 0, format: 'hh:mm:ssa', ago: true },
+		{ id: 'day', ms: 0, format: 'dddd, MMM DD, hh:mma', ago: true },
 		{ id: 'week', ms: 0, format: 'MMM DD, hh:mma', ago: true },
 		{ id: 'month', ms: 0, format: 'MMM DD YYYY, hh:mma' },
 		{ id: 'year', ms: 0, format: 'MMM DD YYYY' },
@@ -138,30 +132,50 @@ function get1Day(symbol: string, tid: number) {
 
 		resolved.forEach(v => { core.fix(v, true); core.fix(v.data[0], true) })
 		let mlquotes = resolved.map(v => webull.toMinutesLives(v)).flatten()
+
+		let predates = _.mapValues(resolved[0].data[0].dates[0], v => (v as any) * 1000)
+		let postdates = _.mapValues(resolved[1].data[0].dates[0], v => (v as any) * 1000)
+
+		let range = {
+			min: Math.min(predates.start, predates.end, postdates.start, postdates.end),
+			max: Math.max(predates.start, predates.end, postdates.start, postdates.end),
+		}
+		console.log(`range ->`, _.mapValues(range, v => utils.format.stamp(v)))
+
 		let mlrange = {
-			min: resolved[0].data[0].dates[0].start * 1000,
-			max: resolved[1].data[0].dates[0].end * 1000,
+			min: Math.min(predates.start, postdates.start),
+			max: Math.max(predates.end, postdates.end),
 		}
+		console.log(`mlrange ->`, _.mapValues(mlrange, v => utils.format.stamp(v)))
 		let klrange = {
-			min: resolved[0].data[0].dates[0].end * 1000,
-			max: resolved[1].data[0].dates[0].start * 1000,
+			min: Math.min(predates.end, postdates.end),
+			max: Math.max(predates.start, postdates.start),
 		}
+		console.log(`klrange ->`, _.mapValues(klrange, v => utils.format.stamp(v)))
+
 		klquotes.remove(v => v.timestamp < mlrange.min)
 
 		return yahoo.getChart(symbol, {
 			interval: '1m',
 			includePrePost: true,
-			period1: dayjs(mlrange.min).unix(),
-			period2: dayjs(mlrange.max).unix(),
+			period1: dayjs(range.min).subtract(1,'day').unix(),
+			period2: dayjs(range.max).unix(),
 		}).then(function(ylquotes) {
-			let removed = _.remove(ylquotes, v => v.timestamp > klrange.min && v.timestamp < klrange.max)
-			if (removed[0]) core.object.merge(klquotes[0], _.pick(removed[0], ['open', 'high', 'low', 'close']));
+			console.log('ylquotes ->', ylquotes)
 
-			let ystamps = ylquotes.map(v => { v.size = 0; return v.timestamp })
+			let removed = _.remove(ylquotes, v => v.timestamp > klrange.min && v.timestamp < klrange.max)
+			if (removed[0]) {
+				core.object.merge(klquotes[0], _.pick(removed[0], ['open', 'high', 'low', 'close']))
+			}
+
+			let ystamps = ylquotes.map(v => {
+				v.size = 0
+				return v.timestamp
+			})
 			mlquotes.forEach(mlquote => {
 				let ylquote = ylquotes.find(v => v.timestamp == mlquote.timestamp)
 				if (ylquote) return ylquote.size += mlquote.size;
-				let index = core.array.closest(ystamps, mlquote.timestamp)
+				let index = core.array.nearest(ystamps, mlquote.timestamp)
 				if (index >= 0) ylquotes[index].size += mlquote.size;
 			})
 

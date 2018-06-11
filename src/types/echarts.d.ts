@@ -382,9 +382,13 @@ declare module 'echarts' {
 			zlevel: number
 		}
 
+		interface PositionSize {
+			contentSize: number[]
+			viewSize: number[]
+		}
 		interface Tooltip {
-			formatter: string | ((params: EventParam[], ticket?: number, callback?: (ticket: number, tooltip: string) => void) => string)
-			position: number | string | (number | string)[] | ((pos, params, el, elRect, size) => any)
+			formatter: string | ((params: EventParam | EventParam[], ticket?: number, callback?: (ticket: number, tooltip: string) => void) => string)
+			position: number | string | (number | string)[] | ((point: number[], params: EventParam[], el: HTMLElement, rect: any, size: PositionSize) => (number | string)[])
 			alwaysShowContent: boolean
 			axisPointer: AxisPointer
 			backgroundColor: string

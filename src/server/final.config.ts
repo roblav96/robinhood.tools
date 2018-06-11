@@ -29,12 +29,10 @@ declare global { namespace NodeJS { interface ProcessEnv { HOST: any; PORT: any 
 
 if (DEVELOPMENT) app.env.DEBUGGER = true;
 
-let instances = cpus
 {
 	Application({ name: 'radio', run: 'services/radio.service' })
 
-	if (DEVELOPMENT) instances = 2;
-	Application({ name: 'api', run: 'api/api', instances })
+	Application({ name: 'api', run: 'api/api', instances: DEVELOPMENT ? 2 : cpus })
 
 	Application({ name: 'symbols', run: 'services/symbols.service' })
 	Application({ name: 'search', run: 'services/search.service' })

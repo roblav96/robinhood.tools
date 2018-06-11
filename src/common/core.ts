@@ -212,7 +212,7 @@ export const array = {
 			return previous
 		}, {})
 	},
-	closest(value: number[], find: number, favor = 'min' as 'min' | 'max') {
+	nearest(value: number[], find: number, favor = 'min' as 'min' | 'max') {
 		let index = value.map(n => Math.abs(n - find))
 		let near = Math[favor].apply(Math, index)
 		return index.indexOf(near)

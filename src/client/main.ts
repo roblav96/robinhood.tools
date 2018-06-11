@@ -7,7 +7,7 @@ process.hrtime = require('browser-process-hrtime')
 
 Object.assign(console, { dtsgen: function() { } })
 if (process.env.DEVELOPMENT) {
-	console.dtsgen = require('../common/dtsgen').default
+	// console.dtsgen = require('../common/dtsgen').default
 	Object.assign(window, require('../common/core'))
 	Object.assign(window, { dayjs: require('dayjs') })
 	require('echarts')
@@ -31,42 +31,30 @@ Vue.config.devtools = false
 
 
 
-import * as Vts from 'vue-property-decorator'
-@Vts.Component
-class VTouchPatch extends Vue {
-	recognizers: Dict<Recognizer>
-	mounted() { this.$nextTick(this.requireFailure) }
-	requireFailure() {
-		console.log('requireFailure ->', this.recognizers)
-		let tap = this.recognizers['tap']
-		let singletap = this.recognizers['singletap']
-		let doubletap = this.recognizers['doubletap']
-		let tripletap = this.recognizers['tripletap']
-		// if (tap && doubletap && tripletap) {
-		console.warn('requireFailure ->')
+// import * as Vts from 'vue-property-decorator'
+// @Vts.Component
+// class VTouchPatch extends Vue {
+// 	recognizers: Dict<Recognizer>
+// 	mounted() {
+// 		this.$nextTick(() => {
+// 			if (!this.recognizers['doubletap'] && !this.recognizers['tripletap']) return;
+// 			let dummy = { recognizeWith: global.noop, requireFailure: global.noop } as Recognizer
+// 			let tap = this.recognizers['tap'] || dummy
+// 			let doubletap = this.recognizers['doubletap'] || dummy
+// 			let tripletap = this.recognizers['tripletap'] || dummy
+// 			tripletap.recognizeWith([doubletap, tap])
+// 			doubletap.recognizeWith(tap)
+// 			doubletap.requireFailure(tripletap)
+// 			tap.requireFailure([tripletap, doubletap])
+// 		})
+// 	}
+// }
 
-		tripletap.recognizeWith([doubletap, singletap])
-		doubletap.recognizeWith(singletap)
-		doubletap.requireFailure(tripletap)
-		singletap.requireFailure([tripletap, doubletap])
-
-		// tap.requireFailure(doubletap)
-		// tripletap.recognizeWith(doubletap)
-		// tripletap.recognizeWith(tap)
-		// doubletap.recognizeWith(tap)
-		// doubletap.requireFailure(tripletap)
-		// tap.requireFailure(tripletap)
-		// tap.requireFailure(doubletap)
-		// }
-	}
-}
-
-import VueTouch from 'vue-touch'
-VueTouch.component.mixins = [VTouchPatch]
-VueTouch.registerCustomEvent('singletap', { type: 'tap', taps: 1 })
-VueTouch.registerCustomEvent('doubletap', { type: 'tap', taps: 2 })
-VueTouch.registerCustomEvent('tripletap', { type: 'tap', taps: 3 })
-Vue.use(VueTouch)
+// import VueTouch from 'vue-touch'
+// VueTouch.component.mixins = [VTouchPatch]
+// VueTouch.registerCustomEvent('doubletap', { type: 'tap', taps: 2 })
+// VueTouch.registerCustomEvent('tripletap', { type: 'tap', taps: 3 })
+// Vue.use(VueTouch)
 
 
 
