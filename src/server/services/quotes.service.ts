@@ -101,7 +101,7 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 		let deal = quotes.toDeal(wbdata)
 		socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
 		let quote = QUOTES.CALCS[symbol]
-		quotes.mergeCalcs(quote, quotes.applyDeal(quote, deal))
+		quotes.mergeCalcs(quote, quotes.applyWbQuote(quote, {} as any, quotes.applyDeal(quote, deal)))
 		return
 	}
 
@@ -172,7 +172,9 @@ function ontick() {
 				lquote.symbol = symbol
 				socket.emit(`${rkeys.LIVES}:${symbol}`, lquote)
 
-				core.object.merge(quote, quotes.resetLive(quote))
+				let reset = quotes.resetLive(quote)
+				quotes.mergeCalcs(quote, reset)
+				core.object.merge(quote, reset)
 
 				ldiff = core.object.difference(flquote, quote)
 				core.object.merge(ediff, ldiff)
@@ -211,53 +213,6 @@ function ontick() {
 
 
 
-
-// const QUOTE = {
-// 	timestamp: 1528810411000,
-// 	openPrice: 61.82,
-// 	prevClose: 61.39,
-// 	closePrice: 61.31,
-// 	vibrateRatio: 0.0098,
-// 	volume: 1909163,
-// 	dealCount: 125099,
-// 	turnoverRate: 0.0017,
-// 	sharesOutstanding: 1159764549,
-// 	sharesFloat: 1108482925,
-// 	yearHigh: 64.66,
-// 	yearLow: 26.85,
-// 	ask: 61.27,
-// 	bid: 61.26,
-// 	status: 'OPENING',
-// 	bids: 200,
-// 	asks: 200,
-// 	price: 61.31,
-// 	size: 0,
-// 	bidSpread: 61.26,
-// 	askSpread: 61.27,
-// 	bidSize: 200,
-// 	bidVolume: 200,
-// 	askSize: 200,
-// 	askVolume: 200,
-// 	statusTimestamp: 1528810420373,
-// 	startPrice: 61.31,
-// 	close: 61.31,
-// 	change: 0,
-// 	percent: 0,
-// 	prePrice: 61.31,
-// 	preChange: 0,
-// 	prePercent: 0,
-// 	regPrice: 61.31,
-// 	regChange: -0.51,
-// 	regPercent: -0.82497574,
-// 	postPrice: 61.31,
-// 	postChange: 0,
-// 	postPercent: 0,
-// 	marketCap: 71105164499,
-// 	regTimestamp: 1528810411000,
-// 	spread: 0.01,
-// 	baFlowSize: 0,
-// 	baFlowVolume: 0
-// }
 
 // import * as benchmark from '../../common/benchmark'
 // benchmark.simple('sum', [

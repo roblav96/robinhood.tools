@@ -111,6 +111,7 @@ const CALC = {
 	prevClose: number,
 	// 
 	spread: number,
+	baSpread: number,
 	baFlowSize: number,
 	baFlowVolume: number,
 	// 

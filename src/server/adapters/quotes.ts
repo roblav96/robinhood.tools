@@ -113,8 +113,9 @@ export function applyFull(
 
 	let toquote = applyWbQuote(quote, wbquote)
 	core.object.repair(quote, mergeCalcs(toquote))
-	let requote = resetFull(quote)
-	resets ? core.object.merge(quote, requote) : core.object.repair(quote, requote)
+	let reset = resetFull(quote)
+	mergeCalcs(quote, reset)
+	resets ? core.object.merge(quote, reset) : core.object.repair(quote, reset)
 
 	core.object.clean(quote)
 	return quote
@@ -266,7 +267,7 @@ export function applyWbQuote(quote: Quotes.Calc, wbquote: Webull.Quote, toquote 
 
 	})
 
-	if (toquote.timestamp) {
+	if (toquote.timestamp && !toquote.price) {
 		if (wbquote.price && toquote.timestamp == wbquote.mktradeTime) {
 			toquote.price = wbquote.price
 		}
@@ -278,7 +279,16 @@ export function applyWbQuote(quote: Quotes.Calc, wbquote: Webull.Quote, toquote 
 		}
 	}
 
-	if (toquote.volume) {
+	if (toquote.price) {
+		toquote.high = core.math.max(quote.high, quote.price, toquote.price)
+		toquote.low = core.math.min(quote.low, quote.price, toquote.price)
+		toquote.dayHigh = core.math.max(quote.dayHigh, quote.price, toquote.price)
+		toquote.dayLow = core.math.min(quote.dayLow, quote.price, toquote.price)
+		toquote.yearHigh = core.math.max(quote.yearHigh, quote.price, toquote.price)
+		toquote.yearLow = core.math.min(quote.yearLow, quote.price, toquote.price)
+	}
+
+	if (toquote.volume && !toquote.size) {
 		toquote.size = core.math.sum0(quote.size, core.math.sum0(toquote.volume, -quote.volume))
 	}
 
@@ -307,17 +317,6 @@ export function applyWbQuote(quote: Quotes.Calc, wbquote: Webull.Quote, toquote 
 
 
 export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
-
-	if (!toquote || toquote.price) {
-		let price = toquote && toquote.price ? toquote.price : quote.price
-		quote.high = core.math.max(quote.high, quote.price, price)
-		quote.low = core.math.min(quote.low, quote.price, price)
-		quote.dayHigh = core.math.max(quote.dayHigh, quote.price, price)
-		quote.dayLow = core.math.min(quote.dayLow, quote.price, price)
-		quote.yearHigh = core.math.max(quote.yearHigh, quote.price, price)
-		quote.yearLow = core.math.min(quote.yearLow, quote.price, price)
-	}
-
 	if (toquote) core.object.merge(quote, toquote);
 	else toquote = quote;
 
@@ -366,6 +365,7 @@ export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 
 	if (toquote.bid || toquote.ask) {
 		quote.spread = core.math.round(core.math.sum(quote.ask, -quote.bid), 8)
+		quote.baSpread = core.math.round(core.math.sum(quote.askSpread, -quote.bidSpread), 8)
 	}
 	if (toquote.bidSize || toquote.askSize) {
 		quote.baFlowSize = core.math.sum(quote.bidSize, -quote.askSize)
