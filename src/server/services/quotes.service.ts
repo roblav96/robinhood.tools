@@ -193,13 +193,13 @@ function ontick() {
 	})
 
 	if (process.env.PRODUCTION) {
-		redis.main.coms(coms)
+		redis.main.coms(coms).then(function() {
+			let tdiff = Date.now() - t
+			let key = live ? 'lives' : 'emits'
+			avgs[key] = avgs[key] ? core.math.round(_.mean([avgs[key], tdiff]), 2) : tdiff
+			console.log(`avgs ->`, avgs)
+		})
 	}
-
-	let tdiff = Date.now() - t
-	let key = live ? 'lives' : 'emits'
-	avgs[key] = avgs[key] ? core.math.round(_.mean([avgs[key], tdiff]), 2) : tdiff
-	console.log(`avgs ->`, avgs)
 
 }
 
