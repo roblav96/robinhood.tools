@@ -133,7 +133,7 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 
 
 function ontick() {
-	let t = Date.now()
+	// let t = Date.now()
 	let coms = [] as Redis.Coms
 	let live = new Date().getSeconds() % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
 
@@ -193,20 +193,20 @@ function ontick() {
 	})
 
 	if (process.env.PRODUCTION) {
-		redis.main.coms(coms).then(function() {
-			let tdiff = Date.now() - t
-			let key = live ? 'lives' : 'emits'
-			avgs[key] = avgs[key] ? core.math.round(_.mean([avgs[key], tdiff]), 2) : tdiff
-			console.log(`avgs ->`, avgs)
-		})
+		redis.main.coms(coms)
 	}
 
+	// let tdiff = Date.now() - t
+	// let key = live ? 'lives' : 'emits'
+	// avgs[key] = avgs[key] ? core.math.round(_.mean([avgs[key], tdiff]), 2) : tdiff
+	// console.log(`avgs ->`, avgs)
+
 }
 
-const avgs = {
-	emits: 0,
-	lives: 0,
-}
+// const avgs = {
+// 	emits: 0,
+// 	lives: 0,
+// }
 
 
 
