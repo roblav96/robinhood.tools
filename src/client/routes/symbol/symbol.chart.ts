@@ -22,7 +22,7 @@ import * as charts from '../../adapters/charts'
 
 @Vts.Component({
 	template: `
-		<div class="">
+		<div>
 			<div class="absolute"></div>
 		</div>
 	`,
@@ -33,28 +33,41 @@ class VSymbolEChart extends Vue {
 	echart: charts.ECharts
 
 	mounted() {
-		console.log(`echarts ->`, echarts)
 		this.echart = new charts.ECharts(this.$el.firstChild)
-		console.log('this.echart ->', this.echart)
-		utils.wemitter.on('resize', this.onresize, this)
-		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize);
-		this.resize()
+		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.echart.onresize);
+		this.$el.addEventListener('wheel', this.onwheel)
 	}
 
 	beforeDestroy() {
-		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize);
-		utils.wemitter.off('resize', this.onresize, this)
-		this.onresize.cancel()
-		this.echart.clear()
-		this.echart.dispose()
+		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.echart.onresize);
+		this.$el.removeEventListener('wheel', this.onwheel)
+		this.echart.destroy()
 		this.echart = null
 	}
 
+	onwheel(event: WheelEvent) {
+		if (Math.abs(event.wheelDeltaY) >= Math.abs(event.wheelDeltaX)) return;
+		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.offsetX, event.offsetY])
+		if (!contains) return;
+		let deltaX = event.deltaX
+		if (_.round(event.deltaX) == 0) return;
+		if (this.ctbounds.start == 0 && deltaX < 0) return;
+		if (this.ctbounds.end == 100 && deltaX > 0) return;
+		let zoomwidth = this.ctbounds.end - this.ctbounds.start
+		if (zoomwidth == 100) return;
+		let scale = (zoomwidth / (this.$el.offsetWidth * 0.5))
+		deltaX = deltaX * scale
+		let start = shared.math_clamp(this.ctbounds.start + deltaX, 0, 100 - zoomwidth)
+		let end = shared.math_clamp(this.ctbounds.end + deltaX, zoomwidth, 100)
+		this.echart.dispatchAction({ type: 'dataZoom', start, end })
+		Object.assign(this.ctbounds, { start, end })
+	}
+
 	empty() {
-		this.echart.updateOption({
-			// dataset: { source: [] },
-			// series: [],
-		})
+		// this.echart.updateOption({
+		// 	dataset: { source: [] },
+		// 	// series: [],
+		// })
 	}
 
 
@@ -79,17 +92,8 @@ class VSymbolEChart extends Vue {
 
 
 
-	onresize = _.debounce(this.resize, 300, { leading: false, trailing: true })
-	resize() {
-		this.echart.resize({ width: this.$el.offsetWidth, height: this.$el.offsetHeight })
-	}
-
-
-
 	syncQuotes(lquotes: Quotes.Live[]) {
-		// lquotes = lquotes.map(v => _.mapValues(v, n => core.math.round(n as any, 4))) as any
 		console.log('syncQuotes ->', lquotes.length)
-		let root = charts.bones.root()
 
 		let bones = {
 			animation: false,
@@ -290,9 +294,9 @@ export default class VSymbolChart extends Mixins(VMixin) {
 
 	}
 
-	vechart: VSymbolEChart
+	echart: VSymbolEChart
 	mounted() {
-		this.vechart = (this.$refs as any)['symbol_echart']
+		this.echart = (this.$refs as any)['symbol_echart']
 		this.getQuotes()
 	}
 
@@ -311,19 +315,17 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	}
 
 	getQuotes() {
-		this.vechart.empty()
 		if (!Number.isFinite(this.quote.tickerId)) return;
-
+		this.echart.empty()
 		this.busy = true
 		return Promise.resolve().then(() => {
 			if (this.range == 'live') {
 				return http.post('/quotes/lives', { symbols: [this.symbol] }).then(response => response[0])
 			}
 			return charts.getChart(this.symbol, this.quote.tickerId, this.range)
-
 		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
-			this.vechart.syncQuotes(lquotes)
+			this.echart.syncQuotes(lquotes)
 		}).catch(error => {
 			console.error(`getQuotes Error ->`, error)
 		}).finally(() => {

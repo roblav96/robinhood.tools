@@ -3,7 +3,41 @@
 declare module 'echarts' {
 	namespace ECharts {
 
-		type EventNames = 'click' | 'dblclick' | 'mouseover' | 'mouseout' | 'mousemove' | 'mousedown' | 'mouseup' | 'globalout' | 'contextmenu'
+		type EventNames =
+			'axisareaselected' |
+			'brush' |
+			'brushselected' |
+			'click' |
+			'contextmenu' |
+			'datarangeselected' |
+			'dataviewchanged' |
+			'datazoom' |
+			'dblclick' |
+			'finished' |
+			'focusnodeadjacency' |
+			'globalout' |
+			'legendscroll' |
+			'legendselectchanged' |
+			'legendselected' |
+			'legendunselected' |
+			'magictypechanged' |
+			'mapselectchanged' |
+			'mapselected' |
+			'mapunselected' |
+			'mousedown' |
+			'mousemove' |
+			'mouseout' |
+			'mouseover' |
+			'mouseup' |
+			'pieselectchanged' |
+			'pieselected' |
+			'pieunselected' |
+			'rendered' |
+			'restore' |
+			'timelinechanged' |
+			'timelineplaychanged' |
+			'unfocusnodeadjacency'
+
 		interface EventParam<T = any> {
 			$vars: string[]
 			axisDim: string
@@ -74,7 +108,7 @@ declare module 'echarts' {
 			setOption(option: Partial<Option>, opts?: Partial<OptionOptions>): void
 			getWidth(): number
 			getHeight(): number
-			getDom(): HTMLElement | Node
+			getDom(): HTMLElement
 			getOption(): Option
 			dispatchAction(payload: any): void
 			showLoading(type: string, opts: object): void
@@ -88,19 +122,19 @@ declare module 'echarts' {
 		}
 
 		interface ConvertFinder {
-			seriesIndex: number[]
+			seriesIndex: string | number[]
 			seriesId: string
 			seriesName: string
-			geoIndex: number[]
+			geoIndex: string | number[]
 			geoId: string
 			geoName: string
-			xAxisIndex: number[]
+			xAxisIndex: string | number[]
 			xAxisId: string
 			xAxisName: string
-			yAxisIndex: number[]
+			yAxisIndex: string | number[]
 			yAxisId: string
 			yAxisName: string
-			gridIndex: number[]
+			gridIndex: string | number[]
 			gridId: string
 			gridName: string
 		}
