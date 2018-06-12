@@ -45,6 +45,12 @@ declare module 'echarts' {
 			renderer: 'canvas' | 'svg'
 		}
 
+		interface OptionOptions {
+			notMerge: boolean
+			lazyUpdate: boolean
+			silent: boolean
+		}
+
 		const graphic: any
 		function init(el: HTMLElement | Node, theme?: string | object, opts?: Partial<InitOptions>): ECharts
 		function connect(group: string | string[]): void
@@ -61,15 +67,15 @@ declare module 'echarts' {
 			one(eventName: EventNames, handler: (...params: any[]) => void, context?: any): void
 			off(eventName: EventNames, handler?: (...params: any[]) => void): void
 			resize(dims: Dims): void
-			getDataURL(options: Partial<DataUrlOptions>): string
-			getConnectedDataURL(options: Partial<DataUrlOptions>): string
-			setOption(option: Partial<Options>, notMerge?: boolean, lazyUpdate?: boolean, silent?: boolean): void
+			getDataURL(opts: Partial<DataUrlOptions>): string
+			getConnectedDataURL(opts: Partial<DataUrlOptions>): string
+			setOption(option: Partial<Options>, opts?: Partial<OptionOptions>): void
 			getWidth(): number
 			getHeight(): number
 			getDom(): HTMLElement | Node
 			getOption(): Options
 			dispatchAction(payload: any): void
-			showLoading(type: string, options: object): void
+			showLoading(type: string, opts: object): void
 			hideLoading(): void
 			clear(): void
 			isDisposed(): boolean
@@ -451,7 +457,7 @@ declare module 'echarts' {
 			fontFamily: string
 			fontSize: number
 			fontStyle: string
-			fontWeight: string
+			fontWeight: number | string
 			lineHeight: number
 			borderColor0: string | ((param: EventParam) => string)
 			borderColor: string | ((param: EventParam) => string)

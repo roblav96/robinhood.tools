@@ -21,7 +21,7 @@ import * as charts from '../../adapters/charts'
 
 @Vts.Component({
 	template: `
-		<div class="min-h-sm">
+		<div class="">
 			<div class="absolute"></div>
 		</div>
 	`,
@@ -45,6 +45,13 @@ class VSymbolEChart extends Vue {
 		this.echart.clear()
 		this.echart.dispose()
 		this.echart = null
+	}
+
+	empty() {
+		this.echart.updateOption({
+			dataset: { source: [] },
+			// series: [],
+		}, false, true)
 	}
 
 
@@ -115,20 +122,20 @@ class VSymbolEChart extends Vue {
 				transitionDuration: 0,
 				// backgroundColor: 'transparent',
 				// extraCssText: 'border: 1px solid #b8c1c1;',
-				formatter: params => {
-					console.log('params ->', params)
-					let param = (params[0] || params) as echarts.EventParam<Quotes.Live>
-					let lquote = _.mapValues(param.value, n => utils.format.number(n as any))
-					// console.log('lquote ->', lquote)
-					// Object.keys(lquote).forEach(k => lquote[k] = utils.format.number(lquote[k]))
+				// formatter: params => {
+				// 	console.log('params ->', params)
+				// 	let param = (params[0] || params) as echarts.EventParam<Quotes.Live>
+				// 	let lquote = _.mapValues(param.value, n => utils.format.number(n as any))
+				// 	// console.log('lquote ->', lquote)
+				// 	// Object.keys(lquote).forEach(k => lquote[k] = utils.format.number(lquote[k]))
 
 
-					let html = ''
-					html += `<p>OHLC: ${lquote.open} ${lquote.high} ${lquote.low} ${lquote.close}</p>`
-					// html += `<p>OHLC: ${JSON.stringify(lquote)}</p>`
+				// 	let html = ''
+				// 	html += `<p>OHLC: ${lquote.open} ${lquote.high} ${lquote.low} ${lquote.close}</p>`
+				// 	// html += `<p>OHLC: ${JSON.stringify(lquote)}</p>`
 
-					return `<div class="px-2 py-1 font-sans has-background-dark has-text-white rounded-sm">${html}</div>`
-				},
+				// 	return `<div class="px-2 py-1 font-sans has-background-dark has-text-white rounded-sm">${html}</div>`
+				// },
 				axisPointer: {
 					link: [{ xAxisIndex: 'all' }],
 					animation: false, type: 'cross',
@@ -139,7 +146,7 @@ class VSymbolEChart extends Vue {
 						borderColor: this.colors.dark, borderWidth: 1, margin: 0,
 						textStyle: {
 							color: this.colors.dark, borderRadius: 0,
-							fontSize: 14, padding: [6, 8],
+							fontSize: 14, padding: [6, 8], fontWeight: 'bold',
 						},
 						formatter: params => utils.format.number(params.value),
 					},
@@ -185,7 +192,7 @@ class VSymbolEChart extends Vue {
 			}],
 			xAxis: [{
 				type: 'category',
-				boundaryGap: false,
+				boundaryGap: true,
 				axisLabel: {
 					textStyle: { color: this.colors.dark, fontSize: 14 },
 					formatter: v => charts.format.xlabel(v),
@@ -200,7 +207,7 @@ class VSymbolEChart extends Vue {
 				},
 			}, {
 				type: 'category',
-				boundaryGap: false,
+				boundaryGap: true,
 				gridIndex: 1,
 				axisLabel: { show: false },
 				axisLine: { show: false },
@@ -305,6 +312,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	resync() {
 		if (!Number.isFinite(this.quote.tickerId)) return;
 		this.busy = true
+		this.vechart.empty()
 		return Promise.resolve().then(() => {
 			return this.range == 'live' ? this.getLives() : this.getHistoricals()
 		}).then(lquotes => {

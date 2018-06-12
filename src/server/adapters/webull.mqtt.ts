@@ -172,12 +172,12 @@ export default class WebullMqttClient {
 
 			let i: number, len = payload.data.length
 			for (i = 0; i < len; i++) {
-				let wbquote = payload.data[i]
-				if (wbquote) {
-					webull.fix(wbquote)
-					wbquote.tickerId = tid
-					wbquote.symbol = symbol
-					this.emitter.emit('data', type, wbquote)
+				let wbdata = payload.data[i]
+				if (wbdata) {
+					webull.fix(wbdata)
+					wbdata.tickerId = tid
+					wbdata.symbol = symbol
+					this.emitter.emit('data', type, wbdata)
 				}
 			}
 

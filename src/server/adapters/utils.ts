@@ -9,7 +9,7 @@ import * as redis from './redis'
 
 
 export const DEV_STOCKS = {
-	// MU: 913324077,
+	MU: 913324077,
 	// AAPL: 913256135,
 	// SPY: 913243251,
 	// NVDA: 913257561,
@@ -24,7 +24,7 @@ export const DEV_STOCKS = {
 	// ROKU: 925376726,
 	// UVXY: 913424717,
 	// NFLX: 913257027,
-	PS: 950053216,
+	// PS: 950053216,
 	// 
 	// XNET: 913255889,
 	// DPW: 913303773,

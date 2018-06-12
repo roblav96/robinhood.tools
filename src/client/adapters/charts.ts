@@ -14,16 +14,17 @@ import * as utils from './utils'
 
 
 
-let ector = echarts.init(document.createElement('div'))
-{ (echarts as any).ECharts = ector.constructor }
-ector.clear(); ector.dispose(); ector = null;
+let ctor = echarts.init(document.createElement('div'))
+{ (echarts as any).ECharts = ctor.constructor }
+ctor.clear(); ctor.dispose(); ctor = null;
 
 Object.assign(echarts.ECharts.prototype, {
-	updateOption(option, notMerge, lazyUpdate, silent) {
-		this.setOption(deepmerge(this.getOption(), option), notMerge, lazyUpdate, silent)
+	updateOption: function(option, opts) {
+		console.log(`core.object.difference(this._model, this.getOption()) ->`, core.object.difference(this._model, this.getOption()))
+		this.setOption(deepmerge(this.getOption(), option), opts)
 	},
 } as echarts.ECharts)
-declare module 'echarts' { interface ECharts { updateOption: typeof echarts.ECharts.prototype.setOption } }
+declare module 'echarts' { interface ECharts { updateOption: typeof echarts.ECharts.prototype.setOption, } }
 
 
 
@@ -122,56 +123,24 @@ export function getChart(symbol: string, tid: number, range: string) {
 function get1Day(symbol: string, tid: number) {
 	return Promise.all([
 		http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/F`, { query: { minuteType: 'm1' } }),
-		http.get(`https://quoteapi.webull.com/api/quote/v2/tickerKDatas/${tid}`, { query: { kDataType: 'm1' } }),
 		http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/A`, { query: { minuteType: 'm1' } }),
 	]).then(function(resolved: Webull.MinuteChart[]) {
-
-		let kdatas = (resolved.splice(1, 1).pop() as any) as Webull.KDatasChart
-		kdatas.tickerKDatas.forEach(v => core.fix(v, true))
-		let klquotes = webull.toKDatasLives(kdatas)
-
 		resolved.forEach(v => { core.fix(v, true); core.fix(v.data[0], true) })
 		let mlquotes = resolved.map(v => webull.toMinutesLives(v)).flatten()
 
-		let predates = _.mapValues(resolved[0].data[0].dates[0], v => (v as any) * 1000)
-		let postdates = _.mapValues(resolved[1].data[0].dates[0], v => (v as any) * 1000)
-
 		let range = {
-			min: Math.min(predates.start, predates.end, postdates.start, postdates.end),
-			max: Math.max(predates.start, predates.end, postdates.start, postdates.end),
+			min: Math.min(resolved[0].data[0].dates[0].start * 1000, resolved[1].data[0].dates[0].start * 1000),
+			max: Math.max(resolved[0].data[0].dates[0].end * 1000, resolved[1].data[0].dates[0].end * 1000, Date.now()),
 		}
-		console.log(`range ->`, _.mapValues(range, v => utils.format.stamp(v)))
-
-		let mlrange = {
-			min: Math.min(predates.start, postdates.start),
-			max: Math.max(predates.end, postdates.end),
-		}
-		console.log(`mlrange ->`, _.mapValues(mlrange, v => utils.format.stamp(v)))
-		let klrange = {
-			min: Math.min(predates.end, postdates.end),
-			max: Math.max(predates.start, postdates.start),
-		}
-		console.log(`klrange ->`, _.mapValues(klrange, v => utils.format.stamp(v)))
-
-		klquotes.remove(v => v.timestamp < mlrange.min)
+		// console.log(`range ->`, _.mapValues(range, v => utils.format.stamp(v)))
 
 		return yahoo.getChart(symbol, {
-			interval: '1m',
-			includePrePost: true,
-			period1: dayjs(range.min).subtract(1,'day').unix(),
+			interval: '1m', includePrePost: true,
+			period1: dayjs(range.min).unix(),
 			period2: dayjs(range.max).unix(),
 		}).then(function(ylquotes) {
-			console.log('ylquotes ->', ylquotes)
 
-			let removed = _.remove(ylquotes, v => v.timestamp > klrange.min && v.timestamp < klrange.max)
-			if (removed[0]) {
-				core.object.merge(klquotes[0], _.pick(removed[0], ['open', 'high', 'low', 'close']))
-			}
-
-			let ystamps = ylquotes.map(v => {
-				v.size = 0
-				return v.timestamp
-			})
+			let ystamps = ylquotes.map(v => v.timestamp)
 			mlquotes.forEach(mlquote => {
 				let ylquote = ylquotes.find(v => v.timestamp == mlquote.timestamp)
 				if (ylquote) return ylquote.size += mlquote.size;
@@ -179,7 +148,7 @@ function get1Day(symbol: string, tid: number) {
 				if (index >= 0) ylquotes[index].size += mlquote.size;
 			})
 
-			return ylquotes.concat(klquotes)
+			return ylquotes
 		})
 	})
 }

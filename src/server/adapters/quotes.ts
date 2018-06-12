@@ -9,6 +9,7 @@ import * as iex from '../../common/iex'
 import * as redis from '../adapters/redis'
 import * as utils from '../adapters/utils'
 import * as hours from '../adapters/hours'
+import * as webull from '../adapters/webull'
 import * as pAll from 'p-all'
 import * as dayjs from 'dayjs'
 
@@ -45,7 +46,7 @@ export async function syncAllQuotes(resets = false) {
 	console.info('syncAllQuotes -> start');
 	let symbols = await utils.getAllSymbols()
 	if (process.env.DEVELOPMENT) {
-		// let ikeys = ['bidSize', 'bidVolume', 'bidSpread', 'askSize', 'askVolume', 'askSpread'] as KeysOf<Quotes.Quote>
+		// let ikeys = ['____', '____', '____', '____'] as KeysOf<Quotes.Quote>
 		// let coms = symbols.map(v => ['hdel', `${rkeys.QUOTES}:${v}`].concat(ikeys))
 		// await redis.main.coms(coms)
 	}
@@ -111,24 +112,12 @@ export function applyFull(
 	quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, _.round(quote.avgVolume10Day, quote.avgVolume3Month)))
 
 	let toquote = applyWbQuote(quote, wbquote)
-	resets ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote)
-	mergeCalcs(quote)
+	core.object.repair(quote, mergeCalcs(toquote))
 	let requote = resetFull(quote)
 	resets ? core.object.merge(quote, requote) : core.object.repair(quote, requote)
-	core.object.clean(quote)
 
+	core.object.clean(quote)
 	return quote
-
-}
-
-export function repaired(quote: Quotes.Calc, wbquote: Webull.Quote) {
-	let fquote = core.clone(quote)
-	let toquote = applyWbQuote(quote, wbquote)
-	core.object.repair(toquote, resetFull(quote))
-	mergeCalcs(toquote)
-	core.object.repair(quote, toquote)
-	core.object.clean(quote)
-	return core.object.difference(fquote, quote)
 }
 
 
@@ -139,7 +128,7 @@ export function resetLive(quote: Quotes.Calc) {
 		dealSize: 0, dealFlowSize: 0,
 		buySize: 0, sellSize: 0,
 		bidSize: 0, askSize: 0,
-		spreadFlowSize: 0,
+		baFlowSize: 0,
 		bidSpread: quote.bid, askSpread: quote.ask,
 		open: quote.price, high: quote.price, low: quote.price, close: quote.price,
 	} as Quotes.Calc
@@ -176,7 +165,7 @@ export function toDeal(wbdeal: Webull.Deal) {
 
 export function applyDeal(quote: Quotes.Calc, deal: Quotes.Deal, toquote = {} as Quotes.Calc) {
 
-	if (quote.timestamp < deal.timestamp) {
+	if (deal.timestamp > quote.timestamp) {
 		toquote.timestamp = deal.timestamp
 		if (quote.price != deal.price) {
 			toquote.price = deal.price
@@ -242,6 +231,7 @@ export const KEY_MAP = (({
 	'volume': ({ key: 'volume', greater: true } as KeyMapValue) as any,
 	// '____': ({ key: '____' } as KeyMapValue) as any,
 } as Webull.Quote) as any) as Dict<KeyMapValue>
+export const KEY_MAP_KEYS = Object.keys(KEY_MAP)
 
 export function applyKeyMap(keymap: KeyMapValue, toquote: any, tokey: string, to: any, from: any) {
 	if (keymap && keymap.time) {
@@ -276,25 +266,20 @@ export function applyWbQuote(quote: Quotes.Calc, wbquote: Webull.Quote, toquote 
 
 	})
 
-	if (!quote.timestamp) {
-		quote.timestamp = _.max(_.compact([wbquote.tradeTime, wbquote.mktradeTime, wbquote.faTradeTime]))
-	}
-	if (!quote.price && wbquote.price) {
-		quote.price = wbquote.price; toquote.price = wbquote.price
-	}
-
-	if (toquote.timestamp && (wbquote.price || wbquote.pPrice)) {
-		let state = hours.getState(hours.rxhours.value, toquote.timestamp)
-		if (wbquote.price && state == 'REGULAR') {
+	if (toquote.timestamp) {
+		if (wbquote.price && toquote.timestamp == wbquote.mktradeTime) {
 			toquote.price = wbquote.price
 		}
-		if (wbquote.pPrice && (state.indexOf('PRE') == 0 || state.indexOf('POST') == 0)) {
+		else if (wbquote.pPrice && toquote.timestamp == wbquote.faTradeTime) {
 			toquote.price = wbquote.pPrice
+		}
+		else if (!quote.price) {
+			toquote.price = wbquote.price || wbquote.pPrice
 		}
 	}
 
 	if (toquote.volume) {
-		toquote.size = quote.size + core.math.sum0(toquote.volume, -quote.volume)
+		toquote.size = core.math.sum0(quote.size, core.math.sum0(toquote.volume, -quote.volume))
 	}
 
 	if (toquote.bid) {
@@ -322,42 +307,43 @@ export function applyWbQuote(quote: Quotes.Calc, wbquote: Webull.Quote, toquote 
 
 
 export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
-	if (toquote) {
 
-		if (toquote.price) {
-			quote.high = core.math.max(quote.high, quote.price, toquote.price)
-			quote.low = core.math.min(quote.low, quote.price, toquote.price)
-			quote.dayHigh = core.math.max(quote.dayHigh, quote.price, toquote.price)
-			quote.dayLow = core.math.min(quote.dayLow, quote.price, toquote.price)
-		}
-
-		core.object.merge(quote, toquote)
-	} else {
-		toquote = quote
+	if (!toquote || toquote.price) {
+		let price = toquote && toquote.price ? toquote.price : quote.price
+		quote.high = core.math.max(quote.high, quote.price, price)
+		quote.low = core.math.min(quote.low, quote.price, price)
+		quote.dayHigh = core.math.max(quote.dayHigh, quote.price, price)
+		quote.dayLow = core.math.min(quote.dayLow, quote.price, price)
+		quote.yearHigh = core.math.max(quote.yearHigh, quote.price, price)
+		quote.yearLow = core.math.min(quote.yearLow, quote.price, price)
 	}
+
+	if (toquote) core.object.merge(quote, toquote);
+	else toquote = quote;
 
 	if (toquote.price || toquote.timestamp) {
 		let state = hours.getState(hours.rxhours.value, quote.timestamp)
 
 		if (toquote.price) {
+			if (!quote.startPrice) quote.startPrice = quote.price;
 			quote.close = quote.price
-			quote.change = core.math.sum(quote.price, -quote.startPrice)
-			quote.percent = core.calc.percent(quote.price, quote.startPrice)
+			quote.change = core.math.round(core.math.sum(quote.price, -quote.startPrice), 8)
+			quote.percent = core.math.round(core.calc.percent(quote.price, quote.startPrice), 8)
 
 			if (state.indexOf('PRE') == 0 || !quote.prePrice) {
 				quote.prePrice = quote.price
-				quote.preChange = core.math.sum(quote.price, -quote.startPrice)
-				quote.prePercent = core.calc.percent(quote.price, quote.startPrice)
+				quote.preChange = core.math.round(core.math.sum(quote.price, -quote.startPrice), 8)
+				quote.prePercent = core.math.round(core.calc.percent(quote.price, quote.startPrice), 8)
 			}
 			if (state == 'REGULAR' || !quote.regPrice) {
 				quote.regPrice = quote.price
-				quote.regChange = core.math.sum(quote.price, -quote.openPrice)
-				quote.regPercent = core.calc.percent(quote.price, quote.openPrice)
+				quote.regChange = core.math.round(core.math.sum(quote.price, -quote.openPrice), 8)
+				quote.regPercent = core.math.round(core.calc.percent(quote.price, quote.openPrice), 8)
 			}
 			if (state.indexOf('POST') == 0 || !quote.postPrice) {
 				quote.postPrice = quote.price
-				quote.postChange = core.math.sum(quote.price, -quote.closePrice)
-				quote.postPercent = core.calc.percent(quote.price, quote.closePrice)
+				quote.postChange = core.math.round(core.math.sum(quote.price, -quote.closePrice), 8)
+				quote.postPercent = core.math.round(core.calc.percent(quote.price, quote.closePrice), 8)
 			}
 
 			if (quote.sharesOutstanding) {
@@ -379,11 +365,11 @@ export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 	}
 
 	if (toquote.bid || toquote.ask) {
-		quote.spread = core.math.sum(quote.ask, -quote.bid)
+		quote.spread = core.math.round(core.math.sum(quote.ask, -quote.bid), 8)
 	}
 	if (toquote.bidSize || toquote.askSize) {
-		quote.spreadFlowSize = core.math.sum(quote.bidSize, -quote.askSize)
-		quote.spreadFlowVolume = core.math.sum(quote.bidVolume, -quote.askVolume)
+		quote.baFlowSize = core.math.sum(quote.bidSize, -quote.askSize)
+		quote.baFlowVolume = core.math.sum(quote.bidVolume, -quote.askVolume)
 	}
 
 	if (toquote.buySize || toquote.sellSize) {

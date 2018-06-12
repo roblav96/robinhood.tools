@@ -5,7 +5,7 @@ import * as Benchmarkify from 'benchmarkify'
 
 
 
-export function simple(name: string, fns: (() => void)[]) {
+export function simple(name: string, fns: ((done?: () => void) => void)[]) {
 	let benchmark = new Benchmarkify('Benchmark Simple', { spinner: !isBrowser })
 	// if (isNodeJS) benchmark.printHeader();
 	let suite = benchmark.createSuite(name, { time: 3000 })

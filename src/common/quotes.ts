@@ -64,6 +64,13 @@ const LIVE = {
 	// 
 	dayHigh: number,
 	dayLow: number,
+	yearHigh: number,
+	yearLow: number,
+	// 
+	bid: number,
+	ask: number,
+	bids: number,
+	asks: number,
 	// 
 	bidSpread: number,
 	askSpread: number,
@@ -102,16 +109,10 @@ const CALC = {
 	openPrice: number,
 	closePrice: number,
 	prevClose: number,
-	yearHigh: number,
-	yearLow: number,
 	// 
-	bid: number,
-	ask: number,
-	bids: number,
-	asks: number,
 	spread: number,
-	spreadFlowSize: number,
-	spreadFlowVolume: number,
+	baFlowSize: number,
+	baFlowVolume: number,
 	// 
 	dealFlowVolume: number,
 	dealFlowSize: number,

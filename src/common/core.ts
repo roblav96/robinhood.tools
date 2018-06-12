@@ -234,19 +234,18 @@ export const sort = {
 
 
 export const object = {
-	// is<T = object>(value: T): value is T { return _.isPlainObject(value) },
 	is<T = object>(value: T): value is T { return value && typeof value == 'object' && value.constructor == Object },
 	sortKeys<T = object>(target: T): T {
 		return _.fromPairs(_.sortBy(_.toPairs(target as any))) as any
 	},
 	assign<T = object>(target: T, source: T, deep = false) {
-		Object.keys(source).forEach(function assignEach(key) {
+		Object.keys(source).forEach(key => {
 			let tvalue = target[key]
 			let svalue = source[key]
 			if (deep && object.is(tvalue) && object.is(svalue)) {
 				return object.assign(tvalue, svalue, deep)
 			}
-			target[key] = svalue;
+			target[key] = svalue
 		})
 	},
 	filter<T = object>(target: T, fn: (value: any, key: string) => boolean) {
@@ -266,9 +265,10 @@ export const object = {
 		for (i = 0; i < len; i++) {
 			let key = keys[i]
 			let value = target[key]
-			if (value == null || (number.is(value) && !number.isFinite(value))) {
-				delete target[key]
-			}
+			if (value == null) delete target[key];
+			// if (value == null || (number.is(value) && !number.isFinite(value))) {
+			// 	delete target[key]
+			// }
 		}
 	},
 	merge<T = object>(target: T, source: T, keys?: string[]) {
