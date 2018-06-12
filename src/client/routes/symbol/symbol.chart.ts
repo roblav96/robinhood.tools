@@ -15,6 +15,7 @@ import * as quotes from '../../../common/quotes'
 import * as yahoo from '../../../common/yahoo'
 import * as http from '../../../common/http'
 import * as utils from '../../adapters/utils'
+import * as pretty from '../../adapters/pretty'
 import * as charts from '../../adapters/charts'
 
 
@@ -29,10 +30,12 @@ import * as charts from '../../adapters/charts'
 class VSymbolEChart extends Vue {
 	$parent: VSymbolChart
 	colors = this.$store.state.colors
-	echart: echarts.ECharts
+	echart: charts.ECharts
 
 	mounted() {
-		this.echart = echarts.init(this.$el.firstChild)
+		console.log(`echarts ->`, echarts)
+		this.echart = new charts.ECharts(this.$el.firstChild)
+		console.log('this.echart ->', this.echart)
 		utils.wemitter.on('resize', this.onresize, this)
 		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize);
 		this.resize()
@@ -49,9 +52,9 @@ class VSymbolEChart extends Vue {
 
 	empty() {
 		this.echart.updateOption({
-			dataset: { source: [] },
+			// dataset: { source: [] },
 			// series: [],
-		}, false, true)
+		})
 	}
 
 
@@ -76,21 +79,18 @@ class VSymbolEChart extends Vue {
 
 
 
-	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
 	onresize = _.debounce(this.resize, 300, { leading: false, trailing: true })
 	resize() {
-		this.echart.resize(this.dims())
-	}
-
-	resetZoom() {
-		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
+		this.echart.resize({ width: this.$el.offsetWidth, height: this.$el.offsetHeight })
 	}
 
 
 
-	onquotes(lquotes: Quotes.Live[]) {
+	syncQuotes(lquotes: Quotes.Live[]) {
 		// lquotes = lquotes.map(v => _.mapValues(v, n => core.math.round(n as any, 4))) as any
-		console.log('onquotes ->', lquotes.length)
+		console.log('syncQuotes ->', lquotes.length)
+		let root = charts.bones.root()
+
 		let bones = {
 			animation: false,
 			color: [this.colors['grey-lighter']],
@@ -125,9 +125,9 @@ class VSymbolEChart extends Vue {
 				// formatter: params => {
 				// 	console.log('params ->', params)
 				// 	let param = (params[0] || params) as echarts.EventParam<Quotes.Live>
-				// 	let lquote = _.mapValues(param.value, n => utils.format.number(n as any))
+				// 	let lquote = _.mapValues(param.value, n => pretty.number(n as any))
 				// 	// console.log('lquote ->', lquote)
-				// 	// Object.keys(lquote).forEach(k => lquote[k] = utils.format.number(lquote[k]))
+				// 	// Object.keys(lquote).forEach(k => lquote[k] = pretty.number(lquote[k]))
 
 
 				// 	let html = ''
@@ -146,9 +146,9 @@ class VSymbolEChart extends Vue {
 						borderColor: this.colors.dark, borderWidth: 1, margin: 0,
 						textStyle: {
 							color: this.colors.dark, borderRadius: 0,
-							fontSize: 14, padding: [6, 8], fontWeight: 'bold',
+							fontSize: 14, padding: [6, 8],
 						},
-						formatter: params => utils.format.number(params.value),
+						formatter: params => pretty.number(params.value),
 					},
 				},
 			},
@@ -171,7 +171,7 @@ class VSymbolEChart extends Vue {
 				xAxisIndex: [0, 1],
 				// rangeMode: ['value', 'percent'],
 				zoomOnMouseWheel: 'shift',
-				// preventDefaultMouseMove: true,
+				// preventDefaultMouseMove: false,
 			}, {
 				show: true,
 				xAxisIndex: [0, 1],
@@ -195,14 +195,14 @@ class VSymbolEChart extends Vue {
 				boundaryGap: true,
 				axisLabel: {
 					textStyle: { color: this.colors.dark, fontSize: 14 },
-					formatter: v => charts.format.xlabel(v),
+					formatter: v => charts.xlabel(v),
 				},
 				axisLine: { lineStyle: { color: this.colors.dark } },
 				splitLine: { show: false },
 				axisPointer: {
 					label: {
 						margin: 1,
-						formatter: params => charts.format.xlabel(params.value),
+						formatter: params => charts.xlabel(params.value),
 					},
 				},
 			}, {
@@ -222,7 +222,7 @@ class VSymbolEChart extends Vue {
 				splitArea: { show: false },
 				axisLabel: {
 					textStyle: { color: this.colors.dark, fontSize: 14 },
-					formatter: value => { return utils.format.number(value) },
+					formatter: value => { return pretty.number(value) },
 				},
 				axisLine: { lineStyle: { color: this.colors.dark } },
 				splitLine: { lineStyle: { color: this.colors['grey-lightest'] } },
@@ -268,9 +268,10 @@ class VSymbolEChart extends Vue {
 				encode: { x: 'timestamp', y: 'size' },
 				emphasis: null,
 			}],
-		} as echarts.Options
+		} as echarts.Option
 		this.echart.setOption(bones)
 		// console.log(`this.echart.getOption() ->`, this.echart.getOption())
+		this.$nextTick(() => this.echart.resetZoom())
 	}
 
 }
@@ -292,59 +293,45 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	vechart: VSymbolEChart
 	mounted() {
 		this.vechart = (this.$refs as any)['symbol_echart']
-		this.resync()
+		this.getQuotes()
 	}
 
 	busy = true
 	@Vts.Watch('quote.tickerId') w_tickerId(tickerId: number) {
-		this.resync()
+		this.getQuotes()
 	}
 
-	range = lockr.get('symbol.chart.range', charts.RANGES[1])
-	ranges = ['live'].concat(charts.RANGES)
+	range = lockr.get('symbol.chart.range', yahoo.RANGES[1])
+	ranges = ['live'].concat(yahoo.RANGES)
 	get rangeindex() { return this.ranges.indexOf(this.range) }
-	vrange(range: string) { return charts.format.range(range) }
+	vrange(range: string) { return charts.range(range) }
 	@Vts.Watch('range') w_range(range: string) {
 		lockr.set('symbol.chart.range', range)
-		this.resync()
+		this.getQuotes()
 	}
 
-	resync() {
-		if (!Number.isFinite(this.quote.tickerId)) return;
-		this.busy = true
+	getQuotes() {
 		this.vechart.empty()
+		if (!Number.isFinite(this.quote.tickerId)) return;
+
+		this.busy = true
 		return Promise.resolve().then(() => {
-			return this.range == 'live' ? this.getLives() : this.getHistoricals()
-		}).then(lquotes => {
+			if (this.range == 'live') {
+				return http.post('/quotes/lives', { symbols: [this.symbol] }).then(response => response[0])
+			}
+			return charts.getChart(this.symbol, this.quote.tickerId, this.range)
+
+		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
-			this.vechart.onquotes(lquotes)
-			return this.$nextTick().then(() => this.vechart.resetZoom())
+			this.vechart.syncQuotes(lquotes)
 		}).catch(error => {
-			console.error(`resync Error ->`, error)
+			console.error(`getQuotes Error ->`, error)
 		}).finally(() => {
 			this.busy = false
 		})
 	}
 
-	getLives() {
-		return http.post('/quotes/lives', { symbols: [this.symbol] }).then((response: Quotes.Live[][]) => {
-			return response[0]
-			// console.log(`response ->`, JSON.parse(JSON.stringify(response)))
-			// this.vechart.syncdataset(response[0])
-			// return this.$nextTick()
-		})
-	}
 
-	getHistoricals() {
-		return charts.getChart(this.symbol, this.quote.tickerId, this.range)
-		// return yahoo.getChart(this.symbol, { range: this.range }, this.hours.hours)
-		// .then(response => {
-		// 	return response
-		// console.log(`response ->`, JSON.parse(JSON.stringify(response)))
-		// this.vechart.syncdataset(response)
-		// return this.$nextTick()
-		// })
-	}
 
 }
 

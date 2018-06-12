@@ -52,12 +52,12 @@ export function getChart(symbol: string, params: Partial<Yahoo.ChartParams>) {
 		query: params, proxify: !!process.env.CLIENT, retries: 3
 	}).then(function(response: Yahoo.ApiChart) {
 		let error = _.get(response, 'chart.error') as Yahoo.ApiError
-		if (error) throw boom.badRequest(JSON.stringify(error), response);
+		if (error) throw boom.badRequest(`chart.error -> ${JSON.stringify(error)}`, response);
 		let result = _.get(response, 'chart.result[0]') as Yahoo.ChartResult
-		if (!result) throw boom.expectationFailed('!result', response);
+		if (!result) throw boom.expectationFailed(`!result -> ${JSON.stringify(response)}`, response);
 		let lquotes = [] as Quotes.Live[]
 		let stamps = result.timestamp
-		if (!stamps) return lquotes;
+		if (!stamps) throw boom.expectationFailed(`!stamps -> ${JSON.stringify(response)}`, response);
 		let hquotes = result.indicators.quote[0]
 		stamps.forEach((stamp, i) => {
 			if (!Number.isFinite(hquotes.close[i])) return;

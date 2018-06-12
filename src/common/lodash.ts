@@ -7,6 +7,7 @@ export {
 	Cancelable,
 	ceil,
 	clone,
+	cloneDeep,
 	compact,
 	concat,
 	debounce,

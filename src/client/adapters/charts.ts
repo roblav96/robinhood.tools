@@ -2,7 +2,6 @@
 
 import deepmerge from 'deepmerge'
 import * as dayjs from 'dayjs'
-import * as prettyms from 'pretty-ms'
 import * as echarts from 'echarts'
 import * as ecstat from 'echarts-stat'
 import * as _ from '../../common/lodash'
@@ -11,145 +10,139 @@ import * as http from '../../common/http'
 import * as webull from '../../common/webull'
 import * as yahoo from '../../common/yahoo'
 import * as utils from './utils'
+import * as pretty from './pretty'
 
 
+
+export interface ECharts extends echarts.ECharts { }
+export class ECharts {
+
+	constructor(el?: HTMLElement | Node) { return Object.assign(echarts.init(el), this).ctor() }
+	private ctor() {
+		console.warn(`ctor`)
+		console.log(`this ->`, this)
+		return this
+	}
+
+	updateOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
+		console.log(`this.getOption() ->`, this.getOption())
+		this.setOption(deepmerge(this.getOption(), option), opts)
+	}
+
+	destroy() {
+		this.clear()
+		this.dispose()
+	}
+
+	resetZoom() {
+		this.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
+	}
+
+}
 
 let ctor = echarts.init(document.createElement('div'))
 { (echarts as any).ECharts = ctor.constructor }
 ctor.clear(); ctor.dispose(); ctor = null;
 
-Object.assign(echarts.ECharts.prototype, {
-	updateOption: function(option, opts) {
-		console.log(`core.object.difference(this._model, this.getOption()) ->`, core.object.difference(this._model, this.getOption()))
-		this.setOption(deepmerge(this.getOption(), option), opts)
-	},
-} as echarts.ECharts)
-declare module 'echarts' { interface ECharts { updateOption: typeof echarts.ECharts.prototype.setOption, } }
+Object.getOwnPropertyNames(ECharts.prototype).slice(1).forEach(key => {
+	Object.assign(echarts.ECharts.prototype, { [key]: ECharts.prototype[key] })
+})
 
 
 
-export const format = {
 
-	UNITS: { m: 'minute', h: 'hour', d: 'day', wk: 'week', mo: 'month', y: 'year' },
-	range(range: string, opts = { plural: false }) {
-		if (!range) return range;
-		let s = range.replace(/[0-9]/g, '')
-		s = format.UNITS[s] || s
-		s = s.charAt(0).toUpperCase() + s.substr(1)
-		let n = Number.parseInt(range)
-		if (!Number.isFinite(n)) return s;
-		if (opts.plural && n > 1) s = s + 's';
-		return n + ' ' + s
-	},
 
-	FRAMES: [
-		{ id: 'millisecond', ms: 0, format: 'hh:mm:ssa', ago: true },
-		{ id: 'hour', ms: 0, format: 'hh:mm:ssa', ago: true },
-		{ id: 'day', ms: 0, format: 'dddd, MMM DD, hh:mma', ago: true },
-		{ id: 'week', ms: 0, format: 'MMM DD, hh:mma', ago: true },
-		{ id: 'month', ms: 0, format: 'MMM DD YYYY, hh:mma' },
-		{ id: 'year', ms: 0, format: 'MMM DD YYYY' },
-	],
-	xlabel(stamp: number) {
-		if (!Number.isFinite(stamp)) return '';
-		let now = Date.now()
-		let i: number, len = format.FRAMES.length
-		for (i = 0; i < len; i++) {
-			if (stamp > (now - format.FRAMES[i].ms)) {
-				let frame = format.FRAMES[Math.max(i - 1, 0)]
-				let label = dayjs(stamp).format(frame.format)
-				if (frame.format.endsWith('ssa')) {
-					if (label.includes(':00')) label = label.replace(':00', '');
-				}
-				if (frame.format.endsWith('mma')) {
-					if (label.includes(', 12:00am')) label = label.replace(', 12:00am', '');
-				}
-				if (frame.format.startsWith('dddd')) {
-					let day = label.split(' ')[0]
-					label = label.replace(day, `${day.substring(0, 3)},`)
-				}
-				if (frame.ago) label += ` (${utils.format.time(stamp)})`
-				return label
+const XLABEL_FRAMES = [
+	{ id: 'millisecond', ms: 0, format: 'hh:mm:ssa', ago: true },
+	{ id: 'hour', ms: 0, format: 'hh:mm:ssa', ago: true },
+	{ id: 'day', ms: 0, format: 'dddd, MMM DD, hh:mma', ago: true },
+	{ id: 'week', ms: 0, format: 'MMM DD, hh:mma', ago: true },
+	{ id: 'month', ms: 0, format: 'MMM DD YYYY, hh:mma' },
+	{ id: 'year', ms: 0, format: 'MMM DD YYYY' },
+]
+XLABEL_FRAMES.forEach(v => v.ms = dayjs(0).add(1, v.id as any).valueOf())
+export function xlabel(stamp: number) {
+	if (!Number.isFinite(stamp)) return '';
+	let now = Date.now()
+	let i: number, len = XLABEL_FRAMES.length
+	for (i = 0; i < len; i++) {
+		if (stamp > (now - XLABEL_FRAMES[i].ms)) {
+			let frame = XLABEL_FRAMES[Math.max(i - 1, 0)]
+			let label = dayjs(stamp).format(frame.format)
+			if (frame.format.endsWith('ssa')) {
+				if (label.includes(':00')) label = label.replace(':00', '');
 			}
+			if (frame.format.endsWith('mma')) {
+				if (label.includes(', 12:00am')) label = label.replace(', 12:00am', '');
+			}
+			if (frame.format.startsWith('dddd')) {
+				let day = label.split(' ')[0]
+				label = label.replace(day, `${day.substring(0, 3)},`)
+			}
+			if (frame.ago) label += ` (${pretty.time(stamp)})`
+			return label
 		}
-		return dayjs(stamp).format(format.FRAMES[format.FRAMES.length - 1].format)
-	},
-
+	}
+	return dayjs(stamp).format(XLABEL_FRAMES[XLABEL_FRAMES.length - 1].format)
 }
-format.FRAMES.forEach(v => v.ms = dayjs(0).add(1, v.id as any).valueOf())
 
-
-
-export const FRAMES = {
-	'1d': 'm1',
-	'5d': 'm5',
-	'1mo': 'm60',
-	'3mo': 'd',
-	'1y': 'd',
-	'5y': 'w',
-	'max': 'm',
+const RANGE_UNITS = { m: 'minute', h: 'hour', d: 'day', wk: 'week', mo: 'month', y: 'year', ytd: 'YTD' }
+export function range(range: string, opts = { plural: false }) {
+	if (!range) return range;
+	let s = range.replace(/[0-9]/g, '')
+	s = RANGE_UNITS[s] || s
+	s = s.charAt(0).toUpperCase() + s.substr(1)
+	let n = Number.parseInt(range)
+	if (!Number.isFinite(n)) return s;
+	if (opts.plural && n > 1) s = s + 's';
+	return n + ' ' + s
 }
-export const RANGES = Object.keys(FRAMES)
+
+
 
 export function getChart(symbol: string, tid: number, range: string) {
 	return Promise.resolve().then(function() {
-		if (range == RANGES[0]) return get1Day(symbol, tid);
-		return yahoo.getChart(symbol, { range, interval: yahoo.FRAMES[range] })
-		// let proms = [http.get(`https://quoteapi.webull.com/api/quote/v2/tickerKDatas/${tid}`, {
-		// 	query: { kDataType: FRAMES[range] },
-		// })]
-		// if (range != 'max') proms.push(yahoo.getChart(symbol, { range, interval: '1d' }));
-		// return Promise.all(proms).then(function(resolved) {
-		// 	let lquotes = webull.toKDatasLives(resolved.shift())
-		// 	if (range == 'max') return lquotes;
-		// 	let ylquotes = resolved.shift() as Quotes.Live[]
+		if (range != yahoo.RANGES[0]) {
+			return yahoo.getChart(symbol, { range, interval: yahoo.FRAMES[range] })
+		}
+		return Promise.all([
+			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/F`, { query: { minuteType: 'm1' } }),
+			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/A`, { query: { minuteType: 'm1' } }),
+		]).then(function(resolved: Webull.MinuteChart[]) {
+			resolved.forEach(v => { core.fix(v, true); core.fix(v.data[0], true) })
+			let mlquotes = resolved.map(v => webull.toMinutesLives(v)).flatten()
 
-		// 	// let unit = format.UNITS[range.replace(/[0-9]/g, '')]
-		// 	// let ms = dayjs(0).add(Number.parseInt(range), unit).valueOf()
-		// 	// lquotes.remove(v => v.timestamp < min)
-		// 	return lquotes
-		// })
+			let range = {
+				min: Math.min(resolved[0].data[0].dates[0].start * 1000, resolved[1].data[0].dates[0].start * 1000),
+				max: Math.max(resolved[0].data[0].dates[0].end * 1000, resolved[1].data[0].dates[0].end * 1000, Date.now()),
+			}
+			// console.log(`range ->`, _.mapValues(range, v => pretty.stamp(v)))
+
+			return yahoo.getChart(symbol, {
+				interval: '1m', includePrePost: true,
+				period1: dayjs(range.min).unix(),
+				period2: dayjs(range.max).unix(),
+			}).then(function(ylquotes) {
+
+				let ystamps = ylquotes.map(v => v.timestamp)
+				mlquotes.forEach(mlquote => {
+					let ylquote = ylquotes.find(v => v.timestamp == mlquote.timestamp)
+					if (ylquote) return ylquote.size += mlquote.size;
+					let index = core.array.nearest(ystamps, mlquote.timestamp)
+					if (index >= 0) ylquotes[index].size += mlquote.size;
+				})
+
+				return ylquotes.sort((a, b) => a.timestamp - b.timestamp)
+			})
+		})
+
 	}).then(function(lquotes) {
-		lquotes.sort((a, b) => a.timestamp - b.timestamp)
 		lquotes.forEach((lquote, i) => {
 			lquote.price = lquote.close
 			let prev = lquotes[i - 1] ? lquotes[i - 1].volume : lquote.size
 			lquote.volume = prev + lquote.size
 		})
 		return lquotes
-	})
-}
-
-function get1Day(symbol: string, tid: number) {
-	return Promise.all([
-		http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/F`, { query: { minuteType: 'm1' } }),
-		http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/A`, { query: { minuteType: 'm1' } }),
-	]).then(function(resolved: Webull.MinuteChart[]) {
-		resolved.forEach(v => { core.fix(v, true); core.fix(v.data[0], true) })
-		let mlquotes = resolved.map(v => webull.toMinutesLives(v)).flatten()
-
-		let range = {
-			min: Math.min(resolved[0].data[0].dates[0].start * 1000, resolved[1].data[0].dates[0].start * 1000),
-			max: Math.max(resolved[0].data[0].dates[0].end * 1000, resolved[1].data[0].dates[0].end * 1000, Date.now()),
-		}
-		// console.log(`range ->`, _.mapValues(range, v => utils.format.stamp(v)))
-
-		return yahoo.getChart(symbol, {
-			interval: '1m', includePrePost: true,
-			period1: dayjs(range.min).unix(),
-			period2: dayjs(range.max).unix(),
-		}).then(function(ylquotes) {
-
-			let ystamps = ylquotes.map(v => v.timestamp)
-			mlquotes.forEach(mlquote => {
-				let ylquote = ylquotes.find(v => v.timestamp == mlquote.timestamp)
-				if (ylquote) return ylquote.size += mlquote.size;
-				let index = core.array.nearest(ystamps, mlquote.timestamp)
-				if (index >= 0) ylquotes[index].size += mlquote.size;
-			})
-
-			return ylquotes
-		})
 	})
 }
 

@@ -8,6 +8,7 @@ import * as anime from 'animejs'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as utils from '../adapters/utils'
+import * as pretty from '../adapters/pretty'
 import clock from '../../common/clock'
 
 
@@ -35,8 +36,8 @@ class Timestamp extends Vue {
 	sync() {
 		if (!Number.isFinite(this.value)) return this.fromnow = '';
 		let opts = this.opts ? core.clone(this.opts) : {}
-		this.fromnow = utils.format.time(this.value, opts)
-		this.tip = utils.format.stamp(this.value)
+		this.fromnow = pretty.time(this.value, opts)
+		this.tip = pretty.stamp(this.value)
 	}
 }
 Vue.component('v-timestamp', Timestamp)
@@ -77,7 +78,7 @@ class NumberTicker extends Vue {
 	}
 	get colors() { return this.$store.state.colors }
 	get digits() {
-		return Number.isFinite(this.number) ? utils.format.number(this.number).split('') : []
+		return Number.isFinite(this.number) ? pretty.number(this.number).split('') : []
 	}
 }
 Vue.component('v-number-ticker', NumberTicker)

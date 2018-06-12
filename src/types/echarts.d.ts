@@ -61,19 +61,21 @@ declare module 'echarts' {
 		function registerTheme(themeName: string, theme: object): void
 
 		class ECharts {
+			id: string
 			group: string
-			_model: { option: Partial<Options> }
+			_model: { option: Partial<Option> }
+			constructor(el: HTMLElement | Node, theme?: string | object, opts?: Partial<InitOptions>)
 			on(eventName: EventNames, handler: (...params: any[]) => void, context?: any): void
 			one(eventName: EventNames, handler: (...params: any[]) => void, context?: any): void
 			off(eventName: EventNames, handler?: (...params: any[]) => void): void
 			resize(dims: Dims): void
 			getDataURL(opts: Partial<DataUrlOptions>): string
 			getConnectedDataURL(opts: Partial<DataUrlOptions>): string
-			setOption(option: Partial<Options>, opts?: Partial<OptionOptions>): void
+			setOption(option: Partial<Option>, opts?: Partial<OptionOptions>): void
 			getWidth(): number
 			getHeight(): number
 			getDom(): HTMLElement | Node
-			getOption(): Options
+			getOption(): Option
 			dispatchAction(payload: any): void
 			showLoading(type: string, opts: object): void
 			hideLoading(): void
@@ -135,7 +137,7 @@ declare module 'echarts' {
 			sourceHeader: boolean
 		}
 
-		interface Options {
+		interface Option {
 			animation: boolean
 			animationDuration: number
 			animationDurationUpdate: number

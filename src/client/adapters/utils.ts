@@ -1,5 +1,6 @@
 // 
 
+import * as Vcc from 'vue-class-component'
 import * as dayjs from 'dayjs'
 import * as prettyms from 'pretty-ms'
 import * as _ from '../../common/lodash'
@@ -7,6 +8,12 @@ import * as core from '../../common/core'
 import * as proxy from '../../common/proxy'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
+
+
+
+export const NoCache = Vcc.createDecorator((options, key, index) => {
+	(options.computed[key] as any).cache = false
+})
 
 
 
@@ -50,90 +57,6 @@ export const wemitter = new UEmitter('window')
 
 
 
-declare global { interface NumberFormatOptions { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } }
-declare global { interface TimeFormatOptions extends prettyms.PrettyMsOptions { max: number, showms: boolean, ago: boolean, keepDecimalsOnWholeSeconds: boolean } }
-export const format = {
-
-	UNITS: ['K', 'M', 'B', 'T'],
-	number(value: number, { precision, compact, plusminus, percent, dollar, nozeros } = {} as Partial<NumberFormatOptions>) {
-		let abs = Math.abs(value)
-
-		if (!Number.isFinite(precision)) {
-			precision = 2
-			if (plusminus && percent) {
-				if (abs >= 1000) precision = 0;
-				else if (abs >= 10) precision = 1;
-			}
-			else if (compact) precision = 0;
-			else {
-				if (compact === undefined && abs >= 10000) compact = true;
-				else if (abs >= 10000) precision = 0;
-				else if (abs >= 2000) precision = 1;
-				else if (abs < 2) precision = 3;
-			}
-		} else { nozeros = false }
-		if (plusminus || percent) precision = Math.min(precision, 2);
-
-		let unit = -1
-		if (compact) {
-			while (abs >= 1000) { abs = abs / 1000; unit++ }
-		}
-
-		let split = abs.toString().split('.')
-		let int = split[0]
-		let fixed = int.slice(-3)
-		{
-			let n: number, i = 1
-			for (n = 1000; n <= abs; n *= 1000) {
-				let from = i * 3
-				i++
-				let to = i * 3
-				fixed = int.slice(-to, -from) + ',' + fixed
-			}
-		}
-
-		if (precision > 0 && !(compact && unit == -1)) {
-			let end = split[1] || ''
-			if (!nozeros || !Number.isNaN(Number.parseInt(end))) {
-				fixed += '.'
-				let i: number, len = precision
-				for (i = 0; i < len; i++) {
-					fixed += end[i] || '0'
-				}
-			}
-		}
-
-		if (compact) fixed += format.UNITS[unit] || '';
-		if (value < 0) fixed = '-' + fixed;
-
-		let cash = dollar ? '$' : ''
-		if (plusminus && value > 0) {
-			fixed = '+' + cash + fixed
-		}
-		else if (plusminus && value < 0) {
-			fixed = '–' + cash + fixed.replace('-', '')
-		}
-		else { fixed = cash + fixed };
-		if (percent) fixed += '%';
-
-		// return fixed == '0.000' ? '0' : fixed
-		return fixed
-	},
-
-	stamp(stamp: number) { return dayjs(stamp).format('dddd, MMM DD YYYY, hh:mm:ssa') },
-	time(stamp: number, opts = {} as Partial<TimeFormatOptions>) {
-		opts.secDecimalDigits = opts.secDecimalDigits || 0
-		opts.max = opts.max || 1
-		let ms = prettyms(Math.max(Date.now() - stamp, opts.showms ? 0 : 1001), opts)
-		ms = ms.split(' ').splice(0, opts.verbose ? opts.max * 2 : opts.max).join(' ')
-		return opts.ago == false ? ms : ms + ' ago'
-	},
-
-}
-if (process.env.DEVELOPMENT) Object.assign(window, { format });
-
-
-
 export function bidask(quote: Quotes.Quote) {
 	let bidask = { bid: { price: 0, size: 0 }, ask: { price: 0, size: 0 } }
 	if (Object.keys(quote).length == 0) return bidask;
@@ -157,14 +80,6 @@ export function randomPrice(price: number) {
 }
 
 
-
-export function marketState(state: Hours.State) {
-	if (!state) return state;
-	if (state == 'REGULAR') return 'Markets Open';
-	if (state.includes('PRE')) return 'Pre Market';
-	if (state.includes('POST')) return 'After Hours';
-	return 'Markets Closed'
-}
 
 export function marketcapCategory(marketcap: number) {
 	if (marketcap > (100 * 1000 * 1000 * 1000)) return 'mega';

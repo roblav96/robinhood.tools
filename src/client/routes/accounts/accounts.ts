@@ -4,12 +4,12 @@ import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
 import * as _ from '../../../common/lodash'
 import * as core from '../../../common/core'
-import * as pretty from '../../../common/pretty'
 import * as rkeys from '../../../common/rkeys'
 import * as robinhood from '../../adapters/robinhood'
 import * as security from '../../adapters/security'
 import * as http from '../../../common/http'
 import * as utils from '../../adapters/utils'
+import * as pretty from '../../adapters/pretty'
 import store from '../../store'
 import socket from '../../adapters/socket'
 
@@ -84,10 +84,10 @@ function filterkey(key: string, value: any) {
 
 function tovalue(key: string, value: any) {
 	if (['created_at', 'updated_at'].includes(key)) {
-		value = utils.format.time(new Date(value).valueOf(), { verbose: true })
+		value = pretty.time(new Date(value).valueOf(), { verbose: true })
 	}
 	else if (core.number.isFinite(value)) {
-		value = utils.format.number(value, { precision: 2 })
+		value = pretty.number(value, { precision: 2 })
 	}
 	else if (core.boolean.is(value)) {
 		value = _.startCase(value as any)

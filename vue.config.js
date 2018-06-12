@@ -40,7 +40,7 @@ module.exports = {
 			// })
 		}
 
-		config.plugins.push(new webpack.ProvidePlugin({ Promise: 'zousan' }))
+		config.plugins.push(new webpack.ProvidePlugin({ Promise: 'zousan/src/zousan' }))
 
 		// config.plugins.push(new BundleAnalyzerPlugin())
 

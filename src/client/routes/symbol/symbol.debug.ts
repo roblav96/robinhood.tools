@@ -8,6 +8,7 @@ import Symbol from './symbol'
 import * as core from '../../../common/core'
 import * as rkeys from '../../../common/rkeys'
 import * as utils from '../../adapters/utils'
+import * as pretty from '../../adapters/pretty'
 import * as http from '../../../common/http'
 
 
@@ -36,9 +37,9 @@ export default class extends Mixins(VMixin) {
 		let k = key.toLowerCase()
 		if (core.number.isFinite(value)) {
 			if (k.includes('time') || k.includes('date') || k.includes('stamp')) {
-				return utils.format.time(value, { verbose: true })
+				return pretty.time(value, { verbose: true })
 			}
-			return utils.format.number(value, { nozeros: true })
+			return pretty.number(value, { nozeros: true })
 		}
 		if (core.boolean.is(value)) {
 			if (core.boolean.is(value)) return !value ? 'No' : 'Yes';

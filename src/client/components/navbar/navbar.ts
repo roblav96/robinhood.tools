@@ -7,7 +7,7 @@ import VMixin from '../../mixins/v.mixin'
 import RHMixin from '../../mixins/robinhood.mixin'
 import * as dayjs from 'dayjs'
 import * as _ from '../../../common/lodash'
-import * as pretty from '../../../common/pretty'
+import * as pretty from '../../adapters/pretty'
 import * as utils from '../../adapters/utils'
 import clock from '../../../common/clock'
 
@@ -53,7 +53,7 @@ export default class extends Mixins(VMixin, RHMixin) {
 
 	time = ''
 	onsec() { this.time = dayjs().format('h:mm:ssa') }
-	get state() { return utils.marketState(this.hours.state) }
+	get state() { return pretty.marketState(this.hours.state) }
 	get scolor() {
 		let state = this.hours.state || ''
 		if (state == 'REGULAR') return 'has-text-success';

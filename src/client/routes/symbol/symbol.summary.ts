@@ -12,6 +12,7 @@ import * as core from '../../../common/core'
 import * as rkeys from '../../../common/rkeys'
 import * as http from '../../../common/http'
 import * as utils from '../../adapters/utils'
+import * as pretty from '../../adapters/pretty'
 import socket from '../../adapters/socket'
 
 
@@ -52,9 +53,9 @@ export default class extends Mixins(VMixin) {
 	vvalue(key: keyof Quotes.Quote) {
 		let value = this.all.quote[key]
 		if (value == null) return value;
-		if (key == 'statusTimestamp') return utils.format.time(value as any, { verbose: true });
+		if (key == 'statusTimestamp') return pretty.time(value as any, { verbose: true });
 		if (key == 'listDate') return dayjs(value as any).format('MMMM D, YYYY');
-		if (core.number.isFinite(value)) return utils.format.number(value);
+		if (core.number.isFinite(value)) return pretty.number(value);
 		if (core.boolean.is(value)) return value ? 'Yes' : 'No';
 		if (core.string.is(value)) {
 			let ikeys = ['timezone', 'status'] as KeysOf<Quotes.Quote>

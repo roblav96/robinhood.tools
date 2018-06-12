@@ -5,12 +5,12 @@ import Vuex, { Store } from 'vuex'
 import * as core from '../../common/core'
 import * as utils from '../adapters/utils'
 import store from '../store'
-import { colors } from '../styles/tailwind.js'
 
 
 
-let state = {} as Colors
-store.register('colors', state)
+const colors = {} as Colors
+store.register('colors', colors)
+export default colors
 declare global { namespace Store { interface State { colors: Colors } } }
 
 let theme = ['accent', 'black', 'black-bis', 'black-ter', 'border', 'danger', 'dark', 'grey', 'grey-dark', 'grey-darker', 'grey-light', 'grey-lighter', 'grey-lightest', 'info', 'light', 'link', 'primary', 'secondary', 'success', 'text', 'text-strong', 'warning', 'white', 'white-bis', 'white-ter']
@@ -19,7 +19,7 @@ function getcolors(event: Event) {
 	let style = window.getComputedStyle(document.documentElement)
 	theme.forEach(name => {
 		let color = style.getPropertyValue('--' + name)
-		Vue.set(state, name, color.trim())
+		Vue.set(colors, name, color.trim())
 	})
 }
 
