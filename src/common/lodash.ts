@@ -5,6 +5,7 @@ export {
 	after,
 	camelCase,
 	Cancelable,
+	capitalize,
 	ceil,
 	clone,
 	cloneDeep,

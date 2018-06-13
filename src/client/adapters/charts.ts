@@ -74,17 +74,18 @@ export function getChart(symbol: string, tid: number, range: string) {
 			let mlquotes = resolved.map(v => webull.toMinutesLives(v)).flatten()
 
 			let range = {
-				min: dayjs(Math.min(...resolved.map(v => v.data[0].dates[0].start * 1000))).startOf('day').unix(),
-				max: dayjs(Math.max(...resolved.map(v => v.data[0].dates[0].end * 1000).concat(Date.now()))).endOf('day').unix(),
+				min: dayjs(Math.min(...resolved.map(v => v.data[0].dates[0].start * 1000))).valueOf(),
+				max: dayjs(Math.max(...resolved.map(v => v.data[0].dates[0].end * 1000).concat(Date.now()))).valueOf(),
 			}
 			// console.log(`range ->`, _.mapValues(range, v => pretty.stamp(v)))
 
 			return yahoo.getChart(symbol, {
 				interval: '1m', includePrePost: true,
-				period1: range.min,
-				period2: range.max,
+				period1: dayjs(range.min).startOf('day').unix(),
+				period2: dayjs(range.max).endOf('day').unix(),
 			}).then(function(ylquotes) {
 
+				ylquotes.remove(v => v.timestamp < range.min)
 				let ystamps = ylquotes.map(v => v.timestamp)
 				mlquotes.forEach(mlquote => {
 					let ylquote = ylquotes.find(v => v.timestamp == mlquote.timestamp)

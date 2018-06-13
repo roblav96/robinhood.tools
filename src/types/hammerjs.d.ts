@@ -4,6 +4,10 @@ import * as Hammer from 'hammerjs'
 
 declare global {
 
+	interface RecognizerOptions {
+		type?: string
+	}
+
 	interface Recognizer {
 		canRecognizeWith(recognizers: Recognizer[]): boolean
 		recognizeWith(recognizers: Recognizer[]): Recognizer[]
@@ -14,9 +18,10 @@ declare global {
 
 	interface HammerEvent {
 		preventDefault(): void
+		additionalEvent: string
 		angle: number
 		center: { x: number, y: number }
-		changedPointers: { isTrusted: boolean }[]
+		changedPointers: PointerEvent[]
 		deltaTime: number
 		deltaX: number
 		deltaY: number

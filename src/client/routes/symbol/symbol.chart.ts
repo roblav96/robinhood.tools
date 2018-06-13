@@ -134,6 +134,7 @@ class VSymbolEChart extends Mixins(VECharts) {
 				end: 100,
 				// rangeMode: ['value', 'percent'],
 				zoomOnMouseWheel: 'shift',
+				moveOnMouseMove: false,
 				preventDefaultMouseMove: false,
 			}, {
 				xAxisIndex: [0, 1],
@@ -188,7 +189,7 @@ class VSymbolEChart extends Mixins(VECharts) {
 				},
 				axisLine: { lineStyle: { color: this.colors.dark } },
 				splitLine: { lineStyle: { color: this.colors['grey-lightest'] } },
-				axisPointer: { label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.startPrice), { percent: true, plusminus: true }) }  },
+				axisPointer: { label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.startPrice), { percent: true, plusminus: true }) } },
 			}, {
 				scale: true,
 				gridIndex: 1,

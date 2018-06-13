@@ -3,6 +3,7 @@
 import Vue, { DirectiveOptions } from 'vue'
 import * as anime from 'animejs'
 import * as Hammer from 'hammerjs'
+import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as pretty from '../../common/pretty'
 import * as utils from '../adapters/utils'
@@ -10,40 +11,47 @@ import clock from '../../common/clock'
 
 
 
-// Vue.directive('hammer', {
-// 	inserted(el, binding, vnode) {
-// 		console.log('binding ->', binding)
-// 		let hammer = new Hammer(el, {
-// 			recognizers: [],
-// 		})
-// 		let singletap = new Hammer.Tap({ event: 'singletap' })
-// 		let doubletap = new Hammer.Tap({ event: 'doubletap', taps: 2 })
-// 		let tripletap = new Hammer.Tap({ event: 'tripletap', taps: 3 })
-// 		hammer.add([tripletap, doubletap, singletap])
-// 		tripletap.recognizeWith([doubletap, singletap])
-// 		doubletap.recognizeWith(singletap)
-// 		doubletap.requireFailure(tripletap)
-// 		singletap.requireFailure([tripletap, doubletap])
+const ALL_GESTURES = {
+	pan: 'pan', pancancel: 'pan', pandown: 'pan', panend: 'pan', panleft: 'pan', panmove: 'pan', panright: 'pan', panstart: 'pan', panup: 'pan',
+	pinch: 'pinch', pinchcancel: 'pinch', pinchend: 'pinch', pinchin: 'pinch', pinchmove: 'pinch', pinchout: 'pinch', pinchstart: 'pinch',
+	press: 'press', pressup: 'press',
+	rotate: 'rotate', rotatecancel: 'rotate', rotateend: 'rotate', rotatemove: 'rotate', rotatestart: 'rotate',
+	swipe: 'swipe', swipedown: 'swipe', swipeleft: 'swipe', swiperight: 'swipe', swipeup: 'swipe',
+	tap: 'tap',
+}
+const GESTURES = _.uniq(Object.values(ALL_GESTURES))
 
-// 		hammer.on('singletap', function(event) {
-// 			console.log(`singletap event ->`, event)
-// 		})
-// 		hammer.on('doubletap', function(event) {
-// 			console.log(`doubletap event ->`, event)
-// 		})
-// 		hammer.on('tripletap', function(event) {
-// 			console.log(`tripletap event ->`, event)
-// 		})
-
-// 		binding.def.hammer = hammer
-// 	},
-// 	update(el, binding, vnode) {
-
-// 	},
-// 	unbind(el, binding, vnode) {
-
-// 	},
-// })
+Vue.directive('touch', {
+	inserted(el: HTMLElement & { mc: HammerManager }, binding) {
+		if (!el.mc) {
+			el.mc = new Hammer(el, { preset: [], recognizers: [] })
+		}
+		// console.log(`el.mc ->`, el.mc)
+		let name = binding.arg
+		let gesture = ALL_GESTURES[name]
+		if (!el.mc.get(gesture)) {
+			let recognizer = _.capitalize(gesture)
+			let opts = {} as RecognizerOptions
+			if (recognizer == 'Pan') opts.threshold = 5;
+			Object.keys(binding.modifiers).forEach(key => {
+				let direction = Hammer[`DIRECTION_${key.toUpperCase()}`]
+				if (Number.isFinite(direction)) {
+					opts.direction = direction
+				}
+			})
+			el.mc.add(new Hammer[recognizer](opts))
+		}
+		el.mc.off(name)
+		el.mc.on(name, binding.value)
+	},
+	unbind(el: HTMLElement & { mc: HammerManager }) {
+		if (el.mc) {
+			el.mc.stop(true)
+			el.mc.destroy()
+			el.mc = null
+		}
+	},
+})
 
 
 
