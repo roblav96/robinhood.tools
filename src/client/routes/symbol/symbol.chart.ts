@@ -26,13 +26,29 @@ class VSymbolEChart extends Mixins(VECharts) {
 
 	$parent: VSymbolChart
 	@Vts.Prop() quote: Quotes.Quote
+	startPrice: number
 
 	mounted() {
 		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize);
+		this.echart.on('datazoom', this.ondatazoom_)
+		this.$once('rendered', this.ondatazoom)
+	}
+	beforeDestroy() {
+		this.ondatazoom_.cancel()
+		this.echart.off('datazoom', this.ondatazoom_)
+		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize);
 	}
 
-	beforeDestroy() {
-		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize);
+
+
+	lquotes() { return this.option().dataset[0].source as Quotes.Live[] }
+
+	ondatazoom_ = _.throttle(this.ondatazoom, 100, { leading: false, trailing: true })
+	ondatazoom() {
+		let start = this.ctbounds().start
+		let lquotes = this.lquotes()
+		let lquote = lquotes[Math.round(lquotes.length * (start / 100))]
+		this.startPrice = lquote.price || lquote.open
 	}
 
 
@@ -172,6 +188,7 @@ class VSymbolEChart extends Mixins(VECharts) {
 				},
 				axisLine: { lineStyle: { color: this.colors.dark } },
 				splitLine: { lineStyle: { color: this.colors['grey-lightest'] } },
+				axisPointer: { label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.startPrice), { percent: true, plusminus: true }) }  },
 			}, {
 				scale: true,
 				gridIndex: 1,
@@ -216,6 +233,7 @@ class VSymbolEChart extends Mixins(VECharts) {
 			}],
 		} as echarts.Option
 		this.echart.setOption(bones)
+		this.ondatazoom()
 		// console.log(`this.echart.getOption() ->`, this.echart.getOption())
 		// this.$nextTick(() => this.resetZoom())
 	}

@@ -29,13 +29,15 @@ export default class extends Vue {
 
 	mounted() {
 		this.echart = echarts.init(this.$el.firstChild)
+		this.echart.on('rendered', this.onrender)
+		// this.echart.on('datazoom', this.ondatazoom)
 		utils.wemitter.on('resize', this.onresize, this)
 		utils.wemitter.on('keydown', this.onkeydown, this)
 		utils.wemitter.on('keyup', this.onkeyup, this)
 		this.$el.addEventListener('wheel', this.onwheel, { passive: true })
 		this.$el.addEventListener('click', this.onclick)
 		this.$el.addEventListener('dblclick', this.ondblclick)
-		this.doresize()
+		this.$once('rendered', this.doresize)
 	}
 	beforeDestroy() {
 		this.$el.removeEventListener('dblclick', this.ondblclick)
@@ -45,8 +47,14 @@ export default class extends Vue {
 		utils.wemitter.off('keydown', this.onkeydown, this)
 		utils.wemitter.off('resize', this.onresize, this)
 		this.onresize.cancel()
+		// this.echart.off('datazoom', this.ondatazoom)
 		this.echart.clear()
 		this.echart.dispose()
+	}
+	onrender(event) {
+		console.log('event ->', event)
+		this.echart.off('rendered', this.onrender)
+		this.$emit('rendered')
 	}
 
 
@@ -74,15 +82,19 @@ export default class extends Vue {
 			dataZoomSelectActive: true,
 		})
 	}
-	onkeyup(event: KeyboardEvent) { }
-
-	onclick(event: MouseEvent) {
+	onkeyup(event: KeyboardEvent) {
+		if (event.key != 'Shift') return;
 		this.echart.dispatchAction({
 			type: 'takeGlobalCursor',
 			key: 'dataZoomSelect',
 			dataZoomSelectActive: false,
 		})
 	}
+	// ondatazoom(event: echarts.EventParam) {
+	// 	// console.log(`event ->`, event)
+	// }
+
+	onclick(event: MouseEvent) { }
 	ondblclick(event: MouseEvent) { this.resetZoom() }
 
 	onwheel(event: WheelEvent) {
