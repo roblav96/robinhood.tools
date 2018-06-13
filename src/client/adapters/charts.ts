@@ -48,7 +48,7 @@ export function xlabel(stamp: number) {
 }
 
 const RANGE_UNITS = { m: 'minute', h: 'hour', d: 'day', wk: 'week', mo: 'month', y: 'year', ytd: 'YTD' }
-export function range(range: string, opts = { plural: false }) {
+export function range(range: string, opts = { plural: true }) {
 	if (!range) return range;
 	let s = range.replace(/[0-9]/g, '')
 	s = RANGE_UNITS[s] || s

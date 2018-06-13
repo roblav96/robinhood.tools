@@ -1,31 +1,36 @@
 // 
+@import '~ibm-design-colors';
 @import '~bulma/sass/utilities/initial-variables';
 // 
-$black: #0a0a0a;
-$black-bis: #121212;
-$black-ter: #272727;
-$grey-darker: #343334;
-$grey-dark: #424747;
-$grey: #6f7878;
-$grey-light: #8c9696;
-$grey-lighter: #b8c1c1;
-$grey-lightest: #e3ecec;
-$white-ter: #f0f4f4;
-$white-bis: #f8fafa;
-$white: #ffffff;
+$black: #0e0e0e;
+$black-bis: #1a1a1a;
+$black-ter: color('cool-gray', 90);
 // 
-$orange: #fe8500;
-$yellow: #ffb000;
-$green: #34bc6e;
-$turquoise: #4dc0b5;
-$cyan: #009bef;
-$blue: #5392ff;
-$purple: #9753e1;
-$red: #e62325;
-$pink: #ff509e;
+$grey-darker: color('cool-gray', 80);
+$grey-dark: color('cool-gray', 70);
+$grey: color('cool-gray', 50);
+$grey-light: color('cool-gray', 30);
+$grey-lighter: color('cool-gray', 10);
+$grey-lightest: color('cool-gray', 1);
 // 
-$light: $white-ter;
-$dark: $grey-dark;
+$white-ter: color('cool-white', 4);
+$white-bis: color('cool-white', 2);
+$white: color('white', 0);
+// 
+$orange: color('orange', 30);
+$yellow: color('gold', 20);
+$green: color('green', 30);
+$turquoise: color('teal', 20);
+$cyan: color('cerulean', 40);
+$blue: color('blue', 40);
+$purple: color('violet', 50);
+$red: color('red', 50);
+$pink: color('magenta', 40);
+// 
+// $light: $white-ter;
+// $dark: $grey-darker;
+// $light-invert: $dark;
+// $dark-invert: $white;
 // 
 $primary: $purple;
 $secondary: $cyan;
@@ -36,7 +41,13 @@ $warning: $orange;
 $danger: $red;
 $link: $primary;
 // 
+$primary-invert: $white;
+$secondary-invert: $white;
+$accent-invert: $white;
+$info-invert: $white;
+$success-invert: $white;
 $warning-invert: $white;
+$danger-invert: $white;
 $link-invert: $white;
 // 
 $text: $grey-dark;
@@ -77,7 +88,7 @@ $footer-background-color: $white-ter;
 // $button-disabled-opacity: 0.33;
 // 
 $table-color: $text;
-$table-head-cell-color: $text;
+$table-head-cell-color: $text-strong;
 // 
 $section-padding: 1.5rem 1.5rem;
 $section-padding-medium: 2rem 1.5rem;

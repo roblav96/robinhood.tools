@@ -64,6 +64,15 @@
 	margin-right: 0.5rem;
 }
 
+.button .icon:first-child:not(:last-child) {
+	margin-left: 0px;
+	margin-right: 0.5rem;
+}
+
+.button .icon:first-child:not(:last-child):only-of-type {
+	margin-right: 0px;
+}
+
 .control.has-icons-left > .icon.is-left {
 	left: 0.25rem;
 }
@@ -96,6 +105,19 @@ span.tooltip.is-small:after {
 span.tooltip.is-large:after {
 	padding: 8px 16px;
 	font-size: 18px;
+}
+
+.notices .toast {
+	opacity: 1;
+	font-weight: 500;
+}
+
+.dropdown-menu {
+	z-index: 99;
+}
+
+.dropdown .background {
+	z-index: 30;
 }
 
 

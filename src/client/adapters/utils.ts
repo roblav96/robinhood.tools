@@ -1,6 +1,5 @@
 // 
 
-import * as Vcc from 'vue-class-component'
 import * as dayjs from 'dayjs'
 import * as prettyms from 'pretty-ms'
 import * as _ from '../../common/lodash'
@@ -8,12 +7,6 @@ import * as core from '../../common/core'
 import * as proxy from '../../common/proxy'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
-
-
-
-export const NoCache = Vcc.createDecorator((options, key, index) => {
-	(options.computed[key] as any).cache = false
-})
 
 
 

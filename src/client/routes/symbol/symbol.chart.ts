@@ -26,16 +26,11 @@ class VSymbolEChart extends Mixins(VECharts) {
 
 	$parent: VSymbolChart
 	@Vts.Prop() quote: Quotes.Quote
-	startPrice: number
 
 	mounted() {
 		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize);
-		this.echart.on('datazoom', this.ondatazoom_)
-		this.$once('rendered', this.ondatazoom)
 	}
 	beforeDestroy() {
-		this.ondatazoom_.cancel()
-		this.echart.off('datazoom', this.ondatazoom_)
 		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize);
 	}
 
@@ -43,12 +38,14 @@ class VSymbolEChart extends Mixins(VECharts) {
 
 	lquotes() { return this.option().dataset[0].source as Quotes.Live[] }
 
-	ondatazoom_ = _.throttle(this.ondatazoom, 100, { leading: false, trailing: true })
-	ondatazoom() {
+	@VMixin.NoCache get firstPrice() {
 		let start = this.ctbounds().start
 		let lquotes = this.lquotes()
-		let lquote = lquotes[Math.round(lquotes.length * (start / 100))]
-		this.startPrice = lquote.price || lquote.open
+		let lquote = lquotes[Math.floor(lquotes.length * (start / 100))]
+		return lquote.open || lquote.price
+	}
+	@VMixin.NoCache get splitNumberY() {
+		return Math.round(this.$el.offsetHeight / 100)
 	}
 
 
@@ -92,9 +89,8 @@ class VSymbolEChart extends Mixins(VECharts) {
 
 
 					let html = ''
-					html += `<p>OHLC: ${lquote.open} ${lquote.high} ${lquote.low} ${lquote.close}</p>`
+					html += `<p>Open ${lquote.open}&nbsp;&nbsp;High ${lquote.high}&nbsp;&nbsp;Low ${lquote.low}&nbsp;&nbsp;Close ${lquote.close}</p>`
 					// html += `<p>OHLC: ${JSON.stringify(lquote)}</p>`
-
 					return `<div class="px-2 py-1 leading-none font-sans has-background-dark has-text-white rounded-sm">${html}</div>`
 				},
 				axisPointer: {
@@ -104,10 +100,10 @@ class VSymbolEChart extends Mixins(VECharts) {
 					crossStyle: { color: this.colors['grey-light'] },
 					label: {
 						backgroundColor: this.colors.white, shadowBlur: 0,
-						borderColor: this.colors.dark, borderWidth: 1, margin: 0,
+						borderColor: this.colors.grey, borderWidth: 1, margin: 0,
 						textStyle: {
 							color: this.colors.dark, borderRadius: 0,
-							fontSize: 14, padding: [4, 8],
+							fontSize: 14, padding: [4, 8], fontWeight: 'bold',
 						},
 						formatter: params => pretty.number(params.value),
 					},
@@ -115,30 +111,28 @@ class VSymbolEChart extends Mixins(VECharts) {
 			},
 			grid: [{
 				top: 24,
-				left: 64,
-				right: 64,
+				left: 72,
+				right: 24,
 				bottom: 92,
 				show: true,
 				backgroundColor: this.colors.white,
 				borderColor: this.colors['grey-lightest'],
 			}, {
 				height: 64,
-				left: 64,
-				right: 64,
+				left: 72,
+				right: 24,
 				bottom: 92,
 			}],
 			dataZoom: [{
-				type: 'inside',
+				type: 'inside', throttle: 60,
 				xAxisIndex: [0, 1],
-				start: 0,
-				end: 100,
 				// rangeMode: ['value', 'percent'],
 				zoomOnMouseWheel: 'shift',
 				// moveOnMouseMove: false,
 				// preventDefaultMouseMove: false,
 			}, {
+				type: 'slider', throttle: 60,
 				xAxisIndex: [0, 1],
-				type: 'slider',
 				height: 32,
 				bottom: 24,
 				showDetail: false,
@@ -157,11 +151,14 @@ class VSymbolEChart extends Mixins(VECharts) {
 				type: 'category',
 				boundaryGap: true,
 				axisLabel: {
+					margin: 4,
 					textStyle: { color: this.colors.dark, fontSize: 14 },
 					formatter: v => charts.xlabel(v),
 				},
-				axisLine: { lineStyle: { color: this.colors.dark } },
+				// axisLine: { lineStyle: { color: this.colors.dark } },
+				axisLine: { show: false },
 				splitLine: { show: false },
+				axisTick: { show: false },
 				axisPointer: {
 					label: {
 						margin: 1,
@@ -182,14 +179,16 @@ class VSymbolEChart extends Mixins(VECharts) {
 			}],
 			yAxis: [{
 				scale: true,
+				splitNumber: this.splitNumberY,
 				splitArea: { show: false },
 				axisLabel: {
 					textStyle: { color: this.colors.dark, fontSize: 14 },
 					formatter: value => { return pretty.number(value) },
 				},
-				axisLine: { lineStyle: { color: this.colors.dark } },
+				axisTick: { show: false },
+				axisLine: { show: false },
 				splitLine: { lineStyle: { color: this.colors['grey-lightest'] } },
-				axisPointer: { label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.startPrice), { percent: true, plusminus: true }) } },
+				axisPointer: { label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.firstPrice), { percent: true, plusminus: true }) } },
 			}, {
 				scale: true,
 				gridIndex: 1,
@@ -234,7 +233,6 @@ class VSymbolEChart extends Mixins(VECharts) {
 			}],
 		} as echarts.Option
 		this.echart.setOption(bones)
-		this.ondatazoom()
 		// console.log(`this.echart.getOption() ->`, this.echart.getOption())
 		// this.$nextTick(() => this.resetZoom())
 	}
@@ -247,23 +245,39 @@ class VSymbolEChart extends Mixins(VECharts) {
 	components: { 'v-symbol-echart': VSymbolEChart },
 })
 export default class VSymbolChart extends Mixins(VMixin) {
+
 	$parent: VSymbol
 	@Vts.Prop() symbol: string
 	@Vts.Prop() quote: Quotes.Quote
 
-	created() {
-
-	}
-
-	echart: VSymbolEChart
+	vechart: VSymbolEChart
 	mounted() {
-		this.echart = (this.$refs as any)['symbol_echart']
+		this.vechart = (this.$refs as any)['symbol_vechart']
 		this.getQuotes()
 	}
 
+	brushing = false
 	busy = true
+
 	@Vts.Watch('quote.tickerId') w_tickerId(tickerId: number) {
 		this.getQuotes()
+	}
+	getQuotes() {
+		if (!Number.isFinite(this.quote.tickerId)) return;
+		this.busy = true
+		return Promise.resolve().then(() => {
+			if (this.range == 'live') {
+				return http.post('/quotes/lives', { symbols: [this.symbol] }).then(response => response[0])
+			}
+			return charts.getChart(this.symbol, this.quote.tickerId, this.range)
+		}).then((lquotes: Quotes.Live[]) => {
+			this.$safety()
+			this.vechart.setQuotes(lquotes)
+		}).catch(error => {
+			console.error(`getQuotes Error ->`, error)
+		}).finally(() => {
+			this.busy = false
+		})
 	}
 
 	range = lockr.get('symbol.chart.range', yahoo.RANGES[1])
@@ -278,24 +292,6 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	ohlc = lockr.get('symbol.chart.ohlc', true)
 	@Vts.Watch('ohlc') w_ohlc(ohlc: boolean) {
 		lockr.set('symbol.chart.ohlc', ohlc)
-	}
-
-	getQuotes() {
-		if (!Number.isFinite(this.quote.tickerId)) return;
-		this.busy = true
-		return Promise.resolve().then(() => {
-			if (this.range == 'live') {
-				return http.post('/quotes/lives', { symbols: [this.symbol] }).then(response => response[0])
-			}
-			return charts.getChart(this.symbol, this.quote.tickerId, this.range)
-		}).then((lquotes: Quotes.Live[]) => {
-			this.$safety()
-			this.echart.setQuotes(lquotes)
-		}).catch(error => {
-			console.error(`getQuotes Error ->`, error)
-		}).finally(() => {
-			this.busy = false
-		})
 	}
 
 

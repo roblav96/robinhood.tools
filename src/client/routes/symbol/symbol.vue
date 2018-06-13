@@ -15,7 +15,7 @@
 	<div id="symbol_route" class="">
 
 		<section class="has-background-white border border-b-1 touch:px-6">
-			<div class="container">
+			<div class="container is-fluid">
 
 				<div class="columns is-mobile my-0 items-center touch:flex-wrap">
 
@@ -24,12 +24,12 @@
 					</div>
 
 					<div class="column py-0">
-						<p class="title leading-none whitespace-no-wrap">{{symbol}}</p>
+						<p class="title font-bold leading-none whitespace-no-wrap">{{symbol}}</p>
 						<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
 					</div>
 
 					<div class="column is-narrow has-text-centered">
-						<p class="title leading-none">
+						<p class="title font-bold leading-none">
 							<v-number-ticker :number="all.quote.price"></v-number-ticker>
 						</p>
 						<p>
@@ -38,7 +38,7 @@
 					</div>
 
 					<div class="column is-narrow has-text-centered">
-						<p class="is-size-3 font-semibold leading-none" v-bull-bear="all.quote.percent">
+						<p class="is-size-3 font-bold leading-none" v-bull-bear="all.quote.percent">
 							{{nformat(all.quote.percent,{plusminus:true,percent:true})}}
 						</p>
 						<p class="" v-bull-bear="all.quote.change">
@@ -48,13 +48,13 @@
 
 					<div v-if="all.quote.volume" class="column is-narrow has-text-centered">
 						<p class="is-size-4 font-medium">
-							{{nformat(all.quote.volume,{compact:true})}}
+							{{nformat(all.quote.volume,{compact:true,precision:1})}}
 						</p>
 						<p>Volume</p>
 					</div>
 					<div v-if="all.quote.avgVolume" class="column is-narrow has-text-centered">
 						<p class="is-size-4 font-medium">
-							{{nformat(all.quote.avgVolume,{compact:true})}}
+							{{nformat(all.quote.avgVolume,{compact:true,precision:1})}}
 						</p>
 						<p>Avg Volume</p>
 					</div>

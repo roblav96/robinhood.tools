@@ -1,6 +1,7 @@
 // 
 
 import * as Vts from 'vue-property-decorator'
+import * as Vcc from 'vue-class-component'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import * as _ from '../../common/lodash'
@@ -11,14 +12,17 @@ import * as pretty from '../adapters/pretty'
 
 
 @Vts.Component
-export default class extends Vue {
+export default class VMixin extends Vue {
+
+	static NoCache = Vcc.createDecorator((options, key, index) => {
+		(options.computed[key] as any).cache = false
+	})
 
 	env = process.env.NODE_ENV
 	development = !!process.env.DEVELOPMENT
 	production = !!process.env.PRODUCTION
 
-	@utils.NoCache
-	get $destroyed() { return this._isDestroyed }
+	@VMixin.NoCache get $destroyed() { return this._isDestroyed }
 	$safety() { if (this.$destroyed) throw new Error('$safety'); }
 
 	vcamel(value: string) { return _.camelCase(value) }
