@@ -4,6 +4,7 @@ import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import VMixin from '../../mixins/v.mixin'
+import VECharts from '../../mixins/echarts.mixin'
 import VSymbol from './symbol'
 import * as echarts from 'echarts'
 import * as ecstat from 'echarts-stat'
@@ -20,79 +21,23 @@ import * as charts from '../../adapters/charts'
 
 
 
-@Vts.Component({
-	template: `
-		<div>
-			<div class="absolute"></div>
-		</div>
-	`,
-})
-class VSymbolEChart extends Vue {
+@Vts.Component
+class VSymbolEChart extends Mixins(VECharts) {
+
 	$parent: VSymbolChart
-	colors = this.$store.state.colors
-	echart: charts.ECharts
+	@Vts.Prop() quote: Quotes.Quote
 
 	mounted() {
-		this.echart = new charts.ECharts(this.$el.firstChild)
-		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.echart.onresize);
-		this.$el.addEventListener('wheel', this.onwheel)
+		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize);
 	}
 
 	beforeDestroy() {
-		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.echart.onresize);
-		this.$el.removeEventListener('wheel', this.onwheel)
-		this.echart.destroy()
-		this.echart = null
-	}
-
-	onwheel(event: WheelEvent) {
-		if (Math.abs(event.wheelDeltaY) >= Math.abs(event.wheelDeltaX)) return;
-		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.offsetX, event.offsetY])
-		if (!contains) return;
-		let deltaX = event.deltaX
-		if (_.round(event.deltaX) == 0) return;
-		if (this.ctbounds.start == 0 && deltaX < 0) return;
-		if (this.ctbounds.end == 100 && deltaX > 0) return;
-		let zoomwidth = this.ctbounds.end - this.ctbounds.start
-		if (zoomwidth == 100) return;
-		let scale = (zoomwidth / (this.$el.offsetWidth * 0.5))
-		deltaX = deltaX * scale
-		let start = shared.math_clamp(this.ctbounds.start + deltaX, 0, 100 - zoomwidth)
-		let end = shared.math_clamp(this.ctbounds.end + deltaX, zoomwidth, 100)
-		this.echart.dispatchAction({ type: 'dataZoom', start, end })
-		Object.assign(this.ctbounds, { start, end })
-	}
-
-	empty() {
-		// this.echart.updateOption({
-		// 	dataset: { source: [] },
-		// 	// series: [],
-		// })
+		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize);
 	}
 
 
 
-	// focused = false
-	ontap = _.throttle(this.tapped, 300, { leading: false, trailing: true })
-	tapped(event: HammerEvent) {
-		console.log(`tapped event ->`, JSON.parse(JSON.stringify(event)))
-
-		// console.log(`TAP tapCount ->`, event.tapCount)
-		// let contains = this.echart.containPixel({ gridIndex: [0] }, [event.srcEvent.offsetX, event.srcEvent.offsetY])
-		// if (!contains) return;
-		// this.focused = !this.focused
-		// this.echart.setOption({
-		// 	grid: [{
-		// 		borderWidth: this.focused ? 2 : 1,
-		// 		borderColor: this.focused ? this.colors.secondary : this.colors['grey-lightest'],
-		// 	}],
-		// 	dataZoom: [{ zoomOnMouseWheel: this.focused }],
-		// })
-	}
-
-
-
-	syncQuotes(lquotes: Quotes.Live[]) {
+	setQuotes(lquotes: Quotes.Live[]) {
 		console.log('syncQuotes ->', lquotes.length)
 
 		let bones = {
@@ -103,45 +48,41 @@ class VSymbolEChart extends Vue {
 			// color: Object.values(this.colors),
 			textStyle: { color: this.colors.dark, fontSize: 14 },
 			dataset: {
-				// dimensions: ['timestamp',''],
+				// dimensions: ['timestamp', 'open', 'close', 'high', 'low'],
 				source: lquotes,
-				// source: data,
 			},
+			toolbox: { itemSize: 0, feature: { dataZoom: { show: true, yAxisIndex: false } } },
 			tooltip: {
 				// showContent: !process.env.DEVELOPMENT,
 				// alwaysShowContent: !!process.env.DEVELOPMENT,
 				trigger: 'axis',
+				triggerOn: 'mousemove',
 				// position: [10, 10],
-				// position: function(point, params, el, rect, size) {
-				// 	console.log('size ->', size)
-				// 	console.log('rect ->', rect)
-				// 	console.log('el ->', el)
-				// 	console.log('params ->', params)
-				// 	console.log('point ->', point)
-				// 	return [point[0], 0];
-				// },
+				position: (point, params, el, rect, size) => {
+					return [point[0] - (size.contentSize[0] / 2), 2];
+				},
 				padding: [0, 0, 0, 0],
 				confine: true, enterable: false,
 				showDelay: 0, hideDelay: 1,
 				transitionDuration: 0,
 				// backgroundColor: 'transparent',
 				// extraCssText: 'border: 1px solid #b8c1c1;',
-				// formatter: params => {
-				// 	console.log('params ->', params)
-				// 	let param = (params[0] || params) as echarts.EventParam<Quotes.Live>
-				// 	let lquote = _.mapValues(param.value, n => pretty.number(n as any))
-				// 	// console.log('lquote ->', lquote)
-				// 	// Object.keys(lquote).forEach(k => lquote[k] = pretty.number(lquote[k]))
+				formatter: params => {
+					// console.log('params ->', params)
+					let param = (params[0] || params) as echarts.EventParam<Quotes.Live>
+					let lquote = _.mapValues(param.value, n => pretty.number(n as any))
+					// console.log('lquote ->', lquote)
+					// Object.keys(lquote).forEach(k => lquote[k] = pretty.number(lquote[k]))
 
 
-				// 	let html = ''
-				// 	html += `<p>OHLC: ${lquote.open} ${lquote.high} ${lquote.low} ${lquote.close}</p>`
-				// 	// html += `<p>OHLC: ${JSON.stringify(lquote)}</p>`
+					let html = ''
+					html += `<p>OHLC: ${lquote.open} ${lquote.high} ${lquote.low} ${lquote.close}</p>`
+					// html += `<p>OHLC: ${JSON.stringify(lquote)}</p>`
 
-				// 	return `<div class="px-2 py-1 font-sans has-background-dark has-text-white rounded-sm">${html}</div>`
-				// },
+					return `<div class="px-2 py-1 leading-none font-sans has-background-dark has-text-white rounded-sm">${html}</div>`
+				},
 				axisPointer: {
-					link: [{ xAxisIndex: 'all' }],
+					// link: [{ xAxisIndex: 'all' }],
 					animation: false, type: 'cross',
 					lineStyle: { color: this.colors['grey-lighter'] },
 					crossStyle: { color: this.colors['grey-light'] },
@@ -150,7 +91,7 @@ class VSymbolEChart extends Vue {
 						borderColor: this.colors.dark, borderWidth: 1, margin: 0,
 						textStyle: {
 							color: this.colors.dark, borderRadius: 0,
-							fontSize: 14, padding: [6, 8],
+							fontSize: 14, padding: [4, 8],
 						},
 						formatter: params => pretty.number(params.value),
 					},
@@ -173,11 +114,12 @@ class VSymbolEChart extends Vue {
 			dataZoom: [{
 				type: 'inside',
 				xAxisIndex: [0, 1],
+				start: 0,
+				end: 100,
 				// rangeMode: ['value', 'percent'],
 				zoomOnMouseWheel: 'shift',
-				// preventDefaultMouseMove: false,
+				preventDefaultMouseMove: false,
 			}, {
-				show: true,
 				xAxisIndex: [0, 1],
 				type: 'slider',
 				height: 32,
@@ -275,7 +217,7 @@ class VSymbolEChart extends Vue {
 		} as echarts.Option
 		this.echart.setOption(bones)
 		// console.log(`this.echart.getOption() ->`, this.echart.getOption())
-		this.$nextTick(() => this.echart.resetZoom())
+		// this.$nextTick(() => this.resetZoom())
 	}
 
 }
@@ -314,9 +256,13 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		this.getQuotes()
 	}
 
+	ohlc = lockr.get('symbol.chart.ohlc', true)
+	@Vts.Watch('ohlc') w_ohlc(ohlc: boolean) {
+		lockr.set('symbol.chart.ohlc', ohlc)
+	}
+
 	getQuotes() {
 		if (!Number.isFinite(this.quote.tickerId)) return;
-		this.echart.empty()
 		this.busy = true
 		return Promise.resolve().then(() => {
 			if (this.range == 'live') {
@@ -325,7 +271,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			return charts.getChart(this.symbol, this.quote.tickerId, this.range)
 		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
-			this.echart.syncQuotes(lquotes)
+			this.echart.setQuotes(lquotes)
 		}).catch(error => {
 			console.error(`getQuotes Error ->`, error)
 		}).finally(() => {

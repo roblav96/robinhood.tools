@@ -97,7 +97,7 @@ declare module 'echarts' {
 		class ECharts {
 			id: string
 			group: string
-			_model: { option: Partial<Option> }
+			_model: { option: Option }
 			constructor(el: HTMLElement | Node, theme?: string | object, opts?: Partial<InitOptions>)
 			on(eventName: EventNames, handler: (...params: any[]) => void, context?: any): void
 			one(eventName: EventNames, handler: (...params: any[]) => void, context?: any): void
@@ -119,6 +119,7 @@ declare module 'echarts' {
 			convertFromPixel(finder: Partial<ConvertFinder>, values: number[]): number[]
 			convertToPixel(finder: Partial<ConvertFinder>, values: any[]): any[]
 			containPixel(finder: Partial<ConvertFinder>, values: number[]): boolean
+			trigger(name: string): void
 		}
 
 		interface ConvertFinder {
@@ -182,8 +183,8 @@ declare module 'echarts' {
 			backgroundColor: string
 			brush: any[]
 			color: string[]
-			dataset: Partial<Dataset> | Partial<Dataset>[]
-			dataZoom: Partial<DataZoom> | Partial<DataZoom>[]
+			dataset: Partial<Dataset> & Partial<Dataset>[]
+			dataZoom: Partial<DataZoom> & Partial<DataZoom>[]
 			grid: Partial<Grid> | Partial<Grid>[]
 			hoverLayerThreshold: number
 			legend: any

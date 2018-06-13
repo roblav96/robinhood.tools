@@ -64,6 +64,14 @@
 	margin-right: 0.5rem;
 }
 
+.control.has-icons-left > .icon.is-left {
+	left: 0.25rem;
+}
+
+.control.has-icons-left .select select {
+	padding-left: 2.5rem;
+}
+
 figure.image > img {
 	max-width: 100%;
 	max-height: 100%;

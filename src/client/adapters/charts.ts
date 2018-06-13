@@ -1,10 +1,5 @@
 // 
 
-import * as Vts from 'vue-property-decorator'
-import { mixins as Mixins } from 'vue-class-component'
-import Vue from 'vue'
-import deepmerge from 'deepmerge'
-import * as util from 'util'
 import * as dayjs from 'dayjs'
 import * as echarts from 'echarts'
 import * as ecstat from 'echarts-stat'
@@ -15,127 +10,6 @@ import * as webull from '../../common/webull'
 import * as yahoo from '../../common/yahoo'
 import * as utils from './utils'
 import * as pretty from './pretty'
-import colors from '../stores/colors'
-import Emitter from '../../common/emitter'
-
-
-
-@Vts.Component
-export class EChartsMixin extends Vue {
-
-	echart: echarts.ECharts
-	colors = this.$store.state.colors
-
-	mounted() {
-		this.echart = echarts.init(this.$el.firstChild)
-		utils.wemitter.on('resize', this.onresize, this)
-		this.doresize()
-	}
-	beforeDestroy() {
-		utils.wemitter.off('resize', this.onresize, this)
-		this.onresize.cancel()
-		this.echart.clear()
-		this.echart.dispose()
-	}
-
-	ctbounds = { start: 0, startValue: 0, end: 100, endValue: 0 }
-	// @utils.NoCache
-	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
-
-
-
-	onresize = _.debounce(this.doresize, 300, { leading: false, trailing: true })
-	doresize() {
-		console.log(`this.dims() ->`, this.dims())
-		this.echart.resize(this.dims())
-	}
-
-	updateOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
-		console.log(`this.getOption() ->`, this.echart.getOption())
-		this.echart.setOption(deepmerge(this.echart.getOption(), option), opts)
-	}
-
-	resetZoom() {
-		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
-	}
-
-
-}
-
-
-
-let ctor = echarts.init(document.createElement('div'))
-{ (echarts as any).ECharts = ctor.constructor }
-ctor.clear(); ctor.dispose(); ctor = null;
-
-export interface ECharts extends echarts.ECharts { }
-export class ECharts {
-
-	// emitter = new Emitter<'resize'>()
-
-	constructor(el: HTMLElement | Node) {
-		// return Object.assign(echarts.init(el), this).init()
-		// Object.setPrototypeOf(Object.getPrototypeOf(this), echarts.init(el))
-		// let echart = echarts.init(el)
-		// console.log('echart ->', echart)
-		// let pechart = Object.getPrototypeOf(echart)
-		// console.log('pechart ->', pechart)
-		// Object.assign(this, echart)
-		// Object.assign(Object.getPrototypeOf(this), pechart)
-		console.log(`constructor this ->`, this)
-
-		utils.wemitter.on('resize', this.onresize, this)
-		this.doresize()
-	}
-
-	// private init() {
-	// 	utils.wemitter.on('resize', this.onresize, this)
-	// 	this.doresize()
-	// 	return this
-	// }
-	destroy() {
-		utils.wemitter.off('resize', this.onresize, this)
-		this.onresize.cancel()
-		this.clear()
-		this.dispose()
-	}
-
-	// allHandlers() { return (this as any)._messageCenter._$handlers as Dict<any[]> }
-	// Object.keys(this.allHandlers()).forEach(key => this.off(key as any))
-
-	ctbounds = { start: 0, startValue: 0, end: 100, endValue: 0 }
-	get dims() {
-		console.info(`get dims this ->`, this)
-		let el = this.getDom().parentElement
-		return { width: el.offsetWidth, height: el.offsetHeight } as echarts.Dims
-	}
-
-	onresize = _.debounce(this.doresize, 300, { leading: false, trailing: true })
-	doresize() {
-		console.log(`this.dims ->`, this.dims)
-		this.resize(this.dims)
-	}
-
-	updateOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
-		console.log(`this.getOption() ->`, this.getOption())
-		this.setOption(deepmerge(this.getOption(), option), opts)
-	}
-
-	resetZoom() {
-		this.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
-	}
-
-}
-
-// util.inherits(echarts.ECharts, ECharts)
-// util.inherits(ECharts, echarts.ECharts)
-
-// Object.getOwnPropertyNames(ECharts.prototype).forEach(key => {
-// 	if (key == 'constructor') return;
-// 	Object.assign(echarts.ECharts.prototype, { [key]: ECharts.prototype[key] })
-// })
-
-
 
 
 
@@ -200,15 +74,15 @@ export function getChart(symbol: string, tid: number, range: string) {
 			let mlquotes = resolved.map(v => webull.toMinutesLives(v)).flatten()
 
 			let range = {
-				min: Math.min(resolved[0].data[0].dates[0].start * 1000, resolved[1].data[0].dates[0].start * 1000),
-				max: Math.max(resolved[0].data[0].dates[0].end * 1000, resolved[1].data[0].dates[0].end * 1000, Date.now()),
+				min: dayjs(Math.min(...resolved.map(v => v.data[0].dates[0].start * 1000))).startOf('day').unix(),
+				max: dayjs(Math.max(...resolved.map(v => v.data[0].dates[0].end * 1000).concat(Date.now()))).endOf('day').unix(),
 			}
 			// console.log(`range ->`, _.mapValues(range, v => pretty.stamp(v)))
 
 			return yahoo.getChart(symbol, {
 				interval: '1m', includePrePost: true,
-				period1: dayjs(range.min).unix(),
-				period2: dayjs(range.max).unix(),
+				period1: range.min,
+				period2: range.max,
 			}).then(function(ylquotes) {
 
 				let ystamps = ylquotes.map(v => v.timestamp)

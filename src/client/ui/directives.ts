@@ -10,17 +10,40 @@ import clock from '../../common/clock'
 
 
 
-Vue.directive('hammer', {
-	inserted(el, binding, vnode) {
-		
-	},
-	update(el, binding, vnode) {
+// Vue.directive('hammer', {
+// 	inserted(el, binding, vnode) {
+// 		console.log('binding ->', binding)
+// 		let hammer = new Hammer(el, {
+// 			recognizers: [],
+// 		})
+// 		let singletap = new Hammer.Tap({ event: 'singletap' })
+// 		let doubletap = new Hammer.Tap({ event: 'doubletap', taps: 2 })
+// 		let tripletap = new Hammer.Tap({ event: 'tripletap', taps: 3 })
+// 		hammer.add([tripletap, doubletap, singletap])
+// 		tripletap.recognizeWith([doubletap, singletap])
+// 		doubletap.recognizeWith(singletap)
+// 		doubletap.requireFailure(tripletap)
+// 		singletap.requireFailure([tripletap, doubletap])
 
-	},
-	unbind(el, binding, vnode) {
+// 		hammer.on('singletap', function(event) {
+// 			console.log(`singletap event ->`, event)
+// 		})
+// 		hammer.on('doubletap', function(event) {
+// 			console.log(`doubletap event ->`, event)
+// 		})
+// 		hammer.on('tripletap', function(event) {
+// 			console.log(`tripletap event ->`, event)
+// 		})
 
-	},
-})
+// 		binding.def.hammer = hammer
+// 	},
+// 	update(el, binding, vnode) {
+
+// 	},
+// 	unbind(el, binding, vnode) {
+
+// 	},
+// })
 
 
 
@@ -65,7 +88,12 @@ declare module 'vue/types/vnode' {
 		readonly def: DirectiveOptions
 	}
 }
-declare global { interface VNodeDirectiveDef extends DirectiveOptions { [key: string]: any } }
+declare module 'vue/types/options' {
+	export interface DirectiveOptions {
+		[key: string]: any
+	}
+}
+// declare global { interface VNodeDirectiveDef extends DirectiveOptions { [key: string]: any } }
 
 
 

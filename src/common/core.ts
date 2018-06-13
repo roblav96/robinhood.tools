@@ -238,6 +238,12 @@ export const object = {
 	sortKeys<T = object>(target: T): T {
 		return _.fromPairs(_.sortBy(_.toPairs(target as any))) as any
 	},
+	// pick<T = object>(target: T, keys: string[]): T {
+	// 	return keys.reduce((v, k, i) => {
+	// 		v[k] = target[k]
+	// 		return v
+	// 	}, {})
+	// },
 	assign<T = object>(target: T, source: T, deep = false) {
 		Object.keys(source).forEach(key => {
 			let tvalue = target[key]

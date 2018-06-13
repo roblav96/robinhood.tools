@@ -2,6 +2,7 @@
 
 import { isBrowser, isNodeJS } from './core'
 import * as Benchmarkify from 'benchmarkify'
+export { Benchmarkify }
 
 
 

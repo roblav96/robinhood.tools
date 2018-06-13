@@ -109,6 +109,30 @@ Vue.component('v-symbol-logo', SymbolLogo)
 
 
 // @Vts.Component
+// class Loading extends Mixins((Buefy as any).Loading) {
+// 	isFullPage: boolean
+// 	mounted() {
+// 		if (this.isFullPage) return;
+// 		let parent = this.$el.parentElement
+// 		console.log(`this.$el -> %O`, this.$el, this.$el)
+// 		// this.$el.style.left = ''
+// 		// this.$el.style.right = ''
+// 		// this.$el.style.top = ''
+// 		// this.$el.style.bottom = ''
+// 		setTimeout(() => {
+// 			this.$el.classList.add('block')
+// 			this.$el.classList.add('w-full')
+// 			this.$el.classList.add('h-full')
+// 		}, 1000)
+// 	}
+// }
+// Vue.component('v-loading', Loading)
+
+
+
+
+
+// @Vts.Component
 // class Tooltip extends Mixins((Buefy as any).Tooltip) {
 // 	active: boolean
 // 	@Vts.Prop({ default: 'is-right' })
