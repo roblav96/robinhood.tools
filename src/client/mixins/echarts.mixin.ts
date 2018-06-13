@@ -21,8 +21,7 @@ import * as pretty from '../adapters/pretty'
 			<div 
 				class="absolute"
 				v-touch:tap="ontap"
-				v-touch:pan.horizontal="onpan"
-				@wheel="onwheel"
+				v-on:wheel="onwheel"
 			></div>
 		</div>
 	`,
@@ -87,55 +86,26 @@ export default class extends Vue {
 		})
 	}
 
-	// onclick(event: MouseEvent) { }
-	// ondblclick(event: MouseEvent) { this.resetZoom() }
-
 	ontap(event: HammerEvent) {
 		if (event.tapCount == 2) this.resetZoom();
 	}
 
-	onpan(event: HammerEvent) {
-		console.log(`event ->`, JSON.stringify(event, null, 4))
-		// console.log(`onpan event ->`, event)
-		// console.log(`event ->`, JSON.stringify(event, null, 4))
-		let moveable = this.moveable({
-			deltaX: event.deltaX,
-			offsetX: event.srcEvent.offsetX,
-			offsetY: event.srcEvent.offsetY,
-		} as WheelEvent)
-		if (Object.keys(moveable).length == 0) return;
-		let { deltaX, ctbounds, zoomwidth } = moveable
-		let scale = (zoomwidth / (this.$el.offsetWidth / 128))
-		let velocityX = event.velocityX * scale
-		let start = core.math.clamp(ctbounds.start + velocityX, 0, 100 - zoomwidth)
-		let end = core.math.clamp(ctbounds.end + velocityX, zoomwidth, 100)
-		this.echart.dispatchAction({ type: 'dataZoom', start, end })
-		// console.log(`event.distance ->`, event.distance)
-		// console.log(`deltaX, ctbounds, zoomwidth ->`, deltaX, ctbounds, zoomwidth)
-		// console.log(`event.srcEvent ->`, event.srcEvent)
-	}
 	onwheel(event: WheelEvent) {
 		if (Math.abs(event.wheelDeltaY) >= Math.abs(event.wheelDeltaX)) return;
-		let moveable = this.moveable(event)
-		if (Object.keys(moveable).length == 0) return;
-		let { deltaX, ctbounds, zoomwidth } = moveable
+		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.offsetX, event.offsetY])
+		if (!contains) return;
+		let deltaX = event.deltaX
+		if (core.math.round(event.deltaX) == 0) return;
+		let ctbounds = this.ctbounds()
+		if (ctbounds.start == 0 && deltaX < 0) return;
+		if (ctbounds.end == 100 && deltaX > 0) return;
+		let zoomwidth = ctbounds.end - ctbounds.start
+		if (zoomwidth == 100) return;
 		let scale = (zoomwidth / (this.$el.offsetWidth * 0.5))
 		deltaX = deltaX * scale
 		let start = core.math.clamp(ctbounds.start + deltaX, 0, 100 - zoomwidth)
 		let end = core.math.clamp(ctbounds.end + deltaX, zoomwidth, 100)
 		this.echart.dispatchAction({ type: 'dataZoom', start, end })
-	}
-	moveable(event: WheelEvent) {
-		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.offsetX, event.offsetY])
-		if (!contains) return {};
-		let deltaX = event.deltaX
-		if (core.math.round(event.deltaX) == 0) return {};
-		let ctbounds = this.ctbounds()
-		if (ctbounds.start == 0 && deltaX < 0) return {};
-		if (ctbounds.end == 100 && deltaX > 0) return {};
-		let zoomwidth = ctbounds.end - ctbounds.start
-		if (zoomwidth == 100) return {};
-		return { deltaX, ctbounds, zoomwidth }
 	}
 
 

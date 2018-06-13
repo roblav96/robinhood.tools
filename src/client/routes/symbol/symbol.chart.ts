@@ -134,8 +134,8 @@ class VSymbolEChart extends Mixins(VECharts) {
 				end: 100,
 				// rangeMode: ['value', 'percent'],
 				zoomOnMouseWheel: 'shift',
-				moveOnMouseMove: false,
-				preventDefaultMouseMove: false,
+				// moveOnMouseMove: false,
+				// preventDefaultMouseMove: false,
 			}, {
 				xAxisIndex: [0, 1],
 				type: 'slider',
