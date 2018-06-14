@@ -95,6 +95,7 @@ class VSymbolEChart extends Mixins(VECharts) {
 				},
 				axisPointer: {
 					// link: [{ xAxisIndex: 'all' }],
+					shadowStyle: { opacity: 0 },
 					animation: false, type: 'cross',
 					lineStyle: { color: this.colors['grey-lighter'] },
 					crossStyle: { color: this.colors['grey-light'] },
@@ -126,6 +127,7 @@ class VSymbolEChart extends Mixins(VECharts) {
 			dataZoom: [{
 				type: 'inside', throttle: 60,
 				xAxisIndex: [0, 1],
+				start: 0, end: 100,
 				// rangeMode: ['value', 'percent'],
 				zoomOnMouseWheel: 'shift',
 				// moveOnMouseMove: false,
@@ -269,7 +271,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			if (this.range == 'live') {
 				return http.post('/quotes/lives', { symbols: [this.symbol] }).then(response => response[0])
 			}
-			return charts.getChart(this.symbol, this.quote.tickerId, this.range)
+			return charts.getChart(this.quote, this.range)
 		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
 			this.vechart.setQuotes(lquotes)

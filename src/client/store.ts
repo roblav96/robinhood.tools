@@ -6,7 +6,10 @@ import * as core from '../common/core'
 
 
 
-const state = {} as Store.State
+const state = {
+	backdrop: false,
+} as Store.State
+declare global { namespace Store { interface State { backdrop: boolean } } }
 
 interface VuexStore { getters: Store.Getters }
 class VuexStore extends Vuex.Store<Store.State> {
@@ -36,14 +39,7 @@ load.keys().forEach(file => load(file))
 
 
 
-
-
-declare global {
-	namespace Store {
-		interface State { }
-		interface Getters { }
-	}
-}
+declare global { namespace Store { interface State { } interface Getters { } } }
 
 declare module 'vue/types/options' {
 	export interface ComponentOptions<V extends Vue> {

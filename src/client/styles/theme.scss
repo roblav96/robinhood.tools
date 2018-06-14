@@ -52,6 +52,8 @@ $link-invert: $white;
 // 
 $text: $grey-dark;
 $text-light: $grey;
+$text-lighter: $grey-light;
+$text-lightest: $grey-lighter;
 $text-strong: $grey-darker;
 // 
 $border: $grey-lighter;
@@ -82,7 +84,7 @@ $colors: map-merge($colors, ('text-strong':($text-strong, $white)));
 $colors: map-merge($colors, ('secondary':($secondary, $white)));
 $colors: map-merge($colors, ('accent':($accent, $white)));
 // 
-$body-line-height: 1.25;
+// $body-line-height: 1.25;
 $body-background-color: $white;
 $footer-background-color: $white-ter;
 // $button-disabled-opacity: 0.33;
@@ -106,7 +108,7 @@ $navbar-item-hover-background-color: $white-ter;
 $dropdown-item-hover-color: $link;
 // 
 $modal-content-width: 480px;
-$modal-background-background-color: rgba($black, 0.66);
+$modal-background-background-color: rgba($black, 0.33);
 // 
 $hr-background-color: $border;
 $hr-height: 1px;

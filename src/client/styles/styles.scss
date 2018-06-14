@@ -38,6 +38,30 @@ $shade in $shades {
 	}
 }
 
+.has-text {
+	color: $text !important;
+}
+
+.has-text-light {
+	color: $text-light !important;
+}
+
+.has-text-lighter {
+	color: $text-lighter !important;
+}
+
+.has-text-lightest {
+	color: $text-lightest !important;
+}
+
+.has-text-strong {
+	color: $text-strong !important;
+}
+
+#backdrop {
+	background-color: rgba($black, 0.1);
+}
+
 // 
 // ████  ICON  ████
 // 

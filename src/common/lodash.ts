@@ -31,6 +31,7 @@ export {
 	isEmpty,
 	isEqual,
 	isFinite,
+	isFunction,
 	isPlainObject,
 	keys,
 	keysIn,

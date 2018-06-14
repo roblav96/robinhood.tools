@@ -21,14 +21,13 @@ import clock from '../../../common/clock'
 export default class extends Mixins(VMixin, RHMixin) {
 
 	created() {
-		this.$router.afterEach(() => this.showmenu = false)
 		document.documentElement.classList.add('has-navbar-fixed-top')
+		this.$router.afterEach(() => this.mobilemenu = false)
 		clock.on('1s', this.onsec)
 		this.onsec()
 	}
 	beforeDestroy() {
 		clock.offListener(this.onsec)
-		document.removeEventListener('pointerdown', this.onpointer)
 	}
 
 	isroute(name: string) { return name == this.$route.name }
@@ -38,27 +37,25 @@ export default class extends Mixins(VMixin, RHMixin) {
 		})
 	}
 
-	showmenu = false
-	@Vts.Watch('showmenu') w_showmenu(to: boolean) {
-		document.removeEventListener('pointerdown', this.onpointer)
-		if (to == true) document.addEventListener('pointerdown', this.onpointer);
+	mobilemenu = false
+	@Vts.Watch('mobilemenu') w_mobilemenu(mobilemenu: boolean) {
+		this.$store.state.backdrop = mobilemenu
 	}
-	onpointer(event: MouseEvent) {
-		let path = (event as any).path as HTMLElement[]
-		if (!path.find(v => v.id == 'navbar')) this.showmenu = false;
+	@Vts.Watch('$store.state.backdrop') w_backdrop(backdrop: boolean) {
+		if (this.mobilemenu && !backdrop) this.mobilemenu = backdrop;
 	}
 	@Vts.Watch('breakpoints.name') w_breakpointsname(to: string) {
-		if (this.showmenu && this.breakpoints.desktopAndUp) this.showmenu = false;
+		if (this.mobilemenu && this.breakpoints.desktopAndUp) this.mobilemenu = false;
 	}
 
 	time = ''
 	onsec() { this.time = dayjs().format('h:mm:ssa') }
 	get state() { return pretty.marketState(this.hours.state) }
-	get scolor() {
+	get colorstate() {
 		let state = this.hours.state || ''
 		if (state == 'REGULAR') return 'has-text-success';
 		if (state.includes('PRE') || state.includes('POST')) return 'has-text-warning';
-		return 'has-text-grey-light'
+		return 'has-text-light'
 	}
 
 }

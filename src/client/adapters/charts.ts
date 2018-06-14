@@ -61,14 +61,18 @@ export function range(range: string, opts = { plural: true }) {
 
 
 
-export function getChart(symbol: string, tid: number, range: string) {
+export function getChart(quote: Quotes.Quote, range: string) {
 	return Promise.resolve().then(function() {
 		if (range != yahoo.RANGES[0]) {
+			let symbol = quote.symbol
+			if (quote.typeof == 'INDEXES') symbol = encodeURI('^' + symbol);
+			if (quote.typeof == 'FOREX') symbol = symbol + '=X';
+			console.log(`symbol ->`, symbol)
 			return yahoo.getChart(symbol, { range, interval: yahoo.FRAMES[range] })
 		}
 		return Promise.all([
-			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/F`, { query: { minuteType: 'm1' } }),
-			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${tid}/A`, { query: { minuteType: 'm1' } }),
+			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/F`, { query: { minuteType: 'm1' } }),
+			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/A`, { query: { minuteType: 'm1' } }),
 		]).then(function(resolved: Webull.MinuteChart[]) {
 			resolved.forEach(v => { core.fix(v, true); core.fix(v.data[0], true) })
 			let mlquotes = resolved.map(v => webull.toMinutesLives(v)).flatten()
@@ -79,7 +83,7 @@ export function getChart(symbol: string, tid: number, range: string) {
 			}
 			// console.log(`range ->`, _.mapValues(range, v => pretty.stamp(v)))
 
-			return yahoo.getChart(symbol, {
+			return yahoo.getChart(quote.symbol, {
 				interval: '1m', includePrePost: true,
 				period1: dayjs(range.min).startOf('day').unix(),
 				period2: dayjs(range.max).endOf('day').unix(),

@@ -23,6 +23,7 @@ const GESTURES = _.uniq(Object.values(ALL_GESTURES))
 
 Vue.directive('touch', {
 	inserted(el: HTMLElement & { mc: HammerManager }, binding) {
+		if (!_.isFunction(binding.value)) return console.error(`v-touch !_.isFunction(binding.value) ->`, binding.value);
 		if (!el.mc) {
 			el.mc = new Hammer(el, { preset: [], recognizers: [] })
 		}
@@ -46,7 +47,7 @@ Vue.directive('touch', {
 	},
 	unbind(el: HTMLElement & { mc: HammerManager }) {
 		if (el.mc) {
-			el.mc.stop(true)
+			Object.keys(el.mc.handlers).forEach(k => el.mc.off(k, el.mc.handlers[k]))
 			el.mc.destroy()
 			el.mc = null
 		}

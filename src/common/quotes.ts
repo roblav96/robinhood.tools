@@ -152,6 +152,7 @@ core.nullify(CALC)
 declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
 const FULL = {
 	tickerId: number,
+	type: string,
 	typeof: string as TypeOfSymbols,
 	alive: boolean,
 	name: string,

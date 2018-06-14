@@ -50,15 +50,15 @@ export async function syncAllQuotes(resets = false) {
 		// let coms = symbols.map(v => ['hdel', `${rkeys.QUOTES}:${v}`].concat(ikeys))
 		// await redis.main.coms(coms)
 	}
-	let fivedays = dayjs(hours.rxhours.value.previous.date).subtract(1, 'day').valueOf()
+	let ago = dayjs(hours.rxhours.value.previous.date).subtract(3, 'day').valueOf()
 	let chunks = core.array.chunks(symbols, _.ceil(symbols.length / 256))
 	await pAll(chunks.map((chunk, i) => async () => {
 		console.log('syncAllQuotes ->', `${_.round((i / chunks.length) * 100)}%`);
 		if (resets && process.env.PRODUCTION) {
 			let coms = [] as Redis.Coms
 			let zkeys = await redis.main.coms(chunk.map(v => {
-				coms.push(['zremrangebyscore', `${rkeys.LIVES}:${v}`, '-inf', fivedays as any])
-				return ['zrangebyscore', `${rkeys.LIVES}:${v}`, '-inf', fivedays as any]
+				coms.push(['zremrangebyscore', `${rkeys.LIVES}:${v}`, '-inf', ago as any])
+				return ['zrangebyscore', `${rkeys.LIVES}:${v}`, '-inf', ago as any]
 			})) as string[][]
 			chunk.forEach((v, i) => {
 				if (zkeys[i].length == 0) return;
@@ -85,6 +85,7 @@ export function applyFull(
 	core.object.merge(quote, {
 		symbol,
 		tickerId: wbticker.tickerId,
+		type: _.startCase(webull.ticker_types[wbticker.type]),
 		typeof: wbquote.typeof,
 		timezone: wbquote.utcOffset || wbquote.timeZone,
 		currency: wbquote.currency,
@@ -92,8 +93,8 @@ export function applyFull(
 		industry: iexitem.industry,
 		website: iexitem.website,
 		alive: instrument.alive,
-		mic: instrument.mic,
-		acronym: instrument.acronym,
+		mic: core.fallback(instrument.mic, wbticker.exchangeCode),
+		acronym: core.fallback(instrument.acronym, wbticker.disExchangeCode),
 		description: iexitem.description,
 		issueType: iex.issueType(iexitem.issueType),
 		listDate: new Date(instrument.list_date).valueOf(),

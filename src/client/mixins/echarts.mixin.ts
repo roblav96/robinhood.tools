@@ -93,18 +93,21 @@ export default class extends Vue {
 	ondatazoom() {
 		this.$emit('datazoom')
 		this.brushing = false
-		this.echart.dispatchAction({ type: 'hideTip' })
+		// this.echart.dispatchAction({ type: 'hideTip' })
+		console.log(`this.echart ->`, this.echart)
 	}
 
 	onresize = _.debounce(this.resize, 300, { leading: false, trailing: true })
 	resize() { this.echart.resize(this.dims()) }
 
 	ontap(event: HammerEvent) {
+		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.srcEvent.offsetX, event.srcEvent.offsetY])
 		if (event.tapCount == 1) {
-			this.brushing = !this.brushing
+			this.brushing = !this.brushing && contains
+			console.log(`this.brushing ->`, this.brushing)
 		}
 		if (event.tapCount == 2) {
-			this.resetZoom()
+			if (contains) this.resetZoom();
 		}
 	}
 

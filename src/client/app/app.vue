@@ -40,5 +40,9 @@
 			</div>
 		</section>
 
+		<!-- <transition enter-active-class="animated-3s fadeIn"> -->
+		<div id="backdrop" v-show="$store.state.backdrop" v-touch:tap="()=>$store.state.backdrop=false" class="fixed pin z-10"></div>
+		<!-- </transition> -->
+
 	</div>
 </template>

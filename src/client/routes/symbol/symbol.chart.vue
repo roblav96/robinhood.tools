@@ -9,7 +9,7 @@
 <template>
 	<div class="flex-col-full">
 
-		<section class="section pb-0">
+		<section class="section">
 			<div class="columns items-center">
 				<div class="column is-narrow">
 					<div class="field has-addons">
@@ -29,7 +29,7 @@
 										<span>{{vrange(range)}}</span>
 									</button>
 								</b-tooltip>
-								<b-dropdown-item class="py-0 is-size-6 font-bold" custom>Date Range</b-dropdown-item>
+								<b-dropdown-item class="is-size-6 font-bold py-0 my-0" custom>Date Range</b-dropdown-item>
 								<b-dropdown-item separator></b-dropdown-item>
 								<b-dropdown-item class="font-medium" @click="range=v" v-for="v in ranges" :value="v" :key="v">
 									<span>{{vrange(v)}}</span>
@@ -90,7 +90,7 @@
 		</section>
 
 		<!-- <b-tooltip type="is-primary" label="Hold click down, then drag to crop" animated> -->
-		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :brushing="brushing"></v-symbol-echart>
+		<v-symbol-echart class="flex-col-full border-danger border-1" ref="symbol_vechart" :quote="quote" :brushing="brushing"></v-symbol-echart>
 		<!-- </b-tooltip> -->
 
 		<!-- <v-loading :is-full-page="false" :active="true"></v-loading> -->

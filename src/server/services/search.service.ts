@@ -55,7 +55,7 @@ radio.reply('search.query', async function onquery(query: string) {
 			})
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 750,
+				boost: 7500,
 				wildcard: lunr.Query.wildcard.TRAILING,
 			})
 			q.term(query, {

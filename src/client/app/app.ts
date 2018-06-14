@@ -29,6 +29,14 @@ export default class extends Mixins(VMixin) {
 		return this.$router.options.routes.filter(v => v.name && !v.path.includes('/:'))
 	}
 
+	// hidebackdrop() {
+	// 	console.log('hidebackdrop ->')
+	// 	// this.$store.state.backdrop = false
+	// }
+	// @Vts.Watch('$store.state.backdrop') w_backdrop(backdrop: boolean) {
+	// 	console.log(`backdrop ->`, backdrop)
+	// }
+
 }
 
 

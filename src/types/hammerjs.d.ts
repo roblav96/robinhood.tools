@@ -8,6 +8,10 @@ declare global {
 		type?: string
 	}
 
+	interface HammerManager {
+		handlers: { [event: string]: HammerListener }
+	}
+
 	interface Recognizer {
 		canRecognizeWith(recognizers: Recognizer[]): boolean
 		recognizeWith(recognizers: Recognizer[]): Recognizer[]

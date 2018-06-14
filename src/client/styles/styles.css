@@ -10,7 +10,8 @@
 
 /* tailwind fixes */
 
-.border {
+.border,
+.border-1 {
 	border-style: solid;
 	border-color: var(--border);
 }
@@ -112,10 +113,7 @@ span.tooltip.is-large:after {
 	font-weight: 500;
 }
 
-.dropdown-menu {
-	z-index: 99;
-}
-
+.dropdown-menu,
 .dropdown .background {
 	z-index: 30;
 }

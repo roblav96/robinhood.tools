@@ -4,7 +4,7 @@
 <style>
 /**/
 
-#symbol_route table .progress::-webkit-progress-bar {
+div.symbol-route table .progress::-webkit-progress-bar {
 	background-color: white;
 	border: 1px solid var(--border);
 }
@@ -12,66 +12,64 @@
 </style>
 
 <template>
-	<div id="symbol_route" class="">
+	<div class="symbol-route">
+		<section class="section py-0 has-background-white border border-b-1 leading-tight">
 
-		<section class="has-background-white border border-b-1 touch:px-6">
-			<div class="container is-fluid">
+			<div class="columns is-mobile my-0 items-center touch:flex-wrap">
 
-				<div class="columns is-mobile my-0 items-center touch:flex-wrap">
+				<div class="column is-narrow">
+					<v-symbol-logo class="is-48x48 shadow" :symbol="symbol"></v-symbol-logo>
+				</div>
 
-					<div class="column is-narrow">
-						<v-symbol-logo class="is-48x48 shadow" :symbol="symbol"></v-symbol-logo>
-					</div>
+				<div class="column py-0">
+					<p class="title font-bold leading-none whitespace-no-wrap">{{symbol}}</p>
+					<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
+				</div>
 
-					<div class="column py-0">
-						<p class="title font-bold leading-none whitespace-no-wrap">{{symbol}}</p>
-						<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
-					</div>
+				<div class="column is-narrow has-text-centered">
+					<p class="title font-bold leading-none">
+						<v-number-ticker :number="all.quote.price"></v-number-ticker>
+					</p>
+					<p>
+						<v-timestamp :value="all.quote.timestamp"></v-timestamp>
+					</p>
+				</div>
 
-					<div class="column is-narrow has-text-centered">
-						<p class="title font-bold leading-none">
-							<v-number-ticker :number="all.quote.price"></v-number-ticker>
-						</p>
-						<p>
-							<v-timestamp :value="all.quote.timestamp"></v-timestamp>
-						</p>
-					</div>
+				<div class="column is-narrow has-text-centered">
+					<p class="is-size-3 font-bold leading-none" v-bull-bear="all.quote.percent">
+						{{nformat(all.quote.percent,{plusminus:true,percent:true})}}
+					</p>
+					<p v-bull-bear="all.quote.change">
+						{{nformat(all.quote.change,{plusminus:true})}}
+					</p>
+				</div>
 
-					<div class="column is-narrow has-text-centered">
-						<p class="is-size-3 font-bold leading-none" v-bull-bear="all.quote.percent">
-							{{nformat(all.quote.percent,{plusminus:true,percent:true})}}
-						</p>
-						<p class="" v-bull-bear="all.quote.change">
-							{{nformat(all.quote.change,{plusminus:true})}}
-						</p>
-					</div>
+				<div v-if="all.quote.volume" class="column is-narrow has-text-centered">
+					<p class="is-size-4 font-medium">
+						{{nformat(all.quote.volume,{compact:true,precision:1})}}
+					</p>
+					<p>Volume</p>
+				</div>
+				<div v-if="all.quote.avgVolume" class="column is-narrow has-text-centered">
+					<p class="is-size-4 font-medium">
+						{{nformat(all.quote.avgVolume,{compact:true,precision:1})}}
+					</p>
+					<p>Avg Volume</p>
+				</div>
+				<div v-if="all.quote.marketCap" class="column is-narrow has-text-centered">
+					<p class="is-size-4 font-medium">
+						{{nformat(all.quote.marketCap,{compact:true})}}
+					</p>
+					<p>Market Cap</p>
+				</div>
+				<div v-if="all.quote.dealFlowVolume" class="column is-narrow has-text-centered">
+					<p class="is-size-4 font-medium" v-bull-bear="all.quote.dealFlowVolume">
+						{{nformat(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
+					</p>
+					<p>Captial Flow</p>
+				</div>
 
-					<div v-if="all.quote.volume" class="column is-narrow has-text-centered">
-						<p class="is-size-4 font-medium">
-							{{nformat(all.quote.volume,{compact:true,precision:1})}}
-						</p>
-						<p>Volume</p>
-					</div>
-					<div v-if="all.quote.avgVolume" class="column is-narrow has-text-centered">
-						<p class="is-size-4 font-medium">
-							{{nformat(all.quote.avgVolume,{compact:true,precision:1})}}
-						</p>
-						<p>Avg Volume</p>
-					</div>
-					<div v-if="all.quote.marketCap" class="column is-narrow has-text-centered">
-						<p class="is-size-4 font-medium">
-							{{nformat(all.quote.marketCap,{compact:true})}}
-						</p>
-						<p>Market Cap</p>
-					</div>
-					<div v-if="all.quote.dealFlowVolume" class="column is-narrow has-text-centered">
-						<p class="is-size-4 font-medium" v-bull-bear="all.quote.dealFlowVolume">
-							{{nformat(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
-						</p>
-						<p>Captial Flow</p>
-					</div>
-
-					<!-- <div class="column is-narrow">
+				<!-- <div class="column is-narrow">
 						<table class="table is-paddingless is-middle is-nowrap is-borderless">
 							<tbody>
 								<tr>
@@ -118,7 +116,7 @@
 						</table>
 					</div> -->
 
-					<!-- <div v-if="all.quote.marketCap && all.quote.dealFlowVolume" class="column is-narrow desktop:flex hidden">
+				<!-- <div v-if="all.quote.marketCap && all.quote.dealFlowVolume" class="column is-narrow desktop:flex hidden">
 						<div class="flex py-0">
 							<table class="table is-paddingless is-middle is-nowrap is-borderless">
 								<tbody>
@@ -137,21 +135,18 @@
 						</div>
 					</div> -->
 
-				</div>
-
-				<nav class="tabs is-boxed is-fullwidth is-centered mb-0">
-					<div class="container">
-						<ul>
-							<router-link tag="li" class="is-dark" v-for="route in routes" :key="route.name" :to="{name:route.name}">
-								<a class="is-dark no-underline">
-									<b-icon :icon="route.icon"></b-icon>
-									<span>{{vcapitalize(route.path)}}</span>
-								</a>
-							</router-link>
-						</ul>
-					</div>
-				</nav>
 			</div>
+
+			<nav class="tabs is-boxed is-fullwidth is-centered mb-0">
+				<ul>
+					<router-link tag="li" class="is-dark" v-for="route in routes" :key="route.name" :to="{name:route.name}">
+						<a class="is-dark no-underline">
+							<b-icon :icon="route.icon"></b-icon>
+							<span>{{vcapitalize(route.path)}}</span>
+						</a>
+					</router-link>
+				</ul>
+			</nav>
 		</section>
 
 		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
