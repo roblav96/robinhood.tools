@@ -32,17 +32,18 @@ export default class extends Vue {
 	colors = this.$store.state.colors
 
 	mounted() {
-		this.$once('rendered', this.resize)
 		this.echart = echarts.init(this.$el.firstChild)
 		this.echart.on('rendered', this.onrender_)
 		this.echart.on('datazoom', this.ondatazoom_)
-		utils.wemitter.on('resize', this.onresize, this)
+		utils.wemitter.on('resize', this.onresize_, this)
 		utils.wemitter.on('keyup', this.onkeyup, this)
+		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize_);
 	}
 	beforeDestroy() {
+		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize_);
 		utils.wemitter.off('keyup', this.onkeyup, this)
-		utils.wemitter.off('resize', this.onresize, this)
-		this.onresize.cancel()
+		utils.wemitter.off('resize', this.onresize_, this)
+		this.onresize_.cancel()
 		this.echart.off('datazoom', this.ondatazoom_)
 		this.ondatazoom_.cancel()
 		this.echart.clear()
@@ -53,6 +54,7 @@ export default class extends Vue {
 	private onrender_() {
 		this.echart.off('rendered', this.onrender_)
 		this.$emit('rendered')
+		this.resize()
 	}
 
 
@@ -89,22 +91,24 @@ export default class extends Vue {
 		if (['Escape'].includes(event.key)) this.brushing = false;
 	}
 
-	ondatazoom_ = _.throttle(this.ondatazoom, 100, { leading: false, trailing: true })
-	ondatazoom() {
+	ondatazoom_ = _.throttle(this.datazoom, 100, { leading: false, trailing: true })
+	datazoom() {
 		this.$emit('datazoom')
 		this.brushing = false
 		// this.echart.dispatchAction({ type: 'hideTip' })
-		console.log(`this.echart ->`, this.echart)
+		// console.log(`this.echart ->`, this.echart)
 	}
 
-	onresize = _.debounce(this.resize, 300, { leading: false, trailing: true })
-	resize() { this.echart.resize(this.dims()) }
+	onresize_ = _.debounce(this.resize, 300, { leading: false, trailing: true })
+	resize() {
+		this.$emit('resize')
+		this.echart.resize(this.dims())
+	}
 
 	ontap(event: HammerEvent) {
 		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.srcEvent.offsetX, event.srcEvent.offsetY])
 		if (event.tapCount == 1) {
 			this.brushing = !this.brushing && contains
-			console.log(`this.brushing ->`, this.brushing)
 		}
 		if (event.tapCount == 2) {
 			if (contains) this.resetZoom();

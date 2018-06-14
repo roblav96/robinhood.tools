@@ -28,10 +28,10 @@ class VSymbolEChart extends Mixins(VECharts) {
 	@Vts.Prop() quote: Quotes.Quote
 
 	mounted() {
-		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize);
+		this.$on('resize', this.onresize)
 	}
 	beforeDestroy() {
-		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize);
+
 	}
 
 
@@ -39,13 +39,19 @@ class VSymbolEChart extends Mixins(VECharts) {
 	lquotes() { return this.option().dataset[0].source as Quotes.Live[] }
 
 	@VMixin.NoCache get firstPrice() {
-		let start = this.ctbounds().start
 		let lquotes = this.lquotes()
-		let lquote = lquotes[Math.floor(lquotes.length * (start / 100))]
+		let lquote = lquotes[Math.floor(lquotes.length * (this.ctbounds().start / 100))]
 		return lquote.open || lquote.price
 	}
 	@VMixin.NoCache get splitNumberY() {
 		return Math.round(this.$el.offsetHeight / 100)
+	}
+
+
+
+	onresize() {
+		console.log(`this.splitNumberY ->`, this.splitNumberY)
+		this.echart.setOption({ yAxis: [{ splitNumber: this.splitNumberY }] })
 	}
 
 

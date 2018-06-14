@@ -14,11 +14,11 @@ import * as pretty from './pretty'
 
 
 const XLABEL_FRAMES = [
-	{ id: 'millisecond', ms: 0, format: 'hh:mm:ssa', ago: true },
-	{ id: 'hour', ms: 0, format: 'hh:mm:ssa', ago: true },
-	{ id: 'day', ms: 0, format: 'dddd, MMM DD, hh:mma', ago: true },
-	{ id: 'week', ms: 0, format: 'MMM DD, hh:mma', ago: true },
-	{ id: 'month', ms: 0, format: 'MMM DD YYYY, hh:mma' },
+	{ id: 'millisecond', ms: 0, format: 'h:mm:ssa', ago: true },
+	{ id: 'hour', ms: 0, format: 'h:mm:ssa', ago: true },
+	{ id: 'day', ms: 0, format: 'dddd, MMM DD, h:mma', ago: true },
+	{ id: 'week', ms: 0, format: 'MMM DD, h:mma', ago: true },
+	{ id: 'month', ms: 0, format: 'MMM DD YYYY, h:mma' },
 	{ id: 'year', ms: 0, format: 'MMM DD YYYY' },
 ]
 XLABEL_FRAMES.forEach(v => v.ms = dayjs(0).add(1, v.id as any).valueOf())
@@ -28,7 +28,8 @@ export function xlabel(stamp: number) {
 	let i: number, len = XLABEL_FRAMES.length
 	for (i = 0; i < len; i++) {
 		if (stamp > (now - XLABEL_FRAMES[i].ms)) {
-			let frame = XLABEL_FRAMES[Math.max(i - 1, 0)]
+			let ii = Math.max(i - 1, 0)
+			let frame = XLABEL_FRAMES[ii]
 			let label = dayjs(stamp).format(frame.format)
 			if (frame.format.endsWith('ssa')) {
 				if (label.includes(':00')) label = label.replace(':00', '');
@@ -40,7 +41,12 @@ export function xlabel(stamp: number) {
 				let day = label.split(' ')[0]
 				label = label.replace(day, `${day.substring(0, 3)},`)
 			}
-			if (frame.ago) label += ` (${pretty.time(stamp)})`
+			if (frame.ago) {
+				label += ` (${pretty.time(stamp)})`
+			}
+			if (!frame.ago) {
+				if (label.includes(', 9:30am')) label = label.replace(', 9:30am', '');
+			}
 			return label
 		}
 	}

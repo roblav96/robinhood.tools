@@ -15,19 +15,19 @@ div.symbol-route table .progress::-webkit-progress-bar {
 	<div class="symbol-route">
 		<section class="section py-0 has-background-white border border-b-1 leading-tight">
 
-			<div class="columns is-mobile my-0 items-center touch:flex-wrap">
+			<div class="columns is-mobile my-0 py-1 items-center touch:flex-wrap">
 
 				<div class="column is-narrow">
 					<v-symbol-logo class="is-48x48 shadow" :symbol="symbol"></v-symbol-logo>
 				</div>
 
 				<div class="column py-0">
-					<p class="title font-bold leading-none whitespace-no-wrap">{{symbol}}</p>
+					<p class="is-size-4 font-bold leading-none whitespace-no-wrap">{{symbol}}</p>
 					<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
 				</div>
 
 				<div class="column is-narrow has-text-centered">
-					<p class="title font-bold leading-none">
+					<p class="is-size-4 font-bold leading-none">
 						<v-number-ticker :number="all.quote.price"></v-number-ticker>
 					</p>
 					<p>
@@ -36,7 +36,7 @@ div.symbol-route table .progress::-webkit-progress-bar {
 				</div>
 
 				<div class="column is-narrow has-text-centered">
-					<p class="is-size-3 font-bold leading-none" v-bull-bear="all.quote.percent">
+					<p class="is-size-4 font-bold leading-none" v-bull-bear="all.quote.percent">
 						{{nformat(all.quote.percent,{plusminus:true,percent:true})}}
 					</p>
 					<p v-bull-bear="all.quote.change">
@@ -45,25 +45,25 @@ div.symbol-route table .progress::-webkit-progress-bar {
 				</div>
 
 				<div v-if="all.quote.volume" class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-medium">
+					<p class="is-size-4 font-medium leading-none">
 						{{nformat(all.quote.volume,{compact:true,precision:1})}}
 					</p>
 					<p>Volume</p>
 				</div>
 				<div v-if="all.quote.avgVolume" class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-medium">
+					<p class="is-size-4 font-medium leading-none">
 						{{nformat(all.quote.avgVolume,{compact:true,precision:1})}}
 					</p>
 					<p>Avg Volume</p>
 				</div>
 				<div v-if="all.quote.marketCap" class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-medium">
+					<p class="is-size-4 font-medium leading-none">
 						{{nformat(all.quote.marketCap,{compact:true})}}
 					</p>
 					<p>Market Cap</p>
 				</div>
 				<div v-if="all.quote.dealFlowVolume" class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-medium" v-bull-bear="all.quote.dealFlowVolume">
+					<p class="is-size-4 font-medium leading-none" v-bull-bear="all.quote.dealFlowVolume">
 						{{nformat(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
 					</p>
 					<p>Captial Flow</p>
