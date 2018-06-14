@@ -51,7 +51,7 @@ export default class extends Vue {
 	}
 
 	echart: echarts.ECharts
-	private onrender_() {
+	onrender_() {
 		this.echart.off('rendered', this.onrender_)
 		this.$emit('rendered')
 		this.resize()
