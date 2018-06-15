@@ -4,6 +4,7 @@ import * as benchmark from '../../common/benchmark'
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
+import VMixin from './v.mixin'
 import deepmerge from 'deepmerge'
 import * as lockr from 'lockr'
 import * as echarts from 'echarts'
@@ -12,7 +13,6 @@ import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as utils from '../adapters/utils'
 import * as pretty from '../adapters/pretty'
-import * as alert from '../adapters/alert'
 
 
 
@@ -36,18 +36,20 @@ export default class extends Vue {
 		this.echart.on('rendered', this.onrender_)
 		this.echart.on('datazoom', this.ondatazoom_)
 		utils.wemitter.on('resize', this.onresize_, this)
-		utils.wemitter.on('keyup', this.onkeyup, this)
+		utils.wemitter.on('keyup', this.onkeyup_, this)
+		utils.wemitter.on('keydown', this.onkeydown_, this)
 		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize_);
 	}
 	beforeDestroy() {
 		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize_);
-		utils.wemitter.off('keyup', this.onkeyup, this)
+		utils.wemitter.off('keydown', this.onkeydown_, this)
+		utils.wemitter.off('keyup', this.onkeyup_, this)
 		utils.wemitter.off('resize', this.onresize_, this)
-		this.onresize_.cancel()
 		this.echart.off('datazoom', this.ondatazoom_)
-		this.ondatazoom_.cancel()
+		this.echart.off('rendered', this.onrender_)
 		this.echart.clear()
 		this.echart.dispose()
+		this.echart = null
 	}
 
 	echart: echarts.ECharts
@@ -59,7 +61,7 @@ export default class extends Vue {
 
 
 
-	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
+	// @VMixin.NoCache get option() { return this.echart._model.option }
 	option() { return this.echart._model.option }
 	ctbounds() {
 		let datazoom = this.option().dataZoom[0]
@@ -80,26 +82,25 @@ export default class extends Vue {
 			dataZoomSelectActive: brushing,
 		})
 		this.echart.setOption({ tooltip: { showContent: !brushing } })
-		let tuts = lockr.get('echarts.mixin.brushing.tuts', 5)
-		if (brushing && tuts) {
-			alert.toast({ message: 'Hold click down, then drag to crop', type: 'is-warning' })
-			lockr.set('echarts.mixin.brushing.tuts', tuts - 1)
-		}
 	}
-	onkeyup(event: KeyboardEvent) {
+	onkeyup_(event: KeyboardEvent) {
 		if (event.metaKey || event.shiftKey || event.ctrlKey || event.altKey) return;
 		if (['Escape'].includes(event.key)) this.brushing = false;
+	}
+	onkeydown_(event: KeyboardEvent) {
+
 	}
 
 	ondatazoom_ = _.throttle(this.datazoom, 100, { leading: false, trailing: true })
 	datazoom() {
 		this.$emit('datazoom')
 		this.brushing = false
-		// this.echart.dispatchAction({ type: 'hideTip' })
+		this.echart.dispatchAction({ type: 'hideTip' })
 		// console.log(`this.echart ->`, this.echart)
 	}
 
-	onresize_ = _.debounce(this.resize, 300, { leading: false, trailing: true })
+	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
+	onresize_ = _.debounce(this.resize, 100, { leading: false, trailing: true })
 	resize() {
 		this.$emit('resize')
 		this.echart.resize(this.dims())

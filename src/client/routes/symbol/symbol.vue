@@ -4,7 +4,7 @@
 <style>
 /**/
 
-div.symbol-route table .progress::-webkit-progress-bar {
+#symbol_route table .progress::-webkit-progress-bar {
 	background-color: white;
 	border: 1px solid var(--border);
 }
@@ -12,16 +12,16 @@ div.symbol-route table .progress::-webkit-progress-bar {
 </style>
 
 <template>
-	<div class="symbol-route">
-		<section class="section py-0 has-background-white border border-b-1 leading-tight">
+	<div id="symbol_route">
+		<section class="section py-0 has-background-white border border-b-1">
 
-			<div class="columns is-mobile my-0 py-1 items-center touch:flex-wrap">
+			<div class="columns is-mobile my-0 items-center touch:flex-wrap">
 
 				<div class="column is-narrow">
 					<v-symbol-logo class="is-48x48 shadow" :symbol="symbol"></v-symbol-logo>
 				</div>
 
-				<div class="column py-0">
+				<div class="column">
 					<p class="is-size-4 font-bold leading-none whitespace-no-wrap">{{symbol}}</p>
 					<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
 				</div>

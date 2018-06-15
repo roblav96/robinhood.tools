@@ -24,9 +24,12 @@ span.navbar-burger.burger > span {
 					<img src="../../../assets/logo-primary.svg" alt="Robinhood Tools">
 				</router-link>
 
-				<b-field class="navbar-item mb-0">
-					<v-searchbar></v-searchbar>
-				</b-field>
+				<div class="navbar-item self-center py-0 flex-col is-hidden-mobile">
+					<p class="leading-tight">{{time}}</p>
+					<p class="is-size-7 font-medium" :class="colorstate">{{state}}</p>
+				</div>
+
+				<v-searchbar class="navbar-item mb-0"></v-searchbar>
 
 				<span class="navbar-burger burger" :class="{'is-active':mobilemenu}" v-on:click="mobilemenu=!mobilemenu">
 					<span></span>
@@ -54,16 +57,11 @@ span.navbar-burger.burger > span {
 					</b-tooltip> -->
 				</div>
 
-				<div class="navbar-end is-hidden-touch">
+				<!-- <div class="navbar-end is-hidden-touch"> -->
 
-					<div class="navbar-item self-center py-0 flex-col">
-						<p class="leading-tight">{{time}}</p>
-						<p class="is-size-7" :class="colorstate">{{state}}</p>
-					</div>
+				<!-- <v-devmenu class="is-hidden-touch"></v-devmenu> -->
 
-					<!-- <v-devmenu class="is-hidden-touch"></v-devmenu> -->
-
-					<!-- <router-link v-if="rhusername" class="navbar-item flex items-center desktop:py-0" :to="{ name: 'robinhood' }"
+				<!-- <router-link v-if="rhusername" class="navbar-item flex items-center desktop:py-0" :to="{ name: 'robinhood' }"
 					    active-class exact-active-class>
 						<img class="image is-28x28 mr-3 touch:ml-1" src="../../../assets/robinhood-logo.svg" alt="Robinhood">
 						<div class="flex flex-col self-center">
@@ -76,7 +74,7 @@ span.navbar-burger.burger > span {
 						</div>
 					</router-link> -->
 
-				</div>
+				<!-- </div> -->
 
 			</div>
 

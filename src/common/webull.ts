@@ -185,6 +185,7 @@ declare global {
 
 		interface Ticker {
 			currencyId: number
+			currencyCode: string
 			disExchangeCode: string
 			disSymbol: string
 			exchangeCode: string

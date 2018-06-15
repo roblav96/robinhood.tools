@@ -73,7 +73,6 @@ export function getChart(quote: Quotes.Quote, range: string) {
 			let symbol = quote.symbol
 			if (quote.typeof == 'INDEXES') symbol = encodeURI('^' + symbol);
 			if (quote.typeof == 'FOREX') symbol = symbol + '=X';
-			console.log(`symbol ->`, symbol)
 			return yahoo.getChart(symbol, { range, interval: yahoo.FRAMES[range] })
 		}
 		return Promise.all([

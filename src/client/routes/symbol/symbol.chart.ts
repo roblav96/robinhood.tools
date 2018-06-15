@@ -86,23 +86,23 @@ class VSymbolEChart extends Mixins(VECharts) {
 				transitionDuration: 0,
 				// backgroundColor: 'transparent',
 				// extraCssText: 'border: 1px solid #b8c1c1;',
-				formatter: params => {
-					// console.log('params ->', params)
-					let param = (params[0] || params) as echarts.EventParam<Quotes.Live>
-					let lquote = _.mapValues(param.value, n => pretty.number(n as any))
-					// console.log('lquote ->', lquote)
-					// Object.keys(lquote).forEach(k => lquote[k] = pretty.number(lquote[k]))
+				// formatter: params => {
+				// 	// console.log('params ->', params)
+				// 	let param = (params[0] || params) as echarts.EventParam<Quotes.Live>
+				// 	let lquote = _.mapValues(param.value, n => pretty.number(n as any))
+				// 	// console.log('lquote ->', lquote)
+				// 	// Object.keys(lquote).forEach(k => lquote[k] = pretty.number(lquote[k]))
 
 
-					let html = ''
-					html += `<p>Open ${lquote.open}&nbsp;&nbsp;High ${lquote.high}&nbsp;&nbsp;Low ${lquote.low}&nbsp;&nbsp;Close ${lquote.close}</p>`
-					// html += `<p>OHLC: ${JSON.stringify(lquote)}</p>`
-					return `<div class="px-2 py-1 leading-none font-sans has-background-dark has-text-white rounded-sm">${html}</div>`
-				},
+				// 	let html = ''
+				// 	html += `<p>Open ${lquote.open}&nbsp;&nbsp;High ${lquote.high}&nbsp;&nbsp;Low ${lquote.low}&nbsp;&nbsp;Close ${lquote.close}</p>`
+				// 	// html += `<p>OHLC: ${JSON.stringify(lquote)}</p>`
+				// 	return `<div class="px-2 py-1 leading-none font-sans has-background-dark has-text-white rounded-sm">${html}</div>`
+				// },
 				axisPointer: {
-					// link: [{ xAxisIndex: 'all' }],
-					shadowStyle: { opacity: 0 },
+					// link: { xAxisIndex: 'all' },
 					animation: false, type: 'cross',
+					shadowStyle: { opacity: 0 },
 					lineStyle: { color: this.colors['grey-lighter'] },
 					crossStyle: { color: this.colors['grey-light'] },
 					label: {
@@ -115,6 +115,9 @@ class VSymbolEChart extends Mixins(VECharts) {
 						formatter: params => pretty.number(params.value),
 					},
 				},
+			},
+			axisPointer: {
+				link: { xAxisIndex: 'all' },
 			},
 			grid: [{
 				top: 24,
@@ -205,6 +208,7 @@ class VSymbolEChart extends Mixins(VECharts) {
 				axisTick: { show: false },
 				splitLine: { show: false },
 				splitArea: { show: false },
+				axisPointer: { show: false },
 			}],
 			series: [{
 				name: 'OHLC',
@@ -213,8 +217,8 @@ class VSymbolEChart extends Mixins(VECharts) {
 				yAxisIndex: 0,
 				large: true,
 				largeThreshold: 200,
-				progressive: 500,
-				progressiveThreshold: 500,
+				// progressive: 500,
+				// progressiveThreshold: 500,
 				animation: false,
 				hoverAnimation: false,
 				legendHoverLink: false,
@@ -235,8 +239,8 @@ class VSymbolEChart extends Mixins(VECharts) {
 				yAxisIndex: 1,
 				large: true,
 				largeThreshold: 200,
-				progressive: 500,
-				progressiveThreshold: 500,
+				// progressive: 500,
+				// progressiveThreshold: 500,
 				animation: false,
 				hoverAnimation: false,
 				legendHoverLink: false,

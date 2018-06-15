@@ -29,7 +29,7 @@ export default class extends Mixins(VMixin) {
 		}
 		if (['f', 'l', 't', '/'].includes(event.key)) {
 			if (document.activeElement.tagName == 'INPUT') return;
-			this.searchbar.$el.querySelector('input').focus()
+			this.inputfield.focus()
 		}
 	}
 
@@ -49,12 +49,12 @@ export default class extends Mixins(VMixin) {
 			if (!this.query) return http.post('/recents', { symbols: this.recents.map(v => v.symbol) });
 			return http.get('/search', { query: { query: this.query } })
 		}).then(results => {
+			console.log(`results ->`, JSON.parse(JSON.stringify(results)))
+			this.$safety()
 			this.results = results
-			return this.$nextTick()
+			this.$nextTick(() => this.scrolltop())
 		}).catch(error => {
 			console.error('sync Error ->', error)
-		}).finally(() => {
-			this.scrolltop()
 		})
 	}
 

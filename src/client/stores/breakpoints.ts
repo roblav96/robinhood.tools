@@ -20,6 +20,8 @@ const state = {
 	widescreenOnly: false, widescreenAndDown: false, widescreenAndUp: false,
 	mobileOnly: false, fullhdOnly: false,
 }
+store.register('breakpoints', state)
+declare global { namespace Store { interface State { breakpoints: typeof state } } }
 
 function update() {
 	let width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
@@ -59,12 +61,8 @@ function update() {
 	})
 	// console.log('state ->', JSON.parse(JSON.stringify(state)))
 
-}
-update()
+} update()
 
 utils.wemitter.on('resize', _.debounce(update, 300, { leading: false, trailing: true }))
-
-store.register('breakpoints', state)
-declare global { namespace Store { interface State { breakpoints: typeof state } } }
 
 
