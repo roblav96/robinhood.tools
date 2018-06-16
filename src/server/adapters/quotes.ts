@@ -113,10 +113,12 @@ export function applyFull(
 	quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, core.math.sum0(quote.avgVolume10Day, quote.avgVolume3Month) / 2))
 
 	let toquote = applyWbQuote(quote, wbquote)
-	core.object.repair(quote, mergeCalcs(toquote))
+	mergeCalcs(toquote)
+	core.object.repair(quote, toquote)
+
 	let reset = resetFull(quote)
-	mergeCalcs(quote, reset)
-	resets ? core.object.merge(quote, reset) : core.object.repair(quote, reset)
+	mergeCalcs(reset)
+	{ (resets && wbquote.typeof == 'STOCKS') ? core.object.merge(quote, reset) : core.object.repair(quote, reset) }
 
 	core.object.clean(quote)
 	return quote
