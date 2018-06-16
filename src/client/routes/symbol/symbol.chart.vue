@@ -9,7 +9,7 @@
 <template>
 	<div class="flex-col-full">
 
-		<section class="section">
+		<section class="section py-0">
 			<div class="columns items-center">
 				<div class="column is-narrow">
 					<div class="field has-addons">

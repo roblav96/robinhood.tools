@@ -19,13 +19,18 @@ import socket from '../../adapters/socket'
 	components: {
 		'v-symbol-ticker': () => import('./symbol.ticker'),
 	},
+	// beforeRouteUpdate(to, from, next) {
+	// 	if (from.name.startsWith('symbol') && from.params.symbol != to.params.symbol && to.name != from.name) {
+	// 		return next({ name: from.name, params: to.params, query: to.query })
+	// 	} next()
+	// },
 })
 export default class VSymbol extends Mixins(VMixin) {
 
 	get symbol() { return this.$route.params.symbol }
 
 	mounted() {
-		
+		console.warn(`mounted`)
 	}
 
 	beforeDestroy() {

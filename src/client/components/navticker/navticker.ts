@@ -19,7 +19,6 @@ export default class extends Mixins(VMixin) {
 		http.post('/quotes/alls', {
 			symbols, types: ['wbticker', 'wbquote'] as Quotes.AllKeys[],
 		}).then((response: Quotes.All[]) => {
-			console.log(`response ->`, JSON.parse(JSON.stringify(response)))
 			this.symbols = symbols
 			socket.offListener(this.onwbquote, this)
 			response.forEach(v => {
@@ -44,7 +43,7 @@ export default class extends Mixins(VMixin) {
 	}
 
 	vname(name: string) {
-		return name.split(' ').slice(0, 3).join(' ')
+		return name.split(' ').slice(0, 4).join(' ')
 	}
 
 	onstep(direction: number) {

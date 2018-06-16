@@ -55,6 +55,7 @@ function Application(application: Partial<final.Application>) {
 	_.defaults(application.env, app.env)
 	_.defaults(application, app)
 	application.run = path.resolve(__dirname, `${application.run}.js`)
+	if (application.instances > 1) application.mode = 'cluster';
 	applications.push(JSON.parse(JSON.stringify(application)))
 }
 

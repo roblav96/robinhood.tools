@@ -40,8 +40,8 @@ span.navbar-burger.burger > span {
 				</span>
 			</div>
 
-			<div class="navbar-menu flex-no-grow" :class="{'is-active animated-slow fadeIn':mobilemenu}">
-				<div class="navbar-start mr-0">
+			<div class="navbar-menu" :class="{'is-active animated-slow fadeIn':mobilemenu}">
+				<div class="navbar-start">
 					<b-tooltip :active="breakpoints.desktopAndUp&&route.name!=$route.name" :label="vcapitalize(route.name)"
 					    position="is-bottom" v-for="route in routes" :key="route.name">
 						<router-link class="navbar-item flex items-center h-full" :to="{name:route.name}">

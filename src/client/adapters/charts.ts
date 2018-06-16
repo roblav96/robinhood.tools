@@ -69,11 +69,15 @@ export function range(range: string, opts = { plural: true }) {
 
 export function getChart(quote: Quotes.Quote, range: string) {
 	return Promise.resolve().then(function() {
-		if (range != yahoo.RANGES[0]) {
-			let symbol = quote.symbol
-			if (quote.typeof == 'INDEXES') symbol = encodeURI('^' + symbol);
-			if (quote.typeof == 'FOREX') symbol = symbol + '=X';
-			return yahoo.getChart(symbol, { range, interval: yahoo.FRAMES[range] })
+		let symbol = quote.symbol
+		if (quote.typeof == 'INDEXES') symbol = encodeURI('^' + symbol);
+		if (quote.typeof == 'FOREX') symbol = symbol + '=X';
+		if (range != yahoo.RANGES[0] || quote.typeof != 'STOCKS') {
+			return yahoo.getChart(symbol, {
+				range,
+				interval: yahoo.FRAMES[range],
+				includePrePost: range == yahoo.RANGES[1],
+			})
 		}
 		return Promise.all([
 			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/F`, { query: { minuteType: 'm1' } }),
@@ -83,12 +87,12 @@ export function getChart(quote: Quotes.Quote, range: string) {
 			let mlquotes = resolved.map(v => webull.toMinutesLives(v)).flatten()
 
 			let range = {
-				min: dayjs(Math.min(...resolved.map(v => v.data[0].dates[0].start * 1000))).valueOf(),
-				max: dayjs(Math.max(...resolved.map(v => v.data[0].dates[0].end * 1000).concat(Date.now()))).valueOf(),
+				min: dayjs(Math.min(...resolved.map(v => v.data[0].dates[0].start * 1000))).startOf('day').valueOf(),
+				max: dayjs(Math.max(...resolved.map(v => v.data[0].dates[0].end * 1000).concat(Date.now()))).endOf('day').valueOf(),
 			}
 			// console.log(`range ->`, _.mapValues(range, v => pretty.stamp(v)))
 
-			return yahoo.getChart(quote.symbol, {
+			return yahoo.getChart(symbol, {
 				interval: '1m', includePrePost: true,
 				period1: dayjs(range.min).startOf('day').unix(),
 				period2: dayjs(range.max).endOf('day').unix(),

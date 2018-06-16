@@ -121,8 +121,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				link: { xAxisIndex: 'all' },
 			},
 			grid: [{
-				top: 24,
-				left: 72,
+				top: 16,
+				left: 64,
 				right: 24,
 				bottom: 92,
 				show: true,
@@ -130,7 +130,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				borderColor: this.colors['grey-lightest'],
 			}, {
 				height: 64,
-				left: 72,
+				left: 64,
 				right: 24,
 				bottom: 92,
 			}],
@@ -160,7 +160,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
 			}],
 			xAxis: [{
-				type: 'category',
+				type: 'time',
 				boundaryGap: true,
 				axisLabel: {
 					margin: 4,
@@ -178,7 +178,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					},
 				},
 			}, {
-				type: 'category',
+				type: 'time',
 				boundaryGap: true,
 				gridIndex: 1,
 				axisLabel: { show: false },

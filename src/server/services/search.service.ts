@@ -50,21 +50,21 @@ radio.reply('search.query', async function onquery(query: string) {
 		if (words.length == 1) {
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 10000,
+				boost: 100000,
 			})
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 7500,
+				boost: 10000,
 				wildcard: lunr.Query.wildcard.TRAILING,
 			})
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 500,
+				boost: 1000,
 				wildcard: lunr.Query.wildcard.LEADING | lunr.Query.wildcard.TRAILING,
 			})
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 250,
+				boost: 100,
 				editDistance: 1,
 			})
 		}
@@ -87,6 +87,16 @@ radio.reply('search.query', async function onquery(query: string) {
 				fields: ['name'],
 				boost: 25,
 				editDistance: 1,
+			})
+			q.term(word, {
+				fields: ['name'],
+				boost: 10,
+				editDistance: 2,
+			})
+			q.term(word, {
+				fields: ['name'],
+				boost: 1,
+				editDistance: 3,
 			})
 		})
 	})

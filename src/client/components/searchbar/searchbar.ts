@@ -15,22 +15,33 @@ import * as utils from '../../adapters/utils'
 @Vts.Component
 export default class extends Mixins(VMixin) {
 
+	created() {
+		this.sync()
+	}
 	mounted() {
-		utils.wemitter.on('keyup', this.onkeyup, this)
+		utils.wemitter.on('keyup', this.onkey, this)
+		utils.wemitter.on('keydown', this.onkey, this)
 	}
 	beforeDestroy() {
-		utils.wemitter.off('keyup', this.onkeyup, this)
+		utils.wemitter.off('keyup', this.onkey, this)
+		utils.wemitter.off('keydown', this.onkey, this)
 	}
 
-	onkeyup(event: KeyboardEvent) {
+	onkey(event: KeyboardEvent) {
 		if (event.metaKey || event.shiftKey || event.ctrlKey || event.altKey) return;
-		if (['Escape'].includes(event.key)) {
-			if (document.activeElement.outerHTML != this.inputfield.outerHTML) return;
-			this.inputfield.blur()
+		if (event.type == 'keyup') {
+			if (event.key == 'Escape' && document.activeElement.outerHTML == this.inputfield.outerHTML) {
+				this.inputfield.blur()
+			}
+			if (event.key == '/' && document.activeElement.tagName != 'INPUT') {
+				this.inputfield.focus()
+			}
 		}
-		if (['f', 'l', 't', '/'].includes(event.key)) {
-			if (document.activeElement.tagName == 'INPUT') return;
-			this.inputfield.focus()
+		if (event.type == 'keydown' && document.activeElement.tagName != 'INPUT') {
+			if (event.code.startsWith('Key')) {
+				this.inputfield.focus()
+				this.query = (this.query || '') + event.key
+			}
 		}
 	}
 
@@ -44,32 +55,34 @@ export default class extends Mixins(VMixin) {
 	query = ''
 	results = [] as Quotes.Quote[]
 
-	oninput = _.debounce(this.sync, 100, { leading: false, trailing: true })
-	sync() {
+	oninput = _.debounce(this.sync, 1, { leading: false, trailing: true })
+	sync(query = this.query) {
 		return Promise.resolve().then(() => {
 			if (!this.query) return http.post('/recents', { symbols: this.recents.map(v => v.symbol) });
 			return http.get('/search', { query: { query: this.query } })
 		}).then(results => {
 			this.$safety()
-			this.results = results
+			if (this.query == query) {
+				this.results = results
+			}
 			this.$nextTick(() => this.scrolltop())
 		}).catch(error => console.error('sync Error ->', error))
 	}
 
-	onfocus(event: Event) {
+	onfocus() {
 		this.$nextTick(() => this.scrolltop('instant'))
-		let el = event.target as HTMLInputElement
-		el.setSelectionRange(0, el.value.length)
-		this.sync()
+		if (this.query) {
+			this.inputfield.setSelectionRange(0, this.inputfield.value.length)
+		}
 	}
-	onblur(event: Event) {
+	onblur() {
 
 	}
 
 	onselect(result: Quotes.Quote) {
-		let name = this.$route.name.includes('symbol.') ? this.$route.name : 'symbol'
-		this.$router.push({ name, params: { symbol: result.symbol } })
+		this.$router.push({ name: this.$symbolname, params: { symbol: result.symbol } })
 		this.inputfield.blur()
+		if (!this.query) this.sync();
 	}
 
 }

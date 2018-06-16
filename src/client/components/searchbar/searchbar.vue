@@ -33,7 +33,7 @@
 
 <template>
 	<b-field id="searchbar">
-		<b-autocomplete ref="searchbar_input" open-on-focus :keep-first="!!query" type="search" placeholder="Search..."
+		<b-autocomplete ref="searchbar_input" open-on-focus clear-on-select :keep-first="!!query" type="search" placeholder="Search..."
 		    icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur" v-on:input="oninput"
 		    v-on:select="onselect">
 			<template v-if="!query" slot="header">

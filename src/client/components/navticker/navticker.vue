@@ -4,6 +4,14 @@
 <style>
 /**/
 
+#navticker .navbar-item {
+	color: var(--text-light);
+}
+
+#navticker a.navbar-item:hover {
+	color: var(--link);
+}
+
 </style>
 
 <template>
@@ -15,17 +23,20 @@
 		</div>
 		<!-- <div class="column is-narrow w-1 shadow-inner"></div> -->
 		<div class="column flex-row items-center overflow-x-auto scrollbar-none">
-			<div class="px-2 flex-col" v-for="symbol in symbols" :key="symbol">
-				<div class="has-text-light is-size-7 whitespace-no-wrap">
-					<p class="font-medium">{{vname(wbtickers[symbol].name)}}</p>
+			<router-link class="navbar-item flex-col" v-for="symbol in symbols" :key="symbol" :to="{name:$symbolname,params:{symbol:symbol}}"
+			    exact-active-class>
+				<div class="is-size-7 whitespace-no-wrap ticker-name">
 					<p>
-						<v-price-ticker :price="wbquotes[symbol].price"></v-price-ticker>
+						{{vname(wbtickers[symbol].name)}}
+					</p>
+					<p>
+						<v-price-ticker class="has-text-light" :price="wbquotes[symbol].price"></v-price-ticker>
 						<span class="font-light" v-bull-bear="wbquotes[symbol].change">
 							{{vnumber(wbquotes[symbol].change,{plusminus:true})}} ({{vnumber(wbquotes[symbol].changeRatio*100,{plusminus:true,percent:true})}})
 						</span>
 					</p>
 				</div>
-			</div>
+			</router-link>
 		</div>
 		<div class="column is-narrow self-center">
 			<button class="button is-small is-white has-text-lighter" @click="onstep(1)">
