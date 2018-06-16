@@ -80,7 +80,7 @@ span.navbar-burger.burger > span {
 
 			</div>
 
-			<v-navticker v-if="breakpoints.desktopAndUp" class="is-hidden-touch flex-grow"></v-navticker>
+			<v-navticker v-if="breakpoints.desktopAndUp" class="is-hidden-touch"></v-navticker>
 
 		<!-- </div> -->
 	</nav>
