@@ -59,7 +59,7 @@ Vue.component('v-timestamp', VTimestamp)
 					easing: 'easeInQuint',
 					color: [
 						{ value: context.color, duration: 0, },
-						{ value: context.black, duration: 1000, },
+						{ value: context.black, duration: 500, },
 					],
 				})
 			},
@@ -70,13 +70,13 @@ Vue.component('v-timestamp', VTimestamp)
 class VPriceTicker extends Vue {
 	black: string
 	color: string
+	colors = this.$store.state.colors
 	mounted() { this.black = window.getComputedStyle(this.$el).getPropertyValue('color') }
 	@Vts.Prop() price: number
 	@Vts.Watch('price') w_number(to: number, from: number) {
 		if (!Number.isFinite(to) || !Number.isFinite(from) || to == from) return;
 		this.color = to > from ? this.colors.success : this.colors.danger
 	}
-	get colors() { return this.$store.state.colors }
 	get digits() {
 		return Number.isFinite(this.price) ? pretty.number(this.price, { price: true }).split('') : []
 	}

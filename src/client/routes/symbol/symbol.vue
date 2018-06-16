@@ -15,19 +15,24 @@
 	<div id="symbol_route">
 		<section class="section py-0 has-background-white">
 
-			<div class="columns is-mobile my-0 items-center leading-tight touch:flex-wrap">
+			<div class="columns my-0 py-2 items-center leading-tight touch:flex-wrap">
 
 				<div class="column is-narrow">
 					<v-symbol-logo class="is-48x48 shadow" :symbol="symbol"></v-symbol-logo>
 				</div>
 
-				<div class="column">
-					<p class="is-size-4 font-bold leading-tighter whitespace-no-wrap">{{symbol}}</p>
-					<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
+				<div class="column is-narrow">
+					<p class="whitespace-no-wrap">
+						<span class="title font-bold is-size-4">{{symbol}}</span>
+						<!-- {{all.quote.tinyName||all.quote.name}} -->
+						{{all.quote.acronym}}
+					</p>
+					<p>{{all.quote.tinyName||all.quote.name}}</p>
+					<!-- <p>{{symbol}}:{{all.quote.acronym}}</p> -->
 				</div>
 
 				<div class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-bold leading-tighter">
+					<p class="title font-bold is-size-4">
 						<v-price-ticker :price="all.quote.price"></v-price-ticker>
 					</p>
 					<p>
@@ -36,7 +41,7 @@
 				</div>
 
 				<div class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-bold leading-tighter" v-bull-bear="all.quote.percent">
+					<p class="title font-bold is-size-4" v-bull-bear="all.quote.percent">
 						{{vnumber(all.quote.percent,{plusminus:true,percent:true})}}
 					</p>
 					<p v-bull-bear="all.quote.change">

@@ -117,8 +117,9 @@ export function applyFull(
 	core.object.repair(quote, toquote)
 
 	let reset = resetFull(quote)
-	mergeCalcs(reset)
-	{ (resets && wbquote.typeof == 'STOCKS') ? core.object.merge(quote, reset) : core.object.repair(quote, reset) }
+	core.object.merge(toquote, reset)
+	mergeCalcs(toquote, reset)
+	{ (resets && wbquote.typeof == 'STOCKS') ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote) }
 
 	core.object.clean(quote)
 	return quote

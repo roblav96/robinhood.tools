@@ -15,7 +15,7 @@ if (process.env.DEVELOPMENT) {
 
 
 
-import 'modern-normalize'
+// import 'modern-normalize'
 import 'animate.css'
 import './styles/vendors.scss'
 import './styles/theme.scss'

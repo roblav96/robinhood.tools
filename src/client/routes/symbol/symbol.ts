@@ -30,7 +30,7 @@ export default class VSymbol extends Mixins(VMixin) {
 	get symbol() { return this.$route.params.symbol }
 
 	mounted() {
-		console.warn(`mounted`)
+
 	}
 
 	beforeDestroy() {

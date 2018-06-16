@@ -43,7 +43,7 @@ export default class extends Mixins(VMixin) {
 	}
 
 	vname(name: string) {
-		return name.split(' ').slice(0, 4).join(' ')
+		return name.split('/').shift().split(' ').shift()
 	}
 
 	onstep(direction: number) {
