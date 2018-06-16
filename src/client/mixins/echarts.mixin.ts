@@ -100,6 +100,7 @@ export default class VEChartsMixin extends Vue {
 	onresize_ = _.debounce(this.resize, 100, { leading: false, trailing: true })
 	resize() {
 		this.$emit('resize')
+		console.log(`this.dims() ->`, this.dims())
 		this.echart.resize(this.dims())
 	}
 

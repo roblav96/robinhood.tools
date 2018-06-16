@@ -12,7 +12,7 @@
 		<v-navbar></v-navbar>
 
 		<transition :enter-active-class="initing==null?'animated-slower fadeIn':''" leave-active-class="opacity-0">
-			<router-view class="router-view is-fullheight flex-col"></router-view>
+			<router-view class="router-view is-fullheight"></router-view>
 		</transition>
 
 		<section v-show="showfooter" class="footer hero py-0">

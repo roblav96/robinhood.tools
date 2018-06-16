@@ -33,7 +33,7 @@
 
 <template>
 	<b-field id="searchbar">
-		<b-autocomplete ref="searchbar_input" open-on-focus clear-on-select :keep-first="!!query" type="search" placeholder="Search..."
+		<b-autocomplete ref="searchbar_autocomplete" open-on-focus clear-on-select :keep-first="!!query" type="search" placeholder="Search..."
 		    icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur" v-on:input="oninput"
 		    v-on:select="onselect">
 			<template v-if="!query" slot="header">
@@ -47,18 +47,8 @@
 					</div>
 					<div class="column">
 						<p class="title is-size-5">{{props.option.symbol}}</p>
-						<p class="subtitle is-size-6">{{vname(props.option.name)}}</p>
-						<!-- <p class="subtitle is-size-6">{{vtruncate(props.option.tinyName||props.option.name)}}</p> -->
+						<p class="subtitle is-size-6">{{vname(props.option.name,3)}}</p>
 					</div>
-					<!-- <div class="column">
-						<div class="flex">
-							<p class="title is-size-5 mr-12">{{props.option.symbol}}</p>
-							<p class="flex-grow has-text-right self-end leading-tight has-text-light font-light">
-								{{props.option.acronym}}
-							</p>
-						</div>
-						<p class="leading-tight is-size-6 mr-12">{{vtruncate(props.option.tinyName||props.option.name)}}</p>
-					</div> -->
 				</div>
 			</template>
 		</b-autocomplete>

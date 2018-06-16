@@ -45,10 +45,10 @@ export default class extends Mixins(VMixin) {
 		}
 	}
 
-	get searchbar() { return this.$refs.searchbar_input as Vue }
-	get inputfield() { return this.searchbar.$el.querySelector('input') }
+	get autocomplete() { return this.$refs.searchbar_autocomplete as Vue }
+	get inputfield() { return this.autocomplete.$el.querySelector('input') }
 	scrolltop(behavior = 'smooth' as ScrollBehavior) {
-		let el = this.searchbar.$el.querySelector('div.dropdown-menu > div.dropdown-content') as HTMLElement
+		let el = this.autocomplete.$el.querySelector('div.dropdown-menu > div.dropdown-content') as HTMLElement
 		el.scrollTo({ top: 0, behavior })
 	}
 

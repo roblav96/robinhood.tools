@@ -4,176 +4,79 @@
 <style>
 /**/
 
-#symbol_route table .progress::-webkit-progress-bar {
-	background-color: white;
-	border: 1px solid var(--border);
-}
-
 </style>
 
 <template>
-	<div id="symbol_route">
-		<section class="section py-0 has-background-white">
+	<div id="symbol_route" class="flex-col has-background-white-ter">
 
-			<div class="columns is-mobile my-0 items-center leading-tight touch:flex-wrap">
-
-				<div class="column is-narrow">
-					<v-symbol-logo class="is-56x56 shadow" :symbol="symbol"></v-symbol-logo>
-				</div>
+		<section class="section whitespace-no-wrap has-background-white">
+			<div class="columns items-center">
 
 				<div class="column is-narrow">
-					<p class="title whitespace-no-wrap">
-						{{symbol}}
-						<!-- {{all.quote.tinyName||all.quote.name}} -->
-						<span class="font-normal is-size-6 has-text">{{all.quote.acronym}}</span>
-					</p>
-					<p>{{vname(all.quote.name)}}</p>
-					<!-- <p>{{all.quote.tinyName||all.quote.name}}</p> -->
-					<!-- <p>{{symbol}}:{{all.quote.acronym}}</p> -->
-				</div>
-
-				<div class="column is-narrow has-text-centered">
-					<p class="title">
-						<v-price-ticker :price="all.quote.price"></v-price-ticker>
-					</p>
-					<p>
-						<v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp>
-					</p>
-				</div>
-
-				<div class="column is-narrow has-text-centered">
-					<p class="title" v-bull-bear="all.quote.percent">
-						{{vnumber(all.quote.percent,{plusminus:true,percent:true})}}
-					</p>
-					<p v-bull-bear="all.quote.change">
-						{{vnumber(all.quote.change,{plusminus:true})}}
-					</p>
-				</div>
-
-				<!--  -->
-
-				<div v-if="all.quote.volume" class="column is-narrow has-text-centered">
-					<p class="is-size-3 font-light leading-tighter">
-						{{vnumber(all.quote.volume,{compact:true,precision:1})}}
-					</p>
-					<p>Volume</p>
-				</div>
-				<div v-if="all.quote.avgVolume" class="column is-narrow has-text-centered">
-					<p class="is-size-3 font-light leading-tighter">
-						{{vnumber(all.quote.avgVolume,{compact:true,precision:1})}}
-					</p>
-					<p>Avg Volume</p>
-				</div>
-				<div v-if="all.quote.marketCap" class="column is-narrow has-text-centered">
-					<p class="is-size-3 font-light leading-tighter">
-						{{vnumber(all.quote.marketCap,{compact:true})}}
-					</p>
-					<p>Market Cap</p>
-				</div>
-				<div v-if="all.quote.dealFlowVolume" class="column is-narrow has-text-centered">
-					<p class="is-size-3 font-light leading-tighter" v-bull-bear="all.quote.dealFlowVolume">
-						{{vnumber(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
-					</p>
-					<p>Captial Flow</p>
-				</div>
-
-				<!-- <div class="column is-narrow">
-						<table class="table is-paddingless is-middle is-nowrap is-borderless">
-							<tbody>
-								<tr>
-									<td class="has-text-danger has-text-right">
-										<b-tooltip label="Bid Price" position="is-left" size="is-small" animated>
-											<p>{{vnumber(all.quote.bid)}}</p>
-										</b-tooltip>
-									</td>
-									<td>
-										<progress class="progress w-16 is-danger is-small rounded-none pr-2" :value="bidask.bid.price" :min="0"
-										    :max="100" style="transform: rotate(180deg);"></progress>
-									</td>
-									<td>
-										<progress class="progress w-16 is-success is-small rounded-none pr-2" :value="bidask.ask.price" :min="0"
-										    :max="100"></progress>
-									</td>
-									<td class="has-text-success has-text-left">
-										<b-tooltip label="Ask Price" position="is-right" size="is-small" animated>
-											<p>{{vnumber(all.quote.ask)}}</p>
-										</b-tooltip>
-									</td>
-								</tr>
-								<tr>
-									<td class="has-text-success has-text-right">
-										<b-tooltip label="Bid Size" position="is-left" size="is-small" animated>
-											<p>{{vnumber(all.quote.bids,{precision:1,compact:true})}}</p>
-										</b-tooltip>
-									</td>
-									<td>
-										<progress class="progress w-16 is-success is-small rounded-none pr-2" :value="bidask.bid.size" :min="0"
-										    :max="100" style="transform: rotate(180deg);"></progress>
-									</td>
-									<td>
-										<progress class="progress w-16 is-danger is-small rounded-none pr-2" :value="bidask.ask.size" :min="0"
-										    :max="100"></progress>
-									</td>
-									<td class="has-text-danger has-text-left">
-										<b-tooltip label="Ask Size" position="is-right" size="is-small" animated>
-											<p>{{vnumber(all.quote.asks,{precision:1,compact:true})}}</p>
-										</b-tooltip>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div> -->
-
-				<!-- <div v-if="all.quote.marketCap && all.quote.dealFlowVolume" class="column is-narrow desktop:flex hidden">
-						<div class="flex py-0">
-							<table class="table is-paddingless is-middle is-nowrap is-borderless">
-								<tbody>
-									<tr>
-										<td class="font-semibold has-text-right pr-2">{{vnumber(all.quote.marketCap,{compact:true})}}</td>
-										<td>Market Cap</td>
-									</tr>
-									<tr>
-										<td class="font-semibold has-text-right pr-2" v-bull-bear="all.quote.dealFlowVolume">
-											{{vnumber(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
-										</td>
-										<td>Capital Flow</td>
-									</tr>
-								</tbody>
-							</table>
+					<div class="columns is-mobile items-center">
+						<div class="column is-narrow">
+							<v-symbol-logo class="is-64x64 shadow" :symbol="symbol"></v-symbol-logo>
 						</div>
-					</div> -->
+						<div class="column">
+							<span class="title">{{symbol}}</span>
+							{{all.quote.acronym}}
+							<br> {{vname(all.quote.name)}}
+						</div>
+					</div>
+				</div>
 
-				<!-- <div class="column is-3">
-					<nav class="tabs my-0 py-0">
-						<ul>
-							<router-link tag="li" class="is-dark" v-for="route in routes" :key="route.name" :to="{name:route.name}">
-								<a class="is-dark no-underline">
-									<b-icon :icon="route.meta.icon"></b-icon>
-									<span>{{vcapitalize(route.path)}}</span>
-								</a>
-							</router-link>
-						</ul>
-					</nav>
+				<div class="column is-narrow">
+					<div class="columns is-mobile has-text-centered">
+						<div class="column">
+							<v-price-ticker class="title" :price="all.quote.price"></v-price-ticker>
+							<br>
+							<v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp>
+						</div>
+						<div class="column">
+							<span class="title" v-bull-bear="all.quote.percent">
+								{{vnumber(all.quote.percent,{plusminus:true,percent:true})}}
+							</span>
+							<br>
+							<span v-bull-bear="all.quote.change">
+								{{vnumber(all.quote.change,{plusminus:true})}}
+							</span>
+						</div>
+					</div>
+				</div>
+
+
+
+				<!-- <div class="column flex-row items-center">
+					<v-symbol-logo class="is-24x24 shadow mr-0" :symbol="symbol"></v-symbol-logo>
+					<p class="title leading-none is-size-4 mr-0">{{vname(all.quote.tinyName||all.quote.name)}}</p>
+					<p class="self-end">{{all.quote.acronym}}</p>
 				</div> -->
-
 			</div>
-
-			<!-- <nav class="tabs is-boxed mb-0">
-				<ul>
-					<router-link tag="li" class="is-dark" v-for="route in routes" :key="route.name" :to="{name:route.name}">
-						<a class="is-dark no-underline">
-							<b-icon :icon="route.meta.icon"></b-icon>
-							<span>{{vcapitalize(route.path)}}</span>
-						</a>
-					</router-link>
-				</ul>
-			</nav> -->
 		</section>
 
-		<hr>
-		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-			<router-view :symbol="symbol" :quote="all.quote"></router-view>
-		</transition>
+
+		<div class="columns flex-grow">
+
+			<div class="column is-4">
+				<div class="columns is-mobile">
+					<!-- <div class="column">
+						<v-symbol-logo class="is-56x56 shadow" :symbol="symbol"></v-symbol-logo>
+					</div> -->
+					<!-- <div class="column is-6">
+						<p class="title is-size-3 whitespace-no-wrap">
+							{{symbol}}
+							<span class="font-normal is-size-6 has-text">{{all.quote.acronym}}</span>
+						</p>
+						<p>{{vname(all.quote.name)}}</p>
+					</div> -->
+				</div>
+			</div>
+
+			<div class="column flex-col-full">
+				<v-symbol-chart :symbol="symbol" :quote="all.quote"></v-symbol-chart>
+			</div>
+
+		</div>
 
 	</div>
 </template>

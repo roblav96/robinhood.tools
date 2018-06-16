@@ -18,6 +18,7 @@ import socket from '../../adapters/socket'
 @Vts.Component({
 	components: {
 		'v-symbol-ticker': () => import('./symbol.ticker'),
+		'v-symbol-chart': () => import('./symbol.chart'),
 	},
 	// beforeRouteUpdate(to, from, next) {
 	// 	if (from.name.startsWith('symbol') && from.params.symbol != to.params.symbol && to.name != from.name) {
