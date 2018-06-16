@@ -15,24 +15,24 @@
 	<div id="symbol_route">
 		<section class="section py-0 has-background-white">
 
-			<div class="columns my-0 py-2 items-center leading-tight touch:flex-wrap">
+			<div class="columns my-0 py-0 items-center leading-tight touch:flex-wrap">
 
 				<div class="column is-narrow">
-					<v-symbol-logo class="is-48x48 shadow" :symbol="symbol"></v-symbol-logo>
+					<v-symbol-logo class="is-56x56 shadow" :symbol="symbol"></v-symbol-logo>
 				</div>
 
 				<div class="column is-narrow">
-					<p class="whitespace-no-wrap">
-						<span class="title font-bold is-size-4">{{symbol}}</span>
+					<p class="title whitespace-no-wrap">
+						{{symbol}}
 						<!-- {{all.quote.tinyName||all.quote.name}} -->
-						{{all.quote.acronym}}
+						<span class="font-normal is-size-6 has-text">{{all.quote.acronym}}</span>
 					</p>
 					<p>{{all.quote.tinyName||all.quote.name}}</p>
 					<!-- <p>{{symbol}}:{{all.quote.acronym}}</p> -->
 				</div>
 
 				<div class="column is-narrow has-text-centered">
-					<p class="title font-bold is-size-4">
+					<p class="title">
 						<v-price-ticker :price="all.quote.price"></v-price-ticker>
 					</p>
 					<p>
@@ -41,7 +41,7 @@
 				</div>
 
 				<div class="column is-narrow has-text-centered">
-					<p class="title font-bold is-size-4" v-bull-bear="all.quote.percent">
+					<p class="title" v-bull-bear="all.quote.percent">
 						{{vnumber(all.quote.percent,{plusminus:true,percent:true})}}
 					</p>
 					<p v-bull-bear="all.quote.change">
@@ -49,26 +49,28 @@
 					</p>
 				</div>
 
+				<!--  -->
+
 				<div v-if="all.quote.volume" class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-medium leading-tighter">
+					<p class="is-size-3 font-light leading-tighter">
 						{{vnumber(all.quote.volume,{compact:true,precision:1})}}
 					</p>
 					<p>Volume</p>
 				</div>
 				<div v-if="all.quote.avgVolume" class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-medium leading-tighter">
+					<p class="is-size-3 font-light leading-tighter">
 						{{vnumber(all.quote.avgVolume,{compact:true,precision:1})}}
 					</p>
 					<p>Avg Volume</p>
 				</div>
 				<div v-if="all.quote.marketCap" class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-medium leading-tighter">
+					<p class="is-size-3 font-light leading-tighter">
 						{{vnumber(all.quote.marketCap,{compact:true})}}
 					</p>
 					<p>Market Cap</p>
 				</div>
 				<div v-if="all.quote.dealFlowVolume" class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-medium leading-tighter" v-bull-bear="all.quote.dealFlowVolume">
+					<p class="is-size-3 font-light leading-tighter" v-bull-bear="all.quote.dealFlowVolume">
 						{{vnumber(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
 					</p>
 					<p>Captial Flow</p>
@@ -142,7 +144,7 @@
 
 			</div>
 
-			<nav class="tabs is-boxed mb-0">
+			<!-- <nav class="tabs is-boxed mb-0">
 				<ul>
 					<router-link tag="li" class="is-dark" v-for="route in routes" :key="route.name" :to="{name:route.name}">
 						<a class="is-dark no-underline">
@@ -151,9 +153,10 @@
 						</a>
 					</router-link>
 				</ul>
-			</nav>
+			</nav> -->
 		</section>
 
+		<hr>
 		<transition mode="out-in" enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
 			<router-view :symbol="symbol" :quote="all.quote"></router-view>
 		</transition>

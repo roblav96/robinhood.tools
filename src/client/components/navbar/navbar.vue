@@ -27,7 +27,7 @@ span.navbar-burger.burger > span {
 			<div class="navbar-item py-0 is-hidden-mobile">
 				<div class="has-text-centered">
 					<p class="leading-tight">{{time}}</p>
-					<p class="is-size-7 font-medium" :class="colorstate">{{state}}</p>
+					<p class="text-sm" :class="colorstate">{{state}}</p>
 				</div>
 			</div>
 
