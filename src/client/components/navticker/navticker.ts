@@ -47,6 +47,12 @@ export default class extends Mixins(VMixin) {
 		return name.split(' ').slice(0, 3).join(' ')
 	}
 
+	onstep(direction: number) {
+		let scroll = this.$el.querySelector('.overflow-x-auto')
+		let left = core.math.clamp(scroll.scrollLeft + (direction * 128), 0, scroll.scrollWidth)
+		scroll.scrollTo({ left, behavior: 'smooth' })
+	}
+
 }
 
 
