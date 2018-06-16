@@ -39,7 +39,7 @@ export default class extends Mixins(VMixin, RHMixin) {
 		let state = this.hours.state || ''
 		if (state == 'REGULAR') return 'has-text-success';
 		if (state.includes('PRE') || state.includes('POST')) return 'has-text-warning';
-		return 'has-text-light'
+		return 'has-text-lighter'
 	}
 
 	isroute(name: string) { return name == this.$route.name }

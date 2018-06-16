@@ -330,23 +330,23 @@ export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 		if (toquote.price) {
 			if (!quote.startPrice) quote.startPrice = quote.price;
 			quote.close = quote.price
-			quote.change = core.math.round(core.math.sum(quote.price, -quote.startPrice), 8)
-			quote.percent = core.math.round(core.calc.percent(quote.price, quote.startPrice), 8)
+			quote.change = core.math.round(core.math.sum(quote.price, -quote.startPrice), 6)
+			quote.percent = core.math.round(core.calc.percent(quote.price, quote.startPrice), 6)
 
 			if (state.indexOf('PRE') == 0 || !quote.prePrice) {
 				quote.prePrice = quote.price
-				quote.preChange = core.math.round(core.math.sum(quote.price, -quote.startPrice), 8)
-				quote.prePercent = core.math.round(core.calc.percent(quote.price, quote.startPrice), 8)
+				quote.preChange = core.math.round(core.math.sum(quote.price, -quote.startPrice), 6)
+				quote.prePercent = core.math.round(core.calc.percent(quote.price, quote.startPrice), 6)
 			}
 			if (state == 'REGULAR' || !quote.regPrice) {
 				quote.regPrice = quote.price
-				quote.regChange = core.math.round(core.math.sum(quote.price, -quote.openPrice), 8)
-				quote.regPercent = core.math.round(core.calc.percent(quote.price, quote.openPrice), 8)
+				quote.regChange = core.math.round(core.math.sum(quote.price, -quote.openPrice), 6)
+				quote.regPercent = core.math.round(core.calc.percent(quote.price, quote.openPrice), 6)
 			}
 			if (state.indexOf('POST') == 0 || !quote.postPrice) {
 				quote.postPrice = quote.price
-				quote.postChange = core.math.round(core.math.sum(quote.price, -quote.closePrice), 8)
-				quote.postPercent = core.math.round(core.calc.percent(quote.price, quote.closePrice), 8)
+				quote.postChange = core.math.round(core.math.sum(quote.price, -quote.closePrice), 6)
+				quote.postPercent = core.math.round(core.calc.percent(quote.price, quote.closePrice), 6)
 			}
 
 			if (quote.sharesOutstanding) {
@@ -368,8 +368,8 @@ export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 	}
 
 	if (toquote.bid || toquote.ask) {
-		quote.spread = core.math.round(core.math.sum(quote.ask, -quote.bid), 8)
-		quote.baSpread = core.math.round(core.math.sum(quote.askSpread, -quote.bidSpread), 8)
+		quote.spread = core.math.round(core.math.sum(quote.ask, -quote.bid), 6)
+		quote.baSpread = core.math.round(core.math.sum(quote.askSpread, -quote.bidSpread), 6)
 	}
 	if (toquote.bidSize || toquote.askSize) {
 		quote.baFlowSize = core.math.sum(quote.bidSize, -quote.askSize)

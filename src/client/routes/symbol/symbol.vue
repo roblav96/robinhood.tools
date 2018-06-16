@@ -15,7 +15,7 @@
 	<div id="symbol_route">
 		<section class="section py-0 has-background-white">
 
-			<div class="columns my-0 py-0 items-center leading-tight touch:flex-wrap">
+			<div class="columns is-mobile my-0 items-center leading-tight touch:flex-wrap">
 
 				<div class="column is-narrow">
 					<v-symbol-logo class="is-56x56 shadow" :symbol="symbol"></v-symbol-logo>
@@ -27,7 +27,8 @@
 						<!-- {{all.quote.tinyName||all.quote.name}} -->
 						<span class="font-normal is-size-6 has-text">{{all.quote.acronym}}</span>
 					</p>
-					<p>{{all.quote.tinyName||all.quote.name}}</p>
+					<p>{{vname(all.quote.name)}}</p>
+					<!-- <p>{{all.quote.tinyName||all.quote.name}}</p> -->
 					<!-- <p>{{symbol}}:{{all.quote.acronym}}</p> -->
 				</div>
 
@@ -36,7 +37,7 @@
 						<v-price-ticker :price="all.quote.price"></v-price-ticker>
 					</p>
 					<p>
-						<v-timestamp :value="all.quote.timestamp"></v-timestamp>
+						<v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp>
 					</p>
 				</div>
 
@@ -141,6 +142,19 @@
 							</table>
 						</div>
 					</div> -->
+
+				<!-- <div class="column is-3">
+					<nav class="tabs my-0 py-0">
+						<ul>
+							<router-link tag="li" class="is-dark" v-for="route in routes" :key="route.name" :to="{name:route.name}">
+								<a class="is-dark no-underline">
+									<b-icon :icon="route.meta.icon"></b-icon>
+									<span>{{vcapitalize(route.path)}}</span>
+								</a>
+							</router-link>
+						</ul>
+					</nav>
+				</div> -->
 
 			</div>
 
