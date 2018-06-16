@@ -63,6 +63,6 @@ function update() {
 
 } update()
 
-utils.wemitter.on('resize', _.debounce(update, 300, { leading: false, trailing: true }))
+utils.wemitter.on('resize', _.debounce(update, 100, { leading: false, trailing: true }))
 
 

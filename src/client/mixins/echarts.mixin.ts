@@ -27,41 +27,34 @@ import * as pretty from '../adapters/pretty'
 		</div>
 	`,
 })
-export default class extends Vue {
+export default class VEChartsMixin extends Vue {
 
+	echart: echarts.ECharts
 	colors = this.$store.state.colors
 
 	mounted() {
-		this.echart = echarts.init(this.$el.firstChild)
-		this.echart.on('rendered', this.onrender_)
+		this.echart = echarts.init(this.$el.firstChild, null, this.dims())
 		this.echart.on('datazoom', this.ondatazoom_)
+		this.echart.on('showtip', this.onshowtip_)
+		this.echart.on('hidetip', this.onhidetip_)
 		utils.wemitter.on('resize', this.onresize_, this)
 		utils.wemitter.on('keyup', this.onkeyup_, this)
 		utils.wemitter.on('keydown', this.onkeydown_, this)
-		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize_);
 	}
 	beforeDestroy() {
-		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize_);
 		utils.wemitter.off('keydown', this.onkeydown_, this)
 		utils.wemitter.off('keyup', this.onkeyup_, this)
 		utils.wemitter.off('resize', this.onresize_, this)
-		this.echart.off('datazoom', this.ondatazoom_)
-		this.echart.off('rendered', this.onrender_)
+		this.echart.off('hidetip')
+		this.echart.off('showtip')
+		this.echart.off('datazoom')
 		this.echart.clear()
 		this.echart.dispose()
 		this.echart = null
 	}
 
-	echart: echarts.ECharts
-	onrender_() {
-		this.echart.off('rendered', this.onrender_)
-		this.$emit('rendered')
-		this.resize()
-	}
 
 
-
-	// @VMixin.NoCache get option() { return this.echart._model.option }
 	option() { return this.echart._model.option }
 	ctbounds() {
 		let datazoom = this.option().dataZoom[0]
@@ -72,6 +65,10 @@ export default class extends Vue {
 	}
 
 
+
+	tippos: Partial<{ show: boolean, x: number, y: number }>
+	onshowtip_(event) { this.tippos = { show: true, x: event.x, y: event.y } }
+	onhidetip_(event) { this.tippos = { show: false } }
 
 	get brushing() { return (this.$parent as any).brushing }
 	set brushing(brushing: boolean) { (this.$parent as any).brushing = brushing }
@@ -91,12 +88,12 @@ export default class extends Vue {
 
 	}
 
+	resetZoom() { this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 }) }
 	ondatazoom_ = _.throttle(this.datazoom, 100, { leading: false, trailing: true })
 	datazoom() {
 		this.$emit('datazoom')
 		this.brushing = false
 		this.echart.dispatchAction({ type: 'hideTip' })
-		// console.log(`this.echart ->`, this.echart)
 	}
 
 	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
@@ -129,18 +126,17 @@ export default class extends Vue {
 		if (zoomwidth == 100) return;
 		let scale = (zoomwidth / (this.$el.offsetWidth * 0.5))
 		deltaX = deltaX * scale
-		let start = core.math.clamp(ctbounds.start + deltaX, 0, 100 - zoomwidth)
-		let end = core.math.clamp(ctbounds.end + deltaX, zoomwidth, 100)
-		this.echart.dispatchAction({ type: 'dataZoom', start, end })
+		this.echart.dispatchAction({
+			type: 'dataZoom',
+			start: core.math.clamp(ctbounds.start + deltaX, 0, 100 - zoomwidth),
+			end: core.math.clamp(ctbounds.end + deltaX, zoomwidth, 100),
+		})
 	}
 
 
 
 	updateOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
 		this.echart.setOption(deepmerge(this.echart.getOption(), option), opts)
-	}
-	resetZoom() {
-		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
 	}
 
 

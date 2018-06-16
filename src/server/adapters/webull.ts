@@ -12,46 +12,6 @@ import * as http from '../../common/http'
 
 
 
-export function fix(quote: Partial<Webull.Ticker & Webull.Quote>) {
-	if (quote.faStatus) quote.faStatus = webull.ticker_status[quote.faStatus];
-	if (quote.status0) quote.status0 = webull.ticker_status[quote.status0];
-	if (quote.status) quote.status = webull.ticker_status[quote.status];
-
-	if (quote.faTradeTime) quote.faTradeTime = new Date(quote.faTradeTime).valueOf();
-	if (quote.mktradeTime) quote.mktradeTime = new Date(quote.mktradeTime).valueOf();
-	if (quote.tradeTime) quote.tradeTime = new Date(quote.tradeTime).valueOf();
-
-	Object.keys(quote).forEach(key => {
-		let value = quote[key]
-		if (key == 'symbol' || value == null) return;
-		if (core.string.is(value) && !isNaN(value as any)) {
-			quote[key] = Number.parseFloat(value)
-		}
-	})
-
-	let bakeys = ['bid', 'ask']
-	bakeys.forEach(key => {
-		if (!Number.isFinite(quote[key])) delete quote[key];
-		let lkey = `${key}List`
-		let list = quote[lkey] as Webull.BidAsk[]
-		if (Array.isArray(list)) {
-			if (list.length > 0) {
-				let prices = [] as number[]
-				let volumes = [] as number[]
-				list.forEach(v => {
-					if (v.price) prices.push(Number.parseFloat(v.price as any));
-					if (v.volume) volumes.push(Number.parseInt(v.volume as any));
-				})
-				quote[key] = _.mean(prices)
-				quote[`${key}Size`] = _.sum(volumes)
-			}
-			delete quote[lkey]
-		}
-	})
-}
-
-
-
 export async function syncTickersQuotes(fsymbols: Dict<number>, type: keyof typeof rkeys.SYMBOLS) {
 	let inverse = _.invert(fsymbols)
 	let tickerIds = Object.values(fsymbols)
@@ -68,7 +28,7 @@ export async function syncTickersQuotes(fsymbols: Dict<number>, type: keyof type
 			let coms = []
 			resolved.forEach((items, i) => {
 				items.forEach(item => {
-					fix(item)
+					webull.fix(item)
 					item.symbol = inverse[item.tickerId]
 					if (i == 0) coms.push(['hmset', `${rkeys.WB.TICKERS}:${item.symbol}`, item]);
 					if (i == 1) {

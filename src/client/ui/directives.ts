@@ -73,7 +73,7 @@ Vue.directive('is', function(el, { arg, modifiers }, { context }) {
 
 
 Vue.directive('bull-bear', function(el, { value, oldValue, arg }) {
-	if (value === oldValue || !core.number.isFinite(value)) return;
+	if ((value === oldValue && process.env.PRODUCTION) || !core.number.isFinite(value)) return;
 	arg = arg || 'has-text'
 	if (value == 0) return el.classList.remove(arg + '-danger', arg + '-success');
 	el.classList.toggle(arg + '-success', value > 0)
@@ -135,14 +135,14 @@ declare module 'vue/types/options' {
 
 
 
-// Vue.directive('v-number-ticker', function(el, { oldValue, value }: { oldValue: number, value: number }) {
+// Vue.directive('v-price-ticker', function(el, { oldValue, value }: { oldValue: number, value: number }) {
 // 	if (value == oldValue) return;
 // 	if (!Number.isFinite(value)) return;
 // 	let direction = value > oldValue ? 'up' : 'down' as 'up' | 'down'
-// 	let voldValue = Number.isFinite(oldValue) ? utils.nformat(oldValue) : ''
+// 	let voldValue = Number.isFinite(oldValue) ? utils.vnumber(oldValue) : ''
 // 	let olddigits = voldValue.split('')
 // 	console.log('olddigits ->', olddigits)
-// 	let vvalue = utils.nformat(value)
+// 	let vvalue = utils.vnumber(value)
 // 	let digits = vvalue.split('')
 // 	console.log('digits ->', digits)
 // 	digits.forEach((digit, i) => {

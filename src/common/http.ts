@@ -185,8 +185,7 @@ function send(config: Http.Config) {
 				if (!data && config.retries > 0) {
 					return reject('proxify -> !query.results')
 				}
-				// let results = _.get(data, 'query.results')
-				// if (results != null) data = results;
+				data = _.get(data, 'json.json') || data
 			}
 
 			if (config.verbose || config.debug) {

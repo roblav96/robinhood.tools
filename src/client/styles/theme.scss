@@ -27,10 +27,10 @@ $purple: color('violet', 50);
 $red: color('red', 50);
 $pink: color('magenta', 40);
 // 
-// $light: $white-ter;
-// $dark: $grey-darker;
-// $light-invert: $dark;
-// $dark-invert: $white;
+$light: $white-ter;
+$dark: $grey-dark;
+$light-invert: $grey-darker;
+$dark-invert: $white;
 // 
 $primary: $purple;
 $secondary: $cyan;
@@ -80,6 +80,8 @@ $speed-slower: 300ms;
 // 
 $shades: map-merge($shades, ('grey-lightest':$grey-lightest));
 $colors: map-merge($colors, ('text':($text, $white)));
+$colors: map-merge($colors, ('text-light':($text-light, $white)));
+$colors: map-merge($colors, ('text-lighter':($text-lighter, $white)));
 $colors: map-merge($colors, ('text-strong':($text-strong, $white)));
 $colors: map-merge($colors, ('secondary':($secondary, $white)));
 $colors: map-merge($colors, ('accent':($accent, $white)));
@@ -117,19 +119,19 @@ $hr-margin: 0px;
 $box-padding: 1rem;
 $box-radius: $radius;
 // 
-$tabs-border-bottom-width: 0px;
-$tabs-border-bottom-color: $border;
-$tabs-link-color: $text;
-$tabs-link-hover-border-bottom-color: $primary;
-$tabs-link-hover-color: $primary;
-$tabs-link-active-border-bottom-color: $link;
-$tabs-link-active-color: $white;
-// 
-$tabs-boxed-link-hover-background-color: $white-ter;
-$tabs-boxed-link-hover-border-bottom-color: $border;
-$tabs-boxed-link-active-background-color: $primary;
-$tabs-boxed-link-active-border-color: $white;
-$tabs-boxed-link-active-border-bottom-color: transparent;
+// $tabs-border-bottom-width: 0px;
+// $tabs-border-bottom-color: $border;
+// $tabs-link-color: $text;
+// $tabs-link-hover-border-bottom-color: $primary;
+// $tabs-link-hover-color: $primary;
+// $tabs-link-active-border-bottom-color: $link;
+// $tabs-link-active-color: $white;
+// // 
+// $tabs-boxed-link-hover-background-color: $white-ter;
+// $tabs-boxed-link-hover-border-bottom-color: $border;
+// $tabs-boxed-link-active-background-color: $primary;
+// $tabs-boxed-link-active-border-color: $white;
+// $tabs-boxed-link-active-border-bottom-color: transparent;
 // 
 // $table-cell-border: 1px solid $grey-lightest;
 // $table-head-cell-border-width: 0 0 1px;

@@ -8,10 +8,11 @@ import * as dayjs from 'dayjs'
 
 
 
-declare global { interface NumberFormatOptions { precision: number, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } }
-export function number(value: number, { precision, compact, plusminus, percent, dollar, nozeros } = {} as Partial<NumberFormatOptions>) {
+declare global { interface NumberFormatOptions { precision: number, price: boolean, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } }
+export function number(value: number, { precision, price, compact, plusminus, percent, dollar, nozeros } = {} as Partial<NumberFormatOptions>) {
 	let abs = Math.abs(value)
 
+	if (price) compact = false;
 	if (!Number.isFinite(precision)) {
 		precision = 2
 		if (plusminus && percent) {
@@ -21,12 +22,13 @@ export function number(value: number, { precision, compact, plusminus, percent, 
 		else if (compact) precision = 0;
 		else {
 			if (compact === undefined && abs >= 10000) compact = true;
-			else if (abs >= 10000) precision = 0;
-			else if (abs >= 2000) precision = 1;
+			else if (abs >= 1000) precision = 0;
+			else if (abs >= 100) precision = 1;
 			else if (abs < 2) precision = 3;
 		}
 	} else { nozeros = false }
 	if (plusminus || percent) precision = Math.min(precision, 2);
+	if (price) precision = Math.max(precision, 2);
 
 	let unit = -1
 	if (compact) {

@@ -79,7 +79,7 @@
 
 		<div class="columns is-multiline is-mobile">
 			<div class="column" v-for="state in states" :key="state.name">
-				<table class="table is-middle is-hoverable is-fullwidth is-nowrap is-borderless card is-light">
+				<table class="table is-middle is-hoverable is-fullwidth is-nowrap is-borderless card is-border">
 					<thead>
 						<tr>
 							<th class="whitespace-no-wrap">{{state.name}}</th>
@@ -91,32 +91,32 @@
 					<tbody>
 						<tr>
 							<b-tooltip :label="state.tip" position="is-right" size="is-small" animated>
-								<td class="font-medium">{{vstcase(state.calc)}}</td>
+								<td class="has-text">{{vstcase(state.calc)}}</td>
 							</b-tooltip>
 							<td class="has-text-right">
-								{{nformat(all.quote[state.calc])}}
+								{{vnumber(all.quote[state.calc])}}
 							</td>
 						</tr>
 						<tr>
-							<td class="font-medium">{{vstcase(`${state.key}Price`)}}</td>
+							<td class="has-text">{{vstcase(`${state.key}Price`)}}</td>
 							<td class="has-text-right">
-								{{nformat(all.quote[vcamel(`${state.key}Price`)])}}
+								{{vnumber(all.quote[vcamel(`${state.key}Price`)])}}
 							</td>
 						</tr>
 						<tr>
-							<td class="font-medium">{{vstcase(`${state.key}Change`)}}</td>
+							<td class="has-text">{{vstcase(`${state.key}Change`)}}</td>
 							<td class="has-text-right" v-bull-bear="all.quote[vcamel(`${state.key}Change`)]">
-								{{nformat(all.quote[vcamel(`${state.key}Change`)],{nozeros:true,plusminus:true})}}
+								{{vnumber(all.quote[vcamel(`${state.key}Change`)],{nozeros:true,plusminus:true})}}
 							</td>
 						</tr>
 						<tr>
-							<td class="font-medium">{{vstcase(`${state.key}Percent`)}}</td>
+							<td class="has-text">{{vstcase(`${state.key}Percent`)}}</td>
 							<td class="has-text-right" v-bull-bear="all.quote[vcamel(`${state.key}Percent`)]">
-								{{nformat(all.quote[vcamel(`${state.key}Percent`)],{nozeros:true,plusminus:true,percent:true})}}
+								{{vnumber(all.quote[vcamel(`${state.key}Percent`)],{nozeros:true,plusminus:true,percent:true})}}
 							</td>
 						</tr>
 						<tr>
-							<td class="font-medium">Updated</td>
+							<td class="has-text">Updated</td>
 							<td class="has-text-right">
 								<v-timestamp :value="all.quote[vcamel(`${state.key}Timestamp`)]"></v-timestamp>
 							</td>

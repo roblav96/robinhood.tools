@@ -87,8 +87,8 @@ export function applyFull(
 		tickerId: wbticker.tickerId,
 		type: _.startCase(webull.ticker_types[wbticker.type]),
 		typeof: wbquote.typeof,
+		issueType: iex.issueType(iexitem.issueType),
 		timezone: wbquote.utcOffset || wbquote.timeZone,
-		currency: core.fallback(wbticker.currencyCode, wbquote.currency),
 		sector: iexitem.sector,
 		industry: iexitem.industry,
 		website: iexitem.website,
@@ -97,20 +97,20 @@ export function applyFull(
 		listDate: new Date(instrument.list_date).valueOf(),
 		mic: core.fallback(instrument.mic, wbticker.exchangeCode),
 		acronym: core.fallback(instrument.acronym, wbticker.disExchangeCode),
-		exchange: core.fallback(iexitem.exchange, iexitem.primaryExchange, wbticker.disExchangeCode, wbticker.exchangeCode),
-		issueType: iex.issueType(iexitem.issueType),
+		exchange: core.fallback(iexitem.exchange, iexitem.primaryExchange, yhquote.fullExchangeName, wbticker.disExchangeCode, wbticker.exchangeCode),
+		currency: core.fallback(wbticker.currencyCode, wbquote.currency),
 		country: core.fallback(instrument.country, wbticker.regionIsoCode, wbquote.countryISOCode, wbquote.regionAlias),
 		sharesOutstanding: _.round(core.fallback(wbquote.totalShares, yhquote.sharesOutstanding, iexitem.sharesOutstanding)),
 		sharesFloat: _.round(core.fallback(wbquote.outstandingShares, iexitem.float)),
 	} as Quotes.Quote)
 
-	quote.name = core.fallback(iexitem.companyName, instrument.simple_name, yhquote.shortName, wbticker.tinyName, wbticker.name)
-	quote.tinyName = core.fallback(instrument.simple_name, yhquote.shortName, quote.name)
+	quote.name = core.fallback(yhquote.longName, iexitem.companyName, instrument.name, wbticker.name)
+	quote.tinyName = core.fallback(instrument.simple_name, yhquote.shortName, wbticker.tinyName, quote.name)
 	quote.fullName = core.fallback(instrument.name, yhquote.longName, wbticker.name, quote.name)
 
 	quote.avgVolume10Day = _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day))
 	quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))
-	quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, _.round(quote.avgVolume10Day, quote.avgVolume3Month)))
+	quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, core.math.sum0(quote.avgVolume10Day, quote.avgVolume3Month) / 2))
 
 	let toquote = applyWbQuote(quote, wbquote)
 	core.object.repair(quote, mergeCalcs(toquote))

@@ -44,7 +44,6 @@ async function start() {
 
 
 
-const MAX = 20
 radio.reply('search.query', async function onquery(query: string) {
 	let words = query.split(' ')
 	let results = search.query(function(q) {
@@ -91,7 +90,7 @@ radio.reply('search.query', async function onquery(query: string) {
 			})
 		})
 	})
-	results.splice(MAX)
+	results.splice(20)
 	return results.map(v => v.ref)
 })
 

@@ -16,6 +16,7 @@ import clock from '../../../common/clock'
 @Vts.Component({
 	components: {
 		'v-searchbar': () => import('../searchbar/searchbar'),
+		'v-navticker': () => import('../navticker/navticker'),
 	},
 })
 export default class extends Mixins(VMixin, RHMixin) {
@@ -30,12 +31,19 @@ export default class extends Mixins(VMixin, RHMixin) {
 		clock.offListener(this.onsec)
 	}
 
-	isroute(name: string) { return name == this.$route.name }
-	get routes() {
-		return this.$router.options.routes.filter(function(route) {
-			return route.title && route.icon
-		})
+	time = ''
+	onsec() { this.time = dayjs().format('h:mm:ssa') }
+
+	get state() { return pretty.marketState(this.hours.state) }
+	get colorstate() {
+		let state = this.hours.state || ''
+		if (state == 'REGULAR') return 'has-text-success';
+		if (state.includes('PRE') || state.includes('POST')) return 'has-text-warning';
+		return 'has-text-light'
 	}
+
+	isroute(name: string) { return name == this.$route.name }
+	get routes() { return this.$router.options.routes.filter(v => v.meta && v.meta.icon) }
 
 	mobilemenu = false
 	@Vts.Watch('mobilemenu') w_mobilemenu(mobilemenu: boolean) {
@@ -46,16 +54,6 @@ export default class extends Mixins(VMixin, RHMixin) {
 	}
 	@Vts.Watch('breakpoints.name') w_breakpointsname(to: string) {
 		if (this.mobilemenu && this.breakpoints.desktopAndUp) this.mobilemenu = false;
-	}
-
-	time = ''
-	onsec() { this.time = dayjs().format('h:mm:ssa') }
-	get state() { return pretty.marketState(this.hours.state) }
-	get colorstate() {
-		let state = this.hours.state || ''
-		if (state == 'REGULAR') return 'has-text-success';
-		if (state.includes('PRE') || state.includes('POST')) return 'has-text-warning';
-		return 'has-text-light'
 	}
 
 }

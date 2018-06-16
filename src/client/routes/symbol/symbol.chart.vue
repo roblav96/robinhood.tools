@@ -90,8 +90,11 @@
 		</section>
 
 		<!-- <b-tooltip type="is-primary" label="Hold click down, then drag to crop" animated> -->
-		<v-symbol-echart class="flex-col-full border-danger border-1" ref="symbol_vechart" :quote="quote" :brushing="brushing"></v-symbol-echart>
+		<!-- <hr> -->
+		<hr>
+		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :brushing="brushing"></v-symbol-echart>
 		<!-- </b-tooltip> -->
+		
 
 		<!-- <v-loading :is-full-page="false" :active="true"></v-loading> -->
 

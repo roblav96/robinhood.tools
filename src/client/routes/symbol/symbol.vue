@@ -13,22 +13,22 @@
 
 <template>
 	<div id="symbol_route">
-		<section class="section py-0 has-background-white border border-b-1">
+		<section class="section py-0 has-background-white">
 
-			<div class="columns is-mobile my-0 items-center touch:flex-wrap">
+			<div class="columns is-mobile my-0 items-center leading-tight touch:flex-wrap">
 
 				<div class="column is-narrow">
 					<v-symbol-logo class="is-48x48 shadow" :symbol="symbol"></v-symbol-logo>
 				</div>
 
 				<div class="column">
-					<p class="is-size-4 font-bold leading-none whitespace-no-wrap">{{symbol}}</p>
+					<p class="is-size-4 font-bold leading-tighter whitespace-no-wrap">{{symbol}}</p>
 					<p>{{vtruncate(all.quote.tinyName||all.quote.name,48)}}</p>
 				</div>
 
 				<div class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-bold leading-none">
-						<v-number-ticker :number="all.quote.price"></v-number-ticker>
+					<p class="is-size-4 font-bold leading-tighter">
+						<v-price-ticker :price="all.quote.price"></v-price-ticker>
 					</p>
 					<p>
 						<v-timestamp :value="all.quote.timestamp"></v-timestamp>
@@ -36,35 +36,35 @@
 				</div>
 
 				<div class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-bold leading-none" v-bull-bear="all.quote.percent">
-						{{nformat(all.quote.percent,{plusminus:true,percent:true})}}
+					<p class="is-size-4 font-bold leading-tighter" v-bull-bear="all.quote.percent">
+						{{vnumber(all.quote.percent,{plusminus:true,percent:true})}}
 					</p>
 					<p v-bull-bear="all.quote.change">
-						{{nformat(all.quote.change,{plusminus:true})}}
+						{{vnumber(all.quote.change,{plusminus:true})}}
 					</p>
 				</div>
 
 				<div v-if="all.quote.volume" class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-medium leading-none">
-						{{nformat(all.quote.volume,{compact:true,precision:1})}}
+					<p class="is-size-4 font-medium leading-tighter">
+						{{vnumber(all.quote.volume,{compact:true,precision:1})}}
 					</p>
 					<p>Volume</p>
 				</div>
 				<div v-if="all.quote.avgVolume" class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-medium leading-none">
-						{{nformat(all.quote.avgVolume,{compact:true,precision:1})}}
+					<p class="is-size-4 font-medium leading-tighter">
+						{{vnumber(all.quote.avgVolume,{compact:true,precision:1})}}
 					</p>
 					<p>Avg Volume</p>
 				</div>
 				<div v-if="all.quote.marketCap" class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-medium leading-none">
-						{{nformat(all.quote.marketCap,{compact:true})}}
+					<p class="is-size-4 font-medium leading-tighter">
+						{{vnumber(all.quote.marketCap,{compact:true})}}
 					</p>
 					<p>Market Cap</p>
 				</div>
 				<div v-if="all.quote.dealFlowVolume" class="column is-narrow has-text-centered">
-					<p class="is-size-4 font-medium leading-none" v-bull-bear="all.quote.dealFlowVolume">
-						{{nformat(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
+					<p class="is-size-4 font-medium leading-tighter" v-bull-bear="all.quote.dealFlowVolume">
+						{{vnumber(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
 					</p>
 					<p>Captial Flow</p>
 				</div>
@@ -75,7 +75,7 @@
 								<tr>
 									<td class="has-text-danger has-text-right">
 										<b-tooltip label="Bid Price" position="is-left" size="is-small" animated>
-											<p>{{nformat(all.quote.bid)}}</p>
+											<p>{{vnumber(all.quote.bid)}}</p>
 										</b-tooltip>
 									</td>
 									<td>
@@ -88,14 +88,14 @@
 									</td>
 									<td class="has-text-success has-text-left">
 										<b-tooltip label="Ask Price" position="is-right" size="is-small" animated>
-											<p>{{nformat(all.quote.ask)}}</p>
+											<p>{{vnumber(all.quote.ask)}}</p>
 										</b-tooltip>
 									</td>
 								</tr>
 								<tr>
 									<td class="has-text-success has-text-right">
 										<b-tooltip label="Bid Size" position="is-left" size="is-small" animated>
-											<p>{{nformat(all.quote.bids,{precision:1,compact:true})}}</p>
+											<p>{{vnumber(all.quote.bids,{precision:1,compact:true})}}</p>
 										</b-tooltip>
 									</td>
 									<td>
@@ -108,7 +108,7 @@
 									</td>
 									<td class="has-text-danger has-text-left">
 										<b-tooltip label="Ask Size" position="is-right" size="is-small" animated>
-											<p>{{nformat(all.quote.asks,{precision:1,compact:true})}}</p>
+											<p>{{vnumber(all.quote.asks,{precision:1,compact:true})}}</p>
 										</b-tooltip>
 									</td>
 								</tr>
@@ -121,12 +121,12 @@
 							<table class="table is-paddingless is-middle is-nowrap is-borderless">
 								<tbody>
 									<tr>
-										<td class="font-semibold has-text-right pr-2">{{nformat(all.quote.marketCap,{compact:true})}}</td>
+										<td class="font-semibold has-text-right pr-2">{{vnumber(all.quote.marketCap,{compact:true})}}</td>
 										<td>Market Cap</td>
 									</tr>
 									<tr>
 										<td class="font-semibold has-text-right pr-2" v-bull-bear="all.quote.dealFlowVolume">
-											{{nformat(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
+											{{vnumber(all.quote.dealFlowVolume,{compact:true,plusminus:true})}}
 										</td>
 										<td>Capital Flow</td>
 									</tr>
@@ -137,11 +137,11 @@
 
 			</div>
 
-			<nav class="tabs is-boxed is-fullwidth is-centered mb-0">
+			<nav class="tabs is-boxed mb-0">
 				<ul>
 					<router-link tag="li" class="is-dark" v-for="route in routes" :key="route.name" :to="{name:route.name}">
 						<a class="is-dark no-underline">
-							<b-icon :icon="route.icon"></b-icon>
+							<b-icon :icon="route.meta.icon"></b-icon>
 							<span>{{vcapitalize(route.path)}}</span>
 						</a>
 					</router-link>

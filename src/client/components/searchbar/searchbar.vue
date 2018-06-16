@@ -41,14 +41,23 @@
 			</template>
 			<template slot="empty">No results found...</template>
 			<template slot-scope="props">
-				<div class="columns is-mobile is-gapless">
-					<div class="column is-narrow self-center mr-4">
+				<div class="columns is-mobile is-gapless items-center">
+					<div class="column is-narrow mr-4">
 						<v-symbol-logo class="is-32x32 shadow" :symbol="props.option.symbol"></v-symbol-logo>
 					</div>
 					<div class="column">
 						<p class="title is-size-5">{{props.option.symbol}}</p>
 						<p class="subtitle is-size-6">{{vtruncate(props.option.tinyName||props.option.name)}}</p>
 					</div>
+					<!-- <div class="column">
+						<div class="flex">
+							<p class="title is-size-5 mr-12">{{props.option.symbol}}</p>
+							<p class="flex-grow has-text-right self-end leading-tight has-text-light font-light">
+								{{props.option.acronym}}
+							</p>
+						</div>
+						<p class="leading-tight is-size-6 mr-12">{{vtruncate(props.option.tinyName||props.option.name)}}</p>
+					</div> -->
 				</div>
 			</template>
 		</b-autocomplete>

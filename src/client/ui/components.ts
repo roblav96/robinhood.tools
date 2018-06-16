@@ -20,7 +20,7 @@ import clock from '../../common/clock'
 		</b-tooltip>
 	`,
 })
-class Timestamp extends Vue {
+class VTimestamp extends Vue {
 	tip = ''
 	fromnow = ''
 	@Vts.Prop() value: number
@@ -40,7 +40,7 @@ class Timestamp extends Vue {
 		this.tip = pretty.stamp(this.value)
 	}
 }
-Vue.component('v-timestamp', Timestamp)
+Vue.component('v-timestamp', VTimestamp)
 
 
 
@@ -52,7 +52,7 @@ Vue.component('v-timestamp', Timestamp)
 		digit: {
 			update(el, binding, vnode) {
 				if (!binding.value || binding.value == binding.oldValue) return;
-				let context = vnode.context as NumberTicker
+				let context = vnode.context as VPriceTicker
 				anime.remove(el)
 				anime({
 					targets: el,
@@ -67,21 +67,21 @@ Vue.component('v-timestamp', Timestamp)
 		},
 	},
 })
-class NumberTicker extends Vue {
+class VPriceTicker extends Vue {
 	black: string
 	color: string
 	mounted() { this.black = window.getComputedStyle(this.$el).getPropertyValue('color') }
-	@Vts.Prop() number: number
-	@Vts.Watch('number') w_number(to: number, from: number) {
+	@Vts.Prop() price: number
+	@Vts.Watch('price') w_number(to: number, from: number) {
 		if (!Number.isFinite(to) || !Number.isFinite(from) || to == from) return;
 		this.color = to > from ? this.colors.success : this.colors.danger
 	}
 	get colors() { return this.$store.state.colors }
 	get digits() {
-		return Number.isFinite(this.number) ? pretty.number(this.number).split('') : []
+		return Number.isFinite(this.price) ? pretty.number(this.price, { price: true }).split('') : []
 	}
 }
-Vue.component('v-number-ticker', NumberTicker)
+Vue.component('v-price-ticker', VPriceTicker)
 
 
 
@@ -92,7 +92,7 @@ Vue.component('v-number-ticker', NumberTicker)
 		</figure>
 	`,
 })
-class SymbolLogo extends Vue {
+class VSymbolLogo extends Vue {
 	@Vts.Prop() symbol: string
 	get src() { return 'https://storage.googleapis.com/iex/api/logos/' + this.symbol + '.png' }
 	onerror(event: Event) {
@@ -102,7 +102,7 @@ class SymbolLogo extends Vue {
 		el.src = src
 	}
 }
-Vue.component('v-symbol-logo', SymbolLogo)
+Vue.component('v-symbol-logo', VSymbolLogo)
 
 
 

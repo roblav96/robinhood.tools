@@ -54,8 +54,6 @@ export const DEV_INDEXES = {
 
 
 
-export const regxSymbol = /[^a-zA-Z-.]/
-
 export async function getSymbols(type = 'STOCKS' as TypeOfSymbols) {
 	let resolved = await redis.main.get(rkeys.SYMBOLS[type])
 	return (resolved ? JSON.parse(resolved) : []) as string[]

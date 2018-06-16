@@ -77,7 +77,7 @@ async function syncInstruments() {
 	console.log('syncInstruments -> start')
 	await pForever(async function getInstruments(url) {
 		let { results, next } = await http.get(url) as Robinhood.Api.Paginated<Robinhood.Instrument>
-		results.remove(v => Array.isArray(v.symbol.match(utils.regxSymbol)))
+		results.remove(v => !quotes.isSymbol(v.symbol))
 
 		console.log('getInstruments ->', results.length, next)
 
@@ -124,7 +124,7 @@ async function syncTickers() {
 		}).then(response => response[0].newStockList),
 	]) as Webull.Ticker[]
 	tickers = _.flatten(tickers)
-	tickers.remove(v => Array.isArray(v.disSymbol.match(utils.regxSymbol)))
+	tickers.remove(v => !quotes.isSymbol(v.disSymbol))
 	tickers.forEach(v => {
 		webull.fix(v)
 		v.disSymbol = webull.fixSymbol(v.disSymbol)

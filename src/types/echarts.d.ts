@@ -16,6 +16,7 @@ declare module 'echarts' {
 			'finished' |
 			'focusnodeadjacency' |
 			'globalout' |
+			'hidetip' |
 			'legendscroll' |
 			'legendselectchanged' |
 			'legendselected' |
@@ -34,6 +35,7 @@ declare module 'echarts' {
 			'pieunselected' |
 			'rendered' |
 			'restore' |
+			'showtip' |
 			'timelinechanged' |
 			'timelineplaychanged' |
 			'unfocusnodeadjacency'
@@ -101,7 +103,7 @@ declare module 'echarts' {
 			constructor(el: HTMLElement | Node, theme?: string | object, opts?: Partial<InitOptions>)
 			on(eventName: EventNames, handler: (...params: any[]) => void, context?: any): void
 			one(eventName: EventNames, handler: (...params: any[]) => void, context?: any): void
-			off(eventName: EventNames, handler?: (...params: any[]) => void): void
+			off(eventName: EventNames, handler?: (...params: any[]) => void, context?: any): void
 			resize(dims: Dims): void
 			getDataURL(opts: Partial<DataUrlOptions>): string
 			getConnectedDataURL(opts: Partial<DataUrlOptions>): string

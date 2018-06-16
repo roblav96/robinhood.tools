@@ -1,27 +1,41 @@
 // 
 
-import Vuex, { Store } from 'vuex'
 import lockr from 'lockr'
-import * as _ from '../../common/lodash'
+import * as http from '../../common/http'
+import * as webull from '../../common/webull'
+import * as quotes from '../../common/quotes'
 import store from '../store'
 import router from '../router'
 
 
 
 interface Recent { symbol: string, stamp: number }
-let state = lockr.get('recents', []) as Recent[]
-store.register('recents', state)
-declare global { namespace Store { interface State { recents: typeof state } } }
+const recents = lockr.get('recents', []) as Partial<Recent>[]
+store.register('recents', recents)
+declare global { namespace Store { interface State { recents: typeof recents } } }
+
+
+
+if (recents.length == 0) {
+	http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/12', {
+		query: { pageIndex: 0, pageSize: 20, hl: 'en', sourceRegionId: 1 },
+	}).then((response: Webull.Ticker[]) => {
+		response.remove(v => !quotes.isSymbol(v.disSymbol))
+		recents.push(...response.map(v => ({
+			symbol: webull.fixSymbol(v.disSymbol), stamp: Date.now(),
+		})))
+	}).catch(error => console.error(`populate Error ->`, error))
+}
 
 
 
 router.afterEach(function(to, from) {
-	if (to.name.indexOf('symbol') == 0) {
-		let symbol = to.params.symbol
-		state.remove(v => v.symbol == symbol)
-		state.unshift({ symbol, stamp: Date.now() })
-		state.splice(20)
-		lockr.set('recents', state)
+	let symbol = to.params.symbol
+	if (to.name.indexOf('symbol') == 0 && symbol) {
+		recents.remove(v => v.symbol == symbol)
+		recents.unshift({ symbol, stamp: Date.now() })
+		recents.splice(20)
+		lockr.set('recents', recents)
 	}
 })
 

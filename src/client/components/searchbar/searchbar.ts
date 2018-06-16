@@ -5,10 +5,10 @@ import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import VMixin from '../../mixins/v.mixin'
 import * as _ from '../../../common/lodash'
-import * as rkeys from '../../../common/rkeys'
 import * as http from '../../../common/http'
+import * as webull from '../../../common/webull'
+import * as quotes from '../../../common/quotes'
 import * as utils from '../../adapters/utils'
-import * as recents from '../../stores/recents'
 
 
 
@@ -21,6 +21,7 @@ export default class extends Mixins(VMixin) {
 	beforeDestroy() {
 		utils.wemitter.off('keyup', this.onkeyup, this)
 	}
+
 	onkeyup(event: KeyboardEvent) {
 		if (event.metaKey || event.shiftKey || event.ctrlKey || event.altKey) return;
 		if (['Escape'].includes(event.key)) {
@@ -49,13 +50,10 @@ export default class extends Mixins(VMixin) {
 			if (!this.query) return http.post('/recents', { symbols: this.recents.map(v => v.symbol) });
 			return http.get('/search', { query: { query: this.query } })
 		}).then(results => {
-			console.log(`results ->`, JSON.parse(JSON.stringify(results)))
 			this.$safety()
 			this.results = results
 			this.$nextTick(() => this.scrolltop())
-		}).catch(error => {
-			console.error('sync Error ->', error)
-		})
+		}).catch(error => console.error('sync Error ->', error))
 	}
 
 	onfocus(event: Event) {

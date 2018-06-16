@@ -13,11 +13,7 @@ import * as _ from '../../common/lodash'
 		'v-navbar': () => import('../components/navbar/navbar'),
 	},
 })
-export default class extends Mixins(VMixin) {
-
-	created() {
-
-	}
+export default class VApp extends Mixins(VMixin) {
 
 	initing = true
 	mounted() {
@@ -25,9 +21,8 @@ export default class extends Mixins(VMixin) {
 		setTimeout(() => this.initing = null, 1000)
 	}
 
-	get routes() {
-		return this.$router.options.routes.filter(v => v.name && !v.path.includes('/:'))
-	}
+	get showfooter() { return (this.$route.matched[0] || this.$route).meta.nofooter != true }
+	get routes() { return this.$router.options.routes.filter(v => v.name && !v.path.includes('/:')) }
 
 	// hidebackdrop() {
 	// 	console.log('hidebackdrop ->')

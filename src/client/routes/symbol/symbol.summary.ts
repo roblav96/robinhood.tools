@@ -19,19 +19,16 @@ import socket from '../../adapters/socket'
 
 @Vts.Component
 export default class extends Mixins(VMixin) {
+
 	$parent: Symbol
 	symbol = this.$parent.symbol
 	all = this.$parent.all
-
-	created() {
-
-	}
 
 	schemas = [
 		{
 			name: 'Instrument', icon: 'coin',
 			defs: [
-				{ key: 'fullName' },
+				{ key: 'name' },
 				{ key: 'issueType' },
 				{ key: 'country' },
 				{ key: 'timezone' },

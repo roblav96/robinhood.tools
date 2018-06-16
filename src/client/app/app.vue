@@ -15,8 +15,8 @@
 			<router-view class="router-view is-fullheight flex-col"></router-view>
 		</transition>
 
-		<hr>
-		<section class="footer hero py-0">
+		<section v-show="showfooter" class="footer hero py-0">
+			<hr>
 			<div class="hero-body">
 				<div class="container">
 					<div class="content has-text-centered">

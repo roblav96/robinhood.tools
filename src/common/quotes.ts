@@ -17,6 +17,10 @@ declare global { namespace Quotes { type AllKeys = keyof typeof ALL_RKEYS } }
 
 
 
+export function isSymbol(symbol: string) {
+	return !Array.isArray(symbol.match(/[^a-zA-Z-.]/))
+}
+
 export function convert<T>(quote: T, qkeys: string[]) {
 	Object.keys(quote).forEach(k => {
 		if (qkeys.indexOf(k) == -1) delete quote[k];

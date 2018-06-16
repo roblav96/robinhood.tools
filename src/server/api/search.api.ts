@@ -13,7 +13,8 @@ import polka from './polka'
 
 
 async function getQuotes(symbols: string[]) {
-	let ikeys = ['symbol', 'name', 'tinyName', 'exchange', 'acronym', 'mic', 'type', 'typeof'] as KeysOf<Quotes.Quote>
+	// let ikeys = ['symbol', 'name', 'tinyName', 'country', 'exchange', 'acronym', 'mic', 'type', 'typeof'] as KeysOf<Quotes.Quote>
+	let ikeys = ['symbol', 'name', 'tinyName'] as KeysOf<Quotes.Quote>
 	let resolved = await redis.main.coms(symbols.map(symbol => {
 		return ['hmget', `${rkeys.QUOTES}:${symbol}`].concat(ikeys)
 	}))

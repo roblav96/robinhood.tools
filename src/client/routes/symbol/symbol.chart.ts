@@ -4,7 +4,7 @@ import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
 import Vue from 'vue'
 import VMixin from '../../mixins/v.mixin'
-import VECharts from '../../mixins/echarts.mixin'
+import VEChartsMixin from '../../mixins/echarts.mixin'
 import VSymbol from './symbol'
 import * as echarts from 'echarts'
 import * as ecstat from 'echarts-stat'
@@ -22,7 +22,7 @@ import * as charts from '../../adapters/charts'
 
 
 @Vts.Component
-class VSymbolEChart extends Mixins(VECharts) {
+class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	$parent: VSymbolChart
 	@Vts.Prop() quote: Quotes.Quote
@@ -76,6 +76,7 @@ class VSymbolEChart extends Mixins(VECharts) {
 				// alwaysShowContent: !!process.env.DEVELOPMENT,
 				trigger: 'axis',
 				triggerOn: 'mousemove',
+
 				// position: [10, 10],
 				position: (point, params, el, rect, size) => {
 					return [point[0] - (size.contentSize[0] / 2), 2];
@@ -112,7 +113,7 @@ class VSymbolEChart extends Mixins(VECharts) {
 							color: this.colors.dark, borderRadius: 0,
 							fontSize: 14, padding: [4, 8], fontWeight: 'bold',
 						},
-						formatter: params => pretty.number(params.value),
+						// formatter: params => pretty.number(params.value),
 					},
 				},
 			},
@@ -194,7 +195,7 @@ class VSymbolEChart extends Mixins(VECharts) {
 				splitArea: { show: false },
 				axisLabel: {
 					textStyle: { color: this.colors.dark, fontSize: 14 },
-					formatter: value => { return pretty.number(value) },
+					formatter: value => pretty.number(value),
 				},
 				axisTick: { show: false },
 				axisLine: { show: false },
@@ -250,7 +251,6 @@ class VSymbolEChart extends Mixins(VECharts) {
 		} as echarts.Option
 		this.echart.setOption(bones)
 		// console.log(`this.echart.getOption() ->`, this.echart.getOption())
-		// this.$nextTick(() => this.resetZoom())
 	}
 
 }
@@ -270,6 +270,10 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	mounted() {
 		this.vechart = (this.$refs as any)['symbol_vechart']
 		this.getQuotes()
+	}
+
+	beforeDestroy() {
+
 	}
 
 	brushing = false

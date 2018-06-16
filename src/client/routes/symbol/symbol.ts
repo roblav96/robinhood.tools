@@ -25,20 +25,20 @@ export default class VSymbol extends Mixins(VMixin) {
 	get symbol() { return this.$route.params.symbol }
 
 	mounted() {
-		// clock.on('1s', () => this.all.quote.price = _.round(this.all.quote.price + _.random(-1, 1, true), 2))
+		
 	}
 
 	beforeDestroy() {
 		this.reset()
 	}
 
-	get routes() { return this.$router.options.routes.find(v => v.name == 'symbol').children.filter(v => v.icon) }
+	get routes() { return this.$router.options.routes.find(v => v.name == 'symbol').children.filter(v => v.meta && v.meta.icon) }
 
 	busy = true
 	all = core.array.dict(Object.keys(quotes.ALL_RKEYS), {} as any) as Quotes.All
 
 	@Vts.Watch('all.quote.price', { immediate: true }) w_price(price: number) {
-		document.title = `${this.symbol} ${this.nformat(price)} (${this.nformat(this.all.quote.percent, { plusminus: true, percent: true })})`
+		document.title = `${this.symbol} ${this.vnumber(price)} (${this.vnumber(this.all.quote.percent, { plusminus: true, percent: true })})`
 	}
 
 	reset() {

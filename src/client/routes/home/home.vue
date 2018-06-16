@@ -15,15 +15,15 @@
 					<img class="max-w-ns mb-8" width="33%" src="../../../assets/logo-white.svg" alt="Robinhood Tools">
 					<h1 class="title is-size-2">Robinhood Tools</h1>
 					<h2 class="subtitle is-size-4">Advanced trading tools and resources for Robinhood Web.</h2>
-					<router-link class="button is-large is-accent font-medium" :to="{name:'login'}">
+					<!-- <router-link class="button is-large is-accent font-medium" :to="{name:'login'}">
 						<img class="image is-28x28 mr-2" src="../../../assets/robinhood-logo-white.svg" alt="Robinhood Login">
 						<span>Login Now</span>
-					</router-link>
+					</router-link> -->
 				</div>
 			</div>
 		</section>
 
-		<section class="section is-medium">
+		<section class="section is-large">
 			<div class="container">
 				<div class="columns is-multiline">
 					<div v-for="box in boxes" class="column is-half-tablet is-one-quarter-widescreen">
@@ -43,12 +43,13 @@
 		<section class="hero is-primary is-bold">
 			<div class="hero-body">
 				<div class="container has-text-centered">
-					<nav class="tabs is-medium is-toggle is-centered">
+					<nav class="tabs is-medium is-toggle is-centered is-fullwidth">
 						<ul>
 							<router-link tag="li" :to="{name:route.name}" v-for="route in routes" :key="route.name">
 								<a>
-									<b-icon size="is-medium" :icon="route.icon"></b-icon>
-									<span class="font-medium">{{route.title}}</span>
+									<b-icon size="is-medium" :icon="route.meta.icon"></b-icon>
+									<span class="font-medium">{{vcapitalize(route.name)}}</span>
+									<!-- <span class="font-medium">{{route.title}}</span> -->
 								</a>
 							</router-link>
 						</ul>

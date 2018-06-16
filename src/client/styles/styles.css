@@ -1,5 +1,9 @@
 /**/
 
+html {
+	overflow-y: auto;
+}
+
 
 /* vue fixes */
 
@@ -116,6 +120,11 @@ span.tooltip.is-large:after {
 .dropdown-menu,
 .dropdown .background {
 	z-index: 30;
+}
+
+span.tag.is-small {
+	height: inherit;
+	padding: 0rem 0.25rem;
 }
 
 
@@ -256,10 +265,18 @@ p.content,
 
 /**/
 
-span.tag.is-small {
-	height: 1.125rem;
-	padding-left: 0.5rem;
-	padding-right: 0.5rem;
+.scrollbar-none::-webkit-scrollbar {
+	display: none;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+	background-color: var(--grey-lighter);
+	border-radius: 0.0625rem;
+}
+
+.scrollbar::-webkit-scrollbar {
+	width: 0.125rem;
+	height: 0.125rem;
 }
 
 
