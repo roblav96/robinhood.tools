@@ -23,8 +23,7 @@
 			</div>
 		</section>
 
-		<section class="section is-large">
-			<div class="container">
+		<section class="section is-medium">
 				<div class="columns is-multiline">
 					<div v-for="box in boxes" class="column is-half-tablet is-one-quarter-widescreen">
 						<div class="box content">
@@ -37,7 +36,6 @@
 						</div>
 					</div>
 				</div>
-			</div>
 		</section>
 
 		<section class="hero is-primary is-bold">

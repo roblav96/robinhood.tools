@@ -270,7 +270,7 @@ p.content,
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
-	background-color: var(--grey-lighter);
+	background-color: var(--grey-light);
 	border-radius: 0.0625rem;
 }
 

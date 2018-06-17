@@ -27,10 +27,10 @@ $purple: color('violet', 50);
 $red: color('red', 50);
 $pink: color('magenta', 40);
 // 
-$light: $white-ter;
-$dark: $grey-dark;
-$light-invert: $grey-darker;
-$dark-invert: $white;
+// $light: $white-ter;
+// $dark: $grey-dark;
+// $light-invert: $grey-darker;
+// $dark-invert: $white;
 // 
 $primary: $purple;
 $secondary: $cyan;
@@ -86,14 +86,15 @@ $colors: map-merge($colors, ('text-strong':($text-strong, $white)));
 $colors: map-merge($colors, ('secondary':($secondary, $white)));
 $colors: map-merge($colors, ('accent':($accent, $white)));
 // 
+$table-color: $text;
 $body-background-color: $white;
 $footer-background-color: $white-ter;
 // 
-$section-padding: ($column-gap*1) ($column-gap*2);
-$section-padding-medium: ($column-gap*2) ($column-gap*2);
-$section-padding-large: ($column-gap*3) ($column-gap*2);
+$section-padding: ($column-gap*2) ($column-gap*2);
+$section-padding-medium: ($column-gap*3) ($column-gap*2);
+$section-padding-large: ($column-gap*4) ($column-gap*2);
 // 
-$table-color: $text;
+$link-focus-border: $link;
 $navbar-item-active-color: $link;
 $dropdown-item-hover-color: $link;
 // 

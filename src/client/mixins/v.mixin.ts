@@ -41,7 +41,7 @@ export default class VMixin extends Vue {
 			v = v.toLowerCase()
 			let match = v.match(/\W+/g)
 			if (match && match[0] == v) max++;
-			return ['the'].indexOf(v) == -1
+			return ['the', 'inc'].indexOf(v.replace(/\W+/g, '')) == -1
 		}).slice(0, max).join(' ').trim()
 	}
 

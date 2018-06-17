@@ -11,7 +11,7 @@
 
 		<section class="section py-0">
 			<div class="columns is-mobile items-center">
-				<div class="column is-narrow">
+				<!-- <div class="column is-narrow">
 					<div class="field has-addons">
 						<p class="control">
 							<b-tooltip :active="!busy&&!!ranges[rangeindex-1]" :label="vrange(ranges[rangeindex-1])" size="is-small"
@@ -25,7 +25,6 @@
 							<b-dropdown v-model="range" :disabled="busy">
 								<b-tooltip label="Date Range" size="is-small" slot="trigger" animated>
 									<button class="button" style="width:5rem;" :class="{'is-loading':busy}" type="button">
-										<!-- <b-icon :icon="rangeindex==0?'clipboard-pulse-outline':'calendar-today'"></b-icon> -->
 										<span>{{vrange(range)}}</span>
 									</button>
 								</b-tooltip>
@@ -45,14 +44,14 @@
 							</b-tooltip>
 						</p>
 					</div>
-				</div>
-				<!-- <div class="column">
+				</div> -->
+				<div class="column is-narrow">
 					<b-field>
 						<b-radio-button v-model="range" type="is-primary" v-for="v in ranges" :native-value="v" :key="v">
 							<span>{{vrange(v)}}</span>
 						</b-radio-button>
 					</b-field>
-				</div> -->
+				</div>
 				<div class="column is-narrow">
 					<!-- <b-field class="rounded">
 						<b-tooltip label="Candlestick" size="is-small">
@@ -94,7 +93,7 @@
 		<hr>
 		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :brushing="brushing"></v-symbol-echart>
 		<!-- </b-tooltip> -->
-		
+
 
 		<!-- <v-loading :is-full-page="false" :active="true"></v-loading> -->
 

@@ -9,6 +9,7 @@ import * as core from '../../../common/core'
 import * as rkeys from '../../../common/rkeys'
 import * as quotes from '../../../common/quotes'
 import * as http from '../../../common/http'
+import * as webull from '../../../common/webull'
 import * as utils from '../../adapters/utils'
 import clock from '../../../common/clock'
 import socket from '../../adapters/socket'
@@ -78,6 +79,7 @@ export default class VSymbol extends Mixins(VMixin) {
 		console.log(`deal ->`, JSON.stringify(deal, null, 4))
 	}
 
+	get vtype() { return core.string.capitalize(_.startCase(webull.ticker_types[this.all.wbticker.type])) }
 	get bidask() { return utils.bidask(this.all.quote) }
 
 	// @Vts.Watch('$route.name') w_$routename(name: string) {
