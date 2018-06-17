@@ -9,13 +9,13 @@
 <template>
 	<div id="symbol_route" class="flex-col has-background-white-ter">
 
-		<section class="section whitespace-no-wrap has-background-white">
-			<div class="columns items-center">
+		<section class="section has-background-white">
+			<div class="columns items-center whitespace-no-wrap">
 
 				<div class="column is-narrow">
 					<div class="columns is-mobile items-center">
 						<div class="column is-narrow">
-							<v-symbol-logo class="is-64x64 shadow" :symbol="symbol"></v-symbol-logo>
+							<v-symbol-logo class="is-56x56 shadow" :symbol="symbol"></v-symbol-logo>
 						</div>
 						<div class="column">
 							<span class="title">{{symbol}}</span>
@@ -53,30 +53,8 @@
 				</div> -->
 			</div>
 		</section>
-
-
-		<div class="columns flex-grow">
-
-			<div class="column is-4">
-				<div class="columns is-mobile">
-					<!-- <div class="column">
-						<v-symbol-logo class="is-56x56 shadow" :symbol="symbol"></v-symbol-logo>
-					</div> -->
-					<!-- <div class="column is-6">
-						<p class="title is-size-3 whitespace-no-wrap">
-							{{symbol}}
-							<span class="font-normal is-size-6 has-text">{{all.quote.acronym}}</span>
-						</p>
-						<p>{{vname(all.quote.name)}}</p>
-					</div> -->
-				</div>
-			</div>
-
-			<div class="column flex-col-full">
-				<v-symbol-chart :symbol="symbol" :quote="all.quote"></v-symbol-chart>
-			</div>
-
-		</div>
+		
+		<v-symbol-chart :symbol="symbol" :quote="all.quote"></v-symbol-chart>
 
 	</div>
 </template>

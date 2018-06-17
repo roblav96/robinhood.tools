@@ -16,15 +16,43 @@ export const YH = {
 
 
 export const SUMMARY_MODULES = [
-	// stocks
-	'assetProfile', 'balanceSheetHistory', 'balanceSheetHistoryQuarterly', 'calendarEvents',
-	'cashflowStatementHistory', 'cashflowStatementHistoryQuarterly', 'defaultKeyStatistics', 'earnings',
-	'earningsHistory', 'earningsTrend', 'financialData', 'fundOwnership', 'incomeStatementHistory',
-	'incomeStatementHistoryQuarterly', 'indexTrend', 'industryTrend', 'insiderHolders', 'insiderTransactions',
-	'institutionOwnership', 'majorDirectHolders', 'majorHoldersBreakdown', 'netSharePurchaseActivity', 'price', 'quoteType',
-	'recommendationTrend', 'secFilings', 'sectorTrend', 'summaryDetail', 'summaryProfile', 'symbol', 'upgradeDowngradeHistory',
-	// funds
-	'fundProfile', 'topHoldings', 'fundPerformance'
+	'assetProfile',
+	'balanceSheetHistory',
+	'balanceSheetHistoryQuarterly',
+	'calendarEvents',
+	'cashflowStatementHistory',
+	'cashflowStatementHistoryQuarterly',
+	'components',
+	'defaultKeyStatistics',
+	'description',
+	'earnings',
+	'earningsHistory',
+	'earningsTrend',
+	'esgScores',
+	'financialData',
+	'fundOwnership',
+	'fundPerformance',
+	'fundProfile',
+	'incomeStatementHistory',
+	'incomeStatementHistoryQuarterly',
+	'indexTrend',
+	'industryTrend',
+	'insiderHolders',
+	'insiderTransactions',
+	'institutionOwnership',
+	'majorDirectHolders',
+	'majorHoldersBreakdown',
+	'netSharePurchaseActivity',
+	'price',
+	'quoteType',
+	'recommendationTrend',
+	'secFilings',
+	'sectorTrend',
+	'summaryDetail',
+	'summaryProfile',
+	'symbol',
+	'topHoldings',
+	'upgradeDowngradeHistory',
 ]
 
 

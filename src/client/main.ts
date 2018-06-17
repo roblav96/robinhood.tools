@@ -2,20 +2,19 @@
 
 require('../common/polyfills')
 
-process.version = 'v9.11.1'
-process.hrtime = require('browser-process-hrtime')
-
 Object.assign(console, { dtsgen: function() { } })
 if (process.env.DEVELOPMENT) {
 	// console.dtsgen = require('../common/dtsgen').default
+	process.version = 'v9.11.1'
+	process.hrtime = require('browser-process-hrtime')
 	Object.assign(window, require('../common/core'))
 	Object.assign(window, { dayjs: require('dayjs') })
-	require('echarts')
+	// require('echarts')
 }
 
 
 
-// import 'modern-normalize'
+import 'modern-normalize'
 import 'animate.css'
 import './styles/vendors.scss'
 import './styles/theme.scss'

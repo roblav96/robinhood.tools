@@ -181,6 +181,7 @@ declare global {
 			interface Topic {
 				type: string
 				tid: string
+				rids: string
 			}
 			interface Payload<T = any> {
 				type: string

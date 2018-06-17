@@ -21,7 +21,7 @@ span.navbar-burger.burger > span {
 
 			<div class="navbar-brand">
 				<router-link class="navbar-item" :to="{name:'home'}" active-class exact-active-class>
-					<img src="../../../assets/logo-primary.svg" alt="Robinhood Tools">
+					<img class="max-h-initial" src="../../../assets/logo-primary.svg" alt="Robinhood Tools">
 				</router-link>
 
 				<div class="navbar-item py-0 is-hidden-mobile">

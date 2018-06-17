@@ -12,6 +12,7 @@ const _ = require('lodash')
 const dotenv = require('dotenv')
 const webpack = require('webpack')
 const package = require('./package.json')
+const tailwindcss = require('tailwindcss')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 
@@ -40,6 +41,7 @@ module.exports = {
 			// })
 		}
 
+		// config.plugins.push(tailwindcss(path.join(__dirname, 'src/client/styles/tailwind.js')))
 		config.plugins.push(new webpack.ProvidePlugin({ Promise: 'zousan/src/zousan' }))
 
 		// config.plugins.push(new BundleAnalyzerPlugin())
@@ -49,7 +51,7 @@ module.exports = {
 	chainWebpack: function(config) {
 		if (DEBUG) console.log('chain config ->', config);
 
-		let main = path.resolve(__dirname, 'src/client/main.ts')
+		let main = path.join(__dirname, 'src/client/main.ts')
 		config.entry('app').clear().add(main)
 		config.resolve.alias.store.delete('@')
 
@@ -59,8 +61,8 @@ module.exports = {
 			args[0]['process.env'].NAME = `"${package.name}"`
 			args[0]['process.env'].VERSION = `"${package.version}"`
 			args[0]['process.env'].DOMAIN = `"${(DEVELOPMENT ? 'dev.' : '') + package.domain}"`
-			let env = dotenv.config({ path: path.resolve(__dirname, 'env/client.env') }).parsed || {}
-			Object.assign(env, dotenv.config({ path: path.resolve(__dirname, 'env/client.' + process.env.NODE_ENV + '.env') }).parsed || {})
+			let env = dotenv.config({ path: path.join(__dirname, 'env/client.env') }).parsed || {}
+			Object.assign(env, dotenv.config({ path: path.join(__dirname, 'env/client.' + process.env.NODE_ENV + '.env') }).parsed || {})
 			Object.keys(env).forEach(k => args[0]['process.env'][k] = `"${env[k]}"`)
 			return args
 		})

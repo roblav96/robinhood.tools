@@ -107,6 +107,24 @@ export default class WebullMqttClient {
 			if (this.options.verbose) console.info('connect');
 			this.alive = true
 
+			// {
+			// 	let topic = {
+			// 		regionIds: [6],
+			// 		header: {
+			// 			app: 'stocks',
+			// 			did: process.env.WEBULL_DID,
+			// 			access_token: process.env.WEBULL_TOKEN,
+			// 		},
+			// 	}
+			// 	let others = [1, 2, 3, 4, 11, 16]
+			// 	let subscriptions = others.map(other => ({
+			// 		topic: JSON.stringify(Object.assign(topic, { type: other.toString() })), qos: 0,
+			// 	}))
+			// 	console.log(`subscriptions ->`, subscriptions)
+			// 	this.client.subscribe({ subscriptions, messageId: this.nextId() })
+			// }
+			// return
+
 			this.dsymbols = _.invert(_.mapValues(this.options.fsymbols, v => v.toString()))
 			let topic = {
 				tickerIds: Object.values(this.options.fsymbols),

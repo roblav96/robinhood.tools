@@ -86,66 +86,23 @@ $colors: map-merge($colors, ('text-strong':($text-strong, $white)));
 $colors: map-merge($colors, ('secondary':($secondary, $white)));
 $colors: map-merge($colors, ('accent':($accent, $white)));
 // 
-// $body-line-height: 1.25;
 $body-background-color: $white;
 $footer-background-color: $white-ter;
-// $button-disabled-opacity: 0.33;
+// 
+$section-padding: ($column-gap*1) ($column-gap*2);
+$section-padding-medium: ($column-gap*2) ($column-gap*2);
+$section-padding-large: ($column-gap*3) ($column-gap*2);
 // 
 $table-color: $text;
-$table-head-cell-color: $text-strong;
-// 
-// $section-padding: ($column-gap * 1) ($column-gap * 2);
-$section-padding: 0.75rem 1.5rem;
-$section-padding-medium: 1.5rem 1.5rem;
-$section-padding-large: 3rem 1.5rem;
-// 
-$link-visited: $pink;
-$link-focus-border: $link;
-// 
-// $navbar-item-color: $grey-dark;
-// $navbar-item-hover-color: $grey-dark;
 $navbar-item-active-color: $link;
-$navbar-item-img-max-height: initial;
-$navbar-item-hover-background-color: $white-ter;
-// 
 $dropdown-item-hover-color: $link;
 // 
 $modal-content-width: 480px;
 $modal-background-background-color: rgba($black, 0.33);
 // 
-$hr-background-color: $border;
 $hr-height: 1px;
 $hr-margin: 0px;
-// 
-$box-padding: 1rem;
-$box-radius: $radius;
-// 
-// $tabs-border-bottom-width: 0px;
-// $tabs-border-bottom-color: $border;
-// $tabs-link-color: $text;
-// $tabs-link-hover-border-bottom-color: $primary;
-// $tabs-link-hover-color: $primary;
-// $tabs-link-active-border-bottom-color: $link;
-// $tabs-link-active-color: $white;
-// // 
-// $tabs-boxed-link-hover-background-color: $white-ter;
-// $tabs-boxed-link-hover-border-bottom-color: $border;
-// $tabs-boxed-link-active-background-color: $primary;
-// $tabs-boxed-link-active-border-color: $white;
-// $tabs-boxed-link-active-border-bottom-color: transparent;
-// 
-// $table-cell-border: 1px solid $grey-lightest;
-// $table-head-cell-border-width: 0 0 1px;
-// 
-// $tooltip-arrow-size: 10px;
-// $tooltip-arrow-margin: 4px;
-// 
-// $table-color: $text;
-// 
-// $progress-bar-background-color: $white-ter;
-// 
-// $title-color: $grey-darker;
-// $subtitle-color: $grey-dark;
+$hr-background-color: $border;
 // 
 @import '~bulma/bulma';
 @import '~buefy/src/scss/buefy';

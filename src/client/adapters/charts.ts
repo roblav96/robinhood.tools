@@ -16,7 +16,7 @@ import * as pretty from './pretty'
 const XLABEL_FRAMES = [
 	{ id: 'millisecond', ms: 0, format: 'h:mm:ssa', ago: true },
 	{ id: 'hour', ms: 0, format: 'h:mm:ssa', ago: true },
-	{ id: 'day', ms: 0, format: 'dddd, MMM DD, h:mma', ago: true },
+	{ id: 'day', ms: 0, format: 'dddd, MMM DD, h:mm:ssa', ago: true },
 	{ id: 'week', ms: 0, format: 'MMM DD, h:mma', ago: true },
 	{ id: 'month', ms: 0, format: 'MMM DD YYYY, h:mma' },
 	{ id: 'year', ms: 0, format: 'MMM DD YYYY' },
