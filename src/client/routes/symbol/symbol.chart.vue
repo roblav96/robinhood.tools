@@ -10,7 +10,7 @@
 	<div class="flex-col-full">
 
 		<section class="section py-0">
-			<div class="columns items-center">
+			<div class="columns is-mobile items-center">
 				<div class="column is-narrow">
 					<div class="field has-addons">
 						<p class="control">

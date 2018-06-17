@@ -300,7 +300,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		})
 	}
 
-	range = lockr.get('symbol.chart.range', yahoo.RANGES[1])
+	range = lockr.get('symbol.chart.range', yahoo.RANGES[2])
 	ranges = ['live'].concat(yahoo.RANGES)
 	get rangeindex() { return this.ranges.indexOf(this.range) }
 	vrange(range: string) { return charts.range(range) }

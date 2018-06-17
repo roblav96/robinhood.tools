@@ -4,12 +4,12 @@ require('../common/polyfills')
 
 Object.assign(console, { dtsgen: function() { } })
 if (process.env.DEVELOPMENT) {
-	// console.dtsgen = require('../common/dtsgen').default
+	require('echarts')
 	process.version = 'v9.11.1'
 	process.hrtime = require('browser-process-hrtime')
+	// console.dtsgen = require('../common/dtsgen').default
 	Object.assign(window, require('../common/core'))
 	Object.assign(window, { dayjs: require('dayjs') })
-	// require('echarts')
 }
 
 

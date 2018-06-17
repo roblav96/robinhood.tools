@@ -44,7 +44,7 @@ span.navbar-burger.burger > span {
 				<div class="navbar-start">
 					<router-link class="navbar-item flex items-center h-full" v-for="route in routes" :key="route.name" :to="{name:route.name}">
 						<b-icon class="mx-1" size="is-28x28" :icon="route.meta.icon"></b-icon>
-						<span :class="{'font-medium':route.name==$route.name}" class="ml-2">
+						<span :class="{'font-medium':route.name==$route.name}" class="ml-1">
 							{{vcapitalize(route.name)}}
 						</span>
 					</router-link>

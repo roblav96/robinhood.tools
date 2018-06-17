@@ -47,7 +47,7 @@
 					</div>
 					<div class="column">
 						<p class="title is-size-5">{{props.option.symbol}}</p>
-						<p class="subtitle is-size-6">{{vname(props.option.name,3)}}</p>
+						<p class="subtitle is-size-6">{{props.option.tinyName||props.option.name}}</p>
 					</div>
 				</div>
 			</template>

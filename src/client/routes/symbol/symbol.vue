@@ -19,14 +19,19 @@
 						</div>
 						<div class="column">
 							<span class="title">{{symbol}}</span>
-							{{all.quote.acronym}}
+							/ {{all.quote.acronym}}
 							<br> {{vname(all.quote.name)}}
+							<!-- <br> {{all.quote.tinyName||all.quote.name}} -->
 						</div>
+						<!-- <div class="column">
+							{{all.quote.sector}}
+							<br> {{all.quote.industry}}
+						</div> -->
 					</div>
 				</div>
 
 				<div class="column is-narrow">
-					<div class="columns is-mobile has-text-centered">
+					<div class="columns is-mobile text-center">
 						<div class="column">
 							<v-price-ticker class="title" :price="all.quote.price"></v-price-ticker>
 							<br>
@@ -46,14 +51,9 @@
 
 
 
-				<!-- <div class="column flex-row items-center">
-					<v-symbol-logo class="is-24x24 shadow mr-0" :symbol="symbol"></v-symbol-logo>
-					<p class="title leading-none is-size-4 mr-0">{{vname(all.quote.tinyName||all.quote.name)}}</p>
-					<p class="self-end">{{all.quote.acronym}}</p>
-				</div> -->
 			</div>
 		</section>
-		
+
 		<v-symbol-chart :symbol="symbol" :quote="all.quote"></v-symbol-chart>
 
 	</div>
