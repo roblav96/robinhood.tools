@@ -122,8 +122,7 @@ export default class WebullMqttClient {
 			// 	}))
 			// 	console.log(`subscriptions ->`, subscriptions)
 			// 	this.client.subscribe({ subscriptions, messageId: this.nextId() })
-			// }
-			// return
+			// } return
 
 			this.dsymbols = _.invert(_.mapValues(this.options.fsymbols, v => v.toString()))
 			let topic = {

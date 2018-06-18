@@ -97,7 +97,7 @@ export function applyFull(
 		listDate: new Date(instrument.list_date).valueOf(),
 		mic: core.fallback(instrument.mic, wbticker.exchangeCode),
 		acronym: core.fallback(instrument.acronym, wbticker.disExchangeCode),
-		exchange: core.fallback(iexitem.exchange, iexitem.primaryExchange, yhquote.fullExchangeName, wbticker.disExchangeCode, wbticker.exchangeCode),
+		exchange: core.fallback(iexitem.exchange, iexitem.primaryExchange, wbticker.exchangeName, yhquote.fullExchangeName, wbticker.disExchangeCode, wbticker.exchangeCode),
 		currency: core.fallback(wbticker.currencyCode, wbquote.currency),
 		country: core.fallback(instrument.country, wbticker.regionIsoCode, wbquote.countryISOCode, wbquote.regionAlias),
 		sharesOutstanding: _.round(core.fallback(wbquote.totalShares, yhquote.sharesOutstanding, iexitem.sharesOutstanding)),

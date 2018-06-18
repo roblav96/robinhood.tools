@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<div id="app" class="has-background-white-bis" :class="{'opacity-0':initing==true,'animated-slow fadeIn':initing==false}">
+	<div id="app" class="has-background-white-ter" :class="{'opacity-0':initing==true,'animated-slow fadeIn':initing==false}">
 
 		<v-navbar></v-navbar>
 

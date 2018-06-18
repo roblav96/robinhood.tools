@@ -9,6 +9,7 @@ import deepmerge from 'deepmerge'
 import * as lockr from 'lockr'
 import * as echarts from 'echarts'
 import * as ecstat from 'echarts-stat'
+import * as Hammer from 'hammerjs'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as utils from '../adapters/utils'
@@ -18,28 +19,28 @@ import * as pretty from '../adapters/pretty'
 
 @Vts.Component({
 	template: `
-		<div>
-			<div
-				class="absolute"
-				v-touch:tap="ontap"
-				v-on:wheel="onwheel"
-			></div>
-		</div>
+		<div
+			v-touch:tap="ontap"
+			v-on:wheel="onwheel"
+		></div>
 	`,
 })
 export default class VEChartsMixin extends Vue {
 
 	echart: echarts.ECharts
-	colors = this.$store.state.colors
 
 	mounted() {
-		this.echart = echarts.init(this.$el.firstChild, null, this.dims())
+		this.echart = echarts.init(this.$el)
 		this.echart.on('datazoom', this.ondatazoom_)
 		this.echart.on('showtip', this.onshowtip_)
 		this.echart.on('hidetip', this.onhidetip_)
 		utils.wemitter.on('resize', this.onresize_, this)
 		utils.wemitter.on('keyup', this.onkeyup_, this)
 		utils.wemitter.on('keydown', this.onkeydown_, this)
+		console.warn(`module.hot.addStatusHandler`)
+		module.hot.addStatusHandler(status=>{
+			console.log(`status ->`, status)
+		})
 	}
 	beforeDestroy() {
 		utils.wemitter.off('keydown', this.onkeydown_, this)
@@ -55,9 +56,13 @@ export default class VEChartsMixin extends Vue {
 
 
 
-	option() { return this.echart._model.option }
+	// getOption() { return this.echart._model.option }
+	getOption() { return this.echart.getOption() }
+	updateOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
+		this.echart.setOption(deepmerge(this.echart.getOption(), option), opts)
+	}
 	ctbounds() {
-		let datazoom = this.option().dataZoom[0]
+		let datazoom = this.getOption().dataZoom[0]
 		return {
 			start: datazoom.start, startValue: datazoom.startValue,
 			end: datazoom.end, endValue: datazoom.endValue,
@@ -80,9 +85,12 @@ export default class VEChartsMixin extends Vue {
 		})
 		this.echart.setOption({ tooltip: { showContent: !brushing } })
 	}
+
 	onkeyup_(event: KeyboardEvent) {
 		if (event.metaKey || event.shiftKey || event.ctrlKey || event.altKey) return;
-		if (['Escape'].includes(event.key)) this.brushing = false;
+		if (['Escape'].includes(event.key)) {
+			this.brushing = false
+		}
 	}
 	onkeydown_(event: KeyboardEvent) {
 
@@ -104,7 +112,7 @@ export default class VEChartsMixin extends Vue {
 		this.echart.resize(this.dims())
 	}
 
-	ontap(event: HammerEvent) {
+	ontap(event: HammerEvent) {		
 		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.srcEvent.offsetX, event.srcEvent.offsetY])
 		if (event.tapCount == 1) {
 			this.brushing = !this.brushing && contains
@@ -136,9 +144,6 @@ export default class VEChartsMixin extends Vue {
 
 
 
-	updateOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
-		this.echart.setOption(deepmerge(this.echart.getOption(), option), opts)
-	}
 
 
 

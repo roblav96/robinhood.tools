@@ -24,19 +24,21 @@ import * as charts from '../../adapters/charts'
 @Vts.Component
 class VSymbolEChart extends Mixins(VEChartsMixin) {
 
-	$parent: VSymbolChart
+	// $parent: VSymbolChart
 	@Vts.Prop() quote: Quotes.Quote
+	colors = this.$store.state.colors
 
 	mounted() {
 		this.$on('resize', this.onresize)
+		// module.hot.addStatusHandler(this.resize)
 	}
 	beforeDestroy() {
-
+		// module.hot.removeStatusHandler(this.resize)
 	}
 
 
 
-	lquotes() { return this.option().dataset[0].source as Quotes.Live[] }
+	lquotes() { return this.getOption().dataset[0].source as Quotes.Live[] }
 
 	@VMixin.NoCache get firstPrice() {
 		let lquotes = this.lquotes()
@@ -50,7 +52,6 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 	onresize() {
-		console.log(`this.splitNumberY ->`, this.splitNumberY)
 		this.echart.setOption({ yAxis: [{ splitNumber: this.splitNumberY }] })
 	}
 
@@ -62,10 +63,10 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		let bones = {
 			animation: false,
 			color: [this.colors['grey-lighter']],
-			// backgroundColor: this.colors.light,
+			backgroundColor: this.colors['white-bis'],
 			// color: ['#0a0a0a', '#ffb000', '#fed500', '#34bc6e', '#4dc0b5', '#009bef', '#5392ff', '#9753e1', '#e62325', '#ff509e', '#ffffff'],
 			// color: Object.values(this.colors),
-			textStyle: { color: this.colors.dark, fontSize: 14 },
+			textStyle: { color: this.colors.dark, fontSize: 8 },
 			dataset: {
 				// dimensions: ['timestamp', 'open', 'close', 'high', 'low'],
 				source: lquotes,
@@ -76,16 +77,18 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				// alwaysShowContent: !!process.env.DEVELOPMENT,
 				trigger: 'axis',
 				triggerOn: 'mousemove',
-
 				// position: [10, 10],
-				position: (point, params, el, rect, size) => {
-					return [point[0] - (size.contentSize[0] / 2), 2];
-				},
-				padding: [0, 0, 0, 0],
-				confine: true, enterable: false,
-				showDelay: 0, hideDelay: 1,
+				// position: (point, params, el, rect, size) => {
+				// 	return [point[0] - (size.contentSize[0] / 2), 2];
+				// },
+				padding: [2, 4],
+				confine: true,
+				enterable: false,
+				showDelay: 0,
+				hideDelay: 0,
 				transitionDuration: 0,
-				// backgroundColor: 'transparent',
+				backgroundColor: this.colors.dark,
+				// formatter: '{a}: {b1}<br>{c}: {d0}',
 				// extraCssText: 'border: 1px solid #b8c1c1;',
 				// formatter: params => {
 				// 	// console.log('params ->', params)
@@ -93,16 +96,15 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				// 	let lquote = _.mapValues(param.value, n => pretty.number(n as any))
 				// 	// console.log('lquote ->', lquote)
 				// 	// Object.keys(lquote).forEach(k => lquote[k] = pretty.number(lquote[k]))
-
-
 				// 	let html = ''
 				// 	html += `<p>Open ${lquote.open}&nbsp;&nbsp;High ${lquote.high}&nbsp;&nbsp;Low ${lquote.low}&nbsp;&nbsp;Close ${lquote.close}</p>`
 				// 	// html += `<p>OHLC: ${JSON.stringify(lquote)}</p>`
 				// 	return `<div class="px-2 py-1 leading-none font-sans has-background-dark has-text-white rounded-sm">${html}</div>`
 				// },
 				axisPointer: {
-					// link: { xAxisIndex: 'all' },
-					animation: false, type: 'cross',
+					link: { xAxisIndex: 'all' },
+					type: 'cross',
+					animation: false,
 					shadowStyle: { opacity: 0 },
 					lineStyle: { color: this.colors['grey-lighter'] },
 					crossStyle: { color: this.colors['grey-light'] },
@@ -121,13 +123,13 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				link: { xAxisIndex: 'all' },
 			},
 			grid: [{
-				top: 16,
+				top: 8,
 				left: 64,
 				right: 24,
 				bottom: 92,
 				show: true,
 				backgroundColor: this.colors.white,
-				borderColor: this.colors['grey-lightest'],
+				borderColor: this.colors['grey-lighter'],
 			}, {
 				height: 64,
 				left: 64,
@@ -145,6 +147,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			}, {
 				type: 'slider', throttle: 60,
 				xAxisIndex: [0, 1],
+				left: 62,
+				right: 26,
 				height: 32,
 				bottom: 24,
 				showDetail: false,
@@ -153,7 +157,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					areaStyle: { color: this.colors['white-ter'], opacity: 1 },
 					lineStyle: { color: this.colors['grey-light'], opacity: 1 },
 				},
-				borderColor: this.colors['grey-lightest'],
+				borderColor: this.colors['grey-lighter'],
 				fillerColor: 'rgba(184,194,204,0.33)',
 				// textStyle: { color: this.colors.dark },
 				handleStyle: { color: this.colors['grey-lighter'] },
@@ -250,6 +254,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			}],
 		} as echarts.Option
 		this.echart.setOption(bones)
+		this.resize()
 		// console.log(`this.echart.getOption() ->`, this.echart.getOption())
 	}
 
@@ -262,13 +267,10 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 })
 export default class VSymbolChart extends Mixins(VMixin) {
 
-	$parent: VSymbol
-	@Vts.Prop() symbol: string
+	// $parent: VSymbol
 	@Vts.Prop() quote: Quotes.Quote
 
-	vechart: VSymbolEChart
 	mounted() {
-		this.vechart = (this.$refs as any)['symbol_vechart']
 		this.getQuotes()
 	}
 
@@ -278,6 +280,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 
 	brushing = false
 	busy = true
+	get vechart() { return (this.$refs as any)['symbol_vechart'] as VSymbolEChart }
 
 	@Vts.Watch('quote.tickerId') w_tickerId(tickerId: number) {
 		this.getQuotes()
@@ -287,7 +290,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		this.busy = true
 		return Promise.resolve().then(() => {
 			if (this.range == 'live') {
-				return http.post('/quotes/lives', { symbols: [this.symbol] }).then(response => response[0])
+				return http.post('/quotes/lives', { symbols: [this.quote.symbol] }).then(response => response[0])
 			}
 			return charts.getChart(this.quote, this.range)
 		}).then((lquotes: Quotes.Live[]) => {

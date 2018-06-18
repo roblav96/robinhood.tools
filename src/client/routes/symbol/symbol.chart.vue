@@ -8,9 +8,8 @@
 
 <template>
 	<div class="flex-col-full">
-
 		<section class="section py-0">
-			<div class="columns is-mobile items-center">
+			<div class="columns is-mobile my-0">
 				<!-- <div class="column is-narrow">
 					<div class="field has-addons">
 						<p class="control">
@@ -48,7 +47,7 @@
 				<div class="column is-narrow">
 					<b-field>
 						<b-radio-button v-model="range" type="is-primary" v-for="v in ranges" :native-value="v" :key="v">
-							<span>{{vrange(v)}}</span>
+							<span>{{vcapitalize(v)}}</span>
 						</b-radio-button>
 					</b-field>
 				</div>
@@ -65,20 +64,14 @@
 							</b-radio-button>
 						</b-tooltip>
 					</b-field> -->
-					<b-tooltip label="Chart Style" size="is-small" animated>
-						<b-field class="w-32">
-							<b-select v-model="ohlc" :icon="ohlc?'poll':'chart-line-variant'">
-								<option :value="true">
-									<span>OHLC</span>
-								</option>
-								<option :value="false">
-									<span>Line</span>
-								</option>
-							</b-select>
-						</b-field>
-					</b-tooltip>
-				</div>
-				<div class="column">
+					<b-select v-model="ohlc" :icon="ohlc?'poll':'chart-line-variant'">
+						<option :value="true">
+							<span>OHLC</span>
+						</option>
+						<option :value="false">
+							<span>Line</span>
+						</option>
+					</b-select>
 				</div>
 				<div class="column is-narrow">
 					<button class="button" :class="{'is-primary':brushing}" @click="brushing=!brushing">
@@ -89,7 +82,6 @@
 		</section>
 
 		<!-- <b-tooltip type="is-primary" label="Hold click down, then drag to crop" animated> -->
-		<!-- <hr> -->
 		<hr>
 		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :brushing="brushing"></v-symbol-echart>
 		<!-- </b-tooltip> -->

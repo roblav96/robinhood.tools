@@ -29,8 +29,8 @@ export default class VMixin extends Vue {
 
 	vcamel(value: string) { return _.camelCase(value) }
 	vstcase(value: string) { return _.startCase(value) }
-	vtruncate(value: string, length = 48) { if (!value) return value; return _.truncate(value, { length }) }
-	vcapitalize(value: string) { if (!value) return value; return core.string.capitalize(value) }
+	vtruncate(value: string, length = 48) { return _.truncate(value, { length }) }
+	vcapitalize(value: string) { return core.string.capitalize(value) }
 	vstamp(stamp: number) { if (!stamp) return stamp; return pretty.stamp(stamp) }
 	vtime(stamp: number, opts?: Partial<TimeFormatOptions>) { if (!stamp) return stamp; return pretty.time(stamp, opts) }
 	vnumber(value: number, opts?: Partial<NumberFormatOptions>) { if (!Number.isFinite(value)) return value; return pretty.number(value, opts) }

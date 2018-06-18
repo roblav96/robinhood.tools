@@ -74,8 +74,7 @@ export function getChart(quote: Quotes.Quote, range: string) {
 		if (quote.typeof == 'FOREX') symbol = symbol + '=X';
 		if (range != yahoo.RANGES[0] || quote.typeof != 'STOCKS') {
 			return yahoo.getChart(symbol, {
-				range,
-				interval: yahoo.FRAMES[range],
+				range, interval: yahoo.FRAMES[range],
 				includePrePost: range == yahoo.RANGES[1],
 			})
 		}
@@ -87,7 +86,7 @@ export function getChart(quote: Quotes.Quote, range: string) {
 			let mlquotes = resolved.map(v => webull.toMinutesLives(v)).flatten()
 
 			let range = {
-				min: dayjs(Math.min(...resolved.map(v => v.data[0].dates[0].start * 1000))).startOf('day').valueOf(),
+				min: dayjs(Math.min(...resolved.map(v => v.data[0].dates[0].start * 1000))).valueOf(),
 				max: dayjs(Math.max(...resolved.map(v => v.data[0].dates[0].end * 1000).concat(Date.now()))).endOf('day').valueOf(),
 			}
 			// console.log(`range ->`, _.mapValues(range, v => pretty.stamp(v)))
