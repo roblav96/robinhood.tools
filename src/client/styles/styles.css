@@ -182,17 +182,6 @@ div.is-scroll > div.table-wrapper {
 	overflow-x: auto;
 }
 
-
-/*table.table th {
-	vertical-align: bottom;
-}*/
-
-
-/*table.table tr > th:last-child > span.icon {
-	margin-top: 4px;
-	margin-bottom: 4px;
-}*/
-
 table.table.is-paddingless th,
 .b-table.is-paddingless table.table th,
 table.table.is-paddingless td,
@@ -269,14 +258,13 @@ p.content,
 	display: none;
 }
 
-.scrollbar::-webkit-scrollbar-thumb {
-	background-color: var(--grey-light);
-	border-radius: 0.0625rem;
-}
-
 .scrollbar::-webkit-scrollbar {
 	width: 0.125rem;
 	height: 0.125rem;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+	background-color: var(--border);
 }
 
 

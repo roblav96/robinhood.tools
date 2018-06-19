@@ -9,41 +9,7 @@
 <template>
 	<div class="flex-col-full">
 		<section class="section py-0">
-			<div class="columns is-mobile my-0">
-				<!-- <div class="column is-narrow">
-					<div class="field has-addons">
-						<p class="control">
-							<b-tooltip :active="!busy&&!!ranges[rangeindex-1]" :label="vrange(ranges[rangeindex-1])" size="is-small"
-							    animated>
-								<button class="button" @click="range=ranges[rangeindex-1]" :disabled="busy||!ranges[rangeindex-1]">
-									<b-icon type="is-primary" icon="chevron-left"></b-icon>
-								</button>
-							</b-tooltip>
-						</p>
-						<p class="control">
-							<b-dropdown v-model="range" :disabled="busy">
-								<b-tooltip label="Date Range" size="is-small" slot="trigger" animated>
-									<button class="button" style="width:5rem;" :class="{'is-loading':busy}" type="button">
-										<span>{{vrange(range)}}</span>
-									</button>
-								</b-tooltip>
-								<b-dropdown-item class="is-size-6 font-bold py-0 my-0" custom>Date Range</b-dropdown-item>
-								<b-dropdown-item separator></b-dropdown-item>
-								<b-dropdown-item class="font-medium" @click="range=v" v-for="v in ranges" :value="v" :key="v">
-									<span>{{vrange(v)}}</span>
-								</b-dropdown-item>
-							</b-dropdown>
-						</p>
-						<p class="control">
-							<b-tooltip :active="!busy&&!!ranges[rangeindex+1]" :label="vrange(ranges[rangeindex+1])" size="is-small"
-							    animated>
-								<button class="button" @click="range=ranges[rangeindex+1]" :disabled="busy||!ranges[rangeindex+1]">
-									<b-icon type="is-primary" icon="chevron-right"></b-icon>
-								</button>
-							</b-tooltip>
-						</p>
-					</div>
-				</div> -->
+			<div class="columns is-mobile my-0 items-center">
 				<div class="column is-narrow">
 					<b-field>
 						<b-radio-button v-model="range" type="is-primary" v-for="v in ranges" :native-value="v" :key="v">
@@ -52,18 +18,6 @@
 					</b-field>
 				</div>
 				<div class="column is-narrow">
-					<!-- <b-field class="rounded">
-						<b-tooltip label="Candlestick" size="is-small">
-							<b-radio-button class="is-outlined" v-model="ohlc" :native-value="true">
-								<b-icon icon="poll"></b-icon>
-							</b-radio-button>
-						</b-tooltip>
-						<b-tooltip label="Line" size="is-small">
-							<b-radio-button class="is-outlined" v-model="ohlc" :native-value="false">
-								<b-icon icon="chart-line-variant"></b-icon>
-							</b-radio-button>
-						</b-tooltip>
-					</b-field> -->
 					<b-select v-model="ohlc" :icon="ohlc?'poll':'chart-line-variant'">
 						<option :value="true">
 							<span>OHLC</span>
@@ -83,14 +37,14 @@
 			</div>
 		</section>
 
-		<!-- <b-tooltip type="is-primary" label="Hold click down, then drag to crop" animated> -->
 		<hr>
-		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :isbrushing.sync="isbrushing"></v-symbol-echart>
-		<!-- </b-tooltip> -->
+		<!-- <section class="flex-col-full overflow-y-auto"> -->
+		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :range="range" :isbrushing.sync="isbrushing"></v-symbol-echart>
+		<!-- </section> -->
+
 
 
 		<!-- <v-loading :is-full-page="false" :active="true"></v-loading> -->
-
 		<!-- <div class="column"> -->
 		<!-- <div class="column">
 					<b-dropdown v-model="range" hoverable position="is-top-right">
@@ -103,9 +57,7 @@
 						</b-dropdown-item>
 					</b-dropdown>
 				</div> -->
-
-
-
 		<!-- </div> -->
+
 	</div>
 </template>

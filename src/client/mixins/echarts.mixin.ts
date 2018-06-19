@@ -40,7 +40,6 @@ export default class VEChartsMixin extends Vue {
 		utils.wemitter.on('keyup', this.onkeyup_, this)
 		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize_);
 	}
-
 	beforeDestroy() {
 		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize_);
 		utils.wemitter.off('keyup', this.onkeyup_, this)
@@ -110,9 +109,10 @@ export default class VEChartsMixin extends Vue {
 
 
 
+	// dims() { return { width: this.$el.parentElement.offsetWidth, height: 1000 } as echarts.Dims }
 	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
-	onresize_ = _.debounce(this.resize, 300, { leading: false, trailing: true })
-	resize(event) {
+	onresize_ = _.debounce(this.resize_, 300, { leading: false, trailing: true })
+	resize_() {
 		this.$emit('resize')
 		this.echart.resize(this.dims())
 	}
@@ -162,7 +162,7 @@ export default class VEChartsMixin extends Vue {
 
 	tippos: Partial<{ show: boolean, x: number, y: number }>
 	onshowtip_(event) { this.tippos = { show: true, x: event.x, y: event.y } }
-	onhidetip_(event) { this.tippos = { show: false } }
+	onhidetip_(event) { this.tippos ? this.tippos.show = false : this.tippos = { show: false } }
 
 
 

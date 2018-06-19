@@ -62,6 +62,11 @@ $shade in $shades {
 	background-color: rgba($black, 0.1);
 }
 
+hr {
+	border-top: 0.5px solid $border;
+	border-bottom: 0.5px solid $border;
+}
+
 // 
 // ████  ICON  ████
 // 
@@ -81,6 +86,10 @@ $shade in $shades {
 html.has-navbar-fixed-top .router-view.is-fullheight,
 html.has-navbar-fixed-top .hero.is-fullheight {
 	min-height: calc(100vh - #{$navbar-height});
+}
+
+html.has-navbar-fixed-top .router-view.is-max-fullheight {
+	max-height: calc(100vh - #{$navbar-height});
 }
 
 .navbar-brand a.navbar-item:hover,

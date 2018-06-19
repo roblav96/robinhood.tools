@@ -62,7 +62,7 @@
 		"mdi": "latest",
 		"modern-normalize": "latest",
 		"mqtt": "latest",
-		"mqtt-connection": "latest",
+		"mqtt-connection": "3.2.0",
 		"node-forge": "latest",
 		"node-schedule": "latest",
 		"p-all": "latest",

@@ -509,6 +509,7 @@ declare module 'echarts' {
 		}
 
 		interface StyleOptions {
+			formatter: string
 			borderColor0: string | ((param: EventParam) => string)
 			borderColor: string | ((param: EventParam) => string)
 			borderWidth: number

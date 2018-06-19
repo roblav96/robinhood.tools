@@ -18,6 +18,7 @@ import * as http from '../../../common/http'
 import * as utils from '../../adapters/utils'
 import * as pretty from '../../adapters/pretty'
 import * as charts from '../../adapters/charts'
+import socket from '../../adapters/socket'
 
 
 
@@ -25,13 +26,15 @@ import * as charts from '../../adapters/charts'
 class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	@Vts.Prop() quote: Quotes.Quote
+	@Vts.Prop() range: string
 	colors = this.$store.state.colors
 
 	mounted() {
-		this.$on('resize', this.onresize)
+		// this.$on('resize', this.onresize)
 	}
 	beforeDestroy() {
-
+		socket.offListener(this.onquote, this)
+		socket.offListener(this.onlquote, this)
 	}
 
 
@@ -43,21 +46,20 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		let lquote = lquotes[Math.floor(lquotes.length * (this.ctbounds().start / 100))]
 		return lquote.open || lquote.price
 	}
-	@VMixin.NoCache get splitNumberY() {
-		return Math.round(this.$el.offsetHeight / 100)
-	}
+	// @VMixin.NoCache get splitNumberY() {
+	// 	return Math.round(this.$el.offsetHeight / 100)
+	// }
 
 
 
 	onresize() {
-		this.echart.setOption({ yAxis: [{ splitNumber: this.splitNumberY }] })
+		// this.echart.setOption({ yAxis: [{ splitNumber: this.splitNumberY }] })
 	}
 
 
 
 	setQuotes(lquotes: Quotes.Live[]) {
 		console.log('syncQuotes ->', lquotes.length)
-
 		let bones = {
 			animation: false,
 			color: [this.colors['grey-lighter']],
@@ -76,30 +78,41 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				triggerOn: 'mousemove',
 				// position: [10, 10],
 				// position: (point, params, el, rect, size) => {
-				// 	return [point[0] - (size.contentSize[0] / 2), 2];
+				// 	return [point[0] - (size.contentSize[0] / 2), 0];
 				// },
-				padding: [2, 4],
 				confine: true,
 				enterable: false,
 				showDelay: 0,
 				hideDelay: 0,
 				transitionDuration: 0,
-				backgroundColor: this.colors.dark,
+				padding: 0,
+				// padding: [32, 0, 0, 32],
+				backgroundColor: 'transparent',
 				// formatter: '{a}: {b1}<br>{c}: {d0}',
-				// extraCssText: 'border: 1px solid #b8c1c1;',
-				// formatter: params => {
-				// 	// console.log('params ->', params)
-				// 	let param = (params[0] || params) as echarts.EventParam<Quotes.Live>
-				// 	let lquote = _.mapValues(param.value, n => pretty.number(n as any))
-				// 	// console.log('lquote ->', lquote)
-				// 	// Object.keys(lquote).forEach(k => lquote[k] = pretty.number(lquote[k]))
-				// 	let html = ''
-				// 	html += `<p>Open ${lquote.open}&nbsp;&nbsp;High ${lquote.high}&nbsp;&nbsp;Low ${lquote.low}&nbsp;&nbsp;Close ${lquote.close}</p>`
-				// 	// html += `<p>OHLC: ${JSON.stringify(lquote)}</p>`
-				// 	return `<div class="px-2 py-1 leading-none font-sans has-background-dark has-text-white rounded-sm">${html}</div>`
-				// },
+				// extraCssText: `border: 0.125rem solid ${this.colors['grey-darker']};`,
+				formatter: (params: echarts.EventParam<Quotes.Live>[]) => {
+					// console.log('params ->', params)
+					let option = this.getOption()
+					let html = ''
+					params.forEach((param, i) => {
+						let trs = `<tr><td class="font-semibold pr-2"><i class="mdi mdi-circle" style="color: ${param.color};"></i> ${param.seriesName}</td>`
+						let tooltip = option.series[param.seriesIndex].encode.tooltip
+						if (Array.isArray(tooltip)) {
+							trs += `</tr>`
+							tooltip.forEach((key: string) => {
+								let value = pretty.number(param.value[key])
+								trs += `<tr><td>${_.startCase(key)}</td><td class="text-right">${value}</td></tr>`
+							})
+						} else {
+							let value = pretty.number(param.value[tooltip], { compact: true, precision: 1 })
+							trs += `<td class="text-right">${value}</td></tr>`
+						}
+						let hr = i < params.length - 1 ? `<hr class="my-1 has-background-grey-darker">` : ''
+						html += `<table class="m-0 w-full"><tbody>${trs}</tbody></table>${hr}`
+					})
+					return `<div class="font-sans leading-tight has-background-dark has-text-white p-2 rounded">${html}</div>`
+				},
 				axisPointer: {
-					link: [{ xAxisIndex: 'all' }],
 					type: 'cross',
 					animation: false,
 					shadowStyle: { opacity: 0 },
@@ -116,10 +129,9 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					},
 				},
 			},
-			// axisPointer: {
-			// 	animation: false,
-			// 	link: [{ xAxisIndex: 'all' }],
-			// },
+			axisPointer: {
+				link: [{ xAxisIndex: 'all' }],
+			},
 			grid: [{
 				top: 16,
 				left: 64,
@@ -189,30 +201,35 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				axisTick: { show: false },
 				splitLine: { show: false },
 				splitArea: { show: false },
-				axisPointer: { show: false },
-				// axisPointer: { label: { show: false } },
+				axisPointer: { label: { show: false } },
 			}],
 			yAxis: [{
 				scale: true,
-				splitNumber: this.splitNumberY,
-				splitArea: { show: false },
+				// splitNumber: this.splitNumberY,
 				axisLabel: {
 					textStyle: { color: this.colors.dark, fontSize: 14 },
 					formatter: value => pretty.number(value),
 				},
 				axisTick: { show: false },
 				axisLine: { show: false },
+				splitArea: { show: false },
 				splitLine: { lineStyle: { color: this.colors['grey-lightest'] } },
 				axisPointer: { label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.firstPrice), { percent: true, plusminus: true }) } },
 			}, {
 				scale: true,
 				gridIndex: 1,
+				splitNumber: 2,
+				// axisLabel: {
+				// 	inside: true,
+				// 	textStyle: { color: this.colors.dark, fontSize: 10 },
+				// 	formatter: value => pretty.number(value, { nozeros: true }),
+				// },
 				axisLabel: { show: false },
 				axisLine: { show: false },
 				axisTick: { show: false },
-				splitLine: { show: false },
 				splitArea: { show: false },
-				axisPointer: { show: false },
+				splitLine: { show: false },
+				axisPointer: { label: { show: false } },
 			}],
 			series: [{
 				name: 'OHLC',
@@ -230,9 +247,10 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				encode: {
 					x: 'timestamp',
 					y: ['open', 'close', 'high', 'low'],
+					tooltip: ['open', 'high', 'low', 'close'],
 				},
 				itemStyle: {
-					borderColor: null, borderColor0: null,
+					borderColor: this.colors.success, borderColor0: this.colors.danger, borderWidth: 1,
 					color: this.colors.success, color0: this.colors.danger,
 				},
 				emphasis: null,
@@ -248,14 +266,68 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				animation: false,
 				hoverAnimation: false,
 				legendHoverLink: false,
-				encode: { x: 'timestamp', y: 'size' },
+				encode: {
+					x: 'timestamp',
+					y: 'size',
+					tooltip: 'size',
+				},
 				emphasis: null,
 			}],
 		} as echarts.Option
 		this.echart.setOption(bones)
-		this.resize()
-		// console.log(`this.echart.getOption() ->`, this.echart.getOption())
+		console.log(`this.getOption() ->`, this.getOption())
+
+		socket.offListener(this.onquote, this)
+		socket.offListener(this.onlquote, this)
+		if (this.range == 'live') {
+			socket.on(`${rkeys.QUOTES}:${this.quote.symbol}`, this.onquote, this)
+			socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.onlquote, this)
+		}
+
 	}
+
+
+
+	onquote(quote: Quotes.Quote) {
+		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
+		console.log(`onquote lquote ->`, JSON.parse(JSON.stringify(lquote)))
+	}
+	onlquote(lquote: Quotes.Live) {
+		console.log(`onlquote lquote ->`, JSON.parse(JSON.stringify(lquote)))
+		let lquotes = this.lquotes()
+		lquotes.push(lquote)
+		this.echart.setOption({ dataset: { source: lquotes } } as echarts.Option)
+		this.fixtip()
+	}
+	@Vts.Watch('quote', { deep: true }) w_quote(quote: Quotes.Quote) {
+		if (this.range != 'live') return;
+		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
+		// console.log(`watch lquote ->`, JSON.parse(JSON.stringify(lquote)))
+	}
+
+	fixtip() {
+		if (!this.tippos || !this.tippos.show) return;
+		_.defer(() => {
+			this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y })
+		})
+	}
+
+	// onquote(quote: Quotes.Quote) {
+	// 	let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
+	// 	let lquotes = this.lquotes()
+	// 	let last = lquotes[lquotes.length - 1]
+	// 	if (lquote.timestamp && lquote.timestamp <= last.timestamp) {
+	// 		console.warn(`lquote.timestamp && lquote.timestamp <= last.timestamp`)
+	// 		let diff = core.object.difference(last, lquote)
+	// 		console.log('diff ->', diff)
+	// 		return
+	// 	}
+	// 	core.object.merge(lquotes[lquotes.length - 1], lquote)
+	// 	this.echart.setOption({ dataset: { source: lquotes } } as echarts.Option)
+	// 	this.fixtip()
+	// }
+
+
 
 }
 
@@ -266,7 +338,6 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 })
 export default class VSymbolChart extends Mixins(VMixin) {
 
-	// $parent: VSymbol
 	@Vts.Prop() quote: Quotes.Quote
 
 	mounted() {

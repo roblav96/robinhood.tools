@@ -16,7 +16,7 @@ export function number(value: number, { precision, price, compact, plusminus, pe
 	if (!Number.isFinite(precision)) {
 		precision = 2
 		if (plusminus && percent) {
-			if (abs >= 1000) precision = 0;
+			if (abs >= 100) precision = 0;
 			else if (abs >= 10) precision = 1;
 		}
 		else if (compact) precision = 0;
