@@ -149,7 +149,8 @@ function ontick() {
 			Object.assign(WB.EMITS, { [symbol]: {} })
 		}
 
-		let ediff = core.object.difference(QUOTES.EMITS[symbol], quote)
+		let equote = QUOTES.EMITS[symbol]
+		let ediff = core.object.difference(equote, quote)
 
 		if (live) {
 			let wbsaves = WB.SAVES[symbol]
@@ -161,6 +162,7 @@ function ontick() {
 			let flquote = QUOTES.LIVES[symbol]
 			let ldiff = core.object.difference(flquote, quote)
 			if (quote.timestamp > flquote.timestamp) {
+
 				quote.liveCount++
 				quote.liveStamp = Date.now()
 
@@ -172,14 +174,15 @@ function ontick() {
 				lquote.symbol = symbol
 				if (process.env.PRODUCTION) socket.emit(`${rkeys.LIVES}:${symbol}`, lquote);
 
+				ediff = core.object.difference(equote, quote)
+				ldiff = core.object.difference(flquote, quote)
+				core.object.merge(flquote, quote)
+
 				let reset = quotes.resetLive(quote)
 				quotes.mergeCalcs(quote, reset)
 				core.object.merge(quote, reset)
 
-				ldiff = core.object.difference(flquote, quote)
-				core.object.merge(ediff, ldiff)
-
-				core.object.merge(flquote, quote)
+				console.warn('ldiff ->', core.object.sortKeys(ldiff))
 			}
 
 			if (Object.keys(ldiff).length > 0) {
@@ -188,6 +191,7 @@ function ontick() {
 		}
 
 		if (Object.keys(ediff).length > 0) {
+			console.log('ediff ->', core.object.sortKeys(ediff))
 			ediff.symbol = symbol
 			if (process.env.PRODUCTION) socket.emit(`${rkeys.QUOTES}:${symbol}`, ediff);
 			Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })

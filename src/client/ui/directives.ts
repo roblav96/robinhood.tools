@@ -11,6 +11,17 @@ import clock from '../../common/clock'
 
 
 
+// Vue.directive('animate-number', {
+// 	bind(el, binding, vnode) { },
+// 	inserted(el, binding, vnode) { },
+// 	update(el, binding, vnode) { },
+// 	unbind(el, binding, vnode) {
+// 		anime.remove(el)
+// 	},
+// })
+
+
+
 const ALL_GESTURES = {
 	pan: 'pan', pancancel: 'pan', pandown: 'pan', panend: 'pan', panleft: 'pan', panmove: 'pan', panright: 'pan', panstart: 'pan', panup: 'pan',
 	pinch: 'pinch', pinchcancel: 'pinch', pinchend: 'pinch', pinchin: 'pinch', pinchmove: 'pinch', pinchout: 'pinch', pinchstart: 'pinch',

@@ -290,19 +290,22 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	onquote(quote: Quotes.Quote) {
 		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
-		console.log(`onquote lquote ->`, JSON.parse(JSON.stringify(lquote)))
+		console.log(`QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
 	}
+	// @Vts.Watch('quote', { deep: true }) w_quote(quote: Quotes.Quote) {
+	// 	if (this.range != 'live') return;
+	// 	let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
+	// 	let lquotes = this.lquotes()
+	// 	let ii = lquotes.findIndex(v => v.liveStamp == lquote.liveStamp)
+	// 	let last = lquotes[ii + 1]
+	// 	// console.log(`watch lquote ->`, JSON.parse(JSON.stringify(lquote)))
+	// }
 	onlquote(lquote: Quotes.Live) {
-		console.log(`onlquote lquote ->`, JSON.parse(JSON.stringify(lquote)))
+		console.log(`LIVE QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
 		let lquotes = this.lquotes()
 		lquotes.push(lquote)
 		this.echart.setOption({ dataset: { source: lquotes } } as echarts.Option)
 		this.fixtip()
-	}
-	@Vts.Watch('quote', { deep: true }) w_quote(quote: Quotes.Quote) {
-		if (this.range != 'live') return;
-		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
-		// console.log(`watch lquote ->`, JSON.parse(JSON.stringify(lquote)))
 	}
 
 	fixtip() {
