@@ -37,12 +37,10 @@ export default class VEChartsMixin extends Vue {
 		utils.wemitter.on('resize', this.onresize_, this)
 		utils.wemitter.on('keyup', this.onkeyup_, this)
 		utils.wemitter.on('keydown', this.onkeydown_, this)
-		console.warn(`module.hot.addStatusHandler`)
-		module.hot.addStatusHandler(status=>{
-			console.log(`status ->`, status)
-		})
+		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize_);
 	}
 	beforeDestroy() {
+		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize_);
 		utils.wemitter.off('keydown', this.onkeydown_, this)
 		utils.wemitter.off('keyup', this.onkeyup_, this)
 		utils.wemitter.off('resize', this.onresize_, this)
@@ -73,7 +71,7 @@ export default class VEChartsMixin extends Vue {
 
 	tippos: Partial<{ show: boolean, x: number, y: number }>
 	onshowtip_(event) { this.tippos = { show: true, x: event.x, y: event.y } }
-	onhidetip_(event) { this.tippos = { show: false } }
+	onhidetip_(event) { this.tippos.show = false }
 
 	get brushing() { return (this.$parent as any).brushing }
 	set brushing(brushing: boolean) { (this.$parent as any).brushing = brushing }
@@ -96,12 +94,14 @@ export default class VEChartsMixin extends Vue {
 
 	}
 
-	resetZoom() { this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 }) }
 	ondatazoom_ = _.throttle(this.datazoom, 100, { leading: false, trailing: true })
 	datazoom() {
 		this.$emit('datazoom')
 		this.brushing = false
 		this.echart.dispatchAction({ type: 'hideTip' })
+	}
+	resetZoom() {
+		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
 	}
 
 	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
@@ -112,7 +112,7 @@ export default class VEChartsMixin extends Vue {
 		this.echart.resize(this.dims())
 	}
 
-	ontap(event: HammerEvent) {		
+	ontap(event: HammerEvent) {
 		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.srcEvent.offsetX, event.srcEvent.offsetY])
 		if (event.tapCount == 1) {
 			this.brushing = !this.brushing && contains
