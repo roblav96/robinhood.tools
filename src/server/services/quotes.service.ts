@@ -179,8 +179,7 @@ function ontick() {
 				core.object.merge(ldiff, core.object.difference(flquote, quote))
 				core.object.merge(flquote, quote)
 
-				let reset = quotes.resetLive(quote)
-				quotes.mergeCalcs(quote, reset)
+				quotes.mergeCalcs(quote, quotes.resetLive(quote))
 
 				// console.warn('ldiff ->', core.object.sortKeys(ldiff))
 			}

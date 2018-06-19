@@ -116,9 +116,7 @@ export function applyFull(
 	mergeCalcs(toquote)
 	core.object.repair(quote, toquote)
 
-	let reset = resetFull(quote)
-	core.object.merge(toquote, reset)
-	mergeCalcs(toquote, reset)
+	mergeCalcs(toquote, resetFull(quote))
 	{ (resets && wbquote.typeof == 'STOCKS') ? core.object.merge(quote, toquote) : core.object.repair(quote, toquote) }
 
 	core.object.clean(quote)
@@ -380,6 +378,8 @@ export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 		quote.dealFlowSize = core.math.sum(quote.buySize, -quote.sellSize)
 		quote.dealFlowVolume = core.math.sum(quote.buyVolume, -quote.sellVolume)
 	}
+
+	if (!quote.stamp) quote.stamp = Date.now();
 
 	return quote
 }
