@@ -60,7 +60,6 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	setQuotes(lquotes: Quotes.Live[]) {
 		console.log('syncQuotes ->', lquotes.length)
-		console.log(`lquotes ->`, JSON.parse(JSON.stringify(lquotes)))
 		let bones = {
 			animation: false,
 			color: [this.colors['grey-lighter']],
@@ -153,7 +152,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				type: 'inside',
 				// throttle: 60,
 				xAxisIndex: [0, 1],
-				start: 0, end: 100,
+				start: this.range == 'live' ? core.calc.slider(lquotes.length - 50, 0, lquotes.length) : 0, end: 100,
 				// rangeMode: ['value', 'percent'],
 				zoomOnMouseWheel: 'shift',
 				// moveOnMouseMove: false,
@@ -250,7 +249,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				encode: {
 					x: 'timestamp',
 					y: ['open', 'close', 'high', 'low'],
-					tooltip: ['open', 'high', 'low', 'close'],
+					tooltip: ['open', 'high', 'low', 'close', 'liveCount'],
 				},
 				itemStyle: {
 					borderColor: this.colors.success, borderColor0: this.colors.danger, borderWidth: 1,
@@ -297,29 +296,20 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		console.log(`QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
 		let lquotes = this.lquotes()
 		let last = lquotes[lquotes.length - 1]
-		console.log('QUOTE lastdiff ->', core.object.difference(last, lquote))
-		// lquotes.remove((v, i, lquotes) => {
-		// 	let prev = lquotes[i - 1]
-		// 	if (prev && prev.liveCount == v.liveCount) {
-		// 		console.warn(`prev && prev.liveCount == v.liveCount`, i)
-		// 	}
-		// 	return prev && prev.liveCount == v.liveCount
-		// })
-		// lquotes.push(lquote)
-		// this.setOption({ dataset: { source: lquotes } } as echarts.Option)
-
+		if (last.liveCount != lquote.liveCount + 1) {
+			core.object.merge(last, lquote)
+		} else {
+			lquotes.push(lquote)
+		}
+		this.setOption({ dataset: { source: lquotes } } as echarts.Option)
 	}
 	onlquote(lquote: Quotes.Live) {
 		console.warn(`LIVE QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
 		let lquotes = this.lquotes()
-		lquotes.remove(v => v.stamp != v.liveStamp)
-		// lquotes.remove((v, i, lquotes) => {
-		// 	let prev = lquotes[i - 1]
-		// 	if (prev && prev.liveCount == v.liveCount) {
-		// 		console.warn(`prev && prev.liveCount == v.liveCount`, i)
-		// 	}
-		// 	return prev && prev.liveCount == v.liveCount
-		// })
+		lquotes.remove((v, i) => {
+			let prev = lquotes[i - 1]
+			return prev && prev.liveCount == v.liveCount
+		})
 		lquotes.push(lquote)
 		this.setOption({ dataset: { source: lquotes } } as echarts.Option)
 	}

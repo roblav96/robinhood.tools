@@ -133,6 +133,7 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 
 
 function ontick() {
+	let stamp = Date.now()
 	let coms = [] as Redis.Coms
 	let live = new Date().getSeconds() % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
 
@@ -150,8 +151,10 @@ function ontick() {
 
 		let ediff = core.object.difference(QUOTES.EMITS[symbol], quote)
 		if (Object.keys(ediff).length > 0) {
+			ediff.updated = stamp
 			ediff.symbol = symbol
 			if (process.env.PRODUCTION) socket.emit(`${rkeys.QUOTES}:${symbol}`, ediff);
+			quote.updated = stamp
 			Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
 		}
 
@@ -163,10 +166,12 @@ function ontick() {
 			}
 
 			let flquote = QUOTES.LIVES[symbol]
+			let ldiff = core.object.difference(flquote, quote)
 			if (quote.timestamp > flquote.timestamp) {
 
+				quote.updated = stamp
+				quote.liveStamp = stamp
 				quote.liveCount++
-				quote.liveStamp = Date.now()
 
 				let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
 				let lkey = `${rkeys.LIVES}:${symbol}:${quote.timestamp}`
@@ -176,11 +181,13 @@ function ontick() {
 				lquote.symbol = symbol
 				if (process.env.PRODUCTION) socket.emit(`${rkeys.LIVES}:${symbol}`, lquote);
 
-				let ldiff = core.object.difference(flquote, quote)
-				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, ldiff as any])
+				ldiff = core.object.difference(flquote, quote)
 				Object.assign(QUOTES.LIVES, { [symbol]: core.clone(quote) })
 
 				quotes.mergeCalcs(quote, quotes.resetLive(quote))
+			}
+			if (Object.keys(ldiff).length > 0) {
+				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, ldiff as any])
 			}
 		}
 	})

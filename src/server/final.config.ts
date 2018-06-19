@@ -40,7 +40,7 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 	// Application({ name: 'robinhood', run: 'services/robinhood.service' })
 
 	if (DEVELOPMENT) {
-		Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances: 1 })
+		// Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances: 1 })
 	} else {
 		Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances: cpus })
 		Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
