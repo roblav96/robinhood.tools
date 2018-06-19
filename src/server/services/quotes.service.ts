@@ -174,13 +174,13 @@ function ontick() {
 				lquote.symbol = symbol
 				if (process.env.PRODUCTION) socket.emit(`${rkeys.LIVES}:${symbol}`, lquote);
 
-				ediff = core.object.difference(equote, quote)
 				ldiff = core.object.difference(flquote, quote)
 				core.object.merge(flquote, quote)
 
 				let reset = quotes.resetLive(quote)
 				quotes.mergeCalcs(quote, reset)
-				core.object.merge(quote, reset)
+
+				ediff = core.object.difference(equote, quote)
 
 				// console.warn('ldiff ->', core.object.sortKeys(ldiff))
 			}
