@@ -322,6 +322,8 @@ export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 	if (toquote) core.object.merge(quote, toquote);
 	else toquote = quote;
 
+	if (!quote.stamp) quote.stamp = Date.now();
+
 	if (toquote.price || toquote.timestamp) {
 		let state = hours.getState(hours.rxhours.value, quote.timestamp)
 
@@ -378,8 +380,6 @@ export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 		quote.dealFlowSize = core.math.sum(quote.buySize, -quote.sellSize)
 		quote.dealFlowVolume = core.math.sum(quote.buyVolume, -quote.sellVolume)
 	}
-
-	if (!quote.stamp) quote.stamp = Date.now();
 
 	return quote
 }
