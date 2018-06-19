@@ -118,12 +118,8 @@ export function applyFull(
 	toquote.stamp = Date.now()
 
 	mergeCalcs(toquote, resetFull(quote))
-	// if (resets && wbquote.typeof == 'STOCKS') {
-	if (resets) {
-		core.object.merge(quote, toquote)
-	} else {
-		core.object.repair(quote, toquote)
-	}
+	if (resets) core.object.merge(quote, toquote);
+	else core.object.repair(quote, toquote);
 
 	core.object.clean(quote)
 	return quote
