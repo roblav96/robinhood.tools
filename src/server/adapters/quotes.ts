@@ -115,7 +115,7 @@ export function applyFull(
 	let toquote = applyWbQuote(quote, wbquote)
 	mergeCalcs(toquote)
 	core.object.repair(quote, toquote)
-	toquote.updated = Date.now()
+	toquote.stamp = Date.now()
 
 	mergeCalcs(toquote, resetFull(quote))
 	// if (resets && wbquote.typeof == 'STOCKS') {

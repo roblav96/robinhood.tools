@@ -67,13 +67,18 @@ async function start() {
 	let alls = await quotes.getAlls(SYMBOLS, ['quote', 'wbquote'])
 	alls.forEach(({ symbol, quote, wbquote }) => {
 
-		if (process.env.PRODUCTION) socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote);
+		if (process.env.PRODUCTION) {
+			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
+		}
 		Object.assign(WB.QUOTES, { [symbol]: core.clone(wbquote) })
 		Object.assign(WB.SAVES, { [symbol]: {} })
 		Object.assign(WB.EMITS, { [symbol]: {} })
 
-		if (process.env.PRODUCTION) socket.emit(`${rkeys.QUOTES}:${symbol}`, quote);
+		if (process.env.PRODUCTION) {
+			socket.emit(`${rkeys.QUOTES}:${symbol}`, quote)
+		}
 		quotes.convert(quote, quotes.ALL_CALC_KEYS)
+		quotes.mergeCalcs(quote, quotes.resetLive(quote))
 		Object.assign(QUOTES.CALCS, { [symbol]: core.clone(quote) })
 		Object.assign(QUOTES.LIVES, { [symbol]: core.clone(quote) })
 		Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
@@ -99,7 +104,9 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
 		let deal = quotes.toDeal(wbdata)
-		if (process.env.PRODUCTION) socket.emit(`${rkeys.DEALS}:${symbol}`, deal);
+		if (process.env.PRODUCTION) {
+			socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
+		}
 		let quote = QUOTES.CALCS[symbol]
 		quotes.mergeCalcs(quote, quotes.applyWbQuote(quote, {} as any, quotes.applyDeal(quote, deal)))
 		return
@@ -144,18 +151,11 @@ function ontick() {
 		if (Object.keys(towbquote).length > 0) {
 			core.object.merge(WB.SAVES[symbol], towbquote)
 			quotes.mergeCalcs(quote, quotes.applyWbQuote(quote, towbquote))
-			towbquote.symbol = symbol
-			if (process.env.PRODUCTION) socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, towbquote);
+			if (process.env.PRODUCTION) {
+				towbquote.symbol = symbol
+				socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, towbquote)
+			}
 			Object.assign(WB.EMITS, { [symbol]: {} })
-		}
-
-		let ediff = core.object.difference(QUOTES.EMITS[symbol], quote)
-		if (Object.keys(ediff).length > 0) {
-			ediff.updated = stamp
-			ediff.symbol = symbol
-			if (process.env.PRODUCTION) socket.emit(`${rkeys.QUOTES}:${symbol}`, ediff);
-			quote.updated = stamp
-			Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
 		}
 
 		if (live) {
@@ -169,26 +169,41 @@ function ontick() {
 			let ldiff = core.object.difference(flquote, quote)
 			if (quote.timestamp > flquote.timestamp) {
 
-				quote.updated = stamp
+				quote.stamp = stamp
 				quote.liveStamp = stamp
-				quote.liveCount++
+				quote.liveCount = core.math.sum0(quote.liveCount, 1)
 
 				let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
 				let lkey = `${rkeys.LIVES}:${symbol}:${quote.timestamp}`
 				coms.push(['hmset', lkey, lquote as any])
 				let zkey = `${rkeys.LIVES}:${symbol}`
 				coms.push(['zadd', zkey, quote.timestamp as any, lkey])
-				lquote.symbol = symbol
-				if (process.env.PRODUCTION) socket.emit(`${rkeys.LIVES}:${symbol}`, lquote);
+				if (process.env.PRODUCTION) {
+					lquote.symbol = symbol
+					socket.emit(`${rkeys.LIVES}:${symbol}`, lquote)
+				}
 
 				ldiff = core.object.difference(flquote, quote)
-				Object.assign(QUOTES.LIVES, { [symbol]: core.clone(quote) })
+				core.object.merge(flquote, quote)
 
 				quotes.mergeCalcs(quote, quotes.resetLive(quote))
+
 			}
 			if (Object.keys(ldiff).length > 0) {
 				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, ldiff as any])
 			}
+		}
+
+		let fequote = QUOTES.EMITS[symbol]
+		let ediff = core.object.difference(fequote, quote)
+		if (Object.keys(ediff).length > 0) {
+			if (process.env.PRODUCTION) {
+				ediff.stamp = stamp
+				ediff.symbol = symbol
+				socket.emit(`${rkeys.QUOTES}:${symbol}`, ediff)
+			}
+			quote.stamp = stamp
+			core.object.merge(fequote, quote)
 		}
 	})
 

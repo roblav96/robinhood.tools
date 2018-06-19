@@ -55,7 +55,8 @@ core.nullify(TINY)
 
 declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Tiny { } } }
 const LIVE = {
-	updated: number,
+	stamp: number,
+	// 
 	status: string,
 	statusTimestamp: number,
 	// 

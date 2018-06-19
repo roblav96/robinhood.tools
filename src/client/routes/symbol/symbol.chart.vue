@@ -12,7 +12,7 @@
 			<div class="columns is-mobile my-0 items-center">
 				<div class="column is-narrow">
 					<b-field>
-						<b-radio-button v-model="range" type="is-primary" v-for="v in ranges" :native-value="v" :key="v">
+						<b-radio-button class="is-loading" v-model="range" type="is-primary" v-for="v in ranges" :native-value="v" :key="v">
 							<span>{{vcapitalize(v)}}</span>
 						</b-radio-button>
 					</b-field>

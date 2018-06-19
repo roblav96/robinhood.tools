@@ -247,7 +247,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				legendHoverLink: false,
 				// dimensions: ['timestamp', 'open', 'close', 'high', 'low'],
 				encode: {
-					x: 'timestamp',
+					x: 'liveStamp',
 					y: ['open', 'close', 'high', 'low'],
 					tooltip: ['open', 'high', 'low', 'close', 'liveCount'],
 				},
@@ -269,7 +269,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				hoverAnimation: false,
 				legendHoverLink: false,
 				encode: {
-					x: 'timestamp',
+					x: 'liveStamp',
 					y: 'size',
 					tooltip: 'size',
 				},
@@ -291,26 +291,25 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 	onquote(quote: Quotes.Quote) {
+		console.log(`QUOTE quote ->`, JSON.parse(JSON.stringify(quote)))
 		core.object.repair(quote, this.quote)
 		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS) as Quotes.Live
 		console.log(`QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
 		let lquotes = this.lquotes()
 		let last = lquotes[lquotes.length - 1]
-		if (lquote.updated <= last.updated) {
-			return console.warn(`lquote.updated <= last.updated`)
-		}
-		lquotes.remove(v => v.updated >= last.liveStamp)
+		if (lquote.timestamp <= last.timestamp) return;
+		lquotes.remove(v => v.stamp && v.stamp > v.liveStamp)
 		lquotes.push(lquote)
 		this.setOption({ dataset: { source: lquotes } } as echarts.Option)
 	}
 	onlquote(lquote: Quotes.Live) {
 		console.warn(`LIVE QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
 		let lquotes = this.lquotes()
-		// lquotes.remove(v => v.updated >= last.liveStamp)
-		lquotes.remove((v, i) => {
-			let prev = lquotes[i - 1]
-			return prev && prev.liveCount == v.liveCount
-		})
+		lquotes.remove(v => v.stamp && v.stamp > v.liveStamp)
+		// lquotes.remove((v, i) => {
+		// 	let prev = lquotes[i - 1]
+		// 	return prev && prev.liveCount == v.liveCount
+		// })
 		lquotes.push(lquote)
 		this.setOption({ dataset: { source: lquotes } } as echarts.Option)
 	}

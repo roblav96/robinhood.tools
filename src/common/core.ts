@@ -233,15 +233,15 @@ export const sort = {
 		if (a > b) return 1;
 		return 0
 	},
+	keys<T = object>(target: T): T {
+		return _.fromPairs(_.sortBy(_.toPairs(target as any))) as any
+	},
 }
 
 
 
 export const object = {
 	is<T = object>(value: T): value is T { return value && typeof value == 'object' && value.constructor == Object },
-	sortKeys<T = object>(target: T): T {
-		return _.fromPairs(_.sortBy(_.toPairs(target as any))) as any
-	},
 	pick<T = object>(target: T, keys: string[]): Partial<T> {
 		return keys.reduce((v, k, i) => {
 			v[k] = target[k]
