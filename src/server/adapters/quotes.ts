@@ -322,8 +322,6 @@ export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 	if (toquote) core.object.merge(quote, toquote);
 	else toquote = quote;
 
-	if (!quote.stamp) quote.stamp = Date.now();
-
 	if (toquote.price || toquote.timestamp) {
 		let state = hours.getState(hours.rxhours.value, quote.timestamp)
 

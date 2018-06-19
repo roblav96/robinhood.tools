@@ -133,7 +133,6 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 
 
 function ontick() {
-	let stamp = Date.now()
 	let coms = [] as Redis.Coms
 	let live = new Date().getSeconds() % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
 
@@ -149,8 +148,12 @@ function ontick() {
 			Object.assign(WB.EMITS, { [symbol]: {} })
 		}
 
-		let equote = QUOTES.EMITS[symbol]
-		let ediff = core.object.difference(equote, quote)
+		let ediff = core.object.difference(QUOTES.EMITS[symbol], quote)
+		if (Object.keys(ediff).length > 0) {
+			ediff.symbol = symbol
+			if (process.env.PRODUCTION) socket.emit(`${rkeys.QUOTES}:${symbol}`, ediff);
+			Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
+		}
 
 		if (live) {
 			let wbsaves = WB.SAVES[symbol]
@@ -160,42 +163,25 @@ function ontick() {
 			}
 
 			let flquote = QUOTES.LIVES[symbol]
-			let ldiff = core.object.difference(flquote, quote)
 			if (quote.timestamp > flquote.timestamp) {
 
-				quote.stamp = stamp
 				quote.liveCount++
-				quote.liveStamp = stamp
+				quote.liveStamp = Date.now()
 
-				let lkey = `${rkeys.LIVES}:${symbol}:${quote.timestamp}`
 				let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
+				let lkey = `${rkeys.LIVES}:${symbol}:${quote.timestamp}`
 				coms.push(['hmset', lkey, lquote as any])
 				let zkey = `${rkeys.LIVES}:${symbol}`
 				coms.push(['zadd', zkey, quote.timestamp as any, lkey])
 				lquote.symbol = symbol
 				if (process.env.PRODUCTION) socket.emit(`${rkeys.LIVES}:${symbol}`, lquote);
 
-				core.object.merge(ediff, core.object.difference(equote, quote))
-				core.object.merge(ldiff, core.object.difference(flquote, quote))
-				core.object.merge(flquote, quote)
+				let ldiff = core.object.difference(flquote, quote)
+				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, ldiff as any])
+				Object.assign(QUOTES.LIVES, { [symbol]: core.clone(quote) })
 
 				quotes.mergeCalcs(quote, quotes.resetLive(quote))
-
-				// console.warn('ldiff ->', core.object.sortKeys(ldiff))
 			}
-
-			if (Object.keys(ldiff).length > 0) {
-				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, ldiff as any])
-			}
-		}
-
-		if (Object.keys(ediff).length > 0) {
-			// console.log('ediff ->', core.object.sortKeys(ediff))
-			quote.stamp = stamp
-			ediff.stamp = stamp
-			ediff.symbol = symbol
-			if (process.env.PRODUCTION) socket.emit(`${rkeys.QUOTES}:${symbol}`, ediff);
-			Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
 		}
 	})
 
