@@ -37,9 +37,9 @@ export function getConverted<T>(quote: T, qkeys: string[]) {
 
 
 
-const string = ''
-const number = 0
-const boolean = false
+let string = ''
+let number = 0
+let boolean = false
 
 declare global { namespace Quotes { type ITiny = typeof TINY; interface Tiny extends ITiny { } } }
 const TINY = {
@@ -55,6 +55,7 @@ core.nullify(TINY)
 
 declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Tiny { } } }
 const LIVE = {
+	stamp: number,
 	status: string,
 	statusTimestamp: number,
 	// 
