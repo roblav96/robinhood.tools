@@ -56,8 +56,8 @@ export class ReadySubject {
 		let args = opts.void ? [Rx.mapTo(void 0)] : []
 		return this.subject.pipe(Rx.filter(v => !!v), Rx.take(1), ...args)
 	}
-	toPromise(): Promise<boolean> {
-		return this.pipe().toPromise()
+	toPromise() {
+		return this.pipe().toPromise() as Promise<boolean>
 	}
 	subscribe(next: (value: boolean) => void) {
 		return this.pipe().subscribe(next)

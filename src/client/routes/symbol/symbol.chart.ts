@@ -24,16 +24,14 @@ import * as charts from '../../adapters/charts'
 @Vts.Component
 class VSymbolEChart extends Mixins(VEChartsMixin) {
 
-	// $parent: VSymbolChart
 	@Vts.Prop() quote: Quotes.Quote
 	colors = this.$store.state.colors
 
 	mounted() {
 		this.$on('resize', this.onresize)
-		// module.hot.addStatusHandler(this.resize)
 	}
 	beforeDestroy() {
-		// module.hot.removeStatusHandler(this.resize)
+
 	}
 
 
@@ -63,7 +61,6 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		let bones = {
 			animation: false,
 			color: [this.colors['grey-lighter']],
-			backgroundColor: this.colors['white-bis'],
 			// color: ['#0a0a0a', '#ffb000', '#fed500', '#34bc6e', '#4dc0b5', '#009bef', '#5392ff', '#9753e1', '#e62325', '#ff509e', '#ffffff'],
 			// color: Object.values(this.colors),
 			textStyle: { color: this.colors.dark, fontSize: 8 },
@@ -102,7 +99,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				// 	return `<div class="px-2 py-1 leading-none font-sans has-background-dark has-text-white rounded-sm">${html}</div>`
 				// },
 				axisPointer: {
-					link: { xAxisIndex: 'all' },
+					link: [{ xAxisIndex: 'all' }],
 					type: 'cross',
 					animation: false,
 					shadowStyle: { opacity: 0 },
@@ -119,17 +116,19 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					},
 				},
 			},
-			axisPointer: {
-				link: { xAxisIndex: 'all' },
-			},
+			// axisPointer: {
+			// 	animation: false,
+			// 	link: [{ xAxisIndex: 'all' }],
+			// },
 			grid: [{
-				top: 8,
+				top: 16,
 				left: 64,
 				right: 24,
 				bottom: 92,
 				show: true,
 				backgroundColor: this.colors.white,
-				borderColor: this.colors['grey-lighter'],
+				borderWidth: 0,
+				// borderColor: this.colors['grey-lighter'],
 			}, {
 				height: 64,
 				left: 64,
@@ -154,11 +153,11 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				showDetail: false,
 				backgroundColor: this.colors.white,
 				dataBackground: {
-					areaStyle: { color: this.colors['white-ter'], opacity: 1 },
+					areaStyle: { color: this.colors['white-bis'], opacity: 1 },
 					lineStyle: { color: this.colors['grey-light'], opacity: 1 },
 				},
 				borderColor: this.colors['grey-lighter'],
-				fillerColor: 'rgba(184,194,204,0.33)',
+				fillerColor: 'rgba(184,194,204,0.2)',
 				// textStyle: { color: this.colors.dark },
 				handleStyle: { color: this.colors['grey-lighter'] },
 				// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
@@ -167,7 +166,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				type: 'category',
 				boundaryGap: true,
 				axisLabel: {
-					margin: 4,
+					margin: 5,
 					textStyle: { color: this.colors.dark, fontSize: 14 },
 					formatter: v => charts.xlabel(v),
 				},
@@ -278,8 +277,8 @@ export default class VSymbolChart extends Mixins(VMixin) {
 
 	}
 
-	brushing = false
 	busy = true
+	isbrushing = false
 	get vechart() { return (this.$refs as any)['symbol_vechart'] as VSymbolEChart }
 
 	@Vts.Watch('quote.tickerId') w_tickerId(tickerId: number) {

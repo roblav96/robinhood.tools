@@ -38,7 +38,8 @@ declare module 'echarts' {
 			'showtip' |
 			'timelinechanged' |
 			'timelineplaychanged' |
-			'unfocusnodeadjacency'
+			'unfocusnodeadjacency' |
+			'updateaxispointer'
 
 		interface EventParam<T = any> {
 			$vars: string[]

@@ -24,6 +24,18 @@ export function screen() {
 
 
 
+export function raf(fn: (...args) => void) {
+	let wait = false
+	return function(...args) {
+		if (wait) return;
+		fn.apply(null, args)
+		wait = true
+		window.requestAnimationFrame(() => wait = false)
+	}
+}
+
+
+
 // let wevents = ['blur', 'click', 'dblclick', 'ended', 'error', 'focus', 'keydown', 'keypress', 'keyup', 'load', 'readystatechange', 'resize', 'scroll', 'suspend', 'unload', 'wheel'] as (keyof WindowEventMap)[]
 class UEmitter extends Emitter<keyof WindowEventMap, Event> {
 	private static PASSIVES = ['mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'mousewheel', 'resize', 'scroll', 'touchend', 'touchenter', 'touchleave', 'touchmove', 'touchstart', 'wheel'] as (keyof WindowEventMap)[]

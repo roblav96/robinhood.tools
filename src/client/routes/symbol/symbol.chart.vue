@@ -74,16 +74,18 @@
 					</b-select>
 				</div>
 				<div class="column is-narrow">
-					<button class="button" :class="{'is-primary':brushing}" @click="brushing=!brushing">
-						<b-icon type="" icon="crop"></b-icon>
-					</button>
+					<b-tooltip :active="isbrushing" label="Click and drag chart area to crop" animated>
+						<button class="button" :class="{'is-primary':isbrushing}" @click="isbrushing=!isbrushing">
+							<b-icon type="" icon="crop"></b-icon>
+						</button>
+					</b-tooltip>
 				</div>
 			</div>
 		</section>
 
 		<!-- <b-tooltip type="is-primary" label="Hold click down, then drag to crop" animated> -->
 		<hr>
-		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :brushing="brushing"></v-symbol-echart>
+		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :isbrushing.sync="isbrushing"></v-symbol-echart>
 		<!-- </b-tooltip> -->
 
 

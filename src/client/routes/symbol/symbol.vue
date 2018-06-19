@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<div id="symbol_route" class="">
+	<div id="symbol_route" class="flex-col-full">
 
 		<section class="section py-0 has-background-white">
 			<div class="columns my-0 items-center">
