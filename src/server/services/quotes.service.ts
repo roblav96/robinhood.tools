@@ -182,7 +182,7 @@ function ontick() {
 				quotes.mergeCalcs(quote, reset)
 				core.object.merge(quote, reset)
 
-				console.warn('ldiff ->', core.object.sortKeys(ldiff))
+				// console.warn('ldiff ->', core.object.sortKeys(ldiff))
 			}
 
 			if (Object.keys(ldiff).length > 0) {
@@ -191,7 +191,7 @@ function ontick() {
 		}
 
 		if (Object.keys(ediff).length > 0) {
-			console.log('ediff ->', core.object.sortKeys(ediff))
+			// console.log('ediff ->', core.object.sortKeys(ediff))
 			ediff.symbol = symbol
 			if (process.env.PRODUCTION) socket.emit(`${rkeys.QUOTES}:${symbol}`, ediff);
 			Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
