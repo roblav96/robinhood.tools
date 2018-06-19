@@ -113,7 +113,6 @@ export default class VEChartsMixin extends Vue {
 
 
 
-	// dims() { return { width: this.$el.parentElement.offsetWidth, height: 1000 } as echarts.Dims }
 	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
 	onresize_ = _.debounce(this.resize_, 300, { leading: false, trailing: true })
 	resize_() {
