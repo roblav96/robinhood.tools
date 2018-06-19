@@ -67,12 +67,12 @@ async function start() {
 	let alls = await quotes.getAlls(SYMBOLS, ['quote', 'wbquote'])
 	alls.forEach(({ symbol, quote, wbquote }) => {
 
-		socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
+		if (process.env.PRODUCTION) socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote);
 		Object.assign(WB.QUOTES, { [symbol]: core.clone(wbquote) })
 		Object.assign(WB.SAVES, { [symbol]: {} })
 		Object.assign(WB.EMITS, { [symbol]: {} })
 
-		socket.emit(`${rkeys.QUOTES}:${symbol}`, quote)
+		if (process.env.PRODUCTION) socket.emit(`${rkeys.QUOTES}:${symbol}`, quote);
 		quotes.convert(quote, quotes.ALL_CALC_KEYS)
 		Object.assign(QUOTES.CALCS, { [symbol]: core.clone(quote) })
 		Object.assign(QUOTES.LIVES, { [symbol]: core.clone(quote) })
@@ -99,7 +99,7 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
 		let deal = quotes.toDeal(wbdata)
-		socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
+		if (process.env.PRODUCTION) socket.emit(`${rkeys.DEALS}:${symbol}`, deal);
 		let quote = QUOTES.CALCS[symbol]
 		quotes.mergeCalcs(quote, quotes.applyWbQuote(quote, {} as any, quotes.applyDeal(quote, deal)))
 		return
@@ -145,7 +145,7 @@ function ontick() {
 			core.object.merge(WB.SAVES[symbol], towbquote)
 			quotes.mergeCalcs(quote, quotes.applyWbQuote(quote, towbquote))
 			towbquote.symbol = symbol
-			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, towbquote)
+			if (process.env.PRODUCTION) socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, towbquote);
 			Object.assign(WB.EMITS, { [symbol]: {} })
 		}
 
@@ -170,7 +170,7 @@ function ontick() {
 				let zkey = `${rkeys.LIVES}:${symbol}`
 				coms.push(['zadd', zkey, quote.timestamp as any, lkey])
 				lquote.symbol = symbol
-				socket.emit(`${rkeys.LIVES}:${symbol}`, lquote)
+				if (process.env.PRODUCTION) socket.emit(`${rkeys.LIVES}:${symbol}`, lquote);
 
 				let reset = quotes.resetLive(quote)
 				quotes.mergeCalcs(quote, reset)
@@ -189,7 +189,7 @@ function ontick() {
 
 		if (Object.keys(ediff).length > 0) {
 			ediff.symbol = symbol
-			socket.emit(`${rkeys.QUOTES}:${symbol}`, ediff)
+			if (process.env.PRODUCTION) socket.emit(`${rkeys.QUOTES}:${symbol}`, ediff);
 			Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
 		}
 	})
