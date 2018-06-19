@@ -104,9 +104,9 @@ export default class VEChartsMixin extends Vue {
 
 
 
-	ondatazoom_ = _.throttle(this.datazoom, 100, { leading: false, trailing: true })
-	datazoom() {
-		this.$emit('datazoom')
+	ondatazoom_ = _.throttle(this.datazoom_, 100, { leading: false, trailing: true })
+	datazoom_(event: echarts.EventData) {
+		this.$emit('datazoom', event)
 		this.brushing = false
 		this.echart.dispatchAction({ type: 'hideTip' })
 	}

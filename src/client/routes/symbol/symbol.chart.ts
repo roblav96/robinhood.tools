@@ -60,6 +60,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	setQuotes(lquotes: Quotes.Live[]) {
 		console.log('syncQuotes ->', lquotes.length)
+		console.log(`lquotes ->`, JSON.parse(JSON.stringify(lquotes)))
 		let bones = {
 			animation: false,
 			color: [this.colors['grey-lighter']],
@@ -85,8 +86,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				showDelay: 0,
 				hideDelay: 0,
 				transitionDuration: 0,
-				padding: 0,
-				// padding: [32, 0, 0, 32],
+				// padding: 0,
+				padding: [0, 0, 0, 64],
 				backgroundColor: 'transparent',
 				// formatter: '{a}: {b1}<br>{c}: {d0}',
 				// extraCssText: `border: 0.125rem solid ${this.colors['grey-darker']};`,
@@ -95,6 +96,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					let option = this.getOption()
 					let html = ''
 					params.forEach((param, i) => {
+						// console.log(`param.value ->`, param.value)
 						let trs = `<tr><td class="font-semibold pr-2"><i class="mdi mdi-circle" style="color: ${param.color};"></i> ${param.seriesName}</td>`
 						let tooltip = option.series[param.seriesIndex].encode.tooltip
 						if (Array.isArray(tooltip)) {
@@ -148,7 +150,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				bottom: 92,
 			}],
 			dataZoom: [{
-				type: 'inside', throttle: 60,
+				type: 'inside',
+				// throttle: 60,
 				xAxisIndex: [0, 1],
 				start: 0, end: 100,
 				// rangeMode: ['value', 'percent'],
@@ -294,23 +297,27 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		let lquotes = this.lquotes()
 		let last = lquotes[lquotes.length - 1]
 		if (lquote.liveCount) {
-			core.object.repair(lquote, last)
+			if (last) core.object.repair(lquote, last);
 			lquotes.push(lquote)
-			return
+			console.log(`lquotes.push(lquote)`)
+		} else {
+			core.object.merge(last, lquote)
+			console.log(`core.object.merge(last, lquote)`)
 		}
-		core.object.merge(last, lquote)
 		this.setOption({ dataset: { source: lquotes } } as echarts.Option)
 	}
 	onlquote(lquote: Quotes.Live) {
-		console.log(`LIVE QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
+		console.warn(`LIVE QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
 		let lquotes = this.lquotes()
-		// let last = lquotes.find(v => v.liveCount == lquote.liveCount - 1)
 		let last = lquotes[lquotes.length - 1]
-		if (last) {
+		if (last && last.liveCount == lquote.liveCount - 1) {
+			console.log(`core.object.merge`)
 			core.object.merge(last, lquote)
 		} else {
+			console.log(`lquotes.push`)
 			lquotes.push(lquote)
 		}
+		// lquotes.push(lquote)
 		this.setOption({ dataset: { source: lquotes } } as echarts.Option)
 	}
 
