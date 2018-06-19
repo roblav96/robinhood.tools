@@ -274,7 +274,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				emphasis: null,
 			}],
 		} as echarts.Option
-		this.echart.setOption(bones)
+		this.setOption(bones)
 		console.log(`this.getOption() ->`, this.getOption())
 
 		socket.offListener(this.onquote, this)
@@ -291,7 +291,29 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 	onquote(quote: Quotes.Quote) {
 		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
 		console.log(`QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
+		let lquotes = this.lquotes()
+		let last = lquotes[lquotes.length - 1]
+		if (lquote.liveCount) {
+			core.object.repair(lquote, last)
+			lquotes.push(lquote)
+			return
+		}
+		core.object.merge(last, lquote)
+		this.setOption({ dataset: { source: lquotes } } as echarts.Option)
 	}
+	onlquote(lquote: Quotes.Live) {
+		console.log(`LIVE QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
+		let lquotes = this.lquotes()
+		// let last = lquotes.find(v => v.liveCount == lquote.liveCount - 1)
+		let last = lquotes[lquotes.length - 1]
+		if (last) {
+			core.object.merge(last, lquote)
+		} else {
+			lquotes.push(lquote)
+		}
+		this.setOption({ dataset: { source: lquotes } } as echarts.Option)
+	}
+
 	// @Vts.Watch('quote', { deep: true }) w_quote(quote: Quotes.Quote) {
 	// 	if (this.range != 'live') return;
 	// 	let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
@@ -300,21 +322,6 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 	// 	let last = lquotes[ii + 1]
 	// 	// console.log(`watch lquote ->`, JSON.parse(JSON.stringify(lquote)))
 	// }
-	onlquote(lquote: Quotes.Live) {
-		console.log(`LIVE QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
-		let lquotes = this.lquotes()
-		lquotes.push(lquote)
-		this.echart.setOption({ dataset: { source: lquotes } } as echarts.Option)
-		this.fixtip()
-	}
-
-	fixtip() {
-		if (!this.tippos || !this.tippos.show) return;
-		_.defer(() => {
-			this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y })
-		})
-	}
-
 	// onquote(quote: Quotes.Quote) {
 	// 	let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS)
 	// 	let lquotes = this.lquotes()

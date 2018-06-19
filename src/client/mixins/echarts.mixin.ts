@@ -67,6 +67,10 @@ export default class VEChartsMixin extends Vue {
 			end: datazoom.end, endValue: datazoom.endValue,
 		}
 	}
+	setOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
+		this.echart.setOption(option, opts)
+		this.fixtip()
+	}
 	updateOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
 		this.echart.setOption(deepmerge(this.echart.getOption(), option), opts)
 	}
@@ -163,6 +167,12 @@ export default class VEChartsMixin extends Vue {
 	tippos: Partial<{ show: boolean, x: number, y: number }>
 	onshowtip_(event) { this.tippos = { show: true, x: event.x, y: event.y } }
 	onhidetip_(event) { this.tippos ? this.tippos.show = false : this.tippos = { show: false } }
+	fixtip() {
+		if (!this.tippos || !this.tippos.show) return;
+		_.defer(() => {
+			this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y })
+		})
+	}
 
 
 
