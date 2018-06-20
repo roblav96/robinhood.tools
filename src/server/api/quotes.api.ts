@@ -80,6 +80,7 @@ polka.route({
 	async handler(req, res) {
 		let symbols = req.body.symbols as string[]
 		let range = req.body.range as number[]
+
 		if (!Array.isArray(range)) {
 			let hhours = hours.rxhours.value
 			if (!hhours.isOpenToday || dayjs().isBefore(dayjs(hhours.prepre))) {
@@ -87,10 +88,20 @@ polka.route({
 			}
 			range = [hhours.prepre, hhours.postpost]
 		}
+		// let zkeys = await redis.main.coms(symbols.map(v => {
+		// 	return ['zrangebyscore', `${rkeys.LIVES}:${v}`, range[0] as any, range[1] as any]
+		// })) as string[][]
 
 		let zkeys = await redis.main.coms(symbols.map(v => {
-			return ['zrangebyscore', `${rkeys.LIVES}:${v}`, range[0] as any, range[1] as any]
+			return ['zrange', `${rkeys.LIVES}:${v}`, -500 as any, -1 as any]
 		})) as string[][]
+		zkeys.forEach(keys => {
+			keys.remove(key => {
+				let stamp = Number.parseInt(key.split(':').pop())
+				return stamp < range[0]
+			})
+		})
+
 		let lives = await redis.main.coms(_.flatten(zkeys.map((keys, i) => {
 			return keys.map(key => ['hgetall', key])
 		}))) as Quotes.Live[]

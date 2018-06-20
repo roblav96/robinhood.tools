@@ -80,7 +80,7 @@ export default class extends Mixins(VMixin) {
 	}
 
 	onselect(result: Quotes.Quote) {
-		this.$router.push({ name: this.$symbolname, params: { symbol: result.symbol } })
+		this.$router.push({ name: this.$routersymbolname, params: { symbol: result.symbol } })
 		this.inputfield.blur()
 		if (!this.query) this.sync();
 	}

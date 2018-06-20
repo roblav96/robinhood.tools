@@ -25,7 +25,7 @@ export default class VMixin extends Vue {
 	@VMixin.NoCache get $destroyed() { return this._isDestroyed }
 	$safety() { if (this.$destroyed) throw new Error('$safety'); }
 
-	get $symbolname() { return this.$route.name.startsWith('symbol.') ? this.$route.name : 'symbol' }
+	get $routersymbolname() { return this.$route.name.startsWith('symbol.') ? this.$route.name : 'symbol' }
 
 	vcamel(value: string) { return _.camelCase(value) }
 	vstcase(value: string) { return _.startCase(value) }

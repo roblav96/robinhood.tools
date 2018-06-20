@@ -34,15 +34,14 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	}
 	beforeDestroy() {
-		socket.offListener(this.onquote, this)
-		socket.offListener(this.onlquote, this)
+
 	}
 
 
 
 	lquotes() { return this.getOption().dataset[0].source as Quotes.Live[] }
 
-	@VMixin.NoCache get firstPrice() {
+	@VMixin.NoCache get ctprice() {
 		let lquotes = this.lquotes()
 		let ctbounds = this.ctbounds()
 		let lquote = lquotes[core.math.clamp(Math.floor(lquotes.length * (ctbounds.start / 100)), 0, lquotes.length - 1)]
@@ -63,7 +62,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 	build(lquotes = this.lquotes()) {
-		console.log('syncQuotes ->', lquotes.length)
+		let tstart = Date.now()
 		let bones = {
 			animation: false,
 			color: [this.colors['grey-lighter']],
@@ -106,7 +105,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 							trs += `</tr>`
 							tooltip.forEach((key: string) => {
 								let value = pretty.number(param.value[key])
-								trs += `<tr><td>${_.startCase(key)}</td><td class="text-right">${value}</td></tr>`
+								trs += `<tr><td class="pr-2">${_.startCase(key)}</td><td class="text-right">${value}</td></tr>`
 							})
 						} else {
 							let value = pretty.number(param.value[tooltip], { compact: true, precision: 1 })
@@ -154,15 +153,16 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			}],
 			dataZoom: [{
 				type: 'inside',
-				// throttle: 60,
+				throttle: 0,
 				xAxisIndex: [0, 1],
-				start: this.range == 'live' ? core.math.clamp(core.calc.slider(lquotes.length - 100, 0, lquotes.length), 0, 100) : 0, end: 100,
+				// start: this.range == 'live' ? core.math.clamp(core.calc.slider(lquotes.length - 100, 0, lquotes.length), 0, 100) : 0, end: 100,
 				// rangeMode: ['value', 'percent'],
 				zoomOnMouseWheel: 'shift',
 				// moveOnMouseMove: false,
-				// preventDefaultMouseMove: false,
+				preventDefaultMouseMove: true,
 			}, {
-				type: 'slider', throttle: 60,
+				type: 'slider',
+				throttle: 0,
 				xAxisIndex: [0, 1],
 				left: 62,
 				right: 26,
@@ -220,7 +220,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				axisLine: { show: false },
 				splitArea: { show: false },
 				splitLine: { lineStyle: { color: this.colors['grey-lightest'] } },
-				axisPointer: { label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.firstPrice), { percent: true, plusminus: true }) } },
+				axisPointer: { label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice), { percent: true, plusminus: true }) } },
 			}, {
 				scale: true,
 				gridIndex: 1,
@@ -243,9 +243,9 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				xAxisIndex: 0,
 				yAxisIndex: 0,
 				large: true,
-				largeThreshold: 200,
-				// progressive: 500,
-				// progressiveThreshold: 500,
+				largeThreshold: 128,
+				progressive: 512,
+				progressiveThreshold: 512,
 				animation: false,
 				hoverAnimation: false,
 				legendHoverLink: false,
@@ -253,7 +253,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				encode: {
 					x: 'timestamp',
 					y: ['open', 'close', 'high', 'low'],
-					tooltip: ['open', 'high', 'low', 'close', 'liveCount'],
+					tooltip: ['open', 'high', 'low', 'close'],
 				},
 				itemStyle: {
 					borderColor: this.colors.success, borderColor0: this.colors.danger, borderWidth: 1,
@@ -266,9 +266,9 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				xAxisIndex: 1,
 				yAxisIndex: 1,
 				large: true,
-				largeThreshold: 200,
-				// progressive: 500,
-				// progressiveThreshold: 500,
+				largeThreshold: 128,
+				progressive: 512,
+				progressiveThreshold: 512,
 				animation: false,
 				hoverAnimation: false,
 				legendHoverLink: false,
@@ -281,46 +281,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			}],
 		} as echarts.Option
 		this.echart.setOption(bones)
-		console.log(`this.getOption() ->`, this.getOption())
-
-		socket.offListener(this.onquote, this)
-		socket.offListener(this.onlquote, this)
-		if (this.range == 'live') {
-			socket.on(`${rkeys.QUOTES}:${this.quote.symbol}`, this.onquote, this)
-			socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.onlquote, this)
-		}
-
-	}
-
-
-
-	onquote(quote: Quotes.Quote) {
-		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS) as Quotes.Live
-		console.log(`ON QUOTE ->`, JSON.parse(JSON.stringify(lquote)))
-		let lquotes = this.lquotes()
-		let last = lquotes[lquotes.length - 1]
-		core.object.merge(last, lquote)
-		// if (lquote.timestamp == last.timestamp) {
-		// 	core.object.merge(last, lquote)
-		// } else {
-		// 	let found = lquotes.find(v => v.stamp && v.stamp != v.liveStamp)
-		// 	if (found) core.object.merge(found, lquote);
-		// 	else lquotes.push(lquote);
-		// }
-		this.echart.setOption({ dataset: [{ source: lquotes }] } as echarts.Option)
 		this.reshowtip()
-	}
-	onlquote(lquote: Quotes.Live) {
-		console.warn(`ON LIVE QUOTE ->`, JSON.parse(JSON.stringify(lquote)))
-		let lquotes = this.lquotes()
-		lquotes.remove(v => v.stamp && v.stamp != v.liveStamp)
-		// lquotes.remove((v, i) => {
-		// 	let prev = lquotes[i - 1]
-		// 	return prev && prev.liveCount == v.liveCount
-		// })
-		lquotes.push(lquote)
-		this.echart.setOption({ dataset: [{ source: lquotes }] } as echarts.Option)
-		this.reshowtip()
+		console.log(`echart build ->`, Date.now() - tstart, 'ms')
 	}
 
 
@@ -339,14 +301,16 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	mounted() {
 		this.getQuotes()
 	}
-
 	beforeDestroy() {
-
+		socket.offListener(this.onquote)
+		socket.offListener(this.onlquote)
 	}
 
 	busy = true
 	isbrushing = false
-	get vechart() { return (this.$refs as any)['symbol_vechart'] as VSymbolEChart }
+	@VMixin.NoCache get vechart() { return (this.$refs as any)['symbol_vechart'] as VSymbolEChart }
+
+
 
 	@Vts.Watch('quote.tickerId') w_tickerId(tickerId: number) {
 		this.getQuotes()
@@ -362,12 +326,47 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
 			this.vechart.build(lquotes)
+			socket.offListener(this.onquote)
+			socket.offListener(this.onlquote)
+			if (this.range == 'live') {
+				socket.on(`${rkeys.QUOTES}:${this.quote.symbol}`, this.onquote)
+				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.onlquote)
+			}
 		}).catch(error => {
 			console.error(`getQuotes Error ->`, error)
 		}).finally(() => {
 			this.busy = false
 		})
 	}
+
+	onquote(quote: Quotes.Quote) {
+		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS) as Quotes.Live
+		console.log(`ON QUOTE ->`, JSON.parse(JSON.stringify(lquote)))
+		let lquotes = this.vechart.lquotes()
+		let last = lquotes[lquotes.length - 1]
+		core.object.merge(last, lquote)
+		this.vechart.build(lquotes)
+		// if (lquote.timestamp == last.timestamp) {
+		// 	core.object.merge(last, lquote)
+		// } else {
+		// 	let found = lquotes.find(v => v.stamp && v.stamp != v.liveStamp)
+		// 	if (found) core.object.merge(found, lquote);
+		// 	else lquotes.push(lquote);
+		// }
+	}
+	onlquote(lquote: Quotes.Live) {
+		console.warn(`ON LIVE QUOTE ->`, JSON.parse(JSON.stringify(lquote)))
+		let lquotes = this.vechart.lquotes()
+		lquotes.remove(v => v.stamp && v.stamp != v.liveStamp)
+		// lquotes.remove((v, i) => {
+		// 	let prev = lquotes[i - 1]
+		// 	return prev && prev.liveCount == v.liveCount
+		// })
+		lquotes.push(lquote)
+		this.vechart.build(lquotes)
+	}
+
+
 
 	range = lockr.get('symbol.chart.range', yahoo.RANGES[2])
 	ranges = ['live'].concat(yahoo.RANGES)
@@ -386,7 +385,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	axis = lockr.get('symbol.chart.axis', 'category') as 'category' | 'time'
 	@Vts.Watch('axis') w_axis(axis: string) {
 		lockr.set('symbol.chart.axis', axis)
-		this.vechart.build()
+		this.$nextTick(this.vechart.build)
 	}
 
 

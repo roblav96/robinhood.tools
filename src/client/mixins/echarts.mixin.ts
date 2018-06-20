@@ -89,6 +89,7 @@ export default class VEChartsMixin extends Vue {
 			dataZoomSelectActive: brushing,
 		})
 		this.echart.setOption({ tooltip: [{ show: !brushing }] })
+		if (brushing) this.echart.dispatchAction({ type: 'hideTip' });
 	}
 
 
@@ -110,6 +111,7 @@ export default class VEChartsMixin extends Vue {
 	datazoom_(event: echarts.EventData) {
 		this.brushing = false
 		this.echart.setOption({ tooltip: [{ show: false }] })
+		this.echart.dispatchAction({ type: 'hideTip' })
 	}
 	ondatazoom__ = _.debounce(this.datazoom__, 100, { leading: false, trailing: true })
 	datazoom__(event: echarts.EventData) {
