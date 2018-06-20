@@ -49,14 +49,13 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		if (this.axis == 'time') lquote = lquotes.find(v => v.timestamp >= ctbounds.startValue);
 		return lquote.open || lquote.price
 	}
-	// @VMixin.NoCache get splitNumberY() {
-	// 	return Math.round(this.$el.offsetHeight / 100)
-	// }
 
 
 
-	onresize() {
-		// this.echart.setOption({ yAxis: [{ splitNumber: this.splitNumberY }] })
+	@Vts.Watch('axis') w_axis(axis: string) {
+		let bones = this.getOption()
+		bones.xAxis.forEach(v => v.type = axis)
+		this.echart.setOption({ xAxis: bones.xAxis })
 	}
 
 
@@ -211,7 +210,6 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			}],
 			yAxis: [{
 				scale: true,
-				// splitNumber: this.splitNumberY,
 				axisLabel: {
 					textStyle: { color: this.colors.dark, fontSize: 14 },
 					formatter: value => pretty.number(value),
@@ -280,9 +278,10 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				emphasis: null,
 			}],
 		} as echarts.Option
+		console.log(`build bones ->`, JSON.parse(JSON.stringify(bones)))
 		this.echart.setOption(bones)
-		this.reshowtip()
-		console.log(`echart build ->`, Date.now() - tstart, 'ms')
+		// this.reshowtip()
+		// console.log(`echart build ->`, Date.now() - tstart, 'ms')
 	}
 
 
@@ -385,7 +384,6 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	axis = lockr.get('symbol.chart.axis', 'category') as 'category' | 'time'
 	@Vts.Watch('axis') w_axis(axis: string) {
 		lockr.set('symbol.chart.axis', axis)
-		this.$nextTick(this.vechart.build)
 	}
 
 

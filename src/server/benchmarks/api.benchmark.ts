@@ -9,7 +9,6 @@ import * as turbo from 'turbo-http'
 import * as Polka from 'polka'
 import * as pAll from 'p-all'
 import * as Table from 'cli-table2'
-// import * as Pandora from 'pandora'
 import * as core from '../../common/core'
 import * as rkeys from '../../common/rkeys'
 import * as pretty from '../../common/pretty'
@@ -21,36 +20,17 @@ import * as redis from '../adapters/redis'
 
 async function run(url: string) {
 	console.log('run ->', url)
-	// let hub = Pandora.getHub()
-	// await hub.hubClient.invoke({ processName: 'api' }, 'gc', 'clear')
-	// await new Promise(r => _.delay(r, 300))
-	// let proxy = await hub.getProxy({ name: 'memory' })
-	// let fromheap = await (proxy as any).memoryUsage() as NodeJS.MemoryUsage
-	let cli = await execa('wrk', [
-		'-t1', '-c100', '-d1s',
-		'-H', 'x-uuid: ' + security.randomBytes(32),
-		'-H', 'x-finger: ' + security.randomBytes(32),
-		'-H', 'user-agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)',
-		url,
-	])
+	let cli = await execa('wrk', ['-t1', '-c100', '-d5s', url])
 	return wrk.parse(cli.stdout)
-	// let toheap = await (proxy as any).memoryUsage() as NodeJS.MemoryUsage
-	// console.log(cli.stdout)
-	// let parsed = wrk.parse(cli.stdout)
-	// return Object.assign(parsed, { fromheap, toheap })
 }
 
 async function start() {
 
 	let urls = []
-	// urls.push(`http://${process.env.HOST}:${+process.env.IPORT + 1}/turbo`)
-	// urls.push(`http://${process.env.HOST}:${+process.env.IPORT + 2}/polka`)
-	// urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/blank`)
-	// urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/route`)
-	// urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/security/token`)
-	urls.push(`http://${process.env.DOMAIN}/api/blank`)
-	urls.push(`http://${process.env.DOMAIN}/api/promise`)
-	urls.push(`http://${process.env.DOMAIN}/api/async`)
+	urls.push(`http://${process.env.HOST}:${process.env.PORT}/`)
+	urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/hello`)
+	urls.push(`http://${process.env.DOMAIN}/`)
+	urls.push(`http://${process.env.DOMAIN}/api/hello`)
 
 	let results = await pAll(urls.map(v => () => run(v)), { concurrency: 1 })
 
@@ -67,7 +47,6 @@ async function start() {
 			parsed.host.concat(parsed.path),
 			pretty.formatNumber(v.requests.rate),
 			pretty.formatNumber(v.transfer.rate, 2),
-			// pretty.formatNumber(pretty.bytes(v.toheap.heapUsed - v.fromheap.heapUsed)),
 			pretty.formatNumber(v.latency.avg, 2),
 			pretty.formatNumber(v.latency.stdev, 2),
 			pretty.formatNumber(v.latency.pStdev, 2) + '%',
@@ -84,7 +63,7 @@ async function start() {
 
 }
 
-setImmediate(() => start().catch(error => console.error(`'${error.cmd}' ->`, error)))
+setTimeout(() => start().catch(error => console.error(`'${error.cmd}' ->`, error)), 1000)
 
 
 
@@ -125,15 +104,12 @@ setImmediate(() => start().catch(error => console.error(`'${error.cmd}' ->`, err
 
 
 // const polka = Polka({ server: turbo.createServer() })
-// polka.get('/', function get(req: any, res: any) { res.end() })
+// polka.get('/', (req: any, res: any) => res.end())
 
-// polka.listen(+process.env.IPORT, process.env.HOST).then(function() {
-// 	console.info('turbo listening ->', process.env.HOST + ':' + process.env.PORT)
+// const port = +process.env.PORT - 123
+// polka.listen(port, process.env.HOST).then(function() {
+// 	console.info('turbo listening ->', process.env.HOST + ':' + port)
 // 	if (process.env.PRIMARY) start().catch(error => console.error(`'${error.cmd}' ->`, error));
-// })
-// exithook(function onexit() {
-// 	polka.server.connections.forEach(v => v.close())
-// 	polka.server.close()
 // })
 
 
