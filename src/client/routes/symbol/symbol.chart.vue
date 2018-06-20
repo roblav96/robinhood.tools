@@ -31,8 +31,8 @@
 					</b-select>
 				</div>
 				<div class="column is-narrow">
-					<b-select v-model="axis" :icon="{'category':'reorder-vertical','time':'timer-sand'}[axis]">
-						<optgroup label="Axis Scale">
+					<b-select v-model="axis" :icon="{'category':'reorder-vertical','time':'av-timer'}[axis]">
+						<optgroup label="X Axis Scale">
 							<option :value="'category'">
 								<span>Linear</span>
 							</option>

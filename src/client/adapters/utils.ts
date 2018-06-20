@@ -22,11 +22,11 @@ export function screen() {
 	return screen
 }
 
-export const mousepos = { x: 0, y: 0 }
-window.addEventListener('pointermove', raf((event: PointerEvent) => {
-	mousepos.x = event.x
-	mousepos.y = event.y
-}), { passive: true })
+// export const mousepos = { x: 0, y: 0 }
+// window.addEventListener('pointermove', raf((event: PointerEvent) => {
+// 	mousepos.x = event.x
+// 	mousepos.y = event.y
+// }), { passive: true })
 
 
 

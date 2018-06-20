@@ -114,7 +114,6 @@ export default class VEChartsMixin extends Vue {
 	ondatazoom__ = _.debounce(this.datazoom__, 100, { leading: false, trailing: true })
 	datazoom__(event: echarts.EventData) {
 		this.echart.setOption({ tooltip: [{ show: true }] })
-		this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y })
 	}
 
 
