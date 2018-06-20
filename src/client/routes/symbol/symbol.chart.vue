@@ -12,19 +12,34 @@
 			<div class="columns is-mobile my-0 items-center">
 				<div class="column is-narrow">
 					<b-field>
-						<b-radio-button class="is-loading" v-model="range" type="is-primary" v-for="v in ranges" :native-value="v" :key="v">
+						<b-radio-button class="is-loading" v-model="range" type="is-primary" v-for="v in ranges" :native-value="v"
+						    :key="v">
 							<span>{{vcapitalize(v)}}</span>
 						</b-radio-button>
 					</b-field>
 				</div>
 				<div class="column is-narrow">
 					<b-select v-model="ohlc" :icon="ohlc?'poll':'chart-line-variant'">
-						<option :value="true">
-							<span>OHLC</span>
-						</option>
-						<option :value="false">
-							<span>Line</span>
-						</option>
+						<optgroup label="Chart Type">
+							<option :value="true">
+								<span>OHLC</span>
+							</option>
+							<option :value="false">
+								<span>Line</span>
+							</option>
+						</optgroup>
+					</b-select>
+				</div>
+				<div class="column is-narrow">
+					<b-select v-model="axis" :icon="{'category':'reorder-vertical','time':'timer-sand'}[axis]">
+						<optgroup label="Axis Scale">
+							<option :value="'category'">
+								<span>Linear</span>
+							</option>
+							<option :value="'time'">
+								<span>Time</span>
+							</option>
+						</optgroup>
 					</b-select>
 				</div>
 				<div class="column is-narrow">
@@ -39,7 +54,8 @@
 
 		<hr>
 		<!-- <section class="flex-col-full overflow-y-auto"> -->
-		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :range="range" :isbrushing.sync="isbrushing"></v-symbol-echart>
+		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :range="range" :axis="axis"
+		    :isbrushing.sync="isbrushing"></v-symbol-echart>
 		<!-- </section> -->
 
 

@@ -27,10 +27,11 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	@Vts.Prop() quote: Quotes.Quote
 	@Vts.Prop() range: string
+	@Vts.Prop() axis: 'category' | 'time'
 	colors = this.$store.state.colors
 
 	mounted() {
-		// this.$on('resize', this.onresize)
+		
 	}
 	beforeDestroy() {
 		socket.offListener(this.onquote, this)
@@ -43,7 +44,10 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	@VMixin.NoCache get firstPrice() {
 		let lquotes = this.lquotes()
-		let lquote = lquotes[Math.floor(lquotes.length * (this.ctbounds().start / 100))]
+		let ctbounds = this.ctbounds()
+		let lquote = lquotes[core.math.clamp(Math.floor(lquotes.length * (this.ctbounds().start / 100)), 0, lquotes.length - 1)]
+		if (this.axis == 'category') lquote = lquotes[ctbounds.startValue];
+		if (this.axis == 'time') lquote = lquotes.find(v => v.timestamp >= ctbounds.startValue);
 		return lquote.open || lquote.price
 	}
 	// @VMixin.NoCache get splitNumberY() {
@@ -52,13 +56,22 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 
+	@Vts.Watch('axis') w_axis(axis: string) {
+		this.build()
+		// let bones = this.echart.getOption()
+		// bones.xAxis.forEach(v => v.type = axis)
+		// console.log('bones ->', bones)
+		// this.echart.setOption(bones)
+		// setTimeout(() => this.echart.resize(this.dims()), 100)
+	}
+
 	onresize() {
 		// this.echart.setOption({ yAxis: [{ splitNumber: this.splitNumberY }] })
 	}
 
 
 
-	setQuotes(lquotes: Quotes.Live[]) {
+	build(lquotes = this.lquotes()) {
 		console.log('syncQuotes ->', lquotes.length)
 		let bones = {
 			animation: false,
@@ -66,12 +79,12 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			// color: ['#0a0a0a', '#ffb000', '#fed500', '#34bc6e', '#4dc0b5', '#009bef', '#5392ff', '#9753e1', '#e62325', '#ff509e', '#ffffff'],
 			// color: Object.values(this.colors),
 			textStyle: { color: this.colors.dark, fontSize: 8 },
-			dataset: {
+			dataset: [{
 				// dimensions: ['timestamp', 'open', 'close', 'high', 'low'],
 				source: lquotes,
-			},
+			}],
 			toolbox: { itemSize: 0, feature: { dataZoom: { show: true, yAxisIndex: false } } },
-			tooltip: {
+			tooltip: [{
 				// showContent: !process.env.DEVELOPMENT,
 				// alwaysShowContent: !!process.env.DEVELOPMENT,
 				trigger: 'axis',
@@ -129,10 +142,10 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 						// formatter: params => pretty.number(params.value),
 					},
 				},
-			},
-			axisPointer: {
+			}],
+			axisPointer: [{
 				link: [{ xAxisIndex: 'all' }],
-			},
+			}],
 			grid: [{
 				top: 16,
 				left: 64,
@@ -152,7 +165,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				type: 'inside',
 				// throttle: 60,
 				xAxisIndex: [0, 1],
-				start: this.range == 'live' ? core.calc.slider(lquotes.length - 50, 0, lquotes.length) : 0, end: 100,
+				start: this.range == 'live' ? core.math.clamp(core.calc.slider(lquotes.length - 100, 0, lquotes.length), 0, 100) : 0, end: 100,
 				// rangeMode: ['value', 'percent'],
 				zoomOnMouseWheel: 'shift',
 				// moveOnMouseMove: false,
@@ -177,7 +190,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
 			}],
 			xAxis: [{
-				type: 'category',
+				type: this.axis,
 				boundaryGap: true,
 				axisLabel: {
 					margin: 5,
@@ -195,7 +208,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					},
 				},
 			}, {
-				type: 'category',
+				type: this.axis,
 				boundaryGap: true,
 				gridIndex: 1,
 				axisLabel: { show: false },
@@ -247,7 +260,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				legendHoverLink: false,
 				// dimensions: ['timestamp', 'open', 'close', 'high', 'low'],
 				encode: {
-					x: 'liveStamp',
+					x: 'timestamp',
 					y: ['open', 'close', 'high', 'low'],
 					tooltip: ['open', 'high', 'low', 'close', 'liveCount'],
 				},
@@ -269,15 +282,15 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				hoverAnimation: false,
 				legendHoverLink: false,
 				encode: {
-					x: 'liveStamp',
+					x: 'timestamp',
 					y: 'size',
 					tooltip: 'size',
 				},
 				emphasis: null,
 			}],
 		} as echarts.Option
-		this.setOption(bones)
-		// console.log(`this.getOption() ->`, this.getOption())
+		this.echart.setOption(bones)
+		console.log(`this.getOption() ->`, this.getOption())
 
 		socket.offListener(this.onquote, this)
 		socket.offListener(this.onlquote, this)
@@ -291,26 +304,23 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 	onquote(quote: Quotes.Quote) {
-		console.log(`QUOTE quote ->`, JSON.parse(JSON.stringify(quote)))
-		// core.object.repair(quote, this.quote)
 		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS) as Quotes.Live
-		console.log(`QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
+		console.log(`ON QUOTE ->`, JSON.parse(JSON.stringify(lquote)))
 		let lquotes = this.lquotes()
 		let last = lquotes[lquotes.length - 1]
-		if (lquote.timestamp == last.timestamp) {
-			core.object.merge(last, lquote)
-		}
-		else if (lquote.timestamp > last.timestamp) {
-			if (last.timestamp == last.liveStamp) {
-
-			}
-		}
-		// lquotes.remove(v => v.stamp && v.stamp > v.liveStamp)
-		// lquotes.push(lquote)
-		this.setOption({ dataset: { source: lquotes } } as echarts.Option)
+		core.object.merge(last, lquote)
+		// if (lquote.timestamp == last.timestamp) {
+		// 	core.object.merge(last, lquote)
+		// } else {
+		// 	let found = lquotes.find(v => v.stamp && v.stamp != v.liveStamp)
+		// 	if (found) core.object.merge(found, lquote);
+		// 	else lquotes.push(lquote);
+		// }
+		this.echart.setOption({ dataset: [{ source: lquotes }] } as echarts.Option)
+		this.reshowtip()
 	}
 	onlquote(lquote: Quotes.Live) {
-		console.warn(`LIVE QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
+		console.warn(`ON LIVE QUOTE ->`, JSON.parse(JSON.stringify(lquote)))
 		let lquotes = this.lquotes()
 		lquotes.remove(v => v.stamp && v.stamp != v.liveStamp)
 		// lquotes.remove((v, i) => {
@@ -318,38 +328,9 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		// 	return prev && prev.liveCount == v.liveCount
 		// })
 		lquotes.push(lquote)
-		this.setOption({ dataset: { source: lquotes } } as echarts.Option)
+		this.echart.setOption({ dataset: [{ source: lquotes }] } as echarts.Option)
+		this.reshowtip()
 	}
-
-	// onquote(quote: Quotes.Quote) {
-	// 	let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS) as Quotes.Live
-	// 	console.log(`QUOTE lquote ->`, JSON.parse(JSON.stringify(lquote)))
-	// 	let lquotes = this.lquotes()
-	// 	let last = lquotes[lquotes.length - 1]
-	// 	if (lquote.liveCount) {
-	// 		if (last) core.object.repair(lquote, last);
-	// 		lquotes.push(lquote)
-	// 		console.log(`lquotes.push(lquote)`)
-	// 	} else {
-	// 		core.object.merge(last, lquote)
-	// 		console.log(`core.object.merge(last, lquote)`)
-	// 	}
-	// 	this.setOption({ dataset: { source: lquotes } } as echarts.Option)
-	// }
-	// onquote(quote: Quotes.Quote) {
-	// 	let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS) as Quotes.Live
-	// 	let lquotes = this.lquotes()
-	// 	let last = lquotes[lquotes.length - 1]
-	// 	if (lquote.timestamp && lquote.timestamp <= last.timestamp) {
-	// 		console.warn(`lquote.timestamp && lquote.timestamp <= last.timestamp`)
-	// 		let diff = core.object.difference(last, lquote)
-	// 		console.log('diff ->', diff)
-	// 		return
-	// 	}
-	// 	core.object.merge(lquotes[lquotes.length - 1], lquote)
-	// 	this.echart.setOption({ dataset: { source: lquotes } } as echarts.Option)
-	// 	this.fixtip()
-	// }
 
 
 
@@ -389,7 +370,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			return charts.getChart(this.quote, this.range)
 		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
-			this.vechart.setQuotes(lquotes)
+			this.vechart.build(lquotes)
 		}).catch(error => {
 			console.error(`getQuotes Error ->`, error)
 		}).finally(() => {
@@ -409,6 +390,11 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	ohlc = lockr.get('symbol.chart.ohlc', true)
 	@Vts.Watch('ohlc') w_ohlc(ohlc: boolean) {
 		lockr.set('symbol.chart.ohlc', ohlc)
+	}
+
+	axis = lockr.get('symbol.chart.axis', 'category') as 'category' | 'time'
+	@Vts.Watch('axis') w_axis(axis: string) {
+		lockr.set('symbol.chart.axis', axis)
 	}
 
 

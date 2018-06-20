@@ -182,13 +182,13 @@ declare module 'echarts' {
 			animationEasing: string
 			animationEasingUpdate: string
 			animationThreshold: number
-			axisPointer: Partial<AxisPointer> | Partial<AxisPointer>[]
+			axisPointer: Partial<AxisPointer>[]
 			backgroundColor: string
 			brush: any[]
 			color: string[]
-			dataset: Partial<Dataset> & Partial<Dataset>[]
-			dataZoom: Partial<DataZoom> & Partial<DataZoom>[]
-			grid: Partial<Grid> | Partial<Grid>[]
+			dataset: Partial<Dataset>[]
+			dataZoom: Partial<DataZoom>[]
+			grid: Partial<Grid>[]
 			hoverLayerThreshold: number
 			legend: any
 			markArea: Partial<MarkArea>[]
@@ -202,11 +202,11 @@ declare module 'echarts' {
 			textStyle: Partial<TextStyle>
 			title: any
 			toolbox: any
-			tooltip: Partial<Tooltip>
+			tooltip: Partial<Tooltip>[]
 			useUTC: boolean
-			visualMap: any | any[]
-			xAxis: Partial<Axis> | Partial<Axis>[]
-			yAxis: Partial<Axis> | Partial<Axis>[]
+			visualMap: any[]
+			xAxis: Partial<Axis>[]
+			yAxis: Partial<Axis>[]
 		}
 
 		interface Grid {
@@ -415,7 +415,7 @@ declare module 'echarts' {
 			}
 			lineStyle: AxisPointerStyle
 			crossStyle: AxisPointerStyle
-			link: any
+			link: any[]
 			shadowStyle: Partial<ShadowOpts>
 			show: boolean
 			snap: boolean

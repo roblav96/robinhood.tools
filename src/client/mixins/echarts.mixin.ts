@@ -28,10 +28,14 @@ export default class VEChartsMixin extends Vue {
 
 	echart: echarts.ECharts
 
+	created() {
+		this.tippos = { show: false }
+	}
 	mounted() {
 		this.echart = echarts.init(this.$el, null, this.dims())
 		this.echart.on('click', this.onclick_)
 		this.echart.on('datazoom', this.ondatazoom_)
+		this.echart.on('datazoom', this.ondatazoom__)
 		this.echart.on('showtip', this.onshowtip_)
 		this.echart.on('hidetip', this.onhidetip_)
 		this.$el.addEventListener('wheel', this.onwheel_, { passive: true })
@@ -67,12 +71,10 @@ export default class VEChartsMixin extends Vue {
 			end: datazoom.end, endValue: datazoom.endValue,
 		}
 	}
-	setOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
-		this.echart.setOption(option, opts)
-		this.fixtip()
-	}
 	updateOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
-		this.echart.setOption(deepmerge(this.echart.getOption(), option), opts)
+		let merged = deepmerge(this.echart.getOption(), option)
+		// console.log('updateOption option ->', option, 'merged ->', merged)
+		this.echart.setOption(merged, opts)
 	}
 
 
@@ -86,7 +88,7 @@ export default class VEChartsMixin extends Vue {
 			key: 'dataZoomSelect',
 			dataZoomSelectActive: brushing,
 		})
-		this.echart.setOption({ tooltip: { showContent: !brushing } })
+		this.echart.setOption({ tooltip: [{ show: !brushing }] })
 	}
 
 
@@ -104,11 +106,15 @@ export default class VEChartsMixin extends Vue {
 
 
 
-	ondatazoom_ = _.throttle(this.datazoom_, 100, { leading: false, trailing: true })
+	ondatazoom_ = _.debounce(this.datazoom_, 100, { leading: true, trailing: false })
 	datazoom_(event: echarts.EventData) {
-		this.$emit('datazoom', event)
 		this.brushing = false
-		this.echart.dispatchAction({ type: 'hideTip' })
+		this.echart.setOption({ tooltip: [{ show: false }] })
+	}
+	ondatazoom__ = _.debounce(this.datazoom__, 100, { leading: false, trailing: true })
+	datazoom__(event: echarts.EventData) {
+		this.echart.setOption({ tooltip: [{ show: true }] })
+		this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y })
 	}
 
 
@@ -116,7 +122,6 @@ export default class VEChartsMixin extends Vue {
 	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
 	onresize_ = _.debounce(this.resize_, 300, { leading: false, trailing: true })
 	resize_() {
-		this.$emit('resize')
 		this.echart.resize(this.dims())
 	}
 
@@ -166,11 +171,9 @@ export default class VEChartsMixin extends Vue {
 	tippos: Partial<{ show: boolean, x: number, y: number }>
 	onshowtip_(event) { this.tippos = { show: true, x: event.x, y: event.y } }
 	onhidetip_(event) { this.tippos ? this.tippos.show = false : this.tippos = { show: false } }
-	fixtip() {
+	reshowtip() {
 		if (!this.tippos || !this.tippos.show) return;
-		_.defer(() => {
-			this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y })
-		})
+		_.defer(() => this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y }))
 	}
 
 
