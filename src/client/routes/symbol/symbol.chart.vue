@@ -17,16 +17,6 @@
 							<b-icon icon="tune"></b-icon>
 						</button>
 						<b-dropdown-item custom>
-							<b-field label="Chart Type">
-								<b-select v-model="ohlc" :icon="ohlc?'poll':'chart-line-variant'" expanded>
-									<option :value="true">
-										<span>OHLC</span>
-									</option>
-									<option :value="false">
-										<span>Line</span>
-									</option>
-								</b-select>
-							</b-field>
 							<b-field label="X Axis Scale">
 								<b-select v-model="axis" :icon="{'category':'reorder-vertical','time':'av-timer'}[axis]" expanded>
 									<option :value="'category'">
@@ -34,6 +24,16 @@
 									</option>
 									<option :value="'time'">
 										<span>Time</span>
+									</option>
+								</b-select>
+							</b-field>
+							<b-field label="Chart Type">
+								<b-select v-model="ohlc" :icon="ohlc?'poll':'chart-line-variant'" expanded>
+									<option :value="true">
+										<span>OHLC</span>
+									</option>
+									<option :value="false">
+										<span>Line</span>
 									</option>
 								</b-select>
 							</b-field>

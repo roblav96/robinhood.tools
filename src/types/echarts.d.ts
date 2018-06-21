@@ -208,9 +208,9 @@ declare module 'echarts' {
 			xAxis: Partial<Axis>[]
 			yAxis: Partial<Axis>[]
 		}
-		
+
 		interface VisualMap {
-			
+
 		}
 
 		interface Grid {
@@ -290,7 +290,7 @@ declare module 'echarts' {
 			axisLine: Partial<AxisLine>
 			axisPointer: Partial<AxisPointer>
 			axisTick: Partial<AxisTick>
-			boundaryGap: boolean | (number | string)[]
+			boundaryGap: boolean | number | string | (number | string)[]
 			inverse: boolean
 			name: string
 			uuid: string
@@ -389,34 +389,36 @@ declare module 'echarts' {
 			width: number
 			opacity: number
 		}
+		interface AxisPointerHandle {
+			color: string
+			icon: string
+			margin: number
+			shadowBlur: number
+			shadowColor: string
+			shadowOffsetX: number
+			shadowOffsetY: number
+			show: boolean
+			size: number
+			throttle: number
+		}
+		interface AxisPointerLabel {
+			backgroundColor: string
+			borderColor: any
+			borderWidth: number
+			formatter: (params: AxisPointerParams) => string
+			margin: number
+			padding: number[]
+			precision: string
+			shadowBlur: number
+			shadowColor: string
+			show: boolean
+			textStyle: Partial<TextStyle>
+		}
 		interface AxisPointer {
 			animation: any
 			animationDurationUpdate: number
-			handle: {
-				color: string
-				icon: string
-				margin: number
-				shadowBlur: number
-				shadowColor: string
-				shadowOffsetX: number
-				shadowOffsetY: number
-				show: boolean
-				size: number
-				throttle: number
-			}
-			label: {
-				backgroundColor: string
-				borderColor: any
-				borderWidth: number
-				formatter: (params: AxisPointerParams) => string
-				margin: number
-				padding: number[]
-				precision: string
-				shadowBlur: number
-				shadowColor: string
-				show: boolean
-				textStyle: Partial<TextStyle>
-			}
+			handle: Partial<AxisPointerHandle>
+			label: Partial<AxisPointerLabel>
 			lineStyle: AxisPointerStyle
 			crossStyle: AxisPointerStyle
 			link: any[]

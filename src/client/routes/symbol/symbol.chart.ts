@@ -21,6 +21,7 @@ import * as charts from '../../adapters/charts'
 import * as ecbones from '../../adapters/ecbones'
 import * as alerts from '../../adapters/alerts'
 import socket from '../../adapters/socket'
+import colors from '../../stores/colors'
 
 
 
@@ -30,7 +31,6 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 	@Vts.Prop() quote: Quotes.Quote
 	@Vts.Prop() range: string
 	@Vts.Prop() axis: 'category' | 'time'
-	colors = this.$store.state.colors
 
 	mounted() {
 
@@ -67,13 +67,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		let stamp = Date.now()
 
 		let bones = ecbones.option({
+			dataset: [{ source: lquotes }],
 			toolbox: { itemSize: 0, feature: { dataZoom: { show: true, yAxisIndex: false } } },
-		})
-		console.log(`bones ->`, JSON.parse(JSON.stringify(bones)))
-
-
-
-		let bones_ = {
 			tooltip: [{
 				formatter: (params: echarts.EventParam<Quotes.Live>[]) => {
 					// console.log('params ->', params)
@@ -99,156 +94,72 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					return `<div class="font-sans leading-tight has-background-dark has-text-white p-2 rounded">${html}</div>`
 				},
 			}],
-			dataZoom: [{
-				type: 'inside',
-				throttle: 0,
-				xAxisIndex: [0, 1],
-				// start: 0,
-				start: this.range == 'live' ? core.math.clamp(core.calc.slider(lquotes.length - 100, 0, lquotes.length), 0, 100) : 0,
-				end: 100,
-				// rangeMode: ['value', 'percent'],
-				zoomOnMouseWheel: 'shift',
-				// moveOnMouseMove: false,
-				preventDefaultMouseMove: true,
-			}, {
-				type: 'slider',
-				throttle: 0,
-				xAxisIndex: [0, 1],
-				left: 64,
-				right: 64,
-				height: 32,
-				bottom: 24,
-				showDetail: false,
-				backgroundColor: this.colors.white,
-				dataBackground: {
-					areaStyle: { color: this.colors['white-bis'], opacity: 1 },
-					lineStyle: { color: this.colors['grey-light'], opacity: 1 },
-				},
-				borderColor: this.colors['grey-lighter'],
-				fillerColor: 'rgba(184,194,204,0.2)',
-				// textStyle: { color: this.colors.dark },
-				handleStyle: { color: this.colors['grey-lighter'] },
-				// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-			}],
-			grid: [{
-				top: 8,
-				left: 64,
-				right: 64,
-				bottom: 92,
-				show: true,
-				backgroundColor: this.colors.white,
-				borderWidth: 0,
-				// borderColor: this.colors['grey-lighter'],
-			}, {
-				height: 64,
-				left: 64,
-				right: 64,
-				bottom: 92,
-			}],
-			xAxis: [{
-				type: this.axis,
-				boundaryGap: true,
-				axisLabel: {
-					margin: 5,
-					textStyle: { color: this.colors.dark, fontSize: 14 },
-					formatter: v => charts.xlabel(v),
-				},
-				// axisLine: { lineStyle: { color: this.colors.dark } },
-				axisLine: { show: false },
-				splitLine: { show: false },
-				axisTick: { show: false },
-				axisPointer: {
-					label: {
-						formatter: params => charts.xlabel(params.value),
-					},
-				},
-			}, {
-				type: this.axis,
-				boundaryGap: true,
-				gridIndex: 1,
-				axisLabel: { show: false },
-				axisLine: { show: false },
-				axisTick: { show: false },
-				splitLine: { show: false },
-				splitArea: { show: false },
-				axisPointer: { type: 'none', label: { show: false } },
-			}],
-			yAxis: [{
-				scale: true,
-				axisLabel: {
-					textStyle: { color: this.colors.dark, fontSize: 14 },
-					formatter: value => pretty.number(value),
-				},
-				axisTick: { show: false },
-				axisLine: { show: false },
-				splitArea: { show: false },
-				splitLine: { lineStyle: { color: this.colors['grey-lightest'] } },
-				axisPointer: {
-					label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice), { percent: true, plusminus: true }) }
-				},
-			}, {
-				scale: true,
-				gridIndex: 1,
-				splitNumber: 2,
-				// axisLabel: {
-				// 	inside: true,
-				// 	textStyle: { color: this.colors.dark, fontSize: 10 },
-				// 	formatter: value => pretty.number(value, { nozeros: true }),
-				// },
-				axisLabel: { show: false },
-				axisLine: { show: false },
-				axisTick: { show: false },
-				splitArea: { show: false },
-				splitLine: { show: false },
-				axisPointer: { label: { show: false } },
-			}],
-			series: [{
-				name: 'OHLC',
-				type: 'candlestick',
-				xAxisIndex: 0,
-				yAxisIndex: 0,
-				large: true,
-				largeThreshold: 128,
-				progressive: 512,
-				progressiveThreshold: 512,
-				animation: false,
-				hoverAnimation: false,
-				legendHoverLink: false,
-				// dimensions: ['timestamp', 'open', 'close', 'high', 'low'],
-				encode: {
-					x: 'timestamp',
-					y: ['open', 'close', 'high', 'low'],
-					tooltip: ['open', 'high', 'low', 'close'],
-				},
-				itemStyle: {
-					borderColor: this.colors.success, borderColor0: this.colors.danger, borderWidth: 1,
-					color: this.colors.success, color0: this.colors.danger,
-				},
-				emphasis: null,
-				// markLine: { data: [{ name: 'Price', yAxis: this.quote.price }] },
-			}, {
-				name: 'Size',
-				type: 'bar',
-				xAxisIndex: 1,
-				yAxisIndex: 1,
-				large: true,
-				largeThreshold: 128,
-				progressive: 512,
-				progressiveThreshold: 512,
-				animation: false,
-				hoverAnimation: false,
-				legendHoverLink: false,
-				encode: {
-					x: 'timestamp',
-					y: 'size',
-					tooltip: 'size',
-				},
-				emphasis: null,
-			}],
-		} as echarts.Option
+		})
+
+		bones.dataZoom.push(ecbones.dataZoom('inside', { xAxisIndex: [0, 1] }))
+		bones.dataZoom.push(ecbones.dataZoom('slider', { xAxisIndex: [0, 1] }))
+
+		bones.grid.push({
+			top: 8,
+			left: 64,
+			right: 64,
+			bottom: 92,
+			show: true,
+			backgroundColor: colors.white,
+			borderWidth: 0,
+			// borderColor: colors['grey-lighter'],
+		})
+		bones.grid.push({
+			height: 64,
+			left: 64,
+			right: 64,
+			bottom: 92,
+		})
+
+		bones.xAxis.push(ecbones.axis('x', { type: this.axis }))
+		bones.xAxis.push(ecbones.axis('x', { blank: true, type: this.axis, gridIndex: 1 }))
+
+		bones.yAxis.push(ecbones.axis('y', {
+			axisPointer: {
+				label: {
+					formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice), { percent: true, plusminus: true })
+				}
+			},
+		}))
+		bones.yAxis.push(ecbones.axis('y', { blank: true, gridIndex: 1 }))
+
+		bones.series.push(ecbones.series({
+			name: 'OHLC',
+			type: 'candlestick',
+			large: true,
+			encode: {
+				x: 'timestamp',
+				y: ['open', 'close', 'high', 'low'],
+				tooltip: ['open', 'high', 'low', 'close'],
+			},
+			itemStyle: {
+				borderColor: colors.success, borderColor0: colors.danger, borderWidth: 1,
+				color: colors.success, color0: colors.danger,
+			},
+		}))
+
+		bones.series.push(ecbones.series({
+			name: 'Size',
+			type: 'bar',
+			xAxisIndex: 1,
+			yAxisIndex: 1,
+			large: true,
+			encode: {
+				x: 'timestamp',
+				y: 'size',
+				tooltip: 'size',
+			},
+		}))
+
 		console.log(`build bones ->`, JSON.parse(JSON.stringify(bones)))
 		this.echart.setOption(bones)
 		setTimeout(() => console.log(`echart build ->`, Date.now() - stamp + 'ms'), 0)
+		// console.log(`build getOption ->`, JSON.parse(JSON.stringify(this.echart.getOption())))
 	}
 
 	onlquote(lquote: Quotes.Live) {

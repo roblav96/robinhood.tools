@@ -4,6 +4,8 @@ import deepmerge from 'deepmerge'
 import * as echarts from 'echarts'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
+import * as pretty from './pretty'
+import * as charts from './charts'
 import colors from '../stores/colors'
 
 
@@ -119,35 +121,41 @@ export function axis(
 	xy: 'x' | 'y',
 	opts = {} as Partial<{
 		blank: boolean
-	}>,
-	mods = {} as Partial<echarts.Axis>,
+	} & echarts.Axis>,
 ) {
 	let axis = {
 		silent: true,
 		gridIndex: 0,
 		uuid: Math.random().toString(16),
-		axisLabel: {
-			margin: 5,
-			textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize },
-		},
 		axisPointer: { show: true },
-		axisLine: { show: !!mods.axisLine },
-		axisTick: { show: !!mods.axisTick },
-		splitArea: { show: !!mods.splitArea },
-		splitLine: { show: !!mods.splitLine },
+		axisLabel: { textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize } },
+		axisLine: { show: !!opts.axisLine },
+		axisTick: { show: !!opts.axisTick },
+		splitArea: { show: !!opts.splitArea },
+		splitLine: { show: !!opts.splitLine },
 	} as echarts.Axis
 	if (xy == 'x') {
 		_.merge(axis, {
 			type: 'category',
+			axisLabel: {
+				margin: 5,
+				formatter(v) { return charts.xlabel(v) },
+			},
+			axisPointer: { label: { formatter(params) { return charts.xlabel(params.value) } } },
 		} as echarts.Axis)
 	}
 	if (xy == 'y') {
 		_.merge(axis, {
 			scale: true,
 			type: 'value',
+			// boundaryGap:false,
+			// boundaryGap: '1%',
+			splitLine: { show: true, lineStyle: { color: colors['grey-lightest'] } },
+			axisLabel: { formatter(v) { return pretty.number(v) } },
 		} as echarts.Axis)
 	}
 	if (opts.blank) {
+		delete opts.blank
 		_.merge(axis, {
 			axisLabel: { show: false },
 			axisLine: { show: false },
@@ -162,7 +170,7 @@ export function axis(
 			},
 		} as echarts.Axis)
 	}
-	return _.merge(axis, mods) as echarts.Axis
+	return _.merge(axis, opts) as echarts.Axis
 }
 
 
@@ -179,11 +187,12 @@ export function series(
 		datasetIndex: 0,
 		xAxisIndex: 0,
 		yAxisIndex: 0,
+		emphasis: null,
 	} as echarts.Series
 	if (mods.symbol) {
 		_.merge(series, {
 			showSymbol: true,
-			itemStyle: { show: true, opacity: 1 }, emphasis: null,
+			itemStyle: { show: true, opacity: 1 },
 		} as echarts.Series)
 	}
 	if (mods.large) {
