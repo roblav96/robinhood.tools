@@ -45,15 +45,19 @@ export async function getAlls(symbols: string[], allrkeys = Object.keys(quotes.A
 export async function syncAllQuotes(resets = false) {
 	console.info('syncAllQuotes -> start');
 	let symbols = await utils.getAllSymbols()
+
 	if (process.env.DEVELOPMENT) {
+		// symbols = Object.keys(utils.DEV_STOCKS)
 		// let ikeys = ['____', '____', '____', '____'] as KeysOf<Quotes.Quote>
 		// let coms = symbols.map(v => ['hdel', `${rkeys.QUOTES}:${v}`].concat(ikeys))
 		// await redis.main.coms(coms)
 	}
+
 	let ago = dayjs(hours.rxhours.value.previous.date).subtract(3, 'day').valueOf()
 	let chunks = core.array.chunks(symbols, _.ceil(symbols.length / 256))
 	await pAll(chunks.map((chunk, i) => async () => {
 		console.log('syncAllQuotes ->', `${_.round((i / chunks.length) * 100)}%`);
+
 		if (resets && process.env.PRODUCTION) {
 			let coms = [] as Redis.Coms
 			let zkeys = await redis.main.coms(chunk.map(v => {
@@ -66,11 +70,13 @@ export async function syncAllQuotes(resets = false) {
 			})
 			await redis.main.coms(coms)
 		}
+
 		let alls = await getAlls(chunk)
 		await redis.main.coms(alls.map(all => {
 			let rkey = `${rkeys.QUOTES}:${all.symbol}`
 			return ['hmset', rkey, applyFull(all, resets) as any]
 		}))
+
 	}), { concurrency: 1 })
 	console.info('syncAllQuotes -> done');
 }
@@ -112,15 +118,19 @@ export function applyFull(
 	quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))
 	quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, core.math.sum0(quote.avgVolume10Day, quote.avgVolume3Month) / 2))
 
-	let toquote = applyWbQuote(quote, wbquote)
+	// let toquote = core.clone(quote)
+	let toquote = { symbol, stamp: Date.now() } as Quotes.Quote
+	mergeCalcs(toquote, applyWbQuote(toquote, wbquote))
+	core.object.merge(toquote, resetFull(toquote))
 	mergeCalcs(toquote)
 	core.object.repair(quote, toquote)
-	core.object.merge(toquote, resetFull(quote))
-	mergeCalcs(toquote)
-	toquote.stamp = Date.now()
+	// console.log(`toquote ->`, JSON.parse(JSON.stringify(core.sort.keys(toquote))))
 
-	if (resets) core.object.merge(quote, toquote);
-	else core.object.repair(quote, toquote);
+	if (resets) {
+		core.object.merge(quote, resetFull(quote))
+		mergeCalcs(quote)
+		// console.log(`quote ->`, JSON.parse(JSON.stringify(core.sort.keys(quote))))
+	}
 
 	core.object.clean(quote)
 	return quote
