@@ -114,6 +114,12 @@ declare module 'echarts' {
 			getHeight(): number
 			getDom(): HTMLElement
 			getOption(): Option
+			// 
+			getModel(): any
+			getViewOfComponentModel(componentModel: any): any
+			getViewOfSeriesModel(seriesModel: any): any
+			getVisual(finder: any, visualType: any): any
+			// 
 			dispatchAction(payload: any): void
 			showLoading(type: string, opts: object): void
 			hideLoading(): void
@@ -171,7 +177,8 @@ declare module 'echarts' {
 		}
 		interface Dataset {
 			id: string
-			source: any[] | any[][] | { [key: string]: any[] }
+			source: any[]
+			// source: any[] | any[][] | { [key: string]: any[] }
 			dimensions: string[] | Dimension[]
 			sourceHeader: boolean
 		}

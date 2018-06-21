@@ -59,8 +59,6 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		this.build(lquotes)
 	}
 
-
-
 	build(lquotes = this.lquotes()) {
 		let stamp = Date.now()
 
@@ -252,6 +250,9 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	@Vts.Watch('settings.range') w_settingsrange(range: string) {
 		this.getQuotes()
 	}
+
+	resetzoom() { this.vechart.resetzoom() }
+	latestzoom() { this.vechart.latestzoom() }
 
 
 

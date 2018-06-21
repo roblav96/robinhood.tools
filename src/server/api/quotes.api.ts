@@ -93,7 +93,7 @@ polka.route({
 		// })) as string[][]
 
 		let zkeys = await redis.main.coms(symbols.map(v => {
-			return ['zrange', `${rkeys.LIVES}:${v}`, -500 as any, -1 as any]
+			return ['zrange', `${rkeys.LIVES}:${v}`, -512 as any, -1 as any]
 		})) as string[][]
 		zkeys.forEach(keys => {
 			keys.remove(key => {

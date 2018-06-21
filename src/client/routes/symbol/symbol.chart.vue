@@ -4,6 +4,10 @@
 <style>
 /**/
 
+.select select {
+	padding-right: 1.5rem !important;
+}
+
 </style>
 
 <template>
@@ -53,13 +57,49 @@
 						</b-radio-button>
 					</b-field>
 				</div>
+
 				<div class="column is-narrow">
-					<b-tooltip :label="brushing?'Click and drag chart area to crop zoom':'Crop Zoom'" animated>
-						<button class="button" :class="{'is-primary':brushing}" @click="brushing=!brushing">
-							<b-icon icon="crop"></b-icon>
-						</button>
-					</b-tooltip>
+					<b-field>
+						<b-select v-model="settings.axis" :icon="{'category':'reorder-vertical','time':'av-timer'}[settings.axis]"
+						    expanded>
+							<optgroup label="X Axis Scale">
+								<option :value="'category'">
+									<span>Linear</span>
+								</option>
+								<option :value="'time'">
+									<span>Time</span>
+								</option>
+							</optgroup>
+						</b-select>
+					</b-field>
 				</div>
+
+				<div class="column">
+
+				</div>
+
+				<div class="column is-narrow">
+					<b-field grouped>
+						<p class="control">
+							<button class="button" @click="resetzoom">
+								<b-icon icon="crop-landscape"></b-icon>
+							</button>
+						</p>
+						<p class="control">
+							<b-tooltip :active="brushing" label="Click and drag chart area to crop zoom" animated>
+								<button class="button" :class="{'is-primary':brushing}" @click="brushing=!brushing">
+									<b-icon icon="crop"></b-icon>
+								</button>
+							</b-tooltip>
+						</p>
+						<p class="control">
+							<button class="button" @click="latestzoom">
+								<b-icon icon="chevron-double-right"></b-icon>
+							</button>
+						</p>
+					</b-field>
+				</div>
+
 			</div>
 		</section>
 
