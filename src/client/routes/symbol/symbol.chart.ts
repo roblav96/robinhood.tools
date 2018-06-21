@@ -18,6 +18,7 @@ import * as http from '../../../common/http'
 import * as utils from '../../adapters/utils'
 import * as pretty from '../../adapters/pretty'
 import * as charts from '../../adapters/charts'
+import * as ecbones from '../../adapters/ecbones'
 import * as alerts from '../../adapters/alerts'
 import socket from '../../adapters/socket'
 
@@ -64,6 +65,15 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 	build(lquotes = this.lquotes()) {
 		console.log(`this.$el.offsetWidth ->`, this.$el.offsetWidth)
 		let stamp = Date.now()
+
+		{
+			let bones = ecbones.blank({
+				toolbox: { itemSize: 0, feature: { dataZoom: { show: true, yAxisIndex: false } } },
+				tooltip: [{ show: false }],
+			})
+			console.log(`bones ->`, JSON.parse(JSON.stringify(bones)))
+		}
+
 		let bones = {
 			animation: false,
 			color: [this.colors['grey-lighter']],

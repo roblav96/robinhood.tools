@@ -185,7 +185,7 @@ export default class VEChartsMixin extends Vue {
 	onhidetip_(event) { this.tippos ? this.tippos.show = false : this.tippos = { show: false } }
 	reshowtip() {
 		if (!this.tippos || !this.tippos.show) return;
-		_.defer(() => this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y }))
+		setTimeout(() => this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y }), 0)
 	}
 
 

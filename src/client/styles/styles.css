@@ -60,8 +60,13 @@ html {
 }
 
 .is-clickable {
-	pointer-events: auto;
+	pointer-events: initial;
 	cursor: pointer;
+}
+
+.is-unclickable {
+	pointer-events: none;
+	user-select: none;
 }
 
 .button .icon:first-child:not(:last-child) {

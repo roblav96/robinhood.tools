@@ -10,42 +10,44 @@
 	<div class="flex-col-full">
 		<section class="section py-0">
 			<div class="columns is-mobile my-0 items-center">
+
 				<div class="column is-narrow">
-					<button class="button">
-						<b-icon icon="tune"></b-icon>
-					</button>
+					<b-dropdown position="is-bottom-right" hoverable>
+						<button class="button" slot="trigger">
+							<b-icon icon="tune"></b-icon>
+						</button>
+						<b-dropdown-item custom>
+							<b-field label="Chart Type">
+								<b-select v-model="ohlc" :icon="ohlc?'poll':'chart-line-variant'" expanded>
+									<option :value="true">
+										<span>OHLC</span>
+									</option>
+									<option :value="false">
+										<span>Line</span>
+									</option>
+								</b-select>
+							</b-field>
+							<b-field label="X Axis Scale">
+								<b-select v-model="axis" :icon="{'category':'reorder-vertical','time':'av-timer'}[axis]" expanded>
+									<option :value="'category'">
+										<span>Linear</span>
+									</option>
+									<option :value="'time'">
+										<span>Time</span>
+									</option>
+								</b-select>
+							</b-field>
+						</b-dropdown-item>
+					</b-dropdown>
 				</div>
+
 				<div class="column is-narrow">
 					<b-field>
-						<b-radio-button :class="{'is-loading':busy&&range==v}" v-model="range" type="is-primary" :disabled="busy" v-for="v in ranges" :native-value="v"
-						    :key="v">
+						<b-radio-button :class="{'is-loading':busy&&range==v}" v-model="range" type="is-primary" :disabled="busy"
+						    v-for="v in ranges" :native-value="v" :key="v">
 							<span>{{vcapitalize(v)}}</span>
 						</b-radio-button>
 					</b-field>
-				</div>
-				<div class="column is-narrow">
-					<b-select v-model="ohlc" :icon="ohlc?'poll':'chart-line-variant'">
-						<optgroup label="Chart Type">
-							<option :value="true">
-								<span>OHLC</span>
-							</option>
-							<option :value="false">
-								<span>Line</span>
-							</option>
-						</optgroup>
-					</b-select>
-				</div>
-				<div class="column is-narrow">
-					<b-select v-model="axis" :icon="{'category':'reorder-vertical','time':'av-timer'}[axis]">
-						<optgroup label="X Axis Scale">
-							<option :value="'category'">
-								<span>Linear</span>
-							</option>
-							<option :value="'time'">
-								<span>Time</span>
-							</option>
-						</optgroup>
-					</b-select>
 				</div>
 				<div class="column is-narrow">
 					<b-tooltip :active="isbrushing" label="Click and drag chart area to crop" animated>

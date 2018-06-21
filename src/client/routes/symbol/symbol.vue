@@ -49,12 +49,12 @@
 					<div class="columns items-center is-mobile whitespace-no-wrap text-center">
 						<!-- <div class="is-hr-vertical"></div> -->
 
-						<div v-if="Number.isFinite(all.quote.size)" class="column is-narrow">
+						<!-- <div v-if="Number.isFinite(all.quote.size)" class="column is-narrow">
 							<p class="is-size-4">
 								{{vnumber(all.quote.size,{compact:true,precision:1})}}
 							</p>
 							<p>Size</p>
-						</div>
+						</div> -->
 						<div v-if="Number.isFinite(all.quote.volume)" class="column is-narrow">
 							<p class="is-size-4">
 								{{vnumber(all.quote.volume,{compact:true,precision:1})}}

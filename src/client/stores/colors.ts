@@ -13,16 +13,15 @@ store.register('colors', colors)
 export default colors
 declare global { namespace Store { interface State { colors: Colors } } }
 
-let theme = ['accent', 'black', 'black-bis', 'black-ter', 'border', 'danger', 'dark', 'grey', 'grey-dark', 'grey-darker', 'grey-light', 'grey-lighter', 'grey-lightest', 'info', 'light', 'link', 'primary', 'secondary', 'success', 'text', 'text-light', 'text-lighter', 'text-strong', 'warning', 'white', 'white-bis', 'white-ter']
+let allcolors = ['accent', 'black', 'black-bis', 'black-ter', 'border', 'danger', 'dark', 'grey', 'grey-dark', 'grey-darker', 'grey-light', 'grey-lighter', 'grey-lightest', 'info', 'light', 'link', 'primary', 'secondary', 'success', 'text', 'text-light', 'text-lighter', 'text-strong', 'warning', 'white', 'white-bis', 'white-ter']
 function getcolors(event: Event) {
 	event.target.removeEventListener('DOMContentLoaded', getcolors)
 	let style = window.getComputedStyle(document.documentElement)
-	theme.forEach(name => {
+	allcolors.forEach(name => {
 		let color = style.getPropertyValue('--' + name)
 		Vue.set(colors, name, color.trim())
 	})
 }
-
 if (document.readyState == 'loading') {
 	document.addEventListener('DOMContentLoaded', getcolors)
 } else {
