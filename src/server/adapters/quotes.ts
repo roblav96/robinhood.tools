@@ -115,9 +115,10 @@ export function applyFull(
 	let toquote = applyWbQuote(quote, wbquote)
 	mergeCalcs(toquote)
 	core.object.repair(quote, toquote)
+	core.object.merge(toquote, resetFull(quote))
+	mergeCalcs(toquote)
 	toquote.stamp = Date.now()
 
-	mergeCalcs(toquote, resetFull(quote))
 	if (resets) core.object.merge(quote, toquote);
 	else core.object.repair(quote, toquote);
 
@@ -145,7 +146,9 @@ export function resetFull(quote: Quotes.Calc) {
 		let tokey: string
 		if (key.includes('size')) tokey = key.replace('size', 'volume');
 		if (key.includes('Size')) tokey = key.replace('Size', 'Volume');
-		if (tokey && quotes.ALL_FULL_KEYS.includes(tokey as any)) toquote[tokey] = 0;
+		if (tokey && quotes.ALL_FULL_KEYS.includes(tokey as any)) {
+			toquote[tokey] = 0
+		}
 	})
 	core.object.merge(toquote, {
 		liveCount: 0, dealCount: 0,
@@ -329,6 +332,7 @@ export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
 
 		if (toquote.price) {
 			if (!quote.startPrice) quote.startPrice = quote.price;
+
 			quote.close = quote.price
 			quote.change = core.math.round(core.math.sum(quote.price, -quote.startPrice), 6)
 			quote.percent = core.math.round(core.calc.percent(quote.price, quote.startPrice), 6)

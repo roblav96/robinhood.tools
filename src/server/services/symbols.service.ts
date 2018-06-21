@@ -29,13 +29,10 @@ radio.on('symbols.ready', function() {
 })
 
 async function start() {
-	await new Promise(function(resolve) {
-		hours.rxhours.pipe(Rx.filter(v => !!v), Rx.take(1)).subscribe(resolve)
-	})
 
 	// await syncEverything()
 	// await syncIndexes()
-	// await quotes.syncAllQuotes()
+	// await quotes.syncAllQuotes(true)
 
 	let keys = [
 		rkeys.RH.SYMBOLS, rkeys.WB.SYMBOLS,
@@ -51,15 +48,12 @@ async function start() {
 
 
 
-schedule.scheduleJob('55 3 * * 1-5', () => syncEverything(true))
+if (process.env.PRODUCTION) {
+	schedule.scheduleJob('55 3 * * 1-5', () => syncEverything(true))
+}
 async function syncEverything(resets = false) {
-	if (resets && process.env.DEVELOPMENT) return;
-	let t = Date.now()
+	let stamp = Date.now()
 	console.warn(`syncEverything -> start`)
-	if (!hours.rxhours.value.isOpenToday) {
-		console.warn(`!isOpenToday -> return`, JSON.stringify(hours.rxhours.value))
-		return
-	}
 	radio.emit('symbols.pause')
 	await syncInstruments()
 	await syncTickers()
@@ -68,7 +62,7 @@ async function syncEverything(resets = false) {
 	await syncIndexes()
 	await quotes.syncAllQuotes(resets)
 	radio.emit('symbols.resume')
-	console.warn(`syncEverything -> done`, prettyms(Date.now() - t, { verbose: true }))
+	console.warn(`syncEverything -> done`, prettyms(Date.now() - stamp, { verbose: true }))
 }
 
 
