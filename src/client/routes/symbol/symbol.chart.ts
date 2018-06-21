@@ -29,8 +29,7 @@ import colors from '../../stores/colors'
 class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	@Vts.Prop() quote: Quotes.Quote
-	@Vts.Prop() range: string
-	@Vts.Prop() axis: 'category' | 'time'
+	@Vts.Prop() settings: typeof VSymbolChart.prototype.settings
 
 	mounted() {
 
@@ -47,8 +46,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		let lquotes = this.lquotes()
 		let ctbounds = this.ctbounds()
 		let lquote = lquotes[core.math.clamp(Math.floor(lquotes.length * (ctbounds.start / 100)), 0, lquotes.length - 1)]
-		if (this.axis == 'category') lquote = lquotes[ctbounds.startValue];
-		if (this.axis == 'time') lquote = lquotes.find(v => v.timestamp >= ctbounds.startValue);
+		if (this.settings.axis == 'category') lquote = lquotes[ctbounds.startValue];
+		if (this.settings.axis == 'time') lquote = lquotes.find(v => v.timestamp >= ctbounds.startValue);
 		return lquote.open || lquote.price
 	}
 
@@ -63,7 +62,6 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 	build(lquotes = this.lquotes()) {
-		console.log(`this.$el.offsetWidth ->`, this.$el.offsetWidth)
 		let stamp = Date.now()
 
 		let bones = ecbones.option({
@@ -116,8 +114,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			bottom: 92,
 		})
 
-		bones.xAxis.push(ecbones.axis('x', { type: this.axis }))
-		bones.xAxis.push(ecbones.axis('x', { blank: true, type: this.axis, gridIndex: 1 }))
+		bones.xAxis.push(ecbones.axis('x', { type: this.settings.axis }))
+		bones.xAxis.push(ecbones.axis('x', { blank: true, type: this.settings.axis, gridIndex: 1 }))
 
 		bones.yAxis.push(ecbones.axis('y', {
 			axisPointer: {
@@ -163,6 +161,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 	}
 
 	onlquote(lquote: Quotes.Live) {
+		if (!this.rendered) return;
 		let lquotes = this.lquotes()
 		let last = lquotes[lquotes.length - 1]
 		if (last.liveCount == lquote.liveCount) {
@@ -183,7 +182,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 })
 export default class VSymbolChart extends Mixins(VMixin) {
 
-	@Vts.Prop() quote: Quotes.Quote
+	brushing = false
 	@VMixin.NoCache get vechart() { return (this.$refs as any)['symbol_vechart'] as VSymbolEChart }
 
 	mounted() {
@@ -193,30 +192,28 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		socket.offListener(this.vechart.onlquote)
 	}
 
-	busy = true
-	isbrushing = false
 
-	@Vts.Watch('quote.tickerId') w_tickerId(tickerId: number) {
-		this.getQuotes()
-	}
+
+	busy = true
+	@Vts.Watch('quote.tickerId') w_tickerId() { this.getQuotes() }
 	getQuotes() {
 		if (!Number.isFinite(this.quote.tickerId)) return;
 		this.busy = true
 		return Promise.resolve().then(() => {
-			if (this.range == 'live') {
+			if (this.settings.range == 'live') {
 				return http.post('/quotes/lives', { symbols: [this.quote.symbol] }).then(response => response[0])
 			}
-			return charts.getChart(this.quote, this.range)
+			return charts.getChart(this.quote, this.settings.range)
 		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
 			if (lquotes.length == 0) {
-				alerts.toast(`Data for range '${core.string.capitalize(this.range)}' not found!`)
+				alerts.toast(`Data for range '${core.string.capitalize(this.settings.range)}' not found!`)
 				this.vechart.echart.clear()
 				return
 			}
 			this.vechart.build(lquotes)
 			socket.offListener(this.vechart.onlquote)
-			if (this.range == 'live' && lquotes.length > 0) {
+			if (this.settings.range == 'live') {
 				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.vechart.onlquote)
 			}
 		}).catch(error => {
@@ -226,33 +223,29 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		})
 	}
 
+	@Vts.Prop() quote: Quotes.Quote
 	@Vts.Watch('quote', { deep: true }) w_quote(quote: Quotes.Quote) {
-		if (!this.vechart.rendered || this.range != 'live' || quote.size == 0) return;
+		if (this.settings.range != 'live' || quote.size == 0) return;
 		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS) as Quotes.Live
-		// console.log(`ON QUOTE ->`, JSON.parse(JSON.stringify(lquote)))
 		lquote.liveCount++
 		this.vechart.onlquote(lquote)
 	}
 
 
 
-	range = lockr.get('symbol.chart.range', yahoo.RANGES[2])
+	settings = lockr.get('symbol.chart.settings', {
+		range: yahoo.RANGES[2],
+		ohlc: true,
+		axis: 'category' as 'category' | 'time',
+	})
+	@Vts.Watch('settings', { deep: true }) w_settings(settings: typeof VSymbolChart.prototype.settings) {
+		lockr.set('symbol.chart.settings', settings)
+	}
+
 	ranges = ['live'].concat(yahoo.RANGES)
-	get rangeindex() { return this.ranges.indexOf(this.range) }
 	vrange(range: string) { return charts.range(range) }
-	@Vts.Watch('range') w_range(range: string) {
-		lockr.set('symbol.chart.range', range)
+	@Vts.Watch('settings.range') w_settingsrange(range: string) {
 		this.getQuotes()
-	}
-
-	ohlc = lockr.get('symbol.chart.ohlc', true)
-	@Vts.Watch('ohlc') w_ohlc(ohlc: boolean) {
-		lockr.set('symbol.chart.ohlc', ohlc)
-	}
-
-	axis = lockr.get('symbol.chart.axis', 'category') as 'category' | 'time'
-	@Vts.Watch('axis') w_axis(axis: string) {
-		lockr.set('symbol.chart.axis', axis)
 	}
 
 

@@ -88,6 +88,8 @@ export function dataZoom(
 	let dataZoom = {
 		type,
 		throttle: 0,
+		start: 0,
+		end: 100,
 		xAxisIndex: [],
 		yAxisIndex: [],
 	} as echarts.DataZoom

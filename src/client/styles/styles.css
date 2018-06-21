@@ -91,6 +91,10 @@ html {
 	padding-left: 2.5rem;
 }
 
+.control.is-expanded > .radio.button {
+	width: 100%;
+}
+
 figure.image > img {
 	max-width: 100%;
 	max-height: 100%;

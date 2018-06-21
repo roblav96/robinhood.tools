@@ -18,24 +18,28 @@
 						</button>
 						<b-dropdown-item custom>
 							<b-field label="X Axis Scale">
-								<b-select v-model="axis" :icon="{'category':'reorder-vertical','time':'av-timer'}[axis]" expanded>
-									<option :value="'category'">
+								<b-field>
+									<b-radio-button class="is-expanded" v-model="settings.axis" native-value="category" :disabled="busy">
+										<b-icon icon="reorder-vertical"></b-icon>
 										<span>Linear</span>
-									</option>
-									<option :value="'time'">
+									</b-radio-button>
+									<b-radio-button class="is-expanded" v-model="settings.axis" native-value="time" :disabled="busy">
+										<b-icon icon="av-timer"></b-icon>
 										<span>Time</span>
-									</option>
-								</b-select>
+									</b-radio-button>
+								</b-field>
 							</b-field>
-							<b-field label="Chart Type">
-								<b-select v-model="ohlc" :icon="ohlc?'poll':'chart-line-variant'" expanded>
-									<option :value="true">
+							<b-field label="Price Chart Type">
+								<b-field>
+									<b-radio-button class="is-expanded" v-model="settings.ohlc" :native-value="true" :disabled="busy">
+										<b-icon icon="poll"></b-icon>
 										<span>OHLC</span>
-									</option>
-									<option :value="false">
+									</b-radio-button>
+									<b-radio-button class="is-expanded" v-model="settings.ohlc" :native-value="false" :disabled="busy">
+										<b-icon icon="chart-line-variant"></b-icon>
 										<span>Line</span>
-									</option>
-								</b-select>
+									</b-radio-button>
+								</b-field>
 							</b-field>
 						</b-dropdown-item>
 					</b-dropdown>
@@ -43,16 +47,16 @@
 
 				<div class="column is-narrow">
 					<b-field>
-						<b-radio-button :class="{'is-loading':busy&&range==v}" v-model="range" type="is-primary" :disabled="busy"
-						    v-for="v in ranges" :native-value="v" :key="v">
+						<b-radio-button :class="{'is-loading':busy&&settings.range==v}" v-model="settings.range" type="is-primary"
+						    :disabled="busy" v-for="v in ranges" :native-value="v" :key="v">
 							<span>{{vcapitalize(v)}}</span>
 						</b-radio-button>
 					</b-field>
 				</div>
 				<div class="column is-narrow">
-					<b-tooltip :active="isbrushing" label="Click and drag chart area to crop" animated>
-						<button class="button" :class="{'is-primary':isbrushing}" @click="isbrushing=!isbrushing">
-							<b-icon type="" icon="crop"></b-icon>
+					<b-tooltip :active="brushing" label="Click and drag chart area to crop" animated>
+						<button class="button" :class="{'is-primary':brushing}" @click="brushing=!brushing">
+							<b-icon icon="crop"></b-icon>
 						</button>
 					</b-tooltip>
 				</div>
@@ -60,8 +64,7 @@
 		</section>
 
 		<!-- <section class="flex-col-full overflow-y-auto"> -->
-		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :range="range" :axis="axis"
-		    :isbrushing.sync="isbrushing"></v-symbol-echart>
+		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :settings="settings" :isbrushing.sync="brushing"></v-symbol-echart>
 		<!-- </section> -->
 
 
