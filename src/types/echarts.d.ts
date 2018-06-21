@@ -204,9 +204,13 @@ declare module 'echarts' {
 			toolbox: any
 			tooltip: Partial<Tooltip>[]
 			useUTC: boolean
-			visualMap: any[]
+			visualMap: Partial<VisualMap>[]
 			xAxis: Partial<Axis>[]
 			yAxis: Partial<Axis>[]
+		}
+		
+		interface VisualMap {
+			
 		}
 
 		interface Grid {

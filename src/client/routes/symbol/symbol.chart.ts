@@ -66,7 +66,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		console.log(`this.$el.offsetWidth ->`, this.$el.offsetWidth)
 		let stamp = Date.now()
 
-		let bones = ecbones.blank({
+		let bones = ecbones.option({
 			toolbox: { itemSize: 0, feature: { dataZoom: { show: true, yAxisIndex: false } } },
 		})
 		console.log(`bones ->`, JSON.parse(JSON.stringify(bones)))

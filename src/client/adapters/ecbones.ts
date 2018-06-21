@@ -10,15 +10,20 @@ import colors from '../stores/colors'
 
 const SETTINGS = {
 	fontSize: 14,
+	largeThreshold: 128,
+	progressive: 512,
+	progressiveThreshold: 512,
 }
 
 
 
-export function blank(
+export function option(
 	mods = {} as Partial<echarts.Option>,
 ) {
-	return _.merge({
+	let option = {
 		animation: false,
+		progressive: SETTINGS.progressive,
+		progressiveThreshold: SETTINGS.progressiveThreshold,
 		color: [colors['grey-lighter']],
 		textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize },
 		dataset: [],
@@ -68,7 +73,8 @@ export function blank(
 		yAxis: [],
 		series: [],
 		visualMap: [],
-	} as Partial<echarts.Option>, mods) as echarts.Option
+	} as echarts.Option
+	return _.merge(option, mods) as echarts.Option
 }
 
 
@@ -158,6 +164,56 @@ export function axis(
 	}
 	return _.merge(axis, mods) as echarts.Axis
 }
+
+
+
+export function series(
+	mods = {} as Partial<echarts.Series>,
+) {
+	let series = {
+		silent: true,
+		animation: false,
+		hoverAnimation: false,
+		legendHoverLink: false,
+		uuid: Math.random().toString(16),
+		datasetIndex: 0,
+		xAxisIndex: 0,
+		yAxisIndex: 0,
+	} as echarts.Series
+	if (mods.symbol) {
+		_.merge(series, {
+			showSymbol: true,
+			itemStyle: { show: true, opacity: 1 }, emphasis: null,
+		} as echarts.Series)
+	}
+	if (mods.large) {
+		_.merge(series, {
+			largeThreshold: SETTINGS.largeThreshold,
+			progressive: SETTINGS.progressive,
+			progressiveThreshold: SETTINGS.progressiveThreshold,
+		} as echarts.Series)
+	}
+	return _.merge(series, mods) as echarts.Series
+}
+
+
+
+export function visualMap(
+	mods = {} as Partial<echarts.VisualMap>,
+) {
+	let visualMap = {
+		show: true,
+		seriesIndex: 0,
+		pieces: [
+			{ min: 0, color: colors.success },
+			{ max: 0, color: colors.danger },
+		],
+	} as echarts.VisualMap
+	return _.merge(visualMap, mods) as echarts.VisualMap
+}
+
+
+
 
 
 
