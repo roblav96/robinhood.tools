@@ -38,7 +38,6 @@ declare global {
 			type Tradability = 'untradable' | 'tradable' | 'position_closing_only'
 			type Type = 'wrt' | 'pfd' | 'stock' | 'etp' | 'unit' | 'adr' | 'nyrs' | 'right' | 'cef' | 'reit' | 'mlp' | 'tracking' | 'lp' | 'rlt'
 		}
-
 		interface Instrument {
 			acronym: string
 			alive: boolean

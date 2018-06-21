@@ -458,34 +458,49 @@ declare module 'echarts' {
 			zlevel: number
 		}
 
+		interface MarkData {
+			coord: number[]
+			label: Partial<Style>
+			lineStyle: Partial<StyleOptions>
+			name: string
+			symbol: string
+			symbolSize: number
+			type: string
+			value: number
+			valueDim: string
+			valueIndex: number
+			x: number
+			xAxis: number
+			y: number
+			yAxis: number
+		}
 		interface MarkArea {
 			animation: boolean
 			itemStyle: Partial<Style>
 			label: Partial<Style>
 			tooltip: Partial<Tooltip>
-			data: any[]
+			data: MarkData[]
 			silent: boolean
 			z: number
 			zlevel: number
 		}
-
 		interface MarkLine {
 			animation: boolean
+			data: MarkData[]
 			label: Partial<Style>
-			lineStyle: Partial<Style>
+			lineStyle: Partial<StyleOptions>
 			precision: number
+			silent: boolean
 			symbol: string[]
 			symbolSize: number
-			data: any[]
-			silent: boolean
 			tooltip: Partial<Tooltip>
 			z: number
 			zlevel: number
 		}
-
 		interface MarkPoint {
 			itemStyle: Partial<Style>
 			label: Partial<Style>
+			data: MarkData[]
 			symbol: string
 			symbolSize: number
 			tooltip: Partial<Tooltip>

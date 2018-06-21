@@ -220,8 +220,8 @@ export const KEY_MAP = (({
 	'close': ({ key: 'closePrice' } as KeyMapValue) as any,
 	'preClose': ({ key: 'prevClose' } as KeyMapValue) as any,
 	// 
-	// 'high': ({ key: 'dayHigh' } as KeyMapValue) as any,
-	// 'low': ({ key: 'dayLow' } as KeyMapValue) as any,
+	'high': ({ key: 'dayHigh' } as KeyMapValue) as any,
+	'low': ({ key: 'dayLow' } as KeyMapValue) as any,
 	'fiftyTwoWkHigh': ({ key: 'yearHigh' } as KeyMapValue) as any,
 	'fiftyTwoWkLow': ({ key: 'yearLow' } as KeyMapValue) as any,
 	// 
@@ -299,10 +299,10 @@ export function applyWbQuote(quote: Quotes.Calc, wbquote: Webull.Quote, toquote 
 	if (toquote.price) {
 		toquote.high = core.math.max(quote.high, quote.price, toquote.price)
 		toquote.low = core.math.min(quote.low, quote.price, toquote.price)
-		toquote.dayHigh = core.math.max(quote.dayHigh, quote.price, toquote.price)
-		toquote.dayLow = core.math.min(quote.dayLow, quote.price, toquote.price)
-		toquote.yearHigh = core.math.max(quote.yearHigh, quote.price, toquote.price)
-		toquote.yearLow = core.math.min(quote.yearLow, quote.price, toquote.price)
+		toquote.dayHigh = core.math.max(quote.dayHigh, quote.price, toquote.price) //, toquote.dayHigh)
+		toquote.dayLow = core.math.min(quote.dayLow, quote.price, toquote.price) //, toquote.dayLow)
+		toquote.yearHigh = core.math.max(quote.yearHigh, quote.price, toquote.price) //, toquote.yearHigh)
+		toquote.yearLow = core.math.min(quote.yearLow, quote.price, toquote.price) //, toquote.yearLow)
 	}
 
 	if (toquote.volume && !toquote.size) {

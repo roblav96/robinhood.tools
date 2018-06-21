@@ -62,6 +62,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 	build(lquotes = this.lquotes()) {
+		console.log(`this.$el.offsetWidth ->`, this.$el.offsetWidth)
 		let stamp = Date.now()
 		let bones = {
 			animation: false,
@@ -125,7 +126,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 						backgroundColor: this.colors.white, shadowBlur: 0, margin: 1,
 						borderColor: this.colors['grey-lighter'], borderWidth: 1,
 						textStyle: {
-							color: this.colors.dark, borderRadius: 0, 
+							color: this.colors.dark, borderRadius: 0,
 							fontSize: 14, padding: [4, 8], fontWeight: 'bold',
 						},
 						// formatter: params => pretty.number(params.value),
@@ -138,7 +139,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			grid: [{
 				top: 8,
 				left: 64,
-				right: 24,
+				right: 64,
 				bottom: 92,
 				show: true,
 				backgroundColor: this.colors.white,
@@ -147,7 +148,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			}, {
 				height: 64,
 				left: 64,
-				right: 24,
+				right: 64,
 				bottom: 92,
 			}],
 			dataZoom: [{
@@ -155,7 +156,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				throttle: 0,
 				xAxisIndex: [0, 1],
 				// start: 0,
-				start: this.range == 'live' ? core.math.clamp(core.calc.slider(lquotes.length - 50, 0, lquotes.length), 0, 100) : 0,
+				start: this.range == 'live' ? core.math.clamp(core.calc.slider(lquotes.length - 100, 0, lquotes.length), 0, 100) : 0,
 				end: 100,
 				// rangeMode: ['value', 'percent'],
 				zoomOnMouseWheel: 'shift',
@@ -165,8 +166,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				type: 'slider',
 				throttle: 0,
 				xAxisIndex: [0, 1],
-				left: 62,
-				right: 26,
+				left: 64,
+				right: 64,
 				height: 32,
 				bottom: 24,
 				showDetail: false,
@@ -261,6 +262,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					color: this.colors.success, color0: this.colors.danger,
 				},
 				emphasis: null,
+				// markLine: { data: [{ name: 'Price', yAxis: this.quote.price }] },
 			}, {
 				name: 'Size',
 				type: 'bar',

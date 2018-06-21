@@ -95,6 +95,10 @@ export default class VEChartsMixin extends Vue {
 		})
 		this.echart.setOption({ tooltip: [{ show: !brushing }] })
 		this.echart.dispatchAction({ type: 'hideTip' })
+		if (!brushing) {
+			let ctbounds = this.ctbounds()
+			this.echart.dispatchAction({ type: 'dataZoom', start: ctbounds.start, end: ctbounds.end })
+		}
 	}
 
 
@@ -123,7 +127,9 @@ export default class VEChartsMixin extends Vue {
 		this.echart.setOption({ tooltip: [{ show: true }] })
 		this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y })
 	}
-	resetdatazoom() { this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 }) }
+	resetdatazoom() {
+		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
+	}
 
 
 
