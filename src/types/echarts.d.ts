@@ -559,17 +559,17 @@ declare module 'echarts' {
 		}
 
 		interface Encode {
-			x: string | string[]
-			y: string | string[]
-			tooltip: string | string[]
-			seriesName: string | string[]
+			angle: string | string[]
 			itemId: string | string[]
 			itemName: string | string[]
-			radius: string | string[]
-			angle: string | string[]
-			lng: string | string[]
 			lat: string | string[]
+			lng: string | string[]
+			radius: string | string[]
+			seriesName: string | string[]
+			tooltip: string | string[]
 			value: string | string[]
+			x: string | string[]
+			y: string | string[]
 		}
 		interface Series {
 			animation: boolean
@@ -612,6 +612,7 @@ declare module 'echarts' {
 			radius: any
 			roseType: string
 			sampling: string
+			seriesLayoutBy: string
 			showAllSymbol: boolean
 			showSymbol: boolean
 			silent: boolean
