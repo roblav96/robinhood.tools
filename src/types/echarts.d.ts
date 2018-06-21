@@ -540,17 +540,17 @@ declare module 'echarts' {
 		}
 
 		interface Encode {
-			x: (number | string) | (number | string)[]
-			y: (number | string) | (number | string)[]
-			tooltip: (number | string) | (number | string)[]
-			seriesName: (number | string) | (number | string)[]
-			itemId: (number | string) | (number | string)[]
-			itemName: (number | string) | (number | string)[]
-			radius: (number | string) | (number | string)[]
-			angle: (number | string) | (number | string)[]
-			lng: (number | string) | (number | string)[]
-			lat: (number | string) | (number | string)[]
-			value: (number | string) | (number | string)[]
+			x: string | string[]
+			y: string | string[]
+			tooltip: string | string[]
+			seriesName: string | string[]
+			itemId: string | string[]
+			itemName: string | string[]
+			radius: string | string[]
+			angle: string | string[]
+			lng: string | string[]
+			lat: string | string[]
+			value: string | string[]
 		}
 		interface Series {
 			animation: boolean

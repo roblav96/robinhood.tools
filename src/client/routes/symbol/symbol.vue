@@ -28,14 +28,14 @@
 					<div class="columns is-mobile whitespace-no-wrap text-center">
 						<div class="column">
 							<p>
-								<v-price-ticker class="title has-text" :price="all.quote.price"></v-price-ticker>
+								<v-price-ticker class="title" :price="all.quote.price"></v-price-ticker>
 							</p>
 							<p>
 								<v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp>
 							</p>
 						</div>
 						<div class="column">
-							<p class="title has-text" v-bull-bear="all.quote.percent">
+							<p class="title" v-bull-bear="all.quote.percent">
 								{{vnumber(all.quote.percent,{plusminus:true,percent:true})}}
 							</p>
 							<p v-bull-bear="all.quote.change">
