@@ -159,7 +159,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 		console.log(`build bones ->`, _.clone(bones))
 		this.echart.setOption(bones)
-		setTimeout(() => console.log(`echart build ->`, Date.now() - stamp + 'ms'), 0)
+		_.defer(() => console.log(`echart build ->`, Date.now() - stamp + 'ms'))
 		// console.log(`build getOption ->`, _.clone(this.echart.getOption()))
 	}
 

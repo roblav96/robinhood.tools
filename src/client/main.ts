@@ -7,7 +7,7 @@ if (process.env.DEVELOPMENT) {
 	require('echarts')
 	process.version = 'v9.11.1'
 	process.hrtime = require('browser-process-hrtime')
-	console.dtsgen = require('../common/dtsgen').default
+	// console.dtsgen = require('../common/dtsgen').default; console.warn(`console.dtsgen`)
 	Object.assign(window, require('../common/core'))
 	Object.assign(window, { dayjs: require('dayjs') })
 }

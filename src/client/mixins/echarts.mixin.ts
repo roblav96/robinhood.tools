@@ -66,17 +66,16 @@ export default class VEChartsMixin extends Vue {
 
 
 	getOption() { return this.echart._model.option }
-	// private buffer: echarts.Option
-	setOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
-		let stamp = Date.now()
-		this.echart.setOption(option, opts)
-		this.$nextTick(() => console.log(`setOption ->`, Date.now() - stamp + 'ms'))
-	}
+	// setOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
+	// 	let stamp = Date.now()
+	// 	this.echart.setOption(option, opts)
+	// 	_.defer(() => console.log(`setOption ->`, Date.now() - stamp + 'ms'))
+	// }
 	updateOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
 		// let merged = deepmerge(this.echart.getOption(), option)
 		let merged = _.merge(this.echart.getOption(), option)
 		// console.log('updateOption option ->', option, 'merged ->', merged)
-		this.setOption(merged, opts)
+		this.echart.setOption(merged, opts)
 	}
 
 	ctbounds() {
@@ -115,32 +114,14 @@ export default class VEChartsMixin extends Vue {
 			key: 'dataZoomSelect',
 			dataZoomSelectActive: brushing,
 		})
-		// this.syncshowtip(!brushing)
 		let mods = {} as echarts.Option
 		if (!brushing) {
 			let ctbounds = this.ctbounds()
 			if (ctbounds.start > 0 && ctbounds.end == 100) {
 				mods.dataZoom = [{ start: ctbounds.start, end: ctbounds.end }]
-				// this.echart.dispatchAction({ type: 'dataZoom', start: ctbounds.start, end: ctbounds.end })
-				// this.syncshowtip(false, { dataZoom: [{ start: ctbounds.start, end: ctbounds.end }] })
-				// return
 			}
 		}
 		this.syncshowtip(!brushing, mods)
-		// if (this.showingtip() == brushing) {
-		// 	console.warn(`w_brushing -> setOption tooltip`)
-		// 	this.echart.setOption({ tooltip: [{ show: !brushing }] })
-		// }
-		// this.echart.dispatchAction({ type: 'hideTip' })
-		// if (brushing) {
-		// 	this.syncshowtip(false)
-		// } else {
-		// 	let ctbounds = this.ctbounds()
-		// 	if (ctbounds.start > 0 && ctbounds.end == 100) {
-		// 		this.echart.dispatchAction({ type: 'dataZoom', start: ctbounds.start, end: ctbounds.end })
-		// 	}
-		// }
-		// this.syncshowtip(!brushing)
 	}
 
 
@@ -149,41 +130,23 @@ export default class VEChartsMixin extends Vue {
 	datazoom_(event: echarts.EventData) {
 		// console.log('leading event ->', event)
 		this.syncshowtip(false)
-		// let wasbrush = Object.keys(event).includes('escapeConnect')
-		// console.log('leading wasbrush ->', wasbrush)
-		// if (this.brushing) return this.brushing = false;
-		// if (this.showingtip()) {
-		// 	console.warn(`leading -> setOption tooltip`)
-		// 	this.echart.setOption({ tooltip: [{ show: false }] })
-		// }
-		// this.echart.dispatchAction({ type: 'hideTip' })
 	}
 	ondatazoom__ = _.debounce(this.datazoom__, 100, { leading: false, trailing: true })
 	datazoom__(event: echarts.EventData) {
 		// console.log('trailing event ->', event)
 		if (this.brushing) return this.brushing = false;
 		this.syncshowtip(true)
-		// if (this.brushing) {
-		// 	console.warn(`this.brushing = false`)
-		// 	this.brushing = false
-		// 	return
-		// }
-		// let wasbrush = Object.keys(event).includes('escapeConnect')
-		// console.log('trailing wasbrush ->', wasbrush)
-		// if (this.brushing) return this.brushing = false;
-		// if (!this.showingtip()) {
-		// 	console.warn(`trailing -> setOption tooltip`)
-		// 	this.echart.setOption({ tooltip: [{ show: true }] })
-		// }
-		// console.log(`this.brushing ->`, this.brushing)
-		// this.syncshowtip(true)
+		let keys = Object.keys(event)
+		if (keys.length == 3 && keys.includes('start') && keys.includes('end')) {
+			this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y })
+		}
 	}
 
 	resetzoom() {
-		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
+		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100, reset: true })
 	}
 	latestzoom() {
-		this.echart.dispatchAction({ type: 'dataZoom', start: this.ctlatest().latest, end: 100 })
+		this.echart.dispatchAction({ type: 'dataZoom', start: this.ctlatest().latest, end: 100, latest: true })
 	}
 
 
@@ -244,13 +207,14 @@ export default class VEChartsMixin extends Vue {
 	showingtip() { return this.getOption().tooltip[0].show }
 	syncshowtip(show: boolean, mods = {} as Partial<echarts.Option>) {
 		if (this.showingtip() != show) {
+			// console.warn(`syncshowtip -> setOption tooltip`, show)
 			this.echart.setOption(_.merge({ tooltip: [{ show }] }, mods))
 		}
 		this.echart.dispatchAction({ type: 'hideTip' })
 	}
 	reshowtip() {
 		if (!this.tippos || !this.tippos.show) return;
-		this.$nextTick(() => this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y }))
+		_.defer(() => this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y }))
 	}
 
 

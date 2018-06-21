@@ -17,9 +17,18 @@
 
 				<div class="column is-narrow">
 					<b-dropdown hoverable>
-						<button class="button" slot="trigger">
-							<b-icon icon="tune"></b-icon>
-						</button>
+						<b-field slot="trigger">
+							<p class="control">
+								<button class="button">
+									<b-icon :icon="{'category':'reorder-vertical','time':'av-timer'}[settings.axis]"></b-icon>
+								</button>
+							</p>
+							<p class="control">
+								<button class="button">
+									<b-icon :icon="settings.ohlc?'poll':'chart-line-variant'"></b-icon>
+								</button>
+							</p>
+						</b-field>
 						<b-dropdown-item custom>
 							<b-field label="X Axis Scale">
 								<b-field>
@@ -55,22 +64,6 @@
 						    :disabled="busy" v-for="v in ranges" :native-value="v" :key="v">
 							<span>{{vcapitalize(v)}}</span>
 						</b-radio-button>
-					</b-field>
-				</div>
-
-				<div class="column is-narrow">
-					<b-field>
-						<b-select v-model="settings.axis" :icon="{'category':'reorder-vertical','time':'av-timer'}[settings.axis]"
-						    expanded>
-							<optgroup label="X Axis Scale">
-								<option :value="'category'">
-									<span>Linear</span>
-								</option>
-								<option :value="'time'">
-									<span>Time</span>
-								</option>
-							</optgroup>
-						</b-select>
 					</b-field>
 				</div>
 
