@@ -8,7 +8,7 @@ import colors from '../stores/colors'
 
 
 
-const STYLES = {
+const SETTINGS = {
 	fontSize: 14,
 }
 
@@ -20,7 +20,7 @@ export function blank(
 	return _.merge({
 		animation: false,
 		color: [colors['grey-lighter']],
-		textStyle: { color: colors.dark, fontSize: STYLES.fontSize },
+		textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize },
 		dataset: [],
 		legend: { show: !!mods.legend },
 		toolbox: { show: !!mods.toolbox },
@@ -54,7 +54,7 @@ export function blank(
 					borderColor: colors['grey-lighter'], borderWidth: 1,
 					textStyle: {
 						color: colors.dark, borderRadius: 0,
-						fontSize: STYLES.fontSize, padding: [4, 8], fontWeight: 'bold',
+						fontSize: SETTINGS.fontSize, padding: [4, 8], fontWeight: 'bold',
 					},
 				},
 			},
@@ -122,7 +122,7 @@ export function axis(
 		uuid: Math.random().toString(16),
 		axisLabel: {
 			margin: 5,
-			textStyle: { color: colors.dark, fontSize: STYLES.fontSize },
+			textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize },
 		},
 		axisPointer: { show: true },
 		axisLine: { show: !!mods.axisLine },
