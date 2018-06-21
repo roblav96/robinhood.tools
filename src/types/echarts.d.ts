@@ -101,6 +101,7 @@ declare module 'echarts' {
 			id: string
 			group: string
 			_model: { option: Option }
+			_$handlers: { [event: string]: any }
 			constructor(el: HTMLElement | Node, theme?: string | object, opts?: Partial<InitOptions>)
 			on(eventName: EventNames, handler: (...params: any[]) => void, context?: any): void
 			one(eventName: EventNames, handler: (...params: any[]) => void, context?: any): void

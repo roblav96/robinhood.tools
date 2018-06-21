@@ -51,16 +51,13 @@ export default class VEChartsMixin extends Vue {
 		utils.wemitter.off('keydown', this.onkeydown_, this)
 		utils.wemitter.off('resize', this.onresize_, this)
 		this.$el.removeEventListener('wheel', this.onwheel_)
-		this.echart.off('hidetip')
-		this.echart.off('showtip')
-		this.echart.off('datazoom')
-		this.echart.off('click')
-		this.echart.off('rendered')
+		Object.keys(this.echart._$handlers).forEach(k => this.echart.off(k as any))
 		this.echart.clear()
 		this.echart.dispose()
 		this.echart = null
 		this.onresize_.cancel()
 		this.ondatazoom_.cancel()
+		this.ondatazoom__.cancel()
 	}
 
 	rendered = false
@@ -77,7 +74,8 @@ export default class VEChartsMixin extends Vue {
 		}
 	}
 	updateOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
-		let merged = deepmerge(this.echart.getOption(), option)
+		// let merged = deepmerge(this.echart.getOption(), option)
+		let merged = _.merge(this.echart.getOption(), option)
 		// console.log('updateOption option ->', option, 'merged ->', merged)
 		this.echart.setOption(merged, opts)
 	}

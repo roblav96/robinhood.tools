@@ -54,7 +54,7 @@
 					</b-field>
 				</div>
 				<div class="column is-narrow">
-					<b-tooltip :active="brushing" label="Click and drag chart area to crop" animated>
+					<b-tooltip :label="brushing?'Click and drag chart area to crop zoom':'Crop Zoom'" animated>
 						<button class="button" :class="{'is-primary':brushing}" @click="brushing=!brushing">
 							<b-icon icon="crop"></b-icon>
 						</button>

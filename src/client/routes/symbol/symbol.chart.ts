@@ -53,7 +53,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 
-	@Vts.Watch('axis') w_axis(axis: string) {
+	@Vts.Watch('settings.axis') w_axis(axis: string) {
 		let lquotes = this.lquotes()
 		this.echart.clear()
 		this.build(lquotes)
