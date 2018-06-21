@@ -89,7 +89,7 @@ export default class VEChartsMixin extends Vue {
 			dataZoomSelectActive: brushing,
 		})
 		this.echart.setOption({ tooltip: [{ show: !brushing }] })
-		if (brushing) this.echart.dispatchAction({ type: 'hideTip' });
+		this.echart.dispatchAction({ type: 'hideTip' })
 	}
 
 
@@ -116,7 +116,9 @@ export default class VEChartsMixin extends Vue {
 	ondatazoom__ = _.debounce(this.datazoom__, 100, { leading: false, trailing: true })
 	datazoom__(event: echarts.EventData) {
 		this.echart.setOption({ tooltip: [{ show: true }] })
+		this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y })
 	}
+	resetdatazoom() { this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 }) }
 
 
 
@@ -138,9 +140,7 @@ export default class VEChartsMixin extends Vue {
 			this.brushing = !this.brushing && contains
 		}
 		if (event.tapCount == 2) {
-			if (contains) {
-				this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
-			}
+			if (contains) this.resetdatazoom();
 		}
 	}
 

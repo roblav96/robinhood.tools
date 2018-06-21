@@ -117,7 +117,7 @@
 
 		<v-symbol-chart :quote="all.quote"></v-symbol-chart>
 
-		<router-view :symbol="symbol" :quote="all.quote"></router-view>
+		<!-- <router-view :symbol="symbol" :quote="all.quote"></router-view> -->
 
 	</div>
 </template>

@@ -136,7 +136,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				link: [{ xAxisIndex: 'all' }],
 			}],
 			grid: [{
-				top: 16,
+				top: 6,
 				left: 64,
 				right: 24,
 				bottom: 92,
@@ -325,6 +325,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
 			this.vechart.build(lquotes)
+			this.vechart.resetdatazoom()
 			socket.offListener(this.onquote)
 			socket.offListener(this.onlquote)
 			if (this.range == 'live') {

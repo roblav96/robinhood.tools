@@ -8,8 +8,13 @@
 
 <template>
 	<div class="flex-col-full">
-		<section class="section py-0">
-			<div class="columns is-mobile my-0 items-center">
+		<section class="section py-0 pt-1">
+			<div class="columns is-mobile my-0 is-variable is-2 items-center">
+				<div class="column is-narrow">
+					<button class="button">
+						<b-icon icon="tune"></b-icon>
+					</button>
+				</div>
 				<div class="column is-narrow">
 					<b-field>
 						<b-radio-button :class="{'is-loading':busy&&range==v}" v-model="range" type="is-primary" :disabled="busy" v-for="v in ranges" :native-value="v"
@@ -52,7 +57,7 @@
 			</div>
 		</section>
 
-		<hr>
+		<!-- <hr> -->
 		<!-- <section class="flex-col-full overflow-y-auto"> -->
 		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :range="range" :axis="axis"
 		    :isbrushing.sync="isbrushing"></v-symbol-echart>
