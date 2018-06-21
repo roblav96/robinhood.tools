@@ -228,7 +228,7 @@ declare module 'echarts' {
 
 		interface DataZoom {
 			handleStyle: Partial<StyleOptions>
-			textStyle: Partial<StyleOptions>
+			textStyle: Partial<TextStyle>
 			dataBackground: {
 				lineStyle: Partial<StyleOptions>
 				areaStyle: Partial<StyleOptions>

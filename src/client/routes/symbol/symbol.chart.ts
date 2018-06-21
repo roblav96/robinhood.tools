@@ -66,43 +66,15 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		console.log(`this.$el.offsetWidth ->`, this.$el.offsetWidth)
 		let stamp = Date.now()
 
-		{
-			let bones = ecbones.blank({
-				toolbox: { itemSize: 0, feature: { dataZoom: { show: true, yAxisIndex: false } } },
-				tooltip: [{ show: false }],
-			})
-			console.log(`bones ->`, JSON.parse(JSON.stringify(bones)))
-		}
-
-		let bones = {
-			animation: false,
-			color: [this.colors['grey-lighter']],
-			// color: ['#0a0a0a', '#ffb000', '#fed500', '#34bc6e', '#4dc0b5', '#009bef', '#5392ff', '#9753e1', '#e62325', '#ff509e', '#ffffff'],
-			// color: Object.values(this.colors),
-			textStyle: { color: this.colors.dark, fontSize: 14 },
-			dataset: [{
-				source: lquotes,
-			}],
+		let bones = ecbones.blank({
 			toolbox: { itemSize: 0, feature: { dataZoom: { show: true, yAxisIndex: false } } },
+		})
+		console.log(`bones ->`, JSON.parse(JSON.stringify(bones)))
+
+
+
+		let bones_ = {
 			tooltip: [{
-				// showContent: !process.env.DEVELOPMENT,
-				// alwaysShowContent: !!process.env.DEVELOPMENT,
-				trigger: 'axis',
-				triggerOn: 'mousemove',
-				// position: [10, 10],
-				// position: (point, params, el, rect, size) => {
-				// 	return [point[0] - (size.contentSize[0] / 2), 0];
-				// },
-				confine: true,
-				enterable: false,
-				showDelay: 0,
-				hideDelay: 0,
-				transitionDuration: 0,
-				// padding: 0,
-				padding: [0, 0, 0, 64],
-				backgroundColor: 'transparent',
-				// formatter: '{a}: {b1}<br>{c}: {d0}',
-				// extraCssText: `border: 0.125rem solid ${this.colors['grey-darker']};`,
 				formatter: (params: echarts.EventParam<Quotes.Live>[]) => {
 					// console.log('params ->', params)
 					let option = this.getOption()
@@ -126,40 +98,6 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					})
 					return `<div class="font-sans leading-tight has-background-dark has-text-white p-2 rounded">${html}</div>`
 				},
-				axisPointer: {
-					type: 'cross',
-					animation: false,
-					shadowStyle: { opacity: 0 },
-					lineStyle: { color: this.colors['grey-lighter'] },
-					crossStyle: { color: this.colors['grey-lighter'] },
-					label: {
-						backgroundColor: this.colors.white, shadowBlur: 0, margin: 1,
-						borderColor: this.colors['grey-lighter'], borderWidth: 1,
-						textStyle: {
-							color: this.colors.dark, borderRadius: 0,
-							fontSize: 14, padding: [4, 8], fontWeight: 'bold',
-						},
-						// formatter: params => pretty.number(params.value),
-					},
-				},
-			}],
-			axisPointer: [{
-				link: [{ xAxisIndex: 'all' }],
-			}],
-			grid: [{
-				top: 8,
-				left: 64,
-				right: 64,
-				bottom: 92,
-				show: true,
-				backgroundColor: this.colors.white,
-				borderWidth: 0,
-				// borderColor: this.colors['grey-lighter'],
-			}, {
-				height: 64,
-				left: 64,
-				right: 64,
-				bottom: 92,
 			}],
 			dataZoom: [{
 				type: 'inside',
@@ -191,6 +129,21 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				// textStyle: { color: this.colors.dark },
 				handleStyle: { color: this.colors['grey-lighter'] },
 				// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+			}],
+			grid: [{
+				top: 8,
+				left: 64,
+				right: 64,
+				bottom: 92,
+				show: true,
+				backgroundColor: this.colors.white,
+				borderWidth: 0,
+				// borderColor: this.colors['grey-lighter'],
+			}, {
+				height: 64,
+				left: 64,
+				right: 64,
+				bottom: 92,
 			}],
 			xAxis: [{
 				type: this.axis,
@@ -295,7 +248,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		} as echarts.Option
 		console.log(`build bones ->`, JSON.parse(JSON.stringify(bones)))
 		this.echart.setOption(bones)
-		_.defer(() => console.log(`echart build ->`, Date.now() - stamp + 'ms'))
+		setTimeout(() => console.log(`echart build ->`, Date.now() - stamp + 'ms'), 0)
 	}
 
 	onlquote(lquote: Quotes.Live) {

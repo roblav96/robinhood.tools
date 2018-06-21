@@ -12,7 +12,7 @@
 			<div class="columns is-mobile my-0 items-center">
 
 				<div class="column is-narrow">
-					<b-dropdown position="is-bottom-right" hoverable>
+					<b-dropdown hoverable>
 						<button class="button" slot="trigger">
 							<b-icon icon="tune"></b-icon>
 						</button>
