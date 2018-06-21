@@ -57,6 +57,7 @@ export function option(
 				lineStyle: { color: colors['grey-lighter'] },
 				crossStyle: { color: colors['grey-lighter'] },
 				label: {
+					formatter(params) { return charts.xlabel(params.value) },
 					backgroundColor: colors.white, shadowBlur: 0, margin: 1,
 					borderColor: colors['grey-lighter'], borderWidth: 1,
 					textStyle: {
@@ -88,10 +89,6 @@ export function dataZoom(
 	let dataZoom = {
 		type,
 		throttle: 0,
-		start: 0,
-		end: 100,
-		xAxisIndex: [],
-		yAxisIndex: [],
 	} as echarts.DataZoom
 	if (type == 'inside') {
 		_.merge(dataZoom, {
@@ -121,7 +118,7 @@ export function dataZoom(
 
 export function axis(
 	xy: 'x' | 'y',
-	opts = {} as Partial<{
+	mods = {} as Partial<{
 		blank: boolean
 	} & echarts.Axis>,
 ) {
@@ -129,12 +126,11 @@ export function axis(
 		silent: true,
 		gridIndex: 0,
 		uuid: Math.random().toString(16),
-		axisPointer: { show: true },
 		axisLabel: { textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize } },
-		axisLine: { show: !!opts.axisLine },
-		axisTick: { show: !!opts.axisTick },
-		splitArea: { show: !!opts.splitArea },
-		splitLine: { show: !!opts.splitLine },
+		axisLine: { show: !!mods.axisLine },
+		axisTick: { show: !!mods.axisTick },
+		splitArea: { show: !!mods.splitArea },
+		splitLine: { show: !!mods.splitLine },
 	} as echarts.Axis
 	if (xy == 'x') {
 		_.merge(axis, {
@@ -143,36 +139,36 @@ export function axis(
 				margin: 5,
 				formatter(v) { return charts.xlabel(v) },
 			},
-			axisPointer: { label: { formatter(params) { return charts.xlabel(params.value) } } },
+			// axisPointer: { label: { formatter(params) { return charts.xlabel(params.value) } } },
 		} as echarts.Axis)
 	}
 	if (xy == 'y') {
 		_.merge(axis, {
 			scale: true,
 			type: 'value',
-			// boundaryGap:false,
-			// boundaryGap: '1%',
 			splitLine: { show: true, lineStyle: { color: colors['grey-lightest'] } },
-			axisLabel: { formatter(v) { return pretty.number(v) } },
+			// axisLabel: { formatter(v) { return pretty.number(v) } },
 		} as echarts.Axis)
 	}
-	if (opts.blank) {
-		delete opts.blank
+	if (mods.blank) {
+		delete mods.blank
 		_.merge(axis, {
 			axisLabel: { show: false },
 			axisLine: { show: false },
 			axisTick: { show: false },
 			splitArea: { show: false },
 			splitLine: { show: false },
-			axisPointer: {
-				show: false,
-				status: 'hide',
-				type: 'none',
-				label: { show: false },
-			},
+			// axisPointer: { show: false },
+			axisPointer: { type: 'none', label: { show: false } },
+			// axisPointer: {
+			// 	show: false,
+			// 	status: 'hide',
+			// 	type: 'none',
+			// 	label: { show: false },
+			// },
 		} as echarts.Axis)
 	}
-	return _.merge(axis, opts) as echarts.Axis
+	return _.merge(axis, mods) as echarts.Axis
 }
 
 

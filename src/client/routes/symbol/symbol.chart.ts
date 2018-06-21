@@ -94,7 +94,11 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			}],
 		})
 
-		bones.dataZoom.push(ecbones.dataZoom('inside', { xAxisIndex: [0, 1] }))
+		bones.dataZoom.push(ecbones.dataZoom('inside', {
+			xAxisIndex: [0, 1],
+			start: 0,
+			end: 100,
+		}))
 		bones.dataZoom.push(ecbones.dataZoom('slider', { xAxisIndex: [0, 1] }))
 
 		bones.grid.push({
@@ -118,6 +122,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		bones.xAxis.push(ecbones.axis('x', { blank: true, type: this.settings.axis, gridIndex: 1 }))
 
 		bones.yAxis.push(ecbones.axis('y', {
+			boundaryGap: '1%',
 			axisPointer: {
 				label: {
 					formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice), { percent: true, plusminus: true })
@@ -154,10 +159,10 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			},
 		}))
 
-		console.log(`build bones ->`, JSON.parse(JSON.stringify(bones)))
+		console.log(`build bones ->`, _.clone(bones))
 		this.echart.setOption(bones)
 		setTimeout(() => console.log(`echart build ->`, Date.now() - stamp + 'ms'), 0)
-		// console.log(`build getOption ->`, JSON.parse(JSON.stringify(this.echart.getOption())))
+		// console.log(`build getOption ->`, _.clone(this.echart.getOption()))
 	}
 
 	onlquote(lquote: Quotes.Live) {
