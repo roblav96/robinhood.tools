@@ -131,7 +131,7 @@ export default class VEChartsMixin extends Vue {
 
 
 	onclick_() {
-		this.brushing = false
+		// this.brushing = false
 	}
 
 	ontap(event: HammerEvent) {
