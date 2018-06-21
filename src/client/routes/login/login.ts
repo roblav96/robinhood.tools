@@ -5,7 +5,7 @@ import Vue from 'vue'
 import * as _ from '../../../common/lodash'
 import * as http from '../../../common/http'
 import * as robinhood from '../../adapters/robinhood'
-import * as alert from '../../adapters/alert'
+import * as alerts from '../../adapters/alerts'
 import store from '../../store'
 import socket from '../../adapters/socket'
 
@@ -53,7 +53,7 @@ export default class extends Vue {
 			}
 
 			Object.assign(this.$store.state.security, response)
-			alert.toast(`Robinhood login success! Hello ${response.rhusername}`)
+			alerts.toast(`Robinhood login success! Hello ${response.rhusername}`)
 			this.$router.push({ name: 'robinhood' })
 			return socket.discover()
 

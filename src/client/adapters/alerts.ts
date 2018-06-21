@@ -1,5 +1,6 @@
 // 
 
+import Vue from 'vue'
 import * as buefy from 'buefy/types/components'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
@@ -9,21 +10,21 @@ import vm from '../vm'
 
 export function toast(opts: string | buefy.ToastConfig) {
 	if (core.string.is(opts)) opts = { message: opts };
-	_.defaults(opts, {
+	core.object.repair(opts, {
 		position: 'is-top',
-		type: 'is-dark',
+		type: 'is-warning',
 	} as buefy.ToastConfig)
-	return vm.$toast.open(opts as any)
+	return vm.$toast.open(opts as any) as void
 }
 
 
 
 export function snackbar(opts: string | buefy.SnackbarConfig) {
 	if (core.string.is(opts)) opts = { message: opts };
-	_.defaults(opts, {
+	core.object.repair(opts, {
 		position: 'is-top',
 		actionText: 'Okay',
-		type: 'is-success',
+		type: 'is-dark',
 	} as buefy.SnackbarConfig)
 	return vm.$snackbar.open(opts as any)
 	// if (!opts.toPromise) return vm.$snackbar.open(opts as any);

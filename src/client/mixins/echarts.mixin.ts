@@ -33,6 +33,7 @@ export default class VEChartsMixin extends Vue {
 	}
 	mounted() {
 		this.echart = echarts.init(this.$el, null, this.dims())
+		this.echart.one('rendered', this.onrendered_)
 		this.echart.on('click', this.onclick_)
 		this.echart.on('datazoom', this.ondatazoom_)
 		this.echart.on('datazoom', this.ondatazoom__)
@@ -54,12 +55,16 @@ export default class VEChartsMixin extends Vue {
 		this.echart.off('showtip')
 		this.echart.off('datazoom')
 		this.echart.off('click')
+		this.echart.off('rendered')
 		this.echart.clear()
 		this.echart.dispose()
 		this.echart = null
 		this.onresize_.cancel()
 		this.ondatazoom_.cancel()
 	}
+
+	rendered = false
+	onrendered_() { this.rendered = true }
 
 
 

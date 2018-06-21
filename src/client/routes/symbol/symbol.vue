@@ -35,7 +35,7 @@
 							</p>
 						</div>
 						<div class="column">
-							<p class="title" v-bull-bear="all.quote.percent">
+							<p class="title has-text" v-bull-bear="all.quote.percent">
 								{{vnumber(all.quote.percent,{plusminus:true,percent:true})}}
 							</p>
 							<p v-bull-bear="all.quote.change">

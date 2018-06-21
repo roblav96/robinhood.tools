@@ -18,6 +18,7 @@ import * as http from '../../../common/http'
 import * as utils from '../../adapters/utils'
 import * as pretty from '../../adapters/pretty'
 import * as charts from '../../adapters/charts'
+import * as alerts from '../../adapters/alerts'
 import socket from '../../adapters/socket'
 
 
@@ -61,7 +62,12 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 	build(lquotes = this.lquotes()) {
-		let tstart = Date.now()
+		if (lquotes.length == 0) {
+			alerts.toast(`Data for range '${core.string.capitalize(this.range)}' not found!`)
+			this.echart.clear()
+			return
+		}
+		let stamp = Date.now()
 		let bones = {
 			animation: false,
 			color: [this.colors['grey-lighter']],
@@ -69,7 +75,6 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			// color: Object.values(this.colors),
 			textStyle: { color: this.colors.dark, fontSize: 8 },
 			dataset: [{
-				// dimensions: ['timestamp', 'open', 'close', 'high', 'low'],
 				source: lquotes,
 			}],
 			toolbox: { itemSize: 0, feature: { dataZoom: { show: true, yAxisIndex: false } } },
@@ -136,7 +141,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				link: [{ xAxisIndex: 'all' }],
 			}],
 			grid: [{
-				top: 6,
+				top: 8,
 				left: 64,
 				right: 24,
 				bottom: 92,
@@ -154,7 +159,9 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				type: 'inside',
 				throttle: 0,
 				xAxisIndex: [0, 1],
-				// start: this.range == 'live' ? core.math.clamp(core.calc.slider(lquotes.length - 100, 0, lquotes.length), 0, 100) : 0, end: 100,
+				// start: 0,
+				start: this.range == 'live' ? core.math.clamp(core.calc.slider(lquotes.length - 100, 0, lquotes.length), 0, 100) : 0,
+				end: 100,
 				// rangeMode: ['value', 'percent'],
 				zoomOnMouseWheel: 'shift',
 				// moveOnMouseMove: false,
@@ -284,6 +291,17 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		// console.log(`echart build ->`, Date.now() - tstart, 'ms')
 	}
 
+	onlquote(lquote: Quotes.Live) {
+		let lquotes = this.lquotes()
+		let last = lquotes[lquotes.length - 1]
+		if (last.liveCount == lquote.liveCount) {
+			core.object.merge(last, lquote)
+		} else {
+			lquotes.push(lquote)
+		}
+		this.echart.setOption({ dataset: [{ source: lquotes }] })
+	}
+
 
 
 }
@@ -296,20 +314,17 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 export default class VSymbolChart extends Mixins(VMixin) {
 
 	@Vts.Prop() quote: Quotes.Quote
+	@VMixin.NoCache get vechart() { return (this.$refs as any)['symbol_vechart'] as VSymbolEChart }
 
 	mounted() {
 		this.getQuotes()
 	}
 	beforeDestroy() {
-		socket.offListener(this.onquote)
-		socket.offListener(this.onlquote)
+		socket.offListener(this.vechart.onlquote)
 	}
 
 	busy = true
 	isbrushing = false
-	@VMixin.NoCache get vechart() { return (this.$refs as any)['symbol_vechart'] as VSymbolEChart }
-
-
 
 	@Vts.Watch('quote.tickerId') w_tickerId(tickerId: number) {
 		this.getQuotes()
@@ -325,12 +340,9 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
 			this.vechart.build(lquotes)
-			this.vechart.resetdatazoom()
-			socket.offListener(this.onquote)
-			socket.offListener(this.onlquote)
+			socket.offListener(this.vechart.onlquote)
 			if (this.range == 'live') {
-				socket.on(`${rkeys.QUOTES}:${this.quote.symbol}`, this.onquote)
-				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.onlquote)
+				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.vechart.onlquote)
 			}
 		}).catch(error => {
 			console.error(`getQuotes Error ->`, error)
@@ -339,32 +351,58 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		})
 	}
 
-	onquote(quote: Quotes.Quote) {
+	@Vts.Watch('quote', { deep: true }) w_quote(quote: Quotes.Quote) {
+		if (!this.vechart.rendered || quote.size == 0) return;
 		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS) as Quotes.Live
-		console.log(`ON QUOTE ->`, JSON.parse(JSON.stringify(lquote)))
-		let lquotes = this.vechart.lquotes()
-		let last = lquotes[lquotes.length - 1]
-		core.object.merge(last, lquote)
-		this.vechart.build(lquotes)
-		// if (lquote.timestamp == last.timestamp) {
+		// console.log(`ON QUOTE ->`, JSON.parse(JSON.stringify(lquote)))
+		lquote.liveCount++
+		this.vechart.onlquote(lquote)
+		// let lquotes = this.vechart.lquotes()
+		// let last = lquotes[lquotes.length - 1]
+		// if (last.liveCount == lquote.liveCount) {
 		// 	core.object.merge(last, lquote)
-		// } else {
-		// 	let found = lquotes.find(v => v.stamp && v.stamp != v.liveStamp)
-		// 	if (found) core.object.merge(found, lquote);
-		// 	else lquotes.push(lquote);
+		// } else if (lquote.timestamp > last.timestamp) {
+		// 	lquotes.push(lquote)
 		// }
+		// this.vechart.echart.setOption({ dataset: [{ source: lquotes }] })
+		// this.vechart.reshowtip()
 	}
-	onlquote(lquote: Quotes.Live) {
-		console.warn(`ON LIVE QUOTE ->`, JSON.parse(JSON.stringify(lquote)))
-		let lquotes = this.vechart.lquotes()
-		lquotes.remove(v => v.stamp && v.stamp != v.liveStamp)
-		// lquotes.remove((v, i) => {
-		// 	let prev = lquotes[i - 1]
-		// 	return prev && prev.liveCount == v.liveCount
-		// })
-		lquotes.push(lquote)
-		this.vechart.build(lquotes)
-	}
+	// onlquote(lquote: Quotes.Live) {
+	// 	console.warn(`ON LIVE QUOTE ->`, JSON.parse(JSON.stringify(lquote)))
+	// 	let lquotes = this.vechart.lquotes()
+	// 	let last = lquotes[lquotes.length - 1]
+	// 	if (last.liveCount == lquote.liveCount) {
+	// 		core.object.merge(last, lquote)
+	// 	} else {
+	// 		lquotes.push(lquote)
+	// 	}
+	// 	this.vechart.echart.setOption({ dataset: [{ source: lquotes }] })
+	// 	// lquotes.remove(v => v.stamp && v.stamp != v.liveStamp)
+	// 	// lquotes.remove((v, i) => {
+	// 	// 	let prev = lquotes[i - 1]
+	// 	// 	return prev && prev.liveCount == v.liveCount
+	// 	// })
+	// 	// lquotes.push(lquote)
+	// 	// this.vechart.build(lquotes)
+	// }
+	// onquote(quote: Quotes.Quote) {
+	// 	core.object.repair(quote, this.quote)
+	// 	let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS) as Quotes.Live
+	// 	console.log(`ON QUOTE ->`, JSON.parse(JSON.stringify(lquote)))
+	// 	let lquotes = this.vechart.lquotes()
+	// 	lquotes.remove(v => v.stamp && v.stamp != v.liveStamp)
+	// 	let last = lquotes[lquotes.length - 1]
+	// 	if (lquote.timestamp <= last.liveStamp) return;
+	// 	// core.object.merge(last, lquote)
+	// 	// this.vechart.build(lquotes)
+	// 	// if (lquote.timestamp == last.timestamp) {
+	// 	// 	core.object.merge(last, lquote)
+	// 	// } else {
+	// 	// 	let found = lquotes.find(v => v.stamp && v.stamp != v.liveStamp)
+	// 	// 	if (found) core.object.merge(found, lquote);
+	// 	// 	else lquotes.push(lquote);
+	// 	// }
+	// }
 
 
 

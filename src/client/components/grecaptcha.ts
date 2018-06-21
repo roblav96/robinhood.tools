@@ -3,7 +3,7 @@
 import * as Vts from 'vue-property-decorator'
 import Vue from 'vue'
 import Emitter from '../../common/emitter'
-import * as alert from '../adapters/alert'
+import * as alerts from '../adapters/alerts'
 import * as http from '../../common/http'
 
 
@@ -26,7 +26,7 @@ export default class extends Vue {
 	gcallback(gresponse: string) {
 		http.post('/recaptcha/verify', { gresponse }).then((response: Security.Doc) => {
 			Object.assign(this.$store.state.security, response)
-			alert.toast('Captcha challenge complete!')
+			alerts.toast('Captcha challenge complete!')
 		}).catch(error => console.error('gcallback > error', error))
 	}
 
