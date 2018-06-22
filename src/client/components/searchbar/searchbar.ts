@@ -62,14 +62,14 @@ export default class extends Mixins(VMixin) {
 	sync(query = this.query) {
 		return Promise.resolve().then(() => {
 			if (!this.query) return http.post('/recents', { symbols: this.recents.map(v => v.symbol) });
-			// return http.get('/search', { query: { query: this.query } })
+			/*return http.get('/search', { query: { query: this.query } })*/
 			return onquery(query)
 		}).then(results => {
 			this.$safety()
 			if (this.query == query) {
 				this.results = results
 			}
-			this.$nextTick(() => this.scrolltop())
+			/*this.$nextTick(() => this.scrolltop())*/
 		}).catch(error => console.error('sync Error ->', error))
 	}
 
@@ -90,7 +90,7 @@ export default class extends Mixins(VMixin) {
 	}
 
 	voption(result) {
-		return _.omit(result, ['symbol', 'name', 'tinyName'])
+		return _.omit(result, ['symbol', 'name', 'rank'])
 	}
 
 }
@@ -99,8 +99,7 @@ export default class extends Mixins(VMixin) {
 
 
 
-const ALLS = [{ "symbol": "MU", "quote": { "name": "Micron Technology, Inc." } }, { "symbol": "AAPL", "quote": { "name": "Apple Inc." } }, { "symbol": "SPY", "quote": { "name": "SPDR S&P 500 ETF" } }, { "symbol": "NVDA", "quote": { "name": "NVIDIA Corporation" } }, { "symbol": "AMD", "quote": { "name": "Advanced Micro Devices, Inc." } }, { "symbol": "FB", "quote": { "name": "Facebook, Inc." } }, { "symbol": "BAC", "quote": { "name": "Bank of America Corporation" } }, { "symbol": "BABA", "quote": { "name": "Alibaba Group Holding Limited" } }, { "symbol": "INTC", "quote": { "name": "Intel Corporation" } }, { "symbol": "MSFT", "quote": { "name": "Microsoft Corporation" } }, { "symbol": "GE", "quote": { "name": "General Electric Company" } }, { "symbol": "SQ", "quote": { "name": "Square, Inc." } }, { "symbol": "ROKU", "quote": { "name": "Roku, Inc." } }, { "symbol": "UVXY", "quote": { "name": "ProShares Ultra VIX Short-Term Futures" } }, { "symbol": "NFLX", "quote": { "name": "Netflix, Inc." } }] as Quotes.All[]
-
+const ALLS = [{ "symbol": "MU", "quote": { "name": "Micron Technology, Inc.", "symbol": "MU" } }, { "symbol": "AAPL", "quote": { "name": "Apple Inc.", "symbol": "AAPL" } }, { "symbol": "SPY", "quote": { "name": "SPDR S&P 500", "symbol": "SPY" } }, { "symbol": "NVDA", "quote": { "name": "NVIDIA Corporation", "symbol": "NVDA" } }, { "symbol": "AMD", "quote": { "name": "Advanced Micro Devices, Inc.", "symbol": "AMD" } }, { "symbol": "FB", "quote": { "name": "Facebook, Inc.", "symbol": "FB" } }, { "symbol": "BAC", "quote": { "name": "Bank of America Corporation", "symbol": "BAC" } }, { "symbol": "BABA", "quote": { "name": "Alibaba Group Holding Limited", "symbol": "BABA" } }, { "symbol": "INTC", "quote": { "name": "Intel Corporation", "symbol": "INTC" } }, { "symbol": "MSFT", "quote": { "name": "Microsoft Corporation", "symbol": "MSFT" } }, { "symbol": "GE", "quote": { "name": "General Electric Company", "symbol": "GE" } }, { "symbol": "SQ", "quote": { "name": "Square, Inc.", "symbol": "SQ" } }, { "symbol": "ROKU", "quote": { "name": "Roku, Inc.", "symbol": "ROKU" } }, { "symbol": "UVXY", "quote": { "name": "ProShares Trust Ultra VIX Short", "symbol": "UVXY" } }, { "symbol": "NFLX", "quote": { "name": "Netflix, Inc.", "symbol": "NFLX" } }] as Quotes.All[]
 const QUOTES = ALLS.map(all => ({
 	_symbol: all.symbol,
 	symbol: core.string.alphanumeric(all.symbol).toLowerCase(),
@@ -112,23 +111,19 @@ function onquery(query: string) {
 	console.log('query ->', query)
 	let results = QUOTES.map(({ _symbol, symbol, name }, i) => {
 
-		// let sleven = core.string.levenshtein(query, symbol)
-		// let srank = sleven
+		let sleven = core.string.levenshtein(query, symbol)
+		let srank = query.length - sleven
 
 		let nleven = core.string.levenshtein(query, name)
-		let nrank = query.length - (name.length - nleven)
-		// let nrank = core.math.round(core.calc.slider(nleven, name.length, query.length))
-
-		// let srank = query.length - (symbol.length + sleven)
-		// let srank = core.calc.slider(sleven, symbol.length, query.length)
-		// let ssrank = (query.length - symbol.length) + srank
+		let nrank = name.length - nleven
 
 		return {
 			symbol: _symbol, name,
-			// qlen: query.length, slen: symbol.length,
-			nlength: name.length,
-			nleven, //srank,
-			rank: nrank, // + nrank
+			slength: symbol.length, sleven, srank,
+			nlength: name.length, nleven, nrank,
+			rank: srank + nrank,
+			// nlength: name.length,
+			// rank: nrank, // + nrank
 		}
 
 	}).sort((a, b) => b.rank - a.rank).slice(0, 20)

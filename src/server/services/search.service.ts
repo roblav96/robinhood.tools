@@ -19,7 +19,7 @@ let QUOTES = [] as Partial<Quotes.Quote & { _symbol: string }>[]
 
 radio.on('symbols.resume', start)
 radio.once('symbols.start', start)
-radio.on('ready', () => radio.emit('symbols.ready'))
+radio.emit('symbols.ready')
 
 async function start() {
 	core.nullify(QUOTES)
@@ -29,6 +29,7 @@ async function start() {
 
 	let ikeys = ['name'] as KeysOf<Quotes.Quote>
 	let alls = await quotes.getAlls(symbols, ['quote'], [ikeys])
+	console.log(`alls ->`, JSON.stringify(alls, null, 4))
 
 	alls.forEach(all => {
 		QUOTES.push({

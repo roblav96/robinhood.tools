@@ -6,8 +6,7 @@
 
 #searchbar div.dropdown-content {
 	max-width: 75vw;
-	/*max-height: 75vh;*/
-	max-height: 85vh;
+	max-height: 75vh;
 }
 
 #searchbar a.dropdown-item.is-hovered,
@@ -30,13 +29,21 @@
 	display: none;
 }
 
+
+/* DEV */
+
+#searchbar .control .help.counter {
+	font-size: 1rem;
+	font-weight: bold;
+}
+
 </style>
 
 <template>
 	<b-field id="searchbar">
 		<b-autocomplete ref="searchbar_autocomplete" open-on-focus clear-on-select :keep-first="!!query" type="search"
 		    placeholder="Search..." icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur"
-		    v-on:input="oninput" v-on:select="onselect" maxlength="32">
+		    v-on:input="oninput" v-on:select="onselect" maxlength=" ">
 			<template v-if="!query" slot="header">
 				<span class="has-text-lighter is-size-6">Recently Viewed</span>
 			</template>
@@ -48,7 +55,8 @@
 					</div>
 					<div class="column">
 						<p class="title is-size-5">
-							{{props.option.symbol}}
+							<span class="mr-2">{{props.option.rank}}</span>
+							<span class="mr-2 has-text">{{props.option.symbol}}</span>
 							<span class="has-text font-normal is-size-6">{{vcompany(props.option.name)}}</span>
 						</p>
 						<p class="subtitle is-size-6 has-text-light">
@@ -56,9 +64,6 @@
 								{{vstcase(k)}}
 								<span class="font-semibold">{{v}}</span>
 							</span>
-							<!-- <span class="mr-4">Rank <span class="font-semibold">{{props.option.rank}}</span></span>
-							<span class="mr-4">Srank <span class="font-semibold">{{props.option.srank}}</span></span>
-							<span class="mr-4">Nrank <span class="font-semibold">{{props.option.nrank}}</span></span> -->
 						</p>
 						<!-- <p class="subtitle is-size-6">{{props.option.tinyName||props.option.name}}</p> -->
 					</div>
