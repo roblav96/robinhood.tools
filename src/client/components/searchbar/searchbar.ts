@@ -60,7 +60,6 @@ export default class extends Mixins(VMixin) {
 		return Promise.resolve().then(() => {
 			if (!this.query) return http.post('/recents', { symbols: this.recents.map(v => v.symbol) });
 			return http.get('/search', { query: { query: this.query } })
-			// return onquery(query)
 		}).then(results => {
 			console.log(`results ->`, JSON.parse(JSON.stringify(results)))
 			this.$safety()

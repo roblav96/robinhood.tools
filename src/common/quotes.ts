@@ -351,8 +351,9 @@ export function getConverted<T>(quote: T, qkeys: string[]) {
 	return toquote
 }
 
+export const regexSymbol = /[^a-zA-Z0-9-._=^]+/g
 export function isSymbol(symbol: string) {
-	return !Array.isArray(symbol.match(/[^a-zA-Z0-9-.]/))
+	return !Array.isArray(symbol.match(regexSymbol))
 }
 
 

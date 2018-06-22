@@ -167,7 +167,7 @@ export const string = {
 		return value && value.replace(/[^a-zA-Z0-9 ]+/g, '').replace(/\s+/g, spaces).trim()
 	},
 	clean(value: string, spaces = '') {
-		return value && value.replace(/[^a-zA-Z0-9-. ]+/g, '').replace(/\s+/g, spaces).trim()
+		return value && value.replace(/[^a-zA-Z0-9-._=^ ]+/g, '').replace(/\s+/g, spaces).trim()
 	},
 	capitalize(value: string) {
 		return value && value.replace(/\s+/g, ' ').trim().toLowerCase().split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ').trim()

@@ -202,7 +202,7 @@ function send(config: Http.Config) {
 			if (!config.silent && process.env.DEVELOPMENT && process.env.SERVER) {
 				console.warn('retry Error ->', config, error)
 			}
-			global.cookies()
+			if (process.env.CLIENT) global.cookies();
 			return clock.toPromise(config.retryTick).then(() => send(config))
 		}
 		return Promise.reject(error)
