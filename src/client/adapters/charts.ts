@@ -65,6 +65,29 @@ export function range(range: string, opts = { plural: true }) {
 	return n + ' ' + s
 }
 
+export function tipformatter(params: echarts.EventParam<Quotes.Live>[], option: echarts.Option) {
+	// console.log('params ->', params)
+	let html = ''
+	params.forEach((param, i) => {
+		// console.log(`param.value ->`, param.value)
+		let trs = `<tr><td class="font-semibold pr-2"><i class="mdi mdi-circle" style="color: ${param.color};"></i> ${param.seriesName}</td>`
+		let tooltip = option.series[param.seriesIndex].encode.tooltip
+		if (Array.isArray(tooltip)) {
+			trs += `</tr>`
+			tooltip.forEach((key: string) => {
+				let value = pretty.number(param.value[key], { nozeros: true })
+				trs += `<tr><td class="pr-2">${_.startCase(key)}</td><td class="text-right">${value}</td></tr>`
+			})
+		} else {
+			let value = pretty.number(param.value[tooltip], { nozeros: true })
+			trs += `<td class="text-right">${value}</td></tr>`
+		}
+		let hr = i < params.length - 1 ? `<hr class="my-1 has-background-grey-darker">` : ''
+		html += `<table class="m-0 w-full"><tbody>${trs}</tbody></table>${hr}`
+	})
+	return `<div class="font-sans leading-tight has-background-dark has-text-white p-2 rounded">${html}</div>`
+}
+
 
 
 export function getChart(quote: Quotes.Quote, range: string) {

@@ -182,11 +182,11 @@ export function series(
 		datasetIndex: 0,
 		xAxisIndex: 0,
 		yAxisIndex: 0,
+		showSymbol: !!mods.showSymbol,
 		emphasis: null,
 	} as echarts.Series
 	if (mods.symbol) {
 		_.merge(series, {
-			showSymbol: true,
 			itemStyle: { show: true, opacity: 1 },
 		} as echarts.Series)
 	}

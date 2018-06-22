@@ -74,21 +74,26 @@
 				<div class="column is-narrow">
 					<b-field grouped>
 						<p class="control">
-							<button class="button" :disabled="busy" @click="resetzoom">
-								<b-icon icon="crop-landscape"></b-icon>
-							</button>
+							<b-tooltip label="Overview" size="is-small" animated>
+								<button class="button" :disabled="busy" @click="resetzoom">
+									<b-icon icon="crop-landscape"></b-icon>
+								</button>
+							</b-tooltip>
 						</p>
 						<p class="control">
-							<b-tooltip :active="brushing" label="Click and drag chart area to crop zoom" animated>
+							<b-tooltip :multilined="brushing" :label="brushing?'Click and drag chart to crop zoom':'Crop'" size="is-small"
+							    animated>
 								<button class="button" :disabled="busy" :class="{'is-primary':brushing}" @click="brushing=!brushing">
 									<b-icon icon="crop"></b-icon>
 								</button>
 							</b-tooltip>
 						</p>
 						<p class="control">
-							<button class="button" :disabled="busy" @click="latestzoom">
-								<b-icon icon="chevron-double-right"></b-icon>
-							</button>
+							<b-tooltip label="Latest" size="is-small" animated>
+								<button class="button" :disabled="busy" @click="latestzoom">
+									<b-icon icon="chevron-double-right"></b-icon>
+								</button>
+							</b-tooltip>
 						</p>
 					</b-field>
 				</div>
@@ -97,7 +102,7 @@
 		</section>
 
 		<!-- <section class="flex-col-full overflow-y-auto"> -->
-		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :settings="settings" :isbrushing.sync="brushing"></v-symbol-echart>
+			<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :settings="settings" :isbrushing.sync="brushing"></v-symbol-echart>
 		<!-- </section> -->
 
 

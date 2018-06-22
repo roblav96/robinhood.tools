@@ -66,16 +66,16 @@ export default class VEChartsMixin extends Vue {
 
 
 	getOption() { return this.echart._model.option }
-	// setOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
-	// 	let stamp = Date.now()
-	// 	this.echart.setOption(option, opts)
-	// 	_.defer(() => console.log(`setOption ->`, Date.now() - stamp + 'ms'))
-	// }
+	setOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
+		let stamp = Date.now()
+		this.echart.setOption(option, opts)
+		_.defer(() => console.log(`setOption ->`, Date.now() - stamp + 'ms'))
+	}
 	updateOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
 		// let merged = deepmerge(this.echart.getOption(), option)
 		let merged = _.merge(this.echart.getOption(), option)
 		// console.log('updateOption option ->', option, 'merged ->', merged)
-		this.echart.setOption(merged, opts)
+		this.setOption(merged, opts)
 	}
 
 	ctbounds() {
@@ -92,13 +92,17 @@ export default class VEChartsMixin extends Vue {
 
 
 
+	shiftkey: boolean
 	onkeydown_(event: KeyboardEvent) {
-		// if (event.shiftKey && event.key == 'Shift') {
-		// 	this.brushing = true
-		// }
+		if (event.shiftKey && event.key == 'Shift') {
+			this.shiftkey = true
+		}
 	}
 	onkeyup_(event: KeyboardEvent) {
-		if (event.key == 'Escape' || event.key == 'Shift') {
+		if (event.key == 'Shift') {
+			this.shiftkey = false
+		}
+		if (event.key == 'Escape') {
 			this.brushing = false
 		}
 	}
@@ -128,6 +132,7 @@ export default class VEChartsMixin extends Vue {
 
 	ondatazoom_ = _.debounce(this.datazoom_, 100, { leading: true, trailing: false })
 	datazoom_(event: echarts.EventData) {
+		if (event.manual) return;
 		// console.log('leading event ->', event)
 		this.syncshowtip(false)
 	}
@@ -143,15 +148,20 @@ export default class VEChartsMixin extends Vue {
 	}
 
 	resetzoom() {
-		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100, reset: true })
+		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100, manual: true })
 	}
 	latestzoom() {
-		this.echart.dispatchAction({ type: 'dataZoom', start: this.ctlatest().latest, end: 100, latest: true })
+		this.echart.dispatchAction({ type: 'dataZoom', start: this.ctlatest().latest, end: 100, manual: true })
 	}
 
 
 
-	dims() { return { width: this.$el.offsetWidth, height: this.$el.offsetHeight } as echarts.Dims }
+	dims() {
+		return {
+			width: Math.max(this.$el.offsetWidth, 256),
+			height: Math.max(this.$el.offsetHeight, 128),
+		} as echarts.Dims
+	}
 	onresize_ = _.debounce(this.resize_, 300, { leading: false, trailing: true })
 	resize_() {
 		this.echart.resize(this.dims())
@@ -165,14 +175,13 @@ export default class VEChartsMixin extends Vue {
 
 	ontap(event: HammerEvent) {
 		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.srcEvent.offsetX, event.srcEvent.offsetY])
+		if (!contains) return;
 		if (event.tapCount == 1) {
-			this.brushing = !this.brushing && contains
+			this.brushing = !this.brushing && this.shiftkey
 		}
 		if (event.tapCount == 2) {
-			if (contains) {
-				let x = core.calc.slider(event.srcEvent.offsetX, 0, this.echart.getWidth())
-				x > 90 ? this.resetzoom() : this.resetzoom()
-			}
+			let x = core.calc.slider(event.srcEvent.offsetX, 0, this.echart.getWidth())
+			x > 90 ? this.latestzoom() : this.resetzoom()
 		}
 	}
 
@@ -180,6 +189,7 @@ export default class VEChartsMixin extends Vue {
 
 	onwheel_ = utils.raf(this.onwheel)
 	onwheel(event: WheelEvent) {
+		if (this.shiftkey) return;
 		if (Math.abs(event.wheelDeltaY) >= Math.abs(event.wheelDeltaX)) return;
 		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.offsetX, event.offsetY])
 		if (!contains) return;
@@ -206,11 +216,11 @@ export default class VEChartsMixin extends Vue {
 	onhidetip_(event) { this.tippos ? this.tippos.show = false : this.tippos = { show: false } }
 	showingtip() { return this.getOption().tooltip[0].show }
 	syncshowtip(show: boolean, mods = {} as Partial<echarts.Option>) {
+		this.echart.dispatchAction({ type: 'hideTip' })
 		if (this.showingtip() != show) {
 			// console.warn(`syncshowtip -> setOption tooltip`, show)
-			this.echart.setOption(_.merge({ tooltip: [{ show }] }, mods))
+			this.setOption(_.merge({ tooltip: [{ show }] }, mods))
 		}
-		this.echart.dispatchAction({ type: 'hideTip' })
 	}
 	reshowtip() {
 		if (!this.tippos || !this.tippos.show) return;

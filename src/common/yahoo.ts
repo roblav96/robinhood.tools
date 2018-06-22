@@ -75,7 +75,7 @@ export const RANGES = Object.keys(FRAMES)
 
 export function getChart(symbol: string, params: Partial<Yahoo.ChartParams>) {
 	return http.get(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`, {
-		query: params, proxify: !!process.env.CLIENT, retries: 3
+		query: params, proxify: !!process.env.CLIENT, retries: 3, timeout: 5000,
 	}).then(function(response: Yahoo.ApiChart) {
 		let error = _.get(response, 'chart.error') as Yahoo.ApiError
 		if (error) throw boom.badRequest(`chart.error -> ${JSON.stringify(error)}`, response);

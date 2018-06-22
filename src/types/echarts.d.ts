@@ -152,6 +152,7 @@ declare module 'echarts' {
 
 		interface EventData {
 			batch: any[]
+			manual: boolean
 			type: string
 			start: number
 			end: number

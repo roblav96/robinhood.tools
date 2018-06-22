@@ -137,6 +137,21 @@ span.tag.is-small {
 }
 
 
+/* buefy fixes */
+
+.tooltip.is-multiline.is-small:after {
+	width: 8rem !important;
+}
+
+.tooltip.is-multiline.is-medium:after {
+	width: 10rem !important;
+}
+
+.tooltip.is-multiline.is-large:after {
+	width: 12rem !important;
+}
+
+
 /**/
 
 .cursor-help {

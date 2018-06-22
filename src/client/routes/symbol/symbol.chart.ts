@@ -35,7 +35,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	}
 	beforeDestroy() {
-
+		
 	}
 
 
@@ -65,38 +65,10 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		let bones = ecbones.option({
 			dataset: [{ source: lquotes }],
 			toolbox: { itemSize: 0, feature: { dataZoom: { show: true, yAxisIndex: false } } },
-			tooltip: [{
-				formatter: (params: echarts.EventParam<Quotes.Live>[]) => {
-					// console.log('params ->', params)
-					let option = this.getOption()
-					let html = ''
-					params.forEach((param, i) => {
-						// console.log(`param.value ->`, param.value)
-						let trs = `<tr><td class="font-semibold pr-2"><i class="mdi mdi-circle" style="color: ${param.color};"></i> ${param.seriesName}</td>`
-						let tooltip = option.series[param.seriesIndex].encode.tooltip
-						if (Array.isArray(tooltip)) {
-							trs += `</tr>`
-							tooltip.forEach((key: string) => {
-								let value = pretty.number(param.value[key], { nozeros: true })
-								trs += `<tr><td class="pr-2">${_.startCase(key)}</td><td class="text-right">${value}</td></tr>`
-							})
-						} else {
-							let value = pretty.number(param.value[tooltip], { compact: true, precision: 1, nozeros: true })
-							trs += `<td class="text-right">${value}</td></tr>`
-						}
-						let hr = i < params.length - 1 ? `<hr class="my-1 has-background-grey-darker">` : ''
-						html += `<table class="m-0 w-full"><tbody>${trs}</tbody></table>${hr}`
-					})
-					return `<div class="font-sans leading-tight has-background-dark has-text-white p-2 rounded">${html}</div>`
-				},
-			}],
+			tooltip: [{ formatter: params => charts.tipformatter(params as any, this.getOption()) }],
 		})
 
-		bones.dataZoom.push(ecbones.dataZoom('inside', {
-			xAxisIndex: [0, 1],
-			start: 0,
-			end: 100,
-		}))
+		bones.dataZoom.push(ecbones.dataZoom('inside', { xAxisIndex: [0, 1] }))
 		bones.dataZoom.push(ecbones.dataZoom('slider', { xAxisIndex: [0, 1] }))
 
 		bones.grid.push({
@@ -131,17 +103,19 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 		bones.series.push(ecbones.series({
 			name: 'OHLC',
-			type: 'candlestick',
-			large: true,
+			type: 'line',
+			// large: true,
 			encode: {
 				x: 'timestamp',
-				y: ['open', 'close', 'high', 'low'],
-				tooltip: ['open', 'high', 'low', 'close'],
+				y: 'price',
+				tooltip: 'price',
+				// y: ['open', 'close', 'high', 'low'],
+				// tooltip: ['open', 'high', 'low', 'close'],
 			},
-			itemStyle: {
-				borderColor: colors.success, borderColor0: colors.danger, borderWidth: 1,
-				color: colors.success, color0: colors.danger,
-			},
+			// itemStyle: {
+			// 	borderColor: colors.success, borderColor0: colors.danger, borderWidth: 1,
+			// 	color: colors.success, color0: colors.danger,
+			// },
 		}))
 
 		bones.series.push(ecbones.series({
@@ -159,8 +133,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 		console.log(`build bones ->`, _.clone(bones))
 		this.echart.setOption(bones)
+		console.log(`build getOption ->`, _.clone(this.echart.getOption()))
 		_.defer(() => console.log(`echart build ->`, Date.now() - stamp + 'ms'))
-		// console.log(`build getOption ->`, _.clone(this.echart.getOption()))
 	}
 
 	onlquote(lquote: Quotes.Live) {
@@ -170,7 +144,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		if (last.liveCount == lquote.liveCount) {
 			core.object.merge(last, lquote)
 		} else lquotes.push(lquote);
-		this.echart.setOption({ dataset: [{ source: lquotes }] })
+		this.setOption({ dataset: [{ source: lquotes }] })
 		this.reshowtip()
 	}
 
@@ -209,16 +183,17 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			return charts.getChart(this.quote, this.settings.range)
 		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
+			socket.offListener(this.vechart.onlquote)
 			if (lquotes.length == 0) {
 				alerts.toast(`Data for range '${core.string.capitalize(this.settings.range)}' not found!`)
 				this.vechart.echart.clear()
 				return
 			}
 			this.vechart.build(lquotes)
-			socket.offListener(this.vechart.onlquote)
 			if (this.settings.range == 'live') {
+				this.vechart.latestzoom()
 				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.vechart.onlquote)
-			}
+			} else this.vechart.resetzoom();
 		}).catch(error => {
 			console.error(`getQuotes Error ->`, error)
 		}).finally(() => {
