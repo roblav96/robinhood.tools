@@ -62,14 +62,14 @@ export default class extends Mixins(VMixin) {
 	sync(query = this.query) {
 		return Promise.resolve().then(() => {
 			if (!this.query) return http.post('/recents', { symbols: this.recents.map(v => v.symbol) });
-			/*return http.get('/search', { query: { query: this.query } })*/
-			return onquery(query)
+			return http.get('/search', { query: { query: this.query } })
+			// return onquery(query)
 		}).then(results => {
 			this.$safety()
 			if (this.query == query) {
 				this.results = results
 			}
-			/*this.$nextTick(() => this.scrolltop())*/
+			this.$nextTick(() => this.scrolltop())
 		}).catch(error => console.error('sync Error ->', error))
 	}
 
@@ -99,35 +99,34 @@ export default class extends Mixins(VMixin) {
 
 
 
-const ALLS = [{ "symbol": "MU", "quote": { "name": "Micron Technology, Inc.", "symbol": "MU" } }, { "symbol": "AAPL", "quote": { "name": "Apple Inc.", "symbol": "AAPL" } }, { "symbol": "SPY", "quote": { "name": "SPDR S&P 500", "symbol": "SPY" } }, { "symbol": "NVDA", "quote": { "name": "NVIDIA Corporation", "symbol": "NVDA" } }, { "symbol": "AMD", "quote": { "name": "Advanced Micro Devices, Inc.", "symbol": "AMD" } }, { "symbol": "FB", "quote": { "name": "Facebook, Inc.", "symbol": "FB" } }, { "symbol": "BAC", "quote": { "name": "Bank of America Corporation", "symbol": "BAC" } }, { "symbol": "BABA", "quote": { "name": "Alibaba Group Holding Limited", "symbol": "BABA" } }, { "symbol": "INTC", "quote": { "name": "Intel Corporation", "symbol": "INTC" } }, { "symbol": "MSFT", "quote": { "name": "Microsoft Corporation", "symbol": "MSFT" } }, { "symbol": "GE", "quote": { "name": "General Electric Company", "symbol": "GE" } }, { "symbol": "SQ", "quote": { "name": "Square, Inc.", "symbol": "SQ" } }, { "symbol": "ROKU", "quote": { "name": "Roku, Inc.", "symbol": "ROKU" } }, { "symbol": "UVXY", "quote": { "name": "ProShares Trust Ultra VIX Short", "symbol": "UVXY" } }, { "symbol": "NFLX", "quote": { "name": "Netflix, Inc.", "symbol": "NFLX" } }] as Quotes.All[]
-const QUOTES = ALLS.map(all => ({
-	_symbol: all.symbol,
-	symbol: core.string.alphanumeric(all.symbol).toLowerCase(),
-	name: core.string.alphanumeric(pretty.company(all.quote.name)).toLowerCase(),
-})) as Partial<Quotes.Quote & { _symbol: string }>[]
+// const ALLS = [{ "symbol": "MU", "quote": { "name": "Micron Technology, Inc.", "symbol": "MU" } }, { "symbol": "AAPL", "quote": { "name": "Apple Inc.", "symbol": "AAPL" } }, { "symbol": "SPY", "quote": { "name": "SPDR S&P 500", "symbol": "SPY" } }, { "symbol": "NVDA", "quote": { "name": "NVIDIA Corporation", "symbol": "NVDA" } }, { "symbol": "AMD", "quote": { "name": "Advanced Micro Devices, Inc.", "symbol": "AMD" } }, { "symbol": "FB", "quote": { "name": "Facebook, Inc.", "symbol": "FB" } }, { "symbol": "BAC", "quote": { "name": "Bank of America Corporation", "symbol": "BAC" } }, { "symbol": "BABA", "quote": { "name": "Alibaba Group Holding Limited", "symbol": "BABA" } }, { "symbol": "INTC", "quote": { "name": "Intel Corporation", "symbol": "INTC" } }, { "symbol": "MSFT", "quote": { "name": "Microsoft Corporation", "symbol": "MSFT" } }, { "symbol": "GE", "quote": { "name": "General Electric Company", "symbol": "GE" } }, { "symbol": "SQ", "quote": { "name": "Square, Inc.", "symbol": "SQ" } }, { "symbol": "ROKU", "quote": { "name": "Roku, Inc.", "symbol": "ROKU" } }, { "symbol": "UVXY", "quote": { "name": "ProShares Trust Ultra VIX Short", "symbol": "UVXY" } }, { "symbol": "NFLX", "quote": { "name": "Netflix, Inc.", "symbol": "NFLX" } }] as Quotes.All[]
+// const QUOTES = ALLS.map(all => ({
+// 	_symbol: all.symbol,
+// 	symbol: core.string.alphanumeric(all.symbol).toLowerCase(),
+// 	name: core.string.alphanumeric(pretty.company(all.quote.name)).toLowerCase(),
+// })) as Partial<Quotes.Quote & { _symbol: string }>[]
 
-function onquery(query: string) {
-	query = core.string.alphanumeric(query).toLowerCase()
-	console.log('query ->', query)
-	let results = QUOTES.map(({ _symbol, symbol, name }, i) => {
+// function onquery(query: string) {
+// 	query = core.string.alphanumeric(query).toLowerCase()
+// 	console.log('query ->', query)
+// 	let results = QUOTES.map(({ _symbol, symbol, name }, i) => {
 
-		let sleven = core.string.levenshtein(query, symbol)
-		let srank = query.length - sleven
+// 		let s_leven = core.string.levenshtein(query, symbol)
+// 		let s_rank = Math.max(symbol.length - s_leven, 0) * query.length
 
-		let nleven = core.string.levenshtein(query, name)
-		let nrank = name.length - nleven
+// 		let n_leven = core.string.levenshtein(query, name)
+// 		let n_rank = Math.max(name.length - n_leven, 0)
 
-		return {
-			symbol: _symbol, name,
-			slength: symbol.length, sleven, srank,
-			nlength: name.length, nleven, nrank,
-			rank: srank + nrank,
-			// nlength: name.length,
-			// rank: nrank, // + nrank
-		}
+// 		return {
+// 			symbol: _symbol, name,
+// 			s_length: symbol.length, s_leven, s_rank,
+// 			n_length: name.length, n_leven, n_rank,
+// 			rank: Math.max(s_rank, 1) * Math.max(n_rank, 1),
+// 			// rank: s_rank + n_rank,
+// 		}
 
-	}).sort((a, b) => b.rank - a.rank).slice(0, 20)
-	return results
-}
+// 	}).sort((a, b) => b.rank - a.rank).slice(0, 20)
+// 	return results
+// }
 
 

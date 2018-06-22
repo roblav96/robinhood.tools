@@ -29,21 +29,13 @@
 	display: none;
 }
 
-
-/* DEV */
-
-#searchbar .control .help.counter {
-	font-size: 1rem;
-	font-weight: bold;
-}
-
 </style>
 
 <template>
 	<b-field id="searchbar">
 		<b-autocomplete ref="searchbar_autocomplete" open-on-focus clear-on-select :keep-first="!!query" type="search"
 		    placeholder="Search..." icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur"
-		    v-on:input="oninput" v-on:select="onselect" maxlength=" ">
+		    v-on:input="oninput" v-on:select="onselect">
 			<template v-if="!query" slot="header">
 				<span class="has-text-lighter is-size-6">Recently Viewed</span>
 			</template>
@@ -54,21 +46,28 @@
 						<v-symbol-logo class="is-32x32 shadow" :symbol="props.option.symbol"></v-symbol-logo>
 					</div>
 					<div class="column">
-						<p class="title is-size-5">
-							<span class="mr-2">{{props.option.rank}}</span>
-							<span class="mr-2 has-text">{{props.option.symbol}}</span>
-							<span class="has-text font-normal is-size-6">{{vcompany(props.option.name)}}</span>
-						</p>
-						<p class="subtitle is-size-6 has-text-light">
-							<span class="mr-2" v-for="(v,k) in voption(props.option)">
-								{{vstcase(k)}}
-								<span class="font-semibold">{{v}}</span>
-							</span>
-						</p>
-						<!-- <p class="subtitle is-size-6">{{props.option.tinyName||props.option.name}}</p> -->
+						<p class="title is-size-5">{{props.option.symbol}}</p>
+						<p class="subtitle is-size-6">{{vcompany(props.option.name)}}</p>
 					</div>
 				</div>
 			</template>
 		</b-autocomplete>
 	</b-field>
 </template>
+
+
+
+<!-- <hr>
+<div class="flex">
+	<p class="title is-size-4 has-text-strong mr-2">{{props.option.rank}}</p>
+	<p class="title is-size-6 font-normal">
+		<span class="mr-2 has-text-light">{{props.option.symbol}}</span>
+		<span class="mr-2 has-text-light font-normal is-size-6">{{vcompany(props.option.name)}}</span>
+	</p>
+</div>
+<p class="subtitle is-size-6 has-text-light">
+	<span class="mr-2" v-for="(v,k) in voption(props.option)">
+		{{k}}
+		<span class="font-semibold">{{v}}</span>
+	</span>
+</p> -->

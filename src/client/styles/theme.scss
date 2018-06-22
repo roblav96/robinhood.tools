@@ -32,6 +32,12 @@ $dark: $grey-dark;
 $light-invert: $grey-darker;
 $dark-invert: $white;
 // 
+$text: color('cool-gray', 70);
+$text-light: color('cool-gray', 60);
+$text-lighter: color('cool-gray', 50);
+$text-lightest: color('cool-gray', 40);
+$text-strong: color('cool-gray', 80);
+// 
 $primary: $purple;
 $secondary: $cyan;
 $accent: $yellow;
@@ -50,15 +56,6 @@ $warning-invert: $white;
 $danger-invert: $white;
 $link-invert: $white;
 // 
-$text: $grey-dark;
-$text-light: $grey;
-$text-lighter: $grey-light;
-$text-lightest: $grey-lighter;
-$text-strong: $grey-darker;
-// 
-$border: $grey-lighter;
-$border-hover: $grey-light;
-// 
 $family-sans-serif: ('IBM Plex Sans', system-ui, BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif);
 $family-monospace: ('IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace);
 // 
@@ -70,6 +67,10 @@ $fullhd: 1408px;
 // 
 $column-gap: 0.75rem;
 $dimensions: 16 20 24 28 32 40 48 56 64 72 80 88 96 104 112 120;
+// 
+$section-padding: ($column-gap*2) ($column-gap*2);
+$section-padding-medium: ($column-gap*3) ($column-gap*2);
+$section-padding-large: ($column-gap*4) ($column-gap*2);
 // 
 $radius-small: 0.125rem;
 $radius: 0.25rem;
@@ -90,13 +91,11 @@ $colors: map-merge($colors, ('text-strong':($text-strong, $white)));
 $colors: map-merge($colors, ('secondary':($secondary, $white)));
 $colors: map-merge($colors, ('accent':($accent, $white)));
 // 
-$table-color: $text;
 $body-background-color: $white;
 $footer-background-color: $white-ter;
 // 
-$section-padding: ($column-gap*2) ($column-gap*2);
-$section-padding-medium: ($column-gap*3) ($column-gap*2);
-$section-padding-large: ($column-gap*4) ($column-gap*2);
+$table-color: $text;
+$button-color: $text;
 // 
 $link-focus-border: $link;
 $navbar-item-active-color: $link;
@@ -108,9 +107,6 @@ $modal-background-background-color: rgba($black, 0.33);
 $hr-height: 0px;
 $hr-margin: 0px;
 $hr-background-color: $border;
-// 
-$button-color: $text;
-// $input-icon-color: $grey-light;
 // 
 @import '~bulma/bulma';
 @import '~buefy/src/scss/buefy';

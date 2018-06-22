@@ -29,7 +29,6 @@ async function start() {
 
 	let ikeys = ['name'] as KeysOf<Quotes.Quote>
 	let alls = await quotes.getAlls(symbols, ['quote'], [ikeys])
-	console.log(`alls ->`, JSON.stringify(alls, null, 4))
 
 	alls.forEach(all => {
 		QUOTES.push({
@@ -45,23 +44,23 @@ async function start() {
 
 radio.reply('search.query', async function onquery(query: string) {
 	console.time(`search.query -> ${query}`)
-
 	let results = QUOTES.map(({ _symbol, symbol, name }, i) => {
 
-		let sleven = core.string.levenshtein(query, symbol)
-		let srank = query.length - sleven
-		// let srank = core.calc.slider(sleven, symbol.length, query.length)
-		// let ssrank = (query.length - symbol.length) + srank
+		let s_leven = core.string.levenshtein(query, symbol)
+		let s_rank = Math.max(symbol.length - s_leven, 0) * query.length
+
+		let n_leven = core.string.levenshtein(query, name)
+		let n_rank = Math.max(name.length - n_leven, 0)
 
 		return {
 			symbol: _symbol, name,
-			queryL: query.length,
-			symbolL: symbol.length,
-			sleven, srank,
-			// rank: srank, // + nrank
+			s_length: symbol.length, s_leven, s_rank,
+			n_length: name.length, n_leven, n_rank,
+			rank: Math.max(s_rank, 1) * Math.max(n_rank, 1),
+			// rank: s_rank + n_rank,
 		}
 
-	}).sort((a, b) => a.srank - b.srank).slice(0, 20)
+	}).sort((a, b) => b.rank - a.rank).slice(0, 20)
 	console.timeEnd(`search.query -> ${query}`)
 	return results
 })
