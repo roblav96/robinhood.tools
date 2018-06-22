@@ -23,7 +23,7 @@ radio.emit('symbols.ready')
 async function start() {
 
 	let symbols = await utils.getAllSymbols()
-	let ikeys = ['name'] as KeysOf<Quotes.Quote>
+	let ikeys = ['name', 'tinyName'] as KeysOf<Quotes.Quote>
 	let alls = await quotes.getAlls(symbols, ['quote'], [ikeys])
 
 	let builder = new lunr.Builder()
@@ -31,11 +31,13 @@ async function start() {
 	builder.ref('_symbol')
 	builder.field('symbol')
 	builder.field('name')
+	builder.field('tinyName')
 	alls.forEach(all => {
 		builder.add({
 			_symbol: all.symbol,
 			symbol: core.string.alphanumeric(all.symbol).toLowerCase(),
 			name: core.string.alphanumeric(all.quote.name, ' ').toLowerCase(),
+			tinyName: core.string.alphanumeric(all.quote.tinyName, ' ').toLowerCase(),
 		})
 	})
 	search = builder.build()
@@ -70,31 +72,31 @@ radio.reply('search.query', async function onquery(query: string) {
 		}
 		words.forEach(word => {
 			q.term(word, {
-				fields: ['name'],
+				fields: ['name', 'tinyName'],
 				boost: 100,
 			})
 			q.term(word, {
-				fields: ['name'],
+				fields: ['name', 'tinyName'],
 				boost: 75,
 				wildcard: lunr.Query.wildcard.TRAILING,
 			})
 			q.term(word, {
-				fields: ['name'],
+				fields: ['name', 'tinyName'],
 				boost: 50,
 				wildcard: lunr.Query.wildcard.LEADING | lunr.Query.wildcard.TRAILING,
 			})
 			q.term(word, {
-				fields: ['name'],
+				fields: ['name', 'tinyName'],
 				boost: 25,
 				editDistance: 1,
 			})
 			q.term(word, {
-				fields: ['name'],
+				fields: ['name', 'tinyName'],
 				boost: 10,
 				editDistance: 2,
 			})
 			q.term(word, {
-				fields: ['name'],
+				fields: ['name', 'tinyName'],
 				boost: 1,
 				editDistance: 3,
 			})
