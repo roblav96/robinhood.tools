@@ -17,13 +17,10 @@ import * as utils from '../../adapters/utils'
 @Vts.Component
 export default class extends Mixins(VMixin) {
 
-	created() {
-		this.sync()
-	}
 	mounted() {
+		this.sync()
 		utils.wemitter.on('keyup', this.onkey, this)
 		utils.wemitter.on('keydown', this.onkey, this)
-		if (process.env.DEVELOPMENT) this.inputfield.focus();
 	}
 	beforeDestroy() {
 		utils.wemitter.off('keyup', this.onkey, this)
@@ -65,6 +62,7 @@ export default class extends Mixins(VMixin) {
 			return http.get('/search', { query: { query: this.query } })
 			// return onquery(query)
 		}).then(results => {
+			console.log(`results ->`, JSON.parse(JSON.stringify(results)))
 			this.$safety()
 			if (this.query == query) {
 				this.results = results

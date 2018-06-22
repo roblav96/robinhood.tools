@@ -15,7 +15,7 @@ import radio from '../adapters/radio'
 
 
 
-let QUOTES = [] as Partial<Quotes.Quote & { _symbol: string }>[]
+let QUOTES = [] as Partial<Quotes.Quote & { _symbol: string, word: string }>[]
 
 radio.on('symbols.resume', start)
 radio.once('symbols.start', start)
@@ -25,7 +25,7 @@ async function start() {
 	core.nullify(QUOTES)
 
 	let symbols = await utils.getAllSymbols()
-	if (process.env.DEVELOPMENT) symbols = Object.keys(utils.DEV_STOCKS);
+	// if (process.env.DEVELOPMENT) symbols = Object.keys(utils.DEV_STOCKS);
 
 	let ikeys = ['name'] as KeysOf<Quotes.Quote>
 	let alls = await quotes.getAlls(symbols, ['quote'], [ikeys])
@@ -35,6 +35,7 @@ async function start() {
 			_symbol: all.symbol,
 			symbol: core.string.alphanumeric(all.symbol).toLowerCase(),
 			name: core.string.alphanumeric(pretty.company(all.quote.name)).toLowerCase(),
+			word: core.string.alphanumeric(pretty.company(all.quote.name).split(' ').shift()).toLowerCase(),
 		})
 	})
 
@@ -43,25 +44,45 @@ async function start() {
 
 
 radio.reply('search.query', async function onquery(query: string) {
-	console.time(`search.query -> ${query}`)
-	let results = QUOTES.map(({ _symbol, symbol, name }, i) => {
+	let stamp = Date.now()
+	let results = QUOTES.map(({ _symbol, symbol, name, word }) => {
+		let ranks = [] as number[]
 
 		let s_leven = core.string.levenshtein(query, symbol)
-		let s_rank = Math.max(symbol.length - s_leven, 0) * query.length
+		let s_rank = Math.max(symbol.length - s_leven, 1)// * Math.round(query.length / 2)
+		if (query.length <= symbol.length && symbol.indexOf(query) == 0) {
+			s_rank *= s_rank
+		}
+		ranks.push(s_rank)
 
 		let n_leven = core.string.levenshtein(query, name)
-		let n_rank = Math.max(name.length - n_leven, 0)
-
-		return {
-			symbol: _symbol, name,
-			s_length: symbol.length, s_leven, s_rank,
-			n_length: name.length, n_leven, n_rank,
-			rank: Math.max(s_rank, 1) * Math.max(n_rank, 1),
-			// rank: s_rank + n_rank,
+		let n_rank = Math.max(name.length - n_leven, 1)
+		if (query.length > 2 && name.indexOf(query) == 0) {
+			n_rank *= n_rank
 		}
+		ranks.push(n_rank)
+
+		// let w_leven = core.string.levenshtein(query, word)
+		// let w_rank = Math.max(Math.max(word.length - w_leven, 0) * query.length, 1) // * Math.round(query.length / 2), 1)
+		// if (query.length > symbol.length && word.indexOf(query) == 0) {
+		// 	w_rank *= w_rank
+		// }
+		// rank *= w_rank
+
+		// let f_rank = query.length > symbol.length && word.indexOf(query) == 0 ? rank : 1
+		// rank *= f_rank
+
+		return { symbol: _symbol, ranks, rank: ranks.reduce((prev, next) => prev *= next, 1) }
+		// return {
+		// 	symbol: _symbol, name,
+		// 	s_length: symbol.length, s_leven, s_rank,
+		// 	n_length: name.length, n_leven, n_rank,
+		// 	rank: Math.max(s_rank, 1) * Math.max(n_rank, 1),
+		// 	// rank: s_rank + n_rank,
+		// }
 
 	}).sort((a, b) => b.rank - a.rank).slice(0, 20)
-	console.timeEnd(`search.query -> ${query}`)
+	console.warn(`search.query -> ${query}`, pretty.ms(Date.now() - stamp))
 	return results
 })
 

@@ -28,7 +28,9 @@ export function formatNumber(value: any, precision = 0) {
 	return humanize.formatNumber(Number.parseFloat(value), precision) + unit
 }
 
-const COMPANY_STOPWORDS = ['co', 'company', 'corp', 'corporation', 'inc', 'ltd', 'the']
+const COMPANY_STOPWORDS = [
+	'co', 'company', 'cor', 'corp', 'corporation', 'in', 'inc', 'ltd', 'the',
+]
 export function company(company: string) {
 	let split = company.split(' ')
 	let first = split[0].toLowerCase().replace(/[^a-z]+/g, '')
