@@ -11,38 +11,36 @@ export const HR = {
 
 
 
-export function getState(hhours: Hours, stamp = Date.now()): Hours.State {
-	if (!hhours || hhours.isOpenToday == false) return 'CLOSED';
-	if (stamp >= hhours.prepre && stamp < hhours.pre) return 'PREPRE';
-	if (stamp >= hhours.pre && stamp < hhours.opens) return 'PRE';
-	if (stamp >= hhours.opens && stamp < hhours.closes) return 'REGULAR';
-	if (stamp >= hhours.closes && stamp < hhours.post) return 'POST';
-	if (stamp >= hhours.post && stamp < hhours.postpost) return 'POSTPOST';
+export function getState(hours: Hours, stamp = Date.now()): Hours.State {
+	if (!hours || hours.isOpenToday == false) return 'CLOSED';
+	if (stamp >= hours.prepre && stamp < hours.pre) return 'PREPRE';
+	if (stamp >= hours.pre && stamp < hours.opens) return 'PRE';
+	if (stamp >= hours.opens && stamp < hours.closes) return 'REGULAR';
+	if (stamp >= hours.closes && stamp < hours.post) return 'POST';
+	if (stamp >= hours.post && stamp < hours.postpost) return 'POSTPOST';
 	return 'CLOSED'
 }
 
 
 
 export function toHours(rhours: Robinhood.Hours) {
-	let hhours = {
+	let hours = {
 		isOpenToday: rhours.is_open,
 		date: rhours.date,
 		prepre: null, pre: null,
 		opens: null, closes: null,
 		post: null, postpost: null,
 	} as Hours
-	if (hhours.isOpenToday) {
-		hhours.prepre = dayjs(new Date(rhours.opens_at)).subtract(5, 'hour').subtract(30, 'minute').valueOf()
-		hhours.pre = dayjs(new Date(rhours.extended_opens_at)).valueOf()
-		hhours.opens = dayjs(new Date(rhours.opens_at)).valueOf()
-		hhours.closes = dayjs(new Date(rhours.closes_at)).valueOf()
-		hhours.post = dayjs(new Date(rhours.extended_closes_at)).valueOf()
-		hhours.postpost = dayjs(new Date(rhours.closes_at)).add(4, 'hour').valueOf()
+	if (hours.isOpenToday) {
+		hours.prepre = dayjs(new Date(rhours.opens_at)).subtract(5, 'hour').subtract(30, 'minute').valueOf()
+		hours.pre = dayjs(new Date(rhours.extended_opens_at)).valueOf()
+		hours.opens = dayjs(new Date(rhours.opens_at)).valueOf()
+		hours.closes = dayjs(new Date(rhours.closes_at)).valueOf()
+		hours.post = dayjs(new Date(rhours.extended_closes_at)).valueOf()
+		hours.postpost = dayjs(new Date(rhours.closes_at)).add(4, 'hour').valueOf()
 	}
-	return hhours
+	return hours
 }
-
-
 
 
 
@@ -63,5 +61,6 @@ declare global {
 		next: Hours
 	}
 }
+// declare namespace NodeJS { interface Global { hours: Hours, state: Hours.State } }
 
 
