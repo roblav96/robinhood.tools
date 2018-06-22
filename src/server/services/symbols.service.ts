@@ -31,7 +31,7 @@ radio.on('symbols.ready', function() {
 async function start() {
 
 	// await syncEverything()
-	// await quotes.syncAllQuotes(true)
+	// await quotes.syncAllQuotes()
 
 	let keys = [
 		rkeys.RH.SYMBOLS, rkeys.WB.SYMBOLS, rkeys.WB.EXCHANGES,

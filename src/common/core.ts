@@ -2,6 +2,8 @@
 
 import * as _ from './lodash'
 import * as leven from 'leven'
+import * as levenshtein from 'js-levenshtein'
+import * as ss from 'simple-statistics'
 import * as dayjs from 'dayjs'
 dayjs.extend(require('dayjs/plugin/relativeTime'))
 
@@ -82,9 +84,31 @@ export const calc = {
 		if (from == 0) return 0;
 		return ((to - from) / from) * 100
 	},
+	ratio(to: number, from: number) {
+		if (from == 0) return 1;
+		return (to / from) + 1
+	},
 	slider(value: number, min: number, max: number) {
 		if ((max - min) == 0) return 0;
 		return ((value - min) / (max - min)) * 100
+	},
+	osc(to: number, from: number, range = 100) {
+		if (from == 0) return 0;
+		return ((range - (range / (1 + (to / from)))) - (range / 2)) * 2
+	},
+	rsi(to: number, from: number, range = 100) {
+		if (from == 0) return 0;
+		return range - (range / (1 + (to / from)))
+	},
+	standardize(values: number[], meanfn = 'mean') {
+		let mean = ss[meanfn](values)
+		let stdev = ss.standardDeviation(values)
+		if (mean == 0 || stdev == 0) return values.map(v => 0);
+		return values.map(v => (v - mean) / stdev)
+	},
+	standardizeByKey(values: any[], key: string, meanfn = 'mean') {
+		let vs = calc.standardize(values.map(v => v[key]), meanfn)
+		values.forEach((v, i) => v[key] = vs[i])
 	},
 }
 
@@ -105,10 +129,8 @@ export const string = {
 	insert(a: string, b: string, position: number) {
 		return a.substr(0, position) + b + a.substr(position)
 	},
-	nostops(value: string) {
-		return value && value.split(' ').filter(v => {
-			return STOP_WORDS.indexOf(v.toLowerCase().replace(/[^a-z]+/g, '').trim()) == -1
-		}).join(' ').trim()
+	filterwords(value: string, words: string[]) {
+		return value && value.split(' ').filter(v => !words.includes(string.alphanumeric(v))).join(' ').trim()
 	},
 	minify(value: string) {
 		if (!value) return value;
@@ -144,18 +166,21 @@ export const string = {
 	capitalize(value: string) {
 		return value && value.replace(/\s+/g, ' ').trim().toLowerCase().split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ').trim()
 	},
-	leven(a: string, b: string) {
-		return leven(a, b) as number
+	levenshtein(query: string, value: string) {
+		return levenshtein(query, value) as number
 	},
-	fuzzy(value: string, search: string) {
-		let hlen = value.length
-		let nlen = search.length
+	leven(query: string, value: string) {
+		return leven(query, value) as number
+	},
+	fuzzy(query: string, value: string) {
+		let hlen = query.length
+		let nlen = value.length
 		if (nlen > hlen) return false;
-		if (nlen === hlen) return search === value;
+		if (nlen === hlen) return value === query;
 		outer: for (let i = 0, j = 0; i < nlen; i++) {
-			let nch = search.charCodeAt(i)
+			let nch = value.charCodeAt(i)
 			while (j < hlen) {
-				if (value.charCodeAt(j++) === nch) {
+				if (query.charCodeAt(j++) === nch) {
 					continue outer
 				}
 			}

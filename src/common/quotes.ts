@@ -230,8 +230,12 @@ export function applyFull(
 		sharesFloat: _.round(core.fallback(wbquote.outstandingShares, iexitem.float)),
 	} as Quotes.Quote)
 
+	let yhnames = _.compact([yhquote.shortName, yhquote.longName]).reduce((from, to, i) => {
+		return 
+	})
+	let yhname = (yhnames.find(v => v.length == _.min(yhnames.map(v => v.length))) || '').replace(/&amp;+/g, '&').replace(/[Â]+/g, '');
 	quote.name = core.fallback(yhquote.longName, iexitem.companyName, instrument.name, wbticker.name)
-	quote.tinyName = core.fallback(instrument.simple_name, yhquote.shortName, wbticker.tinyName, quote.name)
+	quote.tinyName = core.fallback(instrument.simple_name, yhquote.longName, wbticker.tinyName, quote.name)
 	quote.fullName = core.fallback(instrument.name, yhquote.longName, wbticker.name, quote.name)
 
 	quote.avgVolume10Day = _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day))

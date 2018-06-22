@@ -6,7 +6,8 @@
 
 #searchbar div.dropdown-content {
 	max-width: 75vw;
-	max-height: 75vh;
+	/*max-height: 75vh;*/
+	max-height: 85vh;
 }
 
 #searchbar a.dropdown-item.is-hovered,
@@ -33,9 +34,9 @@
 
 <template>
 	<b-field id="searchbar">
-		<b-autocomplete ref="searchbar_autocomplete" open-on-focus clear-on-select :keep-first="!!query" type="search" placeholder="Search..."
-		    icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur" v-on:input="oninput"
-		    v-on:select="onselect">
+		<b-autocomplete ref="searchbar_autocomplete" open-on-focus clear-on-select :keep-first="!!query" type="search"
+		    placeholder="Search..." icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur"
+		    v-on:input="oninput" v-on:select="onselect" maxlength="32">
 			<template v-if="!query" slot="header">
 				<span class="has-text-lighter is-size-6">Recently Viewed</span>
 			</template>
@@ -46,8 +47,20 @@
 						<v-symbol-logo class="is-32x32 shadow" :symbol="props.option.symbol"></v-symbol-logo>
 					</div>
 					<div class="column">
-						<p class="title is-size-5">{{props.option.symbol}}</p>
-						<p class="subtitle is-size-6">{{props.option.tinyName||props.option.name}}</p>
+						<p class="title is-size-5">
+							{{props.option.symbol}}
+							<span class="has-text font-normal is-size-6">{{vcompany(props.option.name)}}</span>
+						</p>
+						<p class="subtitle is-size-6 has-text-light">
+							<span class="mr-2" v-for="(v,k) in voption(props.option)">
+								{{vstcase(k)}}
+								<span class="font-semibold">{{v}}</span>
+							</span>
+							<!-- <span class="mr-4">Rank <span class="font-semibold">{{props.option.rank}}</span></span>
+							<span class="mr-4">Srank <span class="font-semibold">{{props.option.srank}}</span></span>
+							<span class="mr-4">Nrank <span class="font-semibold">{{props.option.nrank}}</span></span> -->
+						</p>
+						<!-- <p class="subtitle is-size-6">{{props.option.tinyName||props.option.name}}</p> -->
 					</div>
 				</div>
 			</template>

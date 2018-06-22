@@ -1,7 +1,7 @@
 // 
 
 import Vue from 'vue'
-import VueRouter, { RouteConfig } from 'vue-router'
+import VueRouter, { RouteConfig, Route } from 'vue-router'
 import * as _ from '../common/lodash'
 import * as core from '../common/core'
 import store from './store'
@@ -40,6 +40,10 @@ export const routes = [
 		name: 'symbol', path: '/symbol/:symbol',
 		meta: { nofooter: true, doctitle: false },
 		component: () => import('./routes/symbol/symbol'),
+		beforeEnter(to, from, next) {
+			if (to.params.symbol == to.params.symbol.toUpperCase()) return next();
+			next(_.merge(_.clone(to), { params: { symbol: to.params.symbol.toUpperCase() } } as Partial<Route>))
+		},
 		children: [
 			{
 				name: 'symbol.summary', path: 'summary',

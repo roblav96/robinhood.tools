@@ -21,10 +21,10 @@ import socket from '../../adapters/socket'
 		'v-symbol-ticker': () => import('./symbol.ticker'),
 		'v-symbol-chart': () => import('./symbol.chart'),
 	},
-	// beforeRouteUpdate(to, from, next) {
-	// 	if (from.name.startsWith('symbol') && from.params.symbol != to.params.symbol && to.name != from.name) {
-	// 		return next({ name: from.name, params: to.params, query: to.query })
-	// 	} next()
+	// beforeRouteEnter(to, from, next) {
+	// 	// if (from.name.startsWith('symbol') && from.params.symbol != to.params.symbol && to.name != from.name) {
+	// 	// 	return next({ name: from.name, params: to.params, query: to.query })
+	// 	// } next()
 	// },
 })
 export default class VSymbol extends Mixins(VMixin) {

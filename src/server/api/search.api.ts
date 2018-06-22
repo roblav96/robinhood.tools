@@ -32,10 +32,11 @@ polka.route({
 		query: { query: 'string' },
 	},
 	async handler(req, res) {
-		let query = core.string.alphanumeric(req.query.query, ' ').toLowerCase()
+		let query = core.string.alphanumeric(req.query.query).toLowerCase()
 		if (!query) return [];
-		let symbols = await radio.invoke({}, 'search.query', query) as string[]
-		return getQuotes(symbols)
+		let results = await radio.invoke({}, 'search.query', query) as any[]
+		let quotes = await getQuotes(results.map(v => v.symbol))
+		return quotes.map((v, i) => Object.assign(v, results[i]))
 	}
 })
 

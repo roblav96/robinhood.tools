@@ -32,18 +32,11 @@ export default class VMixin extends Vue {
 	vtruncate(value: string, length = 48) { return _.truncate(value, { length }) }
 	vcapitalize(value: string) { return core.string.capitalize(value) }
 	vstamp(stamp: number) { if (!stamp) return stamp; return pretty.stamp(stamp) }
+	vcompany(company: string) { if (!company) return company; return pretty.company(company) }
 	vtime(stamp: number, opts?: Partial<TimeFormatOptions>) { if (!stamp) return stamp; return pretty.time(stamp, opts) }
 	vnumber(value: number, opts?: Partial<NumberFormatOptions>) { if (!Number.isFinite(value)) return value; return pretty.number(value, opts) }
 	vpercent(to: number, from: number) { if (!to || !from) return NaN; return core.calc.percent(to, from) }
 	vslider(value: number, min: number, max: number) { if (!value) return NaN; return core.calc.slider(value, min, max) }
-	vname(name: string, max = 3) {
-		return name && name.split(' ').filter(v => {
-			v = v.toLowerCase()
-			let match = v.match(/\W+/g)
-			if (match && match[0] == v) max++;
-			return ['the', 'inc'].indexOf(v.replace(/\W+/g, '')) == -1
-		}).slice(0, max).join(' ').trim()
-	}
 
 	breakpoints = this.$store.state.breakpoints
 	colors = this.$store.state.colors

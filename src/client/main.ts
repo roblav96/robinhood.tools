@@ -9,6 +9,7 @@ if (process.env.DEVELOPMENT) {
 	process.hrtime = require('browser-process-hrtime')
 	// console.dtsgen = require('../common/dtsgen').default; console.warn(`console.dtsgen`)
 	Object.assign(window, require('../common/core'))
+	Object.assign(window, require('../common/pretty'))
 	Object.assign(window, { dayjs: require('dayjs') })
 }
 

@@ -55,6 +55,7 @@
 		"humanize-plus": "latest",
 		"ibm-design-colors": "latest",
 		"ioredis": "latest",
+		"js-levenshtein": "latest",
 		"leven": "latest",
 		"lockr": "latest",
 		"lodash": "latest",
@@ -77,6 +78,7 @@
 		"rxjs": "latest",
 		"signal-exit": "latest",
 		"simple-get": "latest",
+		"simple-statistics": "latest",
 		"sockette": "latest",
 		"turbo-http": "latest",
 		"turbo-net": "latest",
@@ -104,7 +106,7 @@
 		"@types/lockr": "latest",
 		"@types/lodash": "latest",
 		"@types/lunr": "latest",
-		"@types/node": "9.6.17",
+		"@types/node": "latest",
 		"@types/node-forge": "latest",
 		"@types/node-schedule": "latest",
 		"@types/p-all": "latest",
@@ -139,9 +141,7 @@
 		"tsc-wtf": "latest",
 		"typescript": "latest",
 		"vue-template-compiler": "latest",
-		"webpack": "latest",
-		"webpack-bundle-analyzer": "latest",
-		"webpack-cli": "latest"
+		"webpack-bundle-analyzer": "latest"
 	},
 	"babel": {
 		"presets": [
