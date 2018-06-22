@@ -108,6 +108,10 @@ async function syncTickers() {
 		http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/13', {
 			query: { pageSize: 9999, hl: 'en' },
 		}),
+		// recents
+		http.get('https://securitiesapi.webull.com/api/securities/calendar/recently/listed', {
+			query: { regionIds: 6, },
+		}),
 		// ipos
 		http.get('https://securitiesapi.webull.com/api/securities/calendar/recently/regions/ipo', {
 			query: {

@@ -129,7 +129,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			encode: {
 				x: 'timestamp',
 				y: 'size',
-				tooltip: 'size',
+				tooltip: ['size', 'volume'],
 			},
 		}))
 
