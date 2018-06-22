@@ -26,7 +26,7 @@ export function option(
 		animation: false,
 		progressive: SETTINGS.progressive,
 		progressiveThreshold: SETTINGS.progressiveThreshold,
-		color: [colors['grey-lighter']],
+		color: Array(16).fill(colors['grey-lighter']),
 		textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize },
 		dataset: [],
 		legend: { show: !!mods.legend },
@@ -56,11 +56,11 @@ export function option(
 				animation: false,
 				shadowStyle: { opacity: 0 },
 				lineStyle: { color: colors['grey-lighter'] },
-				crossStyle: { color: colors['grey-lighter'] },
+				crossStyle: { color: colors['grey-light'] },
 				label: {
 					formatter(params) { return charts.xlabel(params.value) },
 					backgroundColor: colors.white, shadowBlur: 0, margin: 1,
-					borderColor: colors['grey-lighter'], borderWidth: 1,
+					borderColor: colors.grey, borderWidth: 1,
 					textStyle: {
 						color: colors.dark, borderRadius: 0,
 						fontSize: SETTINGS.fontSize, padding: [4, 8], fontWeight: 'bold',
@@ -127,6 +127,7 @@ export function axis(
 		silent: true,
 		gridIndex: 0,
 		uuid: Math.random().toString(16),
+		// axisPointer: { show: true },
 		axisLabel: { textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize } },
 		axisLine: { show: !!mods.axisLine },
 		axisTick: { show: !!mods.axisTick },
@@ -182,12 +183,15 @@ export function series(
 		datasetIndex: 0,
 		xAxisIndex: 0,
 		yAxisIndex: 0,
-		showSymbol: !!mods.showSymbol,
+		showSymbol: false,
+		showAllSymbol: false,
+		symbolSize: 4,
 		emphasis: null,
+		// emphasis: { label: null, itemStyle: null },
 	} as echarts.Series
-	if (mods.symbol) {
+	if (mods.type == 'line') {
 		_.merge(series, {
-			itemStyle: { show: true, opacity: 1 },
+			lineStyle: { color: mods.itemStyle.color, width: 2 },
 		} as echarts.Series)
 	}
 	if (mods.large) {

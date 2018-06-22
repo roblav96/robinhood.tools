@@ -89,6 +89,7 @@ export default class VEChartsMixin extends Vue {
 		let length = _.max(this.getOption().dataset.map(v => v.source.length))
 		return { length, latest: core.math.clamp(core.calc.slider(length - 100, 0, length), 0, 100) }
 	}
+	splitnumber(height = this.echart.getHeight()) { return Math.round(height / 64) }
 
 
 

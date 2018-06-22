@@ -35,7 +35,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	}
 	beforeDestroy() {
-		
+
 	}
 
 
@@ -112,6 +112,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				// y: ['open', 'close', 'high', 'low'],
 				// tooltip: ['open', 'high', 'low', 'close'],
 			},
+			itemStyle: { color: colors.primary },
+			// symbol: 'diamond',
 			// itemStyle: {
 			// 	borderColor: colors.success, borderColor0: colors.danger, borderWidth: 1,
 			// 	color: colors.success, color0: colors.danger,
