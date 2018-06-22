@@ -34,8 +34,8 @@ async function start() {
 	alls.forEach(all => {
 		builder.add({
 			_symbol: all.symbol,
-			symbol: all.symbol.toLowerCase(),
-			name: core.string.clean(all.quote.name).toLowerCase(),
+			symbol: core.string.alphanumeric(all.symbol).toLowerCase(),
+			name: core.string.alphanumeric(all.quote.name, ' ').toLowerCase(),
 		})
 	})
 	search = builder.build()
@@ -50,21 +50,21 @@ radio.reply('search.query', async function onquery(query: string) {
 		if (words.length == 1) {
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 100000,
+				boost: 1000000,
 			})
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 10000,
+				boost: 100000,
 				wildcard: lunr.Query.wildcard.TRAILING,
 			})
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 1000,
+				boost: 10000,
 				wildcard: lunr.Query.wildcard.LEADING | lunr.Query.wildcard.TRAILING,
 			})
 			q.term(query, {
 				fields: ['symbol'],
-				boost: 100,
+				boost: 1000,
 				editDistance: 1,
 			})
 		}

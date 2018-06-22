@@ -16,7 +16,7 @@
 			<div class="columns is-mobile my-0 items-center">
 
 				<div class="column is-narrow">
-					<b-dropdown hoverable>
+					<b-dropdown :disabled="busy" hoverable>
 						<b-field slot="trigger">
 							<p class="control">
 								<button class="button">
@@ -60,8 +60,8 @@
 
 				<div class="column is-narrow">
 					<b-field>
-						<b-radio-button :class="{'is-loading':busy&&settings.range==v}" v-model="settings.range" type="is-primary"
-						    :disabled="busy" v-for="v in ranges" :native-value="v" :key="v">
+						<b-radio-button type="is-primary" :disabled="busy" v-model="settings.range" v-for="v in ranges" :key="v"
+						    :native-value="v">
 							<span>{{vcapitalize(v)}}</span>
 						</b-radio-button>
 					</b-field>
@@ -74,19 +74,19 @@
 				<div class="column is-narrow">
 					<b-field grouped>
 						<p class="control">
-							<button class="button" @click="resetzoom">
+							<button class="button" :disabled="busy" @click="resetzoom">
 								<b-icon icon="crop-landscape"></b-icon>
 							</button>
 						</p>
 						<p class="control">
 							<b-tooltip :active="brushing" label="Click and drag chart area to crop zoom" animated>
-								<button class="button" :class="{'is-primary':brushing}" @click="brushing=!brushing">
+								<button class="button" :disabled="busy" :class="{'is-primary':brushing}" @click="brushing=!brushing">
 									<b-icon icon="crop"></b-icon>
 								</button>
 							</b-tooltip>
 						</p>
 						<p class="control">
-							<button class="button" @click="latestzoom">
+							<button class="button" :disabled="busy" @click="latestzoom">
 								<b-icon icon="chevron-double-right"></b-icon>
 							</button>
 						</p>

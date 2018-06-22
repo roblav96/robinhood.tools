@@ -107,12 +107,12 @@ export const string = {
 	},
 	nostops(value: string) {
 		return value && value.split(' ').filter(v => {
-			return STOP_WORDS.indexOf(v.toLowerCase().replace(/\W+/g, '')) == -1
+			return STOP_WORDS.indexOf(v.toLowerCase().replace(/[^a-z]+/g, '').trim()) == -1
 		}).join(' ').trim()
 	},
 	minify(value: string) {
 		if (!value) return value;
-		value = value.replace(/[^a-zA-Z ]/g, ' ').replace(/\s\s+/g, ' ').toLowerCase().trim()
+		value = value.toLowerCase().replace(/[^a-z]+/g, ' ').trim()
 		return value.split(' ').filter(v => STOP_WORDS.indexOf(v) == -1).join(' ').trim()
 	},
 	tags(value: string, input = [] as string[]) {
@@ -122,7 +122,7 @@ export const string = {
 		return _.uniq(_.compact(tags)).filter(v => v && v.length > 2 && STOP_WORDS.indexOf(v) == -1)
 	},
 	id(value: string) {
-		return value && string.hash(string.minify(value).replace(/\s/g, '').trim())
+		return value && string.hash(string.minify(value).replace(/\s+/g, '').trim())
 	},
 	hash(value: string) {
 		value = value.toString()
@@ -135,15 +135,14 @@ export const string = {
 		}
 		return Math.abs(hash).toString()
 	},
-	alphanumeric(value: string) {
-		return value && value.replace(/\W+/g, '').trim()
+	alphanumeric(value: string, spaces = '') {
+		return value && value.replace(/[^a-zA-Z0-9 ]+/g, '').replace(/\s+/g, spaces).trim()
 	},
-	clean(value: string) {
-		if (!value) return value;
-		return value && value.replace(/[^a-zA-Z0-9-_. ]/g, '').replace(/\s\s+/g, ' ').trim()
+	clean(value: string, spaces = '') {
+		return value && value.replace(/[^a-zA-Z0-9-. ]+/g, '').replace(/\s+/g, spaces).trim()
 	},
 	capitalize(value: string) {
-		return value && value.trim().replace(/\s\s+/g, ' ').toLowerCase().split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ').trim()
+		return value && value.replace(/\s+/g, ' ').trim().toLowerCase().split(' ').map(word => word[0].toUpperCase() + word.substr(1)).join(' ').trim()
 	},
 	leven(a: string, b: string) {
 		return leven(a, b) as number
