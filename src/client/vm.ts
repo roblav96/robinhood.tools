@@ -18,7 +18,6 @@ router.beforeEach(function(to, from, next) {
 	security.token().catch(function(error) {
 		console.error(`vm Error ->`, error)
 	}).finally(function() {
-		vm.$mount('#app')
 		next()
 		return socket.discover()
 	})
@@ -26,5 +25,6 @@ router.beforeEach(function(to, from, next) {
 
 const vm = new Vue({ router, store, render: h => h(App) })
 export default vm
+vm.$mount('#app')
 
 
