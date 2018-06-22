@@ -7,23 +7,13 @@ import * as rkeys from '../../common/rkeys'
 import * as redis from '../adapters/redis'
 import * as http from '../../common/http'
 import * as utils from '../adapters/utils'
+import * as quotes from '../adapters/quotes'
 import radio from '../adapters/radio'
 import polka from './polka'
 
 
 
-async function getQuotes(symbols: string[]) {
-	// let ikeys = ['symbol', 'name', 'tinyName', 'country', 'exchange', 'acronym', 'mic', 'type', 'typeof'] as KeysOf<Quotes.Quote>
-	let ikeys = ['symbol', 'name', 'tinyName'] as KeysOf<Quotes.Quote>
-	let resolved = await redis.main.coms(symbols.map(symbol => {
-		return ['hmget', `${rkeys.QUOTES}:${symbol}`].concat(ikeys)
-	}))
-	return resolved.map((v: Quotes.Quote) => {
-		v = redis.fixHmget(v, ikeys)
-		core.fix(v)
-		return v
-	})
-}
+const IKEYS = ['name'] as KeysOf<Quotes.Quote> // ['symbol', 'name', 'tinyName', 'country', 'exchange', 'acronym', 'mic', 'type', 'typeof'] as KeysOf<Quotes.Quote>
 
 polka.route({
 	method: 'GET',
@@ -35,8 +25,9 @@ polka.route({
 		let query = core.string.alphanumeric(req.query.query).toLowerCase()
 		if (!query) return [];
 		let results = await radio.invoke({}, 'search.query', query) as any[]
-		let quotes = await getQuotes(results.map(v => v.symbol))
-		return quotes.map((v, i) => Object.assign(v, results[i]))
+		if (results.length == 0) return [];
+		let alls = await quotes.getAlls(results.map(v => v.symbol), ['quote'], [IKEYS])
+		return alls.map((v, i) => Object.assign(v.quote, results[i]))
 	}
 })
 
@@ -44,36 +35,13 @@ polka.route({
 	method: 'POST',
 	url: '/api/recents',
 	schema: {
-		body: {
-			symbols: { type: 'array', items: 'string' },
-		},
+		body: { symbols: { type: 'array', items: 'string' } },
 	},
 	async handler(req, res) {
 		let symbols = req.body.symbols as string[]
-		return getQuotes(symbols)
+		let alls = await quotes.getAlls(symbols, ['quote'], [IKEYS])
+		return alls.map(v => v.quote)
 	}
 })
-
-
-
-
-
-
-
-// const IKEYS = ['symbol', 'name', 'alive', 'acronym', 'mic', 'type', 'country'] as KeysOf<Robinhood.Instrument>
-// async function getInstruments(symbols: string[]) {
-// 	let coms = symbols.map(v => ['hmget', `${rkeys.RH.INSTRUMENTS}:${v}`].concat(IKEYS))
-// 	let results = await redis.main.coms(coms) as Robinhood.Instrument[]
-// 	results = results.map(v => redis.fixHmget(v as any, IKEYS))
-// 	results.forEach(core.fix)
-// 	return results
-// }
-
-// async function getInstruments(symbols: string[]) {
-// 	let coms = symbols.map(v => ['hgetall', `${rkeys.RH.INSTRUMENTS}:${v}`])
-// 	let results = await redis.main.coms(coms) as Robinhood.Instrument[]
-// 	results.forEach(core.fix)
-// 	return results
-// }
 
 

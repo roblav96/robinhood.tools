@@ -77,6 +77,12 @@ export function fallback<T>(...values: T[]): T {
 	return _.compact(values)[0]
 }
 
+export function outlier(fn: 'min' | 'max', ...values: string[]) {
+	values = _.uniq(_.compact(values))
+	let length = _[fn](values.map(v => v.length))
+	return values.find(v => v.length == length)
+}
+
 
 
 export const calc = {

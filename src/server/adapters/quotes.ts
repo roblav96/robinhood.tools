@@ -34,6 +34,7 @@ export async function getAlls(symbols: string[], allrkeys = Object.keys(quotes.A
 				resolve = redis.fixHmget(resolve, ikeys)
 			}
 			core.fix(resolve || {})
+			resolve.symbol = symbol
 			all[k] = resolve
 		})
 		return all

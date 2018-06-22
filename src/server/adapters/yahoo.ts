@@ -37,16 +37,22 @@ export async function getQuotes(symbols: string[]): Promise<Yahoo.Quote[]> {
 
 	response.quoteResponse.result.remove(v => !v)
 	response.quoteResponse.result.forEach(v => {
+		v.symbol = v.symbol.toUpperCase()
+		if (v.longName) v.longName = fixName(v.longName);
+		if (v.shortName) v.shortName = fixName(v.shortName);
 		Object.keys(v).forEach(k => {
 			let value = v[k]
 			if (core.number.isFinite(value) && k.toLowerCase().includes('time')) {
 				v[k] = value * 1000
 			}
 		})
-		v.symbol = v.symbol.toUpperCase()
 	})
 	return response.quoteResponse.result
 
+}
+
+export function fixName(name: string) {
+	return name && name.replace(/&amp;+/g, '&').replace(/[Â]+/g, '').trim()
 }
 
 export async function syncQuotes(symbols: string[]) {

@@ -5,201 +5,8 @@ import * as core from './core'
 import * as rkeys from './rkeys'
 import * as iex from './iex'
 import * as webull from './webull'
+import * as yahoo from './yahoo'
 import * as hours from './hours'
-
-
-
-export const ALL_RKEYS = {
-	'quote': rkeys.QUOTES,
-	'wbticker': rkeys.WB.TICKERS,
-	'wbquote': rkeys.WB.QUOTES,
-	'instrument': rkeys.RH.INSTRUMENTS,
-	'yhquote': rkeys.YH.QUOTES,
-	'iexitem': rkeys.IEX.ITEMS,
-}
-declare global { namespace Quotes { type AllKeys = keyof typeof ALL_RKEYS } }
-
-
-
-export function isSymbol(symbol: string) {
-	return !Array.isArray(symbol.match(/[^a-zA-Z0-9-.]/))
-}
-
-export function convert<T>(quote: T, qkeys: string[]) {
-	Object.keys(quote).forEach(k => {
-		if (qkeys.indexOf(k) == -1) delete quote[k];
-	})
-}
-export function getConverted<T>(quote: T, qkeys: string[]) {
-	let toquote = {} as T
-	qkeys.forEach(k => {
-		let v = quote[k]
-		if (v != null) toquote[k] = v;
-	})
-	return toquote
-}
-
-
-
-let string = ''
-let number = 0
-let boolean = false
-
-declare global { namespace Quotes { type ITiny = typeof TINY; interface Tiny extends ITiny { } } }
-const TINY = {
-	symbol: string,
-	price: number,
-	timestamp: number,
-}
-export const TINY_KEYS = Object.keys(TINY).sort() as (keyof typeof TINY)[]
-export const ALL_TINY_KEYS = TINY_KEYS.sort() as (keyof Quotes.Tiny)[]
-core.nullify(TINY)
-
-
-
-declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Tiny { } } }
-const LIVE = {
-	stamp: number,
-	// 
-	status: string,
-	statusTimestamp: number,
-	// 
-	liveCount: number,
-	liveStamp: number,
-	// 
-	open: number,
-	high: number,
-	low: number,
-	close: number,
-	// 
-	dayHigh: number,
-	dayLow: number,
-	yearHigh: number,
-	yearLow: number,
-	// 
-	bid: number,
-	ask: number,
-	bids: number,
-	asks: number,
-	// 
-	bidSpread: number,
-	askSpread: number,
-	bidSize: number,
-	askSize: number,
-	bidVolume: number,
-	askVolume: number,
-	// 
-	size: number,
-	volume: number,
-	// 
-	dealAmount: number,
-	dealCount: number,
-	dealSize: number,
-	dealVolume: number,
-	// 
-	buySize: number,
-	sellSize: number,
-	buyVolume: number,
-	sellVolume: number,
-	// 
-	turnoverRate: number,
-	vibrateRatio: number,
-	yield: number,
-}
-export const LIVE_KEYS = Object.keys(LIVE).sort() as (keyof typeof LIVE)[]
-export const ALL_LIVE_KEYS = LIVE_KEYS.concat(ALL_TINY_KEYS as any).sort() as (keyof Quotes.Live)[]
-core.nullify(LIVE)
-
-
-
-declare global { namespace Quotes { type ICalc = typeof CALC; interface Calc extends ICalc, Live { } } }
-const CALC = {
-	change: number,
-	percent: number,
-	startPrice: number,
-	openPrice: number,
-	closePrice: number,
-	prevClose: number,
-	// 
-	spread: number,
-	baSpread: number,
-	baFlowSize: number,
-	baFlowVolume: number,
-	// 
-	dealFlowVolume: number,
-	dealFlowSize: number,
-	// 
-	avgVolume: number,
-	avgVolume10Day: number,
-	avgVolume3Month: number,
-	sharesOutstanding: number,
-	sharesFloat: number,
-	marketCap: number,
-	// 
-	quoteMaker: string,
-	quoteMakerAddress: string,
-	// 
-	prePrice: number,
-	preChange: number,
-	prePercent: number,
-	preTimestamp: number,
-	// 
-	regPrice: number,
-	regChange: number,
-	regPercent: number,
-	regTimestamp: number,
-	// 
-	postPrice: number,
-	postChange: number,
-	postPercent: number,
-	postTimestamp: number,
-}
-export const CALC_KEYS = Object.keys(CALC).sort() as (keyof typeof CALC)[]
-export const ALL_CALC_KEYS = CALC_KEYS.concat(ALL_LIVE_KEYS as any).sort() as (keyof Quotes.Calc)[]
-core.nullify(CALC)
-
-
-
-declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
-const FULL = {
-	tickerId: number,
-	type: string,
-	typeof: string as TypeOfSymbols,
-	alive: boolean,
-	name: string,
-	tinyName: string,
-	fullName: string,
-	description: string,
-	mic: string,
-	acronym: string,
-	exchange: string,
-	country: string,
-	timezone: string,
-	issueType: string,
-	currency: string,
-	sector: string,
-	industry: string,
-	website: string,
-	listDate: number,
-}
-export const FULL_KEYS = Object.keys(FULL).sort() as (keyof typeof FULL)[]
-export const ALL_FULL_KEYS = FULL_KEYS.concat(ALL_CALC_KEYS as any).sort() as (keyof Quotes.Full)[]
-core.nullify(FULL)
-
-
-
-declare global { namespace Quotes { type IDeal = typeof DEAL; interface Deal extends IDeal { } } }
-const DEAL = {
-	symbol: string,
-	price: number,
-	size: number,
-	flag: string as 'N' | 'B' | 'S',
-	timestamp: number,
-}
-export const DEAL_KEYS = Object.keys(DEAL).sort() as (keyof Quotes.Deal)[]
-core.nullify(DEAL)
-
-
 
 
 
@@ -230,13 +37,11 @@ export function applyFull(
 		sharesFloat: _.round(core.fallback(wbquote.outstandingShares, iexitem.float)),
 	} as Quotes.Quote)
 
-	let yhnames = _.compact([yhquote.shortName, yhquote.longName]).reduce((from, to, i) => {
-		return 
-	})
-	let yhname = (yhnames.find(v => v.length == _.min(yhnames.map(v => v.length))) || '').replace(/&amp;+/g, '&').replace(/[Â]+/g, '');
-	quote.name = core.fallback(yhquote.longName, iexitem.companyName, instrument.name, wbticker.name)
-	quote.tinyName = core.fallback(instrument.simple_name, yhquote.longName, wbticker.tinyName, quote.name)
-	quote.fullName = core.fallback(instrument.name, yhquote.longName, wbticker.name, quote.name)
+	let wbname = core.outlier('min', wbticker.tinyName, wbticker.name)
+	let yhname = core.outlier('min', yhquote.shortName, yhquote.longName)
+	quote.name = core.fallback(yhname, iexitem.companyName, instrument.name, wbname)
+	quote.tinyName = core.fallback(instrument.simple_name, yhname, wbname, quote.name)
+	quote.fullName = core.fallback(instrument.name, yhname, wbname, quote.name)
 
 	quote.avgVolume10Day = _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day))
 	quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))
@@ -517,6 +322,198 @@ export function mergeCalcs(wbquote: Webull.Quote, quote: Quotes.Calc, toquote?: 
 
 	return quote
 }
+
+
+
+
+
+export const ALL_RKEYS = {
+	'quote': rkeys.QUOTES,
+	'wbticker': rkeys.WB.TICKERS,
+	'wbquote': rkeys.WB.QUOTES,
+	'instrument': rkeys.RH.INSTRUMENTS,
+	'yhquote': rkeys.YH.QUOTES,
+	'iexitem': rkeys.IEX.ITEMS,
+}
+declare global { namespace Quotes { type AllKeys = keyof typeof ALL_RKEYS } }
+
+export function convert<T>(quote: T, qkeys: string[]) {
+	Object.keys(quote).forEach(k => {
+		if (qkeys.indexOf(k) == -1) delete quote[k];
+	})
+}
+export function getConverted<T>(quote: T, qkeys: string[]) {
+	let toquote = {} as T
+	qkeys.forEach(k => {
+		let v = quote[k]
+		if (v != null) toquote[k] = v;
+	})
+	return toquote
+}
+
+export function isSymbol(symbol: string) {
+	return !Array.isArray(symbol.match(/[^a-zA-Z0-9-.]/))
+}
+
+
+
+let string = ''
+let number = 0
+let boolean = false
+
+declare global { namespace Quotes { type ITiny = typeof TINY; interface Tiny extends ITiny { } } }
+const TINY = {
+	symbol: string,
+	price: number,
+	timestamp: number,
+}
+export const TINY_KEYS = Object.keys(TINY).sort() as (keyof typeof TINY)[]
+export const ALL_TINY_KEYS = TINY_KEYS.sort() as (keyof Quotes.Tiny)[]
+core.nullify(TINY)
+
+
+
+declare global { namespace Quotes { type ILive = typeof LIVE; interface Live extends ILive, Tiny { } } }
+const LIVE = {
+	stamp: number,
+	// 
+	status: string,
+	statusTimestamp: number,
+	// 
+	liveCount: number,
+	liveStamp: number,
+	// 
+	open: number,
+	high: number,
+	low: number,
+	close: number,
+	// 
+	dayHigh: number,
+	dayLow: number,
+	yearHigh: number,
+	yearLow: number,
+	// 
+	bid: number,
+	ask: number,
+	bids: number,
+	asks: number,
+	// 
+	bidSpread: number,
+	askSpread: number,
+	bidSize: number,
+	askSize: number,
+	bidVolume: number,
+	askVolume: number,
+	// 
+	size: number,
+	volume: number,
+	// 
+	dealAmount: number,
+	dealCount: number,
+	dealSize: number,
+	dealVolume: number,
+	// 
+	buySize: number,
+	sellSize: number,
+	buyVolume: number,
+	sellVolume: number,
+	// 
+	turnoverRate: number,
+	vibrateRatio: number,
+	yield: number,
+}
+export const LIVE_KEYS = Object.keys(LIVE).sort() as (keyof typeof LIVE)[]
+export const ALL_LIVE_KEYS = LIVE_KEYS.concat(ALL_TINY_KEYS as any).sort() as (keyof Quotes.Live)[]
+core.nullify(LIVE)
+
+
+
+declare global { namespace Quotes { type ICalc = typeof CALC; interface Calc extends ICalc, Live { } } }
+const CALC = {
+	change: number,
+	percent: number,
+	startPrice: number,
+	openPrice: number,
+	closePrice: number,
+	prevClose: number,
+	// 
+	spread: number,
+	baSpread: number,
+	baFlowSize: number,
+	baFlowVolume: number,
+	// 
+	dealFlowVolume: number,
+	dealFlowSize: number,
+	// 
+	avgVolume: number,
+	avgVolume10Day: number,
+	avgVolume3Month: number,
+	sharesOutstanding: number,
+	sharesFloat: number,
+	marketCap: number,
+	// 
+	quoteMaker: string,
+	quoteMakerAddress: string,
+	// 
+	prePrice: number,
+	preChange: number,
+	prePercent: number,
+	preTimestamp: number,
+	// 
+	regPrice: number,
+	regChange: number,
+	regPercent: number,
+	regTimestamp: number,
+	// 
+	postPrice: number,
+	postChange: number,
+	postPercent: number,
+	postTimestamp: number,
+}
+export const CALC_KEYS = Object.keys(CALC).sort() as (keyof typeof CALC)[]
+export const ALL_CALC_KEYS = CALC_KEYS.concat(ALL_LIVE_KEYS as any).sort() as (keyof Quotes.Calc)[]
+core.nullify(CALC)
+
+
+
+declare global { namespace Quotes { type IFull = typeof FULL; interface Full extends IFull, Calc { } } }
+const FULL = {
+	tickerId: number,
+	type: string,
+	typeof: string as TypeOfSymbols,
+	alive: boolean,
+	name: string,
+	tinyName: string,
+	fullName: string,
+	description: string,
+	mic: string,
+	acronym: string,
+	exchange: string,
+	country: string,
+	timezone: string,
+	issueType: string,
+	currency: string,
+	sector: string,
+	industry: string,
+	website: string,
+	listDate: number,
+}
+export const FULL_KEYS = Object.keys(FULL).sort() as (keyof typeof FULL)[]
+export const ALL_FULL_KEYS = FULL_KEYS.concat(ALL_CALC_KEYS as any).sort() as (keyof Quotes.Full)[]
+core.nullify(FULL)
+
+
+
+declare global { namespace Quotes { type IDeal = typeof DEAL; interface Deal extends IDeal { } } }
+const DEAL = {
+	symbol: string,
+	price: number,
+	size: number,
+	flag: string as 'N' | 'B' | 'S',
+	timestamp: number,
+}
+export const DEAL_KEYS = Object.keys(DEAL).sort() as (keyof Quotes.Deal)[]
+core.nullify(DEAL)
 
 
 
