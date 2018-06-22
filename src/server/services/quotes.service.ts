@@ -78,7 +78,7 @@ async function start() {
 			socket.emit(`${rkeys.QUOTES}:${symbol}`, quote)
 		}
 		quotes.convert(quote, quotes.ALL_CALC_KEYS)
-		quotes.mergeCalcs(quote, quotes.resetLive(quote))
+		quotes.mergeCalcs(wbquote, quote, quotes.resetLive(quote))
 		Object.assign(QUOTES.CALCS, { [symbol]: core.clone(quote) })
 		Object.assign(QUOTES.LIVES, { [symbol]: core.clone(quote) })
 		Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
@@ -100,7 +100,12 @@ async function start() {
 
 emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 	let symbol = wbdata.symbol
-	if (!symbol) return console.warn(symbol, webull.mqtt_topics[topic], `!symbol ->\nwbdata ->`, wbdata);
+	if (!symbol) return console.warn(webull.mqtt_topics[topic], '->\n' + symbol, `!symbol ->\nwbdata ->`, core.sort.keys(wbdata));
+
+	// console.log(webull.mqtt_topics[topic], '->\n' + symbol, '->\nwbdata ->', core.sort.keys(wbdata))
+	let towbquote = {} as Webull.Quote
+	let wbquote = WB.QUOTES[symbol]
+	if (!wbquote) return console.warn(webull.mqtt_topics[topic], '->\n' + symbol, `!wbquote ->\nwbdata ->`, core.sort.keys(wbdata));
 
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
 		let deal = quotes.toDeal(wbdata)
@@ -108,19 +113,14 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 			socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
 		}
 		let quote = QUOTES.CALCS[symbol]
-		quotes.mergeCalcs(quote, quotes.applyWbQuote(quote, {} as any, quotes.applyDeal(quote, deal)))
+		quotes.mergeCalcs(wbquote, quote, quotes.applyWbQuote(quote, {} as any, quotes.applyDeal(quote, deal)))
 		return
 	}
 
 	if (topic == webull.mqtt_topics.TICKER_BID_ASK) {
 		let quote = QUOTES.CALCS[symbol]
-		quotes.mergeCalcs(quote, quotes.applyWbQuote(quote, wbdata))
+		quotes.mergeCalcs(wbquote, quote, quotes.applyWbQuote(quote, wbdata))
 	}
-
-	// console.log(symbol, webull.mqtt_topics[topic], '->\nwbdata ->', wbdata)
-	let towbquote = {} as Webull.Quote
-	let wbquote = WB.QUOTES[symbol]
-	if (!wbquote) return console.warn(symbol, webull.mqtt_topics[topic], `!wbquote ->\nwbdata ->`, wbdata);
 
 	Object.keys(wbdata).forEach(key => {
 		let to = wbdata[key]
@@ -132,7 +132,7 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 
 	let tokeys = Object.keys(towbquote)
 	if (tokeys.length > 0) {
-		// console.info(symbol, webull.mqtt_topics[topic], '->\ntowbquote ->', towbquote)
+		// console.info(webull.mqtt_topics[topic], '->\n' + symbol, '->\ntowbquote ->', core.sort.keys(towbquote))
 		core.object.mergeAll([WB.QUOTES[symbol], WB.EMITS[symbol]], towbquote, tokeys)
 	}
 })
@@ -145,12 +145,13 @@ function ontick() {
 	let live = new Date().getSeconds() % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
 
 	SYMBOLS.forEach(symbol => {
+		let wbquote = WB.QUOTES[symbol]
 		let quote = QUOTES.CALCS[symbol]
 
 		let towbquote = WB.EMITS[symbol]
 		if (Object.keys(towbquote).length > 0) {
 			core.object.merge(WB.SAVES[symbol], towbquote)
-			quotes.mergeCalcs(quote, quotes.applyWbQuote(quote, towbquote))
+			quotes.mergeCalcs(wbquote, quote, quotes.applyWbQuote(quote, towbquote))
 			if (process.env.PRODUCTION) {
 				towbquote.symbol = symbol
 				socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, towbquote)
@@ -186,7 +187,7 @@ function ontick() {
 				ldiff = core.object.difference(flquote, quote)
 				core.object.merge(flquote, quote)
 
-				quotes.mergeCalcs(quote, quotes.resetLive(quote))
+				quotes.mergeCalcs(wbquote, quote, quotes.resetLive(quote))
 
 			}
 			if (Object.keys(ldiff).length > 0) {
@@ -197,6 +198,7 @@ function ontick() {
 		let fequote = QUOTES.EMITS[symbol]
 		let ediff = core.object.difference(fequote, quote)
 		if (Object.keys(ediff).length > 0) {
+			// console.log(symbol, `ediff ->`, core.sort.keys(ediff))
 			if (process.env.PRODUCTION) {
 				ediff.stamp = stamp
 				ediff.symbol = symbol

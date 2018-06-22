@@ -92,6 +92,7 @@ const LIVE = {
 	size: number,
 	volume: number,
 	// 
+	dealAmount: number,
 	dealCount: number,
 	dealSize: number,
 	dealVolume: number,
@@ -239,15 +240,15 @@ export function applyFull(
 
 	// let toquote = core.clone(quote)
 	let toquote = { symbol, stamp: Date.now() } as Quotes.Quote
-	mergeCalcs(toquote, applyWbQuote(toquote, wbquote))
+	mergeCalcs(wbquote, toquote, applyWbQuote(toquote, wbquote))
 	core.object.merge(toquote, resetFull(toquote))
-	mergeCalcs(toquote)
+	mergeCalcs(wbquote, toquote)
 	core.object.repair(quote, toquote)
 	// console.log(`toquote ->`, JSON.parse(JSON.stringify(core.sort.keys(toquote))))
 
 	if (resets) {
 		core.object.merge(quote, resetFull(quote))
-		mergeCalcs(quote)
+		mergeCalcs(wbquote, quote)
 		// console.log(`quote ->`, JSON.parse(JSON.stringify(core.sort.keys(quote))))
 	}
 
@@ -292,10 +293,10 @@ export function resetFull(quote: Quotes.Calc) {
 
 export function toDeal(wbdeal: Webull.Deal) {
 	return {
+		symbol: wbdeal.symbol,
 		price: wbdeal.deal,
 		flag: wbdeal.tradeBsFlag,
 		size: wbdeal.volume,
-		symbol: wbdeal.symbol,
 		timestamp: wbdeal.tradeTime,
 	} as Quotes.Deal
 }
@@ -363,8 +364,8 @@ export const KEY_MAP = (({
 	'tradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
 	'mktradeTime': ({ key: 'timestamp', time: true } as KeyMapValue) as any,
 	// 
+	'dealAmount': ({ key: 'dealAmount', greater: true } as KeyMapValue) as any,
 	'dealNum': ({ key: 'dealCount', greater: true } as KeyMapValue) as any,
-	'dealAmount': ({ key: 'dealCount', greater: true } as KeyMapValue) as any,
 	'volume': ({ key: 'volume', greater: true } as KeyMapValue) as any,
 	// '____': ({ key: '____' } as KeyMapValue) as any,
 } as Webull.Quote) as any) as Dict<KeyMapValue>
@@ -452,51 +453,47 @@ export function applyWbQuote(quote: Quotes.Calc, wbquote: Webull.Quote, toquote 
 
 
 
-export function mergeCalcs(quote: Quotes.Calc, toquote?: Quotes.Calc) {
+export function mergeCalcs(wbquote: Webull.Quote, quote: Quotes.Calc, toquote?: Quotes.Calc) {
 	if (toquote) core.object.merge(quote, toquote);
 	else toquote = quote;
 
-	if (toquote.price || toquote.timestamp) {
-		let state = hours.getState(hours.rxhours.value, quote.timestamp)
+	const fa = new Date().getHours() < 12 ? 'pre' : 'post'
+	if (toquote.price) {
+		if (!quote.startPrice) quote.startPrice = quote.price;
 
-		if (toquote.price) {
-			if (!quote.startPrice) quote.startPrice = quote.price;
+		quote.close = quote.price
+		quote.change = core.math.round(core.math.sum(quote.price, -quote.startPrice), 6)
+		quote.percent = core.math.round(core.calc.percent(quote.price, quote.startPrice), 6)
 
-			quote.close = quote.price
-			quote.change = core.math.round(core.math.sum(quote.price, -quote.startPrice), 6)
-			quote.percent = core.math.round(core.calc.percent(quote.price, quote.startPrice), 6)
-
-			if (state.indexOf('PRE') == 0 || !quote.prePrice) {
-				quote.prePrice = quote.price
-				quote.preChange = core.math.round(core.math.sum(quote.price, -quote.startPrice), 6)
-				quote.prePercent = core.math.round(core.calc.percent(quote.price, quote.startPrice), 6)
-			}
-			if (state == 'REGULAR' || !quote.regPrice) {
-				quote.regPrice = quote.price
-				quote.regChange = core.math.round(core.math.sum(quote.price, -quote.openPrice), 6)
-				quote.regPercent = core.math.round(core.calc.percent(quote.price, quote.openPrice), 6)
-			}
-			if (state.indexOf('POST') == 0 || !quote.postPrice) {
-				quote.postPrice = quote.price
-				quote.postChange = core.math.round(core.math.sum(quote.price, -quote.closePrice), 6)
-				quote.postPercent = core.math.round(core.calc.percent(quote.price, quote.closePrice), 6)
-			}
-
-			if (quote.sharesOutstanding) {
-				quote.marketCap = core.math.round(quote.price * quote.sharesOutstanding)
-			}
+		if (fa == 'pre' && wbquote.faTradeTime > wbquote.mktradeTime) {
+			quote.prePrice = quote.price
+			quote.preChange = core.math.round(core.math.sum(quote.price, -quote.startPrice), 6)
+			quote.prePercent = core.math.round(core.calc.percent(quote.price, quote.startPrice), 6)
+		}
+		if (wbquote.mktradeTime > wbquote.faTradeTime) {
+			quote.regPrice = quote.price
+			quote.regChange = core.math.round(core.math.sum(quote.price, -quote.openPrice), 6)
+			quote.regPercent = core.math.round(core.calc.percent(quote.price, quote.openPrice), 6)
+		}
+		if (fa == 'post' && wbquote.faTradeTime > wbquote.mktradeTime) {
+			quote.postPrice = quote.price
+			quote.postChange = core.math.round(core.math.sum(quote.price, -quote.closePrice), 6)
+			quote.postPercent = core.math.round(core.calc.percent(quote.price, quote.closePrice), 6)
 		}
 
-		if (toquote.timestamp) {
-			if (state.indexOf('PRE') == 0) {
-				quote.preTimestamp = quote.timestamp
-			}
-			if (state == 'REGULAR') {
-				quote.regTimestamp = quote.timestamp
-			}
-			if (state.indexOf('POST') == 0) {
-				quote.postTimestamp = quote.timestamp
-			}
+		if (quote.sharesOutstanding) {
+			quote.marketCap = core.math.round(quote.price * quote.sharesOutstanding)
+		}
+	}
+	if (toquote.timestamp) {
+		if (fa == 'pre' && wbquote.faTradeTime > wbquote.mktradeTime) {
+			quote.preTimestamp = quote.timestamp
+		}
+		if (wbquote.mktradeTime > wbquote.faTradeTime) {
+			quote.regTimestamp = quote.timestamp
+		}
+		if (fa == 'post' && wbquote.faTradeTime > wbquote.mktradeTime) {
+			quote.postTimestamp = quote.timestamp
 		}
 	}
 
