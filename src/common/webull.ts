@@ -12,6 +12,7 @@ export const WB = {
 	TICKERS: 'wb:tickers',
 	QUOTES: 'wb:quotes',
 	DEALS: 'wb:deals',
+	EXCHANGES: 'wb:exchanges',
 }
 
 export const forex = [
@@ -435,6 +436,29 @@ declare global {
 			timeZone: string
 			version: string
 			zzz: string
+		}
+
+		namespace Exchange {
+			interface Region {
+				countryCallingCode: string
+				id: number
+				isoCode: string
+				mainCurrencyId: number
+				name: string
+			}
+		}
+		interface Exchange {
+			amClose: string
+			amOpen: string
+			appRegion: Exchange.Region
+			code: string
+			id: number
+			name: string
+			pmClose: string
+			pmOpen: string
+			regionId: number
+			showCode: string
+			timeZone: string
 		}
 
 	}

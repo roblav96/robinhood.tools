@@ -23,6 +23,8 @@ export const FSYMBOLS = {
 	INDEXES: 'fsymbols:indexes',
 }
 
+
+
 export const SECURITY = {
 	DOC: 'security:doc',
 }

@@ -57,7 +57,7 @@ export async function syncQuotes(symbols: string[]) {
 				return ['hmset', `${rkeys.YH.QUOTES}:${yhquote.symbol}`, yhquote as any]
 			}))
 		})
-	}), { concurrency: 2 })
+	}), { concurrency: 1 })
 }
 
 

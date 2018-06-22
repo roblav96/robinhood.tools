@@ -62,6 +62,6 @@ declare global { namespace NodeJS { interface ProcessEnv { DEBUGGER: any } } }
 
 
 Object.assign(console, { dtsgen: function() { } })
-// if (process.env.DEVELOPMENT) console.dtsgen = require('../../common/dtsgen').default;
+if (process.env.DEVELOPMENT) console.dtsgen = require('../../common/dtsgen').default;
 
 
