@@ -27,15 +27,16 @@ async function start() {
 	let symbols = await utils.getAllSymbols()
 	// if (process.env.DEVELOPMENT) symbols = Object.keys(utils.DEV_STOCKS);
 
-	let ikeys = ['name'] as KeysOf<Quotes.Quote>
+	let ikeys = ['name', 'alive'] as KeysOf<Quotes.Quote>
 	let alls = await quotes.getAlls(symbols, ['quote'], [ikeys])
 
 	alls.forEach(all => {
-		if (all.symbol.includes('-')) return;
+		// if (all.symbol.includes('-')) return;
+		if (!all.quote.alive) return;
 		QUOTES.push({
 			_symbol: all.symbol,
-			symbol: core.string.clean(all.symbol).toLowerCase(),
-			name: core.string.clean(pretty.company(all.quote.name)).toLowerCase(),
+			symbol: core.string.alphanumeric(all.symbol).toLowerCase(),
+			name: core.string.alphanumeric(pretty.company(all.quote.name)).toLowerCase(),
 		})
 	})
 
@@ -44,8 +45,7 @@ async function start() {
 
 
 radio.reply('search.query', async function onquery(query: string) {
-	let stamp = Date.now()
-	let results = QUOTES.map(({ _symbol, symbol, name }) => {
+	return QUOTES.map(({ _symbol, symbol, name }) => {
 		let ranks = [] as number[]
 
 		let s_leven = core.string.levenshtein(query, symbol)
@@ -62,14 +62,17 @@ radio.reply('search.query', async function onquery(query: string) {
 			symbol: _symbol,
 			rank: ranks.reduce((prev, next) => prev *= next, 1),
 		} as Search.Result
-		if (process.env.DEVELOPMENT) result.ranks = ranks;
+		if (process.env.DEVELOPMENT) {
+			Object.assign(result, { debug: { query, symbol, name, ranks } } as Search.Result)
+		}
 		return result
 
-		// }).sort((a, b) => b.rank - a.rank).slice(0, 20)
-	})
-	results = _.orderBy(results, ['rank', 'symbol'], ['desc', 'asc']).slice(0, 20)
-	console.log(`search.query -> ${query}`, pretty.ms(Date.now() - stamp))
-	return results
+	}).sort((a, b) => {
+		if (a.rank != b.rank) return b.rank - a.rank;
+		if (a.symbol < b.symbol) return -1;
+		if (a.symbol > b.symbol) return 1;
+		return 0
+	}).slice(0, 20)
 })
 
 
@@ -81,7 +84,12 @@ declare global {
 		interface Result {
 			symbol: string
 			rank: number
-			ranks: number[]
+			debug: {
+				query: string
+				symbol: string
+				name: string
+				ranks: number[]
+			}
 		}
 	}
 }

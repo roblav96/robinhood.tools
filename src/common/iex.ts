@@ -29,7 +29,7 @@ export const BATCH_TYPES = [
 
 export const ISSUE_TYPES = {
 	// '': `Not Available, Warrant, Note, or Non-Filing`,
-	'': `Not Available or Non-Filing`,
+	// '': `Not Available or Non-Filing`,
 	ad: `American Depository Receipt (ADR)`,
 	re: `Real Estate Investment Trust (REIT)`,
 	ce: `Closed End Fund (Stock and Bond Fund)`,

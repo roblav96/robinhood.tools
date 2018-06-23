@@ -13,7 +13,7 @@ import polka from './polka'
 
 
 
-const IKEYS = ['name'] as KeysOf<Quotes.Quote> // ['symbol', 'name', 'tinyName', 'country', 'exchange', 'acronym', 'mic', 'type', 'typeof'] as KeysOf<Quotes.Quote>
+const IKEYS = ['name', 'type', 'acronym'] as KeysOf<Quotes.Quote> // ['symbol', 'name', 'tinyName', 'country', 'exchange', 'acronym', 'mic', 'type', 'typeof'] as KeysOf<Quotes.Quote>
 
 polka.route({
 	method: 'GET',
@@ -22,7 +22,7 @@ polka.route({
 		query: { query: 'string' },
 	},
 	async handler(req, res) {
-		let query = core.string.clean(req.query.query).toLowerCase()
+		let query = core.string.alphanumeric(req.query.query).toLowerCase()
 		if (!query) return [];
 		let results = await radio.invoke({}, 'search.query', query) as Search.Result[]
 		if (results.length == 0) return [];
