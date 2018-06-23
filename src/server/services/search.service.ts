@@ -15,7 +15,7 @@ import radio from '../adapters/radio'
 
 
 
-let QUOTES = [] as Partial<Quotes.Quote & { _symbol: string }>[]
+const QUOTES = {} as Dict<Search.Quote>
 
 radio.on('symbols.resume', start)
 radio.once('symbols.start', start)
@@ -27,16 +27,19 @@ async function start() {
 	let symbols = await utils.getAllSymbols()
 	// if (process.env.DEVELOPMENT) symbols = Object.keys(utils.DEV_STOCKS);
 
-	let ikeys = ['name', 'alive'] as KeysOf<Quotes.Quote>
+	let ikeys = ['name', 'marketCap'] as KeysOf<Quotes.Quote>
 	let alls = await quotes.getAlls(symbols, ['quote'], [ikeys])
 
-	alls.forEach(all => {
-		// if (all.symbol.includes('-')) return;
-		if (!all.quote.alive) return;
-		QUOTES.push({
-			_symbol: all.symbol,
-			symbol: core.string.alphanumeric(all.symbol).toLowerCase(),
-			name: core.string.alphanumeric(pretty.company(all.quote.name)).toLowerCase(),
+	alls.forEach(({ symbol, quote }) => {
+		if (symbol.includes('-')) return;
+		if (symbol.includes('.') && !quote.alive) return;
+		Object.assign(QUOTES, {
+			[symbol]: {
+				_symbol: symbol,
+				marketCap: quote.marketCap,
+				symbol: core.string.alphanumeric(symbol).toLowerCase(),
+				name: core.string.alphanumeric(quotes.getName(quote.name)).toLowerCase(),
+			} as Search.Quote
 		})
 	})
 
@@ -45,22 +48,31 @@ async function start() {
 
 
 radio.reply('search.query', async function onquery(query: string) {
-	return QUOTES.map(({ _symbol, symbol, name }) => {
+	return Object.keys(QUOTES).map(key => {
+		let { symbol, _symbol, name } = QUOTES[key]
 		let ranks = [] as number[]
 
 		let s_leven = core.string.levenshtein(query, symbol)
-		let s_rank = Math.max(symbol.length - s_leven, 1) // * Math.round(query.length / 2)
-		if (symbol.indexOf(query) == 0) s_rank = Math.pow(s_rank, 3);
+		let s_rank = Math.max(symbol.length - s_leven, 2) // * Math.round(query.length / 2)
+		if (query == symbol) {
+			s_rank = Math.pow(s_rank, 5)
+		} else if (symbol.indexOf(query) == 0) {
+			s_rank = Math.pow(s_rank, 3)
+		}
 		ranks.push(s_rank)
 
 		let n_leven = core.string.levenshtein(query, name)
-		let n_rank = Math.max(name.length - n_leven, 1)
-		if (name.indexOf(query) == 0) n_rank = Math.pow(n_rank, 2);
+		let n_rank = Math.max(name.length - n_leven, 2)
+		if (query == name) {
+			n_rank = Math.pow(n_rank, 4)
+		} else if (name.indexOf(query) == 0) {
+			n_rank = Math.pow(n_rank, 2)
+		}
 		ranks.push(n_rank)
 
 		let result = {
 			symbol: _symbol,
-			rank: ranks.reduce((prev, next) => prev *= next, 1),
+			rank: ranks.reduce((prev, next) => prev *= next, 2),
 		} as Search.Result
 		if (process.env.DEVELOPMENT) {
 			Object.assign(result, { debug: { query, symbol, name, ranks } } as Search.Result)
@@ -69,9 +81,7 @@ radio.reply('search.query', async function onquery(query: string) {
 
 	}).sort((a, b) => {
 		if (a.rank != b.rank) return b.rank - a.rank;
-		if (a.symbol < b.symbol) return -1;
-		if (a.symbol > b.symbol) return 1;
-		return 0
+		return QUOTES[b.symbol].marketCap - QUOTES[a.symbol].marketCap
 	}).slice(0, 20)
 })
 
@@ -81,6 +91,9 @@ radio.reply('search.query', async function onquery(query: string) {
 
 declare global {
 	namespace Search {
+		interface Quote extends Quotes.Quote {
+			_symbol: string
+		}
 		interface Result {
 			symbol: string
 			rank: number

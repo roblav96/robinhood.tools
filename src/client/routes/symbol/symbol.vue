@@ -9,7 +9,7 @@
 <template>
 	<div id="symbol_route" class="flex-col-full is-max-fullheight">
 
-		<section class="section py-0 has-background-white">
+		<section class="section py-0 has-background-white shadow-sm">
 			<div class="columns my-0 items-center">
 
 				<div class="column is-narrow">
@@ -19,8 +19,7 @@
 						</div>
 						<div class="column">
 							<p class="title">{{symbol}}</p>
-							<!-- <p>{{vcompany(all.quote.tinyName||all.quote.name)}}</p> -->
-							<p>{{vtruncate(all.quote.tinyName||all.quote.name)}}</p>
+							<p>{{vname(all.quote.name)}}</p>
 						</div>
 					</div>
 				</div>
@@ -46,7 +45,7 @@
 					</div>
 				</div>
 
-				<div class="column overflow-x-auto scrollbar">
+				<div class="column overflow-x-auto scrollbar-none">
 					<div class="columns items-center is-mobile whitespace-no-wrap text-center">
 						<!-- <div class="is-hr-vertical"></div> -->
 
@@ -114,7 +113,6 @@
 
 			</div>
 		</section>
-		<hr>
 
 		<v-symbol-chart :quote="all.quote"></v-symbol-chart>
 

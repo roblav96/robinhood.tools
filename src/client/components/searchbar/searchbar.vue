@@ -20,9 +20,8 @@
 }
 
 #searchbar div.dropdown-item:not(.is-disabled) {
-	border-bottom: 1px solid var(--border);
 	padding: 0px 1rem;
-	padding-bottom: 0.5rem;
+	padding-bottom: 0.25rem;
 }
 
 #searchbar div.dropdown-item:empty {
@@ -43,11 +42,20 @@
 			<template slot-scope="props">
 				<div class="columns is-mobile is-gapless items-center">
 					<div class="column is-narrow mr-4">
-						<v-symbol-logo class="is-32x32 shadow" :symbol="props.option.symbol"></v-symbol-logo>
+						<v-symbol-logo class="is-40x40 shadow" :symbol="props.option.symbol"></v-symbol-logo>
 					</div>
 					<div class="column">
-						<p class="title is-size-5">{{props.option.symbol}}</p>
-						<p class="subtitle is-size-6">{{vcompany(props.option.name)}}</p>
+						<div class="flex">
+							<p class="title is-size-5 mr-1">{{props.option.symbol}}</p>
+							<p class="flex-1 leading-tight is-size-6 self-end has-text-lightest">
+								<span v-if="props.option.acronym">{{props.option.acronym}} </span>
+								<span v-if="props.option.type">| {{props.option.type}} </span>
+								<span v-if="props.option.country">| {{props.option.country}} </span>
+								<span v-if="props.option.marketCap">| {{vnumber(props.option.marketCap,{compact:true})}} </span>
+								<span v-if="props.option.debug">| {{props.option.debug.ranks}} = {{props.option.rank}}</span>
+							</p>
+						</div>
+						<p class="subtitle is-size-6">{{vname(props.option.name)}}</p>
 					</div>
 				</div>
 			</template>
@@ -62,7 +70,7 @@
 	<p class="title is-size-4 has-text-strong mr-2">{{props.option.rank}}</p>
 	<p class="title is-size-6 font-normal">
 		<span class="mr-2 has-text-light">{{props.option.symbol}}</span>
-		<span class="mr-2 has-text-light font-normal is-size-6">{{vcompany(props.option.name)}}</span>
+		<span class="mr-2 has-text-light font-normal is-size-6">{{vname(props.option.name)}}</span>
 	</p>
 </div>
 <p class="subtitle is-size-6 has-text-light">

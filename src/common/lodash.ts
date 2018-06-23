@@ -52,6 +52,7 @@ export {
 	remove,
 	round,
 	sample,
+	set,
 	sortBy,
 	startCase,
 	sum,

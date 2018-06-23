@@ -102,7 +102,7 @@
 		</section>
 
 		<!-- <section class="flex-col-full overflow-y-auto"> -->
-			<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :settings="settings" :isbrushing.sync="brushing"></v-symbol-echart>
+		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :settings="settings" :isbrushing.sync="brushing"></v-symbol-echart>
 		<!-- </section> -->
 
 

@@ -16,7 +16,7 @@ span.navbar-burger.burger > span {
 </style>
 
 <template>
-	<nav class="navbar is-fixed-top is-unselectable border border-b-1" role="navigation" aria-label="main navigation">
+	<nav class="navbar is-fixed-top is-unselectable shadow-sm" role="navigation" aria-label="main navigation">
 		<div class="container is-fluid">
 
 			<div class="navbar-brand">

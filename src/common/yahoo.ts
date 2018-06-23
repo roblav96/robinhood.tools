@@ -15,6 +15,12 @@ export const YH = {
 
 
 
+export function fixName(name: string) {
+	return name && name.replace(/&amp;+/g, '&').replace(/[Â]+/g, '').trim()
+}
+
+
+
 export const SUMMARY_MODULES = [
 	'assetProfile',
 	'balanceSheetHistory',

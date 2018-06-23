@@ -31,7 +31,10 @@ radio.on('symbols.ready', function() {
 async function start() {
 
 	// await syncEverything()
+	// let symbols = await utils.getAllSymbols()
+	// await yahoo.syncQuotes(symbols)
 	// await quotes.syncAllQuotes()
+	// return
 
 	let keys = [
 		rkeys.RH.SYMBOLS, rkeys.WB.SYMBOLS, rkeys.WB.EXCHANGES,
@@ -43,7 +46,7 @@ async function start() {
 	ready = true
 	radio.emit('symbols.start')
 
-} start().catch(error => console.error(`start Error ->`, error))
+} start().catch(error => console.error(`start Error -> %O`, error))
 
 
 

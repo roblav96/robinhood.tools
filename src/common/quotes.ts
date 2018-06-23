@@ -18,9 +18,7 @@ export function applyFull(
 	core.object.merge(quote, {
 		symbol,
 		tickerId: wbticker.tickerId,
-		type: _.startCase(webull.ticker_types[wbticker.type]),
 		typeof: wbquote.typeof,
-		issueType: iex.issueType(iexitem.issueType),
 		timezone: wbquote.utcOffset || wbquote.timeZone,
 		sector: iexitem.sector,
 		industry: iexitem.industry,
@@ -28,6 +26,7 @@ export function applyFull(
 		alive: instrument.alive,
 		description: iexitem.description,
 		listDate: new Date(instrument.list_date).valueOf(),
+		type: webull.getType(wbticker.type),
 		mic: core.fallback(instrument.mic, wbticker.exchangeCode),
 		acronym: core.fallback(instrument.acronym, wbticker.disExchangeCode),
 		exchange: core.fallback(iexitem.exchange, iexitem.primaryExchange, wbticker.exchangeName, yhquote.fullExchangeName, wbticker.disExchangeCode, wbticker.exchangeCode),
@@ -37,11 +36,10 @@ export function applyFull(
 		sharesFloat: _.round(core.fallback(wbquote.outstandingShares, iexitem.float)),
 	} as Quotes.Quote)
 
-	let wbname = core.outlier('min', wbticker.tinyName, wbticker.name)
-	let yhname = core.outlier('min', yhquote.shortName, yhquote.longName)
-	quote.name = core.fallback(yhname, iexitem.companyName, instrument.name, wbname)
-	quote.tinyName = core.fallback(instrument.simple_name, yhname, wbname, quote.name)
-	quote.fullName = core.fallback(instrument.name, yhname, wbname, quote.name)
+	if (yhquote && yhquote.longName) yhquote.longName = yahoo.fixName(yhquote.longName);
+	quote.name = core.fallback(yhquote.longName, iexitem.companyName, wbticker.name)
+	quote.tinyName = core.fallback(instrument.simple_name, quote.name)
+	quote.fullName = core.fallback(instrument.name, quote.name)
 
 	quote.avgVolume10Day = _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day))
 	quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))
@@ -90,7 +88,7 @@ export function resetFull(quote: Quotes.Calc) {
 		}
 	})
 	core.object.merge(toquote, {
-		liveCount: 0, dealCount: 0,
+		liveCount: 0, dealCount: 0, dealAmount: 0,
 		turnoverRate: 0, vibrateRatio: 0, yield: 0,
 		startPrice: quote.price,
 		dayHigh: quote.price, dayLow: quote.price,
@@ -356,6 +354,16 @@ export function isSymbol(symbol: string) {
 	return !Array.isArray(symbol.match(regexSymbol))
 }
 
+export function getName(name: string) {
+	let stopwords = ['co', 'company', 'cor', 'corp', 'corporation', 'i', 'in', 'inc', 'ltd', 'the']
+	let split = name.split(' ')
+	let first = split[0].toLowerCase().replace(/[^a-z]+/g, '')
+	if (stopwords.includes(first)) split.shift();
+	let last = split[split.length - 1].toLowerCase().replace(/[^a-z]+/g, '')
+	if (stopwords.includes(last)) split.pop();
+	return _.truncate(split.join(' ').replace(/[,]+/g, '').trim(), { length: 48 })
+}
+
 
 
 let string = ''
@@ -492,7 +500,6 @@ const FULL = {
 	exchange: string,
 	country: string,
 	timezone: string,
-	issueType: string,
 	currency: string,
 	sector: string,
 	industry: string,

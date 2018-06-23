@@ -45,13 +45,19 @@ export enum ticker_status {
 }
 Object.assign(ticker_status, _.invert(ticker_status))
 
+export function getType(wbtype: number) {
+	let type = _.startCase(ticker_types[wbtype].toLowerCase())
+	if (wbtype == 3) type = ticker_types[wbtype];
+	return type
+}
+
 export enum ticker_types {
-	INDICE = 1,
+	INDEX = 1,
 	STOCK = 2,
-	FUND = 3,
+	ETF = 3, // FUND = 3,
 	FUTURES = 4,
 	BONDS = 5,
-	EXCHANGE = 6,
+	CURRENCY = 6,
 	INDEX_FUTURES = 7,
 	STOCK_FUTURES = 8,
 	INDEX_OPTIONS = 9,

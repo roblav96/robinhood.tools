@@ -27,22 +27,22 @@ $purple: color('violet', 50); // #9561E2;
 $red: color('red', 50); // #E3342F;
 $pink: color('magenta', 40); // #F66D9B;
 // 
-// $text: color('cool-gray', 70);
-// $text-light: color('cool-gray', 60);
-// $text-lighter: color('cool-gray', 50);
-// $text-lightest: color('cool-gray', 40);
-// $text-strong: color('cool-gray', 80);
+$text: color('cool-gray', 70);
+$text-light: color('cool-gray', 60);
+$text-lighter: color('cool-gray', 50);
+$text-lightest: color('cool-gray', 40);
+$text-strong: color('cool-gray', 80);
+// 
+// $text: $grey-dark;
+// $text-light: $grey;
+// $text-lighter: $grey;
+// $text-lightest: $grey-light;
+// $text-strong: $grey-darker;
 // 
 $light: $white-ter;
 $dark: $grey-dark;
 $light-invert: $grey-darker;
 $dark-invert: $white;
-// 
-$text: $grey-dark;
-$text-light: $grey;
-$text-lighter: $grey-light;
-$text-lightest: $grey-lighter;
-$text-strong: $grey-darker;
 // 
 $primary: $purple;
 $secondary: $cyan;

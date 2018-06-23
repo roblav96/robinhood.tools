@@ -37,21 +37,15 @@ export function request(config = {} as Partial<Http.Config>) {
 			}
 			if (host.includes('webull.com') || host.includes('stocks666.com')) {
 				Object.assign(config.headers, {
-					host,
-					origin: 'https://app.webull.com',
-					referer: 'https://app.webull.com',
-					ver: '1.8.4',
-					app: 'desktop',
-					os: 'web',
+					host, origin: 'https://app.webull.com', referer: 'https://app.webull.com',
+					app: 'desktop', os: 'web', ver: '2.0.0', dnt: '1', hl: 'en',
 					osv: 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)',
-					dnt: '1', hl: 'en', locale: 'eng', tz: 'America/New_York',
-					pragma: 'no-cache',
-					'cache-control': 'no-cache',
+					pragma: 'no-cache', 'cache-control': 'no-cache',
 				})
 				config.headers['user-agent'] = config.headers['osv']
 				if (config.wbauth) {
-					if (process.env.WEBULL_DID) config.headers['did'] = process.env.WEBULL_DID;
-					if (process.env.WEBULL_TOKEN) config.headers['access_token'] = process.env.WEBULL_TOKEN;
+					config.headers['did'] = process.env.WEBULL_DID
+					config.headers['access_token'] = process.env.WEBULL_TOKEN
 				}
 			}
 		}
@@ -60,9 +54,9 @@ export function request(config = {} as Partial<Http.Config>) {
 
 	}).then(send).catch(function(error: boom) {
 
-		if (process.env.SERVER) {
-			return Promise.reject(error)
-		}
+		// if (process.env.SERVER) {
+		// 	return Promise.reject(error)
+		// }
 
 		if (error.isBoom && _.get(error, 'data.data.isBoom')) {
 			Object.assign(error.output.payload, error.data.data)
@@ -76,7 +70,8 @@ export function request(config = {} as Partial<Http.Config>) {
 		}
 
 		let endpoint = `[${config.method}] ${config.url.replace(process.env.DOMAIN, '')}`
-		console.log('%c◀ ' + endpoint, 'color: red; font-weight: bolder;', message)
+		if (process.env.CLIENT) console.log('%c◀ ' + endpoint, 'color: red; font-weight: bolder;', message);
+		else console.error(`http Error -> ${endpoint} -> ${message} -> %O`, error);
 		// alert.toast({ message: endpoint + ' ➤ ' + message, type: 'is-danger' })
 
 		return Promise.reject(error)
