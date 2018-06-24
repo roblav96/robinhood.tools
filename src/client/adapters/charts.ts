@@ -66,7 +66,9 @@ export function range(range: string, opts = { plural: true }) {
 	return n + ' ' + s
 }
 
-export function tipformatter(params: echarts.EventParam<Quotes.Live>[], option: echarts.Option) {
+
+
+export function tipFormatter(params: echarts.EventParam<Quotes.Live>[], option: echarts.Option) {
 	// console.log('params ->', params)
 	let html = ''
 	params.forEach((param, i) => {

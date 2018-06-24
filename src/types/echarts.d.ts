@@ -200,10 +200,7 @@ declare module 'echarts' {
 			grid: Partial<Grid>[]
 			hoverLayerThreshold: number
 			legend: any
-			markArea: Partial<MarkArea>[]
 			marker: any[]
-			markLine: Partial<MarkLine>[]
-			markPoint: Partial<MarkPoint>[]
 			progressive: number
 			progressiveThreshold: number
 			progressiveChunkMode: string
@@ -218,8 +215,74 @@ declare module 'echarts' {
 			yAxis: Partial<Axis>[]
 		}
 
-		interface VisualMap {
+		interface VisualMapRange {
+			color: string[]
+			colorAlpha: string[]
+			colorHue: string[]
+			colorLightness: string[]
+			colorSaturation: string[]
+			opacity: number[]
+			symbol: string[]
+			symbolSize: number[]
+		}
+		interface VisualMapController {
+			inRange: VisualMapRange
+			outOfRange: VisualMapRange
+		}
+		interface VisualMapPiece {
 
+		}
+		interface VisualMap {
+			align: string
+			backgroundColor: string
+			borderColor: string
+			borderWidth: number
+			bottom: number | string
+			calculable: boolean
+			categories: string[]
+			color: string
+			contentColor: string
+			controller: VisualMapController
+			dimension: string
+			formatter: string | ((value: number) => string)
+			height: number | string
+			hoverLink: boolean
+			id: string
+			inactiveColor: string
+			inRange: VisualMapRange
+			inverse: boolean
+			itemGap: number
+			itemHeight: number
+			itemSymbol: string
+			itemWidth: number
+			left: number | string
+			max: number
+			maxOpen: boolean
+			min: number
+			minOpen: boolean
+			orient: string
+			outOfRange: VisualMapRange
+			padding: number | string | (number | string)[]
+			pieces: any[]
+			precision: number
+			range: number[]
+			realtime: boolean
+			right: number | string
+			selected: boolean[]
+			selectedMode: string
+			seriesIndex: number | number[]
+			show: boolean
+			showLabel: boolean
+			splitNumber: number
+			target: VisualMapController
+			text: string[]
+			textGap: number
+			textStyle: TextStyle
+			top: number | string
+			type: 'continuous' | 'piecewise'
+			width: number | string
+			z: number
+			zlevel: number
 		}
 
 		interface Grid {
@@ -478,8 +541,8 @@ declare module 'echarts' {
 			label: Partial<Style>
 			lineStyle: Partial<StyleOptions>
 			name: string
-			symbol: string
-			symbolSize: number
+			symbol: string | string[]
+			symbolSize: number | number[]
 			type: string
 			value: number
 			valueDim: string
@@ -489,35 +552,16 @@ declare module 'echarts' {
 			y: number
 			yAxis: number
 		}
-		interface MarkArea {
+		interface Mark {
 			animation: boolean
+			data: Partial<MarkData>[]
 			itemStyle: Partial<Style>
-			label: Partial<Style>
-			tooltip: Partial<Tooltip>
-			data: MarkData[]
-			silent: boolean
-			z: number
-			zlevel: number
-		}
-		interface MarkLine {
-			animation: boolean
-			data: MarkData[]
 			label: Partial<Style>
 			lineStyle: Partial<StyleOptions>
 			precision: number
 			silent: boolean
-			symbol: string[]
-			symbolSize: number
-			tooltip: Partial<Tooltip>
-			z: number
-			zlevel: number
-		}
-		interface MarkPoint {
-			itemStyle: Partial<Style>
-			label: Partial<Style>
-			data: MarkData[]
-			symbol: string
-			symbolSize: number
+			symbol: string | string[]
+			symbolSize: number | number[]
 			tooltip: Partial<Tooltip>
 			z: number
 			zlevel: number
@@ -539,7 +583,7 @@ declare module 'echarts' {
 		}
 
 		interface StyleOptions {
-			formatter: string
+			formatter: string | ((param: EventParam) => string)
 			borderColor0: string | ((param: EventParam) => string)
 			borderColor: string | ((param: EventParam) => string)
 			borderWidth: number
@@ -560,7 +604,7 @@ declare module 'echarts' {
 			shadowOffsetY: number
 			show: boolean
 			smooth: number
-			textStyle: Partial<StyleOptions>
+			textStyle: Partial<TextStyle>
 			type: string
 			width: number
 		}
@@ -613,9 +657,9 @@ declare module 'echarts' {
 			layout: string
 			legendHoverLink: boolean
 			lineStyle: Partial<Style>
-			markArea: Partial<MarkArea>
-			markLine: Partial<MarkLine>
-			markPoint: Partial<MarkPoint>
+			markArea: Partial<Mark>
+			markLine: Partial<Mark>
+			markPoint: Partial<Mark>
 			name: string
 			progressive: number
 			progressiveChunkMode: string

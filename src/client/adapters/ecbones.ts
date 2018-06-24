@@ -2,7 +2,6 @@
 
 import deepmerge from 'deepmerge'
 import * as echarts from 'echarts'
-import * as hyperid from 'hyperid'
 import * as nanoid from 'nanoid'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
@@ -95,7 +94,7 @@ export function dataZoom(
 	} as echarts.DataZoom
 	if (type == 'inside') {
 		_.merge(dataZoom, {
-			preventDefaultMouseMove: true,
+			preventDefaultMouseMove: false,
 			zoomOnMouseWheel: 'shift',
 		} as echarts.DataZoom)
 	}
@@ -128,7 +127,7 @@ export function axis(
 	let axis = {
 		silent: true,
 		gridIndex: 0,
-		uuid: hyperid().uuid,
+		uuid: nanoid(),
 		// axisPointer: { show: true },
 		axisLabel: { textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize } },
 		axisLine: { show: !!mods.axisLine },
@@ -181,7 +180,7 @@ export function series(
 		animation: false,
 		hoverAnimation: false,
 		legendHoverLink: false,
-		uuid: hyperid().uuid,
+		uuid: nanoid(),
 		datasetIndex: 0,
 		xAxisIndex: 0,
 		yAxisIndex: 0,
@@ -208,30 +207,33 @@ export function series(
 
 
 
+export function markLine(
+	mods = {} as Partial<echarts.Mark>,
+) {
+	let markLine = {
+		animation: false,
+		lineStyle: { type: 'solid', color: colors['grey-light'] },
+		precision: -1,
+		silent: true,
+		symbol: 'none',
+	} as echarts.Mark
+	return _.merge(markLine, mods) as echarts.Mark
+}
+
+
+
 export function visualMap(
 	mods = {} as Partial<echarts.VisualMap>,
 ) {
 	let visualMap = {
 		show: true,
 		seriesIndex: 0,
-		pieces: [
-			{ min: 0, color: colors.success },
-			{ max: 0, color: colors.danger },
-		],
+		// pieces: [
+		// 	{ min: 0, color: colors.success },
+		// 	{ max: 0, color: colors.danger },
+		// ],
 	} as echarts.VisualMap
 	return _.merge(visualMap, mods) as echarts.VisualMap
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 

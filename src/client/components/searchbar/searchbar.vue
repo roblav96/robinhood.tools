@@ -48,7 +48,7 @@
 						<div class="flex">
 							<p class="title is-size-5 mr-1">{{props.option.symbol}}</p>
 							<p class="flex-1 leading-tight is-size-6 self-end has-text-lightest">
-								<span v-if="props.option.acronym">- {{props.option.acronym}} </span>
+								<span v-if="props.option.acronym">{{props.option.acronym}} </span>
 								<span v-if="props.option.type">- {{props.option.type}} </span>
 								<!-- <span v-if="props.option.avgVolume">- {{vnumber(props.option.avgVolume,{compact:true,dollar:true})}} </span> -->
 								<!-- <span v-if="props.option.debug">- {{props.option.debug.ranks}} = {{props.option.rank}}</span> -->

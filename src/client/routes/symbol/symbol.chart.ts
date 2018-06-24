@@ -84,7 +84,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		let option = ecbones.option({
 			dataset: [{ source: lquotes }],
 			toolbox: { itemSize: 0, feature: { dataZoom: { show: true, yAxisIndex: false } } },
-			tooltip: [{ formatter: params => charts.tipformatter(params as any, this.getOption()) }],
+			tooltip: [{ formatter: params => charts.tipFormatter(params as any, this.getOption()) }],
 		})
 
 		option.dataZoom.push(ecbones.dataZoom('inside', { xAxisIndex: [0, 1] }))
@@ -125,6 +125,12 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			blank: true,
 		}))
 
+		let markprice = ecbones.markLine({
+			label: { position: 'end', formatter(v) { return pretty.number(v.value, { price: true }) } },
+			lineStyle: { color: colors.warning },
+			data: [{ yAxis: this.quote.price }],
+		})
+
 		if (this.settings.ohlc) {
 			option.series.push(ecbones.series({
 				name: 'OHLC',
@@ -139,6 +145,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					borderColor: colors.success, borderColor0: colors.danger, borderWidth: 1,
 					color: colors.success, color0: colors.danger,
 				},
+				markLine: markprice,
 			}))
 		} else {
 			option.series.push(ecbones.series({
@@ -146,6 +153,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				type: 'line',
 				encode: { x: 'timestamp', y: 'price', tooltip: 'price' },
 				itemStyle: { color: colors.primary },
+				markLine: markprice,
 			}))
 		}
 
@@ -158,19 +166,11 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			encode: { x: 'timestamp', y: 'size', tooltip: 'size' },
 		}))
 
-		// option.markLine.push({
-		// 	data: [{
-		// 		name: 'from lowest to highest',
-		// 		type: 'min',
-		// 		valueDim: 'lowest',
-		// 		symbol: 'circle',
-		// 		symbolSize: 10,
-		// 	}],
-		// })
-
 		console.log(`build bones ->`, _.clone(option))
 		this.echart.setOption(option)
 		console.log(`build getOption ->`, _.clone(this.echart.getOption()))
+
+		console.warn(`dtsgen this.echart.getOption().visualMap[0] ->`, console.dtsgen(this.echart.getOption().visualMap[0]))
 
 		_.defer(() => console.log(`echart build ->`, lquotes.length, Date.now() - stamp + 'ms'))
 	}
