@@ -75,7 +75,7 @@ radio.reply('search.query', async function onquery(query: string) {
 	}).sort((a, b) => {
 		if (a.rank != b.rank) return b.rank - a.rank;
 		return QUOTES[b.symbol].marketCap - QUOTES[a.symbol].marketCap
-	}).filter((v, i) => i < 10 && v.rank > 8)
+	}).filter((v, i) => i < 20 && v.rank > 8)
 })
 
 
