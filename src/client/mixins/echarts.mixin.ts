@@ -157,7 +157,7 @@ export default class VEChartsMixin extends Vue {
 		}
 	}
 
-	latestzoom: () => void
+	latestzoom() { }
 	resetzoom() {
 		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100, manual: true })
 	}
