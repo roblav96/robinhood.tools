@@ -52,8 +52,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 	ctlatest() {
 		let lquotes = this.lquotes()
 		let bounds = { end: 100 } as ReturnType<typeof VEChartsMixin.prototype.ctbounds>
-		let threshold = Math.round(utils.screen().width / 16)
-		console.log('threshold ->', threshold)
+		let threshold = Math.round(utils.screen().width / 10)
 		if (this.settings.time) {
 			let i = core.math.clamp(lquotes.length - threshold, 0, lquotes.length)
 			bounds.startValue = lquotes[i].timestamp
