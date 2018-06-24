@@ -21,7 +21,7 @@ import * as charts from '../../adapters/charts'
 import * as ecbones from '../../adapters/ecbones'
 import * as alerts from '../../adapters/alerts'
 import socket from '../../adapters/socket'
-import colors from '../../stores/colors'
+import { theme } from '../../stores/colors'
 
 
 
@@ -98,9 +98,9 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			right: 64,
 			bottom: 92,
 			show: true,
-			backgroundColor: colors.white,
+			backgroundColor: theme.white,
 			borderWidth: 0,
-			// borderColor: colors['grey-lighter'],
+			// borderColor: theme['grey-lighter'],
 		})
 		option.grid.push({
 			height: 64,
@@ -131,7 +131,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			name: 'Price',
 			type: 'line',
 			encode: { x: 'timestamp', y: 'price', tooltip: 'price' },
-			itemStyle: { color: colors.primary },
+			itemStyle: { color: theme.primary },
 		} as echarts.Series
 		if (this.settings.ohlc) {
 			_.merge(pseries, {
@@ -144,8 +144,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					tooltip: ['open', 'high', 'low', 'close'],
 				},
 				itemStyle: {
-					borderColor: colors.success, borderColor0: colors.danger, borderWidth: 1,
-					color: colors.success, color0: colors.danger,
+					borderColor: theme.success, borderColor0: theme.danger, borderWidth: 1,
+					color: theme.success, color0: theme.danger,
 				},
 			} as echarts.Series)
 		}
@@ -189,7 +189,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		return {
 			yAxis: this.quote.price,
 			label: { position: 'end', formatter(v) { return pretty.number(v.value, { price: true }) } },
-			lineStyle: { color: colors.warning },
+			lineStyle: { color: theme.warning },
 		}
 	}
 

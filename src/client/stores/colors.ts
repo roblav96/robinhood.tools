@@ -2,42 +2,37 @@
 
 import Vue from 'vue'
 import Vuex, { Store } from 'vuex'
-import * as ibm from 'ibm-design-colors/source/colors'
+import * as ibmdesign from 'ibm-design-colors/source/colors'
 import * as core from '../../common/core'
 import * as utils from '../adapters/utils'
 import store from '../store'
 
 
 
-const colors = {
-	theme: {} as Colors.Theme,
-	ibm: {} as Colors.Ibm,
-}
-store.register('colors', colors)
-export default colors
-declare global { namespace Store { interface State { colors: typeof colors } } }
+export const theme = {} as Colors.Theme
+export const ibm = {} as Colors.Ibm
+store.register('colors', { theme, ibm })
+declare global { namespace Store { interface State { colors: { theme: Colors.Theme, ibm: Colors.Ibm } } } }
 
-ibm.palettes.forEach(color => {
+ibmdesign.palettes.forEach(color => {
 	if (color.name.includes('white') || color.name.includes('gray') || color.name.includes('black')) return;
-	colors.ibm[color.name] = `#${color.values.find(v => v.grade == color.core).value}`
+	ibm[color.name] = `#${color.values.find(v => v.grade == color.core).value}`
 })
 
-let allcolors = ['accent', 'black', 'black-bis', 'black-ter', 'border', 'danger', 'dark', 'grey', 'grey-dark', 'grey-darker', 'grey-light', 'grey-lighter', 'grey-lightest', 'info', 'light', 'link', 'primary', 'secondary', 'success', 'text', 'text-light', 'text-lighter', 'text-strong', 'warning', 'white', 'white-bis', 'white-ter']
-function getcolors(event: Event) {
-	event.target.removeEventListener('DOMContentLoaded', getcolors)
+let themes = ['accent', 'black', 'black-bis', 'black-ter', 'border', 'danger', 'dark', 'grey', 'grey-dark', 'grey-darker', 'grey-light', 'grey-lighter', 'grey-lightest', 'info', 'light', 'link', 'primary', 'secondary', 'success', 'text', 'text-light', 'text-lighter', 'text-strong', 'warning', 'white', 'white-bis', 'white-ter']
+function getTheme(event: Event) {
+	event.target.removeEventListener('DOMContentLoaded', getTheme)
 	let style = window.getComputedStyle(document.documentElement)
-	allcolors.forEach(name => {
+	themes.forEach(name => {
 		let color = style.getPropertyValue('--' + name)
-		Vue.set(colors.theme, name, color.trim())
+		Vue.set(theme, name, color.trim())
 	})
 }
 if (document.readyState == 'loading') {
-	document.addEventListener('DOMContentLoaded', getcolors)
+	document.addEventListener('DOMContentLoaded', getTheme)
 } else {
-	getcolors({ target: document.documentElement } as any)
+	getTheme({ target: document.documentElement } as any)
 }
-
-console.log(`colors ->`, JSON.parse(JSON.stringify(colors)))
 
 
 
@@ -73,22 +68,22 @@ declare global {
 			'white-ter': string
 		}
 		interface Ibm {
-			'ultramarine': string
+			'aqua': string
 			'blue': string
 			'cerulean': string
-			'aqua': string
-			'teal': string
-			'green': string
-			'lime': string
-			'yellow': string
 			'gold': string
+			'green': string
+			'indigo': string
+			'lime': string
+			'magenta': string
 			'orange': string
 			'peach': string
-			'red': string
-			'magenta': string
 			'purple': string
+			'red': string
+			'teal': string
+			'ultramarine': string
 			'violet': string
-			'indigo': string
+			'yellow': string
 		}
 	}
 }

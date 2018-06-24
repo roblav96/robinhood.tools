@@ -8,7 +8,7 @@ import * as core from '../../common/core'
 import * as pretty from './pretty'
 import * as charts from './charts'
 import * as utils from './utils'
-import colors from '../stores/colors'
+import { theme } from '../stores/colors'
 
 
 
@@ -27,8 +27,8 @@ export function option(
 		animation: false,
 		progressive: SETTINGS.progressiveThreshold,
 		progressiveThreshold: SETTINGS.progressiveThreshold,
-		color: Array(16).fill(colors['grey-lighter']),
-		textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize },
+		color: Array(16).fill(theme['grey-lighter']),
+		textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize },
 		dataset: [],
 		legend: { show: !!mods.legend },
 		toolbox: { show: !!mods.toolbox },
@@ -51,19 +51,19 @@ export function option(
 			padding: [0, 0, 0, 64],
 			backgroundColor: 'transparent',
 			// formatter: '{a}: {b1}<br>{c}: {d0}',
-			// extraCssText: `border: 0.125rem solid ${colors['grey-darker']};`,
+			// extraCssText: `border: 0.125rem solid ${theme['grey-darker']};`,
 			axisPointer: {
 				type: 'cross',
 				animation: false,
 				shadowStyle: { opacity: 0 },
-				lineStyle: { color: colors['grey-lighter'] },
-				crossStyle: { color: colors['grey-light'] },
+				lineStyle: { color: theme['grey-lighter'] },
+				crossStyle: { color: theme['grey-light'] },
 				label: {
 					formatter(params) { return charts.xlabel(params.value) },
-					backgroundColor: colors.white, shadowBlur: 0, margin: 1,
-					borderColor: colors['grey-light'], borderWidth: 1,
+					backgroundColor: theme.white, shadowBlur: 0, margin: 1,
+					borderColor: theme['grey-light'], borderWidth: 1,
 					textStyle: {
-						color: colors.dark, borderRadius: 0,
+						color: theme.dark, borderRadius: 0,
 						fontSize: SETTINGS.fontSize, padding: [4, 8], fontWeight: 'bold',
 					},
 				},
@@ -101,15 +101,15 @@ export function dataZoom(
 	if (type == 'slider') {
 		_.merge(dataZoom, {
 			showDetail: false,
-			backgroundColor: colors.white,
+			backgroundColor: theme.white,
 			dataBackground: {
-				areaStyle: { color: colors['white-bis'], opacity: 1 },
-				lineStyle: { color: colors['grey-light'], opacity: 1 },
+				areaStyle: { color: theme['white-bis'], opacity: 1 },
+				lineStyle: { color: theme['grey-light'], opacity: 1 },
 			},
-			borderColor: colors['grey-lighter'],
+			borderColor: theme['grey-lighter'],
 			fillerColor: 'rgba(184,194,204,0.2)',
-			textStyle: { color: colors.dark },
-			handleStyle: { color: colors['grey-light'] },
+			textStyle: { color: theme.dark },
+			handleStyle: { color: theme['grey-light'] },
 			// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
 		} as echarts.DataZoom)
 	}
@@ -129,7 +129,7 @@ export function axis(
 		gridIndex: 0,
 		uuid: nanoid(),
 		// axisPointer: { show: true },
-		axisLabel: { textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize } },
+		axisLabel: { textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize } },
 		axisLine: { show: !!mods.axisLine },
 		axisTick: { show: !!mods.axisTick },
 		splitArea: { show: !!mods.splitArea },
@@ -146,7 +146,7 @@ export function axis(
 		_.merge(axis, {
 			scale: true,
 			type: 'value',
-			splitLine: { show: true, lineStyle: { color: colors['grey-lightest'] } },
+			splitLine: { show: true, lineStyle: { color: theme['grey-lightest'] } },
 			axisLabel: { formatter(v) { return pretty.number(v) } },
 		} as echarts.Axis)
 	}
@@ -213,13 +213,13 @@ export function markLine(
 	let markLine = {
 		animation: false,
 		label: {
-			backgroundColor: colors.white, borderColor: colors['grey-light'], borderWidth: 1,
+			backgroundColor: theme.white, borderColor: theme['grey-light'], borderWidth: 1,
 			textStyle: {
-				color: colors.dark, borderRadius: 0,
+				color: theme.dark, borderRadius: 0,
 				fontSize: SETTINGS.fontSize, padding: [4, 8], fontWeight: 'bold',
 			},
 		},
-		lineStyle: { type: 'dashed', color: colors['grey-light'] },
+		lineStyle: { type: 'dashed', color: theme['grey-light'] },
 		precision: -1,
 		silent: true,
 		symbol: 'none',
@@ -236,8 +236,8 @@ export function visualMap(
 		show: true,
 		seriesIndex: 0,
 		// pieces: [
-		// 	{ min: 0, color: colors.success },
-		// 	{ max: 0, color: colors.danger },
+		// 	{ min: 0, color: theme.success },
+		// 	{ max: 0, color: theme.danger },
 		// ],
 	} as echarts.VisualMap
 	return _.merge(visualMap, mods) as echarts.VisualMap

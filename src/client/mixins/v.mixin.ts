@@ -40,7 +40,7 @@ export default class VMixin extends Vue {
 	vslider(value: number, min: number, max: number) { if (!value) return NaN; return core.calc.slider(value, min, max) }
 
 	breakpoints = this.$store.state.breakpoints
-	colors = this.$store.state.colors
+	theme = this.$store.state.colors.theme
 	hours = this.$store.state.hours
 	recents = this.$store.state.recents
 	rhusername = this.$store.state.security.rhusername
