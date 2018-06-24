@@ -127,10 +127,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 		let markprice = ecbones.markLine({
 			label: { position: 'end', formatter(v) { return pretty.number(v.value, { price: true }) } },
-			lineStyle: { color: colors.warning },
 			data: [{ yAxis: this.quote.price }],
 		})
-
 		if (this.settings.ohlc) {
 			option.series.push(ecbones.series({
 				name: 'OHLC',
@@ -145,7 +143,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					borderColor: colors.success, borderColor0: colors.danger, borderWidth: 1,
 					color: colors.success, color0: colors.danger,
 				},
-				markLine: markprice,
+				markLine: this.settings.range == 'live' && markprice,
 			}))
 		} else {
 			option.series.push(ecbones.series({
@@ -153,7 +151,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				type: 'line',
 				encode: { x: 'timestamp', y: 'price', tooltip: 'price' },
 				itemStyle: { color: colors.primary },
-				markLine: markprice,
+				markLine: this.settings.range == 'live' && markprice,
 			}))
 		}
 

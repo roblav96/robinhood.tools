@@ -212,7 +212,14 @@ export function markLine(
 ) {
 	let markLine = {
 		animation: false,
-		lineStyle: { type: 'solid', color: colors['grey-light'] },
+		label: {
+			backgroundColor: colors.white, borderColor: colors['grey-light'], borderWidth: 1,
+			textStyle: {
+				color: colors.dark, borderRadius: 0,
+				fontSize: SETTINGS.fontSize, padding: [4, 8], fontWeight: 'bold',
+			},
+		},
+		lineStyle: { type: 'dashed', color: colors['grey-light'] },
 		precision: -1,
 		silent: true,
 		symbol: 'none',

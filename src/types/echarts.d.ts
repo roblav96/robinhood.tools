@@ -369,17 +369,7 @@ declare module 'echarts' {
 			nameGap: number
 			nameLocation: string
 			nameRotate: any
-			nameTextStyle: {
-				padding: number
-				align: string
-				verticalAlign: string
-				backgroundColor: string
-				borderColor: string
-				borderRadius: number
-				borderWidth: number
-				width: number
-				height: number
-			} & Partial<TextStyle> & Partial<ShadowOpts>
+			nameTextStyle: Partial<Style> & Partial<TextStyle> & Partial<ShadowOpts>
 			nameTruncate: {
 				ellipsis: string
 				maxWidth: any
@@ -583,20 +573,24 @@ declare module 'echarts' {
 		}
 
 		interface StyleOptions {
-			formatter: string | ((param: EventParam) => string)
+			align: string
+			backgroundColor: string
 			borderColor0: string | ((param: EventParam) => string)
 			borderColor: string | ((param: EventParam) => string)
-			borderWidth: number
 			borderRadius: number
+			borderWidth: number
 			color0: string | ((param: EventParam) => string)
 			color: string | ((param: EventParam) => string)
 			emphasis: Partial<StyleOptions>
+			formatter: string | ((param: EventParam) => string)
+			height: number
 			itemStyle: Partial<StyleOptions>
 			label: Partial<StyleOptions>
 			length2: number
 			length: number
 			lineStyle: Partial<StyleOptions>
 			opacity: number
+			padding: number
 			position: string
 			shadowBlur: number
 			shadowColor: string
@@ -606,6 +600,7 @@ declare module 'echarts' {
 			smooth: number
 			textStyle: Partial<TextStyle>
 			type: string
+			verticalAlign: string
 			width: number
 		}
 		interface Style extends Partial<StyleOptions> {
