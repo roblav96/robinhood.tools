@@ -66,8 +66,7 @@
 							</button>
 						</p>
 						<p class="control">
-							<b-tooltip :active="brushing" multilined label="Click and drag chart to crop zoom" size="is-small"
-							    animated>
+							<b-tooltip :active="brushing" multilined label="Click and drag chart to crop zoom" size="is-small" animated>
 								<button class="button" :disabled="busy" :class="{'is-primary':brushing}" @click="brushing=!brushing">
 									<b-icon icon="crop"></b-icon>
 								</button>
@@ -87,10 +86,10 @@
 		<!-- <section class="flex-col-full overflow-y-auto"> -->
 		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :settings="settings" :isbrushing.sync="brushing"></v-symbol-echart>
 		<!-- </section> -->
+		<v-loading :is-full-page="false" :active="busy"></v-loading>
 
 
 
-		<!-- <v-loading :is-full-page="false" :active="true"></v-loading> -->
 		<!-- <div class="column"> -->
 		<!-- <div class="column">
 					<b-dropdown v-model="range" hoverable position="is-top-right">

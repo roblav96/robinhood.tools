@@ -29,7 +29,6 @@ export default class VSymbol extends Mixins(VMixin) {
 	mounted() {
 
 	}
-
 	beforeDestroy() {
 		this.reset()
 	}

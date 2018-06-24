@@ -110,27 +110,29 @@ Vue.component('v-symbol-logo', VSymbolLogo)
 
 
 
-
-
-// @Vts.Component
-// class Loading extends Mixins((Buefy as any).Loading) {
-// 	isFullPage: boolean
-// 	mounted() {
-// 		if (this.isFullPage) return;
-// 		let parent = this.$el.parentElement
-// 		console.log(`this.$el -> %O`, this.$el, this.$el)
-// 		// this.$el.style.left = ''
-// 		// this.$el.style.right = ''
-// 		// this.$el.style.top = ''
-// 		// this.$el.style.bottom = ''
-// 		setTimeout(() => {
-// 			this.$el.classList.add('block')
-// 			this.$el.classList.add('w-full')
-// 			this.$el.classList.add('h-full')
-// 		}, 1000)
-// 	}
-// }
-// Vue.component('v-loading', Loading)
+@Vts.Component
+class VLoading extends Mixins((Buefy as any).Loading) {
+	active: boolean
+	isFullPage: boolean
+	mounted() {
+		this.sync()
+		utils.wemitter.on('resize', this.onresize_, this)
+	}
+	beforeDestroy() {
+		utils.wemitter.off('resize', this.onresize_, this)
+	}
+	@Vts.Watch('active') w_active(active: boolean) {
+		this.$nextTick(this.sync)
+	}
+	onresize_ = _.debounce(this.sync, 100, { leading: false, trailing: true })
+	sync() {
+		if (this.isFullPage || !this.active) return;
+		let wrapper = (this.$el.previousSibling || this.$el.parentElement) as HTMLElement
+		let rect = core.clone(wrapper.getBoundingClientRect())
+		Object.keys(rect).slice(2).forEach(k => this.$el.style[k] = `${rect[k]}px`)
+	}
+}
+Vue.component('v-loading', VLoading)
 
 
 

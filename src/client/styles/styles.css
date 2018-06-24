@@ -143,6 +143,15 @@ span.tag.is-small {
 
 /* buefy fixes */
 
+.loading-overlay .loading-icon:after {
+	top: calc(50% - 2rem);
+	left: calc(50% - 2rem);
+	width: 4rem;
+	height: 4rem;
+	border-left-color: var(--border);
+	border-bottom-color: var(--border);
+}
+
 .tooltip.is-multiline.is-small:after {
 	width: 8rem !important;
 }
