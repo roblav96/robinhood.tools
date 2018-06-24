@@ -51,6 +51,22 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		return this.settings.ohlc ? lquote.open : lquote.price
 	}
 
+	ctlatest() {
+		let lquotes = this.lquotes()
+		let bounds = { end: 100 } as ReturnType<typeof VEChartsMixin.prototype.ctbounds>
+		if (this.settings.axis == 'category') {
+			bounds.start = core.math.clamp(core.calc.slider(lquotes.length - 100, 0, lquotes.length), 0, 100)
+		}
+		if (this.settings.axis == 'time') {
+			let i = core.math.clamp(lquotes.length - 100, 0, lquotes.length)
+			bounds.startValue = lquotes[i].timestamp
+		}
+		return bounds
+	}
+	latestzoom() {
+		this.echart.dispatchAction(Object.assign({ type: 'dataZoom', manual: true }, this.ctlatest()))
+	}
+
 
 
 	@Vts.Watch('settings.ohlc') w_ohlc() { this.reload() }
@@ -68,16 +84,16 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 	build(lquotes = this.lquotes()) {
 		let stamp = Date.now()
 
-		let bones = ecbones.option({
+		let option = ecbones.option({
 			dataset: [{ source: lquotes }],
 			toolbox: { itemSize: 0, feature: { dataZoom: { show: true, yAxisIndex: false } } },
 			tooltip: [{ formatter: params => charts.tipformatter(params as any, this.getOption()) }],
 		})
 
-		bones.dataZoom.push(ecbones.dataZoom('inside', { xAxisIndex: [0, 1] }))
-		bones.dataZoom.push(ecbones.dataZoom('slider', { xAxisIndex: [0, 1] }))
+		option.dataZoom.push(ecbones.dataZoom('inside', { xAxisIndex: [0, 1] }))
+		option.dataZoom.push(ecbones.dataZoom('slider', { xAxisIndex: [0, 1] }))
 
-		bones.grid.push({
+		option.grid.push({
 			top: 8,
 			left: 64,
 			right: 64,
@@ -87,24 +103,24 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			borderWidth: 0,
 			// borderColor: colors['grey-lighter'],
 		})
-		bones.grid.push({
+		option.grid.push({
 			height: 64,
 			left: 64,
 			right: 64,
 			bottom: 92,
 		})
 
-		bones.xAxis.push(ecbones.axis('x', { type: this.settings.axis }))
-		bones.xAxis.push(ecbones.axis('x', { type: this.settings.axis, gridIndex: 1, blank: true }))
+		option.xAxis.push(ecbones.axis('x', { type: this.settings.axis }))
+		option.xAxis.push(ecbones.axis('x', { type: this.settings.axis, gridIndex: 1, blank: true }))
 
-		bones.yAxis.push(ecbones.axis('y', {
+		option.yAxis.push(ecbones.axis('y', {
 			boundaryGap: '1%',
 			axisPointer: { label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice), { percent: true, plusminus: true }) } },
 		}))
-		bones.yAxis.push(ecbones.axis('y', { gridIndex: 1, blank: true }))
+		option.yAxis.push(ecbones.axis('y', { gridIndex: 1, blank: true }))
 
 		if (this.settings.ohlc) {
-			bones.series.push(ecbones.series({
+			option.series.push(ecbones.series({
 				name: 'OHLC',
 				type: 'candlestick',
 				large: true,
@@ -119,7 +135,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				},
 			}))
 		} else {
-			bones.series.push(ecbones.series({
+			option.series.push(ecbones.series({
 				name: 'Price',
 				type: 'line',
 				encode: { x: 'timestamp', y: 'price', tooltip: 'price' },
@@ -127,7 +143,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			}))
 		}
 
-		bones.series.push(ecbones.series({
+		option.series.push(ecbones.series({
 			name: 'Size',
 			type: 'bar',
 			xAxisIndex: 1,
@@ -136,8 +152,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			encode: { x: 'timestamp', y: 'size', tooltip: 'size' },
 		}))
 
-		console.log(`build bones ->`, _.clone(bones))
-		this.echart.setOption(bones)
+		console.log(`build bones ->`, _.clone(option))
+		this.echart.setOption(option)
 		console.log(`build getOption ->`, _.clone(this.echart.getOption()))
 
 		_.defer(() => console.log(`echart build ->`, Date.now() - stamp + 'ms'))
@@ -197,9 +213,8 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			}
 			this.vechart.build(lquotes)
 			if (this.settings.range == 'live') {
-				this.vechart.latestzoom()
 				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.vechart.onlquote)
-			} else this.vechart.resetzoom();
+			}
 		}).catch(error => {
 			console.error(`getQuotes Error ->`, error)
 		}).finally(() => {

@@ -63,6 +63,7 @@
 		"modern-normalize": "latest",
 		"mqtt": "latest",
 		"mqtt-connection": "3.2.0",
+		"nanoid": "latest",
 		"node-forge": "latest",
 		"node-schedule": "latest",
 		"p-all": "latest",

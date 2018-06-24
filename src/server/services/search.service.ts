@@ -112,16 +112,12 @@ declare global {
 
 
 
-import * as levenshtein from 'js-levenshtein'
-import * as hyperid from 'hyperid'
-import * as benchmark from '../../common/benchmark'
-const query = 'amd'
-const company = core.string.alphanumeric('Advanced Micro Devices').toLowerCase()
-setTimeout(() => {
-	benchmark.simple(`Fuzzy Search -> ${query} -> ${company}`, [
-		function Levenshtein() { levenshtein(query, company) },
-		function Hyperid() { hyperid().uuid },
-	])
-}, 3000)
+// import * as hyperid from 'hyperid'
+// import * as nanoid from 'nanoid'
+// import benchmark from '../../common/benchmark'
+// benchmark('UUIDs', [
+// 	() => hyperid(),
+// 	() => nanoid(),
+// ])
 
 

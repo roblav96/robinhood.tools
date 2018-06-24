@@ -85,10 +85,6 @@ export default class VEChartsMixin extends Vue {
 			end: datazoom.end, endValue: datazoom.endValue,
 		}
 	}
-	ctlatest() {
-		let length = _.max(this.getOption().dataset.map(v => v.source.length))
-		return { length, latest: core.math.clamp(core.calc.slider(length - 100, 0, length), 0, 100) }
-	}
 	splitnumber(height = this.echart.getHeight()) { return Math.round(height / 64) }
 
 
@@ -147,12 +143,8 @@ export default class VEChartsMixin extends Vue {
 			this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y })
 		}
 	}
-
 	resetzoom() {
 		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100, manual: true })
-	}
-	latestzoom() {
-		this.echart.dispatchAction({ type: 'dataZoom', start: this.ctlatest().latest, end: 100, manual: true })
 	}
 
 

@@ -32,7 +32,7 @@ module.exports = {
 
 		if (DEVELOPMENT) {
 			// config.devtool = 'source-map'
-			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /env/]))
+			config.plugins.push(new webpack.WatchIgnorePlugin([/node_modules/, /dist/, /server/, /assets/, /public/, /env/, /json/]))
 			// config.module.rules.filter(rule => Array.isArray(rule.use)).forEach(function(rule) {
 			// 	rule.use.filter(use => use.loader == 'url-loader').forEach(function(use) {
 			// 		use.loader = 'file-loader'

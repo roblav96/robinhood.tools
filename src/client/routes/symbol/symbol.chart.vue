@@ -29,7 +29,7 @@
 								</button>
 							</p>
 						</b-field>
-						<b-dropdown-item custom class="text-initial">
+						<b-dropdown-item custom class="text-initial pb-2">
 							<b-field label="X Axis Scale">
 								<b-field>
 									<b-radio v-model="settings.axis" native-value="category" :disabled="busy">
