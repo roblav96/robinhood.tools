@@ -95,6 +95,10 @@ html {
 	width: 100%;
 }
 
+.b-radio.radio + .radio {
+	margin-left: 1rem;
+}
+
 figure.image > img {
 	max-width: 100%;
 	max-height: 100%;

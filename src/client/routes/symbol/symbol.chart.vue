@@ -29,29 +29,21 @@
 								</button>
 							</p>
 						</b-field>
-						<b-dropdown-item custom>
+						<b-dropdown-item custom class="text-initial">
 							<b-field label="X Axis Scale">
 								<b-field>
-									<b-radio-button class="is-expanded" v-model="settings.axis" native-value="category" :disabled="busy">
-										<b-icon icon="reorder-vertical"></b-icon>
-										<span>Linear</span>
-									</b-radio-button>
-									<b-radio-button class="is-expanded" v-model="settings.axis" native-value="time" :disabled="busy">
-										<b-icon icon="av-timer"></b-icon>
-										<span>Time</span>
-									</b-radio-button>
+									<b-radio v-model="settings.axis" native-value="category" :disabled="busy">
+										Linear
+									</b-radio>
+									<b-radio v-model="settings.axis" native-value="time" :disabled="busy">
+										Time
+									</b-radio>
 								</b-field>
 							</b-field>
 							<b-field label="Price Chart Type">
 								<b-field>
-									<b-radio-button class="is-expanded" v-model="settings.ohlc" :native-value="true" :disabled="busy">
-										<b-icon icon="poll"></b-icon>
-										<span>OHLC</span>
-									</b-radio-button>
-									<b-radio-button class="is-expanded" v-model="settings.ohlc" :native-value="false" :disabled="busy">
-										<b-icon icon="chart-line-variant"></b-icon>
-										<span>Line</span>
-									</b-radio-button>
+									<b-radio v-model="settings.ohlc" :native-value="true" :disabled="busy">OHLC</b-radio>
+									<b-radio v-model="settings.ohlc" :native-value="false" :disabled="busy">Line</b-radio>
 								</b-field>
 							</b-field>
 						</b-dropdown-item>

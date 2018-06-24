@@ -262,6 +262,7 @@ module.exports = {
 
 	textSizes: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'xs': '.75rem',     // 12px
 		'sm': '.875rem',    // 14px
 		'base': '1rem',     // 16px
@@ -290,6 +291,7 @@ module.exports = {
 
 	fontWeights: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'hairline': 100,
 		'thin': 200,
 		'light': 300,
@@ -325,6 +327,7 @@ module.exports = {
 
 	leading: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'normal': 'normal',
 		'none': 1,
 		'tighter': 1.125,
@@ -348,6 +351,7 @@ module.exports = {
 
 	tracking: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'tight': '-0.05em',
 		'normal': '0',
 		'wide': '0.05em',
@@ -401,6 +405,7 @@ module.exports = {
 
 	backgroundSize: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'auto': 'auto',
 		'cover': 'cover',
 		'contain': 'contain',
@@ -422,6 +427,7 @@ module.exports = {
 
 	borderWidths: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'default': '0',
 		'0': '0',
 		'1': '1px',
@@ -469,6 +475,7 @@ module.exports = {
 
 	borderRadius: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'default': '.25rem',
 		'none': '0',
 		'sm': '.125rem',
@@ -502,6 +509,7 @@ module.exports = {
 
 	width: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'auto': 'auto',
 		'px': '1px',
 		'0': '0px',
@@ -552,6 +560,7 @@ module.exports = {
 
 	height: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'auto': 'auto',
 		'px': '1px',
 		'0': '0px',
@@ -590,6 +599,7 @@ module.exports = {
 
 	minWidth: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'0': '0',
 		'us': '5rem',
 		'ns': '10rem',
@@ -623,6 +633,7 @@ module.exports = {
 
 	minHeight: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'0': '0',
 		'us': '5rem',
 		'ns': '10rem',
@@ -657,6 +668,7 @@ module.exports = {
 
 	maxWidth: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'0': '0',
 		'us': '5rem',
 		'ns': '10rem',
@@ -690,6 +702,7 @@ module.exports = {
 
 	maxHeight: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'0': '0',
 		'us': '5rem',
 		'ns': '10rem',
@@ -724,6 +737,7 @@ module.exports = {
 
 	padding: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'px': '1px',
 		'0': '0',
 		'1': '0.25rem',
@@ -755,6 +769,7 @@ module.exports = {
 
 	margin: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'auto': 'auto',
 		'px': '1px',
 		'0': '0',
@@ -787,6 +802,7 @@ module.exports = {
 
 	negativeMargin: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'px': '1px',
 		'0': '0',
 		'1': '0.25rem',
@@ -819,6 +835,7 @@ module.exports = {
 
 	shadows: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'sm': '0 2px 4px 0 rgba(0,0,0,0.10)',
 		'default': '0 2px 4px 1px rgba(0,0,0,0.10)',
 		'md': '0 4px 8px 1px rgba(0,0,0,0.12), 0 2px 4px 1px rgba(0,0,0,0.08)',
@@ -843,6 +860,7 @@ module.exports = {
 
 	zIndex: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'auto': 'auto',
 		'0': 0,
 		'10': 10,
@@ -869,6 +887,7 @@ module.exports = {
 
 	opacity: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'0': '0',
 		'25': '.25',
 		'50': '.5',
@@ -893,6 +912,7 @@ module.exports = {
 
 	svgFill: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'current': 'currentColor',
 	},
 
@@ -913,6 +933,7 @@ module.exports = {
 
 	svgStroke: {
 		'initial': 'initial',
+		'inherit': 'inherit',
 		'current': 'currentColor',
 	},
 
