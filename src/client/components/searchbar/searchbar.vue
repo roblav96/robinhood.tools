@@ -36,7 +36,7 @@
 		    placeholder="Search..." icon="magnify" v-model="query" :data="results" v-on:focus="onfocus" v-on:blur="onblur"
 		    v-on:input="oninput" v-on:select="onselect">
 			<template v-if="!query" slot="header">
-				<span class="has-text-lighter is-size-6">Recently Viewed</span>
+				<span class="has-text-lightest is-size-6">Recently Viewed</span>
 			</template>
 			<template slot="empty">No results found...</template>
 			<template slot-scope="props">

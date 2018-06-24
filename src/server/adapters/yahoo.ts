@@ -22,7 +22,7 @@ export async function getQuotes(symbols: string[]): Promise<Yahoo.Quote[]> {
 	}
 
 	let response = await http.get('https://query1.finance.yahoo.com/v7/finance/quote', {
-		query: { symbols: symbols.join(',') },
+		query: { symbols: symbols.map(yahoo.toSymbol).join(',') },
 	}) as Yahoo.ApiQuote
 
 	let error = _.get(response, 'quoteResponse.error') as Yahoo.ApiError
@@ -37,12 +37,12 @@ export async function getQuotes(symbols: string[]): Promise<Yahoo.Quote[]> {
 
 	response.quoteResponse.result.remove(v => !v)
 	response.quoteResponse.result.forEach(v => {
-		v.symbol = v.symbol.toUpperCase()
+		v.symbol = yahoo.fromSymbol(v.symbol.toUpperCase())
 		if (v.longName) v.longName = yahoo.fixName(v.longName);
 		if (v.shortName) v.shortName = yahoo.fixName(v.shortName);
 		Object.keys(v).forEach(k => {
 			let value = v[k]
-			if (core.number.isFinite(value) && k.toLowerCase().includes('time')) {
+			if (Number.isFinite(value) && k.toLowerCase().includes('time')) {
 				v[k] = value * 1000
 			}
 		})
@@ -65,7 +65,7 @@ export async function syncQuotes(symbols: string[]) {
 
 
 export async function getSummary(symbol: string) {
-	let response = await http.get('https://query1.finance.yahoo.com/v10/finance/quoteSummary/' + symbol, {
+	let response = await http.get(`https://query1.finance.yahoo.com/v10/finance/quoteSummary/${yahoo.toSymbol(symbol)}`, {
 		query: { modules: yahoo.SUMMARY_MODULES.join(','), formatted: false },
 	}) as Yahoo.ApiSummary
 	let summary = response.quoteSummary.result[0]

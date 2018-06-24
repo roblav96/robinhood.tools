@@ -25,7 +25,7 @@
 				</div>
 
 				<div class="column is-narrow">
-					<div class="columns is-mobile whitespace-no-wrap text-center">
+					<div class="columns is-mobile items-center whitespace-no-wrap text-center">
 						<div class="column">
 							<p>
 								<v-price-ticker class="title" :price="all.quote.price"></v-price-ticker>
@@ -47,14 +47,6 @@
 
 				<div class="column overflow-x-auto scrollbar-none">
 					<div class="columns items-center is-mobile whitespace-no-wrap text-center">
-						<!-- <div class="is-hr-vertical"></div> -->
-
-						<!-- <div v-if="Number.isFinite(all.quote.size)" class="column is-narrow">
-							<p class="is-size-4">
-								{{vnumber(all.quote.size,{compact:true,precision:1})}}
-							</p>
-							<p>Size</p>
-						</div> -->
 						<div v-if="Number.isFinite(all.quote.volume)" class="column is-narrow">
 							<p class="is-size-4">
 								{{vnumber(all.quote.volume,{compact:true,precision:1})}}

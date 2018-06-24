@@ -30,13 +30,27 @@ export function screen() {
 
 
 
+// let traf = raf(function(args) {
+// 	console.warn(`traf args ->`, args)
+// })
+// let i = 0
+// let ti = setInterval(() => {
+// 	i++
+// 	if (i > 25) clearInterval(ti);
+// 	console.log(`traf(${i})`)
+// 	traf(i)
+// }, 1)
 export function raf(fn: (...args) => void) {
-	let wait = false
+	let waiting = false
+	let theargs = null
 	return function(...args) {
-		if (wait) return;
-		fn.apply(null, args)
-		wait = true
-		window.requestAnimationFrame(() => wait = false)
+		theargs = args
+		if (waiting) return;
+		waiting = true
+		window.requestAnimationFrame(() => {
+			fn.apply(null, theargs)
+			waiting = false
+		})
 	}
 }
 

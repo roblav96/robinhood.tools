@@ -87,6 +87,7 @@ declare global {
 			issueType: string
 			sector: string
 			symbol: string
+			tags: string[]
 			website: string
 		}
 

@@ -61,7 +61,6 @@ export default class extends Mixins(VMixin) {
 			if (!this.query) return http.post('/recents', { symbols: this.recents.map(v => v.symbol) });
 			return http.get('/search', { query: { query: this.query } })
 		}).then(results => {
-			console.log(`results ->`, JSON.parse(JSON.stringify(results)))
 			this.$safety()
 			if (this.query == query) {
 				this.results = results
@@ -81,7 +80,7 @@ export default class extends Mixins(VMixin) {
 	}
 
 	onselect(result: Quotes.Quote) {
-		this.$router.push({ name: this.$routersymbolname, params: { symbol: result.symbol } })
+		this.$router.push({ name: this.$routerSymbolName, params: { symbol: result.symbol } })
 		this.inputfield.blur()
 		if (!this.query) this.sync();
 	}

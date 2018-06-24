@@ -23,7 +23,7 @@
 		</div>
 		<!-- <div class="column is-narrow w-1 shadow-inner"></div> -->
 		<div class="column flex-row items-center overflow-x-auto scrollbar-none">
-			<router-link class="navbar-item flex-col" v-for="symbol in symbols" :key="symbol" :to="{name:$routersymbolname,params:{symbol:symbol}}"
+			<router-link class="navbar-item flex-col" v-for="symbol in symbols" :key="symbol" :to="{name:$routerSymbolName,params:{symbol:symbol}}"
 			    exact-active-class>
 				<div class="whitespace-no-wrap has-text-centered">
 					<p class="is-size-7">

@@ -34,7 +34,6 @@ async function start() {
 	// let symbols = await utils.getAllSymbols()
 	// await yahoo.syncQuotes(symbols)
 	// await quotes.syncAllQuotes()
-	// return
 
 	let keys = [
 		rkeys.RH.SYMBOLS, rkeys.WB.SYMBOLS, rkeys.WB.EXCHANGES,

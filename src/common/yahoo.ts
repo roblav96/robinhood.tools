@@ -15,6 +15,17 @@ export const YH = {
 
 
 
+export function toSymbol(symbol: string) {
+	if (symbol.includes('.')) return symbol.replace('.', '-');
+	if (symbol.includes('-')) return symbol.replace('-', '-P');
+	return symbol
+}
+export function fromSymbol(symbol: string) {
+	if (symbol.includes('-P')) return symbol.replace('-P', '-');
+	if (symbol.includes('-')) return symbol.replace('-', '.');
+	return symbol
+}
+
 export function fixName(name: string) {
 	return name && name.replace(/&amp;+/g, '&').replace(/[Â]+/g, '').trim()
 }
@@ -80,7 +91,7 @@ export const RANGES = Object.keys(FRAMES)
 
 
 export function getChart(symbol: string, params: Partial<Yahoo.ChartParams>) {
-	return http.get(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`, {
+	return http.get(`https://query1.finance.yahoo.com/v8/finance/chart/${toSymbol(symbol)}`, {
 		query: params, proxify: !!process.env.CLIENT, retries: 3, timeout: 5000,
 	}).then(function(response: Yahoo.ApiChart) {
 		let error = _.get(response, 'chart.error') as Yahoo.ApiError

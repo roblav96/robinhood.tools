@@ -26,14 +26,14 @@ export default class VMixin extends Vue {
 	@VMixin.NoCache get $destroyed() { return this._isDestroyed }
 	$safety() { if (this.$destroyed) throw new Error('$safety'); }
 
-	get $routersymbolname() { return this.$route.name.startsWith('symbol.') ? this.$route.name : 'symbol' }
+	get $routerSymbolName() { return this.$route.name.startsWith('symbol.') ? this.$route.name : 'symbol' }
 
 	vcamel(value: string) { return _.camelCase(value) }
 	vstcase(value: string) { return _.startCase(value.toLowerCase()) }
 	vtruncate(value: string, length = 48) { return _.truncate(value, { length }) }
 	vcapitalize(value: string) { return core.string.capitalize(value) }
 	vstamp(stamp: number) { return stamp && pretty.stamp(stamp) }
-	vname(name: string) { return name && this.vtruncate(quotes.getName(name)) }
+	vname(name: string) { return name && quotes.getName(name) }
 	vtime(stamp: number, opts?: Partial<TimeFormatOptions>) { return stamp && pretty.time(stamp, opts) }
 	vnumber(value: number, opts?: Partial<NumberFormatOptions>) { if (!Number.isFinite(value)) return value; return pretty.number(value, opts) }
 	vpercent(to: number, from: number) { if (!to || !from) return NaN; return core.calc.percent(to, from) }
