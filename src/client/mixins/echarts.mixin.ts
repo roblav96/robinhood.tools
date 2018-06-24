@@ -32,7 +32,7 @@ export default class VEChartsMixin extends Vue {
 		this.tippos = { show: false }
 	}
 	mounted() {
-		this.echart = echarts.init(this.$el, null, this.dims())
+		this.echart = echarts.init(this.$el)
 		this.echart.one('rendered', this.onrendered_)
 		this.echart.on('click', this.onclick_)
 		this.echart.on('datazoom', this.ondatazoom_)
