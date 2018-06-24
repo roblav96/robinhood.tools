@@ -15,7 +15,7 @@
 				<div class="column is-narrow">
 					<div class="columns is-mobile items-center">
 						<div class="column is-narrow">
-							<v-symbol-logo class="is-56x56 shadow" :symbol="symbol"></v-symbol-logo>
+							<v-symbol-logo class="is-56x56 shadow" :symbol="symbol" :acronym="all.quote.acronym"></v-symbol-logo>
 						</div>
 						<div class="column">
 							<p class="title">{{symbol}}</p>

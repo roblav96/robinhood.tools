@@ -94,12 +94,16 @@ Vue.component('v-price-ticker', VPriceTicker)
 })
 class VSymbolLogo extends Vue {
 	@Vts.Prop() symbol: string
+	@Vts.Prop() acronym: string
 	get src() { return 'https://storage.googleapis.com/iex/api/logos/' + this.symbol + '.png' }
 	onerror(event: Event) {
-		let el = event.target as HTMLImageElement
-		let src = 'https://bulma.io/images/placeholders/256x256.png'
-		if (el.src == src) return;
-		el.src = src
+		let img = event.target as HTMLImageElement
+		if (img.src.includes('storage.googleapis') && this.acronym) {
+			return img.src = `https://logo.clearbit.com/${this.acronym.toLowerCase()}.com`;
+		}
+		if (img.src.includes('storage.googleapis') || img.src.includes('logo.clearbit')) {
+			return img.src = 'https://bulma.io/images/placeholders/256x256.png'
+		}
 	}
 }
 Vue.component('v-symbol-logo', VSymbolLogo)

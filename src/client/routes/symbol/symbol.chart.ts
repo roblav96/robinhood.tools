@@ -48,12 +48,17 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		let lquote = lquotes[core.math.clamp(Math.floor(lquotes.length * (ctbounds.start / 100)), 0, lquotes.length - 1)]
 		if (this.settings.axis == 'category') lquote = lquotes[ctbounds.startValue];
 		if (this.settings.axis == 'time') lquote = lquotes.find(v => v.timestamp >= ctbounds.startValue);
-		return lquote.open || lquote.price
+		return this.settings.ohlc ? lquote.open : lquote.price
 	}
 
 
 
-	@Vts.Watch('settings.axis') w_axis(axis: string) {
+	@Vts.Watch('settings.ohlc') w_ohlc() {
+		let lquotes = this.lquotes()
+		this.echart.clear()
+		this.build(lquotes)
+	}
+	@Vts.Watch('settings.axis') w_axis() {
 		let lquotes = this.lquotes()
 		this.echart.clear()
 		this.build(lquotes)
@@ -89,36 +94,37 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		})
 
 		bones.xAxis.push(ecbones.axis('x', { type: this.settings.axis }))
-		bones.xAxis.push(ecbones.axis('x', { blank: true, type: this.settings.axis, gridIndex: 1 }))
+		bones.xAxis.push(ecbones.axis('x', { type: this.settings.axis, gridIndex: 1, blank: true }))
 
 		bones.yAxis.push(ecbones.axis('y', {
 			boundaryGap: '1%',
-			axisPointer: {
-				label: {
-					formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice), { percent: true, plusminus: true })
-				}
-			},
+			axisPointer: { label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice), { percent: true, plusminus: true }) } },
 		}))
-		bones.yAxis.push(ecbones.axis('y', { blank: true, gridIndex: 1 }))
+		bones.yAxis.push(ecbones.axis('y', { gridIndex: 1, blank: true }))
 
-		bones.series.push(ecbones.series({
-			name: 'OHLC',
-			type: 'line',
-			// large: true,
-			encode: {
-				x: 'timestamp',
-				y: 'price',
-				tooltip: 'price',
-				// y: ['open', 'close', 'high', 'low'],
-				// tooltip: ['open', 'high', 'low', 'close'],
-			},
-			itemStyle: { color: colors.primary },
-			// symbol: 'diamond',
-			// itemStyle: {
-			// 	borderColor: colors.success, borderColor0: colors.danger, borderWidth: 1,
-			// 	color: colors.success, color0: colors.danger,
-			// },
-		}))
+		if (this.settings.ohlc) {
+			bones.series.push(ecbones.series({
+				name: 'OHLC',
+				type: 'candlestick',
+				large: true,
+				encode: {
+					x: 'timestamp',
+					y: ['open', 'close', 'high', 'low'],
+					tooltip: ['open', 'high', 'low', 'close'],
+				},
+				itemStyle: {
+					borderColor: colors.success, borderColor0: colors.danger, borderWidth: 1,
+					color: colors.success, color0: colors.danger,
+				},
+			}))
+		} else {
+			bones.series.push(ecbones.series({
+				name: 'Price',
+				type: 'line',
+				encode: { x: 'timestamp', y: 'price', tooltip: 'price' },
+				itemStyle: { color: colors.primary },
+			}))
+		}
 
 		bones.series.push(ecbones.series({
 			name: 'Size',
@@ -126,16 +132,13 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			xAxisIndex: 1,
 			yAxisIndex: 1,
 			large: true,
-			encode: {
-				x: 'timestamp',
-				y: 'size',
-				tooltip: ['size', 'volume'],
-			},
+			encode: { x: 'timestamp', y: 'size', tooltip: 'size' },
 		}))
 
 		console.log(`build bones ->`, _.clone(bones))
 		this.echart.setOption(bones)
 		console.log(`build getOption ->`, _.clone(this.echart.getOption()))
+
 		_.defer(() => console.log(`echart build ->`, Date.now() - stamp + 'ms'))
 	}
 

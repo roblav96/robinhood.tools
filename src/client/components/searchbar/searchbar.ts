@@ -86,10 +86,6 @@ export default class extends Mixins(VMixin) {
 		if (!this.query) this.sync();
 	}
 
-	voption(result) {
-		return _.omit(result, ['symbol', 'name', 'rank'])
-	}
-
 }
 
 

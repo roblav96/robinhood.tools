@@ -1,16 +1,9 @@
 // 
 
 import '../main'
-import * as lunr from 'lunr'
-import * as _ from '../../common/lodash'
-import * as Rx from '../../common/rxjs'
 import * as core from '../../common/core'
-import * as rkeys from '../../common/rkeys'
-import * as pretty from '../../common/pretty'
-import * as redis from '../adapters/redis'
 import * as utils from '../adapters/utils'
 import * as quotes from '../adapters/quotes'
-import * as hours from '../adapters/hours'
 import radio from '../adapters/radio'
 
 
@@ -27,11 +20,11 @@ async function start() {
 	let symbols = await utils.getAllSymbols()
 	// if (process.env.DEVELOPMENT) symbols = Object.keys(utils.DEV_STOCKS);
 
-	let ikeys = ['name', 'marketCap'] as KeysOf<Quotes.Quote>
+	let ikeys = ['name', 'alive', 'marketCap'] as KeysOf<Quotes.Quote>
 	let alls = await quotes.getAlls(symbols, ['quote'], [ikeys])
 
 	alls.forEach(({ symbol, quote }) => {
-		if (symbol.includes('-')) return;
+		if (symbol.includes('-') && !quote.alive) return;
 		if (symbol.includes('.') && !quote.alive) return;
 		Object.assign(QUOTES, {
 			[symbol]: {
@@ -52,23 +45,23 @@ radio.reply('search.query', async function onquery(query: string) {
 		let { symbol, _symbol, name } = QUOTES[key]
 		let ranks = [] as number[]
 
-		let s_leven = core.string.levenshtein(query, symbol)
-		let s_rank = Math.max(symbol.length - s_leven, 2) // * Math.round(query.length / 2)
+		let sleven = core.string.levenshtein(query, symbol)
+		let srank = Math.max(symbol.length - sleven, 2)
 		if (query == symbol) {
-			s_rank = Math.pow(s_rank, 5)
+			srank = Math.pow(srank, 5)
 		} else if (symbol.indexOf(query) == 0) {
-			s_rank = Math.pow(s_rank, 3)
+			srank = Math.pow(srank, 3)
 		}
-		ranks.push(s_rank)
+		ranks.push(srank)
 
-		let n_leven = core.string.levenshtein(query, name)
-		let n_rank = Math.max(name.length - n_leven, 2)
+		let nleven = core.string.levenshtein(query, name)
+		let nrank = Math.max(name.length - nleven, 2)
 		if (query == name) {
-			n_rank = Math.pow(n_rank, 4)
+			nrank = Math.pow(nrank, 4)
 		} else if (name.indexOf(query) == 0) {
-			n_rank = Math.pow(n_rank, 2)
+			nrank = Math.pow(nrank, 2)
 		}
-		ranks.push(n_rank)
+		ranks.push(nrank)
 
 		let result = {
 			symbol: _symbol,
@@ -82,7 +75,7 @@ radio.reply('search.query', async function onquery(query: string) {
 	}).sort((a, b) => {
 		if (a.rank != b.rank) return b.rank - a.rank;
 		return QUOTES[b.symbol].marketCap - QUOTES[a.symbol].marketCap
-	}).slice(0, 20)
+	}).filter((v, i) => i < 10 && v.rank > 8)
 })
 
 

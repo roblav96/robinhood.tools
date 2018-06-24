@@ -37,7 +37,7 @@ export function applyFull(
 	} as Quotes.Quote)
 
 	if (yhquote && yhquote.longName) yhquote.longName = yahoo.fixName(yhquote.longName);
-	quote.name = core.fallback(yhquote.longName, iexitem.companyName, wbticker.name)
+	quote.name = core.fallback(iexitem.companyName, yhquote.longName, wbticker.name)
 	quote.tinyName = core.fallback(instrument.simple_name, quote.name)
 	quote.fullName = core.fallback(instrument.name, quote.name)
 
@@ -361,7 +361,8 @@ export function getName(name: string) {
 	if (stopwords.includes(first)) split.shift();
 	let last = split[split.length - 1].toLowerCase().replace(/[^a-z]+/g, '')
 	if (stopwords.includes(last)) split.pop();
-	return _.truncate(split.join(' ').replace(/[,]+/g, '').trim(), { length: 48 })
+	split.remove(v => v.toLowerCase().replace(/[^a-z]+/g, '').length == 0)
+	return split.join(' ').replace(/[,]+/g, '').trim()
 }
 
 

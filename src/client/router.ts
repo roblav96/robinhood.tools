@@ -41,8 +41,10 @@ export const routes = [
 		meta: { nofooter: true, doctitle: false },
 		component: () => import('./routes/symbol/symbol'),
 		beforeEnter(to, from, next) {
-			if (to.params.symbol == to.params.symbol.toUpperCase()) return next();
-			next(_.merge(_.clone(to), { params: { symbol: to.params.symbol.toUpperCase() } } as Partial<Route>))
+			let symbol = to.params.symbol as string
+			if (symbol == symbol.toUpperCase()) return next();
+			if (symbol.endsWith('1') || symbol.endsWith('2')) return next();
+			next(_.merge(_.clone(to), { params: { symbol: symbol.toUpperCase() } } as Partial<Route>))
 		},
 		children: [
 			{

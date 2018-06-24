@@ -16,7 +16,7 @@
 				    detailed detail-key="symbol">
 					<template slot-scope="props">
 						<b-table-column label="" width="1">
-							<v-symbol-logo class="shadow is-32x32" :symbol="props.row.symbol"></v-symbol-logo>
+							<v-symbol-logo class="shadow is-32x32" :symbol="props.row.symbol" :acronym="props.row.acronym"></v-symbol-logo>
 						</b-table-column>
 						<b-table-column label="Symbol" width="1">
 							<button class="button is-size-5 font-semibold leading-none w-full h-initial" v-on:click="gotosymbol(props.row.symbol)">

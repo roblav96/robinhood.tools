@@ -60,7 +60,7 @@ export function option(
 				label: {
 					formatter(params) { return charts.xlabel(params.value) },
 					backgroundColor: colors.white, shadowBlur: 0, margin: 1,
-					borderColor: colors.grey, borderWidth: 1,
+					borderColor: colors['grey-light'], borderWidth: 1,
 					textStyle: {
 						color: colors.dark, borderRadius: 0,
 						fontSize: SETTINGS.fontSize, padding: [4, 8], fontWeight: 'bold',

@@ -4,7 +4,7 @@ export { }
 
 
 
-global.Zousan.suppressUncaughtRejectionError = false // !!process.env.DEVELOPMENT
+global.Zousan.suppressUncaughtRejectionError = true // !!process.env.DEVELOPMENT
 
 global.noop = function noop() { }
 declare global { namespace NodeJS { interface Global { noop: any } } }

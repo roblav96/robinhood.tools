@@ -1,7 +1,6 @@
 // 
 
 import * as _ from './lodash'
-import * as leven from 'leven'
 import * as levenshtein from 'js-levenshtein'
 import * as ss from 'simple-statistics'
 import * as dayjs from 'dayjs'
@@ -174,9 +173,6 @@ export const string = {
 	},
 	levenshtein(query: string, value: string) {
 		return levenshtein(query, value) as number
-	},
-	leven(query: string, value: string) {
-		return leven(query, value) as number
 	},
 	fuzzy(query: string, value: string) {
 		let hlen = query.length
