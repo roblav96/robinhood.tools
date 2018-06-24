@@ -52,11 +52,13 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 	ctlatest() {
 		let lquotes = this.lquotes()
 		let bounds = { end: 100 } as ReturnType<typeof VEChartsMixin.prototype.ctbounds>
+		let threshold = Math.round(utils.screen().width / 16)
+		console.log('threshold ->', threshold)
 		if (this.settings.time) {
-			let i = core.math.clamp(lquotes.length - 100, 0, lquotes.length)
+			let i = core.math.clamp(lquotes.length - threshold, 0, lquotes.length)
 			bounds.startValue = lquotes[i].timestamp
 		} else {
-			bounds.start = core.math.clamp(core.calc.slider(lquotes.length - 100, 0, lquotes.length), 0, 100)
+			bounds.start = core.math.clamp(core.calc.slider(lquotes.length - threshold, 0, lquotes.length), 0, 100)
 		}
 		return bounds
 	}
@@ -125,12 +127,14 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			blank: true,
 		}))
 
-		let markprice = ecbones.markLine({
-			label: { position: 'end', formatter(v) { return pretty.number(v.value, { price: true }) } },
-			data: [{ yAxis: this.quote.price }],
-		})
+		let pseries = {
+			name: 'Price',
+			type: 'line',
+			encode: { x: 'timestamp', y: 'price', tooltip: 'price' },
+			itemStyle: { color: colors.primary },
+		} as echarts.Series
 		if (this.settings.ohlc) {
-			option.series.push(ecbones.series({
+			_.merge(pseries, {
 				name: 'OHLC',
 				type: 'candlestick',
 				large: true,
@@ -143,17 +147,14 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 					borderColor: colors.success, borderColor0: colors.danger, borderWidth: 1,
 					color: colors.success, color0: colors.danger,
 				},
-				markLine: this.settings.range == 'live' && markprice,
-			}))
-		} else {
-			option.series.push(ecbones.series({
-				name: 'Price',
-				type: 'line',
-				encode: { x: 'timestamp', y: 'price', tooltip: 'price' },
-				itemStyle: { color: colors.primary },
-				markLine: this.settings.range == 'live' && markprice,
-			}))
+			} as echarts.Series)
 		}
+		if (this.settings.range == 'live') {
+			pseries.markLine = ecbones.markLine({
+				data: [this.priceLineData()],
+			})
+		}
+		option.series.push(ecbones.series(pseries))
 
 		option.series.push(ecbones.series({
 			name: 'Size',
@@ -168,8 +169,6 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		this.echart.setOption(option)
 		console.log(`build getOption ->`, _.clone(this.echart.getOption()))
 
-		console.warn(`dtsgen this.echart.getOption().visualMap[0] ->`, console.dtsgen(this.echart.getOption().visualMap[0]))
-
 		_.defer(() => console.log(`echart build ->`, lquotes.length, Date.now() - stamp + 'ms'))
 	}
 
@@ -182,6 +181,16 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		} else lquotes.push(lquote);
 		this.setOption({ dataset: [{ source: lquotes }] })
 		this.reshowtip()
+	}
+
+
+
+	priceLineData() {
+		return {
+			yAxis: this.quote.price,
+			label: { position: 'end', formatter(v) { return pretty.number(v.value, { price: true }) } },
+			lineStyle: { color: colors.warning },
+		}
 	}
 
 
@@ -247,7 +256,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 
 
 	settings = lockr.get('symbol.chart.settings', {
-		range: yahoo.RANGES[2],
+		range: yahoo.RANGES[2] as keyof typeof yahoo.FRAMES | 'live',
 		ohlc: true,
 		time: false,
 	})

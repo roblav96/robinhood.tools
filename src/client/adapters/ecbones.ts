@@ -7,15 +7,15 @@ import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as pretty from './pretty'
 import * as charts from './charts'
+import * as utils from './utils'
 import colors from '../stores/colors'
 
 
 
 const SETTINGS = {
 	fontSize: 14,
-	largeThreshold: 128,
-	progressive: 512,
-	progressiveThreshold: 512,
+	largeThreshold: Math.round(utils.screen().width / 8),
+	progressiveThreshold: Math.round(utils.screen().width / 2),
 }
 
 
@@ -25,7 +25,7 @@ export function option(
 ) {
 	let option = {
 		animation: false,
-		progressive: SETTINGS.progressive,
+		progressive: SETTINGS.progressiveThreshold,
 		progressiveThreshold: SETTINGS.progressiveThreshold,
 		color: Array(16).fill(colors['grey-lighter']),
 		textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize },
@@ -198,7 +198,7 @@ export function series(
 	if (mods.large) {
 		_.merge(series, {
 			largeThreshold: SETTINGS.largeThreshold,
-			progressive: SETTINGS.progressive,
+			progressive: SETTINGS.progressiveThreshold,
 			progressiveThreshold: SETTINGS.progressiveThreshold,
 		} as echarts.Series)
 	}

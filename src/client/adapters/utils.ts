@@ -12,10 +12,8 @@ import clock from '../../common/clock'
 
 export function screen() {
 	let screen = {
-		width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || window.screen.width,
-		wpixels: 0,
-		height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || window.screen.height,
-		hpixels: 0,
+		width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || window.screen.width, wpixels: 0,
+		height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight || window.screen.height, hpixels: 0,
 	}
 	screen.wpixels = window.devicePixelRatio * screen.width
 	screen.hpixels = window.devicePixelRatio * screen.height

@@ -70,12 +70,11 @@ Vue.component('v-timestamp', VTimestamp)
 class VPriceTicker extends Vue {
 	black: string
 	color: string
-	colors = this.$store.state.colors
 	mounted() { this.black = window.getComputedStyle(this.$el).getPropertyValue('color') }
 	@Vts.Prop() price: number
 	@Vts.Watch('price') w_number(to: number, from: number) {
 		if (!Number.isFinite(to) || !Number.isFinite(from) || to == from) return;
-		this.color = to > from ? this.colors.success : this.colors.danger
+		this.color = to > from ? colors.theme.success : colors.theme.danger
 	}
 	get digits() {
 		return Number.isFinite(this.price) ? pretty.number(this.price, { price: true }).split('') : []
