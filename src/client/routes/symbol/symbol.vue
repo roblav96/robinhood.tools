@@ -71,14 +71,12 @@
 							</p>
 							<p>3mo Volume</p>
 						</div>
-
 						<div v-if="Number.isFinite(all.quote.marketCap)" class="column is-narrow">
 							<p class="is-size-4">
 								{{vnumber(all.quote.marketCap,{compact:true})}}
 							</p>
 							<p>Market Cap</p>
 						</div>
-
 						<div v-if="Number.isFinite(all.quote.sharesFloat)" class="column is-narrow">
 							<p class="is-size-4">
 								{{vnumber(all.quote.sharesFloat,{compact:true,precision:1})}}
@@ -91,13 +89,6 @@
 							</p>
 							<p>Shares Outstanding</p>
 						</div>
-						<div v-if="Number.isFinite(all.quote.avgVolume3Month)" class="column is-narrow">
-							<p class="is-size-4">
-								{{vnumber(all.quote.avgVolume3Month,{compact:true,precision:1})}}
-							</p>
-							<p>3mo Volume</p>
-						</div>
-
 					</div>
 				</div>
 

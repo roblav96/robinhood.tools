@@ -112,18 +112,16 @@ declare global {
 
 
 
-// import * as leven from 'leven'
-// import * as levenshtein from 'js-levenshtein'
-// import * as similarity from 'string-similarity'
-// import * as benchmark from '../../common/benchmark'
-// const query = 'amd'
-// const company = core.string.alphanumeric('Advanced Micro Devices').toLowerCase()
-// setTimeout(() => {
-// 	benchmark.simple(`Fuzzy Search -> ${query} -> ${company}`, [
-// 		function Levenshtein() { levenshtein(query, company) },
-// 		function Leven() { leven(query, company) },
-// 		function Similarity() { similarity.compareTwoStrings(query, company) },
-// 	])
-// }, 3000)
+import * as levenshtein from 'js-levenshtein'
+import * as hyperid from 'hyperid'
+import * as benchmark from '../../common/benchmark'
+const query = 'amd'
+const company = core.string.alphanumeric('Advanced Micro Devices').toLowerCase()
+setTimeout(() => {
+	benchmark.simple(`Fuzzy Search -> ${query} -> ${company}`, [
+		function Levenshtein() { levenshtein(query, company) },
+		function Hyperid() { hyperid().uuid },
+	])
+}, 3000)
 
 

@@ -16,10 +16,10 @@ import * as pretty from './pretty'
 const XLABEL_FRAMES = [
 	{ id: 'millisecond', ms: 0, format: 'h:mm:ssa', ago: true },
 	{ id: 'hour', ms: 0, format: 'h:mm:ssa', ago: true },
-	{ id: 'day', ms: 0, format: 'dddd, MMM DD, h:mm:ssa', ago: true },
-	{ id: 'week', ms: 0, format: 'MMM DD, h:mma', ago: true },
-	{ id: 'month', ms: 0, format: 'MMM DD YYYY, h:mma' },
-	{ id: 'year', ms: 0, format: 'MMM DD YYYY' },
+	{ id: 'day', ms: 0, format: 'dddd, MMM D, h:mm:ssa', ago: true },
+	{ id: 'week', ms: 0, format: 'MMM D, h:mma', ago: true },
+	{ id: 'month', ms: 0, format: 'MMM D YYYY, h:mma' },
+	{ id: 'year', ms: 0, format: 'MMM D YYYY' },
 ]
 XLABEL_FRAMES.forEach(v => v.ms = dayjs(0).add(1, v.id as any).valueOf())
 export function xlabel(stamp: number) {
@@ -35,6 +35,7 @@ export function xlabel(stamp: number) {
 				if (label.includes(':00')) label = label.replace(':00', '');
 			}
 			if (frame.format.endsWith('mma')) {
+				if (label.includes(', 9:30am')) label = label.replace(', 9:30am', '');
 				if (label.includes(', 12:00am')) label = label.replace(', 12:00am', '');
 			}
 			if (frame.format.startsWith('dddd')) {

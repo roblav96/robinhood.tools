@@ -2,6 +2,7 @@
 
 import deepmerge from 'deepmerge'
 import * as echarts from 'echarts'
+import * as hyperid from 'hyperid'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as pretty from './pretty'
@@ -126,7 +127,7 @@ export function axis(
 	let axis = {
 		silent: true,
 		gridIndex: 0,
-		uuid: Math.random().toString(16),
+		uuid: hyperid().uuid,
 		// axisPointer: { show: true },
 		axisLabel: { textStyle: { color: colors.dark, fontSize: SETTINGS.fontSize } },
 		axisLine: { show: !!mods.axisLine },
@@ -179,7 +180,7 @@ export function series(
 		animation: false,
 		hoverAnimation: false,
 		legendHoverLink: false,
-		uuid: Math.random().toString(16),
+		uuid: hyperid().uuid,
 		datasetIndex: 0,
 		xAxisIndex: 0,
 		yAxisIndex: 0,

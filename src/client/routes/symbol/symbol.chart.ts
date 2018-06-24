@@ -53,15 +53,16 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 
-	@Vts.Watch('settings.ohlc') w_ohlc() {
+	@Vts.Watch('settings.ohlc') w_ohlc() { this.reload() }
+	@Vts.Watch('settings.axis') w_axis() { this.reload() }
+
+	reload = _.debounce(this.reload_, 100, { leading: false, trailing: true })
+	reload_() {
+		let ctbounds = this.ctbounds()
 		let lquotes = this.lquotes()
 		this.echart.clear()
 		this.build(lquotes)
-	}
-	@Vts.Watch('settings.axis') w_axis() {
-		let lquotes = this.lquotes()
-		this.echart.clear()
-		this.build(lquotes)
+		this.echart.dispatchAction(Object.assign({ type: 'dataZoom', manual: true }, ctbounds))
 	}
 
 	build(lquotes = this.lquotes()) {
