@@ -13,7 +13,7 @@ import polka from './polka'
 
 
 
-const IKEYS = ['name', 'type', 'acronym'] as KeysOf<Quotes.Quote> // ['symbol', 'name', 'tinyName', 'country', 'exchange', 'acronym', 'mic', 'type', 'typeof'] as KeysOf<Quotes.Quote>
+const IKEYS = ['name', 'type', 'acronym', 'marketCap'] as KeysOf<Quotes.Quote> // ['symbol', 'name', 'tinyName', 'country', 'exchange', 'acronym', 'mic', 'type', 'typeof'] as KeysOf<Quotes.Quote>
 
 polka.route({
 	method: 'GET',

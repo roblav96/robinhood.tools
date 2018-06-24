@@ -19,7 +19,7 @@
 						</div>
 						<div class="column">
 							<p class="title">{{symbol}}</p>
-							<p>{{vname(all.quote.name)}}</p>
+							<p>{{vtruncate(vname(all.quote.name),32)}}</p>
 						</div>
 					</div>
 				</div>
