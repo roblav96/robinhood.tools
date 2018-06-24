@@ -109,18 +109,19 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			bottom: 92,
 		})
 
+		let xtype = this.settings.time ? 'time' : 'category'
 		option.xAxis.push(ecbones.axis('x', {
-			type: this.settings.time ? 'time' : 'category',
+			type: xtype,
 		}))
 		option.xAxis.push(ecbones.axis('x', {
-			type: this.settings.time ? 'time' : 'category',
+			type: xtype,
 			gridIndex: 1,
 			blank: true,
 		}))
 
 		option.yAxis.push(ecbones.axis('y', {
 			boundaryGap: '1%',
-			axisPointer: { label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice), { percent: true, plusminus: true }) } },
+			axisPointer: { label: { formatter: this.pricePointerFormatter } },
 		}))
 		option.yAxis.push(ecbones.axis('y', {
 			gridIndex: 1,
@@ -132,6 +133,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			type: 'line',
 			encode: { x: 'timestamp', y: 'price', tooltip: 'price' },
 			itemStyle: { color: theme.primary },
+			markLine: { data: [] },
 		} as echarts.Series
 		if (this.settings.ohlc) {
 			_.merge(pseries, {
@@ -150,9 +152,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			} as echarts.Series)
 		}
 		if (this.settings.range == 'live') {
-			pseries.markLine = ecbones.markLine({
-				data: [this.priceLineData()],
-			})
+			pseries.markLine = ecbones.markLine({ data: this.priceMarkDatas() })
 		}
 		option.series.push(ecbones.series(pseries))
 
@@ -185,12 +185,26 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 
-	priceLineData() {
-		return {
+	pricePointerFormatter(params: echarts.AxisPointerParams) {
+		return pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice), { percent: true, plusminus: true })
+	}
+	priceMarkDatas() {
+		let color = theme['grey-light']
+		if (this.quote.change > 0) color = theme.success;
+		if (this.quote.change < 0) color = theme.danger;
+		return [{
+			// yAxis: this.quote.startPrice,
+			// }, {
 			yAxis: this.quote.price,
-			label: { position: 'end', formatter(v) { return pretty.number(v.value, { price: true }) } },
-			lineStyle: { color: theme.warning },
-		}
+			lineStyle: { color },
+			label: {
+				position: 'end',
+				backgroundColor: color,
+				color: theme.white,
+				borderColor: theme.white,
+				formatter: v => pretty.number(v.value, { price: true }),
+			},
+		}] as echarts.MarkData[]
 	}
 
 

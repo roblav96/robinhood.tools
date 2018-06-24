@@ -563,6 +563,7 @@ declare module 'echarts' {
 			fontStyle: string
 			fontWeight: number | string
 			lineHeight: number
+			backgroundColor: string | ((param: EventParam) => string)
 			borderColor0: string | ((param: EventParam) => string)
 			borderColor: string | ((param: EventParam) => string)
 			borderWidth: number
@@ -574,7 +575,7 @@ declare module 'echarts' {
 
 		interface StyleOptions {
 			align: string
-			backgroundColor: string
+			backgroundColor: string | ((param: EventParam) => string)
 			borderColor0: string | ((param: EventParam) => string)
 			borderColor: string | ((param: EventParam) => string)
 			borderRadius: number

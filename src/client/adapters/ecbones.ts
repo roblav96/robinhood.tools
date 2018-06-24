@@ -212,17 +212,14 @@ export function markLine(
 ) {
 	let markLine = {
 		animation: false,
+		silent: true,
+		precision: -1,
+		symbol: 'none',
 		label: {
 			backgroundColor: theme.white, borderColor: theme['grey-light'], borderWidth: 1,
-			textStyle: {
-				color: theme.dark, borderRadius: 0,
-				fontSize: SETTINGS.fontSize, padding: [4, 8], fontWeight: 'bold',
-			},
+			textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize, fontWeight: 'bold', padding: [4, 8] },
 		},
 		lineStyle: { type: 'dashed', color: theme['grey-light'] },
-		precision: -1,
-		silent: true,
-		symbol: 'none',
 	} as echarts.Mark
 	return _.merge(markLine, mods) as echarts.Mark
 }
