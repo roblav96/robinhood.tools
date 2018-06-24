@@ -45,21 +45,18 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 	@VMixin.NoCache get ctprice() {
 		let lquotes = this.lquotes()
 		let ctbounds = this.ctbounds()
-		let lquote = lquotes[core.math.clamp(Math.floor(lquotes.length * (ctbounds.start / 100)), 0, lquotes.length - 1)]
-		if (this.settings.axis == 'category') lquote = lquotes[ctbounds.startValue];
-		if (this.settings.axis == 'time') lquote = lquotes.find(v => v.timestamp >= ctbounds.startValue);
+		let lquote = this.settings.time ? lquotes.find(v => v.timestamp >= ctbounds.startValue) : lquotes[ctbounds.startValue]
 		return this.settings.ohlc ? lquote.open : lquote.price
 	}
 
 	ctlatest() {
 		let lquotes = this.lquotes()
 		let bounds = { end: 100 } as ReturnType<typeof VEChartsMixin.prototype.ctbounds>
-		if (this.settings.axis == 'category') {
-			bounds.start = core.math.clamp(core.calc.slider(lquotes.length - 100, 0, lquotes.length), 0, 100)
-		}
-		if (this.settings.axis == 'time') {
+		if (this.settings.time) {
 			let i = core.math.clamp(lquotes.length - 100, 0, lquotes.length)
 			bounds.startValue = lquotes[i].timestamp
+		} else {
+			bounds.start = core.math.clamp(core.calc.slider(lquotes.length - 100, 0, lquotes.length), 0, 100)
 		}
 		return bounds
 	}
@@ -69,8 +66,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 
+	@Vts.Watch('settings.time') w_time() { this.reload() }
 	@Vts.Watch('settings.ohlc') w_ohlc() { this.reload() }
-	@Vts.Watch('settings.axis') w_axis() { this.reload() }
 
 	reload = _.debounce(this.reload_, 100, { leading: false, trailing: true })
 	reload_() {
@@ -110,14 +107,23 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			bottom: 92,
 		})
 
-		option.xAxis.push(ecbones.axis('x', { type: this.settings.axis }))
-		option.xAxis.push(ecbones.axis('x', { type: this.settings.axis, gridIndex: 1, blank: true }))
+		option.xAxis.push(ecbones.axis('x', {
+			type: this.settings.time ? 'time' : 'category',
+		}))
+		option.xAxis.push(ecbones.axis('x', {
+			type: this.settings.time ? 'time' : 'category',
+			gridIndex: 1,
+			blank: true,
+		}))
 
 		option.yAxis.push(ecbones.axis('y', {
 			boundaryGap: '1%',
 			axisPointer: { label: { formatter: params => pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice), { percent: true, plusminus: true }) } },
 		}))
-		option.yAxis.push(ecbones.axis('y', { gridIndex: 1, blank: true }))
+		option.yAxis.push(ecbones.axis('y', {
+			gridIndex: 1,
+			blank: true,
+		}))
 
 		if (this.settings.ohlc) {
 			option.series.push(ecbones.series({
@@ -152,11 +158,21 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			encode: { x: 'timestamp', y: 'size', tooltip: 'size' },
 		}))
 
+		// option.markLine.push({
+		// 	data: [{
+		// 		name: 'from lowest to highest',
+		// 		type: 'min',
+		// 		valueDim: 'lowest',
+		// 		symbol: 'circle',
+		// 		symbolSize: 10,
+		// 	}],
+		// })
+
 		console.log(`build bones ->`, _.clone(option))
 		this.echart.setOption(option)
 		console.log(`build getOption ->`, _.clone(this.echart.getOption()))
 
-		_.defer(() => console.log(`echart build ->`, Date.now() - stamp + 'ms'))
+		_.defer(() => console.log(`echart build ->`, lquotes.length, Date.now() - stamp + 'ms'))
 	}
 
 	onlquote(lquote: Quotes.Live) {
@@ -235,7 +251,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	settings = lockr.get('symbol.chart.settings', {
 		range: yahoo.RANGES[2],
 		ohlc: true,
-		axis: 'category' as 'category' | 'time',
+		time: false,
 	})
 	@Vts.Watch('settings', { deep: true }) w_settings(settings: typeof VSymbolChart.prototype.settings) {
 		lockr.set('symbol.chart.settings', settings)
@@ -246,9 +262,6 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	@Vts.Watch('settings.range') w_settingsrange(range: string) {
 		this.getQuotes()
 	}
-
-	resetzoom() { this.vechart.resetzoom() }
-	latestzoom() { this.vechart.latestzoom() }
 
 
 

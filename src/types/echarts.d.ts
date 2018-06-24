@@ -627,7 +627,7 @@ declare module 'echarts' {
 			showAllSymbol: boolean
 			showSymbol: boolean
 			silent: boolean
-			smooth: boolean
+			smooth: boolean | number
 			smoothMonotone: string
 			stack: string
 			step: string

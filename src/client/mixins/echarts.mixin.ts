@@ -61,7 +61,10 @@ export default class VEChartsMixin extends Vue {
 	}
 
 	rendered = false
-	onrendered_() { this.rendered = true }
+	onrendered_() {
+		this.resize_()
+		this.rendered = true
+	}
 
 
 
@@ -143,12 +146,10 @@ export default class VEChartsMixin extends Vue {
 	ondatazoom_ = _.debounce(this.datazoom_, 100, { leading: true, trailing: false })
 	datazoom_(event: echarts.EventData) {
 		if (event.manual) return;
-		// console.log('leading event ->', event)
 		this.syncshowtip(false)
 	}
 	ondatazoom__ = _.debounce(this.datazoom__, 100, { leading: false, trailing: true })
 	datazoom__(event: echarts.EventData) {
-		// console.log('trailing event ->', event)
 		if (this.brushing) return this.brushing = false;
 		this.syncshowtip(true)
 		let keys = Object.keys(event)
@@ -164,8 +165,8 @@ export default class VEChartsMixin extends Vue {
 
 
 
-	onclick_() {
-		// this.brushing = false
+	onclick_(event: echarts.EventParam) {
+
 	}
 
 	ontap_(event: HammerEvent) {
@@ -214,10 +215,8 @@ export default class VEChartsMixin extends Vue {
 	showingtip() { return this.getOption().tooltip[0].show }
 	syncshowtip(show: boolean, mods = {} as Partial<echarts.Option>) {
 		this.echart.dispatchAction({ type: 'hideTip' })
-		if (this.showingtip() != show) {
-			// console.warn(`syncshowtip -> setOption tooltip`, show)
-			this.setOption(_.merge({ tooltip: [{ show }] }, mods))
-		}
+		if (this.showingtip() == show) return;
+		this.setOption(_.merge({ tooltip: [{ show }] }, mods))
 	}
 	reshowtip() {
 		if (!this.tippos || !this.tippos.show) return;

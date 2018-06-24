@@ -78,6 +78,9 @@ export function option(
 		yAxis: [],
 		series: [],
 		visualMap: [],
+		// markArea: [],
+		// markLine: [],
+		// markPoint: [],
 	} as echarts.Option
 	return _.merge(option, mods) as echarts.Option
 }

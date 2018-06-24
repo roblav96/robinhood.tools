@@ -19,12 +19,12 @@
 					<b-dropdown :disabled="busy" hoverable>
 						<b-field slot="trigger">
 							<p class="control">
-								<button class="button">
-									<b-icon :icon="{'category':'reorder-vertical','time':'av-timer'}[settings.axis]"></b-icon>
+								<button class="button" @click="settings.time=!settings.time">
+									<b-icon :icon="settings.time?'av-timer':'reorder-vertical'"></b-icon>
 								</button>
 							</p>
 							<p class="control">
-								<button class="button">
+								<button class="button" @click="settings.ohlc=!settings.ohlc">
 									<b-icon :icon="settings.ohlc?'poll':'chart-line-variant'"></b-icon>
 								</button>
 							</p>
@@ -32,15 +32,11 @@
 						<b-dropdown-item custom class="text-initial pb-2">
 							<b-field label="X Axis Scale">
 								<b-field>
-									<b-radio v-model="settings.axis" native-value="category" :disabled="busy">
-										Linear
-									</b-radio>
-									<b-radio v-model="settings.axis" native-value="time" :disabled="busy">
-										Time
-									</b-radio>
+									<b-radio v-model="settings.time" :native-value="false" :disabled="busy">Linear</b-radio>
+									<b-radio v-model="settings.time" :native-value="true" :disabled="busy">Time</b-radio>
 								</b-field>
 							</b-field>
-							<b-field label="Price Chart Type">
+							<b-field label="Price Chart">
 								<b-field>
 									<b-radio v-model="settings.ohlc" :native-value="true" :disabled="busy">OHLC</b-radio>
 									<b-radio v-model="settings.ohlc" :native-value="false" :disabled="busy">Line</b-radio>
@@ -60,20 +56,17 @@
 				</div>
 
 				<div class="column">
-
 				</div>
 
 				<div class="column is-narrow">
 					<b-field grouped>
 						<p class="control">
-							<b-tooltip label="Overview" size="is-small" animated>
-								<button class="button" :disabled="busy" @click="resetzoom">
-									<b-icon icon="crop-landscape"></b-icon>
-								</button>
-							</b-tooltip>
+							<button class="button" :disabled="busy" @click="()=>$refs.symbol_vechart.resetzoom()">
+								<b-icon icon="crop-landscape"></b-icon>
+							</button>
 						</p>
 						<p class="control">
-							<b-tooltip :multilined="brushing" :label="brushing?'Click and drag chart to crop zoom':'Crop'" size="is-small"
+							<b-tooltip :active="brushing" multilined label="Click and drag chart to crop zoom" size="is-small"
 							    animated>
 								<button class="button" :disabled="busy" :class="{'is-primary':brushing}" @click="brushing=!brushing">
 									<b-icon icon="crop"></b-icon>
@@ -81,11 +74,9 @@
 							</b-tooltip>
 						</p>
 						<p class="control">
-							<b-tooltip label="Latest" size="is-small" animated>
-								<button class="button" :disabled="busy" @click="latestzoom">
-									<b-icon icon="chevron-double-right"></b-icon>
-								</button>
-							</b-tooltip>
+							<button class="button" :disabled="busy" @click="()=>$refs.symbol_vechart.latestzoom()">
+								<b-icon icon="chevron-double-right"></b-icon>
+							</button>
 						</p>
 					</b-field>
 				</div>
