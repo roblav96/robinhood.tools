@@ -43,7 +43,7 @@ export function applyFull(
 
 	quote.avgVolume10Day = _.round(core.fallback(wbquote.avgVol10D, yhquote.averageDailyVolume10Day))
 	quote.avgVolume3Month = _.round(core.fallback(wbquote.avgVol3M, yhquote.averageDailyVolume3Month))
-	quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, core.math.sum0(quote.avgVolume10Day, quote.avgVolume3Month) / 2))
+	quote.avgVolume = _.round(core.fallback(wbquote.avgVolume, iexitem.avgTotalVolume, quote.avgVolume3Month, quote.avgVolume10Day, wbquote.volume, yhquote.regularMarketVolume))
 
 	// let toquote = core.clone(quote)
 	let toquote = { symbol, stamp: Date.now() } as Quotes.Quote

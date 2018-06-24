@@ -20,7 +20,7 @@ async function start() {
 	let symbols = await utils.getAllSymbols()
 	// if (process.env.DEVELOPMENT) symbols = Object.keys(utils.DEV_STOCKS);
 
-	let ikeys = ['name', 'alive', 'marketCap'] as KeysOf<Quotes.Quote>
+	let ikeys = ['name', 'alive', 'avgVolume'] as KeysOf<Quotes.Quote>
 	let alls = await quotes.getAlls(symbols, ['quote'], [ikeys])
 
 	alls.forEach(({ symbol, quote }) => {
@@ -29,7 +29,7 @@ async function start() {
 		Object.assign(QUOTES, {
 			[symbol]: {
 				_symbol: symbol,
-				marketCap: quote.marketCap,
+				avgVolume: quote.avgVolume,
 				symbol: core.string.alphanumeric(symbol).toLowerCase(),
 				name: core.string.alphanumeric(quotes.getName(quote.name)).toLowerCase(),
 			} as Search.Quote
@@ -41,7 +41,8 @@ async function start() {
 
 
 radio.reply('search.query', async function onquery(query: string) {
-	return Object.keys(QUOTES).map(key => {
+	let results = [] as Search.Result[]
+	Object.keys(QUOTES).map(key => {
 		let { symbol, _symbol, name } = QUOTES[key]
 		let ranks = [] as number[]
 
@@ -63,19 +64,26 @@ radio.reply('search.query', async function onquery(query: string) {
 		}
 		ranks.push(nrank)
 
+		let rank = ranks.reduce((prev, next) => prev *= next, 2)
+		if (rank == 8) return;
+
 		let result = {
-			symbol: _symbol,
-			rank: ranks.reduce((prev, next) => prev *= next, 2),
+			symbol: _symbol, rank,
 		} as Search.Result
 		if (process.env.DEVELOPMENT) {
 			Object.assign(result, { debug: { query, symbol, name, ranks } } as Search.Result)
 		}
-		return result
+		results.push(result)
 
-	}).sort((a, b) => {
-		if (a.rank != b.rank) return b.rank - a.rank;
-		return QUOTES[b.symbol].marketCap - QUOTES[a.symbol].marketCap
-	}).filter((v, i) => i < 20 && v.rank > 8)
+	})
+	results.sort((a, b) => {
+		if (a.rank == b.rank) {
+			return QUOTES[b.symbol].avgVolume - QUOTES[a.symbol].avgVolume
+		}
+		return b.rank - a.rank
+	})
+	results.remove((v, i) => i > 20)
+	return results
 })
 
 
