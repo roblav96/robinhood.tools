@@ -21,11 +21,6 @@ import socket from '../../adapters/socket'
 		'v-symbol-ticker': () => import('./symbol.ticker'),
 		'v-symbol-chart': () => import('./symbol.chart'),
 	},
-	// beforeRouteEnter(to, from, next) {
-	// 	// if (from.name.startsWith('symbol') && from.params.symbol != to.params.symbol && to.name != from.name) {
-	// 	// 	return next({ name: from.name, params: to.params, query: to.query })
-	// 	// } next()
-	// },
 })
 export default class VSymbol extends Mixins(VMixin) {
 
@@ -45,12 +40,11 @@ export default class VSymbol extends Mixins(VMixin) {
 	all = core.array.dict(Object.keys(quotes.ALL_RKEYS), {} as any) as Quotes.All
 
 	@Vts.Watch('all.quote.price', { immediate: true }) w_price(price: number) {
-		document.title = `${this.symbol} ${this.vnumber(price)} (${this.vnumber(this.all.quote.percent, { plusminus: true, percent: true })})`
+		document.title = this.symbol + (price ? ` ${this.vnumber(price)} (${this.vnumber(this.all.quote.percent, { plusminus: true, percent: true })})` : '')
 	}
 
 	reset() {
 		socket.offListener(this.onquote, this)
-		// socket.offListener(this.ondeal, this)
 		core.nullify(this.all)
 	}
 
@@ -62,7 +56,6 @@ export default class VSymbol extends Mixins(VMixin) {
 			return this.$nextTick(() => {
 				core.object.merge(this.all, _.omit(response[0], ['symbol']) as any)
 				socket.on(`${rkeys.QUOTES}:${this.symbol}`, this.onquote, this)
-				// socket.on(`${rkeys.DEALS}:${this.symbol}`, this.ondeal, this)
 			})
 		}).catch(error => {
 			console.error('w_symbol Error ->', error)
@@ -72,19 +65,10 @@ export default class VSymbol extends Mixins(VMixin) {
 	}
 
 	onquote(quote: Quotes.Quote) {
-		// console.log(`quote ->`, JSON.stringify(quote, null, 4))
 		core.object.merge(this.all.quote, quote)
 	}
-	ondeal(deal: Quotes.Deal) {
-		console.log(`deal ->`, JSON.stringify(deal, null, 4))
-	}
 
-	get vtype() { return core.string.capitalize(_.startCase(webull.ticker_types[this.all.wbticker.type])) }
-	get bidask() { return utils.bidask(this.all.quote) }
 
-	// @Vts.Watch('$route.name') w_$routename(name: string) {
-	// 	if (!name.includes('symbol.')) return;
-	// }
 
 }
 

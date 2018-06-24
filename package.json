@@ -106,6 +106,7 @@
 		"@types/lockr": "latest",
 		"@types/lodash": "latest",
 		"@types/lunr": "latest",
+		"@types/nanoid": "latest",
 		"@types/node": "latest",
 		"@types/node-forge": "latest",
 		"@types/node-schedule": "latest",

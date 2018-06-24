@@ -3,6 +3,7 @@
 import deepmerge from 'deepmerge'
 import * as echarts from 'echarts'
 import * as hyperid from 'hyperid'
+import * as nanoid from 'nanoid'
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
 import * as pretty from './pretty'
@@ -78,9 +79,6 @@ export function option(
 		yAxis: [],
 		series: [],
 		visualMap: [],
-		// markArea: [],
-		// markLine: [],
-		// markPoint: [],
 	} as echarts.Option
 	return _.merge(option, mods) as echarts.Option
 }
@@ -195,7 +193,7 @@ export function series(
 	} as echarts.Series
 	if (mods.type == 'line') {
 		_.merge(series, {
-			lineStyle: { color: mods.itemStyle.color, width: 2 },
+			lineStyle: { color: mods.itemStyle.color, width: 1 },
 		} as echarts.Series)
 	}
 	if (mods.large) {

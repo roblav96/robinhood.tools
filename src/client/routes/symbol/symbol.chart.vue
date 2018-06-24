@@ -75,7 +75,7 @@
 						</p>
 						<p class="control">
 							<button class="button" :disabled="busy" @click="()=>$refs.symbol_vechart.latestzoom()">
-								<b-icon icon="chevron-double-right"></b-icon>
+								<b-icon icon="page-last"></b-icon>
 							</button>
 						</p>
 					</b-field>
