@@ -20,7 +20,7 @@ import * as pretty from '../adapters/pretty'
 @Vts.Component({
 	template: `
 		<div
-			v-touch:tap="ontap"
+			v-touch:tap="ontap_"
 		></div>
 	`,
 })
@@ -127,6 +127,19 @@ export default class VEChartsMixin extends Vue {
 
 
 
+	dims() {
+		return {
+			width: Math.max(this.$el.offsetWidth, 256),
+			height: Math.max(this.$el.offsetHeight, 128),
+		} as echarts.Dims
+	}
+	onresize_ = _.debounce(this.resize_, 100, { leading: false, trailing: true })
+	resize_() {
+		this.echart.resize(this.dims())
+	}
+
+
+
 	ondatazoom_ = _.debounce(this.datazoom_, 100, { leading: true, trailing: false })
 	datazoom_(event: echarts.EventData) {
 		if (event.manual) return;
@@ -143,21 +156,10 @@ export default class VEChartsMixin extends Vue {
 			this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y })
 		}
 	}
+
+	latestzoom: () => void
 	resetzoom() {
 		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100, manual: true })
-	}
-
-
-
-	dims() {
-		return {
-			width: Math.max(this.$el.offsetWidth, 256),
-			height: Math.max(this.$el.offsetHeight, 128),
-		} as echarts.Dims
-	}
-	onresize_ = _.debounce(this.resize_, 100, { leading: false, trailing: true })
-	resize_() {
-		this.echart.resize(this.dims())
 	}
 
 
@@ -166,15 +168,17 @@ export default class VEChartsMixin extends Vue {
 		// this.brushing = false
 	}
 
-	ontap(event: HammerEvent) {
+	ontap_(event: HammerEvent) {
 		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.srcEvent.offsetX, event.srcEvent.offsetY])
 		if (!contains) return;
 		if (event.tapCount == 1) {
 			this.brushing = !this.brushing && this.shiftkey
 		}
+		this.$emit('tap', event)
 		if (event.tapCount == 2) {
-			let x = core.calc.slider(event.srcEvent.offsetX, 0, this.echart.getWidth())
-			x > 90 ? this.latestzoom() : this.resetzoom()
+			let grid = this.getOption().grid[0]
+			let x = core.calc.slider(event.srcEvent.offsetX - +grid.left, 0, this.echart.getWidth() - +grid.left - +grid.right)
+			x > 90 && this.latestzoom ? this.latestzoom() : this.resetzoom()
 		}
 	}
 
