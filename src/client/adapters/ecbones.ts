@@ -37,7 +37,7 @@ export function option(
 		toolbox: { show: !!mods.toolbox },
 		tooltip: [{
 			show: true,
-			showContent: !process.env.DEVELOPMENT,
+			// showContent: !process.env.DEVELOPMENT,
 			// alwaysShowContent: !!process.env.DEVELOPMENT,
 			trigger: 'axis',
 			triggerOn: 'mousemove',

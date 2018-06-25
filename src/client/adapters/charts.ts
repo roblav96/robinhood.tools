@@ -94,6 +94,7 @@ export function tipFormatter(params: echarts.EventParam<Quotes.Live>[], option: 
 
 export function getChart(quote: Quotes.Quote, range: string) {
 	return Promise.resolve().then(function() {
+
 		let symbol = quote.symbol
 		if (quote.typeof == 'INDEXES') symbol = encodeURI('^' + symbol);
 		if (quote.typeof == 'FOREX') symbol = symbol + '=X';
@@ -103,49 +104,45 @@ export function getChart(quote: Quotes.Quote, range: string) {
 				includePrePost: range == yahoo.RANGES[1],
 			})
 		}
+
 		return Promise.all([
 			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/F`, { query: { minuteType: 'm1' } }),
 			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/A`, { query: { minuteType: 'm1' } }),
-		]).then(function(resolved: Webull.MinuteChart[]) {
-			resolved.forEach(v => { core.fix(v, true); core.fix(v.data[0], true) })
-			let mlquotes = resolved.map(v => webull.toMinutesLives(v)).flatten()
+			http.get(`https://quoteapi.webull.com/api/quote/v2/tickerKDatas/${quote.tickerId}`, { query: { kDataType: 'm1' } }),
+		]).then(function(mquotes: Webull.MinuteChart[]) {
 
-			let range = {
-				min: dayjs(Math.min(...resolved.map(v => v.data[0].dates[0].start * 1000))).valueOf(),
-				max: dayjs(Math.max(...resolved.map(v => v.data[0].dates[0].end * 1000).concat(Date.now()))).valueOf(),
+			let kquotes = (mquotes.pop() as any) as Webull.KDatasChart
+			kquotes.tickerKDatas.forEach(v => core.fix(v, true))
+			let klquotes = webull.toKDatasLives(kquotes)
+
+			mquotes.forEach(v => core.fix(v.data[0], true))
+			let mlquotes = mquotes.map(v => webull.toMinutesLives(v)).flatten()
+
+			let mrange = {
+				min: dayjs(Math.min(...mquotes.map(v => v.data[0].dates[0].start * 1000))).valueOf(),
+				max: dayjs(Math.max(...mquotes.map(v => v.data[0].dates[0].end * 1000))).valueOf(),
 			}
-			// console.log(`range ->`, _.mapValues(range, v => pretty.stamp(v)))
+			// console.log(`mrange ->`, _.mapValues(mrange, v => pretty.stamp(v)))
+			klquotes.remove(v => v.timestamp < mrange.min)
 
 			return yahoo.getChart(symbol, {
 				interval: '1m', includePrePost: true,
-				period1: dayjs(range.min).startOf('day').unix(),
-				period2: dayjs(range.max).endOf('day').unix(),
+				period1: dayjs(mrange.min).startOf('hour').unix(),
+				period2: dayjs(mrange.max).endOf('hour').unix(),
 			}).then(function(ylquotes) {
 
-				ylquotes.remove(v => v.timestamp < range.min)
-				let last = ylquotes[ylquotes.length - 1]
-				let ystamps = ylquotes.map(v => v.timestamp)
-				// console.log(`ystamps ->`, _.mapValues(ystamps, v => pretty.stamp(v)))
 				mlquotes.forEach(mlquote => {
 					let ylquote = ylquotes.find(v => v.timestamp == mlquote.timestamp)
-					if (ylquote) return ylquote.size += mlquote.size;
-					if (mlquote.timestamp > last.timestamp) {
-						mlquote.open = mlquote.close
-						mlquote.high = mlquote.close
-						mlquote.low = mlquote.close
-						return ylquotes.push(mlquote)
-					}
-					let index = core.array.nearest(ystamps, mlquote.timestamp)
-					if (index >= 0) ylquotes[index].size += mlquote.size;
+					if (!ylquote) return;
+					core.object.merge(mlquote, core.object.pick(ylquote, ['open', 'high', 'low', 'close']))
 				})
 
-				return ylquotes.sort((a, b) => a.timestamp - b.timestamp)
+				return mlquotes.concat(klquotes).sort((a, b) => a.timestamp - b.timestamp)
 			})
 		})
 
 	}).then(function(lquotes) {
 		lquotes.forEach((lquote, i) => {
-			lquote.price = lquote.close
 			let prev = lquotes[i - 1] ? lquotes[i - 1].volume : lquote.size
 			lquote.volume = prev + lquote.size
 		})

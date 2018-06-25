@@ -28,9 +28,6 @@ export default class VEChartsMixin extends Vue {
 
 	echart: echarts.ECharts
 
-	created() {
-		this.tippos = { show: false }
-	}
 	mounted() {
 		this.echart = echarts.init(this.$el)
 		this.echart.one('rendered', this.onrendered_)
@@ -115,14 +112,12 @@ export default class VEChartsMixin extends Vue {
 			key: 'dataZoomSelect',
 			dataZoomSelectActive: brushing,
 		})
-		let mods = {} as echarts.Option
 		if (!brushing) {
 			let ctbounds = this.ctbounds()
 			if (ctbounds.start > 0 && ctbounds.end == 100) {
-				mods.dataZoom = [{ start: ctbounds.start, end: ctbounds.end }]
+				this.echart.dispatchAction(Object.assign({ type: 'dataZoom' }, ctbounds))
 			}
 		}
-		this.syncshowtip(!brushing, mods)
 	}
 
 
@@ -138,26 +133,18 @@ export default class VEChartsMixin extends Vue {
 		this.echart.resize(this.dims())
 	}
 
-
-
-	ondatazoom_ = _.debounce(this.datazoom_, 100, { leading: true, trailing: false })
+	ondatazoom_ = _.debounce(this.datazoom_, 100, { leading: false, trailing: true })
 	datazoom_(event: echarts.EventData) {
-		if (event.manual) return;
-		this.syncshowtip(false)
+
 	}
-	ondatazoom__ = _.debounce(this.datazoom__, 100, { leading: false, trailing: true })
+	ondatazoom__ = _.debounce(this.datazoom__, 100, { leading: true, trailing: false })
 	datazoom__(event: echarts.EventData) {
-		if (this.brushing) return this.brushing = false;
-		this.syncshowtip(true)
-		let keys = Object.keys(event)
-		if (keys.length == 3 && keys.includes('start') && keys.includes('end')) {
-			this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y })
-		}
+		if (this.brushing) this.brushing = false;
 	}
 
-	latestzoom() { }
+	latestzoom(large = false) { }
 	resetzoom() {
-		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100, manual: true })
+		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
 	}
 
 
@@ -172,10 +159,9 @@ export default class VEChartsMixin extends Vue {
 		if (event.tapCount == 1) {
 			this.brushing = !this.brushing && this.shiftkey
 		}
-		this.$emit('tap', event)
 		if (event.tapCount == 2) {
 			let grid = this.getOption().grid[0]
-			let x = core.calc.slider(event.srcEvent.offsetX - +grid.left, 0, this.echart.getWidth() - +grid.left - +grid.right)
+			let x = core.calc.slider(event.srcEvent.offsetX - +grid.left, 0, this.$el.offsetWidth - +grid.left - +grid.right)
 			x > 90 ? this.latestzoom() : this.resetzoom()
 		}
 	}
@@ -209,12 +195,6 @@ export default class VEChartsMixin extends Vue {
 	tippos: Partial<{ show: boolean, x: number, y: number }>
 	onshowtip_(event) { this.tippos = { show: true, x: event.x, y: event.y } }
 	onhidetip_(event) { this.tippos ? this.tippos.show = false : this.tippos = { show: false } }
-	showingtip() { return this.getOption().tooltip[0].show }
-	syncshowtip(show: boolean, mods = {} as Partial<echarts.Option>) {
-		this.echart.dispatchAction({ type: 'hideTip' })
-		if (this.showingtip() == show) return;
-		this.setOption(_.merge({ tooltip: [{ show }] }, mods))
-	}
 	reshowtip() {
 		if (!this.tippos || !this.tippos.show) return;
 		_.defer(() => this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y }))
