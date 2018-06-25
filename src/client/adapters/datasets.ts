@@ -13,7 +13,7 @@ declare global {
 			id: string
 			title: string
 			desc: string
-			encode: echarts.Encode
+			build(option: echarts.Option): void
 		}
 	}
 }
@@ -24,8 +24,9 @@ export const templates = [
 		id: 'size',
 		title: 'Size',
 		desc: 'Size = (total volume) - (previous tick total volume)',
-		key: '',
-		encode: { y: 'size', tooltip: 'size' },
+		build(option) {
+			option.
+		},
 	},
 
 	{
