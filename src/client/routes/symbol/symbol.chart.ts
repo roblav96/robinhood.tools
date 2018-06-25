@@ -298,6 +298,9 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	editds(ds) {
 		console.log(`ds ->`, ds)
 	}
+	ontagclick(event){
+		console.log(`ontagclick ->`, event)
+	}
 
 
 

@@ -15,9 +15,9 @@ import { theme } from '../stores/colors'
 export const SETTINGS = {
 	padding: { x: 68, y: 16 },
 	fontSize: 14,
-	latestThreshold: () => Math.round(utils.screen().pxwidth / 32),
-	largeThreshold: () => Math.round(utils.screen().pxwidth / 16),
-	progressiveThreshold: () => Math.round(utils.screen().pxwidth / 4),
+	latestThreshold: () => Math.round(utils.screen().pxwidth / 16),
+	largeThreshold: () => Math.round(utils.screen().pxwidth / 8),
+	progressiveThreshold: () => Math.round(utils.screen().pxwidth / 2),
 }
 
 

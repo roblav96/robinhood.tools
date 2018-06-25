@@ -108,7 +108,7 @@ export default class VEChartsMixin extends Vue {
 
 
 
-	@Vts.Prop({ default: false }) brushing: boolean
+	@Vts.Prop() brushing: boolean
 	@Vts.Watch('brushing') w_brushing(brushing: boolean) {
 		this.echart.dispatchAction({
 			type: 'takeGlobalCursor',

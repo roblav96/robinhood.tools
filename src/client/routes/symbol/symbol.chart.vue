@@ -20,7 +20,7 @@
 
 <template>
 	<div id="symbol_chart" class="flex-col-full">
-		<section class="section py-0">
+		<section class="section py-0 pt-2">
 			<div class="columns is-mobile my-0 items-center">
 
 				<div class="column is-narrow">
@@ -63,6 +63,15 @@
 					</b-field>
 				</div>
 
+				<div class="column is-narrow">
+					<b-field>
+						<span class="tag is-medium is-success">
+							<span>SMA 10</span>
+							<button class="delete is-small ml-2 -mr-1"></button>
+						</span>
+					</b-field>
+				</div>
+
 				<div class="column">
 					<b-field>
 						<p class="control">
@@ -72,7 +81,7 @@
 						</p>
 						<p class="control is-expanded">
 							<b-taginput v-model="tags" :data="datasets" autocomplete open-on-focus clear-on-select keep-first spellcheck="off"
-							    field="name" placeholder="Datasets..." @typing="typing">
+							    field="name" placeholder="Datasets..." @typing="typing" @click="ontagclick">
 								<template slot-scope="props">
 									<div @click="editds">
 										{{props.option}}
