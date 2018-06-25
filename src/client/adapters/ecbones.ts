@@ -125,9 +125,9 @@ export function axis(
 	} & echarts.Axis>,
 ) {
 	let axis = {
+		uuid: nanoid(),
 		silent: true,
 		gridIndex: 0,
-		uuid: nanoid(),
 		// axisPointer: { show: true },
 		axisLabel: { textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize } },
 		axisLine: { show: !!mods.axisLine },
@@ -176,11 +176,11 @@ export function series(
 	mods = {} as Partial<echarts.Series>,
 ) {
 	let series = {
+		uuid: nanoid(),
 		silent: true,
 		animation: false,
 		hoverAnimation: false,
 		legendHoverLink: false,
-		uuid: nanoid(),
 		datasetIndex: 0,
 		xAxisIndex: 0,
 		yAxisIndex: 0,
@@ -219,7 +219,7 @@ export function markLine(
 			backgroundColor: theme.white, borderColor: theme['grey-light'], borderWidth: 1,
 			textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize, fontWeight: 'bold', padding: [4, 8] },
 		},
-		lineStyle: { type: 'dashed', color: theme['grey-light'] },
+		lineStyle: { type: 'dotted', color: theme['grey-light'] },
 	} as echarts.Mark
 	return _.merge(markLine, mods) as echarts.Mark
 }
