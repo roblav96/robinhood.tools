@@ -71,19 +71,12 @@ html {
 
 .button .icon:first-child:not(:last-child) {
 	margin-left: 0px;
-	margin-right: 0.5rem;
-}
-
-.button .icon:first-child:not(:last-child) {
-	margin-left: 0px;
-	margin-right: 0.5rem;
+	margin-right: 0.25rem;
 }
 
 .button .icon:first-child:not(:last-child):only-of-type {
 	margin-right: 0px;
 }
-
-
 
 .control.has-icons-left .select select {
 	padding-left: 2.5rem;

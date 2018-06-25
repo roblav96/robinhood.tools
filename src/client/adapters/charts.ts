@@ -115,7 +115,7 @@ export function getChart(quote: Quotes.Quote, range: string) {
 				min: dayjs(Math.min(...resolved.map(v => v.data[0].dates[0].start * 1000))).valueOf(),
 				max: dayjs(Math.max(...resolved.map(v => v.data[0].dates[0].end * 1000).concat(Date.now()))).valueOf(),
 			}
-			console.log(`range ->`, _.mapValues(range, v => pretty.stamp(v)))
+			// console.log(`range ->`, _.mapValues(range, v => pretty.stamp(v)))
 
 			return yahoo.getChart(symbol, {
 				interval: '1m', includePrePost: true,

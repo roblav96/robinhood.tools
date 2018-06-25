@@ -16,38 +16,34 @@
 			<div class="columns is-mobile my-0 items-center">
 
 				<div class="column is-narrow">
-					<b-field>
-						<p class="control">
-							<b-dropdown :disabled="busy" hoverable>
-								<button class="button" @click="settings.time=!settings.time" slot="trigger">
+					<b-dropdown :disabled="busy" hoverable>
+						<b-field slot="trigger">
+							<p class="control">
+								<button class="button" @click="settings.time=!settings.time">
 									<b-icon :icon="settings.time?'av-timer':'reorder-vertical'"></b-icon>
 								</button>
-								<b-dropdown-item custom class="text-initial pt-0">
-									<b-field label="X Axis Scale">
-										<b-field>
-											<b-radio v-model="settings.time" :native-value="false" :disabled="busy">Linear</b-radio>
-											<b-radio v-model="settings.time" :native-value="true" :disabled="busy">Time</b-radio>
-										</b-field>
-									</b-field>
-								</b-dropdown-item>
-							</b-dropdown>
-						</p>
-						<p class="control">
-							<b-dropdown :disabled="busy" hoverable>
-								<button class="button" @click="settings.ohlc=!settings.ohlc" slot="trigger">
+							</p>
+							<p class="control">
+								<button class="button" @click="settings.ohlc=!settings.ohlc">
 									<b-icon :icon="settings.ohlc?'poll':'chart-line-variant'"></b-icon>
 								</button>
-								<b-dropdown-item custom class="text-initial pt-0">
-									<b-field label="Price Chart">
-										<b-field>
-											<b-radio v-model="settings.ohlc" :native-value="true" :disabled="busy">OHLC</b-radio>
-											<b-radio v-model="settings.ohlc" :native-value="false" :disabled="busy">Line</b-radio>
-										</b-field>
-									</b-field>
-								</b-dropdown-item>
-							</b-dropdown>
-						</p>
-					</b-field>
+							</p>
+						</b-field>
+						<b-dropdown-item custom class="text-initial">
+							<b-field label="X Axis Scale">
+								<b-field>
+									<b-radio v-model="settings.time" :native-value="false" :disabled="busy">Linear</b-radio>
+									<b-radio v-model="settings.time" :native-value="true" :disabled="busy">Time</b-radio>
+								</b-field>
+							</b-field>
+							<b-field label="Price Chart">
+								<b-field>
+									<b-radio v-model="settings.ohlc" :native-value="true" :disabled="busy">OHLC</b-radio>
+									<b-radio v-model="settings.ohlc" :native-value="false" :disabled="busy">Line</b-radio>
+								</b-field>
+							</b-field>
+						</b-dropdown-item>
+					</b-dropdown>
 				</div>
 
 				<div class="column is-narrow">

@@ -88,7 +88,6 @@ export default class VEChartsMixin extends Vue {
 			end: datazoom.end, endValue: datazoom.endValue,
 		}
 	}
-	splitnumber(height = this.echart.getHeight()) { return Math.round(height / 64) }
 
 
 

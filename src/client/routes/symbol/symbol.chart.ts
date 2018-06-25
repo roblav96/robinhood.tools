@@ -62,23 +62,12 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		}
 		return bounds
 	}
+
 	latestzoom() {
 		this.echart.dispatchAction(Object.assign({ type: 'dataZoom', manual: true }, this.ctlatest()))
 	}
 
 
-
-	@Vts.Watch('settings.time') w_time() { this.reload() }
-	@Vts.Watch('settings.ohlc') w_ohlc() { this.reload() }
-
-	reload = _.debounce(this.reload_, 100, { leading: false, trailing: true })
-	reload_() {
-		let ctbounds = this.ctbounds()
-		let lquotes = this.lquotes()
-		this.echart.clear()
-		this.build(lquotes)
-		this.echart.dispatchAction(Object.assign({ type: 'dataZoom', manual: true }, ctbounds))
-	}
 
 	build(lquotes = this.lquotes()) {
 		let stamp = Date.now()
@@ -94,8 +83,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 		option.grid.push({
 			top: 8,
-			left: 64,
-			right: 64,
+			left: ecbones.SETTINGS.padding.x,
+			right: ecbones.SETTINGS.padding.x,
 			bottom: 92,
 			show: true,
 			backgroundColor: theme.white,
@@ -103,9 +92,9 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			// borderColor: theme['grey-lighter'],
 		})
 		// option.grid.push({
-		// 	height: 64,
-		// 	left: 64,
-		// 	right: 64,
+		// 	height: ecbones.SETTINGS.padding.x,
+		// 	left: ecbones.SETTINGS.padding.x,
+		// 	right: ecbones.SETTINGS.padding.x,
 		// 	bottom: 92,
 		// })
 
@@ -157,6 +146,19 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		_.defer(() => console.log(`echart build ->`, lquotes.length, Date.now() - stamp + 'ms'))
 	}
 
+
+
+	@Vts.Watch('settings.time') w_time() { this.reload() }
+	@Vts.Watch('settings.ohlc') w_ohlc() { this.reload() }
+
+	// onreload = _.debounce(this.reload, 100, { leading: false, trailing: true })
+	reload(lquotes = this.lquotes()) {
+		let ctbounds = this.ctbounds()
+		this.echart.clear()
+		this.build(lquotes)
+		this.echart.dispatchAction(Object.assign({ type: 'dataZoom', manual: true }, ctbounds))
+	}
+
 	onlquote(lquote: Quotes.Live) {
 		if (!this.rendered) return;
 		let lquotes = this.lquotes()
@@ -164,21 +166,25 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		if (last.liveCount == lquote.liveCount) {
 			core.object.merge(last, lquote)
 		} else lquotes.push(lquote);
-		this.setOption({ dataset: [{ source: lquotes }] })
+		this.reload(lquotes)
+		// this.setOption({ dataset: [{ source: lquotes }] })
 		this.reshowtip()
 	}
 
 
 
+	splitNumber(height = this.echart.getHeight()) { return Math.round(height / ecbones.SETTINGS.padding.x) }
+
 	yAxisPointerFormatter(params: echarts.AxisPointerParams) {
 		return pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice()), { percent: true, plusminus: true })
 	}
+
 	markDataPrice() {
 		let color = theme['grey-light']
 		if (this.quote.change > 0) color = theme.success;
 		if (this.quote.change < 0) color = theme.danger;
 		return [{
-			// yAxis: this.quote.startPrice,
+			// 	yAxis: this.quote.startPrice,
 			// }, {
 			yAxis: this.quote.price,
 			lineStyle: { color },
@@ -186,7 +192,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 				position: 'end',
 				backgroundColor: color,
 				color: theme.white,
-				borderColor: theme.white,
+				borderWidth: 0,
 				formatter: v => pretty.number(v.value, { price: true }),
 			},
 		}] as echarts.MarkData[]

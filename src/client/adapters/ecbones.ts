@@ -12,7 +12,8 @@ import { theme } from '../stores/colors'
 
 
 
-const SETTINGS = {
+export const SETTINGS = {
+	padding: { x: 68, y: 16 },
 	fontSize: 14,
 	largeThreshold: Math.round(utils.screen().width / 8),
 	progressiveThreshold: Math.round(utils.screen().width / 2),

@@ -62,9 +62,15 @@ export default class VSymbol extends Mixins(VMixin) {
 			return this.$nextTick(() => this.busy = false)
 		})
 	}
-
 	onquote(quote: Quotes.Quote) {
 		core.object.merge(this.all.quote, quote)
+	}
+
+	onstep(direction: number) {
+		let el = this.$el.querySelector('section .overflow-x-auto')
+		el.scrollTo({
+			left: core.math.clamp(el.scrollLeft + (direction * 256), 0, el.scrollWidth), behavior: 'smooth',
+		})
 	}
 
 

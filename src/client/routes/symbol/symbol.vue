@@ -51,7 +51,12 @@
 					</div>
 				</div>
 
-				<div class="column overflow-x-auto scrollbar-none">
+				<div class="column is-narrow p-0 mr-1">
+					<button class="button is-small is-white has-text-lightest" @click="onstep(-1)">
+						<b-icon icon="menu-left"></b-icon>
+					</button>
+				</div>
+				<div class="column overflow-x-auto scrollbar">
 					<div class="columns items-center is-mobile whitespace-no-wrap text-center">
 						<div v-if="Number.isFinite(all.quote.volume)" class="column is-narrow">
 							<p class="is-size-4">
@@ -96,6 +101,11 @@
 							<p>Shares Outstanding</p>
 						</div>
 					</div>
+				</div>
+				<div class="column is-narrow p-0 ml-1">
+					<button class="button is-small is-white has-text-lightest" @click="onstep(1)">
+						<b-icon icon="menu-right"></b-icon>
+					</button>
 				</div>
 
 
