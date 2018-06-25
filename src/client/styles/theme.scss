@@ -87,7 +87,7 @@ $speed-slow: 200ms;
 $speed-slower: 300ms;
 // 
 @import '~bulma/sass/utilities/all';
-@import '~buefy/src/scss/utils/all';
+@import '~buefy/src/scss/utils/variables';
 // 
 $shades: map-merge($shades, ('grey-lightest':$grey-lightest));
 $colors: map-merge($colors, ('text':($text, $white)));
@@ -114,7 +114,7 @@ $hr-height: 0px;
 $hr-margin: 0px;
 $hr-background-color: $border;
 // 
-@import '~bulma/bulma';
+@import '~bulma';
 @import '~buefy/src/scss/buefy';
 // 
 @import './styles';

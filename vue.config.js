@@ -21,6 +21,7 @@ module.exports = {
 
 	outputDir: 'dist/client',
 	runtimeCompiler: true,
+	css: { sourceMap: true },
 
 	configureWebpack: function(config) {
 		if (DEBUG) console.log('configure config ->', config);

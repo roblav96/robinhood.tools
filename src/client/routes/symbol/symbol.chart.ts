@@ -42,7 +42,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	lquotes() { return _.get(this.getOption(), 'dataset[0].source', []) as Quotes.Live[] }
 
-	@VMixin.NoCache get ctprice() {
+	ctprice() {
 		let lquotes = this.lquotes()
 		let ctbounds = this.ctbounds()
 		let lquote = this.settings.time ? lquotes.find(v => v.timestamp >= ctbounds.startValue) : lquotes[ctbounds.startValue]
@@ -185,7 +185,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 	pricePointerFormatter(params: echarts.AxisPointerParams) {
-		return pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice), { percent: true, plusminus: true })
+		return pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice()), { percent: true, plusminus: true })
 	}
 	priceMarkDatas() {
 		let color = theme['grey-light']
@@ -218,13 +218,13 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 export default class VSymbolChart extends Mixins(VMixin) {
 
 	brushing = false
-	@VMixin.NoCache get vechart() { return (this.$refs as any)['symbol_vechart'] as VSymbolEChart }
+	vechart() { return (this.$refs as any)['symbol_vechart'] as VSymbolEChart }
 
 	mounted() {
 		this.getQuotes()
 	}
 	beforeDestroy() {
-		socket.offListener(this.vechart.onlquote)
+		socket.offListener(this.vechart().onlquote)
 	}
 
 
@@ -241,15 +241,15 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			return charts.getChart(this.quote, this.settings.range)
 		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
-			socket.offListener(this.vechart.onlquote)
+			socket.offListener(this.vechart().onlquote)
 			if (lquotes.length == 0) {
 				alerts.toast(`Data for range '${core.string.capitalize(this.settings.range)}' not found!`)
-				this.vechart.echart.clear()
+				this.vechart().echart.clear()
 				return
 			}
-			this.vechart.build(lquotes)
+			this.vechart().build(lquotes)
 			if (this.settings.range == 'live') {
-				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.vechart.onlquote)
+				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.vechart().onlquote)
 			}
 		}).catch(error => {
 			console.error(`getQuotes Error ->`, error)
@@ -263,7 +263,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		if (this.settings.range != 'live' || quote.size == 0) return;
 		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS) as Quotes.Live
 		lquote.liveCount++
-		this.vechart.onlquote(lquote)
+		this.vechart().onlquote(lquote)
 	}
 
 
@@ -281,6 +281,15 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	vrange(range: string) { return charts.range(range) }
 	@Vts.Watch('settings.range') w_settingsrange(range: string) {
 		this.getQuotes()
+	}
+
+
+
+	tags = []
+	datasets = []
+	typing(text: string) {
+		console.log(`text ->`, text)
+		return text
 	}
 
 

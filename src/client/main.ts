@@ -13,7 +13,6 @@ if (process.env.DEVELOPMENT) {
 	Object.assign(window, { dayjs: require('dayjs') })
 }
 
-import 'modern-normalize'
 import 'animate.css'
 import './styles/vendors.scss'
 import './styles/theme.scss'

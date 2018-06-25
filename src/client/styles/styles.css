@@ -83,7 +83,7 @@ html {
 	margin-right: 0px;
 }
 
-.control.has-icons-left > .icon.is-left {
+.control.has-icons-left > input[type="search"] + .icon.is-left {
 	left: 0.25rem;
 }
 

@@ -56,10 +56,18 @@
 				</div>
 
 				<div class="column">
+					<b-field>
+						<b-taginput v-model="tags" :data="datasets" spellcheck="off" autocomplete icon="label" field="name" placeholder="Datasets..." @typing="typing">
+							<template slot-scope="props">
+								{{props.option.name}}
+							</template>
+							<template slot="empty">No datasets found...</template>
+						</b-taginput>
+					</b-field>
 				</div>
 
 				<div class="column is-narrow">
-					<b-field grouped>
+					<b-field>
 						<p class="control">
 							<button class="button" :disabled="busy" @click="()=>$refs.symbol_vechart.resetzoom()">
 								<b-icon icon="crop-landscape"></b-icon>
