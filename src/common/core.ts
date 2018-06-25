@@ -131,6 +131,9 @@ const STOP_WORDS = ['a', 'able', 'about', 'across', 'after', 'all', 'almost', 'a
 
 export const string = {
 	is(value: any): value is string { return typeof value == 'string' },
+	alphaonly(value: string) {
+		return value && !Array.isArray(value.match(/[^a-zA-Z]/g))
+	},
 	insert(a: string, b: string, position: number) {
 		return a.substr(0, position) + b + a.substr(position)
 	},

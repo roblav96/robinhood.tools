@@ -124,11 +124,18 @@ export function getChart(quote: Quotes.Quote, range: string) {
 			}).then(function(ylquotes) {
 
 				ylquotes.remove(v => v.timestamp < range.min)
+				let last = ylquotes[ylquotes.length - 1]
 				let ystamps = ylquotes.map(v => v.timestamp)
 				// console.log(`ystamps ->`, _.mapValues(ystamps, v => pretty.stamp(v)))
 				mlquotes.forEach(mlquote => {
 					let ylquote = ylquotes.find(v => v.timestamp == mlquote.timestamp)
 					if (ylquote) return ylquote.size += mlquote.size;
+					if (mlquote.timestamp > last.timestamp) {
+						mlquote.open = mlquote.close
+						mlquote.high = mlquote.close
+						mlquote.low = mlquote.close
+						return ylquotes.push(mlquote)
+					}
 					let index = core.array.nearest(ystamps, mlquote.timestamp)
 					if (index >= 0) ylquotes[index].size += mlquote.size;
 				})

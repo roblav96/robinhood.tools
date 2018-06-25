@@ -13,6 +13,35 @@ import clock from '../../common/clock'
 
 
 
+// @Vts.Component({
+// 	template: `
+// 		<div class="flex">
+// 			<div class="column is-narrow p-0 mr-1">
+// 				<button class="button is-small is-white has-text-lightest" @click="onstep(-1)">
+// 					<b-icon icon="menu-left"></b-icon>
+// 				</button>
+// 			</div>
+// 			<div class="overflow-x-auto scrollbar" @scroll="onscroll">
+// 				<slot></slot>
+// 			</div>
+// 			<div class="column is-narrow p-0 ml-1">
+// 				<button class="button is-small is-white has-text-lightest" @click="onstep(1)">
+// 					<b-icon icon="menu-right"></b-icon>
+// 				</button>
+// 			</div>
+// 		</div>
+// 	`,
+// })
+// class VXScroll extends Vue {
+
+// 	onscroll(event: MouseEvent) {
+// 		this.$el.scrollLeft
+// 	}
+// }
+// Vue.component('v-xscroll', VXScroll)
+
+
+
 @Vts.Component({
 	template: `
 		<b-tooltip :label="tip" position="is-right" size="is-small" animated>

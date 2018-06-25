@@ -15,8 +15,8 @@ import { theme } from '../stores/colors'
 export const SETTINGS = {
 	padding: { x: 68, y: 16 },
 	fontSize: 14,
-	largeThreshold: Math.round(utils.screen().width / 8),
-	progressiveThreshold: Math.round(utils.screen().width / 2),
+	largeThreshold: Math.round(utils.screen().pxwidth / 8),
+	progressiveThreshold: Math.round(utils.screen().pxwidth / 2),
 }
 
 
@@ -49,7 +49,7 @@ export function option(
 			hideDelay: 1,
 			transitionDuration: 0,
 			// padding: 0,
-			padding: [0, 0, 0, 128],
+			padding: [0, 0, 0, 64],
 			backgroundColor: 'transparent',
 			// formatter: '{a}: {b1}<br>{c}: {d0}',
 			// extraCssText: `border: 0.125rem solid ${theme['grey-darker']};`,
@@ -291,7 +291,7 @@ export function markLine(
 			backgroundColor: theme.white, borderColor: theme['grey-light'], borderWidth: 1,
 			textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize, fontWeight: 'bold', padding: [4, 8] },
 		},
-		lineStyle: { type: 'dotted', color: theme['grey-light'] },
+		lineStyle: { type: 'dashed', color: theme['grey-light'], opacity: 0.5, width: 1 },
 	} as echarts.Mark
 	return _.merge(markLine, mods) as echarts.Mark
 }

@@ -33,7 +33,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 	@Vts.Prop() settings: typeof VSymbolChart.prototype.settings
 
 	mounted() {
-
+		console.log(`utils.screen() ->`, utils.screen())
 	}
 	beforeDestroy() {
 
@@ -53,7 +53,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 	ctlatest() {
 		let lquotes = this.lquotes()
 		let bounds = { end: 100 } as ReturnType<typeof VEChartsMixin.prototype.ctbounds>
-		let threshold = Math.round(utils.screen().width / 10)
+		let threshold = Math.round(utils.screen().pxwidth / 10)
 		if (this.settings.time) {
 			let i = core.math.clamp(lquotes.length - threshold, 0, lquotes.length)
 			bounds.startValue = lquotes[i].timestamp
@@ -185,11 +185,11 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		if (this.quote.change < 0) color = theme.danger;
 		return [{
 			// 	yAxis: this.quote.startPrice,
+			// 	label: { formatter: v => pretty.number(v.value, { price: true }) },
 			// }, {
 			yAxis: this.quote.price,
 			lineStyle: { color },
 			label: {
-				position: 'end',
 				backgroundColor: color,
 				color: theme.white,
 				borderWidth: 0,

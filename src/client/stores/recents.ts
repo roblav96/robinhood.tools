@@ -1,6 +1,7 @@
 // 
 
 import * as lockr from 'lockr'
+import * as core from '../../common/core'
 import * as http from '../../common/http'
 import * as webull from '../../common/webull'
 import * as quotes from '../../common/quotes'
@@ -19,7 +20,7 @@ if (recents.length == 0) {
 	http.get('https://securitiesapi.webull.com/api/securities/market/tabs/v2/6/cards/12', {
 		query: { pageIndex: 0, pageSize: 20, sourceRegionId: 6 },
 	}).then((response: Webull.Ticker[]) => {
-		response.remove(v => !quotes.isSymbol(v.disSymbol))
+		response.remove(v => !core.string.alphaonly(v.disSymbol))
 		recents.push(...response.map(v => ({
 			symbol: webull.fixSymbol(v.disSymbol), stamp: Date.now(),
 		})))
