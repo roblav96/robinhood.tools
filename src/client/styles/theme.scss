@@ -82,9 +82,9 @@ $radius-small: 0.125rem;
 $radius: 0.25rem;
 $radius-large: 0.5rem;
 // 
-$speed: 100ms;
-$speed-slow: 200ms;
-$speed-slower: 300ms;
+$speed: 64ms;
+$speed-slow: 128ms;
+$speed-slower: 256ms;
 // 
 @import '~bulma/sass/utilities/all';
 @import '~buefy/src/scss/utils/variables';

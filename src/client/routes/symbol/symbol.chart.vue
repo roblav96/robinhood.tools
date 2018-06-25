@@ -4,14 +4,22 @@
 <style>
 /**/
 
-.select select {
-	padding-right: 1.5rem !important;
+#symbol_chart .dropdown-content {
+	max-height: calc(80vh - 150px);
+}
+
+#symbol_chart .taginput .control.has-icons-left .input {
+	padding-left: 2.5rem;
+}
+
+#symbol_chart .taginput .input {
+	padding-left: 0px;
 }
 
 </style>
 
 <template>
-	<div class="flex-col-full">
+	<div id="symbol_chart" class="flex-col-full">
 		<section class="section py-0">
 			<div class="columns is-mobile my-0 items-center">
 
@@ -57,15 +65,22 @@
 
 				<div class="column">
 					<b-field>
-						<b-taginput v-model="tags" :data="datasets" autocomplete open-on-focus clear-on-select keep-first spellcheck="off"
-						    icon="label" field="name" placeholder="Datasets..." @typing="typing">
-							<template slot-scope="props">
-								<div @click="editds">
-									{{props.option}}
-								</div>
-							</template>
-							<template slot="empty">No datasets found...</template>
-						</b-taginput>
+						<p class="control">
+							<button class="button h-full" :disabled="busy" @click="()=>$refs.symbol_vechart.resetzoom()">
+								<b-icon icon="tune-vertical"></b-icon>
+							</button>
+						</p>
+						<p class="control is-expanded">
+							<b-taginput v-model="tags" :data="datasets" autocomplete open-on-focus clear-on-select keep-first spellcheck="off"
+							    field="name" placeholder="Datasets..." @typing="typing">
+								<template slot-scope="props">
+									<div @click="editds">
+										{{props.option}}
+									</div>
+								</template>
+								<template slot="empty">No datasets found...</template>
+							</b-taginput>
+						</p>
 					</b-field>
 				</div>
 

@@ -15,8 +15,9 @@ import { theme } from '../stores/colors'
 export const SETTINGS = {
 	padding: { x: 68, y: 16 },
 	fontSize: 14,
-	largeThreshold: Math.round(utils.screen().pxwidth / 8),
-	progressiveThreshold: Math.round(utils.screen().pxwidth / 2),
+	latestThreshold: () => Math.round(utils.screen().pxwidth / 32),
+	largeThreshold: () => Math.round(utils.screen().pxwidth / 16),
+	progressiveThreshold: () => Math.round(utils.screen().pxwidth / 4),
 }
 
 
@@ -26,8 +27,6 @@ export function option(
 ) {
 	let option = {
 		animation: false,
-		progressive: SETTINGS.progressiveThreshold,
-		progressiveThreshold: SETTINGS.progressiveThreshold,
 		color: Array(16).fill(theme['grey-lighter']),
 		textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize },
 		dataset: [],
@@ -80,6 +79,8 @@ export function option(
 		series: [],
 		visualMap: [],
 	} as echarts.Option
+	option.progressive = SETTINGS.progressiveThreshold()
+	option.progressiveThreshold = option.progressive
 	return _.merge(option, mods) as echarts.Option
 }
 
@@ -182,9 +183,9 @@ export function series(
 		itemStyle: { show: true, width: 4, color: theme['grey-lighter'], opacity: 1 },
 	} as echarts.Series
 	if (mods.large) {
-		series.largeThreshold = SETTINGS.largeThreshold
-		series.progressive = SETTINGS.progressiveThreshold
-		series.progressiveThreshold = SETTINGS.progressiveThreshold
+		series.largeThreshold = SETTINGS.largeThreshold()
+		series.progressive = SETTINGS.progressiveThreshold()
+		series.progressiveThreshold = series.progressive
 	}
 	return _.merge(series, mods) as echarts.Series
 }

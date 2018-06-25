@@ -4,10 +4,6 @@
 <style>
 /**/
 
-#searchbar .control.has-icons-left .icon.is-left {
-	left: 0.25rem;
-}
-
 #searchbar div.dropdown-content {
 	max-width: 75vw;
 	max-height: 75vh;
