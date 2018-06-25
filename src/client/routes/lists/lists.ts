@@ -25,6 +25,8 @@ import socket from '../../adapters/socket'
 })
 export default class Lists extends Mixins(VMixin, RHMixin) {
 
+	recents = this.$store.state.recents
+
 	created() {
 		this.synclists().then(this.syncsymbols)
 		// Promise.resolve().then(() => {

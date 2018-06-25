@@ -1,6 +1,6 @@
 // 
 
-import lockr from 'lockr'
+import * as lockr from 'lockr'
 import * as http from '../../common/http'
 import * as webull from '../../common/webull'
 import * as quotes from '../../common/quotes'

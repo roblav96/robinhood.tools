@@ -23,6 +23,10 @@ import Vue from 'vue'
 Vue.config.productionTip = false
 Vue.config.performance = false
 Vue.config.devtools = false
+Vue.config.warnHandler = function(message, vm, trace) {
+	if (message.startsWith('Avoid mutating a prop directly')) return;
+	console.warn(`vue warning ->`, vm.$options.name, message, trace)
+}
 
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)

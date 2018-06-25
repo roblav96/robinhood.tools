@@ -42,7 +42,6 @@ export default class VMixin extends Vue {
 	breakpoints = this.$store.state.breakpoints
 	theme = this.$store.state.colors.theme
 	hours = this.$store.state.hours
-	recents = this.$store.state.recents
 	rhusername = this.$store.state.security.rhusername
 
 }

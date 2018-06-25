@@ -113,9 +113,9 @@ export function getChart(quote: Quotes.Quote, range: string) {
 
 			let range = {
 				min: dayjs(Math.min(...resolved.map(v => v.data[0].dates[0].start * 1000))).valueOf(),
-				max: dayjs(Math.max(...resolved.map(v => v.data[0].dates[0].end * 1000).concat(Date.now()))).endOf('day').valueOf(),
+				max: dayjs(Math.max(...resolved.map(v => v.data[0].dates[0].end * 1000).concat(Date.now()))).valueOf(),
 			}
-			// console.log(`range ->`, _.mapValues(range, v => pretty.stamp(v)))
+			console.log(`range ->`, _.mapValues(range, v => pretty.stamp(v)))
 
 			return yahoo.getChart(symbol, {
 				interval: '1m', includePrePost: true,
@@ -125,6 +125,7 @@ export function getChart(quote: Quotes.Quote, range: string) {
 
 				ylquotes.remove(v => v.timestamp < range.min)
 				let ystamps = ylquotes.map(v => v.timestamp)
+				// console.log(`ystamps ->`, _.mapValues(ystamps, v => pretty.stamp(v)))
 				mlquotes.forEach(mlquote => {
 					let ylquote = ylquotes.find(v => v.timestamp == mlquote.timestamp)
 					if (ylquote) return ylquote.size += mlquote.size;

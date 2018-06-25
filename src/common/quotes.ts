@@ -363,7 +363,7 @@ export function getName(name: string) {
 	if (stopwords.includes(last)) split.pop();
 	split.remove(v => v.toLowerCase().replace(/[^a-z]+/g, '').length == 0)
 	// split.forEach((v, i) => { if (v == 'plc') split[i] = v.toUpperCase(); })
-	return split.join(' ').replace(/[,]+/g, '').trim()
+	return yahoo.fixName(split.join(' ').replace(/[,]+/g, '').trim())
 }
 
 

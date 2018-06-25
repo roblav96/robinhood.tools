@@ -504,7 +504,7 @@ declare module 'echarts' {
 			formatter: string | ((params: EventParam | EventParam[], ticket?: number, callback?: (ticket: number, tooltip: string) => void) => string)
 			position: number | string | (number | string)[] | ((point: number[], params: EventParam[], el: HTMLElement, rect: any, size: PositionSize) => (number | string)[])
 			alwaysShowContent: boolean
-			axisPointer: AxisPointer
+			axisPointer: Partial<AxisPointer>
 			backgroundColor: string
 			borderColor: string
 			borderRadius: number

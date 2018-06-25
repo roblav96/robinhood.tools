@@ -28,6 +28,7 @@ import { theme } from '../../stores/colors'
 @Vts.Component
 class VSymbolEChart extends Mixins(VEChartsMixin) {
 
+	$parent: VSymbolChart
 	@Vts.Prop() quote: Quotes.Quote
 	@Vts.Prop() settings: typeof VSymbolChart.prototype.settings
 
@@ -88,8 +89,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			tooltip: [{ formatter: params => charts.tipFormatter(params as any, this.getOption()) }],
 		})
 
-		option.dataZoom.push(ecbones.dataZoom('inside', { xAxisIndex: [0, 1] }))
-		option.dataZoom.push(ecbones.dataZoom('slider', { xAxisIndex: [0, 1] }))
+		option.dataZoom.push(ecbones.dataZoom({ type: 'inside' }, { xAxisIndex: [0] }))
+		option.dataZoom.push(ecbones.dataZoom({ type: 'slider' }, { xAxisIndex: [0] }))
 
 		option.grid.push({
 			top: 8,
@@ -101,68 +102,53 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			borderWidth: 0,
 			// borderColor: theme['grey-lighter'],
 		})
-		option.grid.push({
-			height: 64,
-			left: 64,
-			right: 64,
-			bottom: 92,
-		})
+		// option.grid.push({
+		// 	height: 64,
+		// 	left: 64,
+		// 	right: 64,
+		// 	bottom: 92,
+		// })
 
 		let xtype = this.settings.time ? 'time' : 'category'
-		option.xAxis.push(ecbones.axis('x', {
+		option.xAxis.push(ecbones.axis({ xy: 'x' }, {
 			type: xtype,
 		}))
-		option.xAxis.push(ecbones.axis('x', {
-			type: xtype,
-			gridIndex: 1,
-			blank: true,
-		}))
+		// option.xAxis.push(ecbones.axis({ xy: 'x', blank: true }, {
+		// 	type: xtype,
+		// 	gridIndex: 1,
+		// }))
 
-		option.yAxis.push(ecbones.axis('y', {
+		option.yAxis.push(ecbones.axis({ xy: 'y' }, {
 			boundaryGap: '1%',
-			axisPointer: { label: { formatter: this.pricePointerFormatter } },
+			axisPointer: { label: { formatter: this.yAxisPointerFormatter } },
 		}))
-		option.yAxis.push(ecbones.axis('y', {
-			gridIndex: 1,
-			blank: true,
-		}))
+		// option.yAxis.push(ecbones.axis({ xy: 'y', blank: true }, {
+		// 	gridIndex: 1,
+		// }))
 
-		let pseries = {
+		let priceseries = this.settings.ohlc ? ecbones.candlestick({
+			name: 'OHLC',
+			encode: {
+				x: 'timestamp',
+				y: ['open', 'close', 'high', 'low'],
+				tooltip: ['open', 'high', 'low', 'close'],
+			},
+		}) : ecbones.line({ color: theme.primary, width: 1.5 }, {
 			name: 'Price',
-			type: 'line',
 			encode: { x: 'timestamp', y: 'price', tooltip: 'price' },
-			itemStyle: { color: theme.primary },
-			markLine: { data: [] },
-		} as echarts.Series
-		if (this.settings.ohlc) {
-			_.merge(pseries, {
-				name: 'OHLC',
-				type: 'candlestick',
-				large: true,
-				encode: {
-					x: 'timestamp',
-					y: ['open', 'close', 'high', 'low'],
-					tooltip: ['open', 'high', 'low', 'close'],
-				},
-				itemStyle: {
-					borderColor: theme.success, borderColor0: theme.danger, borderWidth: 1,
-					color: theme.success, color0: theme.danger,
-				},
-			} as echarts.Series)
+		})
+		priceseries.markLine = { data: [] }
+		if (this.$parent.rangeindex <= 1) {
+			priceseries.markLine = ecbones.markLine({ data: this.markDataPrice() })
 		}
-		if (this.settings.range == 'live') {
-			pseries.markLine = ecbones.markLine({ data: this.priceMarkDatas() })
-		}
-		option.series.push(ecbones.series(pseries))
+		option.series.push(priceseries)
 
-		option.series.push(ecbones.series({
-			name: 'Size',
-			type: 'bar',
-			xAxisIndex: 1,
-			yAxisIndex: 1,
-			large: true,
-			encode: { x: 'timestamp', y: 'size', tooltip: 'size' },
-		}))
+		// option.series.push(ecbones.bar({ color: theme['grey-lighter'] }, {
+		// 	name: 'Size',
+		// 	xAxisIndex: 1,
+		// 	yAxisIndex: 1,
+		// 	encode: { x: 'timestamp', y: 'size', tooltip: 'size' },
+		// }))
 
 		console.log(`build bones ->`, _.clone(option))
 		this.echart.setOption(option)
@@ -184,10 +170,10 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 
-	pricePointerFormatter(params: echarts.AxisPointerParams) {
+	yAxisPointerFormatter(params: echarts.AxisPointerParams) {
 		return pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice()), { percent: true, plusminus: true })
 	}
-	priceMarkDatas() {
+	markDataPrice() {
 		let color = theme['grey-light']
 		if (this.quote.change > 0) color = theme.success;
 		if (this.quote.change < 0) color = theme.danger;
@@ -217,23 +203,29 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 })
 export default class VSymbolChart extends Mixins(VMixin) {
 
+	$parent: VSymbol
+	@Vts.Prop() symbol: string
+	@Vts.Prop() quote: Quotes.Quote
+
 	brushing = false
-	vechart() { return (this.$refs as any)['symbol_vechart'] as VSymbolEChart }
+	get vechart() { return this.$refs['symbol_vechart'] as VSymbolEChart }
 
 	mounted() {
 		this.getQuotes()
 	}
 	beforeDestroy() {
-		socket.offListener(this.vechart().onlquote)
+		socket.offListener(this.vechart.onlquote)
 	}
 
 
 
 	busy = true
 	@Vts.Watch('quote.tickerId') w_tickerId() { this.getQuotes() }
+
 	getQuotes() {
 		if (!Number.isFinite(this.quote.tickerId)) return;
 		this.busy = true
+		this.buildDatasets()
 		return Promise.resolve().then(() => {
 			if (this.settings.range == 'live') {
 				return http.post('/quotes/lives', { symbols: [this.quote.symbol] }).then(response => response[0])
@@ -241,15 +233,15 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			return charts.getChart(this.quote, this.settings.range)
 		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
-			socket.offListener(this.vechart().onlquote)
+			socket.offListener(this.vechart.onlquote)
 			if (lquotes.length == 0) {
 				alerts.toast(`Data for range '${core.string.capitalize(this.settings.range)}' not found!`)
-				this.vechart().echart.clear()
+				this.vechart.echart.clear()
 				return
 			}
-			this.vechart().build(lquotes)
+			this.vechart.build(lquotes)
 			if (this.settings.range == 'live') {
-				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.vechart().onlquote)
+				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.vechart.onlquote)
 			}
 		}).catch(error => {
 			console.error(`getQuotes Error ->`, error)
@@ -258,12 +250,11 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		})
 	}
 
-	@Vts.Prop() quote: Quotes.Quote
 	@Vts.Watch('quote', { deep: true }) w_quote(quote: Quotes.Quote) {
 		if (this.settings.range != 'live' || quote.size == 0) return;
 		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS) as Quotes.Live
 		lquote.liveCount++
-		this.vechart().onlquote(lquote)
+		this.vechart.onlquote(lquote)
 	}
 
 
@@ -278,6 +269,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	}
 
 	ranges = ['live'].concat(yahoo.RANGES)
+	get rangeindex() { return this.ranges.indexOf(this.settings.range) }
 	vrange(range: string) { return charts.range(range) }
 	@Vts.Watch('settings.range') w_settingsrange(range: string) {
 		this.getQuotes()
@@ -286,10 +278,19 @@ export default class VSymbolChart extends Mixins(VMixin) {
 
 
 	tags = []
-	datasets = []
 	typing(text: string) {
 		console.log(`text ->`, text)
 		return text
+	}
+
+	datasets = []
+	buildDatasets() {
+		this.datasets = quotes.ALL_LIVE_KEYS.filter(k => Number.isFinite(this.quote[k as any]))
+		console.log('this.datasets ->', this.datasets)
+	}
+
+	editds(ds) {
+		console.log(`ds ->`, ds)
 	}
 
 

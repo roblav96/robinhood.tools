@@ -48,7 +48,7 @@ export function option(
 			hideDelay: 1,
 			transitionDuration: 0,
 			// padding: 0,
-			padding: [0, 0, 0, 64],
+			padding: [0, 0, 0, 128],
 			backgroundColor: 'transparent',
 			// formatter: '{a}: {b1}<br>{c}: {d0}',
 			// extraCssText: `border: 0.125rem solid ${theme['grey-darker']};`,
@@ -60,7 +60,7 @@ export function option(
 				crossStyle: { color: theme['grey-light'] },
 				label: {
 					formatter(params) { return charts.xlabel(params.value) },
-					backgroundColor: theme.white, shadowBlur: 0, margin: 1,
+					backgroundColor: theme.white, shadowBlur: 0, margin: 0,
 					borderColor: theme['grey-light'], borderWidth: 1,
 					textStyle: {
 						color: theme.dark, borderRadius: 0,
@@ -85,33 +85,30 @@ export function option(
 
 
 export function dataZoom(
-	type: 'inside' | 'slider',
+	opts = {} as Partial<{
+		type: 'inside' | 'slider'
+	}>,
 	mods = {} as Partial<echarts.DataZoom>,
 ) {
 	let dataZoom = {
-		type,
+		type: opts.type,
 		throttle: 0,
 	} as echarts.DataZoom
-	if (type == 'inside') {
-		_.merge(dataZoom, {
-			preventDefaultMouseMove: false,
-			zoomOnMouseWheel: 'shift',
-		} as echarts.DataZoom)
+	if (opts.type == 'inside') {
+		dataZoom.preventDefaultMouseMove = false
+		dataZoom.zoomOnMouseWheel = 'shift'
 	}
-	if (type == 'slider') {
-		_.merge(dataZoom, {
-			showDetail: false,
-			backgroundColor: theme.white,
-			dataBackground: {
-				areaStyle: { color: theme['white-bis'], opacity: 1 },
-				lineStyle: { color: theme['grey-light'], opacity: 1 },
-			},
-			borderColor: theme['grey-lighter'],
-			fillerColor: 'rgba(184,194,204,0.2)',
-			textStyle: { color: theme.dark },
-			handleStyle: { color: theme['grey-light'] },
-			// handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-		} as echarts.DataZoom)
+	if (opts.type == 'slider') {
+		dataZoom.showDetail = false
+		dataZoom.backgroundColor = theme.white
+		dataZoom.dataBackground = {
+			areaStyle: { color: theme['white-bis'], opacity: 1 },
+			lineStyle: { color: theme['grey-light'], opacity: 1 },
+		}
+		dataZoom.borderColor = theme['grey-lighter']
+		dataZoom.fillerColor = 'rgba(184,194,204,0.2)'
+		dataZoom.textStyle = { color: theme.dark }
+		dataZoom.handleStyle = { color: theme['grey-light'] }
 	}
 	return _.merge(dataZoom, mods) as echarts.DataZoom
 }
@@ -119,39 +116,37 @@ export function dataZoom(
 
 
 export function axis(
-	xy: 'x' | 'y',
-	mods = {} as Partial<{
+	opts = {} as Partial<{
+		xy: 'x' | 'y'
 		blank: boolean
-	} & echarts.Axis>,
+	}>,
+	mods = {} as Partial<echarts.Axis>,
 ) {
 	let axis = {
 		uuid: nanoid(),
 		silent: true,
 		gridIndex: 0,
-		// axisPointer: { show: true },
 		axisLabel: { textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize } },
 		axisLine: { show: !!mods.axisLine },
 		axisTick: { show: !!mods.axisTick },
 		splitArea: { show: !!mods.splitArea },
 		splitLine: { show: !!mods.splitLine },
 	} as echarts.Axis
-	if (xy == 'x') {
+	if (opts.xy == 'x') {
 		_.merge(axis, {
 			type: 'category',
-			axisLabel: { margin: 5, formatter(v) { return charts.xlabel(v) } },
-			// axisPointer: { label: { formatter(params) { return charts.xlabel(params.value) } } },
+			axisLabel: { margin: 4, formatter: charts.xlabel },
 		} as echarts.Axis)
 	}
-	if (xy == 'y') {
+	if (opts.xy == 'y') {
 		_.merge(axis, {
 			scale: true,
 			type: 'value',
 			splitLine: { show: true, lineStyle: { color: theme['grey-lightest'] } },
-			axisLabel: { formatter(v) { return pretty.number(v) } },
+			axisLabel: { formatter: pretty.number },
 		} as echarts.Axis)
 	}
-	if (mods.blank) {
-		delete mods.blank
+	if (opts.blank) {
 		_.merge(axis, {
 			axisLabel: { show: false },
 			axisLine: { show: false },
@@ -159,12 +154,6 @@ export function axis(
 			splitArea: { show: false },
 			splitLine: { show: false },
 			axisPointer: { type: 'none', label: { show: false } },
-			// axisPointer: {
-			// 	show: false,
-			// 	status: 'hide',
-			// 	type: 'none',
-			// 	label: { show: false },
-			// },
 		} as echarts.Axis)
 	}
 	return _.merge(axis, mods) as echarts.Axis
@@ -187,22 +176,104 @@ export function series(
 		showSymbol: false,
 		showAllSymbol: false,
 		symbolSize: 4,
+		symbolRotate: 0,
 		emphasis: null,
-		// emphasis: { label: null, itemStyle: null },
+		itemStyle: { show: true, width: 4, color: theme['grey-lighter'], opacity: 1 },
 	} as echarts.Series
-	if (mods.type == 'line') {
-		_.merge(series, {
-			lineStyle: { color: mods.itemStyle.color, width: 1 },
-		} as echarts.Series)
-	}
 	if (mods.large) {
-		_.merge(series, {
-			largeThreshold: SETTINGS.largeThreshold,
-			progressive: SETTINGS.progressiveThreshold,
-			progressiveThreshold: SETTINGS.progressiveThreshold,
-		} as echarts.Series)
+		series.largeThreshold = SETTINGS.largeThreshold
+		series.progressive = SETTINGS.progressiveThreshold
+		series.progressiveThreshold = SETTINGS.progressiveThreshold
 	}
 	return _.merge(series, mods) as echarts.Series
+}
+
+export function scatter(
+	opts = {} as Partial<{
+		width: number
+		color: string
+		opacity: number
+		rotate: number
+		outline: boolean
+	}>,
+	mods = {} as Partial<echarts.Series>,
+) {
+	let scatter = {
+		type: 'scatter',
+		symbolSize: opts.width,
+		symbolRotate: opts.rotate,
+		itemStyle: { color: opts.color, opacity: opts.opacity },
+	} as echarts.Series
+	if (opts.outline) {
+		scatter.itemStyle.borderWidth = 1
+		scatter.itemStyle.normal.borderColor = theme.dark
+	}
+	return _.merge(series(scatter), mods) as echarts.Series
+}
+
+export function line(
+	opts = {} as Partial<{
+		width: number
+		color: string
+		opacity: number
+		step: boolean
+		dashed: boolean
+		dotted: boolean
+		area: number
+	}>,
+	mods = {} as Partial<echarts.Series>,
+) {
+	let line = {
+		type: 'line',
+		itemStyle: { color: opts.color },
+		lineStyle: { width: opts.width, color: opts.color, opacity: opts.opacity },
+	} as echarts.Series
+	if (opts.step) {
+		line.step = 'middle'
+		line.smooth = false
+	}
+	if (opts.dashed) line.lineStyle.type = 'dashed';
+	if (opts.dotted) line.lineStyle.type = 'dotted';
+	if (opts.area) line.areaStyle = { show: true, opacity: opts.area, color: opts.color };
+	return _.merge(series(line), mods) as echarts.Series
+}
+
+export function bar(
+	opts = {} as Partial<{
+		width: number
+		color: string
+		opacity: number
+		overlap: boolean
+		outline: boolean
+	}>,
+	mods = {} as Partial<echarts.Series>,
+) {
+	let bar = {
+		type: 'bar',
+		large: true,
+		barWidth: opts.width,
+		itemStyle: { color: opts.color, opacity: opts.opacity },
+	} as echarts.Series
+	if (opts.overlap) bar.barGap = '-100%';
+	if (opts.outline) {
+		bar.itemStyle.borderWidth = 1
+		bar.itemStyle.borderColor = theme.dark
+	}
+	return _.merge(series(bar), mods) as echarts.Series
+}
+
+export function candlestick(
+	mods = {} as Partial<echarts.Series>,
+) {
+	let candlestick = {
+		type: 'candlestick',
+		large: true,
+		itemStyle: {
+			color: theme.success, color0: theme.danger,
+			borderColor: theme.success, borderColor0: theme.danger, borderWidth: 1,
+		},
+	} as echarts.Series
+	return _.merge(series(candlestick), mods) as echarts.Series
 }
 
 

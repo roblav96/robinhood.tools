@@ -16,34 +16,38 @@
 			<div class="columns is-mobile my-0 items-center">
 
 				<div class="column is-narrow">
-					<b-dropdown :disabled="busy" hoverable>
-						<b-field slot="trigger">
-							<p class="control">
-								<button class="button" @click="settings.time=!settings.time">
+					<b-field>
+						<p class="control">
+							<b-dropdown :disabled="busy" hoverable>
+								<button class="button" @click="settings.time=!settings.time" slot="trigger">
 									<b-icon :icon="settings.time?'av-timer':'reorder-vertical'"></b-icon>
 								</button>
-							</p>
-							<p class="control">
-								<button class="button" @click="settings.ohlc=!settings.ohlc">
+								<b-dropdown-item custom class="text-initial pt-0">
+									<b-field label="X Axis Scale">
+										<b-field>
+											<b-radio v-model="settings.time" :native-value="false" :disabled="busy">Linear</b-radio>
+											<b-radio v-model="settings.time" :native-value="true" :disabled="busy">Time</b-radio>
+										</b-field>
+									</b-field>
+								</b-dropdown-item>
+							</b-dropdown>
+						</p>
+						<p class="control">
+							<b-dropdown :disabled="busy" hoverable>
+								<button class="button" @click="settings.ohlc=!settings.ohlc" slot="trigger">
 									<b-icon :icon="settings.ohlc?'poll':'chart-line-variant'"></b-icon>
 								</button>
-							</p>
-						</b-field>
-						<b-dropdown-item custom class="text-initial pb-2">
-							<b-field label="X Axis Scale">
-								<b-field>
-									<b-radio v-model="settings.time" :native-value="false" :disabled="busy">Linear</b-radio>
-									<b-radio v-model="settings.time" :native-value="true" :disabled="busy">Time</b-radio>
-								</b-field>
-							</b-field>
-							<b-field label="Price Chart">
-								<b-field>
-									<b-radio v-model="settings.ohlc" :native-value="true" :disabled="busy">OHLC</b-radio>
-									<b-radio v-model="settings.ohlc" :native-value="false" :disabled="busy">Line</b-radio>
-								</b-field>
-							</b-field>
-						</b-dropdown-item>
-					</b-dropdown>
+								<b-dropdown-item custom class="text-initial pt-0">
+									<b-field label="Price Chart">
+										<b-field>
+											<b-radio v-model="settings.ohlc" :native-value="true" :disabled="busy">OHLC</b-radio>
+											<b-radio v-model="settings.ohlc" :native-value="false" :disabled="busy">Line</b-radio>
+										</b-field>
+									</b-field>
+								</b-dropdown-item>
+							</b-dropdown>
+						</p>
+					</b-field>
 				</div>
 
 				<div class="column is-narrow">
@@ -57,9 +61,12 @@
 
 				<div class="column">
 					<b-field>
-						<b-taginput v-model="tags" :data="datasets" spellcheck="off" autocomplete icon="label" field="name" placeholder="Datasets..." @typing="typing">
+						<b-taginput v-model="tags" :data="datasets" autocomplete open-on-focus clear-on-select keep-first spellcheck="off"
+						    icon="label" field="name" placeholder="Datasets..." @typing="typing">
 							<template slot-scope="props">
-								{{props.option.name}}
+								<div @click="editds">
+									{{props.option}}
+								</div>
 							</template>
 							<template slot="empty">No datasets found...</template>
 						</b-taginput>
@@ -92,7 +99,7 @@
 		</section>
 
 		<!-- <section class="flex-col-full overflow-y-auto"> -->
-		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :settings="settings" :isbrushing.sync="brushing"></v-symbol-echart>
+		<v-symbol-echart class="flex-col-full" ref="symbol_vechart" :quote="quote" :settings="settings" :brushing.sync="brushing"></v-symbol-echart>
 		<!-- </section> -->
 		<v-loading :is-full-page="false" :active="busy"></v-loading>
 

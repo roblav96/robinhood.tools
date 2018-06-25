@@ -77,7 +77,6 @@ export const SUMMARY_MODULES = [
 export const ALL_RANGES = ['1d', '5d', '1wk', '1mo', '3mo', '6mo', 'ytd', '1y', '2y', '5y', '10y', 'max']
 export const ALL_INTERVALS = ['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo']
 
-export const INTERVALS = ['1m', '2m', '5m', '15m', '30m', '1h', '1d', '1wk', '1mo']
 export const FRAMES = {
 	'1d': '1m',
 	'5d': '5m',
@@ -87,6 +86,7 @@ export const FRAMES = {
 	'max': '1mo'
 }
 export const RANGES = Object.keys(FRAMES)
+export const INTERVALS = ['1m', '2m', '5m', '15m', '30m', '1h', '1d', '1wk', '1mo']
 
 
 

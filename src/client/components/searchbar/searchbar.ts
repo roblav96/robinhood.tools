@@ -17,6 +17,8 @@ import * as utils from '../../adapters/utils'
 @Vts.Component
 export default class extends Mixins(VMixin) {
 
+	recents = this.$store.state.recents
+
 	mounted() {
 		this.sync()
 		utils.wemitter.on('keyup', this.onkey, this)
@@ -26,6 +28,8 @@ export default class extends Mixins(VMixin) {
 		utils.wemitter.off('keyup', this.onkey, this)
 		utils.wemitter.off('keydown', this.onkey, this)
 	}
+
+	@Vts.Watch('recents') w_recents() { this.sync() }
 
 	onkey(event: KeyboardEvent) {
 		if (event.metaKey || event.shiftKey || event.ctrlKey || event.altKey) return;
@@ -82,7 +86,6 @@ export default class extends Mixins(VMixin) {
 	onselect(result: Quotes.Quote) {
 		this.$router.push({ name: this.$routerSymbolName, params: { symbol: result.symbol } })
 		this.inputfield.blur()
-		if (!this.query) this.sync();
 	}
 
 }

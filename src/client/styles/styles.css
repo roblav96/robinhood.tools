@@ -83,9 +83,7 @@ html {
 	margin-right: 0px;
 }
 
-.control.has-icons-left > input[type="search"] + .icon.is-left {
-	left: 0.25rem;
-}
+
 
 .control.has-icons-left .select select {
 	padding-left: 2.5rem;

@@ -20,10 +20,10 @@
 						<div class="column">
 							<div class="flex">
 								<p class="title mr-1">{{symbol}}</p>
-								<p class="flex-1 self-end has-text-lightest">
+								<!-- <p class="flex-1 self-end has-text-lightest">
 									<span v-if="all.quote.acronym">{{all.quote.acronym}} </span>
 									<span v-if="all.quote.type">- {{all.quote.type}} </span>
-								</p>
+								</p> -->
 							</div>
 							<p>{{vtruncate(vname(all.quote.name),32)}}</p>
 						</div>
