@@ -37,21 +37,21 @@ export function option(
 		toolbox: { show: !!mods.toolbox },
 		tooltip: [{
 			show: true,
-			// showContent: !process.env.DEVELOPMENT,
+			showContent: !process.env.DEVELOPMENT,
 			// alwaysShowContent: !!process.env.DEVELOPMENT,
 			trigger: 'axis',
 			triggerOn: 'mousemove',
 			// position: [10, 10],
-			position: (point, params, el, rect, size) => {
-				return [point[0] - (size.contentSize[0] / 2), 0];
-			},
+			// position: (point, params, el, rect, size) => {
+			// 	return [point[0] - (size.contentSize[0] / 2), 0];
+			// },
 			confine: true,
 			enterable: false,
 			showDelay: 0,
 			hideDelay: 0,
 			transitionDuration: 0,
 			// padding: 0,
-			padding: [0, 0, 0, 0],
+			padding: [0, 0, 0, 32],
 			backgroundColor: 'transparent',
 			// formatter: '{a}: {b1}<br>{c}: {d0}',
 			// extraCssText: `border: 0.125rem solid ${theme['grey-darker']};`,
@@ -59,8 +59,8 @@ export function option(
 				type: 'cross',
 				animation: false,
 				shadowStyle: { opacity: 0 },
-				lineStyle: { color: theme['grey-lighter'] },
-				crossStyle: { color: theme['grey-light'] },
+				lineStyle: { color: theme['grey-lightest'] },
+				crossStyle: { color: theme['grey-lighter'] },
 				label: {
 					formatter(params) { return charts.xlabel(params.value) },
 					backgroundColor: theme.white, shadowBlur: 0, margin: 0,

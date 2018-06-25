@@ -29,9 +29,11 @@ import { theme } from '../../stores/colors'
 export class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	$parent: VSymbolChart
-	@Vts.Prop() quote: Quotes.Quote
-	@Vts.Prop() settings: typeof VSymbolChart.prototype.settings
 
+	lquotes: Quotes.Live[]
+	get busy() { return this.$parent.busy }
+	get quote() { return this.$parent.quote }
+	get settings() { return this.$parent.settings }
 	get brushing() { return this.$parent.brushing }
 	set brushing(brushing: boolean) { this.$parent.brushing = brushing }
 
@@ -44,35 +46,42 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 
-	lquotes() { return _.get(this.getOption(), 'dataset[0].source', []) as Quotes.Live[] }
-
 	ctprice() {
-		let lquotes = this.lquotes()
 		let ctbounds = this.ctbounds()
-		let lquote = this.settings.time ? lquotes.find(v => v.timestamp >= ctbounds.startValue) : lquotes[ctbounds.startValue]
+		let lquote = this.settings.time ? this.lquotes.find(v => v.timestamp >= ctbounds.startValue) : this.lquotes[ctbounds.startValue]
 		return this.settings.ohlc ? lquote.open : lquote.price
 	}
-
 	ctlatest() {
-		let lquotes = this.lquotes()
 		let bounds = { end: 100 } as ReturnType<typeof VEChartsMixin.prototype.ctbounds>
 		let threshold = ecbones.SETTINGS.latestThreshold()
 		if (this.settings.time) {
-			let i = core.math.clamp(lquotes.length - threshold, 0, lquotes.length)
-			bounds.startValue = lquotes[i].timestamp
+			let i = core.math.clamp(this.lquotes.length - threshold, 0, this.lquotes.length)
+			bounds.startValue = this.lquotes[i].timestamp
 		} else {
-			bounds.start = core.math.clamp(core.calc.slider(lquotes.length - threshold, 0, lquotes.length), 0, 100)
+			bounds.start = core.math.clamp(core.calc.slider(this.lquotes.length - threshold, 0, this.lquotes.length), 0, 100)
 		}
 		return bounds
 	}
-
 	latestzoom() {
 		this.echart.dispatchAction(Object.assign({ type: 'dataZoom', manual: true }, this.ctlatest()))
 	}
 
 
 
-	build(lquotes = this.lquotes()) {
+	initLquotes(lquotes: Quotes.Live[]) {
+		this.lquotes = lquotes
+		this.build()
+		this.resetzoom()
+	}
+	syncLquotes() {
+		this.setOption({
+			dataset: this.ecDatasets(),
+			series: [{ markLine: { data: this.ecPriceMarkData() } }],
+		})
+		this.reshowtip()
+	}
+
+	build() {
 		let stamp = Date.now()
 
 		let option = ecbones.option({
@@ -88,7 +97,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 		option.grid.push({
-			top: 32,
+			top: 6,
 			left: ecbones.SETTINGS.padding.x,
 			right: ecbones.SETTINGS.padding.x,
 			bottom: ecbones.SETTINGS.primary.bottom,
@@ -104,7 +113,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 		option.yAxis.push(ecbones.axis({ xy: 'y' }, {
 			boundaryGap: '10%',
-			axisPointer: { label: { formatter: this.yAxisPointerFormatter } },
+			axisPointer: { label: { formatter: this.ecYAxisPointerFormatter } },
 		}))
 
 		let primary = this.settings.ohlc ? ecbones.candlestick({
@@ -118,7 +127,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 			name: 'Price',
 			encode: { x: 'timestamp', y: 'price', tooltip: 'price' },
 		})
-		primary.markLine = ecbones.markLine({ data: this.priceMarkData() })
+		primary.markLine = ecbones.markLine({ data: this.ecPriceMarkData() })
 		option.series.push(primary)
 
 
@@ -152,7 +161,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 		option.dataZoom.forEach(v => v.xAxisIndex = [0, 1])
-		option.dataset = this.buildDatasets(lquotes)
+		option.dataset = this.ecDatasets()
 
 
 
@@ -160,14 +169,14 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 		this.echart.setOption(option)
 		console.log(`build getOption ->`, _.clone(this.echart.getOption()))
 
-		_.defer(() => console.log(`echart build ->`, lquotes.length, Date.now() - stamp + 'ms'))
+		_.defer(() => console.log(`echart build ->`, this.lquotes.length, Date.now() - stamp + 'ms'))
 	}
 
-	buildDatasets(lquotes: Quotes.Live[]) {
+	ecDatasets() {
 		return [
-			{ source: lquotes },
+			{ source: this.lquotes },
 			{
-				source: core.clone(lquotes).map(lquote => {
+				source: core.clone(this.lquotes).map(lquote => {
 					if (lquote.close > lquote.open) {
 						lquote.open = 0
 						lquote.close = lquote.size
@@ -187,39 +196,21 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	@Vts.Watch('settings.time') w_time() { this.reload() }
 	@Vts.Watch('settings.ohlc') w_ohlc() { this.reload() }
-
 	// onreload = _.debounce(this.reload, 100, { leading: false, trailing: true })
-	reload(lquotes = this.lquotes()) {
+	reload() {
 		let ctbounds = this.ctbounds()
 		this.echart.clear()
-		this.build(lquotes)
+		this.build()
 		this.echart.dispatchAction(Object.assign({ type: 'dataZoom', manual: true }, ctbounds))
 	}
 
-	onlquote(lquote: Quotes.Live) {
-		if (!this.rendered) return;
-		let lquotes = this.lquotes()
-		let last = lquotes[lquotes.length - 1]
-		if (last.liveCount == lquote.liveCount) {
-			core.object.merge(last, lquote)
-		} else lquotes.push(lquote);
-		// this.reload(lquotes)
-		this.setOption({
-			dataset: this.buildDatasets(lquotes),
-			series: [{ markLine: { data: this.priceMarkData() } }],
-		})
-		this.reshowtip()
-	}
 
 
-
-	splitNumber(height = this.echart.getHeight()) { return Math.round(height / ecbones.SETTINGS.padding.x) }
-
-	yAxisPointerFormatter(params: echarts.AxisPointerParams) {
+	ecYAxisPointerFormatter(params: echarts.AxisPointerParams) {
 		return pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice()), { percent: true, plusminus: true })
 	}
 
-	priceMarkData() {
+	ecPriceMarkData() {
 		if (this.$parent.rangeindex > 1) return [];
 		let color = theme['grey-light']
 		if (this.quote.change > 0) color = theme.success;
@@ -251,7 +242,6 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 export default class VSymbolChart extends Mixins(VMixin) {
 
 	$parent: VSymbol
-	@Vts.Prop() symbol: string
 	@Vts.Prop() quote: Quotes.Quote
 
 	brushing = false
@@ -261,7 +251,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 		this.getQuotes()
 	}
 	beforeDestroy() {
-		socket.offListener(this.vechart.onlquote)
+		socket.offListener(this.onlquote)
 	}
 
 
@@ -272,7 +262,6 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	getQuotes() {
 		if (!Number.isFinite(this.quote.tickerId)) return;
 		this.busy = true
-		this.buildDatasets()
 		return Promise.resolve().then(() => {
 			if (this.settings.range == 'live') {
 				return http.post('/quotes/lives', { symbols: [this.quote.symbol] }).then(response => response[0])
@@ -280,15 +269,15 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			return charts.getChart(this.quote, this.settings.range)
 		}).then((lquotes: Quotes.Live[]) => {
 			this.$safety()
-			socket.offListener(this.vechart.onlquote)
+			socket.offListener(this.onlquote)
 			if (lquotes.length == 0) {
 				alerts.toast(`Data for range '${core.string.capitalize(this.settings.range)}' not found!`)
 				this.vechart.echart.clear()
 				return
 			}
-			this.vechart.build(lquotes)
+			this.vechart.initLquotes(lquotes)
 			if (this.settings.range == 'live') {
-				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.vechart.onlquote)
+				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.onlquote)
 			}
 		}).catch(error => {
 			console.error(`getQuotes Error ->`, error)
@@ -296,12 +285,19 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			this.busy = false
 		})
 	}
-
 	@Vts.Watch('quote', { deep: true }) w_quote(quote: Quotes.Quote) {
-		if (this.settings.range != 'live' || quote.size == 0) return;
+		if (this.settings.range != 'live' || !quote.size) return;
 		let lquote = quotes.getConverted(quote, quotes.ALL_LIVE_KEYS) as Quotes.Live
 		lquote.liveCount++
-		this.vechart.onlquote(lquote)
+		this.onlquote(lquote)
+	}
+	onlquote(lquote: Quotes.Live) {
+		let lquotes = this.vechart.lquotes
+		let last = lquotes[lquotes.length - 1]
+		if (last.liveCount == lquote.liveCount) {
+			core.object.merge(last, lquote)
+		} else lquotes.push(lquote);
+		this.vechart.syncLquotes()
 	}
 
 
@@ -331,10 +327,6 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	}
 
 	datasets = []
-	buildDatasets() {
-		this.datasets = quotes.ALL_LIVE_KEYS.filter(k => Number.isFinite(this.quote[k as any]))
-		console.log('this.datasets ->', this.datasets)
-	}
 
 	editds(ds) {
 		console.log(`ds ->`, ds)

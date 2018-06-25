@@ -20,7 +20,7 @@
 
 <template>
 	<div id="symbol_chart" class="flex-col-full">
-		<section class="section py-0 pt-2">
+		<section class="section py-0 pt-1">
 			<div class="columns is-mobile my-0 items-center">
 
 				<div class="column is-narrow">
@@ -37,7 +37,7 @@
 								</button>
 							</p>
 						</b-field>
-						<b-dropdown-item custom class="text-initial">
+						<b-dropdown-item custom class="text-initial pt-0">
 							<b-field label="X Axis Scale">
 								<b-field>
 									<b-radio v-model="settings.time" :native-value="false" :disabled="busy">Linear</b-radio>
@@ -119,7 +119,7 @@
 		</section>
 
 		<!-- <section class="flex-col-full overflow-y-auto"> -->
-		<v-symbol-echart class="flex-col-full mx-1" ref="symbol_vechart" :quote="quote" :settings="settings" :brushing.sync="brushing"></v-symbol-echart>
+		<v-symbol-echart class="flex-col-full mx-1" ref="symbol_vechart"></v-symbol-echart>
 		<!-- </section> -->
 		<v-loading :is-full-page="false" :active="busy"></v-loading>
 
