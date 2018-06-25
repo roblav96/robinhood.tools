@@ -26,14 +26,14 @@ import { theme } from '../../stores/colors'
 
 
 @Vts.Component
-class VSymbolEChart extends Mixins(VEChartsMixin) {
+export class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 	$parent: VSymbolChart
 	@Vts.Prop() quote: Quotes.Quote
 	@Vts.Prop() settings: typeof VSymbolChart.prototype.settings
 
 	mounted() {
-		
+
 	}
 	beforeDestroy() {
 
@@ -78,8 +78,13 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			tooltip: [{ formatter: params => charts.tipFormatter(params as any, this.getOption()) }],
 		})
 
-		option.dataZoom.push(ecbones.dataZoom({ type: 'inside' }, { xAxisIndex: [0] }))
-		option.dataZoom.push(ecbones.dataZoom({ type: 'slider' }, { xAxisIndex: [0] }))
+		option.dataZoom.push(ecbones.dataZoom({ type: 'inside' }, {
+			xAxisIndex: [0],
+		}))
+		option.dataZoom.push(ecbones.dataZoom({ type: 'slider' }, {
+			height: ecbones.SETTINGS.dataZoom.height,
+			xAxisIndex: [0],
+		}))
 
 		option.grid.push({
 			top: 8,
@@ -99,7 +104,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		// })
 
 		let xtype = this.settings.time ? 'time' : 'category'
-		option.xAxis.push(ecbones.axis({ xy: 'x' }, {
+		option.xAxis.push(ecbones.axis({ axis: 'x' }, {
 			type: xtype,
 		}))
 		// option.xAxis.push(ecbones.axis({ xy: 'x', blank: true }, {
@@ -107,7 +112,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		// 	gridIndex: 1,
 		// }))
 
-		option.yAxis.push(ecbones.axis({ xy: 'y' }, {
+		option.yAxis.push(ecbones.axis({ axis: 'y' }, {
 			boundaryGap: '1%',
 			axisPointer: { label: { formatter: this.yAxisPointerFormatter } },
 		}))
@@ -126,10 +131,7 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 			name: 'Price',
 			encode: { x: 'timestamp', y: 'price', tooltip: 'price' },
 		})
-		priceseries.markLine = { data: [] }
-		if (this.$parent.rangeindex <= 1) {
-			priceseries.markLine = ecbones.markLine({ data: this.markDataPrice() })
-		}
+		priceseries.markLine = ecbones.markLine({ data: this.priceMarkData() })
 		option.series.push(priceseries)
 
 		// option.series.push(ecbones.bar({ color: theme['grey-lighter'] }, {
@@ -166,8 +168,11 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		if (last.liveCount == lquote.liveCount) {
 			core.object.merge(last, lquote)
 		} else lquotes.push(lquote);
-		this.reload(lquotes)
-		// this.setOption({ dataset: [{ source: lquotes }] })
+		// this.reload(lquotes)
+		this.setOption({
+			dataset: [{ source: lquotes }],
+			series: [{ markLine: { data: this.priceMarkData() } }],
+		})
 		this.reshowtip()
 	}
 
@@ -179,7 +184,8 @@ class VSymbolEChart extends Mixins(VEChartsMixin) {
 		return pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice()), { percent: true, plusminus: true })
 	}
 
-	markDataPrice() {
+	priceMarkData() {
+		if (this.$parent.rangeindex > 1) return [];
 		let color = theme['grey-light']
 		if (this.quote.change > 0) color = theme.success;
 		if (this.quote.change < 0) color = theme.danger;
@@ -298,7 +304,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 	editds(ds) {
 		console.log(`ds ->`, ds)
 	}
-	ontagclick(event){
+	ontagclick(event) {
 		console.log(`ontagclick ->`, event)
 	}
 

@@ -13,8 +13,10 @@ import { theme } from '../stores/colors'
 
 
 export const SETTINGS = {
-	padding: { x: 68, y: 16 },
 	fontSize: 14,
+	spacer: 8,
+	padding: { x: 68, y: 16 },
+	dataZoom: { height: 32 },
 	latestThreshold: () => Math.round(utils.screen().pxwidth / 16),
 	largeThreshold: () => Math.round(utils.screen().pxwidth / 8),
 	progressiveThreshold: () => Math.round(utils.screen().pxwidth / 2),
@@ -39,16 +41,16 @@ export function option(
 			trigger: 'axis',
 			triggerOn: 'mousemove',
 			// position: [10, 10],
-			// position: (point, params, el, rect, size) => {
-			// 	return [point[0] - (size.contentSize[0] / 2), 0];
-			// },
+			position: (point, params, el, rect, size) => {
+				return [point[0] - (size.contentSize[0] / 2), 0];
+			},
 			confine: true,
 			enterable: false,
 			showDelay: 0,
-			hideDelay: 1,
+			hideDelay: 0,
 			transitionDuration: 0,
 			// padding: 0,
-			padding: [0, 0, 0, 64],
+			padding: [0, 0, 0, 0],
 			backgroundColor: 'transparent',
 			// formatter: '{a}: {b1}<br>{c}: {d0}',
 			// extraCssText: `border: 0.125rem solid ${theme['grey-darker']};`,
@@ -119,7 +121,7 @@ export function dataZoom(
 
 export function axis(
 	opts = {} as Partial<{
-		xy: 'x' | 'y'
+		axis: 'x' | 'y'
 		blank: boolean
 	}>,
 	mods = {} as Partial<echarts.Axis>,
@@ -134,13 +136,13 @@ export function axis(
 		splitArea: { show: !!mods.splitArea },
 		splitLine: { show: !!mods.splitLine },
 	} as echarts.Axis
-	if (opts.xy == 'x') {
+	if (opts.axis == 'x') {
 		_.merge(axis, {
 			type: 'category',
 			axisLabel: { margin: 4, formatter: charts.xlabel },
 		} as echarts.Axis)
 	}
-	if (opts.xy == 'y') {
+	if (opts.axis == 'y') {
 		_.merge(axis, {
 			scale: true,
 			type: 'value',
