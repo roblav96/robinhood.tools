@@ -77,7 +77,7 @@ export function tipFormatter(params: echarts.EventParam<Quotes.Live>[], option: 
 		let tooltip = option.series[param.seriesIndex].encode.tooltip
 		if (Array.isArray(tooltip)) {
 			tooltip.forEach((key: string) => {
-				let value = pretty.number(param.value[key], { nozeros: true })
+				let value = pretty.number(param.value[key], { price: true, nozeros: true })
 				trs += `<td class="pr-1">${_.startCase(key)}</td><td class="text-right">${value}&nbsp;&nbsp;</td>`
 			})
 		} else {
@@ -108,11 +108,11 @@ export function getChart(quote: Quotes.Quote, range: string) {
 		return Promise.all([
 			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/F`, { query: { minuteType: 'm1' } }),
 			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/A`, { query: { minuteType: 'm1' } }),
-			http.get(`https://quoteapi.webull.com/api/quote/v2/tickerKDatas/${quote.tickerId}`, { query: { kDataType: 'm1' } }),
+			http.get(`https://quoteapi.webull.com/api/quote/v4/tickerKDatas/${quote.tickerId}`, { query: { kDataType: 'm1', dayCount: 1, adjustType: 'none' } }),
 		]).then(function(mquotes: Webull.MinuteChart[]) {
 
 			let kquotes = (mquotes.pop() as any) as Webull.KDatasChart
-			kquotes.tickerKDatas.forEach(v => core.fix(v, true))
+			core.fix(kquotes, true)
 			let klquotes = webull.toKDatasLives(kquotes)
 
 			mquotes.forEach(v => core.fix(v.data[0], true))
@@ -134,8 +134,15 @@ export function getChart(quote: Quotes.Quote, range: string) {
 				mlquotes.forEach(mlquote => {
 					let ylquote = ylquotes.find(v => v.timestamp == mlquote.timestamp)
 					if (!ylquote) return;
-					core.object.merge(mlquote, core.object.pick(ylquote, ['open', 'high', 'low', 'close']))
+					let wick = Math.abs(ylquote.high - ylquote.low)
+					let bar = Math.abs(ylquote.open - ylquote.close)
+					let percent = core.calc.percent(wick, bar)
+					if (percent > 15000) return;
+					core.object.merge(mlquote, core.object.pick(ylquote, ['open', 'high', 'low']))
 				})
+
+				let ylquote = ylquotes.find(v => v.timestamp >= klquotes[0].timestamp)
+				if (ylquote) core.object.merge(klquotes[0], core.object.pick(ylquote, ['open', 'high', 'low']));
 
 				return mlquotes.concat(klquotes).sort((a, b) => a.timestamp - b.timestamp)
 			})

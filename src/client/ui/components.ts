@@ -53,7 +53,7 @@ class VTimestamp extends Vue {
 	tip = ''
 	fromnow = ''
 	@Vts.Prop() value: number
-	@Vts.Prop() opts: TimeFormatOptions
+	@Vts.Prop() opts: Pretty.TimeFormatOptions
 	@Vts.Watch('value') w_value() { this.sync() }
 	mounted() {
 		this.sync();

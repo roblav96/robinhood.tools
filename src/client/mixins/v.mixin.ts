@@ -34,8 +34,8 @@ export default class VMixin extends Vue {
 	vcapitalize(value: string) { return core.string.capitalize(value) }
 	vstamp(stamp: number) { return stamp && pretty.stamp(stamp) }
 	vname(name: string) { return name && quotes.getName(name) }
-	vtime(stamp: number, opts?: Partial<TimeFormatOptions>) { return stamp && pretty.time(stamp, opts) }
-	vnumber(value: number, opts?: Partial<NumberFormatOptions>) { if (!Number.isFinite(value)) return value; return pretty.number(value, opts) }
+	vtime(stamp: number, opts?: Partial<Pretty.TimeFormatOptions>) { return stamp && pretty.time(stamp, opts) }
+	vnumber(value: number, opts?: Partial<Pretty.NumberFormatOptions>) { if (!Number.isFinite(value)) return value; return pretty.number(value, opts) }
 	vpercent(to: number, from: number) { if (!to || !from) return NaN; return core.calc.percent(to, from) }
 	vslider(value: number, min: number, max: number) { if (!value) return NaN; return core.calc.slider(value, min, max) }
 

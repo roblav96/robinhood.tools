@@ -196,8 +196,8 @@ export function series(
 
 export function scatter(
 	opts = {} as Partial<{
+		color: string | ((param: echarts.EventParam) => string)
 		width: number
-		color: string
 		opacity: number
 		rotate: number
 		outline: boolean
@@ -219,8 +219,8 @@ export function scatter(
 
 export function line(
 	opts = {} as Partial<{
+		color: string | ((param: echarts.EventParam) => string)
 		width: number
-		color: string
 		opacity: number
 		step: boolean
 		dashed: boolean
@@ -246,8 +246,8 @@ export function line(
 
 export function bar(
 	opts = {} as Partial<{
+		color: string | ((param: echarts.EventParam) => string)
 		width: number
-		color: string
 		opacity: number
 		overlap: boolean
 		outline: boolean
@@ -260,7 +260,9 @@ export function bar(
 		barWidth: opts.width,
 		itemStyle: { color: opts.color, opacity: opts.opacity },
 	} as echarts.Series
-	if (opts.overlap) bar.barGap = '-100%';
+	if (opts.overlap) {
+		bar.barGap = '-100%'
+	}
 	if (opts.outline) {
 		bar.itemStyle.borderWidth = 1
 		bar.itemStyle.borderColor = theme.dark

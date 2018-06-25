@@ -84,7 +84,7 @@
 						</div>
 						<div v-if="Number.isFinite(all.quote.marketCap)" class="column is-narrow">
 							<p class="is-size-4">
-								{{vnumber(all.quote.marketCap,{compact:true})}}
+								{{vnumber(all.quote.marketCap,{compact:true,precision:1})}}
 							</p>
 							<p>Market Cap</p>
 						</div>

@@ -169,11 +169,12 @@ export function toMinutesLives(response: Webull.MinuteChart) {
 }
 
 export function toKDatasLives(response: Webull.KDatasChart) {
-	return response.tickerKDatas.map(kdata => {
+	return response.k.map(k => {
+		let ksplit = k.split(',').map(Number.parseFloat)
 		return {
-			open: kdata.noneKData.open, close: kdata.noneKData.close,
-			high: kdata.noneKData.high, low: kdata.noneKData.low,
-			size: kdata.volume, timestamp: new Date(kdata.tradeTime).valueOf(),
+			open: ksplit[3], close: ksplit[2],
+			high: ksplit[4], low: ksplit[5],
+			size: ksplit[6], timestamp: ksplit[0] * 1000,
 		} as Quotes.Live
 	}).sort((a, b) => a.timestamp - b.timestamp)
 }
@@ -399,49 +400,24 @@ declare global {
 		}
 
 		namespace KDatasChart {
-			interface ForwardKData {
-				close: number
-				high: number
-				low: number
-				ma10: number
-				ma120: number
-				ma20: number
-				ma30: number
-				ma5: number
-				ma60: number
-				open: number
-				preClose: number
-			}
-			interface NoneKData {
-				close: number
-				high: number
-				low: number
-				ma10: number
-				ma120: number
-				ma20: number
-				ma30: number
-				ma5: number
-				ma60: number
-				open: number
-				preClose: number
-			}
-			interface KDatas {
-				dealAmount: number
-				forwardKData: ForwardKData
-				noneKData: NoneKData
-				tickerId: number
-				tradeTime: string
-				volume: number
+			interface KDates {
+				avgShow: boolean
+				end: string
+				start: string
+				type: string
 			}
 		}
 		interface KDatasChart {
+			dates: KDatasChart.KDates[]
 			hasMoreData: boolean
+			k: string[]
+			preClose: number
 			regionId: number
 			tickerId: number
-			tickerKDatas: KDatasChart.KDatas[]
 			tickerType: number
 			timeZone: string
-			version: string
+			tradeStatus: string
+			version: number
 			zzz: string
 		}
 

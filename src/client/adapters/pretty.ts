@@ -8,8 +8,8 @@ import * as dayjs from 'dayjs'
 
 
 
-declare global { interface NumberFormatOptions { precision: number, price: boolean, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } }
-export function number(value: number, { precision, price, compact, plusminus, percent, dollar, nozeros } = {} as Partial<NumberFormatOptions>) {
+declare global { namespace Pretty { interface NumberFormatOptions { precision: number, price: boolean, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } } }
+export function number(value: number, { precision, price, compact, plusminus, percent, dollar, nozeros } = {} as Partial<Pretty.NumberFormatOptions>) {
 	let autoprecision = !Number.isFinite(precision)
 	let abs = Math.abs(value)
 
@@ -85,8 +85,8 @@ if (process.env.DEVELOPMENT) Object.assign(window, { number });
 
 
 
-declare global { interface TimeFormatOptions extends prettyms.PrettyMsOptions { max: number, showms: boolean, ago: boolean, keepDecimalsOnWholeSeconds: boolean } }
-export function time(stamp: number, opts = {} as Partial<TimeFormatOptions>) {
+declare global { namespace Pretty { interface TimeFormatOptions extends prettyms.PrettyMsOptions { max: number, showms: boolean, ago: boolean, keepDecimalsOnWholeSeconds: boolean } } }
+export function time(stamp: number, opts = {} as Partial<Pretty.TimeFormatOptions>) {
 	opts.secDecimalDigits = opts.secDecimalDigits || 0
 	opts.max = opts.max || 1
 	let ms = prettyms(Math.max(Date.now() - stamp, opts.showms ? 0 : 1001), opts)

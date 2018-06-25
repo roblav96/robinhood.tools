@@ -226,10 +226,10 @@ export const array = {
 			return filled
 		}) as any
 	},
-	chunks<T = any>(value: T[], size: number) {
-		if (size == 0) return [value];
+	chunks<T = any>(values: T[], size: number) {
+		if (size == 0) return [values];
 		let chunks = Array.from(Array(size), v => []) as T[][]
-		value.forEach((v, i) => chunks[i % chunks.length].push(v))
+		values.forEach((v, i) => chunks[i % chunks.length].push(v))
 		return chunks
 	},
 	merge<T = any>(target: T[], source: T[], primary: string, deep = false) {
@@ -239,16 +239,15 @@ export const array = {
 			else target.push(item);
 		})
 	},
-	dict<T = string>(value: any[], filled?: T): Dict<T> {
-		return value.reduce(function(previous, current, i) {
+	dict<T = string>(values: any[], filled?: T): Dict<T> {
+		return values.reduce(function(previous, current, i) {
 			previous[current] = filled == null ? current : filled
 			return previous
 		}, {})
 	},
-	nearest(value: number[], find: number, favor = 'min' as 'min' | 'max') {
-		let index = value.map(n => Math.abs(n - find))
-		let near = Math[favor].apply(Math, index)
-		return index.indexOf(near)
+	nearest(source: number[], find: number, fn = 'min' as 'min' | 'max') {
+		let index = source.map(n => Math.abs(n - find))
+		return index.indexOf(Math[fn].apply(Math, index))
 	},
 }
 

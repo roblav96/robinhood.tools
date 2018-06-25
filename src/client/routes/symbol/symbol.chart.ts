@@ -83,13 +83,16 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 			tooltip: [{ formatter: params => charts.tipFormatter(params as any, this.getOption()) }],
 		})
 
-		option.dataZoom.push(ecbones.dataZoom({ type: 'inside' }, {}))
+		option.dataZoom.push(ecbones.dataZoom({ type: 'inside' }, {
+
+		}))
 		option.dataZoom.push(ecbones.dataZoom({ type: 'slider' }, {
 			height: ecbones.SETTINGS.dataZoom.height,
 		}))
 
 
 
+		let dims = this.dims()
 		option.grid.push({
 			top: 6,
 			left: ecbones.SETTINGS.padding.x,
@@ -104,7 +107,6 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 		option.xAxis.push(ecbones.axis({ xy: 'x' }, {
 			type: xtype,
 		}))
-
 		option.yAxis.push(ecbones.axis({ xy: 'y' }, {
 			boundaryGap: '1%',
 			axisPointer: { label: { formatter: this.ecYAxisPointerFormatter } },
@@ -121,49 +123,51 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 			name: 'Price',
 			encode: { x: 'timestamp', y: 'close', tooltip: 'close' },
 		})
-		primary.markLine = ecbones.markLine({ data: this.ecPriceMarkData() })
 		option.series.push(primary)
 
 
 
-		// option.grid.push({
-		// 	height: '20%',
-		// 	left: ecbones.SETTINGS.padding.x,
-		// 	right: ecbones.SETTINGS.padding.x,
-		// 	bottom: ecbones.SETTINGS.primary.bottom,
-		// })
-		// option.yAxis.push(ecbones.axis({ xy: 'y', blank: true }, {
-		// 	gridIndex: 1,
-		// }))
-		// option.xAxis.push(ecbones.axis({ xy: 'x', blank: true }, {
-		// 	type: xtype,
-		// 	gridIndex: 1,
-		// }))
+		option.grid.push({
+			height: '20%',
+			left: ecbones.SETTINGS.padding.x,
+			right: ecbones.SETTINGS.padding.x,
+			bottom: ecbones.SETTINGS.primary.bottom,
+		})
+		option.yAxis.push(ecbones.axis({ xy: 'y', blank: true }, {
+			gridIndex: 1,
+		}))
+		option.xAxis.push(ecbones.axis({ xy: 'x', blank: true }, {
+			type: xtype,
+			gridIndex: 1,
+		}))
 
-		// option.series.push(ecbones.candlestick({
-		// 	name: 'Size',
-		// 	xAxisIndex: 1,
-		// 	yAxisIndex: 1,
-		// 	datasetIndex: 1,
-		// 	encode: {
-		// 		x: 'timestamp',
-		// 		y: ['open', 'close', 'high', 'low'],
-		// 		tooltip: 'size',
-		// 	},
-		// }))
+		option.series.push(ecbones.bar({ color: theme.success, opacity: 0.5, overlap: true }, {
+			name: 'Size Bull',
+			xAxisIndex: 1,
+			yAxisIndex: 1,
+			datasetIndex: 1,
+			encode: { x: 'timestamp', y: 'sizebull', tooltip: 'sizebull' },
+		}))
+		option.series.push(ecbones.bar({ color: theme.danger, opacity: 0.5, overlap: true }, {
+			name: 'Size Bear',
+			xAxisIndex: 1,
+			yAxisIndex: 1,
+			datasetIndex: 1,
+			encode: { x: 'timestamp', y: 'sizebear', tooltip: 'sizebear' },
+		}))
 
 
 
 		let grids = option.xAxis.map((v, i) => i)
-		console.log('grids ->', grids)
 		option.dataZoom.forEach(v => v.xAxisIndex = grids)
 		option.dataset = this.ecDatasets()
+		option.series[0].markLine = ecbones.markLine({ data: this.ecPriceMarkData() })
 
 
 
-		// console.log(`build bones ->`, _.clone(option))
+		console.log(`build bones ->`, _.clone(option))
 		this.echart.setOption(option)
-		// console.log(`build getOption ->`, _.clone(this.echart.getOption()))
+		console.log(`build getOption ->`, _.clone(this.echart.getOption()))
 
 		_.defer(() => console.log(`echart build ->`, this.lquotes.length, Date.now() - stamp + 'ms'))
 	}
@@ -199,16 +203,16 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 			{ source: this.lquotes },
 			{
 				source: core.clone(this.lquotes).map(lquote => {
-					if (lquote.close > lquote.open) {
-						lquote.open = 0
-						lquote.close = lquote.size
-					} else {
-						lquote.close = 0
-						lquote.open = lquote.size
+					let data = {
+						sizebull: 0, sizebear: 0,
+						timestamp: lquote.timestamp,
 					}
-					lquote.low = 0
-					lquote.high = lquote.size
-					return lquote
+					if (lquote.close > lquote.open) {
+						data.sizebull = lquote.size
+					} else {
+						data.sizebear = lquote.size
+					}
+					return data
 				})
 			},
 		] as echarts.Dataset[]
@@ -288,7 +292,7 @@ export default class VSymbolChart extends Mixins(VMixin) {
 			if (this.settings.range == 'live') {
 				socket.on(`${rkeys.LIVES}:${this.quote.symbol}`, this.onlquote)
 			} else if (this.settings.range == '1d') {
-				clock.on('5s', this.sync1day)
+				clock.on('10s', this.sync1day)
 			}
 		}).catch(error => {
 			console.error(`getQuotes Error ->`, error)
