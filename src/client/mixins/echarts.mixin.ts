@@ -108,7 +108,7 @@ export default class VEChartsMixin extends Vue {
 
 
 
-	@Vts.Prop() brushing: boolean
+	brushing: boolean
 	@Vts.Watch('brushing') w_brushing(brushing: boolean) {
 		this.echart.dispatchAction({
 			type: 'takeGlobalCursor',
@@ -176,7 +176,7 @@ export default class VEChartsMixin extends Vue {
 		if (event.tapCount == 2) {
 			let grid = this.getOption().grid[0]
 			let x = core.calc.slider(event.srcEvent.offsetX - +grid.left, 0, this.echart.getWidth() - +grid.left - +grid.right)
-			x > 90 && this.latestzoom ? this.latestzoom() : this.resetzoom()
+			x > 90 ? this.latestzoom() : this.resetzoom()
 		}
 	}
 

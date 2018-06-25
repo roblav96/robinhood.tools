@@ -32,6 +32,9 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 	@Vts.Prop() quote: Quotes.Quote
 	@Vts.Prop() settings: typeof VSymbolChart.prototype.settings
 
+	get brushing() { return this.$parent.brushing }
+	set brushing(brushing: boolean) { this.$parent.brushing = brushing }
+
 	mounted() {
 
 	}
@@ -73,54 +76,38 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 		let stamp = Date.now()
 
 		let option = ecbones.option({
-			dataset: [{ source: lquotes }],
 			toolbox: { itemSize: 0, feature: { dataZoom: { show: true, yAxisIndex: false } } },
 			tooltip: [{ formatter: params => charts.tipFormatter(params as any, this.getOption()) }],
 		})
 
-		option.dataZoom.push(ecbones.dataZoom({ type: 'inside' }, {
-			xAxisIndex: [0],
-		}))
+		option.dataZoom.push(ecbones.dataZoom({ type: 'inside' }, {}))
 		option.dataZoom.push(ecbones.dataZoom({ type: 'slider' }, {
 			height: ecbones.SETTINGS.dataZoom.height,
-			xAxisIndex: [0],
 		}))
 
+
+
 		option.grid.push({
-			top: 8,
+			top: 32,
 			left: ecbones.SETTINGS.padding.x,
 			right: ecbones.SETTINGS.padding.x,
-			bottom: 92,
+			bottom: ecbones.SETTINGS.primary.bottom,
 			show: true,
 			backgroundColor: theme.white,
 			borderWidth: 0,
-			// borderColor: theme['grey-lighter'],
 		})
-		// option.grid.push({
-		// 	height: ecbones.SETTINGS.padding.x,
-		// 	left: ecbones.SETTINGS.padding.x,
-		// 	right: ecbones.SETTINGS.padding.x,
-		// 	bottom: 92,
-		// })
 
 		let xtype = this.settings.time ? 'time' : 'category'
-		option.xAxis.push(ecbones.axis({ axis: 'x' }, {
+		option.xAxis.push(ecbones.axis({ xy: 'x' }, {
 			type: xtype,
 		}))
-		// option.xAxis.push(ecbones.axis({ xy: 'x', blank: true }, {
-		// 	type: xtype,
-		// 	gridIndex: 1,
-		// }))
 
-		option.yAxis.push(ecbones.axis({ axis: 'y' }, {
-			boundaryGap: '1%',
+		option.yAxis.push(ecbones.axis({ xy: 'y' }, {
+			boundaryGap: '10%',
 			axisPointer: { label: { formatter: this.yAxisPointerFormatter } },
 		}))
-		// option.yAxis.push(ecbones.axis({ xy: 'y', blank: true }, {
-		// 	gridIndex: 1,
-		// }))
 
-		let priceseries = this.settings.ohlc ? ecbones.candlestick({
+		let primary = this.settings.ohlc ? ecbones.candlestick({
 			name: 'OHLC',
 			encode: {
 				x: 'timestamp',
@@ -131,21 +118,69 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 			name: 'Price',
 			encode: { x: 'timestamp', y: 'price', tooltip: 'price' },
 		})
-		priceseries.markLine = ecbones.markLine({ data: this.priceMarkData() })
-		option.series.push(priceseries)
+		primary.markLine = ecbones.markLine({ data: this.priceMarkData() })
+		option.series.push(primary)
 
-		// option.series.push(ecbones.bar({ color: theme['grey-lighter'] }, {
-		// 	name: 'Size',
-		// 	xAxisIndex: 1,
-		// 	yAxisIndex: 1,
-		// 	encode: { x: 'timestamp', y: 'size', tooltip: 'size' },
-		// }))
+
+
+		option.grid.push({
+			height: '20%',
+			left: ecbones.SETTINGS.padding.x,
+			right: ecbones.SETTINGS.padding.x,
+			bottom: ecbones.SETTINGS.primary.bottom,
+		})
+		option.yAxis.push(ecbones.axis({ xy: 'y', blank: true }, {
+			gridIndex: 1,
+		}))
+		option.xAxis.push(ecbones.axis({ xy: 'x', blank: true }, {
+			type: xtype,
+			gridIndex: 1,
+		}))
+
+		option.series.push(ecbones.candlestick({
+			name: 'Size',
+			xAxisIndex: 1,
+			yAxisIndex: 1,
+			datasetIndex: 1,
+			encode: {
+				x: 'timestamp',
+				y: ['open', 'close', 'high', 'low'],
+				tooltip: 'size',
+			},
+		}))
+
+
+
+		option.dataZoom.forEach(v => v.xAxisIndex = [0, 1])
+		option.dataset = this.buildDatasets(lquotes)
+
+
 
 		console.log(`build bones ->`, _.clone(option))
 		this.echart.setOption(option)
 		console.log(`build getOption ->`, _.clone(this.echart.getOption()))
 
 		_.defer(() => console.log(`echart build ->`, lquotes.length, Date.now() - stamp + 'ms'))
+	}
+
+	buildDatasets(lquotes: Quotes.Live[]) {
+		return [
+			{ source: lquotes },
+			{
+				source: core.clone(lquotes).map(lquote => {
+					if (lquote.close > lquote.open) {
+						lquote.open = 0
+						lquote.close = lquote.size
+					} else {
+						lquote.close = 0
+						lquote.open = lquote.size
+					}
+					lquote.low = 0
+					lquote.high = lquote.size
+					return lquote
+				})
+			},
+		] as echarts.Dataset[]
 	}
 
 
@@ -170,7 +205,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 		} else lquotes.push(lquote);
 		// this.reload(lquotes)
 		this.setOption({
-			dataset: [{ source: lquotes }],
+			dataset: this.buildDatasets(lquotes),
 			series: [{ markLine: { data: this.priceMarkData() } }],
 		})
 		this.reshowtip()

@@ -17,9 +17,10 @@ export const SETTINGS = {
 	spacer: 8,
 	padding: { x: 68, y: 16 },
 	dataZoom: { height: 32 },
-	latestThreshold: () => Math.round(utils.screen().pxwidth / 16),
-	largeThreshold: () => Math.round(utils.screen().pxwidth / 8),
-	progressiveThreshold: () => Math.round(utils.screen().pxwidth / 2),
+	primary: { bottom: 92 },
+	latestThreshold: () => Math.round(utils.screen().width / 16),
+	largeThreshold: () => Math.round(utils.screen().width / 8),
+	progressiveThreshold: () => Math.round(utils.screen().width / 2),
 }
 
 
@@ -97,6 +98,7 @@ export function dataZoom(
 	let dataZoom = {
 		type: opts.type,
 		throttle: 0,
+		xAxisIndex: [0],
 	} as echarts.DataZoom
 	if (opts.type == 'inside') {
 		dataZoom.preventDefaultMouseMove = false
@@ -121,7 +123,7 @@ export function dataZoom(
 
 export function axis(
 	opts = {} as Partial<{
-		axis: 'x' | 'y'
+		xy: 'x' | 'y'
 		blank: boolean
 	}>,
 	mods = {} as Partial<echarts.Axis>,
@@ -136,13 +138,13 @@ export function axis(
 		splitArea: { show: !!mods.splitArea },
 		splitLine: { show: !!mods.splitLine },
 	} as echarts.Axis
-	if (opts.axis == 'x') {
+	if (opts.xy == 'x') {
 		_.merge(axis, {
 			type: 'category',
 			axisLabel: { margin: 4, formatter: charts.xlabel },
 		} as echarts.Axis)
 	}
-	if (opts.axis == 'y') {
+	if (opts.xy == 'y') {
 		_.merge(axis, {
 			scale: true,
 			type: 'value',
