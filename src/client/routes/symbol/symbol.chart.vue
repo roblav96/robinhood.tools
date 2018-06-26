@@ -20,6 +20,7 @@
 
 <template>
 	<div id="symbol_chart" class="flex-col-full">
+		<v-loading :active="busy" parent :is-full-page="false"></v-loading>
 		<section class="section py-0 pt-1">
 			<div class="columns is-mobile my-0 items-center">
 
@@ -122,7 +123,6 @@
 		<!-- <section class="flex-col-full overflow-y-auto"> -->
 		<v-symbol-echart class="flex-col-full mx-1" ref="symbol_vechart"></v-symbol-echart>
 		<!-- </section> -->
-		<!-- <v-loading :is-full-page="false" :active="busy"></v-loading> -->
 
 
 

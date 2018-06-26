@@ -95,12 +95,10 @@ export function grid(
 	let grid = {
 		left: SETTINGS.xpadding,
 		right: SETTINGS.xpadding,
+		show: true,
+		borderWidth: 0,
+		backgroundColor: theme.white,
 	} as echarts.Grid
-	if (mods.show) {
-		grid.borderWidth = 1
-		grid.backgroundColor = theme.white
-		grid.borderColor = theme['grey-lighter']
-	}
 	return _.merge(grid, mods) as echarts.Grid
 }
 

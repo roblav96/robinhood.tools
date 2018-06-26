@@ -141,10 +141,12 @@ Vue.component('v-symbol-logo', VSymbolLogo)
 
 @Vts.Component
 class VLoading extends Mixins((Buefy as any).Loading) {
+	@Vts.Prop() parent: boolean
+	@Vts.Prop() sibling: boolean
 	active: boolean
 	isFullPage: boolean
 	mounted() {
-		this.sync()
+		this.$nextTick(this.sync)
 		utils.wemitter.on('resize', this.onresize_, this)
 	}
 	beforeDestroy() {
@@ -156,8 +158,10 @@ class VLoading extends Mixins((Buefy as any).Loading) {
 	onresize_ = _.debounce(this.sync, 100, { leading: false, trailing: true })
 	sync() {
 		if (this.isFullPage || !this.active) return;
-		let wrapper = (this.$el.previousSibling || this.$el.parentElement) as HTMLElement
-		let rect = core.clone(wrapper.getBoundingClientRect())
+		let el = this.$el as HTMLElement
+		if (this.parent && this.$el.parentElement) el = this.$el.parentElement;
+		if (this.sibling && this.$el.previousSibling) el = this.$el.previousSibling as any;
+		let rect = core.clone(el.getBoundingClientRect())
 		Object.keys(rect).slice(2).forEach(k => this.$el.style[k] = `${rect[k]}px`)
 	}
 }

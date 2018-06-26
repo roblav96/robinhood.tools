@@ -96,7 +96,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 		}))
 		height -= ecbones.SETTINGS.datazoomheight
 		height -= ecbones.SETTINGS.spacing
-		height -= ecbones.SETTINGS.fontsize
+		height -= Math.round(ecbones.SETTINGS.fontsize*1.2)
 
 
 
