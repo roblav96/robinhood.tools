@@ -67,9 +67,9 @@ export default class VSymbol extends Mixins(VMixin) {
 	}
 
 	onstep(direction: number) {
-		let el = this.$el.querySelector('section .overflow-x-auto')
+		let el = this.$el.querySelector('section .overflow-x-auto') as HTMLElement
 		el.scrollTo({
-			left: core.math.clamp(el.scrollLeft + (direction * 256), 0, el.scrollWidth), behavior: 'smooth',
+			left: core.math.clamp(el.scrollLeft + (direction * (el.offsetWidth / 2)), 0, el.scrollWidth), behavior: 'smooth',
 		})
 	}
 

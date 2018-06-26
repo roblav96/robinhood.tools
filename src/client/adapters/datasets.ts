@@ -14,96 +14,74 @@ declare global {
 		interface Template {
 			id: string
 			name: string
-			title: string
 			desc: string
-			type: string
 			primary: boolean
-			secondary: boolean
-			tipformats: Pretty.NumberFormatOptions[]
-			encodes: echarts.Encode[]
+			encodes: Partial<echarts.Encode>[]
+			tipformats: Partial<Pretty.NumberFormatOptions>[]
 			bones(option: echarts.Option, lquotes: Quotes.Live[]): void
-			sources(lquotes: Quotes.Live[]): any[][]
-			// series(): echarts.Series[]
-			// scatter: typeof ecbones.scatter
-			// line: typeof ecbones.line
-			// bar: typeof ecbones.bar
-			// candlestick: typeof ecbones.candlestick
+			sources(lquotes: Quotes.Live[]): Dict<number>[][]
 		}
 	}
 }
 
-export const templates = [
+export const templates: Partial<Datasets.Template>[] = [
 
 	{
-		id: 'pohlc',
-		title: 'OHLC',
+		id: '_ohlc',
+		name: 'OHLC',
 		primary: true,
-		type: 'candlestick',
 		tipformats: [{ price: true }],
 		encodes: [{
 			y: ['open', 'close', 'high', 'low'],
 			tooltip: ['open', 'high', 'low', 'close'],
 		}],
-		series() { return [ecbones.candlestick()] },
+		bones: option => [ecbones.candlestick()],
 	},
 	{
-		id: 'pline',
-		title: 'Price',
+		id: '_price',
+		name: 'Price',
 		primary: true,
 		tipformats: [{ price: true }],
-		encodes: [{ y: 'close', tooltip: 'close' }],
+		encodes: [{ y: 'close' }],
 	},
 	{
-		id: 'psize',
-		title: 'Size',
+		id: '_size',
+		name: 'Size',
 		primary: true,
-		secondary: true,
-		tipformats: { compact: true },
-		encodes: [
-			{ y: 'sizebull', tooltip: 'value' },
-			{ y: 'sizebear', tooltip: 'value' },
+		tipformats: [{ compact: true }],
+		encodes: [{ y: ['sizebull', 'sizebear'] }],
+		bones: option => [
+			ecbones.bar({ color: theme.success, opacity: 0.5, overlap: true }),
+			ecbones.bar({ color: theme.danger, opacity: 0.5, overlap: true }),
 		],
-		sources(lquotes) {
-			return lquotes.map(lquote => {
-				let data = {
-					sizebull: 0, sizebear: 0,
-					timestamp: lquote.timestamp,
-				}
-				if (lquote.close > lquote.open) {
-					data.sizebull = lquote.size
-				} else {
-					data.sizebear = lquote.size
-				}
-				return data
-			})
-		},
-		series() {
-			return [
-				ecbones.bar({ color: theme.success, opacity: 0.5, overlap: true }),
-				ecbones.bar({ color: theme.danger, opacity: 0.5, overlap: true }),
-			]
-		},
+		sources: lquotes => [lquotes.map(lquote => ({
+			sizebull: lquote.close > lquote.open ? lquote.size : 0,
+			sizebear: lquote.close <= lquote.open ? lquote.size : 0,
+			timestamp: lquote.timestamp,
+		}))],
 	},
 
 	{
 		id: 'size',
-		title: 'Size',
+		name: 'Size',
 		desc: 'Size = (total volume) - (previous tick total volume)',
-		primary: true,
-		secondary: true,
+		// secondary: true,
 	},
 
 	{
 		id: 'volume',
-		title: 'Volume',
+		name: 'Volume',
 		desc: 'Volume = total amount of shares traded starting at the first tick',
+		// secondary: true,
 	},
 
-] as Datasets.Template[]
+]
 
 templates.forEach(v => {
-	v.title = v.title || v.name
-	v.encodes.forEach(v => v.x = 'timestamp')
+	v.encodes.forEach(encode => {
+		encode.x = 'timestamp'
+		if (!encode.tooltip) encode.tooltip = encode.y;
+	})
 })
 
 

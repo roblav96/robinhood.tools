@@ -10,11 +10,11 @@ import * as dayjs from 'dayjs'
 
 declare global { namespace Pretty { interface NumberFormatOptions { precision: number, price: boolean, compact: boolean, plusminus: boolean, percent: boolean, dollar: boolean, nozeros: boolean } } }
 export function number(value: number, { precision, price, compact, plusminus, percent, dollar, nozeros } = {} as Partial<Pretty.NumberFormatOptions>) {
-	let autoprecision = !Number.isFinite(precision)
+	let auto = !Number.isFinite(precision)
 	let abs = Math.abs(value)
 
 	if (price) compact = false;
-	if (autoprecision) {
+	if (auto) {
 		precision = 2
 		if (plusminus && percent) {
 			if (abs >= 100) precision = 0;
@@ -29,7 +29,7 @@ export function number(value: number, { precision, price, compact, plusminus, pe
 		}
 	} else { nozeros = false }
 
-	if (plusminus || percent || price) autoprecision = false;
+	if (plusminus || percent || price) auto = false;
 	if (plusminus || percent) precision = Math.min(precision, 2);
 	if (price) precision = Math.max(precision, 2);
 
@@ -54,7 +54,7 @@ export function number(value: number, { precision, price, compact, plusminus, pe
 	if (precision > 0 && !(compact && unit == -1)) {
 		let end = split[1] || ''
 		if (!nozeros || !Number.isNaN(Number.parseInt(end))) {
-			if (compact && autoprecision) {
+			if (compact && auto) {
 				precision = Math.min(4 - fixed.length, 2)
 			}
 			fixed += '.'

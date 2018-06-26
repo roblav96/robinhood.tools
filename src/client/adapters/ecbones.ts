@@ -14,10 +14,11 @@ import { theme } from '../stores/colors'
 
 export const SETTINGS = {
 	fontSize: 14,
-	spacer: 8,
-	padding: { x: 68, y: 16 },
-	dataZoom: { height: 32 },
-	primary: { bottom: 92 },
+	spacing: 8,
+	gridHeight: 100,
+	paddingX: 64,
+	paddingY: 8,
+	dataZoomHeight: 32,
 	latestThreshold: () => Math.round(utils.screen().width / 16),
 	largeThreshold: () => Math.round(utils.screen().width / 8),
 	progressiveThreshold: () => Math.round(utils.screen().width / 2),
@@ -99,6 +100,7 @@ export function dataZoom(
 		type: opts.type,
 		throttle: 0,
 		xAxisIndex: [0],
+		height: SETTINGS.dataZoomHeight,
 	} as echarts.DataZoom
 	if (opts.type == 'inside') {
 		dataZoom.preventDefaultMouseMove = false
@@ -132,7 +134,7 @@ export function axis(
 		uuid: nanoid(),
 		silent: true,
 		gridIndex: 0,
-		axisLabel: { textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize } },
+		axisLabel: { textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize }, margin: 4 },
 		axisLine: { show: !!mods.axisLine },
 		axisTick: { show: !!mods.axisTick },
 		splitArea: { show: !!mods.splitArea },
@@ -296,7 +298,7 @@ export function markLine(
 		symbol: 'none',
 		label: {
 			backgroundColor: theme.white, borderColor: theme['grey-light'], borderWidth: 1,
-			textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize, fontWeight: 'bold', padding: [4, 8] },
+			textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize, fontWeight: 'bold', padding: 4 },
 		},
 		lineStyle: { type: 'dashed', color: theme['grey-light'], opacity: 0.5, width: 1 },
 	} as echarts.Mark

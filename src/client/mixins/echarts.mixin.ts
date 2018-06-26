@@ -90,6 +90,7 @@ export default class VEChartsMixin extends Vue {
 
 	shiftkey: boolean
 	onkeydown_(event: KeyboardEvent) {
+		console.log('onkeydown_ ->', event)
 		if (event.shiftKey && event.key == 'Shift') {
 			this.shiftkey = true
 		}

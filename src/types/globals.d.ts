@@ -17,9 +17,8 @@ declare namespace NodeJS {
 
 
 type KeysOf<T> = (keyof T)[]
-interface Dict<T = any> {
-	[key: string]: T
-}
+type PartialDeep<T> = { [P in keyof T]?: PartialDeep<T[P]> }
+interface Dict<T = any> { [key: string]: T }
 
 
 

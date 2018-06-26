@@ -24,6 +24,7 @@ $pair in $colors {
 	.border-#{$name} {
 		border-color: #{$color} !important;
 		border-style: solid;
+		border-width: 1px;
 	}
 }
 
@@ -35,6 +36,7 @@ $shade in $shades {
 	.border-#{$name} {
 		border-color: #{$shade} !important;
 		border-style: solid;
+		border-width: 1px;
 	}
 }
 

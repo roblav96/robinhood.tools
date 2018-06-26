@@ -6,6 +6,7 @@ import Vue from 'vue'
 import VMixin from '../../mixins/v.mixin'
 import VEChartsMixin from '../../mixins/echarts.mixin'
 import VSymbol from './symbol'
+import * as Color from 'color'
 import * as echarts from 'echarts'
 import * as ecstat from 'echarts-stat'
 import * as lockr from 'lockr'
@@ -36,7 +37,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 	get quote() { return this.$parent.quote }
 	get settings() { return this.$parent.settings }
 	get brushing() { return this.$parent.brushing }
-	set brushing(brushing: boolean) { this.$parent.brushing = brushing }
+	set brushing(brushing: boolean) { if (core.boolean.is(brushing)) this.$parent.brushing = brushing; }
 
 	mounted() {
 
@@ -83,21 +84,19 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 			tooltip: [{ formatter: params => charts.tipFormatter(params as any, this.getOption()) }],
 		})
 
-		option.dataZoom.push(ecbones.dataZoom({ type: 'inside' }, {
+		option.dataZoom.push(ecbones.dataZoom({ type: 'inside' }))
+		option.dataZoom.push(ecbones.dataZoom({ type: 'slider' }))
 
-		}))
-		option.dataZoom.push(ecbones.dataZoom({ type: 'slider' }, {
-			height: ecbones.SETTINGS.dataZoom.height,
-		}))
+		let height = this.dims().height
+		console.log('height ->', height)
+		height -= ecbones.SETTINGS.paddingY
+		console.log('height ->', height)
 
-
-
-		let dims = this.dims()
 		option.grid.push({
 			top: 6,
-			left: ecbones.SETTINGS.padding.x,
-			right: ecbones.SETTINGS.padding.x,
-			bottom: ecbones.SETTINGS.primary.bottom,
+			left: ecbones.SETTINGS.paddingX,
+			right: ecbones.SETTINGS.paddingX,
+			bottom: ecbones.SETTINGS.dataZoomHeight,
 			show: true,
 			backgroundColor: theme.white,
 			borderWidth: 0,
@@ -129,9 +128,9 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 		option.grid.push({
 			height: '20%',
-			left: ecbones.SETTINGS.padding.x,
-			right: ecbones.SETTINGS.padding.x,
-			bottom: ecbones.SETTINGS.primary.bottom,
+			left: ecbones.SETTINGS.paddingX,
+			right: ecbones.SETTINGS.paddingX,
+			bottom: ecbones.SETTINGS.dataZoomHeight,
 		})
 		option.yAxis.push(ecbones.axis({ xy: 'y', blank: true }, {
 			gridIndex: 1,
@@ -143,6 +142,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 		option.series.push(ecbones.bar({ color: theme.success, opacity: 0.5, overlap: true }, {
 			name: 'Size Bull',
+			barWidth: '25%',
 			xAxisIndex: 1,
 			yAxisIndex: 1,
 			datasetIndex: 1,
@@ -150,6 +150,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 		}))
 		option.series.push(ecbones.bar({ color: theme.danger, opacity: 0.5, overlap: true }, {
 			name: 'Size Bear',
+			barWidth: '25%',
 			xAxisIndex: 1,
 			yAxisIndex: 1,
 			datasetIndex: 1,
