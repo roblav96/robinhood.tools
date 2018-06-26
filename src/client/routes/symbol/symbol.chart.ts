@@ -84,34 +84,34 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 			tooltip: [{ formatter: params => charts.tipFormatter(params as any, this.getOption()) }],
 		})
 
+		let maxheight = this.dims().height
+		let height = maxheight
+		height -= ecbones.SETTINGS.spacing
+
+		// secondaries
+
 		option.dataZoom.push(ecbones.dataZoom({ type: 'inside' }))
-		option.dataZoom.push(ecbones.dataZoom({ type: 'slider' }))
+		option.dataZoom.push(ecbones.dataZoom({ type: 'slider' }, {
+			bottom: ecbones.SETTINGS.spacing,
+		}))
+		height -= ecbones.SETTINGS.datazoomheight
+		height -= ecbones.SETTINGS.spacing
+		height -= ecbones.SETTINGS.fontsize
 
-		let height = this.dims().height
-		console.log('height ->', height)
-		height -= ecbones.SETTINGS.paddingY
-		console.log('height ->', height)
 
-		option.grid.push({
-			top: 6,
-			left: ecbones.SETTINGS.paddingX,
-			right: ecbones.SETTINGS.paddingX,
-			bottom: ecbones.SETTINGS.dataZoomHeight,
-			show: true,
-			backgroundColor: theme.white,
-			borderWidth: 0,
-		})
 
+		let gridbottom = maxheight - height
 		let xtype = this.settings.time ? 'time' : 'category'
+
+		option.grid.push(ecbones.grid({ top: ecbones.SETTINGS.spacing, bottom: gridbottom }))
 		option.xAxis.push(ecbones.axis({ xy: 'x' }, {
 			type: xtype,
 		}))
 		option.yAxis.push(ecbones.axis({ xy: 'y' }, {
 			boundaryGap: '1%',
-			axisPointer: { label: { formatter: this.ecYAxisPointerFormatter } },
+			axisPointer: { label: { formatter: this.yPointerFormatter } },
 		}))
-
-		let primary = this.settings.ohlc ? ecbones.candlestick({
+		option.series.push(this.settings.ohlc ? ecbones.candlestick({
 			name: 'OHLC',
 			encode: {
 				x: 'timestamp',
@@ -121,17 +121,11 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 		}) : ecbones.line({ color: theme.primary, width: 1.5 }, {
 			name: 'Price',
 			encode: { x: 'timestamp', y: 'close', tooltip: 'close' },
-		})
-		option.series.push(primary)
+		}))
 
 
 
-		option.grid.push({
-			height: '20%',
-			left: ecbones.SETTINGS.paddingX,
-			right: ecbones.SETTINGS.paddingX,
-			bottom: ecbones.SETTINGS.dataZoomHeight,
-		})
+		option.grid.push(ecbones.grid({ height: '20%', bottom: gridbottom }))
 		option.yAxis.push(ecbones.axis({ xy: 'y', blank: true }, {
 			gridIndex: 1,
 		}))
@@ -195,7 +189,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 
-	ecYAxisPointerFormatter(params: echarts.AxisPointerParams) {
+	yPointerFormatter(params: echarts.AxisPointerParams) {
 		return pretty.number(params.value) + '\n' + pretty.number(core.calc.percent(params.value, this.ctprice()), { percent: true, plusminus: true })
 	}
 

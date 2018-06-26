@@ -13,12 +13,11 @@ import { theme } from '../stores/colors'
 
 
 export const SETTINGS = {
-	fontSize: 14,
+	fontsize: 14,
 	spacing: 8,
-	gridHeight: 100,
-	paddingX: 64,
-	paddingY: 8,
-	dataZoomHeight: 32,
+	gridheight: 100,
+	xpadding: 64,
+	datazoomheight: 32,
 	latestThreshold: () => Math.round(utils.screen().width / 16),
 	largeThreshold: () => Math.round(utils.screen().width / 8),
 	progressiveThreshold: () => Math.round(utils.screen().width / 2),
@@ -32,7 +31,7 @@ export function option(
 	let option = {
 		animation: false,
 		color: Array(16).fill(theme['grey-lighter']),
-		textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize },
+		textStyle: { color: theme.dark, fontSize: SETTINGS.fontsize },
 		dataset: [],
 		legend: { show: !!mods.legend },
 		toolbox: { show: !!mods.toolbox },
@@ -68,7 +67,7 @@ export function option(
 					borderColor: theme['grey-light'], borderWidth: 1,
 					textStyle: {
 						color: theme.dark, borderRadius: 0,
-						fontSize: SETTINGS.fontSize, padding: [4, 8], fontWeight: 'bold',
+						fontSize: SETTINGS.fontsize, padding: [4, 8], fontWeight: 'bold',
 					},
 				},
 			},
@@ -90,6 +89,23 @@ export function option(
 
 
 
+export function grid(
+	mods = {} as Partial<echarts.Grid>,
+) {
+	let grid = {
+		left: SETTINGS.xpadding,
+		right: SETTINGS.xpadding,
+	} as echarts.Grid
+	if (mods.show) {
+		grid.borderWidth = 1
+		grid.backgroundColor = theme.white
+		grid.borderColor = theme['grey-lighter']
+	}
+	return _.merge(grid, mods) as echarts.Grid
+}
+
+
+
 export function dataZoom(
 	opts = {} as Partial<{
 		type: 'inside' | 'slider'
@@ -100,7 +116,7 @@ export function dataZoom(
 		type: opts.type,
 		throttle: 0,
 		xAxisIndex: [0],
-		height: SETTINGS.dataZoomHeight,
+		height: SETTINGS.datazoomheight,
 	} as echarts.DataZoom
 	if (opts.type == 'inside') {
 		dataZoom.preventDefaultMouseMove = false
@@ -134,7 +150,7 @@ export function axis(
 		uuid: nanoid(),
 		silent: true,
 		gridIndex: 0,
-		axisLabel: { textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize }, margin: 4 },
+		axisLabel: { textStyle: { color: theme.dark, fontSize: SETTINGS.fontsize }, margin: 4 },
 		axisLine: { show: !!mods.axisLine },
 		axisTick: { show: !!mods.axisTick },
 		splitArea: { show: !!mods.splitArea },
@@ -298,7 +314,7 @@ export function markLine(
 		symbol: 'none',
 		label: {
 			backgroundColor: theme.white, borderColor: theme['grey-light'], borderWidth: 1,
-			textStyle: { color: theme.dark, fontSize: SETTINGS.fontSize, fontWeight: 'bold', padding: 4 },
+			textStyle: { color: theme.dark, fontSize: SETTINGS.fontsize, fontWeight: 'bold', padding: 4 },
 		},
 		lineStyle: { type: 'dashed', color: theme['grey-light'], opacity: 0.5, width: 1 },
 	} as echarts.Mark
