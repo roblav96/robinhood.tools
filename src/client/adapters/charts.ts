@@ -106,10 +106,11 @@ export function getChart(quote: Quotes.Quote, range: string) {
 		}
 
 		return Promise.all([
-			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/F`, { query: { minuteType: 'm1' } }),
-			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/A`, { query: { minuteType: 'm1' } }),
-			http.get(`https://quoteapi.webull.com/api/quote/v4/tickerKDatas/${quote.tickerId}`, { query: { kDataType: 'm1', dayCount: 1, adjustType: 'none' } }),
+			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/F`, { query: { minuteType: 'm1' } }).catch(_.noop),
+			http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/A`, { query: { minuteType: 'm1' } }).catch(_.noop),
+			http.get(`https://quoteapi.webull.com/api/quote/v4/tickerKDatas/${quote.tickerId}`, { query: { kDataType: 'm1', dayCount: 1, adjustType: 'none' } }).catch(_.noop),
 		]).then(function(mquotes: Webull.MinuteChart[]) {
+			console.log(`mquotes ->`, JSON.parse(JSON.stringify(mquotes)))
 
 			let kquotes = (mquotes.pop() as any) as Webull.KDatasChart
 			core.fix(kquotes, true)
@@ -122,7 +123,7 @@ export function getChart(quote: Quotes.Quote, range: string) {
 				min: dayjs(Math.min(...mquotes.map(v => v.data[0].dates[0].start * 1000))).valueOf(),
 				max: dayjs(Math.max(...mquotes.map(v => v.data[0].dates[0].end * 1000))).valueOf(),
 			}
-			// console.log(`mrange ->`, _.mapValues(mrange, v => pretty.stamp(v)))
+			console.log(`mrange ->`, _.mapValues(mrange, v => pretty.stamp(v)))
 			klquotes.remove(v => v.timestamp < mrange.min)
 
 			return yahoo.getChart(symbol, {

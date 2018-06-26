@@ -12,6 +12,53 @@ import clock from './clock'
 
 
 
+const HttpConfig = {
+	headers: {},
+	verbose: false,
+	silent: false,
+	debug: false,
+	proxify: false,
+	timeout: 10000,
+	retries: process.env.CLIENT ? 0 : 3,
+	retryTick: '3s' as Clock.Tick,
+	maxRedirects: 10,
+	rhtoken: '',
+	wbauth: false,
+	query: undefined as any,
+}
+Object.keys(HttpConfig).forEach(k => { if (!HttpConfig[k]) delete HttpConfig[k]; })
+
+export function applyconfig(config: Partial<Http.Config>) {
+
+	core.object.repair(config, core.clone(HttpConfig))
+
+	if (process.env.CLIENT && config.retries == Infinity) config.retryTick = '1s';
+
+	if (config.verbose || config.debug) {
+		let ending = (config.query || config.body) ? ' -> ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
+		console.log('-> ' + config.method + ' ' + config.url + ending);
+	}
+
+	if (config.query) {
+		config.url += `?${qs.stringify(config.query)}`
+		delete config.query
+	}
+
+	if (config.proxify) {
+		config.url = proxify(config.url)
+	}
+
+	if (config.body) {
+		config.headers['accept'] = 'application/json'
+		config.headers['content-type'] = 'application/json'
+		config.body = JSON.stringify(config.body)
+	}
+
+	return config
+}
+
+
+
 export function request(config = {} as Partial<Http.Config>) {
 	return Promise.resolve().then(function() {
 
@@ -68,6 +115,9 @@ export function request(config = {} as Partial<Http.Config>) {
 			message = payload.error
 			if (message != payload.message) message += ` ➤ "${payload.message}"`;
 		}
+		if (error.data) {
+			message += `\nerror.data -> ${JSON.stringify(_.get(error, 'data.data', error.data))}`
+		}
 
 		let endpoint = `[${config.method}] ${config.url.replace(process.env.DOMAIN, '')}`
 		if (process.env.CLIENT) console.log('%c◀ ' + endpoint, 'color: red; font-weight: bolder;', message);
@@ -90,53 +140,6 @@ export function post<B = any, T = any>(url: string, body?: B, config = {} as Par
 	config.method = 'POST'
 	if (body) config.body = body;
 	return request(config)
-}
-
-
-
-const HttpConfig = {
-	headers: {},
-	verbose: false,
-	silent: false,
-	debug: false,
-	proxify: false,
-	timeout: 10000,
-	retries: process.env.CLIENT ? 0 : 3,
-	retryTick: '3s' as Clock.Tick,
-	maxRedirects: 10,
-	rhtoken: '',
-	wbauth: false,
-	query: undefined as any,
-}
-Object.keys(HttpConfig).forEach(k => { if (!HttpConfig[k]) delete HttpConfig[k]; })
-
-export function applyconfig(config: Partial<Http.Config>) {
-
-	core.object.repair(config, core.clone(HttpConfig))
-
-	if (process.env.CLIENT && config.retries == Infinity) config.retryTick = '1s';
-
-	if (config.verbose || config.debug) {
-		let ending = (config.query || config.body) ? ' -> ' + (JSON.stringify(config.query || config.body || '')).substring(0, 64) : ''
-		console.log('-> ' + config.method + ' ' + config.url + ending);
-	}
-
-	if (config.query) {
-		config.url += `?${qs.stringify(config.query)}`
-		delete config.query
-	}
-
-	if (config.proxify) {
-		config.url = proxify(config.url)
-	}
-
-	if (config.body) {
-		config.headers['accept'] = 'application/json'
-		config.headers['content-type'] = 'application/json'
-		config.body = JSON.stringify(config.body)
-	}
-
-	return config
 }
 
 
