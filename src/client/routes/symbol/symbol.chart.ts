@@ -85,27 +85,24 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 		})
 
 		let maxheight = this.dims().height
-		let height = maxheight
-		height -= ecbones.SETTINGS.spacing
+		let bottom = 0
+		bottom += ecbones.SETTINGS.spacing
 
 		// secondaries
 
 		option.dataZoom.push(ecbones.dataZoom({ type: 'inside' }))
-		option.dataZoom.push(ecbones.dataZoom({ type: 'slider' }, {
-			bottom: ecbones.SETTINGS.spacing,
-		}))
-		height -= ecbones.SETTINGS.datazoomheight
-		height -= ecbones.SETTINGS.spacing
-		height -= Math.round(ecbones.SETTINGS.fontsize*1.2)
+		option.dataZoom.push(ecbones.dataZoom({ type: 'slider' }, { bottom }))
+		bottom += ecbones.SETTINGS.datazoomheight
+		bottom += ecbones.SETTINGS.spacing
+		bottom += Math.round(ecbones.SETTINGS.fontsize * 1.2)
 
 
 
-		let gridbottom = maxheight - height
-		let xtype = this.settings.time ? 'time' : 'category'
+		let axistype = this.settings.time ? 'time' : 'category'
 
-		option.grid.push(ecbones.grid({ top: ecbones.SETTINGS.spacing, bottom: gridbottom }))
+		option.grid.push(ecbones.grid({ top: ecbones.SETTINGS.gridtop, bottom }))
 		option.xAxis.push(ecbones.axis({ xy: 'x' }, {
-			type: xtype,
+			type: axistype,
 		}))
 		option.yAxis.push(ecbones.axis({ xy: 'y' }, {
 			boundaryGap: '1%',
@@ -125,16 +122,16 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 
 
 
-		option.grid.push(ecbones.grid({ height: '20%', bottom: gridbottom }))
+		option.grid.push(ecbones.grid({ height: '25%', bottom }))
 		option.yAxis.push(ecbones.axis({ xy: 'y', blank: true }, {
 			gridIndex: 1,
 		}))
 		option.xAxis.push(ecbones.axis({ xy: 'x', blank: true }, {
-			type: xtype,
+			type: axistype,
 			gridIndex: 1,
 		}))
 
-		option.series.push(ecbones.bar({ color: theme.success, opacity: 0.5, overlap: true }, {
+		option.series.push(ecbones.bar({ color: theme.success, opacity: 0.33, overlap: true }, {
 			name: 'Size Bull',
 			barWidth: '25%',
 			xAxisIndex: 1,
@@ -142,7 +139,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 			datasetIndex: 1,
 			encode: { x: 'timestamp', y: 'sizebull', tooltip: 'sizebull' },
 		}))
-		option.series.push(ecbones.bar({ color: theme.danger, opacity: 0.5, overlap: true }, {
+		option.series.push(ecbones.bar({ color: theme.danger, opacity: 0.33, overlap: true }, {
 			name: 'Size Bear',
 			barWidth: '25%',
 			xAxisIndex: 1,
@@ -152,6 +149,8 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 		}))
 
 
+
+		option.series.forEach((v, i) => v.z = i + 2)
 
 		let grids = option.xAxis.map((v, i) => i)
 		option.dataZoom.forEach(v => v.xAxisIndex = grids)

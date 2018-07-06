@@ -9,19 +9,20 @@ import * as rkeys from '../../common/rkeys'
 
 
 
-let state = {
+let hours = {
 	hours: null as Hours,
 	state: null as Hours.State,
 }
-Object.assign(state, lockr.get('hours', state))
-store.register('hours', state)
-declare global { namespace Store { interface State { hours: typeof state } } }
+Object.assign(hours, lockr.get('hours', hours))
+store.register('hours', hours)
+export default hours
+declare global { namespace Store { interface State { hours: typeof hours } } }
 
 _.defer(function() {
 
 	store.watch(function(state) { return state.security.ready }, function(ready) {
-		http.get('/hours', { retries: Infinity }).then(function(response: typeof state) {
-			Object.assign(state, response)
+		http.get('/hours', { retries: Infinity }).then(function(response: typeof hours) {
+			Object.assign(hours, response)
 		}).catch(error => console.error('watch security.ready Error ->', error))
 	})
 
@@ -29,8 +30,8 @@ _.defer(function() {
 		lockr.set('hours', state)
 	}, { deep: true })
 
-	socket.on(rkeys.HR.HOURS, v => Object.assign(state.hours, v))
-	socket.on(rkeys.HR.STATE, v => state.state = v)
+	socket.on(rkeys.HR.HOURS, v => Object.assign(hours.hours, v))
+	socket.on(rkeys.HR.STATE, v => hours.state = v)
 
 })
 

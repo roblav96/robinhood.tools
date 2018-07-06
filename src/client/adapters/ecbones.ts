@@ -14,7 +14,8 @@ import { theme } from '../stores/colors'
 
 export const SETTINGS = {
 	fontsize: 14,
-	spacing: 8,
+	spacing: 10,
+	gridtop: 6,
 	gridheight: 100,
 	xpadding: 64,
 	datazoomheight: 32,
@@ -280,7 +281,7 @@ export function bar(
 		bar.barGap = '-100%'
 	}
 	if (opts.outline) {
-		bar.itemStyle.borderWidth = 1
+		bar.itemStyle.borderWidth = 0.5
 		bar.itemStyle.borderColor = theme.dark
 	}
 	return _.merge(series(bar), mods) as echarts.Series

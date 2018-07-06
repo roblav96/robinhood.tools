@@ -11,6 +11,7 @@ import * as webull from '../../common/webull'
 import * as yahoo from '../../common/yahoo'
 import * as utils from './utils'
 import * as pretty from './pretty'
+import hours from '../stores/hours'
 
 
 
@@ -36,7 +37,7 @@ export function xlabel(stamp: number) {
 				if (label.includes(':00')) label = label.replace(':00', '');
 			}
 			if (frame.format.endsWith('mma')) {
-				if (label.includes(', 9:30am')) label = label.replace(', 9:30am', '');
+				// if (label.includes(', 9:30am')) label = label.replace(', 9:30am', '');
 				if (label.includes(', 12:00am')) label = label.replace(', 12:00am', '');
 			}
 			if (frame.format.startsWith('dddd')) {
@@ -106,11 +107,14 @@ export function getChart(quote: Quotes.Quote, range: string) {
 			})
 		}
 
-		return pAll([
+		let proms = [
 			() => http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/F`, { query: { minuteType: 'm1' }, retryTick: '1s', retries: 3 }),
-			() => http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/A`, { query: { minuteType: 'm1' }, retryTick: '1s', retries: 3 }),
-			() => http.get(`https://quoteapi.webull.com/api/quote/v4/tickerKDatas/${quote.tickerId}`, { query: { kDataType: 'm1', dayCount: 1, adjustType: 'none' } }),
-		], { concurrency: 1 }).then(function(mquotes: Webull.MinuteChart[]) {
+			() => http.get(`https://quoteapi.webull.com/api/quote/v4/tickerKDatas/${quote.tickerId}`, { query: { kDataType: 'm1', dayCount: 1, adjustType: 'none' }, retryTick: '1s', retries: 3 }),
+		]
+		if (hours.state != 'REGULAR') {
+			proms.unshift(() => http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/A`, { query: { minuteType: 'm1' }, retryTick: '1s', retries: 3 }))
+		}
+		return pAll(proms, { concurrency: 1 }).then(function(mquotes: Webull.MinuteChart[]) {
 			mquotes.remove(v => !v)
 
 			let kquotes = (mquotes.pop() as any) as Webull.KDatasChart

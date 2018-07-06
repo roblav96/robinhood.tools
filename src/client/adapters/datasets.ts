@@ -26,40 +26,40 @@ declare global {
 
 export const templates: Partial<Datasets.Template>[] = [
 
-	{
-		id: '_ohlc',
-		name: 'OHLC',
-		primary: true,
-		tipformats: [{ price: true }],
-		encodes: [{
-			y: ['open', 'close', 'high', 'low'],
-			tooltip: ['open', 'high', 'low', 'close'],
-		}],
-		bones: option => [ecbones.candlestick()],
-	},
-	{
-		id: '_price',
-		name: 'Price',
-		primary: true,
-		tipformats: [{ price: true }],
-		encodes: [{ y: 'close' }],
-	},
-	{
-		id: '_size',
-		name: 'Size',
-		primary: true,
-		tipformats: [{ compact: true }],
-		encodes: [{ y: ['sizebull', 'sizebear'] }],
-		bones: option => [
-			ecbones.bar({ color: theme.success, opacity: 0.5, overlap: true }),
-			ecbones.bar({ color: theme.danger, opacity: 0.5, overlap: true }),
-		],
-		sources: lquotes => [lquotes.map(lquote => ({
-			sizebull: lquote.close > lquote.open ? lquote.size : 0,
-			sizebear: lquote.close <= lquote.open ? lquote.size : 0,
-			timestamp: lquote.timestamp,
-		}))],
-	},
+	// {
+	// 	id: '_ohlc',
+	// 	name: 'OHLC',
+	// 	primary: true,
+	// 	tipformats: [{ price: true }],
+	// 	encodes: [{
+	// 		y: ['open', 'close', 'high', 'low'],
+	// 		tooltip: ['open', 'high', 'low', 'close'],
+	// 	}],
+	// 	bones: option => [ecbones.candlestick()],
+	// },
+	// {
+	// 	id: '_price',
+	// 	name: 'Price',
+	// 	primary: true,
+	// 	tipformats: [{ price: true }],
+	// 	encodes: [{ y: 'close' }],
+	// },
+	// {
+	// 	id: '_size',
+	// 	name: 'Size',
+	// 	primary: true,
+	// 	tipformats: [{ compact: true }],
+	// 	encodes: [{ y: ['sizebull', 'sizebear'] }],
+	// 	bones: option => [
+	// 		ecbones.bar({ color: theme.success, opacity: 0.5, overlap: true }),
+	// 		ecbones.bar({ color: theme.danger, opacity: 0.5, overlap: true }),
+	// 	],
+	// 	sources: lquotes => [lquotes.map(lquote => ({
+	// 		sizebull: lquote.close > lquote.open ? lquote.size : 0,
+	// 		sizebear: lquote.close <= lquote.open ? lquote.size : 0,
+	// 		timestamp: lquote.timestamp,
+	// 	}))],
+	// },
 
 	{
 		id: 'size',
