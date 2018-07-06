@@ -131,7 +131,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 			gridIndex: 1,
 		}))
 
-		option.series.push(ecbones.bar({ color: theme.success, opacity: 0.33, overlap: true }, {
+		option.series.push(ecbones.bar({ color: theme.success, opacity: 0.5, overlap: true }, {
 			name: 'Size Bull',
 			barWidth: '25%',
 			xAxisIndex: 1,
@@ -139,7 +139,7 @@ export class VSymbolEChart extends Mixins(VEChartsMixin) {
 			datasetIndex: 1,
 			encode: { x: 'timestamp', y: 'sizebull', tooltip: 'sizebull' },
 		}))
-		option.series.push(ecbones.bar({ color: theme.danger, opacity: 0.33, overlap: true }, {
+		option.series.push(ecbones.bar({ color: theme.danger, opacity: 0.5, overlap: true }, {
 			name: 'Size Bear',
 			barWidth: '25%',
 			xAxisIndex: 1,
