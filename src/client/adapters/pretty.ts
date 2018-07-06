@@ -78,8 +78,8 @@ export function number(value: number, { precision, price, compact, plusminus, pe
 	else { fixed = cash + fixed };
 	if (percent) fixed += '%';
 
-	// return fixed == '0.000' ? '0' : fixed
-	return fixed
+	return fixed == '0.000' ? '0' : fixed
+	// return fixed
 }
 if (process.env.DEVELOPMENT) Object.assign(window, { number });
 

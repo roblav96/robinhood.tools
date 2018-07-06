@@ -73,6 +73,8 @@ export default class VSymbol extends Mixins(VMixin) {
 		})
 	}
 
+	get marketcap() { return utils.marketCap(this.all.quote.marketCap) }
+
 
 
 }

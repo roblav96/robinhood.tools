@@ -4,37 +4,51 @@
 <style>
 /**/
 
+#symbol_route > section .progress::-webkit-progress-bar {
+	background-color: var(--grey-lightest);
+}
+
 </style>
 
 <template>
 	<div id="symbol_route" class="flex-col-full is-max-fullheight">
 
-		<section class="section py-0 has-background-white shadow-sm">
-			<div class="columns my-0 items-center">
+		<section class="section py-2 has-background-white shadow-sm">
+			<div class="columns items-center">
 
-				<div class="column is-narrow">
+				<div class="column is-narrow leading-tight">
 					<div class="columns is-mobile items-center">
-						<div class="column is-narrow">
-							<v-symbol-logo class="is-56x56 shadow" :symbol="symbol" :acronym="all.quote.acronym"></v-symbol-logo>
+						<div class="column is-narrow pr-1">
+							<v-symbol-logo class="is-40x40 shadow" :symbol="symbol" :acronym="all.quote.acronym"></v-symbol-logo>
 						</div>
 						<div class="column">
 							<div class="flex">
-								<p class="title mr-1">{{symbol}}</p>
-								<!-- <p class="flex-1 self-end has-text-lightest">
-									<span v-if="all.quote.acronym">{{all.quote.acronym}} </span>
-									<span v-if="all.quote.type">- {{all.quote.type}} </span>
-								</p> -->
+								<p class="title is-size-2 leading-none mr-3">{{symbol}}</p>
+								<div class="self-center">
+									<p class="has-text-lightest">
+										<span v-if="all.quote.acronym">
+											<b-tooltip :label="all.quote.exchange" position="is-right" size="is-small">
+												{{all.quote.acronym}}
+											</b-tooltip>
+										</span>
+										<span v-if="all.quote.type"> | {{vcapitalize(all.quote.type)}} </span>
+									</p>
+									<p class="">
+										<b-tooltip :active="vname(all.quote.name).length>24" :label="vname(all.quote.name)" position="is-right" size="is-small">
+											{{vtruncate(vname(all.quote.name),24)}}
+										</b-tooltip>
+									</p>
+								</div>
 							</div>
-							<p>{{vtruncate(vname(all.quote.name),32)}}</p>
 						</div>
 					</div>
 				</div>
 
-				<div class="column is-narrow">
+				<!-- <div class="column is-narrow">
 					<div class="columns is-mobile items-center whitespace-no-wrap text-center">
 						<div class="column">
 							<p>
-								<v-price-ticker class="title" :price="all.quote.price"></v-price-ticker>
+								<v-price-ticker class="title is-size-2" :price="all.quote.price"></v-price-ticker>
 							</p>
 							<p>
 								<v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp>
@@ -49,15 +63,21 @@
 							</p>
 						</div>
 					</div>
-				</div>
+				</div> -->
 
-				<div class="column is-narrow p-0 mr-1">
+				<!-- <div class="column is-narrow p-0 mr-1">
 					<button class="button is-small is-white has-text-lightest" @click="onstep(-1)">
 						<b-icon icon="menu-left"></b-icon>
 					</button>
 				</div>
 				<div class="column overflow-x-auto scrollbar">
 					<div class="columns items-center is-mobile whitespace-no-wrap text-center">
+
+						<div v-if="Number.isFinite(all.quote.marketCap)" class="column is-narrow">
+							<progress class="progress is-small my-3 w-32" :value="marketcap.i" max="6"></progress>
+							<p>{{vcapitalize(marketcap.text)}} Cap</p>
+						</div>
+
 						<div v-if="Number.isFinite(all.quote.volume)" class="column is-narrow">
 							<p class="is-size-4">
 								{{vnumber(all.quote.volume,{compact:true,precision:1})}}
@@ -106,7 +126,7 @@
 					<button class="button is-small is-white has-text-lightest" @click="onstep(1)">
 						<b-icon icon="menu-right"></b-icon>
 					</button>
-				</div>
+				</div> -->
 
 
 

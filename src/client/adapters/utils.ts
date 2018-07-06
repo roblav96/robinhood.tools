@@ -103,13 +103,14 @@ export function randomPrice(price: number) {
 
 
 
-export function marketcapCategory(marketcap: number) {
-	if (marketcap > (100 * 1000 * 1000 * 1000)) return 'mega';
-	if (marketcap > (10 * 1000 * 1000 * 1000)) return 'large';
-	if (marketcap > (2 * 1000 * 1000 * 1000)) return 'mid';
-	if (marketcap > (300 * 1000 * 1000)) return 'small';
-	if (marketcap > (50 * 1000 * 1000)) return 'micro';
-	return 'nano'
+export function marketCap(value: number) {
+	let category = { i: 1, text: 'nano' }
+	if (value > (200 * 1000 * 1000 * 1000)) category = { i: 6, text: 'mega' };
+	else if (value > (10 * 1000 * 1000 * 1000)) category = { i: 5, text: 'large' };
+	else if (value > (2 * 1000 * 1000 * 1000)) category = { i: 4, text: 'mid' };
+	else if (value > (300 * 1000 * 1000)) category = { i: 3, text: 'small' };
+	else if (value > (50 * 1000 * 1000)) category = { i: 2, text: 'micro' };
+	return category
 }
 
 
