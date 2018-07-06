@@ -44,7 +44,7 @@
 					</div>
 				</div>
 
-				<!-- <div class="column is-narrow">
+				<div class="column is-narrow">
 					<div class="columns is-mobile items-center whitespace-no-wrap text-center">
 						<div class="column">
 							<p>
@@ -63,9 +63,9 @@
 							</p>
 						</div>
 					</div>
-				</div> -->
+				</div>
 
-				<!-- <div class="column is-narrow p-0 mr-1">
+				<div class="column is-narrow p-0 mr-1">
 					<button class="button is-small is-white has-text-lightest" @click="onstep(-1)">
 						<b-icon icon="menu-left"></b-icon>
 					</button>
@@ -73,10 +73,10 @@
 				<div class="column overflow-x-auto scrollbar">
 					<div class="columns items-center is-mobile whitespace-no-wrap text-center">
 
-						<div v-if="Number.isFinite(all.quote.marketCap)" class="column is-narrow">
+						<!-- <div v-if="Number.isFinite(all.quote.marketCap)" class="column is-narrow">
 							<progress class="progress is-small my-3 w-32" :value="marketcap.i" max="6"></progress>
 							<p>{{vcapitalize(marketcap.text)}} Cap</p>
-						</div>
+						</div> -->
 
 						<div v-if="Number.isFinite(all.quote.volume)" class="column is-narrow">
 							<p class="is-size-4">
@@ -126,7 +126,7 @@
 					<button class="button is-small is-white has-text-lightest" @click="onstep(1)">
 						<b-icon icon="menu-right"></b-icon>
 					</button>
-				</div> -->
+				</div>
 
 
 
