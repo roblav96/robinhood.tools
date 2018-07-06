@@ -31,9 +31,9 @@
 												{{all.quote.acronym}}
 											</b-tooltip>
 										</span>
-										<span v-if="all.quote.type"> | {{vcapitalize(all.quote.type)}} </span>
+										<span v-if="all.quote.type"> | {{all.quote.type}}</span>
 									</p>
-									<p class="">
+									<p v-if="all.quote.name">
 										<b-tooltip :active="vname(all.quote.name).length>24" :label="vname(all.quote.name)" position="is-right" size="is-small">
 											{{vtruncate(vname(all.quote.name),24)}}
 										</b-tooltip>
