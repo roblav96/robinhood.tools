@@ -21,7 +21,7 @@
 						<div class="column is-narrow pr-1">
 							<v-symbol-logo class="is-40x40 shadow" :symbol="symbol" :acronym="all.quote.acronym"></v-symbol-logo>
 						</div>
-						<div class="column">
+						<div class="column whitespace-no-wrap">
 							<div class="flex">
 								<p class="title is-size-2 leading-none mr-3">{{symbol}}</p>
 								<div class="self-center">
@@ -34,11 +34,15 @@
 										<span v-if="all.quote.type"> | {{all.quote.type}}</span>
 									</p>
 									<p v-if="all.quote.name">
-										<b-tooltip :active="vname(all.quote.name).length>24" :label="vname(all.quote.name)" position="is-right" size="is-small">
+										<b-tooltip :active="vname(all.quote.name).length>24" :label="vname(all.quote.name)" position="is-right"
+										    size="is-small">
 											{{vtruncate(vname(all.quote.name),24)}}
 										</b-tooltip>
 									</p>
 								</div>
+								<p class="title is-size-2 leading-none ml-3">
+									<v-price-ticker :price="all.quote.price"></v-price-ticker>
+								</p>
 							</div>
 						</div>
 					</div>
@@ -47,9 +51,7 @@
 				<div class="column is-narrow">
 					<div class="columns is-mobile items-center whitespace-no-wrap text-center">
 						<div class="column">
-							<p>
-								<v-price-ticker class="title is-size-2" :price="all.quote.price"></v-price-ticker>
-							</p>
+
 							<p>
 								<v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp>
 							</p>
