@@ -21,20 +21,20 @@ export const routes = [
 		component: () => import('./routes/lists/lists'),
 	},
 
-	{
-		name: 'markets', path: '/markets',
-		meta: { icon: 'earth' },
-	},
+	// {
+	// 	name: 'markets', path: '/markets',
+	// 	meta: { icon: 'earth' },
+	// },
 
-	{
-		name: 'news', path: '/news',
-		meta: { icon: 'newspaper' },
-	},
+	// {
+	// 	name: 'news', path: '/news',
+	// 	meta: { icon: 'newspaper' },
+	// },
 
-	{
-		name: 'screener', path: '/screener',
-		meta: { icon: 'radar' },
-	},
+	// {
+	// 	name: 'screener', path: '/screener',
+	// 	meta: { icon: 'radar' },
+	// },
 
 	{
 		name: 'symbol', path: '/symbol/:symbol',
