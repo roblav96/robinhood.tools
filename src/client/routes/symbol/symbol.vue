@@ -40,9 +40,9 @@
 										</b-tooltip>
 									</p>
 								</div>
-								<p class="title is-size-2 leading-none ml-3">
+								<!-- <p class="title is-size-2 leading-none ml-3">
 									<v-price-ticker :price="all.quote.price"></v-price-ticker>
-								</p>
+								</p> -->
 							</div>
 						</div>
 					</div>
@@ -51,7 +51,9 @@
 				<div class="column is-narrow">
 					<div class="columns is-mobile items-center whitespace-no-wrap text-center">
 						<div class="column">
-
+							<p class="title" v-bull-bear="all.quote.percent">
+								<v-price-ticker :price="all.quote.price"></v-price-ticker>
+							</p>
 							<p>
 								<v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp>
 							</p>

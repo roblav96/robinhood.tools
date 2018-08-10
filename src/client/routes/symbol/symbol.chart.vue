@@ -63,8 +63,10 @@
 						</b-radio-button>
 					</b-field>
 				</div>
+				
+				<div class="column"></div>
 
-				<div class="column is-narrow">
+				<!-- <div class="column is-narrow">
 					<b-field>
 						<span class="tag is-medium is-success">
 							<span>SMA 10</span>
@@ -92,7 +94,7 @@
 							</b-taginput>
 						</p>
 					</b-field>
-				</div>
+				</div> -->
 
 				<div class="column is-narrow">
 					<b-field>
