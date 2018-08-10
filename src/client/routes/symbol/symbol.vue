@@ -52,7 +52,7 @@
 					<div class="columns is-mobile items-center whitespace-no-wrap text-center">
 						<div class="column">
 							<p>
-								<v-price-ticker class="title is-size-2" :price="all.quote.price"></v-price-ticker>
+								<v-price-ticker class="title" :price="all.quote.price"></v-price-ticker>
 							</p>
 							<p>
 								<v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp>
