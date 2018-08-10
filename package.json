@@ -82,7 +82,7 @@
 		"technicalindicators": "latest",
 		"turbo-http": "latest",
 		"turbo-net": "latest",
-		"uws": "latest",
+		"uws": "10.148.1",
 		"vue": "latest",
 		"vue-class-component": "latest",
 		"vue-property-decorator": "latest",
