@@ -51,8 +51,8 @@
 				<div class="column is-narrow">
 					<div class="columns is-mobile items-center whitespace-no-wrap text-center">
 						<div class="column">
-							<p class="title" v-bull-bear="all.quote.percent">
-								<v-price-ticker :price="all.quote.price"></v-price-ticker>
+							<p>
+								<v-price-ticker class="title is-size-2" :price="all.quote.price"></v-price-ticker>
 							</p>
 							<p>
 								<v-timestamp :value="all.quote.timestamp" :opts="{verbose:true}"></v-timestamp>
