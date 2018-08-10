@@ -38,7 +38,7 @@ function startTick(tick: Clock.Tick, ms: number) {
 	onTick(tick)
 }
 
-const geneses = clock.ticks.map(tick => {
+const genesis = clock.ticks.map(tick => {
 	let qty = Number.parseInt(tick)
 	let unit = tick.substr(qty.toString().length)
 	let ms = unit == 'ms' ? qty : dayjs(0).add(qty, unit as any).valueOf()
@@ -51,12 +51,12 @@ let ready = 0
 schedule.scheduleJob('* * * * * *', function onjob(this: schedule.Job, date) {
 	if (Date.now() - date.valueOf() > 5 || ready++ < 3) return;
 	let second = date.getSeconds()
-	geneses.remove(({ div, ims, ms, qty, tick, unit }) => {
+	genesis.remove(({ div, ims, ms, qty, tick, unit }) => {
 		if (second % qty) return false;
 		setTimeout(startTick, ims, tick, ms)
 		return true
 	})
-	if (geneses.length == 0) this.cancel();
+	if (genesis.length == 0) this.cancel();
 })
 
 
