@@ -355,6 +355,7 @@ export function isSymbol(symbol: string) {
 }
 
 export function getName(name: string) {
+	return name
 	let stopwords = ['co', 'company', 'cor', 'corp', 'corporation', 'i', 'in', 'inc', 'ltd', 'plc', 'the']
 	let split = name.split(' ')
 	let first = split[0].toLowerCase().replace(/[^a-z]+/g, '')

@@ -26,6 +26,7 @@ async function start() {
 	alls.forEach(({ symbol, quote }) => {
 		if (symbol.includes('-') && !quote.alive) return;
 		if (symbol.includes('.') && !quote.alive) return;
+		if (!quote.name) return;
 		Object.assign(QUOTES, {
 			[symbol]: {
 				_symbol: symbol,
