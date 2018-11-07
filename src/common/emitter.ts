@@ -10,12 +10,11 @@ export default class Emitter<Names extends string = string, Data = any> extends 
 	get events() { return this._events }
 
 	hasListener(listener: EventEmitter3.Listener<Data>, context?: any, once?: boolean): boolean {
-		let ee3s = this.events
-		let names = Object.keys(ee3s)
+		let names = Object.keys(this.events)
 		let i: number, len = names.length
 		for (i = 0; i < len; i++) {
 			let name = names[i]
-			let events = ee3s[name] as EventEmitter3.Event<Data>[]
+			let events = this.events[name] as EventEmitter3.Event<Data>[]
 			if (!Array.isArray(events)) events = [events];
 			let ii: number, lenn = events.length
 			for (ii = 0; ii < lenn; ii++) {
