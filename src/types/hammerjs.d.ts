@@ -1,9 +1,8 @@
-// 
+//
 
 import * as Hammer from 'hammerjs'
 
 declare global {
-
 	interface RecognizerOptions {
 		type?: string
 	}
@@ -24,7 +23,7 @@ declare global {
 		preventDefault(): void
 		additionalEvent: string
 		angle: number
-		center: { x: number, y: number }
+		center: { x: number; y: number }
 		changedPointers: PointerEvent[]
 		deltaTime: number
 		deltaX: number
@@ -52,7 +51,4 @@ declare global {
 		velocityX: number
 		velocityY: number
 	}
-
 }
-
-

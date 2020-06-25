@@ -1,12 +1,10 @@
-// 
+//
 
 import '../main'
 import * as core from '../../common/core'
 import * as utils from '../adapters/utils'
 import * as quotes from '../adapters/quotes'
 import radio from '../adapters/radio'
-
-
 
 const QUOTES = {} as Dict<Search.Quote>
 
@@ -24,26 +22,23 @@ async function start() {
 	let alls = await quotes.getAlls(symbols, ['quote'], [ikeys])
 
 	alls.forEach(({ symbol, quote }) => {
-		if (symbol.includes('-') && !quote.alive) return;
-		if (symbol.includes('.') && !quote.alive) return;
-		if (!quote.name) return;
+		if (symbol.includes('-') && !quote.alive) return
+		if (symbol.includes('.') && !quote.alive) return
+		if (!quote.name) return
 		Object.assign(QUOTES, {
 			[symbol]: {
 				_symbol: symbol,
 				avgVolume: quote.avgVolume,
 				symbol: core.string.alphanumeric(symbol).toLowerCase(),
 				name: core.string.alphanumeric(quotes.getName(quote.name)).toLowerCase(),
-			} as Search.Quote
+			} as Search.Quote,
 		})
 	})
-
 }
-
-
 
 radio.reply('search.query', async function onquery(query: string) {
 	let results = [] as Search.Result[]
-	Object.keys(QUOTES).map(key => {
+	Object.keys(QUOTES).map((key) => {
 		let { symbol, _symbol, name } = QUOTES[key]
 		let ranks = [] as number[]
 
@@ -65,17 +60,17 @@ radio.reply('search.query', async function onquery(query: string) {
 		}
 		ranks.push(nrank)
 
-		let rank = ranks.reduce((prev, next) => prev *= next, 2)
-		if (rank == 8) return;
+		let rank = ranks.reduce((prev, next) => (prev *= next), 2)
+		if (rank == 8) return
 
 		let result = {
-			symbol: _symbol, rank,
+			symbol: _symbol,
+			rank,
 		} as Search.Result
 		if (process.env.DEVELOPMENT) {
 			Object.assign(result, { debug: { query, symbol, name, ranks } } as Search.Result)
 		}
 		results.push(result)
-
 	})
 	results.sort((a, b) => {
 		if (a.rank == b.rank) {
@@ -86,10 +81,6 @@ radio.reply('search.query', async function onquery(query: string) {
 	results.remove((v, i) => i > 20)
 	return results
 })
-
-
-
-
 
 declare global {
 	namespace Search {
@@ -109,10 +100,6 @@ declare global {
 	}
 }
 
-
-
-
-
 // import * as hyperid from 'hyperid'
 // import * as nanoid from 'nanoid'
 // import benchmark from '../../common/benchmark'
@@ -120,5 +107,3 @@ declare global {
 // 	() => hyperid(),
 // 	() => nanoid(),
 // ])
-
-

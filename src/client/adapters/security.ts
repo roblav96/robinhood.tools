@@ -1,4 +1,4 @@
-// 
+//
 
 export * from '../../common/security'
 import * as security from '../../common/security'
@@ -13,17 +13,19 @@ import clock from '../../common/clock'
 import store from '../store'
 import * as http from '../../common/http'
 
-
-
 const state = {
 	ready: false,
 	ishuman: false,
 	rhusername: '',
 }
 store.register('security', state)
-declare global { namespace Store { interface State { security: typeof state } } }
-
-
+declare global {
+	namespace Store {
+		interface State {
+			security: typeof state
+		}
+	}
+}
 
 export const doc = {
 	uuid: lockr.get('security.uuid'),
@@ -40,7 +42,8 @@ export const doc = {
 
 const copts = {
 	domain: core.HOSTNAME,
-	path: '/', sameSite: true,
+	path: '/',
+	sameSite: true,
 } as cookie.CookieSerializeOptions
 
 export function cookies() {
@@ -49,36 +52,35 @@ export function cookies() {
 }
 global.cookies = cookies
 
-
-
 export function token(): Promise<void> {
-	return Promise.resolve().then(function() {
-		if (!doc.uuid) {
-			doc.uuid = security.randomBits(security.LENGTHS.uuid)
-			lockr.set('security.uuid', doc.uuid)
-		}
+	return Promise.resolve()
+		.then(function () {
+			if (!doc.uuid) {
+				doc.uuid = security.randomBits(security.LENGTHS.uuid)
+				lockr.set('security.uuid', doc.uuid)
+			}
 
-		return doc.finger ? doc.finger : new Promise<string>(function(resolve) {
-			new Fingerprint2().get(resolve)
+			return doc.finger
+				? doc.finger
+				: new Promise<string>(function (resolve) {
+						new Fingerprint2().get(resolve)
+				  })
 		})
-
-	}).then(function(finger) {
-		doc.finger = finger
-		lockr.set('security.finger', doc.finger)
-		return http.get('/security/token', { retries: Infinity })
-
-	}).then(function(response: Security.Doc) {
-		Object.assign(state, response)
-		state.ready = true
-
-	}).catch(function(error: boom) {
-		console.error('token Error ->', error)
-		console.dir(error)
-		if (error && error.isBoom && error.output.statusCode == 401) {
-			core.nullify(doc)
-		}
-		return new Promise(r => setTimeout(r, 3000)).then(token)
-	})
+		.then(function (finger) {
+			doc.finger = finger
+			lockr.set('security.finger', doc.finger)
+			return http.get('/security/token', { retries: Infinity })
+		})
+		.then(function (response: Security.Doc) {
+			Object.assign(state, response)
+			state.ready = true
+		})
+		.catch(function (error: boom) {
+			console.error('token Error ->', error)
+			console.dir(error)
+			if (error && error.isBoom && error.output.statusCode == 401) {
+				core.nullify(doc)
+			}
+			return new Promise((r) => setTimeout(r, 3000)).then(token)
+		})
 }
-
-

@@ -1,4 +1,4 @@
-// 
+//
 
 global.Promise = require('zousan')
 global.WebSocket = require('uws')
@@ -11,5 +11,3 @@ import './adapters/process'
 import './adapters/console'
 import './adapters/radio'
 import '../common/clock'
-
-

@@ -1,4 +1,4 @@
-// 
+//
 
 import * as net from 'net'
 import * as Mqtt from 'mqtt'
@@ -12,14 +12,24 @@ import * as webull from './webull'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
 
-
-
 type Topics = (keyof typeof webull.mqtt_topics)[]
 export default class WebullMqttClient {
-
 	private static topics = {
-		STOCKS: ['TICKER', 'TICKER_DETAIL', 'TICKER_DEAL_DETAILS', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as Topics,
-		INDEXES: ['TICKER_MARKET_INDEX', 'FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as Topics,
+		STOCKS: [
+			'TICKER',
+			'TICKER_DETAIL',
+			'TICKER_DEAL_DETAILS',
+			'TICKER_BID_ASK',
+			'TICKER_HANDICAP',
+			'TICKER_STATUS',
+		] as Topics,
+		INDEXES: [
+			'TICKER_MARKET_INDEX',
+			'FOREIGN_EXCHANGE',
+			'TICKER_BID_ASK',
+			'TICKER_HANDICAP',
+			'TICKER_STATUS',
+		] as Topics,
 		FOREX: ['FOREIGN_EXCHANGE', 'TICKER_BID_ASK', 'TICKER_HANDICAP', 'TICKER_STATUS'] as Topics,
 	}
 
@@ -28,7 +38,8 @@ export default class WebullMqttClient {
 			fsymbols: null as Dict<number>,
 			topics: '' as keyof typeof WebullMqttClient.topics,
 			heartbeat: '10s' as Clock.Tick,
-			host: 'push.webull.com', port: 9018,
+			host: 'push.webull.com',
+			port: 9018,
 			verbose: false,
 		})
 	}
@@ -45,7 +56,9 @@ export default class WebullMqttClient {
 	dsymbols: Dict<string>
 	client: MqttConnection
 
-	private nextId() { return _.random(111, 999) }
+	private nextId() {
+		return _.random(111, 999)
+	}
 
 	destroy() {
 		this.terminate()
@@ -92,11 +105,10 @@ export default class WebullMqttClient {
 		this.client.on('error', this.onerror)
 		if (!clock.hasListener(this.reconnect, this)) {
 			clock.on(this.options.heartbeat, this.reconnect, this)
-		} else console.log('reconnecting...');
+		} else console.log('reconnecting...')
 	}
 
 	private ondata = (packet: Mqtt.Packet) => {
-
 		if (packet.cmd == 'pingreq') {
 			// if (this.options.verbose) console.log('ping');
 			this.client.pingresp()
@@ -110,10 +122,10 @@ export default class WebullMqttClient {
 		}
 
 		if (packet.cmd == 'connack') {
-			if (this.options.verbose) console.info('connect');
+			if (this.options.verbose) console.info('connect')
 			this.alive = true
 
-			this.dsymbols = _.invert(_.mapValues(this.options.fsymbols, v => v.toString()))
+			this.dsymbols = _.invert(_.mapValues(this.options.fsymbols, (v) => v.toString()))
 			let topic = {
 				tickerIds: Object.values(this.options.fsymbols),
 				header: {
@@ -122,13 +134,16 @@ export default class WebullMqttClient {
 					access_token: process.env.WEBULL_TOKEN,
 				},
 			}
-			let topics = Object.keys(webull.mqtt_topics).filter(v => !isNaN(v as any))
+			let topics = Object.keys(webull.mqtt_topics).filter((v) => !isNaN(v as any))
 			if (this.options.topics) {
-				topics = WebullMqttClient.topics[this.options.topics].map(v => webull.mqtt_topics[v].toString())
+				topics = WebullMqttClient.topics[this.options.topics].map((v) =>
+					webull.mqtt_topics[v].toString(),
+				)
 			}
 
-			let subscriptions = topics.map(type => ({
-				topic: JSON.stringify(Object.assign(topic, { type })), qos: 0,
+			let subscriptions = topics.map((type) => ({
+				topic: JSON.stringify(Object.assign(topic, { type })),
+				qos: 0,
 			}))
 			this.client.subscribe({ subscriptions, messageId: this.nextId() })
 
@@ -142,7 +157,7 @@ export default class WebullMqttClient {
 		}
 
 		if (packet.cmd == 'disconnect') {
-			if (this.options.verbose) console.warn('disconnect');
+			if (this.options.verbose) console.warn('disconnect')
 			this.alive = false
 			// this.destroy()
 			return
@@ -154,23 +169,23 @@ export default class WebullMqttClient {
 
 			let type = Number.parseInt(topic.type)
 			if (type == webull.mqtt_topics.TICKER_BID_ASK) {
-				payload.data.remove(v => {
+				payload.data.remove((v) => {
 					delete v.countryISOCode
 					delete v.tradeTime
 					return !(
-						(Array.isArray(v.bidList) && v.bidList.length > 0)
-						||
+						(Array.isArray(v.bidList) && v.bidList.length > 0) ||
 						(Array.isArray(v.askList) && v.askList.length > 0)
 					)
 				})
 			}
-			if (payload.data.length == 0) return;
+			if (payload.data.length == 0) return
 
 			let tid = Number.parseInt(topic.tid)
 			let symbol = this.dsymbols[topic.tid]
-			if (!symbol) return console.warn(`!symbol`, topic);
+			if (!symbol) return console.warn(`!symbol`, topic)
 
-			let i: number, len = payload.data.length
+			let i: number,
+				len = payload.data.length
 			for (i = 0; i < len; i++) {
 				let wbdata = payload.data[i]
 				if (wbdata) {
@@ -185,10 +200,9 @@ export default class WebullMqttClient {
 		}
 
 		console.warn('ondata packet ->', packet)
-
 	}
 
-	private onclose = reason => {
+	private onclose = (reason) => {
 		console.warn('onclose ->', reason)
 		this.alive = false
 	}
@@ -197,6 +211,4 @@ export default class WebullMqttClient {
 		console.error('onerror Error ->', error)
 		this.alive = false
 	}
-
 }
-

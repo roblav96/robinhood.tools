@@ -1,8 +1,8 @@
-// 
+//
 
 require('../common/polyfills')
 
-Object.assign(console, { dtsgen: function() { } })
+Object.assign(console, { dtsgen: function () {} })
 if (process.env.DEVELOPMENT) {
 	require('echarts')
 	process.version = 'v9.11.1'

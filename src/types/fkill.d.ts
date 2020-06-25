@@ -1,7 +1,6 @@
-// 
+//
 
 declare module 'fkill' {
-
 	namespace fkill {
 		interface Options {
 			force: boolean
@@ -14,7 +13,4 @@ declare module 'fkill' {
 	function fkill(input: number[], opts?: Partial<fkill.Options>): void
 	function fkill(input: string[], opts?: Partial<fkill.Options>): void
 	export = fkill
-
 }
-
-

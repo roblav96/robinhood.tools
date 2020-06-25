@@ -1,11 +1,7 @@
-// 
+//
 
 declare module 'exit-hook' {
-
-	namespace exithook { }
+	namespace exithook {}
 	function exithook(fn: () => void): void
 	export = exithook
-
 }
-
-

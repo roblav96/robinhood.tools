@@ -1,4 +1,4 @@
-// 
+//
 
 import Vue from 'vue'
 import Vuex, { Store } from 'vuex'
@@ -7,23 +7,56 @@ import * as core from '../../common/core'
 import * as utils from '../adapters/utils'
 import store from '../store'
 
-
-
 export const theme = {} as Colors.Theme
 export const ibm = {} as Colors.Ibm
 store.register('colors', { theme, ibm })
-declare global { namespace Store { interface State { colors: { theme: Colors.Theme, ibm: Colors.Ibm } } } }
+declare global {
+	namespace Store {
+		interface State {
+			colors: { theme: Colors.Theme; ibm: Colors.Ibm }
+		}
+	}
+}
 
-ibmdesign.palettes.forEach(color => {
-	if (color.name.includes('white') || color.name.includes('gray') || color.name.includes('black')) return;
-	ibm[color.name] = `#${color.values.find(v => v.grade == color.core).value}`
+ibmdesign.palettes.forEach((color) => {
+	if (color.name.includes('white') || color.name.includes('gray') || color.name.includes('black'))
+		return
+	ibm[color.name] = `#${color.values.find((v) => v.grade == color.core).value}`
 })
 
-let themes = ['accent', 'black', 'black-bis', 'black-ter', 'border', 'danger', 'dark', 'grey', 'grey-dark', 'grey-darker', 'grey-light', 'grey-lighter', 'grey-lightest', 'info', 'light', 'link', 'primary', 'secondary', 'success', 'text', 'text-light', 'text-lighter', 'text-strong', 'warning', 'white', 'white-bis', 'white-ter']
+let themes = [
+	'accent',
+	'black',
+	'black-bis',
+	'black-ter',
+	'border',
+	'danger',
+	'dark',
+	'grey',
+	'grey-dark',
+	'grey-darker',
+	'grey-light',
+	'grey-lighter',
+	'grey-lightest',
+	'info',
+	'light',
+	'link',
+	'primary',
+	'secondary',
+	'success',
+	'text',
+	'text-light',
+	'text-lighter',
+	'text-strong',
+	'warning',
+	'white',
+	'white-bis',
+	'white-ter',
+]
 function getTheme(event: Event) {
 	event.target.removeEventListener('DOMContentLoaded', getTheme)
 	let style = window.getComputedStyle(document.documentElement)
-	themes.forEach(name => {
+	themes.forEach((name) => {
 		let color = style.getPropertyValue('--' + name)
 		Vue.set(theme, name, color.trim())
 	})
@@ -33,8 +66,6 @@ if (document.readyState == 'loading') {
 } else {
 	getTheme({ target: document.documentElement } as any)
 }
-
-
 
 declare global {
 	namespace Colors {
@@ -68,24 +99,22 @@ declare global {
 			'white-ter': string
 		}
 		interface Ibm {
-			'aqua': string
-			'blue': string
-			'cerulean': string
-			'gold': string
-			'green': string
-			'indigo': string
-			'lime': string
-			'magenta': string
-			'orange': string
-			'peach': string
-			'purple': string
-			'red': string
-			'teal': string
-			'ultramarine': string
-			'violet': string
-			'yellow': string
+			aqua: string
+			blue: string
+			cerulean: string
+			gold: string
+			green: string
+			indigo: string
+			lime: string
+			magenta: string
+			orange: string
+			peach: string
+			purple: string
+			red: string
+			teal: string
+			ultramarine: string
+			violet: string
+			yellow: string
 		}
 	}
 }
-
-

@@ -1,7 +1,6 @@
-// 
+//
 
 declare module 'trouter' {
-
 	namespace Trouter {
 		type Method = 'GET' | 'POST' | 'PUT' | 'HEAD' | 'PATCH' | 'DELETE' | 'OPTIONS'
 		interface Found<Handler> {
@@ -24,10 +23,7 @@ declare module 'trouter' {
 			options(pattern: string, fn: Handler): void
 		}
 	}
-	interface Trouter<Handler, Options> extends Trouter.Trouter<Handler, Options> { }
-	class Trouter<Handler = (...args: any[]) => void, Options = {}> { }
+	interface Trouter<Handler, Options> extends Trouter.Trouter<Handler, Options> {}
+	class Trouter<Handler = (...args: any[]) => void, Options = {}> {}
 	export = Trouter
-
 }
-
-

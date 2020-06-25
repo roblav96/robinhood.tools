@@ -1,6 +1,4 @@
-// 
-
-
+//
 
 declare namespace NodeJS {
 	interface ProcessEnv {
@@ -14,13 +12,11 @@ declare namespace NodeJS {
 	}
 }
 
-
-
 type KeysOf<T> = (keyof T)[]
 type PartialDeep<T> = { [P in keyof T]?: PartialDeep<T[P]> }
-interface Dict<T = any> { [key: string]: T }
-
-
+interface Dict<T = any> {
+	[key: string]: T
+}
 
 interface WebpackRequireContext {
 	(file: string): void
@@ -49,5 +45,3 @@ interface HotNodeModule {
 	removeStatusHandler(fn: (status: string) => void): void
 	status(fn: (status: string) => void): void
 }
-
-

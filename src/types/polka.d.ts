@@ -1,4 +1,4 @@
-// 
+//
 
 declare module 'polka' {
 	import * as http from 'http'
@@ -21,7 +21,8 @@ declare module 'polka' {
 			onError(error: Error, req: Request, res: Response, next: (error?: Error) => void): void
 			onNoMatch(req: Request, res: Response): void
 		}
-		interface Router<Server, Request, Response> extends Trouter<Handler<Request, Response>, Options<Server, Request, Response>> { }
+		interface Router<Server, Request, Response>
+			extends Trouter<Handler<Request, Response>, Options<Server, Request, Response>> {}
 		class Router<Server, Request, Response> extends Options<Server, Request, Response> {
 			constructor(options?: Partial<Options<Server, Request, Response>>)
 			apps: { [base: string]: Router<Server, Request, Response> }
@@ -34,10 +35,13 @@ declare module 'polka' {
 			listen(port: number, hostname?: string): Promise<void>
 		}
 	}
-	function Polka<Server = http.Server, Request = http.ServerRequest, Response = http.ServerResponse>(options?: Partial<Polka.Options<Server, Request & Polka.Request, Response>>): Polka.Router<Server, Request & Polka.Request, Response>
-	
+	function Polka<
+		Server = http.Server,
+		Request = http.ServerRequest,
+		Response = http.ServerResponse
+	>(
+		options?: Partial<Polka.Options<Server, Request & Polka.Request, Response>>,
+	): Polka.Router<Server, Request & Polka.Request, Response>
+
 	export = Polka
-
 }
-
-

@@ -1,4 +1,4 @@
-// 
+//
 
 import '../main'
 
@@ -12,6 +12,4 @@ import './validator.hook'
 import './robinhood.hook'
 
 import * as utils from '../adapters/utils'
-utils.requireDir(__dirname, __filename, v => v.endsWith('.api.ts'))
-
-
+utils.requireDir(__dirname, __filename, (v) => v.endsWith('.api.ts'))

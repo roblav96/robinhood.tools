@@ -1,10 +1,10 @@
-// 
+//
 
 import * as uws from 'uws'
 import * as http from 'http'
 
 declare module 'uws' {
-	export interface WebSocket extends uws { }
+	export interface WebSocket extends uws {}
 	export interface Server {
 		httpServer: http.Server
 		broadcast(message: string, options?: { binary: boolean }): void
@@ -17,7 +17,9 @@ declare module 'uws' {
 
 declare global {
 	// interface WebSocket extends uws { }
-	namespace NodeJS { interface Global { WebSocket: uws & WebSocket } }
+	namespace NodeJS {
+		interface Global {
+			WebSocket: uws & WebSocket
+		}
+	}
 }
-
-

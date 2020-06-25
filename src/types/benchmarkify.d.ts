@@ -1,7 +1,6 @@
-// 
+//
 
 declare module 'benchmarkify' {
-
 	namespace Benchmarkify {
 		interface Options {
 			logger: Console
@@ -47,7 +46,4 @@ declare module 'benchmarkify' {
 		run(suites: Benchmarkify.Suite[]): Promise<Benchmarkify.Result[]>
 	}
 	export = Benchmarkify
-
 }
-
-

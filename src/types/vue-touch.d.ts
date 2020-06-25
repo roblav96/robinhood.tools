@@ -1,4 +1,4 @@
-// 
+//
 
 declare module 'vue-touch' {
 	import Vue from 'vue'
@@ -11,5 +11,4 @@ declare module 'vue-touch' {
 		function registerCustomEvent(name: string, options: Partial<RecognizerOptions>): void
 	}
 	export default VueTouch
-
 }

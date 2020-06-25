@@ -1,7 +1,6 @@
-// 
+//
 
 declare module 'mqtt-connection' {
-
 	import * as Mqtt from 'mqtt'
 
 	class MqttConnection {
@@ -60,8 +59,7 @@ declare module 'mqtt-connection' {
 		write(chunk?: any, encoding?: any, cb?: any): any
 	}
 
-	namespace MqttConnection { }
+	namespace MqttConnection {}
 
 	export = MqttConnection
-
 }

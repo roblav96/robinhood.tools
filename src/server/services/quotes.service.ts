@@ -1,4 +1,4 @@
-// 
+//
 
 import '../main'
 import * as schedule from 'node-schedule'
@@ -18,9 +18,13 @@ import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
 import radio from '../adapters/radio'
 
-
-
-declare global { namespace NodeJS { interface ProcessEnv { SYMBOLS: TypeOfSymbols } } }
+declare global {
+	namespace NodeJS {
+		interface ProcessEnv {
+			SYMBOLS: TypeOfSymbols
+		}
+	}
+}
 const emitter = new Emitter<'data'>()
 const MQTTS = [] as WebullMqttClient[]
 
@@ -36,8 +40,6 @@ const QUOTES = {
 	EMITS: {} as Dict<Quotes.Calc>,
 }
 
-
-
 radio.on('symbols.pause', destroy)
 radio.on('symbols.resume', start)
 radio.once('symbols.start', start)
@@ -45,7 +47,7 @@ radio.emit('symbols.ready')
 
 function destroy() {
 	clock.offListener(ontick)
-	MQTTS.forEach(v => v.destroy())
+	MQTTS.forEach((v) => v.destroy())
 	core.nullify(MQTTS)
 	core.nullify(SYMBOLS)
 	core.nullify(WB)
@@ -55,18 +57,18 @@ function destroy() {
 async function start() {
 	destroy()
 
-	let fsymbols = (process.env.SYMBOLS == 'STOCKS' ?
-		await utils.getInstanceFullSymbols(process.env.SYMBOLS) :
-		await utils.getFullSymbols(process.env.SYMBOLS)
-	)
+	let fsymbols =
+		process.env.SYMBOLS == 'STOCKS'
+			? await utils.getInstanceFullSymbols(process.env.SYMBOLS)
+			: await utils.getFullSymbols(process.env.SYMBOLS)
 
 	// if (process.env.DEVELOPMENT) return;
-	if (process.env.DEVELOPMENT && +process.env.SCALE == 1) fsymbols = utils[`DEV_${process.env.SYMBOLS}`];
+	if (process.env.DEVELOPMENT && +process.env.SCALE == 1)
+		fsymbols = utils[`DEV_${process.env.SYMBOLS}`]
 	SYMBOLS.push(...Object.keys(fsymbols))
 
 	let alls = await quotes.getAlls(SYMBOLS, ['quote', 'wbquote'])
 	alls.forEach(({ symbol, quote, wbquote }) => {
-
 		if (process.env.PRODUCTION) {
 			socket.emit(`${rkeys.WB.QUOTES}:${symbol}`, wbquote)
 		}
@@ -82,30 +84,48 @@ async function start() {
 		Object.assign(QUOTES.CALCS, { [symbol]: core.clone(quote) })
 		Object.assign(QUOTES.LIVES, { [symbol]: core.clone(quote) })
 		Object.assign(QUOTES.EMITS, { [symbol]: core.clone(quote) })
-
 	})
 
 	let chunks = core.array.chunks(_.toPairs(fsymbols), _.ceil(SYMBOLS.length / 256))
-	MQTTS.splice(0, Infinity, ...chunks.map((chunk, i) => new WebullMqttClient({
-		fsymbols: _.fromPairs(chunk),
-		topics: process.env.SYMBOLS,
-		verbose: true,
-	}, emitter)))
+	MQTTS.splice(
+		0,
+		Infinity,
+		...chunks.map(
+			(chunk, i) =>
+				new WebullMqttClient(
+					{
+						fsymbols: _.fromPairs(chunk),
+						topics: process.env.SYMBOLS,
+						verbose: true,
+					},
+					emitter,
+				),
+		),
+	)
 
 	clock.on('1s', ontick)
-
 }
-
-
 
 emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 	let symbol = wbdata.symbol
-	if (!symbol) return console.warn(webull.mqtt_topics[topic], '->\n' + symbol, `!symbol ->\nwbdata ->`, core.sort.keys(wbdata));
+	if (!symbol)
+		return console.warn(
+			webull.mqtt_topics[topic],
+			'->\n' + symbol,
+			`!symbol ->\nwbdata ->`,
+			core.sort.keys(wbdata),
+		)
 
 	// console.log(webull.mqtt_topics[topic], '->\n' + symbol, '->\nwbdata ->', core.sort.keys(wbdata))
 	let towbquote = {} as Webull.Quote
 	let wbquote = WB.QUOTES[symbol]
-	if (!wbquote) return console.warn(webull.mqtt_topics[topic], '->\n' + symbol, `!wbquote ->\nwbdata ->`, core.sort.keys(wbdata));
+	if (!wbquote)
+		return console.warn(
+			webull.mqtt_topics[topic],
+			'->\n' + symbol,
+			`!wbquote ->\nwbdata ->`,
+			core.sort.keys(wbdata),
+		)
 
 	if (topic == webull.mqtt_topics.TICKER_DEAL_DETAILS) {
 		let deal = quotes.toDeal(wbdata)
@@ -113,7 +133,11 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 			socket.emit(`${rkeys.DEALS}:${symbol}`, deal)
 		}
 		let quote = QUOTES.CALCS[symbol]
-		quotes.mergeCalcs(wbquote, quote, quotes.applyWbQuote(quote, {} as any, quotes.applyDeal(quote, deal)))
+		quotes.mergeCalcs(
+			wbquote,
+			quote,
+			quotes.applyWbQuote(quote, {} as any, quotes.applyDeal(quote, deal)),
+		)
 		return
 	}
 
@@ -122,10 +146,14 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 		quotes.mergeCalcs(wbquote, quote, quotes.applyWbQuote(quote, wbdata))
 	}
 
-	Object.keys(wbdata).forEach(key => {
+	Object.keys(wbdata).forEach((key) => {
 		let to = wbdata[key]
 		let from = wbquote[key]
-		if (from == null) { from = to; wbquote[key] = to; towbquote[key] = to }
+		if (from == null) {
+			from = to
+			wbquote[key] = to
+			towbquote[key] = to
+		}
 		let keymap = quotes.KEY_MAP[key]
 		quotes.applyKeyMap(keymap, towbquote, key, to, from)
 	})
@@ -137,14 +165,14 @@ emitter.on('data', function ondata(topic: number, wbdata: Webull.Quote) {
 	}
 })
 
-
-
 function ontick() {
 	let stamp = Date.now()
 	let coms = [] as Redis.Coms
-	let live = new Date().getSeconds() % 10 == core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
+	let live =
+		new Date().getSeconds() % 10 ==
+		core.math.dispersed(10, +process.env.INSTANCE, +process.env.SCALE)
 
-	SYMBOLS.forEach(symbol => {
+	SYMBOLS.forEach((symbol) => {
 		let wbquote = WB.QUOTES[symbol]
 		let quote = QUOTES.CALCS[symbol]
 
@@ -169,7 +197,6 @@ function ontick() {
 			let flquote = QUOTES.LIVES[symbol]
 			let ldiff = core.object.difference(flquote, quote)
 			if (quote.timestamp > flquote.timestamp) {
-
 				quote.stamp = stamp
 				quote.liveStamp = stamp
 				quote.liveCount = core.math.sum0(quote.liveCount, 1)
@@ -188,7 +215,6 @@ function ontick() {
 				core.object.merge(flquote, quote)
 
 				quotes.mergeCalcs(wbquote, quote, quotes.resetLive(quote))
-
 			}
 			if (Object.keys(ldiff).length > 0) {
 				coms.push(['hmset', `${rkeys.QUOTES}:${symbol}`, ldiff as any])
@@ -217,17 +243,12 @@ function ontick() {
 	// let key = live ? 'lives' : 'emits'
 	// avgs[key] = avgs[key] ? core.math.round(_.mean([avgs[key], tdiff]), 2) : tdiff
 	// console.log(`avgs ->`, avgs)
-
 }
 
 // const avgs = {
 // 	emits: 0,
 // 	lives: 0,
 // }
-
-
-
-
 
 // import * as benchmark from '../../common/benchmark'
 // benchmark.simple('sum', [
@@ -251,8 +272,6 @@ function ontick() {
 // 	},
 // ])
 
-
-
 // import * as benchmark from '../../common/benchmark'
 // benchmark.simple('math', [
 // 	function mathmin() {
@@ -269,8 +288,6 @@ function ontick() {
 // 	},
 // ])
 
-
-
 // import * as benchmark from '../../common/benchmark'
 // let state = 'PREPRE' as Hours.State
 // benchmark.simple('indexof', [
@@ -284,8 +301,6 @@ function ontick() {
 // 		Date.now()
 // 	},
 // ])
-
-
 
 // const rxBuffer = new Rx.Subject<LiveQuote>()
 // const rxSub = rxBuffer
@@ -309,23 +324,6 @@ function ontick() {
 // 	})
 // }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // if (mergeIfAll([WB_QUOTES[symbol], WB_EMITS[symbol]], toquote)) {
 
 // }
@@ -346,5 +344,3 @@ function ontick() {
 // 	}
 // 	return true
 // }
-
-

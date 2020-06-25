@@ -1,4 +1,4 @@
-// 
+//
 
 import * as util from 'util'
 
@@ -7,5 +7,3 @@ declare module 'util' {
 		compact?: boolean
 	}
 }
-
-

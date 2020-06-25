@@ -1,4 +1,4 @@
-// // 
+// //
 
 // import * as eyes from 'eyes'
 
@@ -7,5 +7,3 @@
 // 	export const defaults: eyes.EyesOptions
 // 	export function stringify(value: any): string
 // }
-
-

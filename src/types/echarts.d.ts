@@ -1,45 +1,44 @@
-// 
+//
 
 declare module 'echarts' {
 	namespace ECharts {
-
 		type EventNames =
-			'axisareaselected' |
-			'brush' |
-			'brushselected' |
-			'click' |
-			'contextmenu' |
-			'datarangeselected' |
-			'dataviewchanged' |
-			'datazoom' |
-			'dblclick' |
-			'finished' |
-			'focusnodeadjacency' |
-			'globalout' |
-			'hidetip' |
-			'legendscroll' |
-			'legendselectchanged' |
-			'legendselected' |
-			'legendunselected' |
-			'magictypechanged' |
-			'mapselectchanged' |
-			'mapselected' |
-			'mapunselected' |
-			'mousedown' |
-			'mousemove' |
-			'mouseout' |
-			'mouseover' |
-			'mouseup' |
-			'pieselectchanged' |
-			'pieselected' |
-			'pieunselected' |
-			'rendered' |
-			'restore' |
-			'showtip' |
-			'timelinechanged' |
-			'timelineplaychanged' |
-			'unfocusnodeadjacency' |
-			'updateaxispointer'
+			| 'axisareaselected'
+			| 'brush'
+			| 'brushselected'
+			| 'click'
+			| 'contextmenu'
+			| 'datarangeselected'
+			| 'dataviewchanged'
+			| 'datazoom'
+			| 'dblclick'
+			| 'finished'
+			| 'focusnodeadjacency'
+			| 'globalout'
+			| 'hidetip'
+			| 'legendscroll'
+			| 'legendselectchanged'
+			| 'legendselected'
+			| 'legendunselected'
+			| 'magictypechanged'
+			| 'mapselectchanged'
+			| 'mapselected'
+			| 'mapunselected'
+			| 'mousedown'
+			| 'mousemove'
+			| 'mouseout'
+			| 'mouseover'
+			| 'mouseup'
+			| 'pieselectchanged'
+			| 'pieselected'
+			| 'pieunselected'
+			| 'rendered'
+			| 'restore'
+			| 'showtip'
+			| 'timelinechanged'
+			| 'timelineplaychanged'
+			| 'unfocusnodeadjacency'
+			| 'updateaxispointer'
 
 		interface EventParam<T = any> {
 			$vars: string[]
@@ -89,7 +88,11 @@ declare module 'echarts' {
 		}
 
 		const graphic: any
-		function init(el: HTMLElement | Node, theme?: string | object, opts?: Partial<InitOptions>): ECharts
+		function init(
+			el: HTMLElement | Node,
+			theme?: string | object,
+			opts?: Partial<InitOptions>,
+		): ECharts
 		function connect(group: string | string[]): void
 		function disConnect(group: string): void
 		function dispose(target: ECharts | HTMLElement | Node): void
@@ -102,7 +105,11 @@ declare module 'echarts' {
 			group: string
 			_model: { option: Option }
 			_$handlers: { [event: string]: any }
-			constructor(el: HTMLElement | Node, theme?: string | object, opts?: Partial<InitOptions>)
+			constructor(
+				el: HTMLElement | Node,
+				theme?: string | object,
+				opts?: Partial<InitOptions>,
+			)
 			on(eventName: EventNames, handler: (...params: any[]) => void, context?: any): void
 			one(eventName: EventNames, handler: (...params: any[]) => void, context?: any): void
 			off(eventName: EventNames, handler?: (...params: any[]) => void, context?: any): void
@@ -114,12 +121,12 @@ declare module 'echarts' {
 			getHeight(): number
 			getDom(): HTMLElement
 			getOption(): Option
-			// 
+			//
 			getModel(): any
 			getViewOfComponentModel(componentModel: any): any
 			getViewOfSeriesModel(seriesModel: any): any
 			getVisual(finder: any, visualType: any): any
-			// 
+			//
 			dispatchAction(payload: any): void
 			showLoading(type: string, opts: object): void
 			hideLoading(): void
@@ -228,9 +235,7 @@ declare module 'echarts' {
 			inRange: VisualMapRange
 			outOfRange: VisualMapRange
 		}
-		interface VisualMapPiece {
-
-		}
+		interface VisualMapPiece {}
 		interface VisualMap {
 			align: string
 			backgroundColor: string
@@ -500,8 +505,24 @@ declare module 'echarts' {
 			viewSize: number[]
 		}
 		interface Tooltip {
-			formatter: string | ((params: EventParam | EventParam[], ticket?: number, callback?: (ticket: number, tooltip: string) => void) => string)
-			position: number | string | (number | string)[] | ((point: number[], params: EventParam[], el: HTMLElement, rect: any, size: PositionSize) => (number | string)[])
+			formatter:
+				| string
+				| ((
+						params: EventParam | EventParam[],
+						ticket?: number,
+						callback?: (ticket: number, tooltip: string) => void,
+				  ) => string)
+			position:
+				| number
+				| string
+				| (number | string)[]
+				| ((
+						point: number[],
+						params: EventParam[],
+						el: HTMLElement,
+						rect: any,
+						size: PositionSize,
+				  ) => (number | string)[])
 			alwaysShowContent: boolean
 			axisPointer: Partial<AxisPointer>
 			backgroundColor: string
@@ -682,11 +703,7 @@ declare module 'echarts' {
 			z: number
 			zlevel: number
 		}
-
 	}
 
 	export = ECharts
-
 }
-
-

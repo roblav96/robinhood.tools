@@ -1,4 +1,4 @@
-// 
+//
 
 import * as pAll from 'p-all'
 import * as dayjs from 'dayjs'
@@ -13,8 +13,6 @@ import * as utils from './utils'
 import * as pretty from './pretty'
 import hours from '../stores/hours'
 
-
-
 const XLABEL_FRAMES = [
 	{ id: 'millisecond', ms: 0, format: 'h:mm:ssa', ago: true },
 	{ id: 'hour', ms: 0, format: 'h:mm:ssa', ago: true },
@@ -23,22 +21,28 @@ const XLABEL_FRAMES = [
 	{ id: 'month', ms: 0, format: 'MMM D YYYY, h:mma' },
 	{ id: 'year', ms: 0, format: 'MMM D YYYY' },
 ]
-XLABEL_FRAMES.forEach(v => v.ms = dayjs(0).add(1, v.id as any).valueOf())
+XLABEL_FRAMES.forEach(
+	(v) =>
+		(v.ms = dayjs(0)
+			.add(1, v.id as any)
+			.valueOf()),
+)
 export function xlabel(stamp: number) {
-	if (!Number.isFinite(stamp)) return '';
+	if (!Number.isFinite(stamp)) return ''
 	let now = Date.now()
-	let i: number, len = XLABEL_FRAMES.length
+	let i: number,
+		len = XLABEL_FRAMES.length
 	for (i = 0; i < len; i++) {
-		if (stamp > (now - XLABEL_FRAMES[i].ms)) {
+		if (stamp > now - XLABEL_FRAMES[i].ms) {
 			let ii = Math.max(i - 1, 0)
 			let frame = XLABEL_FRAMES[ii]
 			let label = dayjs(stamp).format(frame.format)
 			if (frame.format.endsWith('ssa')) {
-				if (label.includes(':00')) label = label.replace(':00', '');
+				if (label.includes(':00')) label = label.replace(':00', '')
 			}
 			if (frame.format.endsWith('mma')) {
 				// if (label.includes(', 9:30am')) label = label.replace(', 9:30am', '');
-				if (label.includes(', 12:00am')) label = label.replace(', 12:00am', '');
+				if (label.includes(', 12:00am')) label = label.replace(', 12:00am', '')
 			}
 			if (frame.format.startsWith('dddd')) {
 				let day = label.split(' ')[0]
@@ -48,7 +52,7 @@ export function xlabel(stamp: number) {
 				label += ` (${pretty.time(stamp)})`
 			}
 			if (!frame.ago) {
-				if (label.includes(', 9:30am')) label = label.replace(', 9:30am', '');
+				if (label.includes(', 9:30am')) label = label.replace(', 9:30am', '')
 			}
 			return label
 		}
@@ -56,19 +60,25 @@ export function xlabel(stamp: number) {
 	return dayjs(stamp).format(XLABEL_FRAMES[XLABEL_FRAMES.length - 1].format)
 }
 
-const RANGE_UNITS = { m: 'minute', h: 'hour', d: 'day', wk: 'week', mo: 'month', y: 'year', ytd: 'YTD' }
+const RANGE_UNITS = {
+	m: 'minute',
+	h: 'hour',
+	d: 'day',
+	wk: 'week',
+	mo: 'month',
+	y: 'year',
+	ytd: 'YTD',
+}
 export function range(range: string, opts = { plural: true }) {
-	if (!range) return range;
+	if (!range) return range
 	let s = range.replace(/[0-9]/g, '')
 	s = RANGE_UNITS[s] || s
 	s = s.charAt(0).toUpperCase() + s.substr(1)
 	let n = Number.parseInt(range)
-	if (!Number.isFinite(n)) return s;
-	if (opts.plural && n > 1) s = s + 's';
+	if (!Number.isFinite(n)) return s
+	if (opts.plural && n > 1) s = s + 's'
 	return n + ' ' + s
 }
-
-
 
 export function tipFormatter(params: echarts.EventParam<Quotes.Live>[], option: echarts.Option) {
 	// console.log('params ->', params)
@@ -80,7 +90,9 @@ export function tipFormatter(params: echarts.EventParam<Quotes.Live>[], option: 
 		if (Array.isArray(tooltip)) {
 			tooltip.forEach((key: string) => {
 				let value = pretty.number(param.value[key], { price: true, nozeros: true })
-				trs += `<td class="pr-1">${_.startCase(key)}</td><td class="text-right">${value}&nbsp;&nbsp;</td>`
+				trs += `<td class="pr-1">${_.startCase(
+					key,
+				)}</td><td class="text-right">${value}&nbsp;&nbsp;</td>`
 			})
 		} else {
 			let value = pretty.number(param.value[tooltip], { nozeros: true })
@@ -92,82 +104,109 @@ export function tipFormatter(params: echarts.EventParam<Quotes.Live>[], option: 
 	return `<div class="font-sans leading-tight has-background-dark has-text-white p-1 rounded">${html}</div>`
 }
 
-
-
 export function getChart(quote: Quotes.Quote, range: string) {
-	return Promise.resolve().then(function() {
-
-		let symbol = quote.symbol
-		if (quote.typeof == 'INDEXES') symbol = encodeURI('^' + symbol);
-		if (quote.typeof == 'FOREX') symbol = symbol + '=X';
-		if (range != yahoo.RANGES[0] || quote.typeof != 'STOCKS') {
-			return yahoo.getChart(symbol, {
-				range, interval: yahoo.FRAMES[range],
-				includePrePost: range == yahoo.RANGES[1],
-			})
-		}
-
-		let proms = [
-			() => http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/F`, { query: { minuteType: 'm1' }, retryTick: '1s', retries: 3 }),
-			() => http.get(`https://quoteapi.webull.com/api/quote/v4/tickerKDatas/${quote.tickerId}`, { query: { kDataType: 'm1', dayCount: 1, adjustType: 'none' }, retryTick: '1s', retries: 3 }),
-		]
-		if (hours.state != 'REGULAR') {
-			proms.unshift(() => http.get(`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/A`, { query: { minuteType: 'm1' }, retryTick: '1s', retries: 3 }))
-		}
-		return pAll(proms, { concurrency: 1 }).then(function(mquotes: Webull.MinuteChart[]) {
-			mquotes.remove(v => !v)
-
-			let kquotes = (mquotes.pop() as any) as Webull.KDatasChart
-			core.fix(kquotes, true)
-			let klquotes = webull.toKDatasLives(kquotes)
-
-			mquotes.forEach(v => core.fix(v.data[0], true))
-			let mlquotes = mquotes.map(v => webull.toMinutesLives(v)).flatten()
-
-			let mrange = {
-				min: dayjs(Math.min(...mquotes.map(v => v.data[0].dates[0].start * 1000))).valueOf(),
-				max: dayjs(Math.max(...mquotes.map(v => v.data[0].dates[0].end * 1000).concat(Date.now()))).valueOf(),
-			}
-			// console.log(`mrange ->`, _.mapValues(mrange, v => pretty.stamp(v)))
-			klquotes.remove(v => v.timestamp < mrange.min)
-
-			return yahoo.getChart(symbol, {
-				interval: '1m', includePrePost: true,
-				period1: dayjs(mrange.min).startOf('day').unix(),
-				period2: dayjs(mrange.max).endOf('day').unix(),
-			}).then(function(ylquotes: Quotes.Live[]) {
-
-				mlquotes.forEach(mlquote => {
-					let ylquote = ylquotes.find(v => v.timestamp == mlquote.timestamp)
-					if (!ylquote) return;
-					let wick = Math.abs(ylquote.high - ylquote.low)
-					let bar = Math.abs(ylquote.open - ylquote.close)
-					let percent = core.calc.percent(wick, bar)
-					if (percent > 15000) return;
-					core.object.merge(mlquote, core.object.pick(ylquote, ['open', 'high', 'low']))
+	return Promise.resolve()
+		.then(function () {
+			let symbol = quote.symbol
+			if (quote.typeof == 'INDEXES') symbol = encodeURI('^' + symbol)
+			if (quote.typeof == 'FOREX') symbol = symbol + '=X'
+			if (range != yahoo.RANGES[0] || quote.typeof != 'STOCKS') {
+				return yahoo.getChart(symbol, {
+					range,
+					interval: yahoo.FRAMES[range],
+					includePrePost: range == yahoo.RANGES[1],
 				})
+			}
 
-				if (klquotes.length > 0) {
-					let ylquote = ylquotes.find(v => v.timestamp >= klquotes[0].timestamp)
-					if (ylquote) core.object.merge(klquotes[0], core.object.pick(ylquote, ['open', 'high', 'low']));
+			let proms = [
+				() =>
+					http.get(
+						`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/F`,
+						{ query: { minuteType: 'm1' }, retryTick: '1s', retries: 3 },
+					),
+				() =>
+					http.get(
+						`https://quoteapi.webull.com/api/quote/v4/tickerKDatas/${quote.tickerId}`,
+						{
+							query: { kDataType: 'm1', dayCount: 1, adjustType: 'none' },
+							retryTick: '1s',
+							retries: 3,
+						},
+					),
+			]
+			if (hours.state != 'REGULAR') {
+				proms.unshift(() =>
+					http.get(
+						`https://quoteapi.webull.com/api/quote/v3/tickerMinutes/${quote.tickerId}/A`,
+						{ query: { minuteType: 'm1' }, retryTick: '1s', retries: 3 },
+					),
+				)
+			}
+			return pAll(proms, { concurrency: 1 }).then(function (mquotes: Webull.MinuteChart[]) {
+				mquotes.remove((v) => !v)
+
+				let kquotes = (mquotes.pop() as any) as Webull.KDatasChart
+				core.fix(kquotes, true)
+				let klquotes = webull.toKDatasLives(kquotes)
+
+				mquotes.forEach((v) => core.fix(v.data[0], true))
+				let mlquotes = mquotes.map((v) => webull.toMinutesLives(v)).flatten()
+
+				let mrange = {
+					min: dayjs(
+						Math.min(...mquotes.map((v) => v.data[0].dates[0].start * 1000)),
+					).valueOf(),
+					max: dayjs(
+						Math.max(
+							...mquotes.map((v) => v.data[0].dates[0].end * 1000).concat(Date.now()),
+						),
+					).valueOf(),
 				}
+				// console.log(`mrange ->`, _.mapValues(mrange, v => pretty.stamp(v)))
+				klquotes.remove((v) => v.timestamp < mrange.min)
 
-				return mlquotes.concat(klquotes).sort((a, b) => a.timestamp - b.timestamp)
+				return yahoo
+					.getChart(symbol, {
+						interval: '1m',
+						includePrePost: true,
+						period1: dayjs(mrange.min).startOf('day').unix(),
+						period2: dayjs(mrange.max).endOf('day').unix(),
+					})
+					.then(function (ylquotes: Quotes.Live[]) {
+						mlquotes.forEach((mlquote) => {
+							let ylquote = ylquotes.find((v) => v.timestamp == mlquote.timestamp)
+							if (!ylquote) return
+							let wick = Math.abs(ylquote.high - ylquote.low)
+							let bar = Math.abs(ylquote.open - ylquote.close)
+							let percent = core.calc.percent(wick, bar)
+							if (percent > 15000) return
+							core.object.merge(
+								mlquote,
+								core.object.pick(ylquote, ['open', 'high', 'low']),
+							)
+						})
+
+						if (klquotes.length > 0) {
+							let ylquote = ylquotes.find((v) => v.timestamp >= klquotes[0].timestamp)
+							if (ylquote)
+								core.object.merge(
+									klquotes[0],
+									core.object.pick(ylquote, ['open', 'high', 'low']),
+								)
+						}
+
+						return mlquotes.concat(klquotes).sort((a, b) => a.timestamp - b.timestamp)
+					})
 			})
 		})
-
-	}).then(function(lquotes) {
-		lquotes.forEach((lquote, i) => {
-			let prev = lquotes[i - 1] ? lquotes[i - 1].volume : lquote.size
-			lquote.volume = prev + lquote.size
+		.then(function (lquotes) {
+			lquotes.forEach((lquote, i) => {
+				let prev = lquotes[i - 1] ? lquotes[i - 1].volume : lquote.size
+				lquote.volume = prev + lquote.size
+			})
+			return lquotes
 		})
-		return lquotes
-	})
 }
-
-
-
-
 
 // export function getMinutes(tid: number, range: string) {
 // 	return Promise.resolve().then(function() {
@@ -206,8 +245,6 @@ export function getChart(quote: Quotes.Quote, range: string) {
 // 	})
 // }
 
-
-
 // import * as benchmark from '../../common/benchmark'
 // benchmark.simple('formats', [
 // 	function formattime() {
@@ -223,5 +260,3 @@ export function getChart(quote: Quotes.Quote, range: string) {
 // 		format.xlabel(Date.now() - (Math.round(Math.random() * 1000000)))
 // 	},
 // ])
-
-

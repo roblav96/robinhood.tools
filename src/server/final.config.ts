@@ -1,11 +1,9 @@
-// 
+//
 
 import * as final from 'final-pm'
 import * as _ from 'lodash'
 import * as path from 'path'
 import * as os from 'os'
-
-
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const DEVELOPMENT = process.env.NODE_ENV == 'development'
@@ -15,7 +13,8 @@ const applications = [] as final.Application[]
 const app = {
 	'env': {
 		NODE_ENV: process.env.NODE_ENV,
-		HOST: '127.0.0.1', PORT: 12300,
+		HOST: '127.0.0.1',
+		PORT: 12300,
 	},
 	'instances': 1,
 	'mode': 'fork',
@@ -23,11 +22,16 @@ const app = {
 	'restart-crashing-delay': 3000,
 	'node-args': ['--no-warnings', '--expose-gc', '--max_old_space_size=2048'],
 } as final.Application
-declare global { namespace NodeJS { interface ProcessEnv { HOST: any; PORT: any } } }
+declare global {
+	namespace NodeJS {
+		interface ProcessEnv {
+			HOST: any
+			PORT: any
+		}
+	}
+}
 
-
-
-if (DEVELOPMENT) app.env.DEBUGGER = true;
+if (DEVELOPMENT) app.env.DEBUGGER = true
 
 {
 	Application({ name: 'radio', run: 'services/radio.service' })
@@ -40,45 +44,68 @@ if (DEVELOPMENT) app.env.DEBUGGER = true;
 	// Application({ name: 'robinhood', run: 'services/robinhood.service' })
 
 	if (DEVELOPMENT) {
-		Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances: 1 })
+		Application({
+			name: 'stocks',
+			run: 'services/quotes.service',
+			env: { SYMBOLS: 'STOCKS' },
+			instances: 1,
+		})
 	} else {
-		Application({ name: 'stocks', run: 'services/quotes.service', env: { SYMBOLS: 'STOCKS' }, instances: cpus })
+		Application({
+			name: 'stocks',
+			run: 'services/quotes.service',
+			env: { SYMBOLS: 'STOCKS' },
+			instances: cpus,
+		})
 		Application({ name: 'forex', run: 'services/quotes.service', env: { SYMBOLS: 'FOREX' } })
-		Application({ name: 'indexes', run: 'services/quotes.service', env: { SYMBOLS: 'INDEXES' } })
+		Application({
+			name: 'indexes',
+			run: 'services/quotes.service',
+			env: { SYMBOLS: 'INDEXES' },
+		})
 	}
-
 }
-
-
 
 function Application(application: Partial<final.Application>) {
 	_.defaults(application.env, app.env)
 	_.defaults(application, app)
 	application.run = path.resolve(__dirname, `${application.run}.js`)
-	if (application.instances > 1) application.mode = 'cluster';
+	if (application.instances > 1) application.mode = 'cluster'
 	applications.push(JSON.parse(JSON.stringify(application)))
 }
 
 let total = 0
-let envs = JSON.stringify(applications.map((v, i) => {
-	let env = {
-		NAME: v.name,
-		SCALE: v.instances,
-		OFFSET: total,
-		LENGTH: applications.length,
-	} as NodeJS.ProcessEnv
-	total += v.instances
-	Object.assign(v.env, env)
-	return env
-}))
-declare global { namespace NodeJS { interface ProcessEnv { NAME: string; SCALE: any; OFFSET: any; LENGTH: any; TOTAL: any; ENVS: any; FINAL_PM_INSTANCE_NUMBER: any } } }
+let envs = JSON.stringify(
+	applications.map((v, i) => {
+		let env = {
+			NAME: v.name,
+			SCALE: v.instances,
+			OFFSET: total,
+			LENGTH: applications.length,
+		} as NodeJS.ProcessEnv
+		total += v.instances
+		Object.assign(v.env, env)
+		return env
+	}),
+)
+declare global {
+	namespace NodeJS {
+		interface ProcessEnv {
+			NAME: string
+			SCALE: any
+			OFFSET: any
+			LENGTH: any
+			TOTAL: any
+			ENVS: any
+			FINAL_PM_INSTANCE_NUMBER: any
+		}
+	}
+}
 
-applications.forEach(v => {
+applications.forEach((v) => {
 	v.env.TOTAL = total
 	v.env.ENVS = envs
 })
 // console.log(`applications ->`, JSON.stringify(applications, null, 4))
 
 module.exports = { applications } as final.Configuration
-
-

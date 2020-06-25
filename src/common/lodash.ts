@@ -1,4 +1,4 @@
-// 
+//
 
 export {
 	add,
@@ -66,5 +66,3 @@ export {
 	values,
 	zipObject,
 } from 'lodash'
-
-

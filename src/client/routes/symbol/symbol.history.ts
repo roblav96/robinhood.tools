@@ -1,4 +1,4 @@
-// 
+//
 
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
@@ -7,13 +7,5 @@ import * as core from '../../../common/core'
 import * as rkeys from '../../../common/rkeys'
 import * as http from '../../../common/http'
 
-
-
 @Vts.Component
-export default class extends Vue {
-	
-	
-
-}
-
-
+export default class extends Vue {}

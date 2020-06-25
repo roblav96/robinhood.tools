@@ -1,4 +1,4 @@
-// 
+//
 
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
@@ -12,9 +12,7 @@ import * as boom from 'boom'
 import * as matchit from 'matchit'
 import polka from './polka'
 
-
-
-export interface PolkaRequest extends TurboRequest, Polka.Request { }
+export interface PolkaRequest extends TurboRequest, Polka.Request {}
 export class PolkaRequest {
 	body: any
 	headers: Dict<string>
@@ -25,13 +23,11 @@ export class PolkaRequest {
 }
 util.inherits(TurboRequest, PolkaRequest)
 
-
-
 polka.use(function request(req, res, next) {
-
 	req.headers = {}
 	let rawheaders = req._options.headers
-	let i: number, len = rawheaders.length
+	let i: number,
+		len = rawheaders.length
 	for (i = 0; i < len; i += 2) {
 		let header = rawheaders[i].toLowerCase()
 		req.headers[header] = rawheaders[i + 1]
@@ -43,7 +39,7 @@ polka.use(function request(req, res, next) {
 	req.match = matchit.match(req.path, polka.routes[req.method])[0]
 
 	req.body = {}
-	if (req.method == 'GET') return next();
+	if (req.method == 'GET') return next()
 
 	let chunks = [] as string[]
 	req.ondata = function ondata(buffer, start, length) {
@@ -51,13 +47,14 @@ polka.use(function request(req, res, next) {
 		chunks.push(chunk.toString())
 	}
 	req.onend = function onend() {
-		req.ondata = _.noop; req.onend = _.noop
+		req.ondata = _.noop
+		req.onend = _.noop
 		let body = chunks.join('')
-		if (!body) return next();
+		if (!body) return next()
 		let content = req.headers['content-type']
 		if (content == 'application/json') {
 			let parsed = fastjsonparse(body)
-			if (parsed.err) return next(boom.badData(parsed.err.message));
+			if (parsed.err) return next(boom.badData(parsed.err.message))
 			req.body = parsed.value
 		} else if (content == 'application/x-www-form-urlencoded') {
 			req.body = qs.parse(body)
@@ -66,7 +63,4 @@ polka.use(function request(req, res, next) {
 		}
 		next()
 	}
-
 })
-
-

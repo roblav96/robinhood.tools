@@ -1,4 +1,4 @@
-// 
+//
 
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
@@ -15,8 +15,6 @@ import * as http from '../../../common/http'
 import store from '../../store'
 import socket from '../../adapters/socket'
 
-
-
 @Vts.Component({
 	beforeRouteEnter(to, from, next) {
 		// if (process.env.DEVELOPMENT) return next();
@@ -24,9 +22,7 @@ import socket from '../../adapters/socket'
 	},
 })
 export default class extends Mixins(VMixin, RHMixin) {
-
-	get routes() { return this.$router.options.routes.find(v => v.name == 'robinhood').children }
-
+	get routes() {
+		return this.$router.options.routes.find((v) => v.name == 'robinhood').children
+	}
 }
-
-

@@ -4,13 +4,11 @@ html {
 	overflow-y: auto;
 }
 
-
 /* vue fixes */
 
-*[style*="display: none"] {
+*[style*='display: none'] {
 	display: none !important;
 }
-
 
 /* tailwind fixes */
 
@@ -37,7 +35,6 @@ html {
 	flex-direction: column;
 	flex: 1;
 }
-
 
 /* bulma fixes */
 
@@ -132,7 +129,6 @@ span.tag.is-small {
 	padding: 0rem 0.25rem;
 }
 
-
 /* buefy fixes */
 
 .control.has-icons-left .icon.is-left {
@@ -160,7 +156,6 @@ span.tag.is-small {
 	width: 12rem !important;
 }
 
-
 /**/
 
 .cursor-help {
@@ -187,17 +182,15 @@ span.tag.is-small {
 	cursor: zoom-out;
 }
 
-
 /**/
 
 .bg-bullish {
-	background-color: #E3FCEC;
+	background-color: #e3fcec;
 }
 
 .bg-bearish {
-	background-color: #FCEBEA;
+	background-color: #fcebea;
 }
-
 
 /**/
 
@@ -207,7 +200,6 @@ span.tag.is-small {
 .debug-border {
 	border: 1px solid red !important;
 }
-
 
 /**/
 
@@ -261,12 +253,10 @@ table.table.is-narrowest td,
 	padding: 0rem 0.25rem;
 }
 
-
 /*table.table th.font-mono,
 table.table td.font-mono {
 	white-space: nowrap;
 }*/
-
 
 /**/
 
@@ -284,7 +274,6 @@ p.content,
 	line-height: 1.5;
 }
 
-
 /**/
 
 .scrollbar-none::-webkit-scrollbar {
@@ -299,7 +288,6 @@ p.content,
 .scrollbar::-webkit-scrollbar-thumb {
 	background-color: var(--border);
 }
-
 
 /**/
 
@@ -328,6 +316,5 @@ span.icon.is-xxlarge > i.mdi,
 span.icon.is-xxlarge > i.mdi::before {
 	font-size: 5rem;
 }
-
 
 /**/

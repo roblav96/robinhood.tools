@@ -1,7 +1,6 @@
-// 
+//
 
 declare module 'stacktracey' {
-
 	class StackTracey {
 		constructor(...args: any[])
 
@@ -42,11 +41,9 @@ declare module 'stacktracey' {
 		static stack?: any
 
 		static withSource(...args: any[]): void
-
 	}
 
-	namespace StackTracey { }
+	namespace StackTracey {}
 
 	export = StackTracey
-
 }

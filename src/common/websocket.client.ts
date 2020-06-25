@@ -1,4 +1,4 @@
-// 
+//
 
 import * as _ from './lodash'
 import * as qs from 'querystring'
@@ -8,9 +8,8 @@ import * as core from './core'
 import Emitter from './emitter'
 import clock from './clock'
 
-
-
-export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' | 'message'> { //, string | number | Error> {
+export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' | 'message'> {
+	//, string | number | Error> {
 
 	static readonly CODES = {
 		1000: 'Normal',
@@ -37,7 +36,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	get name() {
 		let parsed = url.parse(this.address)
-		if (parsed.pathname) return 'ws:/' + parsed.pathname;
+		if (parsed.pathname) return 'ws:/' + parsed.pathname
 		return 'ws:' + parsed.host
 	}
 
@@ -47,27 +46,29 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	) {
 		super()
 		_.defaults(this.options, WebSocketClient.options)
-		if (this.options.connect) this.connect();
+		if (this.options.connect) this.connect()
 	}
 
 	ws: WebSocket & uws
-	alive() { return this.ws && this.ws.readyState == this.ws.OPEN }
+	alive() {
+		return this.ws && this.ws.readyState == this.ws.OPEN
+	}
 
 	send(message: string) {
-		if (!this.alive()) return;
+		if (!this.alive()) return
 		this.ws.send(message)
 	}
 	json(data: any) {
-		if (!this.alive()) return;
+		if (!this.alive()) return
 		this.ws.send(JSON.stringify(data))
 	}
 	binary(data: any) {
-		if (!this.alive()) return;
+		if (!this.alive()) return
 		this.ws.send(Buffer.from(data), { binary: true })
 	}
 
 	close(code = 1000, reason = '') {
-		if (this.ws == null) return;
+		if (this.ws == null) return
 		this.ws.close(code, reason)
 	}
 
@@ -79,7 +80,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	terminate() {
-		if (this.ws == null) return;
+		if (this.ws == null) return
 		this.ws.close(1000)
 		if (process.env.SERVER) {
 			this.ws.terminate()
@@ -88,7 +89,9 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		this.ws = null
 	}
 
-	private heartbeat() { this.send('ping') }
+	private heartbeat() {
+		this.send('ping')
+	}
 	private reconnect() {
 		clock.offListener(this.connect, this)
 		clock.once(this.options.timeout, this.connect, this)
@@ -96,7 +99,9 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	connect() {
 		this.terminate()
-		let address = this.options.query ? `${this.address}?${qs.stringify(this.options.query())}` : this.address
+		let address = this.options.query
+			? `${this.address}?${qs.stringify(this.options.query())}`
+			: this.address
 		this.ws = new WebSocket(address) as any
 		this.ws.binaryType = 'arraybuffer'
 		this.ws.onopen = this.onopen as any
@@ -107,7 +112,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	}
 
 	private onopen = (event: Event) => {
-		if (this.options.verbose) console.info(this.name, 'onopen');
+		if (this.options.verbose) console.info(this.name, 'onopen')
 		this.emit('open', event)
 		clock.offListener(this.connect, this)
 		if (this.options.heartbeat) {
@@ -118,9 +123,9 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 
 	private onclose = (event: CloseEvent) => {
 		if (this.options.verbose) {
-			let code = (WebSocketClient.CODES[event.code]) || event.code
-			if (!Number.isFinite(code)) code += ` (${event.code})`;
-			console.warn(this.name, 'onclose ->', code, '->', event.reason);
+			let code = WebSocketClient.CODES[event.code] || event.code
+			if (!Number.isFinite(code)) code += ` (${event.code})`
+			console.warn(this.name, 'onclose ->', code, '->', event.reason)
 		}
 		this.emit('close', _.pick(event, ['code', 'reason']))
 		if (this.options.retry) {
@@ -132,19 +137,16 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 	private onerror = (error: Error) => {
 		if (this.options.verbose) {
 			let message = (error.message || error) as string
-			console.error(this.name, 'onerror Error ->', message);
+			console.error(this.name, 'onerror Error ->', message)
 		}
 		this.emit('error', error)
 	}
 
 	private onmessage = (event: MessageEvent) => {
 		let message = event.data as string
-		if (message == 'pong') return;
-		if (message == 'ping') return this.send('pong');
-		if (this.options.verbose) console.log(this.name, 'onmessage ->', message);
+		if (message == 'pong') return
+		if (message == 'ping') return this.send('pong')
+		if (this.options.verbose) console.log(this.name, 'onmessage ->', message)
 		this.emit('message', message)
 	}
-
 }
-
-

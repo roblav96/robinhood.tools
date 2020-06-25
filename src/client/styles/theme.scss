@@ -1,22 +1,22 @@
-// 
+//
 @import '~ibm-design-colors';
 @import '~bulma/sass/utilities/initial-variables';
-// 
+//
 $black: #0e0e0e;
 $black-bis: #1a1a1a;
 $black-ter: color('cool-gray', 90);
-// 
+//
 $grey-darker: color('cool-gray', 80);
 $grey-dark: color('cool-gray', 70);
 $grey: color('cool-gray', 50);
 $grey-light: color('cool-gray', 30);
 $grey-lighter: color('cool-gray', 10);
 $grey-lightest: color('cool-gray', 1);
-// 
+//
 $white-ter: color('cool-white', 4);
 $white-bis: color('cool-white', 2);
 $white: color('white', 0);
-// 
+//
 $orange: color('orange', 30); // #F6993F;
 $yellow: color('gold', 20); // #FFED4A;
 $green: color('green', 40); // #38C172;
@@ -26,24 +26,24 @@ $blue: color('blue', 40); // #3490DC;
 $purple: color('violet', 50); // #9561E2;
 $red: color('red', 50); // #E3342F;
 $pink: color('magenta', 40); // #F66D9B;
-// 
+//
 $text: color('cool-gray', 70);
 $text-light: color('cool-gray', 60);
 $text-lighter: color('cool-gray', 50);
 $text-lightest: color('cool-gray', 40);
 $text-strong: color('cool-gray', 80);
-// 
+//
 // $text: $grey-dark;
 // $text-light: $grey;
 // $text-lighter: $grey;
 // $text-lightest: $grey-light;
 // $text-strong: $grey-darker;
-// 
+//
 $light: $white-ter;
 $dark: $grey-dark;
 $light-invert: $grey-darker;
 $dark-invert: $white;
-// 
+//
 $primary: $purple;
 $secondary: $cyan;
 $accent: $yellow;
@@ -52,7 +52,7 @@ $success: $green;
 $warning: $orange;
 $danger: $red;
 $link: $primary;
-// 
+//
 $primary-invert: $white;
 $secondary-invert: $white;
 $accent-invert: $white;
@@ -61,63 +61,139 @@ $success-invert: $white;
 $warning-invert: $white;
 $danger-invert: $white;
 $link-invert: $white;
-// 
-$family-sans-serif: ('IBM Plex Sans', system-ui, BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif);
-$family-monospace: ('IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace);
-// 
+//
+$family-sans-serif: (
+	'IBM Plex Sans',
+	system-ui,
+	BlinkMacSystemFont,
+	-apple-system,
+	'Segoe UI',
+	'Roboto',
+	'Oxygen',
+	'Ubuntu',
+	'Cantarell',
+	'Fira Sans',
+	'Droid Sans',
+	'Helvetica Neue',
+	'Helvetica',
+	'Arial',
+	sans-serif
+);
+$family-monospace: (
+	'IBM Plex Mono',
+	'Menlo',
+	'DejaVu Sans Mono',
+	'Bitstream Vera Sans Mono',
+	Courier,
+	monospace
+);
+//
 $gap: 32px;
 $tablet: 768px;
 $desktop: 992px;
 $widescreen: 1200px;
 $fullhd: 1408px;
-// 
+//
 $column-gap: 0.75rem;
 $dimensions: 16 20 24 28 32 40 48 56 64 72 80 88 96 104 112 120;
-// 
-$section-padding: ($column-gap*2) ($column-gap*2);
-$section-padding-medium: ($column-gap*3) ($column-gap*2);
-$section-padding-large: ($column-gap*4) ($column-gap*2);
-// 
+//
+$section-padding: ($column-gap * 2) ($column-gap * 2);
+$section-padding-medium: ($column-gap * 3) ($column-gap * 2);
+$section-padding-large: ($column-gap * 4) ($column-gap * 2);
+//
 $radius-small: 0.125rem;
 $radius: 0.25rem;
 $radius-large: 0.5rem;
-// 
+//
 $speed: 64ms;
 $speed-slow: 128ms;
 $speed-slower: 256ms;
-// 
+//
 @import '~bulma/sass/utilities/all';
 @import '~buefy/src/scss/utils/variables';
-// 
-$shades: map-merge($shades, ('grey-lightest':$grey-lightest));
-$colors: map-merge($colors, ('text':($text, $white)));
-$colors: map-merge($colors, ('text-light':($text-light, $white)));
-$colors: map-merge($colors, ('text-lighter':($text-lighter, $white)));
-$colors: map-merge($colors, ('text-strong':($text-strong, $white)));
-$colors: map-merge($colors, ('secondary':($secondary, $white)));
-$colors: map-merge($colors, ('accent':($accent, $white)));
-// 
+//
+$shades: map-merge(
+	$shades,
+	(
+		'grey-lightest': $grey-lightest,
+	)
+);
+$colors: map-merge(
+	$colors,
+	(
+		'text': (
+			$text,
+			$white,
+		),
+	)
+);
+$colors: map-merge(
+	$colors,
+	(
+		'text-light': (
+			$text-light,
+			$white,
+		),
+	)
+);
+$colors: map-merge(
+	$colors,
+	(
+		'text-lighter': (
+			$text-lighter,
+			$white,
+		),
+	)
+);
+$colors: map-merge(
+	$colors,
+	(
+		'text-strong': (
+			$text-strong,
+			$white,
+		),
+	)
+);
+$colors: map-merge(
+	$colors,
+	(
+		'secondary': (
+			$secondary,
+			$white,
+		),
+	)
+);
+$colors: map-merge(
+	$colors,
+	(
+		'accent': (
+			$accent,
+			$white,
+		),
+	)
+);
+//
 $body-background-color: $white;
 $footer-background-color: $white-ter;
-// 
+//
 $table-color: $text;
 $button-color: $text;
-// 
+//
 $link-focus-border: $link;
 $navbar-item-active-color: $link;
 $dropdown-item-hover-color: $link;
-// 
+//
 $modal-content-width: 480px;
 $modal-background-background-color: rgba($black, 0.2);
-// 
+//
 $hr-height: 0px;
 $hr-margin: 0px;
 $hr-background-color: $border;
-// 
+//
 @import '~bulma';
 @import '~buefy/src/scss/buefy';
-// 
+//
 @import './styles';
-// 
-// 
+//
+//
 //

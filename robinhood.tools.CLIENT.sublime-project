@@ -1,29 +1,25 @@
 {
-	"folders": [{
-		"name": "robinhood.tools.CLIENT",
-		"path": ".",
-		"folder_exclude_patterns": [
-			"public/img",
-			"assets",
-			"server",
-			"dist",
-			"node_modules"
-		],
-		"file_exclude_patterns": [
-			"public/vendors*",
-			"tailwind.css",
-			"procfile*",
-			"final.config*",
-			"forever.config*",
-			"pm2.config*",
-			"*.tsconfig.*",
-			"*.sublime*",
-			"*.gitignore*",
-			"*favicon*",
-			"*nginx*",
-			"*server*",
-			"*license*",
-			"*readme*"
-		]
-	}]
+	"folders": [
+		{
+			"name": "robinhood.tools.CLIENT",
+			"path": ".",
+			"folder_exclude_patterns": ["public/img", "assets", "server", "dist", "node_modules"],
+			"file_exclude_patterns": [
+				"public/vendors*",
+				"tailwind.css",
+				"procfile*",
+				"final.config*",
+				"forever.config*",
+				"pm2.config*",
+				"*.tsconfig.*",
+				"*.sublime*",
+				"*.gitignore*",
+				"*favicon*",
+				"*nginx*",
+				"*server*",
+				"*license*",
+				"*readme*"
+			]
+		}
+	]
 }

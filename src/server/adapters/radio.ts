@@ -1,4 +1,4 @@
-// 
+//
 
 import * as Sockette from 'sockette'
 import * as uws from 'uws'
@@ -9,14 +9,11 @@ import * as Rx from '../../common/rxjs'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
 
-
-
 const host = '127.0.0.1'
 const port = +process.env.PORT - 1
 const address = `ws://${host}:${port}`
 
 class Radio extends Emitter<string, Radio.Event> {
-
 	private sockette: Sockette
 	private uuid = security.randomBits(16)
 	private name = process.env.NAME
@@ -37,7 +34,7 @@ class Radio extends Emitter<string, Radio.Event> {
 			onopen: this.onopen,
 			onclose: this.onclose,
 			onerror: this.onerror,
-			onmessage: this.onmessage
+			onmessage: this.onmessage,
 		})
 	}
 
@@ -60,8 +57,8 @@ class Radio extends Emitter<string, Radio.Event> {
 	}
 	private onmessage = ({ data }: MessageEvent) => {
 		let message = data as string
-		if (message == 'pong') return;
-		if (message == 'ping') return this.sockette.send('pong');
+		if (message == 'pong') return
+		if (message == 'ping') return this.sockette.send('pong')
 		if (message == '__onopen__') {
 			this.isopen = true
 			super.emit('open')
@@ -73,12 +70,16 @@ class Radio extends Emitter<string, Radio.Event> {
 			return
 		}
 		let parsed = fastjsonparse(message)
-		if (parsed.err) return console.error(`parsed.err.message Error -> %O`, parsed.err.message);
+		if (parsed.err) return console.error(`parsed.err.message Error -> %O`, parsed.err.message)
 		let event = parsed.value as Radio.Event
 		if (event.selector) {
-			if (event.selector.uuid && event.selector.uuid != this.uuid) return;
-			if (event.selector.name && event.selector.name != this.name) return;
-			if (Number.isFinite(event.selector.instance) && event.selector.instance != this.instance) return;
+			if (event.selector.uuid && event.selector.uuid != this.uuid) return
+			if (event.selector.name && event.selector.name != this.name) return
+			if (
+				Number.isFinite(event.selector.instance) &&
+				event.selector.instance != this.instance
+			)
+				return
 		}
 		super.emit(event.name, event)
 	}
@@ -86,7 +87,7 @@ class Radio extends Emitter<string, Radio.Event> {
 	event(event: Partial<Radio.Event>) {
 		event.host = this.host
 		let message = JSON.stringify(event)
-		if (this.isready) return this.sockette.send(message);
+		if (this.isready) return this.sockette.send(message)
 		this.toPromise('ready').then(() => this.sockette.send(message))
 		// this.once('ready', () => this.sockette.send(message))
 	}
@@ -101,11 +102,13 @@ class Radio extends Emitter<string, Radio.Event> {
 		this.on(name, (event: Radio.Event<Radio.InvokeReply>) => {
 			let reqid = event.data.reqid
 			let uuid = event.host.uuid
-			return fn(event.data.request).then(response => {
-				this.send({ uuid }, name, { reqid, response } as Radio.InvokeReply)
-			}).catch(error => {
-				this.send({ uuid }, name, { reqid, error } as Radio.InvokeReply)
-			})
+			return fn(event.data.request)
+				.then((response) => {
+					this.send({ uuid }, name, { reqid, response } as Radio.InvokeReply)
+				})
+				.catch((error) => {
+					this.send({ uuid }, name, { reqid, error } as Radio.InvokeReply)
+				})
 		})
 	}
 	invoke(selector: Partial<Radio.Host>, name: string, request?: any) {
@@ -113,21 +116,18 @@ class Radio extends Emitter<string, Radio.Event> {
 		let reqid = security.randomBits(16)
 		return new Promise<any>((resolve, reject) => {
 			this.on(name, function onreply(event: Radio.Event<Radio.InvokeReply>) {
-				if (event.host.uuid == uuid) return;
-				if (event.data.reqid != reqid) return;
+				if (event.host.uuid == uuid) return
+				if (event.data.reqid != reqid) return
 				radio.off(name, onreply)
 				event.data.error ? reject(event.data.error) : resolve(event.data.response)
 			})
 			this.send(selector, name, { reqid, request } as Radio.InvokeReply)
 		})
 	}
-
 }
 
 const radio = new Radio()
 export default radio
-
-
 
 declare global {
 	namespace Radio {
@@ -150,5 +150,3 @@ declare global {
 		}
 	}
 }
-
-

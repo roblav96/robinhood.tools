@@ -1,4 +1,4 @@
-// 
+//
 
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
@@ -12,11 +12,8 @@ import * as quotes from '../../../common/quotes'
 import * as pretty from '../../adapters/pretty'
 import * as utils from '../../adapters/utils'
 
-
-
 @Vts.Component
 export default class extends Mixins(VMixin) {
-
 	recents = this.$store.state.recents
 
 	mounted() {
@@ -29,12 +26,17 @@ export default class extends Mixins(VMixin) {
 		utils.wemitter.off('keydown', this.onkey, this)
 	}
 
-	@Vts.Watch('recents') w_recents() { this.sync() }
+	@Vts.Watch('recents') w_recents() {
+		this.sync()
+	}
 
 	onkey(event: KeyboardEvent) {
-		if (event.metaKey || event.shiftKey || event.ctrlKey || event.altKey) return;
+		if (event.metaKey || event.shiftKey || event.ctrlKey || event.altKey) return
 		if (event.type == 'keyup') {
-			if (event.key == 'Escape' && document.activeElement.outerHTML == this.inputfield.outerHTML) {
+			if (
+				event.key == 'Escape' &&
+				document.activeElement.outerHTML == this.inputfield.outerHTML
+			) {
 				this.inputfield.blur()
 			}
 			if (event.key == '/' && document.activeElement.tagName != 'INPUT') {
@@ -49,10 +51,16 @@ export default class extends Mixins(VMixin) {
 		}
 	}
 
-	get autocomplete() { return this.$refs.searchbar_autocomplete as Vue }
-	get inputfield() { return this.autocomplete.$el.querySelector('input') }
+	get autocomplete() {
+		return this.$refs.searchbar_autocomplete as Vue
+	}
+	get inputfield() {
+		return this.autocomplete.$el.querySelector('input')
+	}
 	scrolltop(behavior = 'smooth' as ScrollBehavior) {
-		let el = this.autocomplete.$el.querySelector('div.dropdown-menu > div.dropdown-content') as HTMLElement
+		let el = this.autocomplete.$el.querySelector(
+			'div.dropdown-menu > div.dropdown-content',
+		) as HTMLElement
 		el.scrollTo({ top: 0, behavior })
 	}
 
@@ -61,16 +69,20 @@ export default class extends Mixins(VMixin) {
 
 	oninput = _.debounce(this.sync, 1, { leading: false, trailing: true })
 	sync(query = this.query) {
-		return Promise.resolve().then(() => {
-			if (!this.query) return http.post('/recents', { symbols: this.recents.map(v => v.symbol) });
-			return http.get('/search', { query: { query: this.query } })
-		}).then(results => {
-			this.$safety()
-			if (this.query == query) {
-				this.results = results
-			}
-			this.$nextTick(() => this.scrolltop())
-		}).catch(error => console.error('sync Error ->', error))
+		return Promise.resolve()
+			.then(() => {
+				if (!this.query)
+					return http.post('/recents', { symbols: this.recents.map((v) => v.symbol) })
+				return http.get('/search', { query: { query: this.query } })
+			})
+			.then((results) => {
+				this.$safety()
+				if (this.query == query) {
+					this.results = results
+				}
+				this.$nextTick(() => this.scrolltop())
+			})
+			.catch((error) => console.error('sync Error ->', error))
 	}
 
 	onfocus() {
@@ -79,15 +91,10 @@ export default class extends Mixins(VMixin) {
 			this.inputfield.setSelectionRange(0, this.inputfield.value.length)
 		}
 	}
-	onblur() {
-
-	}
+	onblur() {}
 
 	onselect(result: Quotes.Quote) {
 		this.$router.push({ name: this.$routerSymbolName, params: { symbol: result.symbol } })
 		this.inputfield.blur()
 	}
-
 }
-
-

@@ -1,7 +1,6 @@
-// 
+//
 
 declare module 'eventemitter3' {
-
 	namespace EventEmitter3 {
 		type Listener<Data = any> = (...args: Data[]) => void
 		interface Event<Data = any> {
@@ -19,16 +18,35 @@ declare module 'eventemitter3' {
 		listeners<Name extends Names>(name: Name): EventEmitter3.Listener<Data>[]
 		listenerCount<Name extends Names>(name: Name): number
 		emit<Name extends Names>(name: Name, ...args: Data[]): any
-		on<Name extends Names>(name: Name, listener: EventEmitter3.Listener<Data>, context?: any): this
-		addListener<Name extends Names>(name: Name, listener: EventEmitter3.Listener<Data>, context?: any): this
-		once<Name extends Names>(name: Name, listener: EventEmitter3.Listener<Data>, context?: any): this
-		removeListener<Name extends Names>(name: Name, listener?: EventEmitter3.Listener<Data>, context?: any, once?: boolean): this
-		off<Name extends Names>(name: Name, listener?: EventEmitter3.Listener<Data>, context?: any, once?: boolean): this
+		on<Name extends Names>(
+			name: Name,
+			listener: EventEmitter3.Listener<Data>,
+			context?: any,
+		): this
+		addListener<Name extends Names>(
+			name: Name,
+			listener: EventEmitter3.Listener<Data>,
+			context?: any,
+		): this
+		once<Name extends Names>(
+			name: Name,
+			listener: EventEmitter3.Listener<Data>,
+			context?: any,
+		): this
+		removeListener<Name extends Names>(
+			name: Name,
+			listener?: EventEmitter3.Listener<Data>,
+			context?: any,
+			once?: boolean,
+		): this
+		off<Name extends Names>(
+			name: Name,
+			listener?: EventEmitter3.Listener<Data>,
+			context?: any,
+			once?: boolean,
+		): this
 		removeAllListeners<Name extends Names>(name?: Name): this
 	}
 
 	export = EventEmitter3
-
 }
-
-

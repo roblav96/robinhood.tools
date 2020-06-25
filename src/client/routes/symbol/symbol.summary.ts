@@ -1,4 +1,4 @@
-// 
+//
 
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
@@ -15,18 +15,16 @@ import * as utils from '../../adapters/utils'
 import * as pretty from '../../adapters/pretty'
 import socket from '../../adapters/socket'
 
-
-
 @Vts.Component
 export default class extends Mixins(VMixin) {
-
 	$parent: Symbol
 	symbol = this.$parent.symbol
 	all = this.$parent.all
 
 	schemas = [
 		{
-			name: 'Instrument', icon: 'coin',
+			name: 'Instrument',
+			icon: 'coin',
 			defs: [
 				{ key: 'name' },
 				{ key: 'issueType' },
@@ -36,7 +34,8 @@ export default class extends Mixins(VMixin) {
 			],
 		},
 		{
-			name: 'Exchange', icon: 'bank',
+			name: 'Exchange',
+			icon: 'bank',
 			defs: [
 				{ key: 'exchange', title: 'Name' },
 				{ key: 'acronym' },
@@ -49,29 +48,54 @@ export default class extends Mixins(VMixin) {
 
 	vvalue(key: keyof Quotes.Quote) {
 		let value = this.all.quote[key]
-		if (value == null) return value;
-		if (key == 'statusTimestamp') return pretty.time(value as any, { verbose: true });
-		if (key == 'listDate') return dayjs(value as any).format('MMMM D, YYYY');
-		if (core.number.isFinite(value)) return pretty.number(value);
-		if (core.boolean.is(value)) return value ? 'Yes' : 'No';
+		if (value == null) return value
+		if (key == 'statusTimestamp') return pretty.time(value as any, { verbose: true })
+		if (key == 'listDate') return dayjs(value as any).format('MMMM D, YYYY')
+		if (core.number.isFinite(value)) return pretty.number(value)
+		if (core.boolean.is(value)) return value ? 'Yes' : 'No'
 		if (core.string.is(value)) {
 			let ikeys = ['timezone', 'status'] as KeysOf<Quotes.Quote>
-			if (ikeys.includes(key)) return core.string.capitalize(_.startCase(value));
+			if (ikeys.includes(key)) return core.string.capitalize(_.startCase(value))
 		}
 		return value
 	}
 
 	get website() {
-		return this.all.quote.website ? url.parse(this.all.quote.website).host : this.all.quote.website
+		return this.all.quote.website
+			? url.parse(this.all.quote.website).host
+			: this.all.quote.website
 	}
 
 	states = [
-		{ name: '4am to 8pm', icon: 'theme-light-dark', key: '', calc: 'startPrice', tip: 'Price at start of day (4:00am)' },
-		{ name: 'Pre Market', icon: 'weather-sunset-up', key: 'pre', calc: 'startPrice', tip: 'Price at start of day (4:00am)' },
-		{ name: 'Regular', icon: 'weather-sunny', key: 'reg', calc: 'openPrice', tip: 'Price at market open (9:30am)' },
-		{ name: 'After Hours', icon: 'weather-sunset-down', key: 'post', calc: 'closePrice', tip: 'Price at market close (4:00pm)' },
+		{
+			name: '4am to 8pm',
+			icon: 'theme-light-dark',
+			key: '',
+			calc: 'startPrice',
+			tip: 'Price at start of day (4:00am)',
+		},
+		{
+			name: 'Pre Market',
+			icon: 'weather-sunset-up',
+			key: 'pre',
+			calc: 'startPrice',
+			tip: 'Price at start of day (4:00am)',
+		},
+		{
+			name: 'Regular',
+			icon: 'weather-sunny',
+			key: 'reg',
+			calc: 'openPrice',
+			tip: 'Price at market open (9:30am)',
+		},
+		{
+			name: 'After Hours',
+			icon: 'weather-sunset-down',
+			key: 'post',
+			calc: 'closePrice',
+			tip: 'Price at market close (4:00pm)',
+		},
 	]
-
 }
 
 interface Schema {
@@ -83,5 +107,3 @@ interface SchemaMap {
 	key: keyof Quotes.Quote
 	title?: string
 }
-
-

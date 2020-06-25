@@ -1,7 +1,6 @@
-// 
+//
 
 declare module 'proxify-url' {
-
 	namespace Proxify {
 		interface Options {
 			inputFormat: string
@@ -12,7 +11,4 @@ declare module 'proxify-url' {
 	}
 	function Proxify(url: string, opts?: Partial<Proxify.Options>): string
 	export = Proxify
-
 }
-
-

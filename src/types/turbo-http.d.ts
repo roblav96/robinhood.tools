@@ -1,4 +1,4 @@
-// 
+//
 
 declare module 'turbo-http' {
 	import * as turbo from 'turbo-net'
@@ -8,19 +8,34 @@ declare module 'turbo-http' {
 	namespace Server {
 		type Methods = 'GET' | 'POST' | 'PUT' | 'HEAD' | 'PATCH' | 'DELETE' | 'OPTIONS'
 		interface Events extends turbo.Server.Events {
-			'request': [TurboRequest, TurboResponse]
+			request: [TurboRequest, TurboResponse]
 		}
 	}
 	export class Server extends turbo.Server {
 		constructor(options?: turbo.Server.Options)
-		emit<Name extends keyof Server.Events>(event: Name, arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]): boolean
-		on<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void): this
-		once<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void): this
-		addListener<Name extends keyof Server.Events>(event: Name, fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void): this
+		emit<Name extends keyof Server.Events>(
+			event: Name,
+			arg0?: Server.Events[Name][0],
+			arg1?: Server.Events[Name][1],
+		): boolean
+		on<Name extends keyof Server.Events>(
+			event: Name,
+			fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void,
+		): this
+		once<Name extends keyof Server.Events>(
+			event: Name,
+			fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void,
+		): this
+		addListener<Name extends keyof Server.Events>(
+			event: Name,
+			fn: (arg0?: Server.Events[Name][0], arg1?: Server.Events[Name][1]) => void,
+		): this
 	}
 	export function createServer(handler?: (req: TurboRequest, res: TurboResponse) => void): Server
-	export function createServer(options?: turbo.Server.Options, handler?: (req: TurboRequest, res: TurboResponse) => void): Server
-
+	export function createServer(
+		options?: turbo.Server.Options,
+		handler?: (req: TurboRequest, res: TurboResponse) => void,
+	): Server
 }
 
 declare module 'turbo-http/lib/request' {
@@ -49,10 +64,9 @@ declare module 'turbo-http/lib/request' {
 			onend(): void
 		}
 	}
-	interface TurboRequest extends TurboRequest.TurboRequest { }
-	class TurboRequest { }
+	interface TurboRequest extends TurboRequest.TurboRequest {}
+	class TurboRequest {}
 	export = TurboRequest
-
 }
 
 declare module 'turbo-http/lib/response' {
@@ -78,10 +92,7 @@ declare module 'turbo-http/lib/response' {
 			writev(buffers: (Buffer | string)[], lengths?: number[], cb?: () => void): void
 		}
 	}
-	interface TurboResponse extends TurboResponse.TurboResponse { }
-	class TurboResponse { }
+	interface TurboResponse extends TurboResponse.TurboResponse {}
+	class TurboResponse {}
 	export = TurboResponse
-
 }
-
-

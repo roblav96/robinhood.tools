@@ -1,7 +1,6 @@
-// 
+//
 
 declare namespace EChartsStat {
-
 	type InputData = number[][]
 	type OutputData = number[][]
 
@@ -14,7 +13,10 @@ declare namespace EChartsStat {
 		y0: number
 		sample: number[]
 	}
-	function histogram(data: number[], binMethod: 'squareRoot' | 'scott' | 'freedmanDiaconis' | 'sturges'): HistogramBins
+	function histogram(
+		data: number[],
+		binMethod: 'squareRoot' | 'scott' | 'freedmanDiaconis' | 'sturges',
+	): HistogramBins
 
 	namespace clustering {
 		interface Result {
@@ -22,7 +24,11 @@ declare namespace EChartsStat {
 			clusterAssment: OutputData
 			pointsInCluster: OutputData
 		}
-		function hierarchicalKMeans(data: InputData, clusterNumer: number, stepByStep: boolean): Result
+		function hierarchicalKMeans(
+			data: InputData,
+			clusterNumer: number,
+			stepByStep: boolean,
+		): Result
 		function kMeans(data: InputData, clusterNumer: number): Result
 	}
 
@@ -33,13 +39,21 @@ declare namespace EChartsStat {
 		gradient: number
 		intercept: number
 	}
-	function regression(regreMethod: 'exponential' | 'logarithmic' | 'polynomial', data: InputData, order?: number): RegressionResult
+	function regression(
+		regreMethod: 'exponential' | 'logarithmic' | 'polynomial',
+		data: InputData,
+		order?: number,
+	): RegressionResult
 
 	interface LinearRegressionResult {
 		gradient: number
 		intercept: number
 	}
-	function regression(regreMethod: 'linear', data: InputData, order?: number): RegressionResult<LinearRegressionResult>
+	function regression(
+		regreMethod: 'linear',
+		data: InputData,
+		order?: number,
+	): RegressionResult<LinearRegressionResult>
 
 	namespace statistics {
 		function deviation(data: number[]): number
@@ -51,10 +65,8 @@ declare namespace EChartsStat {
 		function min(data: number[]): number
 		function sum(data: number[]): number
 	}
-
 }
 
 declare module 'echarts-stat' {
 	export = EChartsStat
 }
-

@@ -1,4 +1,4 @@
-// 
+//
 
 import { PolkaRequest } from './polka.request'
 import * as core from '../../common/core'
@@ -9,11 +9,9 @@ import * as url from 'url'
 import * as boom from 'boom'
 import polka from './polka'
 
-
-
 polka.use(function securityhook(req, res, next) {
 	req.authed = false
-	
+
 	let doc = {
 		ip: security.ip(req.headers),
 		uuid: req.cookies['x-uuid'],
@@ -22,18 +20,13 @@ polka.use(function securityhook(req, res, next) {
 		bits: req.cookies['x-bits'],
 		token: req.cookies['x-token'],
 	} as Security.Doc
-	
+
 	// console.log(`doc ->`, doc)
 
 	let failed = security.isDoc(doc)
-	if (failed) return next(boom.preconditionFailed(failed, { hook: 'security' }));
+	if (failed) return next(boom.preconditionFailed(failed, { hook: 'security' }))
 	req.doc = doc
 
-	if (!req.doc.token) return next();
+	if (!req.doc.token) return next()
 	security.reqDoc(req).then(next).catch(next)
-
 })
-
-
-
-

@@ -1,4 +1,4 @@
-// 
+//
 
 declare module 'cli-color' {
 	import * as erase from 'cli-color/erase'
@@ -89,7 +89,7 @@ declare module 'cli-color' {
 
 declare module 'cli-color/trim' {
 	function ansiTrim(str: string): string
-	namespace ansiTrim { }
+	namespace ansiTrim {}
 	export = ansiTrim
 }
 
@@ -102,7 +102,11 @@ declare module 'cli-color/throbber' {
 			restart(): void
 		}
 	}
-	function setupThrobber(write: (str: string) => any, period: number, format?: clc.Format): setupThrobber.Throbber
+	function setupThrobber(
+		write: (str: string) => any,
+		period: number,
+		format?: clc.Format,
+	): setupThrobber.Throbber
 	export = setupThrobber
 }
 
@@ -129,13 +133,13 @@ declare module 'cli-color/window-size' {
 
 declare module 'cli-color/columns' {
 	function ClcColumns(value: any): any
-	namespace ClcColumns { }
+	namespace ClcColumns {}
 	export = ClcColumns
 }
 
 declare module 'cli-color/strip' {
 	function ClcStrip(value: string): string
-	namespace ClcStrip { }
+	namespace ClcStrip {}
 	export = ClcStrip
 }
 
@@ -151,8 +155,6 @@ declare module 'cli-color/erase' {
 	export = ClcErase
 }
 
-
-
 // declare module 'cli-color' {
 // 	// import * as erase from 'cli-color/erase'
 // 	namespace mm {
@@ -162,10 +164,6 @@ declare module 'cli-color/erase' {
 // 	}
 // }
 
-
-
-
-
 // import * as clc from 'cli-color'
 // declare module 'cli-color' {
 // 	namespace m {
@@ -174,5 +172,3 @@ declare module 'cli-color/erase' {
 // 		}
 // 	}
 // }
-
-

@@ -1,4 +1,4 @@
-// 
+//
 
 import Vue, { DirectiveOptions } from 'vue'
 import * as anime from 'animejs'
@@ -9,8 +9,6 @@ import * as pretty from '../../common/pretty'
 import * as utils from '../adapters/utils'
 import clock from '../../common/clock'
 
-
-
 // Vue.directive('animate-number', {
 // 	bind(el, binding, vnode) { },
 // 	inserted(el, binding, vnode) { },
@@ -20,21 +18,43 @@ import clock from '../../common/clock'
 // 	},
 // })
 
-
-
 const ALL_GESTURES = {
-	pan: 'pan', pancancel: 'pan', pandown: 'pan', panend: 'pan', panleft: 'pan', panmove: 'pan', panright: 'pan', panstart: 'pan', panup: 'pan',
-	pinch: 'pinch', pinchcancel: 'pinch', pinchend: 'pinch', pinchin: 'pinch', pinchmove: 'pinch', pinchout: 'pinch', pinchstart: 'pinch',
-	press: 'press', pressup: 'press',
-	rotate: 'rotate', rotatecancel: 'rotate', rotateend: 'rotate', rotatemove: 'rotate', rotatestart: 'rotate',
-	swipe: 'swipe', swipedown: 'swipe', swipeleft: 'swipe', swiperight: 'swipe', swipeup: 'swipe',
+	pan: 'pan',
+	pancancel: 'pan',
+	pandown: 'pan',
+	panend: 'pan',
+	panleft: 'pan',
+	panmove: 'pan',
+	panright: 'pan',
+	panstart: 'pan',
+	panup: 'pan',
+	pinch: 'pinch',
+	pinchcancel: 'pinch',
+	pinchend: 'pinch',
+	pinchin: 'pinch',
+	pinchmove: 'pinch',
+	pinchout: 'pinch',
+	pinchstart: 'pinch',
+	press: 'press',
+	pressup: 'press',
+	rotate: 'rotate',
+	rotatecancel: 'rotate',
+	rotateend: 'rotate',
+	rotatemove: 'rotate',
+	rotatestart: 'rotate',
+	swipe: 'swipe',
+	swipedown: 'swipe',
+	swipeleft: 'swipe',
+	swiperight: 'swipe',
+	swipeup: 'swipe',
 	tap: 'tap',
 }
 const GESTURES = _.uniq(Object.values(ALL_GESTURES))
 
 Vue.directive('touch', {
 	inserted(el: HTMLElement & { mc: HammerManager }, binding) {
-		if (!_.isFunction(binding.value)) return console.error(`v-touch !_.isFunction(binding.value) ->`, binding.value);
+		if (!_.isFunction(binding.value))
+			return console.error(`v-touch !_.isFunction(binding.value) ->`, binding.value)
 		if (!el.mc) {
 			el.mc = new Hammer(el, { preset: [], recognizers: [] })
 		}
@@ -44,8 +64,8 @@ Vue.directive('touch', {
 		if (!el.mc.get(gesture)) {
 			let recognizer = _.capitalize(gesture)
 			let opts = {} as RecognizerOptions
-			if (recognizer == 'Pan') opts.threshold = 5;
-			Object.keys(binding.modifiers).forEach(key => {
+			if (recognizer == 'Pan') opts.threshold = 5
+			Object.keys(binding.modifiers).forEach((key) => {
 				let direction = Hammer[`DIRECTION_${key.toUpperCase()}`]
 				if (Number.isFinite(direction)) {
 					opts.direction = direction
@@ -58,49 +78,39 @@ Vue.directive('touch', {
 	},
 	unbind(el: HTMLElement & { mc: HammerManager }) {
 		if (el.mc) {
-			Object.keys(el.mc.handlers).forEach(k => el.mc.off(k, el.mc.handlers[k]))
+			Object.keys(el.mc.handlers).forEach((k) => el.mc.off(k, el.mc.handlers[k]))
 			el.mc.destroy()
 			el.mc = null
 		}
 	},
 })
 
-
-
-Vue.directive('visible', function(el, { value, oldValue }) {
-	if (value === oldValue || !core.boolean.is(value)) return;
+Vue.directive('visible', function (el, { value, oldValue }) {
+	if (value === oldValue || !core.boolean.is(value)) return
 	el.classList.toggle('invisible', !value)
 	// anime.remove(el) // if (value == true) {// 	let t = Date.now() // 	Vue.nextTick(() => {// 		let smooth = ((Date.now() - t) * 3) // 		anime({// 			targets: el, // 			easing: 'easeInQuad', // 			delay: smooth > 10 ? smooth : 0, // 			opacity: [// 				{ value: 0, duration: 0 }, // 				{ value: 1, duration: 50 + smooth }, // 			], // 		}) // 	}) // }
 })
 
-
-
-Vue.directive('is', function(el, { arg, modifiers }, { context }) {
+Vue.directive('is', function (el, { arg, modifiers }, { context }) {
 	let classes = Object.keys(modifiers)
 	let value = context.$store.state.breakpoints[arg] as boolean
 	!value ? el.classList.remove(...classes) : el.classList.add(...classes)
 })
 
-
-
-Vue.directive('bull-bear', function(el, { value, oldValue, arg }) {
-	if ((value === oldValue && process.env.PRODUCTION) || !core.number.isFinite(value)) return;
+Vue.directive('bull-bear', function (el, { value, oldValue, arg }) {
+	if ((value === oldValue && process.env.PRODUCTION) || !core.number.isFinite(value)) return
 	arg = arg || 'has-text'
-	if (value == 0) return el.classList.remove(arg + '-danger', arg + '-success');
+	if (value == 0) return el.classList.remove(arg + '-danger', arg + '-success')
 	el.classList.toggle(arg + '-success', value > 0)
 	el.classList.toggle(arg + '-danger', value < 0)
 })
 
-Vue.directive('bg-bull-bear', function(el, { value, oldValue, arg }) {
-	if (value === oldValue || !core.number.isFinite(value)) return;
-	if (value == 0) return el.classList.remove('bg-bullish', 'bg-bearish');
+Vue.directive('bg-bull-bear', function (el, { value, oldValue, arg }) {
+	if (value === oldValue || !core.number.isFinite(value)) return
+	if (value == 0) return el.classList.remove('bg-bullish', 'bg-bearish')
 	el.classList.toggle('bg-bullish', value > 0)
 	el.classList.toggle('bg-bearish', value < 0)
 })
-
-
-
-
 
 declare module 'vue/types/vnode' {
 	export interface VNodeDirective {
@@ -114,10 +124,6 @@ declare module 'vue/types/options' {
 	}
 }
 // declare global { interface VNodeDirectiveDef extends DirectiveOptions { [key: string]: any } }
-
-
-
-
 
 // Vue.directive('timestamp', {
 // 	update(el, binding, vnode, oldVnode) {
@@ -144,8 +150,6 @@ declare module 'vue/types/options' {
 // 	// },
 // })
 
-
-
 // Vue.directive('v-price-ticker', function(el, { oldValue, value }: { oldValue: number, value: number }) {
 // 	if (value == oldValue) return;
 // 	if (!Number.isFinite(value)) return;
@@ -168,10 +172,6 @@ declare module 'vue/types/options' {
 // 	})
 // })
 
-
-
-
-
 // Vue.directive('ui-bull-bear', {
 // 	bind(el, binding, vnode) { },
 // 	inserted(el, binding, vnode) { },
@@ -183,5 +183,3 @@ declare module 'vue/types/options' {
 // 	console.log('binding ->', binding)
 // 	// console.log('breakpoints ->', JSON.parse(JSON.stringify(context.$store.state.breakpoints)))
 // })
-
-

@@ -1,4 +1,4 @@
-// 
+//
 
 import * as _ from './lodash'
 
@@ -10,10 +10,6 @@ export function observe<T>(target: T, handler: (key: keyof T) => void): T {
 		},
 	})
 }
-
-
-
-
 
 // export function observe<T>(
 // 	target: T,
@@ -59,8 +55,6 @@ export function observe<T>(target: T, handler: (key: keyof T) => void): T {
 // 	return new Proxy(target as any, config)
 // }
 
-
-
 // export default function proxy<T = any>(target: T, fn: (method: string, property: string) => void): T {
 // 	const handler = {
 // 		get(target, property, receiver) {
@@ -86,10 +80,6 @@ export function observe<T>(target: T, handler: (key: keyof T) => void): T {
 // 	return new Proxy(target as any, handler)
 // }
 
-
-
-
-
 // export function observe(this: any, keys: string[], handler: (key: string) => void) {
 // 	let i: number, len = keys.length
 // 	for (i = 0; i < len; i++) {
@@ -103,5 +93,3 @@ export function observe<T>(target: T, handler: (key: keyof T) => void): T {
 // 		})
 // 	}
 // }
-
-

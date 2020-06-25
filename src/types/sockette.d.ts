@@ -1,7 +1,6 @@
-// 
+//
 
 declare module 'sockette' {
-
 	namespace Sockette {
 		interface Options {
 			protocols: string[]
@@ -26,7 +25,4 @@ declare module 'sockette' {
 	}
 
 	export = Sockette
-
 }
-
-

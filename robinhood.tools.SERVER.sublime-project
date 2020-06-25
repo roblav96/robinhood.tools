@@ -1,25 +1,21 @@
 {
-	"folders": [{
-		"name": "robinhood.tools.SERVER",
-		"path": ".",
-		"folder_exclude_patterns": [
-			"public",
-			"assets",
-			"client",
-			"dist",
-			"node_modules"
-		],
-		"file_exclude_patterns": [
-			"client*.env",
-			"*.tsconfig.*",
-			"*.sublime*",
-			"*.gitignore*",
-			"*.debug*",
-			"*vendors.*",
-			"*tailwind*",
-			"*vue*",
-			"*license*",
-			"*readme*"
-		]
-	}]
+	"folders": [
+		{
+			"name": "robinhood.tools.SERVER",
+			"path": ".",
+			"folder_exclude_patterns": ["public", "assets", "client", "dist", "node_modules"],
+			"file_exclude_patterns": [
+				"client*.env",
+				"*.tsconfig.*",
+				"*.sublime*",
+				"*.gitignore*",
+				"*.debug*",
+				"*vendors.*",
+				"*tailwind*",
+				"*vue*",
+				"*license*",
+				"*readme*"
+			]
+		}
+	]
 }

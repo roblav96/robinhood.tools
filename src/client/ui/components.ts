@@ -1,4 +1,4 @@
-// 
+//
 
 import * as Vts from 'vue-property-decorator'
 import { mixins as Mixins } from 'vue-class-component'
@@ -10,8 +10,6 @@ import * as core from '../../common/core'
 import * as utils from '../adapters/utils'
 import * as pretty from '../adapters/pretty'
 import clock from '../../common/clock'
-
-
 
 // @Vts.Component({
 // 	template: `
@@ -40,8 +38,6 @@ import clock from '../../common/clock'
 // }
 // Vue.component('v-xscroll', VXScroll)
 
-
-
 @Vts.Component({
 	template: `
 		<b-tooltip :label="tip" position="is-right" size="is-small" animated>
@@ -54,24 +50,24 @@ class VTimestamp extends Vue {
 	fromnow = ''
 	@Vts.Prop() value: number
 	@Vts.Prop() opts: Pretty.TimeFormatOptions
-	@Vts.Watch('value') w_value() { this.sync() }
+	@Vts.Watch('value') w_value() {
+		this.sync()
+	}
 	mounted() {
-		this.sync();
+		this.sync()
 		clock.on('1s', this.sync, this)
 	}
 	beforeDestroy() {
 		clock.off('1s', this.sync, this)
 	}
 	sync() {
-		if (!Number.isFinite(this.value)) return this.fromnow = '';
+		if (!Number.isFinite(this.value)) return (this.fromnow = '')
 		let opts = this.opts ? core.clone(this.opts) : {}
 		this.fromnow = pretty.time(this.value, opts)
 		this.tip = pretty.stamp(this.value)
 	}
 }
 Vue.component('v-timestamp', VTimestamp)
-
-
 
 @Vts.Component({
 	template: `
@@ -80,7 +76,7 @@ Vue.component('v-timestamp', VTimestamp)
 	directives: {
 		digit: {
 			update(el, binding, vnode) {
-				if (!binding.value || binding.value == binding.oldValue) return;
+				if (!binding.value || binding.value == binding.oldValue) return
 				let context = vnode.context as VPriceTicker
 				anime.remove(el)
 				anime({
@@ -92,7 +88,9 @@ Vue.component('v-timestamp', VTimestamp)
 					],
 				})
 			},
-			unbind(el) { anime.remove(el) },
+			unbind(el) {
+				anime.remove(el)
+			},
 		},
 	},
 })
@@ -100,19 +98,21 @@ class VPriceTicker extends Vue {
 	black: string
 	color: string
 	theme = this.$store.state.colors.theme
-	mounted() { this.black = window.getComputedStyle(this.$el).getPropertyValue('color') }
+	mounted() {
+		this.black = window.getComputedStyle(this.$el).getPropertyValue('color')
+	}
 	@Vts.Prop() price: number
 	@Vts.Watch('price') w_number(to: number, from: number) {
-		if (!Number.isFinite(to) || !Number.isFinite(from) || to == from) return;
+		if (!Number.isFinite(to) || !Number.isFinite(from) || to == from) return
 		this.color = to > from ? this.theme.success : this.theme.danger
 	}
 	get digits() {
-		return Number.isFinite(this.price) ? pretty.number(this.price, { price: true }).split('') : []
+		return Number.isFinite(this.price)
+			? pretty.number(this.price, { price: true }).split('')
+			: []
 	}
 }
 Vue.component('v-price-ticker', VPriceTicker)
-
-
 
 @Vts.Component({
 	template: `
@@ -124,20 +124,20 @@ Vue.component('v-price-ticker', VPriceTicker)
 class VSymbolLogo extends Vue {
 	@Vts.Prop() symbol: string
 	@Vts.Prop() acronym: string
-	get src() { return 'https://storage.googleapis.com/iex/api/logos/' + this.symbol + '.png' }
+	get src() {
+		return 'https://storage.googleapis.com/iex/api/logos/' + this.symbol + '.png'
+	}
 	onerror(event: Event) {
 		let img = event.target as HTMLImageElement
 		if (img.src.includes('storage.googleapis') && this.acronym) {
-			return img.src = `https://logo.clearbit.com/${this.acronym.toLowerCase()}.com`;
+			return (img.src = `https://logo.clearbit.com/${this.acronym.toLowerCase()}.com`)
 		}
 		if (img.src.includes('storage.googleapis') || img.src.includes('logo.clearbit')) {
-			return img.src = 'https://bulma.io/images/placeholders/256x256.png'
+			return (img.src = 'https://bulma.io/images/placeholders/256x256.png')
 		}
 	}
 }
 Vue.component('v-symbol-logo', VSymbolLogo)
-
-
 
 @Vts.Component
 class VLoading extends Mixins((Buefy as any).Loading) {
@@ -157,19 +157,17 @@ class VLoading extends Mixins((Buefy as any).Loading) {
 	}
 	onresize_ = _.debounce(this.sync, 100, { leading: false, trailing: true })
 	sync() {
-		if (this.isFullPage || !this.active) return;
+		if (this.isFullPage || !this.active) return
 		let el = this.$el as HTMLElement
-		if (this.parent && this.$el.parentElement) el = this.$el.parentElement;
-		if (this.sibling && this.$el.previousSibling) el = this.$el.previousSibling as any;
+		if (this.parent && this.$el.parentElement) el = this.$el.parentElement
+		if (this.sibling && this.$el.previousSibling) el = this.$el.previousSibling as any
 		let rect = core.clone(el.getBoundingClientRect())
-		Object.keys(rect).slice(2).forEach(k => this.$el.style[k] = `${rect[k]}px`)
+		Object.keys(rect)
+			.slice(2)
+			.forEach((k) => (this.$el.style[k] = `${rect[k]}px`))
 	}
 }
 Vue.component('v-loading', VLoading)
-
-
-
-
 
 // @Vts.Component
 // class Tooltip extends Mixins((Buefy as any).Tooltip) {
@@ -197,7 +195,3 @@ Vue.component('v-loading', VLoading)
 // 	}
 // }
 // Vue.component('v-tooltip', Tooltip)
-
-
-
-

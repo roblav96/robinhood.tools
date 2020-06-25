@@ -1,4 +1,4 @@
-// 
+//
 
 declare module 'matchit' {
 	interface Match {
@@ -10,5 +10,3 @@ declare module 'matchit' {
 	export function match(url: string, routes: string[]): Match[]
 	export function exec(url: string, match: Match[]): { [key: string]: string }
 }
-
-

@@ -1,7 +1,6 @@
-// 
+//
 
 declare module 'final-pm' {
-
 	export interface Configuration {
 		'applications': Application[]
 		'config-path': string
@@ -236,5 +235,4 @@ declare module 'final-pm' {
 			static usingDomains: boolean
 		}
 	}
-
 }

@@ -1,4 +1,4 @@
-// 
+//
 
 import * as qs from 'querystring'
 import * as boom from 'boom'
@@ -7,30 +7,30 @@ import * as _ from './lodash'
 import * as hours from './hours'
 import * as http from './http'
 
-
-
 export const YH = {
-	QUOTES: 'yh:quotes'
+	QUOTES: 'yh:quotes',
 }
 
-
-
 export function toSymbol(symbol: string) {
-	if (symbol.includes('.')) return symbol.replace('.', '-');
-	if (symbol.includes('-')) return symbol.replace('-', '-P');
+	if (symbol.includes('.')) return symbol.replace('.', '-')
+	if (symbol.includes('-')) return symbol.replace('-', '-P')
 	return symbol
 }
 export function fromSymbol(symbol: string) {
-	if (symbol.includes('-P')) return symbol.replace('-P', '-');
-	if (symbol.includes('-')) return symbol.replace('-', '.');
+	if (symbol.includes('-P')) return symbol.replace('-P', '-')
+	if (symbol.includes('-')) return symbol.replace('-', '.')
 	return symbol
 }
 
 export function fixName(name: string) {
-	return name && name.replace(/&amp;+/g, '&').replace(/[Â]+/g, '').trim()
+	return (
+		name &&
+		name
+			.replace(/&amp;+/g, '&')
+			.replace(/[Â]+/g, '')
+			.trim()
+	)
 }
-
-
 
 export const SUMMARY_MODULES = [
 	'assetProfile',
@@ -72,10 +72,35 @@ export const SUMMARY_MODULES = [
 	'upgradeDowngradeHistory',
 ]
 
-
-
-export const ALL_RANGES = ['1d', '5d', '1wk', '1mo', '3mo', '6mo', 'ytd', '1y', '2y', '5y', '10y', 'max']
-export const ALL_INTERVALS = ['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo']
+export const ALL_RANGES = [
+	'1d',
+	'5d',
+	'1wk',
+	'1mo',
+	'3mo',
+	'6mo',
+	'ytd',
+	'1y',
+	'2y',
+	'5y',
+	'10y',
+	'max',
+]
+export const ALL_INTERVALS = [
+	'1m',
+	'2m',
+	'5m',
+	'15m',
+	'30m',
+	'60m',
+	'90m',
+	'1h',
+	'1d',
+	'5d',
+	'1wk',
+	'1mo',
+	'3mo',
+]
 
 export const FRAMES = {
 	'1d': '1m',
@@ -83,44 +108,47 @@ export const FRAMES = {
 	'1mo': '1h',
 	'1y': '1d',
 	'5y': '1wk',
-	'max': '1mo'
+	'max': '1mo',
 }
 export const RANGES = Object.keys(FRAMES)
 export const INTERVALS = ['1m', '2m', '5m', '15m', '30m', '1h', '1d', '1wk', '1mo']
 
-
-
 export function getChart(symbol: string, params: Partial<Yahoo.ChartParams>) {
-	return http.get(`https://query1.finance.yahoo.com/v8/finance/chart/${toSymbol(symbol)}`, {
-		query: params, proxify: !!process.env.CLIENT, retries: 3, timeout: 5000,
-	}).then(function(response: Yahoo.ApiChart) {
-		let error = _.get(response, 'chart.error') as Yahoo.ApiError
-		if (error) throw boom.badRequest(`chart.error -> ${JSON.stringify(error)}`, response);
-		let result = _.get(response, 'chart.result[0]') as Yahoo.ChartResult
-		if (!result) throw boom.expectationFailed(`!result -> ${JSON.stringify(response)}`, response);
-		let lquotes = [] as Quotes.Live[]
-		let stamps = result.timestamp
-		if (!stamps) throw boom.expectationFailed(`!stamps -> ${JSON.stringify(response)}`, response);
-		let hquotes = result.indicators.quote[0]
-		stamps.forEach((stamp, i) => {
-			if (!Number.isFinite(hquotes.close[i])) return;
-			lquotes.push({
-				open: hquotes.open[i], close: hquotes.close[i],
-				high: hquotes.high[i], low: hquotes.low[i],
-				size: hquotes.volume[i], timestamp: stamp * 1000
-			} as Quotes.Live)
+	return http
+		.get(`https://query1.finance.yahoo.com/v8/finance/chart/${toSymbol(symbol)}`, {
+			query: params,
+			proxify: !!process.env.CLIENT,
+			retries: 3,
+			timeout: 5000,
 		})
-		return lquotes.sort((a, b) => a.timestamp - b.timestamp)
-	})
+		.then(function (response: Yahoo.ApiChart) {
+			let error = _.get(response, 'chart.error') as Yahoo.ApiError
+			if (error) throw boom.badRequest(`chart.error -> ${JSON.stringify(error)}`, response)
+			let result = _.get(response, 'chart.result[0]') as Yahoo.ChartResult
+			if (!result)
+				throw boom.expectationFailed(`!result -> ${JSON.stringify(response)}`, response)
+			let lquotes = [] as Quotes.Live[]
+			let stamps = result.timestamp
+			if (!stamps)
+				throw boom.expectationFailed(`!stamps -> ${JSON.stringify(response)}`, response)
+			let hquotes = result.indicators.quote[0]
+			stamps.forEach((stamp, i) => {
+				if (!Number.isFinite(hquotes.close[i])) return
+				lquotes.push({
+					open: hquotes.open[i],
+					close: hquotes.close[i],
+					high: hquotes.high[i],
+					low: hquotes.low[i],
+					size: hquotes.volume[i],
+					timestamp: stamp * 1000,
+				} as Quotes.Live)
+			})
+			return lquotes.sort((a, b) => a.timestamp - b.timestamp)
+		})
 }
-
-
-
-
 
 declare global {
 	namespace Yahoo {
-
 		interface ApiError {
 			code: string
 			description: string
@@ -266,8 +294,5 @@ declare global {
 			symbol: string
 			response: ChartResult[]
 		}
-
 	}
 }
-
-

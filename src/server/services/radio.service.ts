@@ -1,4 +1,4 @@
-// 
+//
 
 import '../main'
 import { AddressInfo } from 'net'
@@ -8,12 +8,11 @@ import * as Sockette from 'sockette'
 import * as uws from 'uws'
 import clock from '../../common/clock'
 
-
-
 const host = '127.0.0.1'
 const port = +process.env.PORT - 1
 const wss = new uws.Server({
-	host, port,
+	host,
+	port,
 	verifyClient(incoming, next: (allow: boolean, code?: number, message?: string) => void) {
 		next(incoming.req.headers.host == `${host}:${port}`)
 	},
@@ -37,10 +36,9 @@ exithook(function onexit() {
 })
 
 wss.on('connection', function onconnection(client: Radio.Client, req: IncomingMessage) {
-
 	client.on('message', function onmessage(message: string) {
-		if (message == 'pong') return;
-		if (message == 'ping') return this.send('pong');
+		if (message == 'pong') return
+		if (message == 'ping') return this.send('pong')
 		if (message == '__onopen__') {
 			this.send('__onopen__')
 			if (wss.clients.length == +process.env.TOTAL) {
@@ -60,17 +58,10 @@ wss.on('connection', function onconnection(client: Radio.Client, req: IncomingMe
 	client.on('error', function onerror(error) {
 		console.error(`client Error -> %O`, error)
 	})
-
 })
-
-
 
 declare global {
 	namespace Radio {
-		interface Client extends uws.WebSocket {
-
-		}
+		interface Client extends uws.WebSocket {}
 	}
 }
-
-

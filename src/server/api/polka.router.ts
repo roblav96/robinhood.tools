@@ -1,4 +1,4 @@
-// 
+//
 
 import { Server as PolkaServer } from 'turbo-http'
 import { PolkaRequest } from './polka.request'
@@ -9,8 +9,6 @@ import * as Polka from 'polka'
 import * as boom from 'boom'
 import * as matchit from 'matchit'
 import * as FastestValidator from 'fastest-validator'
-
-
 
 declare global {
 	namespace Api {
@@ -23,9 +21,10 @@ declare global {
 	}
 }
 
-{ (Polka as any).Router = Polka().constructor }
+{
+	;(Polka as any).Router = Polka().constructor
+}
 export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest, PolkaResponse> {
-
 	schemas = {} as Dict<Api.RouterSchemaMap<FastestValidator.Schema>>
 	validators = {} as Dict<Api.RouterSchemaMap<FastestValidator.CompiledValidator>>
 	rhdocurls = {} as Dict<boolean>
@@ -44,7 +43,7 @@ export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest,
 		if (opts.schema) {
 			this.schemas[opts.url] = {}
 			this.validators[opts.url] = {}
-			Object.keys(opts.schema).forEach(key => {
+			Object.keys(opts.schema).forEach((key) => {
 				let schema = opts.schema[key]
 				this.schemas[opts.url][key] = schema
 				this.validators[opts.url][key] = new FastestValidator().compile(schema)
@@ -54,20 +53,23 @@ export default class PolkaRouter extends Polka.Router<PolkaServer, PolkaRequest,
 			if (opts.authed && !req.authed) {
 				return this.onError(boom.unauthorized('!req.authed'), req, res, _.noop)
 			}
-			Promise.resolve().then(() => {
-				return opts.handler(req, res)
-			}).then(data => res.send(data)).catch(error => {
-				this.onError(error, req, res, _.noop)
-			})
+			Promise.resolve()
+				.then(() => {
+					return opts.handler(req, res)
+				})
+				.then((data) => res.send(data))
+				.catch((error) => {
+					this.onError(error, req, res, _.noop)
+				})
 		})
 	}
 
 	hook(fn: (req: PolkaRequest, res: PolkaResponse) => any) {
 		this.use((req, res, next) => {
-			Promise.resolve().then(() => fn(req, res)).then(next).catch(next)
+			Promise.resolve()
+				.then(() => fn(req, res))
+				.then(next)
+				.catch(next)
 		})
 	}
-
 }
-
-

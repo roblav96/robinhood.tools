@@ -1,6 +1,4 @@
-// 
-
-
+//
 
 export const RH = {
 	IDS: 'rh:ids',
@@ -18,13 +16,8 @@ export const MICS = {
 	XNYS: 'NYSE',
 }
 
-
-
-
-
 declare global {
 	namespace Robinhood {
-
 		namespace Api {
 			interface Paginated<T = any> {
 				next: string
@@ -36,7 +29,21 @@ declare global {
 		namespace Instrument {
 			type State = 'unlisted' | 'active' | 'inactive'
 			type Tradability = 'untradable' | 'tradable' | 'position_closing_only'
-			type Type = 'wrt' | 'pfd' | 'stock' | 'etp' | 'unit' | 'adr' | 'nyrs' | 'right' | 'cef' | 'reit' | 'mlp' | 'tracking' | 'lp' | 'rlt'
+			type Type =
+				| 'wrt'
+				| 'pfd'
+				| 'stock'
+				| 'etp'
+				| 'unit'
+				| 'adr'
+				| 'nyrs'
+				| 'right'
+				| 'cef'
+				| 'reit'
+				| 'mlp'
+				| 'tracking'
+				| 'lp'
+				| 'rlt'
 		}
 		interface Instrument {
 			acronym: string
@@ -381,8 +388,5 @@ declare global {
 			verify_micro_deposits: any
 			withdrawal_limit: number
 		}
-
 	}
 }
-
-

@@ -1,4 +1,4 @@
-// 
+//
 
 import '../main'
 import * as clc from 'cli-color'
@@ -16,8 +16,6 @@ import * as security from '../../common/security'
 import * as wrk from './wrk'
 import * as redis from '../adapters/redis'
 
-
-
 async function run(url: string) {
 	console.log('run ->', url)
 	let cli = await execa('wrk', ['-t1', '-c100', '-d5s', url])
@@ -25,14 +23,16 @@ async function run(url: string) {
 }
 
 async function start() {
-
 	let urls = []
 	urls.push(`http://${process.env.HOST}:${process.env.PORT}/`)
 	urls.push(`http://${process.env.HOST}:${process.env.PORT}/api/hello`)
 	urls.push(`http://${process.env.DOMAIN}/`)
 	urls.push(`http://${process.env.DOMAIN}/api/hello`)
 
-	let results = await pAll(urls.map(v => () => run(v)), { concurrency: 1 })
+	let results = await pAll(
+		urls.map((v) => () => run(v)),
+		{ concurrency: 1 },
+	)
 
 	let table = new Table({
 		head: ['Address', 'Req/sec', 'Data/sec', 'Latency', 'Stdev', '+/- Stdev', 'Dropped'],
@@ -40,9 +40,10 @@ async function start() {
 		style: { head: ['bold', 'blue'] },
 	}) as string[][]
 
-	results.forEach(function(v, i) {
+	results.forEach(function (v, i) {
 		let parsed = url.parse(urls[i])
-		let dropped = pretty.formatNumber(v.errors.non2xx3xx) + '/' + pretty.formatNumber(v.requests.total)
+		let dropped =
+			pretty.formatNumber(v.errors.non2xx3xx) + '/' + pretty.formatNumber(v.requests.total)
 		table.push([
 			parsed.host.concat(parsed.path),
 			pretty.formatNumber(v.requests.rate),
@@ -55,17 +56,14 @@ async function start() {
 	})
 
 	let previous = await redis.main.get(rkeys.BENCHMARKS.API.PREVIOUS)
-	if (previous) process.stdout.write('\r\n' + previous + '\r\n\r\n');
+	if (previous) process.stdout.write('\r\n' + previous + '\r\n\r\n')
 	let output = table.toString()
 
 	process.stdout.write('\r\n' + output + '\r\n\r\n')
 	redis.main.set(rkeys.BENCHMARKS.API.PREVIOUS, output)
-
 }
 
-setTimeout(() => start().catch(error => console.error(`'${error.cmd}' ->`, error)), 1000)
-
-
+setTimeout(() => start().catch((error) => console.error(`'${error.cmd}' ->`, error)), 1000)
 
 // let server = turbo.createServer(function handler(req, res) { res.end() })
 // if (+process.env.INSTANCE == 2) {
@@ -86,10 +84,6 @@ setTimeout(() => start().catch(error => console.error(`'${error.cmd}' ->`, error
 // 	server.close()
 // })
 
-
-
-
-
 // if (process.env.PRIMARY) {
 // 	_.delay(async function() {
 // 		let proxy = await Pandora.getHub().getProxy({ name: 'memory' })
@@ -99,10 +93,6 @@ setTimeout(() => start().catch(error => console.error(`'${error.cmd}' ->`, error
 // 	}, 1000)
 // }
 
-
-
-
-
 // const polka = Polka({ server: turbo.createServer() })
 // polka.get('/', (req: any, res: any) => res.end())
 
@@ -111,5 +101,3 @@ setTimeout(() => start().catch(error => console.error(`'${error.cmd}' ->`, error
 // 	console.info('turbo listening ->', process.env.HOST + ':' + port)
 // 	if (process.env.PRIMARY) start().catch(error => console.error(`'${error.cmd}' ->`, error));
 // })
-
-

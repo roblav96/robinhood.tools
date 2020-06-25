@@ -1,9 +1,7 @@
-// 
+//
 
 declare module 'fastest-validator' {
-
 	namespace FastestValidator {
-
 		interface Messages {
 			array: string
 			arrayContains: string
@@ -75,7 +73,9 @@ declare module 'fastest-validator' {
 		}
 
 		type CompiledValidator = (value: any) => boolean | Invalid[]
-		interface Options { messages: Messages }
+		interface Options {
+			messages: Messages
+		}
 		class FastestValidator {
 			constructor(opts?: Options)
 			opts: Options
@@ -87,12 +87,9 @@ declare module 'fastest-validator' {
 			resolveMessage(error: any): any
 			validate(value: any, schema: any): any
 		}
-
 	}
 
-	interface FastestValidator extends FastestValidator.FastestValidator { }
-	class FastestValidator { }
+	interface FastestValidator extends FastestValidator.FastestValidator {}
+	class FastestValidator {}
 	export = FastestValidator
-
 }
-

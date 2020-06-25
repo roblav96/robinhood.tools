@@ -1,6 +1,6 @@
-// 
+//
 // ████  COLOR  ████
-// 
+//
 :root {
 	@for $i from 1 through length($colors) {
 		$color: nth($colors, $i);
@@ -8,15 +8,13 @@
 		$hex: nth($color, 2);
 		--#{$name}: #{nth($hex, 1)};
 	}
-	@each $name,
-	$shade in $shades {
+	@each $name, $shade in $shades {
 		--#{$name}: #{$shade};
 	}
 	--border: #{$border};
 }
 
-@each $name,
-$pair in $colors {
+@each $name, $pair in $colors {
 	$color: nth($pair, 1);
 	.hover-#{$name}:hover {
 		color: #{$color} !important;
@@ -28,8 +26,7 @@ $pair in $colors {
 	}
 }
 
-@each $name,
-$shade in $shades {
+@each $name, $shade in $shades {
 	.hover-#{$name}:hover {
 		color: #{$shade} !important;
 	}
@@ -73,9 +70,9 @@ hr {
 	border-bottom: 0.5px solid $border;
 }
 
-// 
+//
 // ████  ICON  ████
-// 
+//
 @each $dim in $dimensions {
 	.icon.is-#{$dim}x#{$dim} {
 		width: $dim + px !important;
@@ -86,9 +83,9 @@ hr {
 	}
 }
 
-// 
+//
 // ████  NAVBAR  ████
-// 
+//
 html.has-navbar-fixed-top .router-view.is-fullheight,
 html.has-navbar-fixed-top .hero.is-fullheight {
 	min-height: calc(100vh - #{$navbar-height});
@@ -103,17 +100,28 @@ html.has-navbar-fixed-top .router-view.is-max-fullheight {
 	background-color: $navbar-item-hover-background-color;
 }
 
-// 
+//
 // ████  ANIMATION  ████
-// 
+//
 @each $key,
-$value in (('', $speed), ('-slow', $speed-slow), ('-slower', $speed-slower), ('-slowest', 500ms), ('-1s', 1s), ('-2s', 2s), ('-3s', 3s), ('-debug', 3s)) {
+	$value
+		in (
+			('', $speed),
+			('-slow', $speed-slow),
+			('-slower', $speed-slower),
+			('-slowest', 500ms),
+			('-1s', 1s),
+			('-2s', 2s),
+			('-3s', 3s),
+			('-debug', 3s)
+		)
+{
 	.animated#{$key} {
 		animation-duration: $value !important;
 		animation-fill-mode: both;
 	}
 }
 
-// 
-// 
+//
+//
 //

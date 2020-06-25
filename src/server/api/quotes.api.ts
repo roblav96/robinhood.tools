@@ -1,4 +1,4 @@
-// 
+//
 
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
@@ -13,8 +13,6 @@ import * as dayjs from 'dayjs'
 import * as boom from 'boom'
 import * as pAll from 'p-all'
 import polka from './polka'
-
-
 
 polka.route({
 	method: 'POST',
@@ -31,13 +29,11 @@ polka.route({
 		let types = (req.body.types || allrkeys) as Quotes.AllKeys[]
 
 		let invalids = _.difference(types, allrkeys)
-		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids });
+		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids })
 
 		return quotes.getAlls(symbols, types)
-	}
+	},
 })
-
-
 
 polka.route({
 	method: 'POST',
@@ -48,25 +44,31 @@ polka.route({
 	async handler(req, res) {
 		let symbols = req.body.symbols as string[]
 
-		let fsymbols = await redis.main.hmget(rkeys.WB.TIDS, ...symbols) as Dict<number>
+		let fsymbols = (await redis.main.hmget(rkeys.WB.TIDS, ...symbols)) as Dict<number>
 		fsymbols = redis.fixHmget(fsymbols, symbols)
-		fsymbols = _.mapValues(fsymbols, v => Number.parseInt(v as any))
+		fsymbols = _.mapValues(fsymbols, (v) => Number.parseInt(v as any))
 
-		let resolved = await pAll(symbols.map(symbol => {
-			let tid = fsymbols[symbol]
-			if (!Number.isFinite(tid)) return () => Promise.resolve([]);
-			let url = 'https://quoteapi.webull.com/api/quote/tickerDeals/' + tid
-			return () => http.get(url, { query: { count: 20 }, wbauth: true }) as Promise<Webull.Deal[]>
-		}), { concurrency: 1 })
+		let resolved = await pAll(
+			symbols.map((symbol) => {
+				let tid = fsymbols[symbol]
+				if (!Number.isFinite(tid)) return () => Promise.resolve([])
+				let url = 'https://quoteapi.webull.com/api/quote/tickerDeals/' + tid
+				return () =>
+					http.get(url, { query: { count: 20 }, wbauth: true }) as Promise<Webull.Deal[]>
+			}),
+			{ concurrency: 1 },
+		)
 
-		return resolved.map(v => v.map(vv => {
-			core.fix(vv)
-			return quotes.toDeal(vv)
-		}).sort((a, b) => b.timestamp - a.timestamp))
-	}
+		return resolved.map((v) =>
+			v
+				.map((vv) => {
+					core.fix(vv)
+					return quotes.toDeal(vv)
+				})
+				.sort((a, b) => b.timestamp - a.timestamp),
+		)
+	},
 })
-
-
 
 polka.route({
 	method: 'POST',
@@ -92,30 +94,33 @@ polka.route({
 		// 	return ['zrangebyscore', `${rkeys.LIVES}:${v}`, range[0] as any, range[1] as any]
 		// })) as string[][]
 
-		let zkeys = await redis.main.coms(symbols.map(v => {
-			return ['zrange', `${rkeys.LIVES}:${v}`, -512 as any, -1 as any]
-		})) as string[][]
-		zkeys.forEach(keys => {
-			keys.remove(key => {
+		let zkeys = (await redis.main.coms(
+			symbols.map((v) => {
+				return ['zrange', `${rkeys.LIVES}:${v}`, -512 as any, -1 as any]
+			}),
+		)) as string[][]
+		zkeys.forEach((keys) => {
+			keys.remove((key) => {
 				let stamp = Number.parseInt(key.split(':').pop())
 				return stamp < range[0]
 			})
 		})
 
-		let lives = await redis.main.coms(_.flatten(zkeys.map((keys, i) => {
-			return keys.map(key => ['hgetall', key])
-		}))) as Quotes.Live[]
+		let lives = (await redis.main.coms(
+			_.flatten(
+				zkeys.map((keys, i) => {
+					return keys.map((key) => ['hgetall', key])
+				}),
+			),
+		)) as Quotes.Live[]
 		lives.forEach(core.fix)
 
 		let ii = 0
-		return zkeys.map(keys => {
+		return zkeys.map((keys) => {
 			return keys.map(() => lives[ii++]).sort((a, b) => a.timestamp - b.timestamp)
 		})
-
-	}
+	},
 })
-
-
 
 // polka.route({
 // 	method: 'POST',
@@ -134,8 +139,3 @@ polka.route({
 // 		})
 // 	}
 // })
-
-
-
-
-

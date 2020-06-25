@@ -1,4 +1,4 @@
-// 
+//
 
 import * as _ from '../../common/lodash'
 import * as core from '../../common/core'
@@ -9,8 +9,6 @@ import * as robinhood from '../adapters/robinhood'
 import * as pAll from 'p-all'
 import * as boom from 'boom'
 import polka from './polka'
-
-
 
 polka.route({
 	method: 'POST',
@@ -25,10 +23,10 @@ polka.route({
 	},
 	handler: async function apilogin(req, res) {
 		let ishuman = await redis.main.hget(req.doc.rkey, 'ishuman')
-		if (ishuman != 'true') throw boom.unauthorized('ishuman != true');
+		if (ishuman != 'true') throw boom.unauthorized('ishuman != true')
 
 		let oauth = await robinhood.login(req.body)
-		if (oauth.mfa_required) return { mfa: true };
+		if (oauth.mfa_required) return { mfa: true }
 		if (!oauth.access_token || !oauth.refresh_token) {
 			throw boom.illegal('!oauth.token')
 		}
@@ -44,8 +42,7 @@ polka.route({
 		await redis.main.hmset(req.doc.rkey, rdoc)
 
 		return { rhusername: rdoc.rhusername } as Security.Doc
-
-	}
+	},
 })
 
 polka.route({
@@ -56,10 +53,8 @@ polka.route({
 		let revoked = await robinhood.revoke(req.doc.rhtoken)
 		let ikeys = ['rhusername', 'rhtoken', 'rhrefresh'] as KeysOf<Security.Doc>
 		await redis.main.hdel(req.doc.rkey, ...ikeys)
-	}
+	},
 })
-
-
 
 polka.route({
 	method: 'POST',
@@ -76,23 +71,23 @@ polka.route({
 		let synckeys = req.body.synckeys as string[]
 		if (!synckeys) {
 			let skips = req.body.all ? [] : ['watchlists']
-			synckeys = allsyncs.filter(k => !skips.includes(k))
+			synckeys = allsyncs.filter((k) => !skips.includes(k))
 		}
 
 		let invalids = _.difference(synckeys, allsyncs)
-		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids });
+		if (invalids.length > 0) throw boom.notAcceptable(invalids.toString(), { invalids })
 
 		let opts = { all: req.body.all == true }
-		let resolved = await pAll(synckeys.map(key => {
-			return () => robinhood.sync[key](req.doc, opts)
-		}), { concurrency: 1 })
+		let resolved = await pAll(
+			synckeys.map((key) => {
+				return () => robinhood.sync[key](req.doc, opts)
+			}),
+			{ concurrency: 1 },
+		)
 		// let resolved = await Promise.all(synckeys.map(k => robinhood.sync[k](req.doc, opts)))
 
 		let response = {} as any
-		synckeys.forEach((k, i) => response[k] = resolved[i])
+		synckeys.forEach((k, i) => (response[k] = resolved[i]))
 		return response
-
-	}
+	},
 })
-
-

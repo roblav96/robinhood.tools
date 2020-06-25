@@ -1,4 +1,4 @@
-// 
+//
 
 export * from '../../common/robinhood'
 import * as _ from '../../common/lodash'
@@ -12,8 +12,6 @@ import socket from '../adapters/socket'
 import store from '../store'
 import clock from '../../common/clock'
 
-
-
 const state = {
 	accounts: [] as Robinhood.Account[],
 	achrelationships: [] as Robinhood.AchRelationship[],
@@ -26,39 +24,50 @@ const state = {
 	user: {} as Robinhood.User,
 	watchlists: [] as Robinhood.Watchlist[],
 }
-Object.keys(state).forEach(k => state[k] = lockr.get(`rh.${k}`, state[k]))
+Object.keys(state).forEach((k) => (state[k] = lockr.get(`rh.${k}`, state[k])))
 store.register('rh', state)
-declare global { namespace Store { interface State { rh: Robinhood.State } } }
-declare global { namespace Robinhood { type State = typeof state } }
+declare global {
+	namespace Store {
+		interface State {
+			rh: Robinhood.State
+		}
+	}
+}
+declare global {
+	namespace Robinhood {
+		type State = typeof state
+	}
+}
 
-
-
-export function sync(body: {
-	synckeys?: KeysOf<Robinhood.State>
-	all?: boolean
-} = {}) {
-	return http.post('/robinhood/sync', body).catch(function(error) {
+export function sync(
+	body: {
+		synckeys?: KeysOf<Robinhood.State>
+		all?: boolean
+	} = {},
+) {
+	return http.post('/robinhood/sync', body).catch(function (error) {
 		console.error('robinhood sync Error ->', error)
 		return {}
 	}) as Promise<Robinhood.State>
 }
 
-
-
 let L_KEYS = ['accounts', 'orders', 'portfolios', 'positions'] as KeysOf<Robinhood.State>
-store.watch(state => state.security.rhusername, rhusername => {
-	if (!rhusername) return;
-	sync().then(onsync).then(function(response) {
-		console.log('robinhood sync response ->', JSON.parse(JSON.stringify(response)))
-		Object.keys(response).forEach(function(key) {
-			lockr.set(`rh.${key}`, response[key])
-		})
-		socket.offListener(onsync)
-		L_KEYS.forEach(k => socket.on(`${rkeys.RH.SYNC}:${k}`, onsync))
-	})
-})
-
-
+store.watch(
+	(state) => state.security.rhusername,
+	(rhusername) => {
+		if (!rhusername) return
+		sync()
+			.then(onsync)
+			.then(function (response) {
+				console.log('robinhood sync response ->', JSON.parse(JSON.stringify(response)))
+				Object.keys(response).forEach(function (key) {
+					lockr.set(`rh.${key}`, response[key])
+				})
+				socket.offListener(onsync)
+				L_KEYS.forEach((k) => socket.on(`${rkeys.RH.SYNC}:${k}`, onsync))
+			})
+	},
+)
 
 const P_KEYS = (({
 	accounts: 'account_number' as any,
@@ -73,7 +82,7 @@ const P_KEYS = (({
 } as typeof state) as any) as Dict<string>
 
 export function onsync(response: Robinhood.State) {
-	Object.keys(response).forEach(function(key) {
+	Object.keys(response).forEach(function (key) {
 		state[key] = response[key]
 		// let target = state[key]
 		// let source = response[key]
@@ -88,10 +97,6 @@ export function onsync(response: Robinhood.State) {
 	return response
 	// return _.mapValues(response, (v, k) => state[k])
 }
-
-
-
-
 
 // pForever(function onsync() {
 // 	return core.promise.delay(3000).then(function() {
@@ -131,5 +136,3 @@ export function onsync(response: Robinhood.State) {
 // 	})
 // 	console.log('state ->', state)
 // })
-
-

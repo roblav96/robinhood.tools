@@ -1,12 +1,8 @@
-// 
-
-
+//
 
 export const WS = {
 	DISCOVER: 'ws:discover',
 }
-
-
 
 declare global {
 	namespace Socket {
@@ -19,8 +15,3 @@ declare global {
 		}
 	}
 }
-
-
-
-
-

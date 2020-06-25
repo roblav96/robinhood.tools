@@ -1,4 +1,4 @@
-// 
+//
 
 import * as nanoid from 'nanoid'
 import * as echarts from 'echarts'
@@ -6,8 +6,6 @@ import * as ecstat from 'echarts-stat'
 import * as ti from 'technicalindicators'
 import * as ecbones from './ecbones'
 import { theme } from '../stores/colors'
-
-
 
 declare global {
 	namespace Datasets {
@@ -25,7 +23,6 @@ declare global {
 }
 
 export const templates: Partial<Datasets.Template>[] = [
-
 	// {
 	// 	id: '_ohlc',
 	// 	name: 'OHLC',
@@ -74,16 +71,11 @@ export const templates: Partial<Datasets.Template>[] = [
 		desc: 'Volume = total amount of shares traded starting at the first tick',
 		// secondary: true,
 	},
-
 ]
 
-templates.forEach(v => {
-	v.encodes.forEach(encode => {
+templates.forEach((v) => {
+	v.encodes.forEach((encode) => {
 		encode.x = 'timestamp'
-		if (!encode.tooltip) encode.tooltip = encode.y;
+		if (!encode.tooltip) encode.tooltip = encode.y
 	})
 })
-
-
-
-

@@ -1,18 +1,17 @@
-// 
+//
 
 import * as boom from 'boom'
 import polka from './polka'
 
-
-
 polka.use(function validatorhook(req, res, next) {
-	if (!req.match || !req.match.old) return next();
+	if (!req.match || !req.match.old) return next()
 
 	let schemas = polka.schemas[req.match.old]
 	let validators = polka.validators[req.match.old]
 	if (validators) {
 		let keys = Object.keys(validators)
-		let i: number, len = keys.length
+		let i: number,
+			len = keys.length
 		for (i = 0; i < len; i++) {
 			let key = keys[i]
 			let value = req[key]
@@ -20,11 +19,16 @@ polka.use(function validatorhook(req, res, next) {
 			let schema = schemas[key]
 			let schemakeys = Object.keys(schema)
 			let valuekeys = Object.keys(value)
-			let ii: number, lenn = valuekeys.length
+			let ii: number,
+				lenn = valuekeys.length
 			for (ii = 0; ii < lenn; ii++) {
 				let valuekey = valuekeys[ii]
 				if (!schemakeys.includes(valuekey)) {
-					return next(boom.preconditionFailed(`Invalid key '${valuekey}' in request ${key}`, { hook: 'validator' }))
+					return next(
+						boom.preconditionFailed(`Invalid key '${valuekey}' in request ${key}`, {
+							hook: 'validator',
+						}),
+					)
 				}
 			}
 
@@ -40,7 +44,4 @@ polka.use(function validatorhook(req, res, next) {
 	}
 
 	next()
-
 })
-
-

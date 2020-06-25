@@ -1,4 +1,4 @@
-// 
+//
 
 declare module 'ibm-design-colors/source/colors' {
 	namespace ibmdesigncolors {

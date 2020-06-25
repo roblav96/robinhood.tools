@@ -1,4 +1,4 @@
-// 
+//
 
 export * from '../../common/socket'
 import * as _ from '../../common/lodash'
@@ -10,10 +10,7 @@ import Sockette from 'sockette'
 import Emitter from '../../common/emitter'
 import clock from '../../common/clock'
 
-
-
 class Client extends Emitter<'open' | 'close' | 'error' | 'message'> {
-
 	private static readonly codes = {
 		1000: 'Normal',
 		1001: 'Going Away',
@@ -36,14 +33,12 @@ class Client extends Emitter<'open' | 'close' | 'error' | 'message'> {
 	}
 
 	private sockette: Sockette
-	constructor(
-		private address: string,
-		private options = {} as Partial<typeof Client.options>,
-	) {
+	constructor(private address: string, private options = {} as Partial<typeof Client.options>) {
 		super()
 		_.defaults(this.options, Client.options)
 		clock.on('5s', this.onping, this)
-		if (this.options.query) this.address = `${this.address}?${qs.stringify(this.options.query())}`;
+		if (this.options.query)
+			this.address = `${this.address}?${qs.stringify(this.options.query())}`
 		this.sockette = new Sockette(this.address, {
 			timeout: this.options.timeout,
 			maxAttempts: this.options.maxAttempts,
@@ -57,7 +52,7 @@ class Client extends Emitter<'open' | 'close' | 'error' | 'message'> {
 
 	alive = false
 	send(message: string) {
-		if (!this.alive) return;
+		if (!this.alive) return
 		this.sockette.send(message)
 	}
 	destroy() {
@@ -67,40 +62,39 @@ class Client extends Emitter<'open' | 'close' | 'error' | 'message'> {
 		clock.offListener(this.onping, this)
 	}
 
-	private onping() { this.send('ping') }
+	private onping() {
+		this.send('ping')
+	}
 	private onopen = (event: Event) => {
-		if (this.options.verbose) console.info(this.address, 'onopen ->', event);
+		if (this.options.verbose) console.info(this.address, 'onopen ->', event)
 		this.alive = true
 		this.emit('open', event)
 	}
 	private onclose = (event: CloseEvent) => {
 		if (this.options.verbose) {
-			let code = (Client.codes[event.code]) || event.code
-			if (!Number.isFinite(code)) code += ` (${event.code})`;
+			let code = Client.codes[event.code] || event.code
+			if (!Number.isFinite(code)) code += ` (${event.code})`
 			console.warn(this.address, 'onclose ->', code, event.reason)
 		}
 		this.alive = false
 		this.emit('close', _.pick(event, ['code', 'reason']))
 	}
 	private onerror = (error: ErrorEvent) => {
-		if (this.options.verbose) console.error(this.address, 'onerror Error ->', error.message || error);
+		if (this.options.verbose)
+			console.error(this.address, 'onerror Error ->', error.message || error)
 		this.alive = false
 		this.emit('error', error)
 	}
 	private onmessage = (event: MessageEvent) => {
 		let message = event.data as string
-		if (message == 'pong') return;
-		if (message == 'ping') return this.send('pong');
-		if (this.options.verbose) console.log(this.address, 'onmessage ->', message);
+		if (message == 'pong') return
+		if (message == 'ping') return this.send('pong')
+		if (this.options.verbose) console.log(this.address, 'onmessage ->', message)
 		this.emit('message', message)
 	}
-
 }
 
-
-
 class Socket extends Emitter {
-
 	constructor() {
 		super()
 		clock.on('1s', this.sync, this)
@@ -108,26 +102,36 @@ class Socket extends Emitter {
 
 	private clients = [] as Client[]
 	ready() {
-		let alives = this.clients.map(v => v.alive).filter(v => v).length
+		let alives = this.clients.map((v) => v.alive).filter((v) => v).length
 		return alives == this.clients.length
 	}
 
 	discover() {
-		return http.get('/websocket/discover', { retries: Infinity }).then((addresses: string[]) => {
-			// console.log('addresses ->', addresses)
-			security.cookies()
-			this.clients.forEach(v => v.destroy())
-			this.clients.splice(0, Infinity, ...addresses.map((v, i) => {
-				return new Client(v, {
-					// verbose: true,
-				}).on('open', this.onopen, this).on('close', this.onclose, this).on('message', this.onmessage, this)
-			}))
-		}).catch(error => console.error('discover Error ->', error))
+		return http
+			.get('/websocket/discover', { retries: Infinity })
+			.then((addresses: string[]) => {
+				// console.log('addresses ->', addresses)
+				security.cookies()
+				this.clients.forEach((v) => v.destroy())
+				this.clients.splice(
+					0,
+					Infinity,
+					...addresses.map((v, i) => {
+						return new Client(v, {
+							// verbose: true,
+						})
+							.on('open', this.onopen, this)
+							.on('close', this.onclose, this)
+							.on('message', this.onmessage, this)
+					}),
+				)
+			})
+			.catch((error) => console.error('discover Error ->', error))
 	}
 
 	private onopen() {
 		this.strsubs = ''
-		if (!this.ready()) return;
+		if (!this.ready()) return
 		this.emit('ready')
 	}
 	private onclose() {
@@ -136,10 +140,10 @@ class Socket extends Emitter {
 
 	private strsubs = ''
 	private sync() {
-		if (!this.ready()) return;
+		if (!this.ready()) return
 		let subs = this.eventNames()
 		let strsubs = JSON.stringify(subs)
-		if (this.strsubs == strsubs) return;
+		if (this.strsubs == strsubs) return
 		this.strsubs = strsubs
 		this.send({ action: 'sync', subs })
 	}
@@ -153,17 +157,12 @@ class Socket extends Emitter {
 	send(event: Partial<Socket.Event>) {
 		// console.log('send ->', event)
 		let message = JSON.stringify(event)
-		this.clients.forEach(v => v.send(message))
+		this.clients.forEach((v) => v.send(message))
 	}
-
 }
 
 const socket = new Socket()
 export default socket
-
-
-
-
 
 // console.info('socket ->', socket)
 // console.dir(socket)
@@ -186,10 +185,6 @@ export default socket
 // 		socket.off('where')
 // 	}, 3000)
 // }, 1000)
-
-
-
-
 
 // import * as bench from 'nanobench'
 // bench('socket.emit -> native', function({ start, end }) {
@@ -251,6 +246,3 @@ export default socket
 // 	}
 // 	end()
 // })
-
-
-

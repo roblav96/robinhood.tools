@@ -1,7 +1,6 @@
-// 
+//
 
 declare module 'nanobench' {
-
 	namespace nanobench {
 		interface Suite {
 			start(): void
@@ -14,7 +13,4 @@ declare module 'nanobench' {
 	}
 	function nanobench(name: string, run: (suite: nanobench.Suite) => void): void
 	export = nanobench
-
 }
-
-

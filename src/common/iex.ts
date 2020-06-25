@@ -1,12 +1,8 @@
-// 
-
-
+//
 
 export const IEX = {
 	ITEMS: 'iex:items',
 }
-
-
 
 export const BATCH_TYPES = [
 	'book',
@@ -25,8 +21,6 @@ export const BATCH_TYPES = [
 	'volume-by-venue',
 ]
 
-
-
 export const ISSUE_TYPES = {
 	// '': `Not Available, Warrant, Note, or Non-Filing`,
 	// '': `Not Available or Non-Filing`,
@@ -38,13 +32,12 @@ export const ISSUE_TYPES = {
 	cs: `Common Stock`,
 	et: `Exchange Traded Fund (ETF)`,
 }
-export function issueType(type = '') { return ISSUE_TYPES[type] }
-
-
+export function issueType(type = '') {
+	return ISSUE_TYPES[type]
+}
 
 declare global {
 	namespace Iex {
-
 		type BatchResponse = { [symbol: string]: Batch }
 		interface Batch {
 			'company': Company
@@ -60,7 +53,17 @@ declare global {
 			'stats': Stats
 		}
 
-		interface Item extends Relevant, News, Company, EarningsMeta, EstimatesMeta, EffectiveSpread, EffectiveSpreadMeta, FinancialsMeta, Quote, Stats {
+		interface Item
+			extends Relevant,
+				News,
+				Company,
+				EarningsMeta,
+				EstimatesMeta,
+				EffectiveSpread,
+				EffectiveSpreadMeta,
+				FinancialsMeta,
+				Quote,
+				Stats {
 			symbol: string
 		}
 
@@ -310,8 +313,5 @@ declare global {
 			systemEvent: string
 			timestamp: number
 		}
-
 	}
 }
-
-

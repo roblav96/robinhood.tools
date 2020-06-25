@@ -1,4 +1,4 @@
-// 
+//
 
 import * as benchmark from '../../common/benchmark'
 import * as Vts from 'vue-property-decorator'
@@ -15,8 +15,6 @@ import * as core from '../../common/core'
 import * as utils from '../adapters/utils'
 import * as pretty from '../adapters/pretty'
 
-
-
 @Vts.Component({
 	template: `
 		<div
@@ -25,7 +23,6 @@ import * as pretty from '../adapters/pretty'
 	`,
 })
 export default class VEChartsMixin extends Vue {
-
 	echart: echarts.ECharts
 
 	mounted() {
@@ -40,15 +37,15 @@ export default class VEChartsMixin extends Vue {
 		utils.wemitter.on('resize', this.onresize_, this)
 		utils.wemitter.on('keydown', this.onkeydown_, this)
 		utils.wemitter.on('keyup', this.onkeyup_, this)
-		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize_);
+		if (process.env.DEVELOPMENT) module.hot.addStatusHandler(this.onresize_)
 	}
 	beforeDestroy() {
-		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize_);
+		if (process.env.DEVELOPMENT) module.hot.removeStatusHandler(this.onresize_)
 		utils.wemitter.off('keyup', this.onkeyup_, this)
 		utils.wemitter.off('keydown', this.onkeydown_, this)
 		utils.wemitter.off('resize', this.onresize_, this)
 		this.$el.removeEventListener('wheel', this.onwheel_)
-		Object.keys(this.echart._$handlers).forEach(k => this.echart.off(k as any))
+		Object.keys(this.echart._$handlers).forEach((k) => this.echart.off(k as any))
 		this.echart.clear()
 		this.echart.dispose()
 		this.echart = null
@@ -63,9 +60,9 @@ export default class VEChartsMixin extends Vue {
 		this.rendered = true
 	}
 
-
-
-	getOption() { return this.echart._model.option }
+	getOption() {
+		return this.echart._model.option
+	}
 	setOption(option: Partial<echarts.Option>, opts?: Partial<echarts.OptionOptions>) {
 		let stamp = Date.now()
 		this.echart.setOption(option, opts)
@@ -81,12 +78,12 @@ export default class VEChartsMixin extends Vue {
 	ctbounds() {
 		let datazoom = this.getOption().dataZoom[0]
 		return {
-			start: datazoom.start, startValue: datazoom.startValue,
-			end: datazoom.end, endValue: datazoom.endValue,
+			start: datazoom.start,
+			startValue: datazoom.startValue,
+			end: datazoom.end,
+			endValue: datazoom.endValue,
 		}
 	}
-
-
 
 	shiftkey: boolean
 	onkeydown_(event: KeyboardEvent) {
@@ -104,8 +101,6 @@ export default class VEChartsMixin extends Vue {
 		}
 	}
 
-
-
 	brushing: boolean
 	@Vts.Watch('brushing') w_brushing(brushing: boolean) {
 		this.echart.dispatchAction({
@@ -121,8 +116,6 @@ export default class VEChartsMixin extends Vue {
 		}
 	}
 
-
-
 	dims() {
 		return {
 			width: Math.max(this.$el.offsetWidth, 256),
@@ -135,54 +128,56 @@ export default class VEChartsMixin extends Vue {
 	}
 
 	ondatazoom_ = _.debounce(this.datazoom_, 100, { leading: false, trailing: true })
-	datazoom_(event: echarts.EventData) {
-
-	}
+	datazoom_(event: echarts.EventData) {}
 	ondatazoom__ = _.debounce(this.datazoom__, 100, { leading: true, trailing: false })
 	datazoom__(event: echarts.EventData) {
-		if (this.brushing) this.brushing = false;
+		if (this.brushing) this.brushing = false
 	}
 
-	latestzoom(large = false) { }
+	latestzoom(large = false) {}
 	resetzoom() {
 		this.echart.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
 	}
 
-
-
-	onclick_(event: echarts.EventParam) {
-
-	}
+	onclick_(event: echarts.EventParam) {}
 
 	ontap_(event: HammerEvent) {
-		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.srcEvent.offsetX, event.srcEvent.offsetY])
-		if (!contains) return;
+		let contains = this.echart.containPixel({ gridIndex: 'all' }, [
+			event.srcEvent.offsetX,
+			event.srcEvent.offsetY,
+		])
+		if (!contains) return
 		if (event.tapCount == 1) {
 			this.brushing = !this.brushing && this.shiftkey
 		}
 		if (event.tapCount == 2) {
 			let grid = this.getOption().grid[0]
-			let x = core.calc.slider(event.srcEvent.offsetX - +grid.left, 0, this.$el.offsetWidth - +grid.left - +grid.right)
+			let x = core.calc.slider(
+				event.srcEvent.offsetX - +grid.left,
+				0,
+				this.$el.offsetWidth - +grid.left - +grid.right,
+			)
 			x > 90 ? this.latestzoom() : this.resetzoom()
 		}
 	}
 
-
-
 	onwheel_ = utils.raf(this.onwheel)
 	onwheel(event: WheelEvent) {
-		if (this.shiftkey) return;
-		if (Math.abs(event.wheelDeltaY) >= Math.abs(event.wheelDeltaX)) return;
-		let contains = this.echart.containPixel({ gridIndex: 'all' }, [event.offsetX, event.offsetY])
-		if (!contains) return;
+		if (this.shiftkey) return
+		if (Math.abs(event.wheelDeltaY) >= Math.abs(event.wheelDeltaX)) return
+		let contains = this.echart.containPixel({ gridIndex: 'all' }, [
+			event.offsetX,
+			event.offsetY,
+		])
+		if (!contains) return
 		let deltaX = event.deltaX
-		if (core.math.round(event.deltaX) == 0) return;
+		if (core.math.round(event.deltaX) == 0) return
 		let ctbounds = this.ctbounds()
-		if (ctbounds.start == 0 && deltaX < 0) return;
-		if (ctbounds.end == 100 && deltaX > 0) return;
+		if (ctbounds.start == 0 && deltaX < 0) return
+		if (ctbounds.end == 100 && deltaX > 0) return
 		let zoomwidth = ctbounds.end - ctbounds.start
-		if (zoomwidth == 100) return;
-		let scale = (zoomwidth / (this.$el.offsetWidth * 0.5))
+		if (zoomwidth == 100) return
+		let scale = zoomwidth / (this.$el.offsetWidth * 0.5)
 		deltaX = deltaX * scale
 		this.echart.dispatchAction({
 			type: 'dataZoom',
@@ -191,18 +186,17 @@ export default class VEChartsMixin extends Vue {
 		})
 	}
 
-
-
-	tippos: Partial<{ show: boolean, x: number, y: number }>
-	onshowtip_(event) { this.tippos = { show: true, x: event.x, y: event.y } }
-	onhidetip_(event) { this.tippos ? this.tippos.show = false : this.tippos = { show: false } }
-	reshowtip() {
-		if (!this.tippos || !this.tippos.show) return;
-		_.defer(() => this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y }))
+	tippos: Partial<{ show: boolean; x: number; y: number }>
+	onshowtip_(event) {
+		this.tippos = { show: true, x: event.x, y: event.y }
 	}
-
-
-
+	onhidetip_(event) {
+		this.tippos ? (this.tippos.show = false) : (this.tippos = { show: false })
+	}
+	reshowtip() {
+		if (!this.tippos || !this.tippos.show) return
+		_.defer(() =>
+			this.echart.dispatchAction({ type: 'showTip', x: this.tippos.x, y: this.tippos.y }),
+		)
+	}
 }
-
-

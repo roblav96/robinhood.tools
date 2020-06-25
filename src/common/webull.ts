@@ -1,10 +1,8 @@
-// 
+//
 
 import * as rkeys from './rkeys'
 import * as _ from './lodash'
 import * as core from './core'
-
-
 
 export const WB = {
 	SYMBOLS: 'wb:symbols',
@@ -15,19 +13,40 @@ export const WB = {
 	EXCHANGES: 'wb:exchanges',
 }
 
-export const forex = [
-	'BTCUSD', 'XAUUSD', 'XAGUSD',
-]
+export const forex = ['BTCUSD', 'XAUUSD', 'XAGUSD']
 export const fiats = [
-	'AUD', 'CAD', 'CHF', 'CNH', 'CNY', 'EUR', 'GBP', 'HDK', 'JPY', 'KRW', 'MXN', 'NZD', 'RUB', 'SEK', 'USD',
+	'AUD',
+	'CAD',
+	'CHF',
+	'CNH',
+	'CNY',
+	'EUR',
+	'GBP',
+	'HDK',
+	'JPY',
+	'KRW',
+	'MXN',
+	'NZD',
+	'RUB',
+	'SEK',
+	'USD',
 ]
 
 export const indexes = [
-	'ESc1', '1YMc1', 'NQc1', // futures
-	'CLc2', 'GCc2', 'SIc2', 'HGc2', // continuations
-	'RUI', 'RUT', // russell 2000
-	'FVX', 'TNX', 'TYX', // treasury bonds
-	'SRVIX', 'VIX', // volatility
+	'ESc1',
+	'1YMc1',
+	'NQc1', // futures
+	'CLc2',
+	'GCc2',
+	'SIc2',
+	'HGc2', // continuations
+	'RUI',
+	'RUT', // russell 2000
+	'FVX',
+	'TNX',
+	'TYX', // treasury bonds
+	'SRVIX',
+	'VIX', // volatility
 ]
 
 export enum ticker_status {
@@ -47,7 +66,7 @@ Object.assign(ticker_status, _.invert(ticker_status))
 
 export function getType(wbtype: number) {
 	let type = _.startCase(ticker_types[wbtype].toLowerCase())
-	if (wbtype == 3) type = ticker_types[wbtype];
+	if (wbtype == 3) type = ticker_types[wbtype]
 	return type
 }
 
@@ -104,37 +123,35 @@ export enum mqtt_topics {
 	MARKET_ETFS = 16,
 }
 
-
-
 export function fix(quote: Partial<Webull.Ticker & Webull.Quote>) {
-	if (quote.faStatus) quote.faStatus = ticker_status[quote.faStatus];
-	if (quote.status0) quote.status0 = ticker_status[quote.status0];
-	if (quote.status) quote.status = ticker_status[quote.status];
+	if (quote.faStatus) quote.faStatus = ticker_status[quote.faStatus]
+	if (quote.status0) quote.status0 = ticker_status[quote.status0]
+	if (quote.status) quote.status = ticker_status[quote.status]
 
-	if (quote.faTradeTime) quote.faTradeTime = new Date(quote.faTradeTime).valueOf();
-	if (quote.mktradeTime) quote.mktradeTime = new Date(quote.mktradeTime).valueOf();
-	if (quote.tradeTime) quote.tradeTime = new Date(quote.tradeTime).valueOf();
+	if (quote.faTradeTime) quote.faTradeTime = new Date(quote.faTradeTime).valueOf()
+	if (quote.mktradeTime) quote.mktradeTime = new Date(quote.mktradeTime).valueOf()
+	if (quote.tradeTime) quote.tradeTime = new Date(quote.tradeTime).valueOf()
 
-	Object.keys(quote).forEach(key => {
+	Object.keys(quote).forEach((key) => {
 		let value = quote[key]
-		if (key == 'symbol' || value == null) return;
+		if (key == 'symbol' || value == null) return
 		if (core.string.is(value) && !isNaN(value as any)) {
 			quote[key] = Number.parseFloat(value)
 		}
 	})
 
 	let bakeys = ['bid', 'ask']
-	bakeys.forEach(key => {
-		if (!Number.isFinite(quote[key])) delete quote[key];
+	bakeys.forEach((key) => {
+		if (!Number.isFinite(quote[key])) delete quote[key]
 		let lkey = `${key}List`
 		let list = quote[lkey] as Webull.BidAsk[]
 		if (Array.isArray(list)) {
 			if (list.length > 0) {
 				let prices = [] as number[]
 				let volumes = [] as number[]
-				list.forEach(v => {
-					if (v.price) prices.push(Number.parseFloat(v.price as any));
-					if (v.volume) volumes.push(Number.parseInt(v.volume as any));
+				list.forEach((v) => {
+					if (v.price) prices.push(Number.parseFloat(v.price as any))
+					if (v.volume) volumes.push(Number.parseInt(v.volume as any))
 				})
 				quote[key] = _.mean(prices)
 				quote[`${key}Size`] = _.sum(volumes)
@@ -145,7 +162,7 @@ export function fix(quote: Partial<Webull.Ticker & Webull.Quote>) {
 }
 
 export function fixSymbol(symbol: string) {
-	if (symbol.indexOf('-') == -1) return symbol;
+	if (symbol.indexOf('-') == -1) return symbol
 	let split = symbol.split('-')
 	let start = split.shift()
 	let end = split.pop()
@@ -155,13 +172,16 @@ export function fixSymbol(symbol: string) {
 
 export function toMinutesLives(response: Webull.MinuteChart) {
 	let lquotes = [] as Quotes.Live[]
-	response.data.forEach(data => {
-		data.tickerMinutes.forEach(minute => {
+	response.data.forEach((data) => {
+		data.tickerMinutes.forEach((minute) => {
 			let msplit = minute.split(',').map(Number.parseFloat)
 			lquotes.push({
-				open: msplit[1], close: msplit[1],
-				high: msplit[1], low: msplit[1],
-				size: msplit[2], timestamp: msplit[0] * 1000,
+				open: msplit[1],
+				close: msplit[1],
+				high: msplit[1],
+				low: msplit[1],
+				size: msplit[2],
+				timestamp: msplit[0] * 1000,
 			} as Quotes.Live)
 		})
 	})
@@ -169,23 +189,23 @@ export function toMinutesLives(response: Webull.MinuteChart) {
 }
 
 export function toKDatasLives(response: Webull.KDatasChart) {
-	return response.k.map(k => {
-		let ksplit = k.split(',').map(Number.parseFloat)
-		return {
-			open: ksplit[3], close: ksplit[2],
-			high: ksplit[4], low: ksplit[5],
-			size: ksplit[6], timestamp: ksplit[0] * 1000,
-		} as Quotes.Live
-	}).sort((a, b) => a.timestamp - b.timestamp)
+	return response.k
+		.map((k) => {
+			let ksplit = k.split(',').map(Number.parseFloat)
+			return {
+				open: ksplit[3],
+				close: ksplit[2],
+				high: ksplit[4],
+				low: ksplit[5],
+				size: ksplit[6],
+				timestamp: ksplit[0] * 1000,
+			} as Quotes.Live
+		})
+		.sort((a, b) => a.timestamp - b.timestamp)
 }
-
-
-
-
 
 declare global {
 	namespace Webull {
-
 		namespace Mqtt {
 			interface Topic {
 				type: string
@@ -261,7 +281,10 @@ declare global {
 			type: number
 		}
 
-		interface BidAsk { price: number, volume: number }
+		interface BidAsk {
+			price: number
+			volume: number
+		}
 
 		interface Deal {
 			deal: number
@@ -443,8 +466,5 @@ declare global {
 			showCode: string
 			timeZone: string
 		}
-
 	}
 }
-
-

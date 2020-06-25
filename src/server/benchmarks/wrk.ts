@@ -1,17 +1,31 @@
-// 
+//
 // https://github.com/sidorares/node-wrk
-// 
+//
 
 import * as _ from '../../common/lodash'
 
-
-
 export interface Results {
 	duration: string
-	requests: { avg: string, max: string, pStdev: number, rate: number, stdev: string, total: number }
-	transfer: { rate: string, total: string }
-	latency: { avg: string, max: string, p50: string, p75: string, p90: string, p99: string, pStdev: number, stdev: string }
-	errors: { non2xx3xx: number, connect: number, read: number, write: number, timeout: number }
+	requests: {
+		avg: string
+		max: string
+		pStdev: number
+		rate: number
+		stdev: string
+		total: number
+	}
+	transfer: { rate: string; total: string }
+	latency: {
+		avg: string
+		max: string
+		p50: string
+		p75: string
+		p90: string
+		p99: string
+		pStdev: number
+		stdev: string
+	}
+	errors: { non2xx3xx: number; connect: number; read: number; write: number; timeout: number }
 }
 
 export function parse(stdout: string) {
@@ -31,7 +45,9 @@ export function parse(stdout: string) {
 			errors++
 		}
 	}
-	let m = lines[lines.length - 4 - errors].match(/(\d+) requests in ([0-9\.]+[A-Za-z]+), ([0-9\.]+[A-Za]+)/)
+	let m = lines[lines.length - 4 - errors].match(
+		/(\d+) requests in ([0-9\.]+[A-Za-z]+), ([0-9\.]+[A-Za]+)/,
+	)
 	result.requests.total = Number.parseFloat(m[1])
 	result.duration = m[2]
 	result.transfer.total = m[3]
@@ -51,7 +67,7 @@ export function parse(stdout: string) {
 		result.latency.p90 = lines[8].split(/[\t ]+/)[2]
 		result.latency.p99 = lines[9].split(/[\t ]+/)[2]
 	}
-	Object.keys(result.latency).forEach(function(key) {
+	Object.keys(result.latency).forEach(function (key) {
 		let value = result.latency[key]
 		if (value.includes && value.includes('us')) {
 			result.latency[key] = _.round(Number.parseFloat(value) * 0.001, 3) + 'ms'
@@ -65,7 +81,7 @@ function parseErrors(line: string, result: Results) {
 	let errors = /Socket errors: connect (\d+), read (\d+), write (\d+), timeout (\d+)/
 	let match = line.match(errors)
 	if (match) {
-		result.errors = result.errors || {} as any
+		result.errors = result.errors || ({} as any)
 		result.errors.connect = Number.parseInt(match[1])
 		result.errors.read = Number.parseInt(match[2])
 		result.errors.write = Number.parseInt(match[3])
@@ -75,10 +91,8 @@ function parseErrors(line: string, result: Results) {
 	errors = /Non-2xx or 3xx responses: (\d+)/
 	match = line.match(errors)
 	if (match) {
-		result.errors = result.errors || {} as any
+		result.errors = result.errors || ({} as any)
 		result.errors.non2xx3xx = Number.parseInt(match[1])
 		return true
 	}
 }
-
-

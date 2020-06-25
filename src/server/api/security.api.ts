@@ -1,4 +1,4 @@
-// 
+//
 
 import { CookieSerializeOptions } from 'cookie'
 import * as _ from '../../common/lodash'
@@ -10,8 +10,6 @@ import * as robinhood from '../adapters/robinhood'
 import * as boom from 'boom'
 import * as url from 'url'
 import polka from './polka'
-
-
 
 polka.route({
 	method: 'GET',
@@ -26,7 +24,9 @@ polka.route({
 
 		let cookie = {
 			domain: core.HOSTNAME,
-			path: '/', sameSite: true, httpOnly: true,
+			path: '/',
+			sameSite: true,
+			httpOnly: true,
 			secure: !!process.env.PRODUCTION,
 		} as CookieSerializeOptions
 		req.doc.bits = security.randomBits(security.LENGTHS.bits)
@@ -34,22 +34,22 @@ polka.route({
 		let token = security.token(req.doc, prime)
 		res.setCookie('x-token', token, cookie)
 
-		if (!req.authed) return response;
+		if (!req.authed) return response
 
 		let ikeys = ['rhusername', 'rhtoken', 'rhrefresh'] as KeysOf<Security.Doc>
-		let rdoc = await redis.main.hmget(req.doc.rkey, ...ikeys) as Security.Doc
+		let rdoc = (await redis.main.hmget(req.doc.rkey, ...ikeys)) as Security.Doc
 		rdoc = redis.fixHmget(rdoc, ikeys)
-		if (Object.keys(rdoc).length != ikeys.length) return response;
+		if (Object.keys(rdoc).length != ikeys.length) return response
 
 		response.rhusername = rdoc.rhusername
 
-		let oauth = await robinhood.refresh(rdoc.rhrefresh).catch(function(error) {
+		let oauth = (await robinhood.refresh(rdoc.rhrefresh).catch(function (error) {
 			console.error('oauth refresh Error ->', error)
-		}) as Robinhood.Oauth
+		})) as Robinhood.Oauth
 
 		if (!oauth) {
 			console.warn('!oauth ->', oauth)
-			await robinhood.revoke(rdoc.rhtoken).catch(function(error) {
+			await robinhood.revoke(rdoc.rhtoken).catch(function (error) {
 				console.error('oauth revoke Error ->', error)
 			})
 			await redis.main.hdel(req.doc.rkey, ...ikeys)
@@ -63,6 +63,5 @@ polka.route({
 		} as Security.Doc)
 
 		return response
-
-	}
+	},
 })

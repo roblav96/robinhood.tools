@@ -1,4 +1,4 @@
-// 
+//
 
 import * as boom from 'boom'
 
@@ -7,5 +7,3 @@ declare module 'boom' {
 		isBoom: boolean
 	}
 }
-
-

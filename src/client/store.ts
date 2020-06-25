@@ -1,17 +1,23 @@
-// 
+//
 
 import Vue, { ComponentOptions } from 'vue'
 import Vuex, { Store } from 'vuex'
 import * as core from '../common/core'
 
-
-
 const state = {
 	backdrop: false,
 } as Store.State
-declare global { namespace Store { interface State { backdrop: boolean } } }
+declare global {
+	namespace Store {
+		interface State {
+			backdrop: boolean
+		}
+	}
+}
 
-interface VuexStore { getters: Store.Getters }
+interface VuexStore {
+	getters: Store.Getters
+}
 class VuexStore extends Vuex.Store<Store.State> {
 	register<K extends keyof Store.State>(path: K, state: Store.State[K], getters?: any) {
 		super.registerModule(path, { state, getters })
@@ -24,7 +30,8 @@ class VuexStore extends Vuex.Store<Store.State> {
 }
 
 const store = new VuexStore({
-	state, strict: false,
+	state,
+	strict: false,
 	plugins: [],
 	getters: {},
 })
@@ -32,14 +39,15 @@ export default store
 
 // setImmediate(() => console.log('store.getters ->', store.getters))
 
-
-
 let load = require.context('./stores/', true, /\.ts$/)
-load.keys().forEach(file => load(file))
+load.keys().forEach((file) => load(file))
 
-
-
-declare global { namespace Store { interface State { } interface Getters { } } }
+declare global {
+	namespace Store {
+		interface State {}
+		interface Getters {}
+	}
+}
 
 declare module 'vue/types/options' {
 	export interface ComponentOptions<V extends Vue> {
@@ -52,5 +60,3 @@ declare module 'vue/types/vue' {
 		$store: VuexStore
 	}
 }
-
-

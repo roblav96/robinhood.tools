@@ -1,7 +1,6 @@
-// 
+//
 
 declare module 'signal-exit' {
-
 	namespace SignalExit {
 		interface Handler {
 			(code: number, signal: NodeJS.Signals): void
@@ -12,7 +11,4 @@ declare module 'signal-exit' {
 	}
 	function SignalExit(handler: SignalExit.Handler, opts?: SignalExit.Options): void
 	export = SignalExit
-
 }
-
-

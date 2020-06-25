@@ -1,4 +1,4 @@
-// 
+//
 
 import * as chalk from 'chalk'
 
@@ -7,5 +7,3 @@ declare module 'chalk' {
 		(...text: (string | number)[]): string
 	}
 }
-
-

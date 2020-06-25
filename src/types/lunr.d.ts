@@ -1,4 +1,4 @@
-// 
+//
 
 import * as lunr from 'lunr'
 
@@ -23,5 +23,3 @@ declare module 'lunr' {
 		term(term: string, options: Partial<Query.Clause>): Query
 	}
 }
-
-

@@ -1,4 +1,4 @@
-// 
+//
 
 import Vue from 'vue'
 import VueRouter, { RouteConfig, Route } from 'vue-router'
@@ -6,17 +6,16 @@ import * as _ from '../common/lodash'
 import * as core from '../common/core'
 import store from './store'
 
-
-
 export const routes = [
-
 	{
-		name: 'home', path: '/',
+		name: 'home',
+		path: '/',
 		component: () => import('./routes/home/home'),
 	},
 
 	{
-		name: 'lists', path: '/lists',
+		name: 'lists',
+		path: '/lists',
 		meta: { icon: 'format-list-bulleted' },
 		component: () => import('./routes/lists/lists'),
 	},
@@ -37,38 +36,48 @@ export const routes = [
 	// },
 
 	{
-		name: 'symbol', path: '/symbol/:symbol',
+		name: 'symbol',
+		path: '/symbol/:symbol',
 		meta: { nofooter: true, doctitle: false },
 		component: () => import('./routes/symbol/symbol'),
 		beforeEnter(to, from, next) {
 			let symbol = to.params.symbol as string
-			if (symbol == symbol.toUpperCase()) return next();
-			if (symbol.endsWith('1') || symbol.endsWith('2')) return next();
-			next(_.merge(_.clone(to), { params: { symbol: symbol.toUpperCase() } } as Partial<Route>))
+			if (symbol == symbol.toUpperCase()) return next()
+			if (symbol.endsWith('1') || symbol.endsWith('2')) return next()
+			next(
+				_.merge(_.clone(to), { params: { symbol: symbol.toUpperCase() } } as Partial<
+					Route
+				>),
+			)
 		},
 		children: [
 			{
-				name: 'symbol.summary', path: 'summary',
+				name: 'symbol.summary',
+				path: 'summary',
 				meta: { icon: 'bulletin-board' },
 				component: () => import('./routes/symbol/symbol.summary'),
 			},
 			{
-				name: 'symbol.chart', path: 'chart',
+				name: 'symbol.chart',
+				path: 'chart',
 				meta: { icon: 'chart-line' },
 				component: () => import('./routes/symbol/symbol.chart'),
 			},
 			{
-				name: 'symbol.news', path: 'news',
+				name: 'symbol.news',
+				path: 'news',
 				meta: { icon: 'newspaper' },
 				component: () => import('./routes/symbol/symbol.news'),
 			},
 			{
-				name: 'symbol.history', path: 'history',
+				name: 'symbol.history',
+				path: 'history',
 				meta: { icon: 'calendar-clock' },
 				component: () => import('./routes/symbol/symbol.history'),
 			},
 			{
-				name: 'symbol.debug', path: 'debug',
+				name: 'symbol.debug',
+				path: 'debug',
 				meta: { icon: 'bug' },
 				component: () => import('./routes/symbol/symbol.debug'),
 			},
@@ -103,28 +112,27 @@ export const routes = [
 	// },
 
 	{
-		name: 'styleguide', path: '/styleguide',
+		name: 'styleguide',
+		path: '/styleguide',
 		component: () => import('./routes/styleguide/styleguide'),
 	},
 
 	{ path: '*', redirect: { name: 'home' } },
-
 ] as Array<RouteConfig>
 
-
-
 const router = new VueRouter({
-	routes, mode: 'history',
+	routes,
+	mode: 'history',
 	linkActiveClass: '',
 	linkExactActiveClass: 'is-active',
-	scrollBehavior: function(to, from, saved) {
+	scrollBehavior: function (to, from, saved) {
 		to.meta.scroll = saved
-		if (!from.name || saved) return;
+		if (!from.name || saved) return
 		return { x: 0, y: 0 }
 	},
 })
 
-router.afterEach(function(to, from) {
+router.afterEach(function (to, from) {
 	let route = to.matched[0] || to
 	if (route.meta.doctitle != false) {
 		document.title = route.meta.title || _.startCase(route.name)
@@ -133,15 +141,11 @@ router.afterEach(function(to, from) {
 
 export default router
 
-
-
-
-
 declare module 'vue-router/types/router' {
 	export interface VueRouter {
 		options: RouterOptions
 	}
 }
-declare global { type VueRouteConfig = RouteConfig }
-
-
+declare global {
+	type VueRouteConfig = RouteConfig
+}

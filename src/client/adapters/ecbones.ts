@@ -1,4 +1,4 @@
-// 
+//
 
 import deepmerge from 'deepmerge'
 import * as echarts from 'echarts'
@@ -9,8 +9,6 @@ import * as pretty from './pretty'
 import * as charts from './charts'
 import * as utils from './utils'
 import { theme } from '../stores/colors'
-
-
 
 export const SETTINGS = {
 	fontsize: 14,
@@ -24,11 +22,7 @@ export const SETTINGS = {
 	progressiveThreshold: () => Math.round(utils.screen().width / 2),
 }
 
-
-
-export function option(
-	mods = {} as Partial<echarts.Option>,
-) {
+export function option(mods = {} as Partial<echarts.Option>) {
 	let option = {
 		animation: false,
 		color: Array(16).fill(theme['grey-lighter']),
@@ -36,46 +30,58 @@ export function option(
 		dataset: [],
 		legend: { show: !!mods.legend },
 		toolbox: { show: !!mods.toolbox },
-		tooltip: [{
-			show: true,
-			// showContent: !process.env.DEVELOPMENT,
-			// alwaysShowContent: !!process.env.DEVELOPMENT,
-			trigger: 'axis',
-			triggerOn: 'mousemove',
-			// position: [10, 10],
-			// position: (point, params, el, rect, size) => {
-			// 	return [point[0] - (size.contentSize[0] / 2), 0];
-			// },
-			confine: true,
-			enterable: false,
-			showDelay: 0,
-			hideDelay: 0,
-			transitionDuration: 0,
-			// padding: 0,
-			padding: [0, 0, 0, 32],
-			backgroundColor: 'transparent',
-			// formatter: '{a}: {b1}<br>{c}: {d0}',
-			// extraCssText: `border: 0.125rem solid ${theme['grey-darker']};`,
-			axisPointer: {
-				type: 'cross',
-				animation: false,
-				shadowStyle: { opacity: 0 },
-				lineStyle: { color: theme['grey-lightest'] },
-				crossStyle: { color: theme['grey-lighter'] },
-				label: {
-					formatter(params) { return charts.xlabel(params.value) },
-					backgroundColor: theme.white, shadowBlur: 0, margin: 0,
-					borderColor: theme['grey-light'], borderWidth: 1,
-					textStyle: {
-						color: theme.dark, borderRadius: 0,
-						fontSize: SETTINGS.fontsize, padding: [4, 8], fontWeight: 'bold',
+		tooltip: [
+			{
+				show: true,
+				// showContent: !process.env.DEVELOPMENT,
+				// alwaysShowContent: !!process.env.DEVELOPMENT,
+				trigger: 'axis',
+				triggerOn: 'mousemove',
+				// position: [10, 10],
+				// position: (point, params, el, rect, size) => {
+				// 	return [point[0] - (size.contentSize[0] / 2), 0];
+				// },
+				confine: true,
+				enterable: false,
+				showDelay: 0,
+				hideDelay: 0,
+				transitionDuration: 0,
+				// padding: 0,
+				padding: [0, 0, 0, 32],
+				backgroundColor: 'transparent',
+				// formatter: '{a}: {b1}<br>{c}: {d0}',
+				// extraCssText: `border: 0.125rem solid ${theme['grey-darker']};`,
+				axisPointer: {
+					type: 'cross',
+					animation: false,
+					shadowStyle: { opacity: 0 },
+					lineStyle: { color: theme['grey-lightest'] },
+					crossStyle: { color: theme['grey-lighter'] },
+					label: {
+						formatter(params) {
+							return charts.xlabel(params.value)
+						},
+						backgroundColor: theme.white,
+						shadowBlur: 0,
+						margin: 0,
+						borderColor: theme['grey-light'],
+						borderWidth: 1,
+						textStyle: {
+							color: theme.dark,
+							borderRadius: 0,
+							fontSize: SETTINGS.fontsize,
+							padding: [4, 8],
+							fontWeight: 'bold',
+						},
 					},
 				},
 			},
-		}],
-		axisPointer: [{
-			link: [{ xAxisIndex: 'all' }],
-		}],
+		],
+		axisPointer: [
+			{
+				link: [{ xAxisIndex: 'all' }],
+			},
+		],
 		dataZoom: [],
 		grid: [],
 		xAxis: [],
@@ -88,11 +94,7 @@ export function option(
 	return _.merge(option, mods) as echarts.Option
 }
 
-
-
-export function grid(
-	mods = {} as Partial<echarts.Grid>,
-) {
+export function grid(mods = {} as Partial<echarts.Grid>) {
 	let grid = {
 		left: SETTINGS.xpadding,
 		right: SETTINGS.xpadding,
@@ -102,8 +104,6 @@ export function grid(
 	} as echarts.Grid
 	return _.merge(grid, mods) as echarts.Grid
 }
-
-
 
 export function dataZoom(
 	opts = {} as Partial<{
@@ -135,8 +135,6 @@ export function dataZoom(
 	}
 	return _.merge(dataZoom, mods) as echarts.DataZoom
 }
-
-
 
 export function axis(
 	opts = {} as Partial<{
@@ -182,11 +180,7 @@ export function axis(
 	return _.merge(axis, mods) as echarts.Axis
 }
 
-
-
-export function series(
-	mods = {} as Partial<echarts.Series>,
-) {
+export function series(mods = {} as Partial<echarts.Series>) {
 	let series = {
 		uuid: nanoid(),
 		silent: true,
@@ -255,9 +249,9 @@ export function line(
 		line.step = 'middle'
 		line.smooth = false
 	}
-	if (opts.dashed) line.lineStyle.type = 'dashed';
-	if (opts.dotted) line.lineStyle.type = 'dotted';
-	if (opts.area) line.areaStyle = { show: true, opacity: opts.area, color: opts.color };
+	if (opts.dashed) line.lineStyle.type = 'dashed'
+	if (opts.dotted) line.lineStyle.type = 'dotted'
+	if (opts.area) line.areaStyle = { show: true, opacity: opts.area, color: opts.color }
 	return _.merge(series(line), mods) as echarts.Series
 }
 
@@ -287,44 +281,44 @@ export function bar(
 	return _.merge(series(bar), mods) as echarts.Series
 }
 
-export function candlestick(
-	mods = {} as Partial<echarts.Series>,
-) {
+export function candlestick(mods = {} as Partial<echarts.Series>) {
 	let candlestick = {
 		type: 'candlestick',
 		large: true,
 		itemStyle: {
-			color: theme.success, color0: theme.danger,
-			borderColor: theme.success, borderColor0: theme.danger, borderWidth: 1,
+			color: theme.success,
+			color0: theme.danger,
+			borderColor: theme.success,
+			borderColor0: theme.danger,
+			borderWidth: 1,
 		},
 	} as echarts.Series
 	return _.merge(series(candlestick), mods) as echarts.Series
 }
 
-
-
-export function markLine(
-	mods = {} as Partial<echarts.Mark>,
-) {
+export function markLine(mods = {} as Partial<echarts.Mark>) {
 	let markLine = {
 		animation: false,
 		silent: true,
 		precision: -1,
 		symbol: 'none',
 		label: {
-			backgroundColor: theme.white, borderColor: theme['grey-light'], borderWidth: 1,
-			textStyle: { color: theme.dark, fontSize: SETTINGS.fontsize, fontWeight: 'bold', padding: 4 },
+			backgroundColor: theme.white,
+			borderColor: theme['grey-light'],
+			borderWidth: 1,
+			textStyle: {
+				color: theme.dark,
+				fontSize: SETTINGS.fontsize,
+				fontWeight: 'bold',
+				padding: 4,
+			},
 		},
 		lineStyle: { type: 'dashed', color: theme['grey-light'], opacity: 0.5, width: 1 },
 	} as echarts.Mark
 	return _.merge(markLine, mods) as echarts.Mark
 }
 
-
-
-export function visualMap(
-	mods = {} as Partial<echarts.VisualMap>,
-) {
+export function visualMap(mods = {} as Partial<echarts.VisualMap>) {
 	let visualMap = {
 		show: true,
 		seriesIndex: 0,
@@ -335,5 +329,3 @@ export function visualMap(
 	} as echarts.VisualMap
 	return _.merge(visualMap, mods) as echarts.VisualMap
 }
-
-
