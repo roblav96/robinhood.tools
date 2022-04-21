@@ -50,7 +50,7 @@ module.exports = {
 		}
 
 		// config.plugins.push(tailwindcss(path.join(__dirname, 'src/client/styles/tailwind.js')))
-		config.plugins.push(new webpack.ProvidePlugin({ Promise: 'zousan/src/zousan' }))
+		// config.plugins.push(new webpack.ProvidePlugin({ Promise: 'zousan/src/zousan' }))
 
 		// config.plugins.push(new BundleAnalyzerPlugin())
 	},
