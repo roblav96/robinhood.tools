@@ -1,7 +1,7 @@
 //
 
-global.WebSocket = require('uws')
 // global.Promise = require('zousan')
+global.WebSocket = require('ws')
 
 require('../common/polyfills')
 require('bluebird').config({ warnings: { wForgottenReturn: false } })

@@ -2,7 +2,7 @@
 
 import * as _ from './lodash'
 import * as qs from 'querystring'
-import * as uws from 'uws'
+import * as uws from 'ws'
 import * as url from 'url'
 import * as core from './core'
 import Emitter from './emitter'
@@ -49,7 +49,7 @@ export default class WebSocketClient extends Emitter<'open' | 'close' | 'error' 
 		if (this.options.connect) this.connect()
 	}
 
-	ws: WebSocket & uws
+	ws: WebSocket & uws.WebSocket
 	alive() {
 		return this.ws && this.ws.readyState == this.ws.OPEN
 	}

@@ -5,7 +5,7 @@ import { AddressInfo } from 'net'
 import { IncomingMessage } from 'http'
 import * as exithook from 'exit-hook'
 import * as Sockette from 'sockette'
-import * as uws from 'uws'
+import * as uws from 'ws'
 import clock from '../../common/clock'
 
 const host = '127.0.0.1'

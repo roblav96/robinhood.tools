@@ -1,7 +1,7 @@
 //
 
 import * as Sockette from 'sockette'
-import * as uws from 'uws'
+import * as uws from 'ws'
 import * as fastjsonparse from 'fast-json-parse'
 import * as security from './security'
 import * as _ from '../../common/lodash'
