@@ -1,3 +1,3 @@
-# [https://robinhood.tools/](https://robinhood.tools/)
+# robinhood.tools
 
 Advanced trading tools and resources for Robinhood Web.
